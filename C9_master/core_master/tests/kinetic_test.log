@@ -1,0 +1,5 @@
+Running suite(s): Matrix
+100%: Checks: 2, Failures: 0, Errors: 0
+kinetic_tests/matrix_test.c:54:P:Core:test_subtractvec3_t:0: Passed
+kinetic_tests/matrix_test.c:68:P:Limits:test_subtractvec3_t_neg:0: Passed
+PASS kinetic_test (exit status: 0)
