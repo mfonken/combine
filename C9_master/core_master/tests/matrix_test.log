@@ -1,0 +1,31 @@
+Running suite(s): Matrix
+100%: Checks: 28, Failures: 0, Errors: 0
+kinetic_tests/matrix_test.c:75:P:Core:test_subtractvec3_t:0: Passed
+kinetic_tests/matrix_test.c:107:P:Core:test_lengthOfvec3_t:0: Passed
+kinetic_tests/matrix_test.c:137:P:Core:test_lengthOfvec2_t:0: Passed
+kinetic_tests/matrix_test.c:170:P:Core:test_normalizevec3_t:0: Passed
+kinetic_tests/matrix_test.c:209:P:Core:test_get2dDistance:0: Passed
+kinetic_tests/matrix_test.c:258:P:Core:test_Multiply_Vec_3x1:0: Passed
+kinetic_tests/matrix_test.c:322:P:Core:test_Euler_To_Quaternion:0: Passed
+kinetic_tests/matrix_test.c:375:P:Core:test_Quaternion_To_Matrix:0: Passed
+kinetic_tests/matrix_test.c:444:P:Core:test_Rotate_Vector_By_Quaternion:0: Passed
+kinetic_tests/matrix_test.c:533:P:Core:test_Quaternion_Combine:0: Passed
+kinetic_tests/matrix_test.c:92:P:Limits:test_subtractvec3_t_neg:0: Passed
+kinetic_tests/matrix_test.c:117:P:Limits:test_lengthOfvec3_t_neg:0: Passed
+kinetic_tests/matrix_test.c:127:P:Limits:test_lengthOfvec3_t_zero:0: Passed
+kinetic_tests/matrix_test.c:146:P:Limits:test_lengthOfvec2_t_neg:0: Passed
+kinetic_tests/matrix_test.c:183:P:Limits:test_normalizevec3_t_neg:0: Passed
+kinetic_tests/matrix_test.c:196:P:Limits:test_normalizevec3_t_zero:0: Passed
+kinetic_tests/matrix_test.c:221:P:Limits:test_get2dDistance_neg:0: Passed
+kinetic_tests/matrix_test.c:233:P:Limits:test_get2dDistance_zero:0: Passed
+kinetic_tests/matrix_test.c:282:P:Limits:test_Multiply_Vec_3x1_neg:0: Passed
+kinetic_tests/matrix_test.c:306:P:Limits:test_Multiply_Vec_3x1_zero:0: Passed
+kinetic_tests/matrix_test.c:337:P:Limits:test_Euler_To_Quaternion_neg:0: Passed
+kinetic_tests/matrix_test.c:352:P:Limits:test_Euler_To_Quaternion_zero:0: Passed
+kinetic_tests/matrix_test.c:397:P:Limits:test_Quaternion_To_Matrix_neg:0: Passed
+kinetic_tests/matrix_test.c:419:P:Limits:test_Quaternion_To_Matrix_zero:0: Passed
+kinetic_tests/matrix_test.c:469:P:Limits:test_Rotate_Vector_By_Quaternion_neg:0: Passed
+kinetic_tests/matrix_test.c:493:P:Limits:test_Rotate_Vector_By_Quaternion_zero:0: Passed
+kinetic_tests/matrix_test.c:576:P:Limits:test_Quaternion_Combine_over_rotate:0: Passed
+kinetic_tests/matrix_test.c:617:P:Limits:test_Quaternion_Combine_zero:0: Passed
+PASS matrix_test (exit status: 0)

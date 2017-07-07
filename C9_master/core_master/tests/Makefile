@@ -87,8 +87,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = x86_64-apple-darwin16.6.0
 host_triplet = x86_64-apple-darwin16.6.0
-TESTS = system_test$(EXEEXT) kinetic_test$(EXEEXT)
-check_PROGRAMS = system_test$(EXEEXT) kinetic_test$(EXEEXT)
+TESTS = system_test$(EXEEXT) kalman_test$(EXEEXT) \
+	kinetic_test$(EXEEXT) matrix_test$(EXEEXT)
+check_PROGRAMS = system_test$(EXEEXT) kalman_test$(EXEEXT) \
+	kinetic_test$(EXEEXT) matrix_test$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -100,21 +102,39 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_kinetic_test_OBJECTS =  \
-	kinetic_tests/kinetic_test-matrix_test.$(OBJEXT)
-kinetic_test_OBJECTS = $(am_kinetic_test_OBJECTS)
-kinetic_test_DEPENDENCIES = $(top_builddir)/ble-module/libble.la
+am_kalman_test_OBJECTS =  \
+	kinetic_tests/kalman_test-kalman_test.$(OBJEXT)
+kalman_test_OBJECTS = $(am_kalman_test_OBJECTS)
+kalman_test_DEPENDENCIES =  \
+	$(top_builddir)/ble-module/lib_ble_kalman.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+kalman_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(kalman_test_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_kinetic_test_OBJECTS =  \
+	kinetic_tests/kinetic_test-kinetic_test.$(OBJEXT)
+kinetic_test_OBJECTS = $(am_kinetic_test_OBJECTS)
+kinetic_test_DEPENDENCIES =  \
+	$(top_builddir)/ble-module/lib_ble_kinetic.la
 kinetic_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(kinetic_test_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_matrix_test_OBJECTS =  \
+	kinetic_tests/matrix_test-matrix_test.$(OBJEXT)
+matrix_test_OBJECTS = $(am_matrix_test_OBJECTS)
+matrix_test_DEPENDENCIES =  \
+	$(top_builddir)/ble-module/lib_ble_matrix.la
+matrix_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(matrix_test_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_system_test_OBJECTS =  \
 	system_tests/system_test-startup_test.$(OBJEXT)
 system_test_OBJECTS = $(am_system_test_OBJECTS)
-system_test_DEPENDENCIES = $(top_builddir)/ble-module/libble.la
+system_test_DEPENDENCIES =  \
+	$(top_builddir)/ble-module/lib_ble_system.la
 system_test_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(system_test_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -152,8 +172,10 @@ AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(kinetic_test_SOURCES) $(system_test_SOURCES)
-DIST_SOURCES = $(kinetic_test_SOURCES) $(system_test_SOURCES)
+SOURCES = $(kalman_test_SOURCES) $(kinetic_test_SOURCES) \
+	$(matrix_test_SOURCES) $(system_test_SOURCES)
+DIST_SOURCES = $(kalman_test_SOURCES) $(kinetic_test_SOURCES) \
+	$(matrix_test_SOURCES) $(system_test_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -506,14 +528,18 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 check_override_CFLAGS = -DCHECK_TESTING
-
-#kinetic_tests/kalman_test.c $(top_builddir)/ble-module/kinetic/kalman.h
-kinetic_test_SOURCES = $(top_builddir)/ble-module/testing/ble_core_stubs.h kinetic_tests/matrix_test.c $(top_builddir)/ble-module/kinetic/matrix.h
-kinetic_test_CFLAGS = -D_THREAD_SAFE -I/opt/local/include $(check_override_CFLAGS)
-kinetic_test_LDADD = $(top_builddir)/ble-module/libble.la -L/opt/local/lib -lcheck
 system_test_SOURCES = system_tests/startup_test.c $(top_builddir)/ble-module/system/startup.h
 system_test_CFLAGS = -D_THREAD_SAFE -I/opt/local/include $(check_override_CFLAGS)
-system_test_LDADD = $(top_builddir)/ble-module/libble.la -L/opt/local/lib -lcheck
+system_test_LDADD = $(top_builddir)/ble-module/lib_ble_system.la -L/opt/local/lib -lcheck
+kalman_test_SOURCES = $(top_builddir)/ble-module/testing/ble_core_stubs.h kinetic_tests/kalman_test.c $(top_builddir)/ble-module/kinetic/kalman.h 
+kalman_test_CFLAGS = -D_THREAD_SAFE -I/opt/local/include $(check_override_CFLAGS)
+kalman_test_LDADD = $(top_builddir)/ble-module/lib_ble_kalman.la -L/opt/local/lib -lcheck
+kinetic_test_SOURCES = $(top_builddir)/ble-module/testing/ble_core_stubs.h kinetic_tests/kinetic_test.c $(top_builddir)/ble-module/kinetic/kinetic.h #$(top_builddir)/ble-module/sensors/sensor_data_types.h $(top_builddir)/ble-module/sensors/imu/LSM9DS1_regs.c $(top_builddir)/ble-module/sensors/imu/LSM9DS1_regs.h $(top_builddir)/ble-module/sensors/imu/LSM9DS1.c $(top_builddir)/ble-module/sensors/imu/LSM9DS1.h 
+kinetic_test_CFLAGS = -D_THREAD_SAFE -I/opt/local/include $(check_override_CFLAGS)
+kinetic_test_LDADD = $(top_builddir)/ble-module/lib_ble_kinetic.la -L/opt/local/lib -lcheck
+matrix_test_SOURCES = $(top_builddir)/ble-module/testing/ble_core_stubs.h kinetic_tests/matrix_test.c $(top_builddir)/ble-module/kinetic/matrix.h
+matrix_test_CFLAGS = -D_THREAD_SAFE -I/opt/local/include $(check_override_CFLAGS)
+matrix_test_LDADD = $(top_builddir)/ble-module/lib_ble_matrix.la -L/opt/local/lib -lcheck
 all: all-am
 
 .SUFFIXES:
@@ -562,13 +588,27 @@ kinetic_tests/$(am__dirstamp):
 kinetic_tests/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) kinetic_tests/$(DEPDIR)
 	@: > kinetic_tests/$(DEPDIR)/$(am__dirstamp)
-kinetic_tests/kinetic_test-matrix_test.$(OBJEXT):  \
+kinetic_tests/kalman_test-kalman_test.$(OBJEXT):  \
+	kinetic_tests/$(am__dirstamp) \
+	kinetic_tests/$(DEPDIR)/$(am__dirstamp)
+
+kalman_test$(EXEEXT): $(kalman_test_OBJECTS) $(kalman_test_DEPENDENCIES) $(EXTRA_kalman_test_DEPENDENCIES) 
+	@rm -f kalman_test$(EXEEXT)
+	$(AM_V_CCLD)$(kalman_test_LINK) $(kalman_test_OBJECTS) $(kalman_test_LDADD) $(LIBS)
+kinetic_tests/kinetic_test-kinetic_test.$(OBJEXT):  \
 	kinetic_tests/$(am__dirstamp) \
 	kinetic_tests/$(DEPDIR)/$(am__dirstamp)
 
 kinetic_test$(EXEEXT): $(kinetic_test_OBJECTS) $(kinetic_test_DEPENDENCIES) $(EXTRA_kinetic_test_DEPENDENCIES) 
 	@rm -f kinetic_test$(EXEEXT)
 	$(AM_V_CCLD)$(kinetic_test_LINK) $(kinetic_test_OBJECTS) $(kinetic_test_LDADD) $(LIBS)
+kinetic_tests/matrix_test-matrix_test.$(OBJEXT):  \
+	kinetic_tests/$(am__dirstamp) \
+	kinetic_tests/$(DEPDIR)/$(am__dirstamp)
+
+matrix_test$(EXEEXT): $(matrix_test_OBJECTS) $(matrix_test_DEPENDENCIES) $(EXTRA_matrix_test_DEPENDENCIES) 
+	@rm -f matrix_test$(EXEEXT)
+	$(AM_V_CCLD)$(matrix_test_LINK) $(matrix_test_OBJECTS) $(matrix_test_LDADD) $(LIBS)
 system_tests/$(am__dirstamp):
 	@$(MKDIR_P) system_tests
 	@: > system_tests/$(am__dirstamp)
@@ -591,7 +631,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Po
+include kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Po
+include kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Po
+include kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Po
 include system_tests/$(DEPDIR)/system_test-startup_test.Po
 
 .c.o:
@@ -618,19 +660,47 @@ include system_tests/$(DEPDIR)/system_test-startup_test.Po
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(LTCOMPILE) -c -o $@ $<
 
-kinetic_tests/kinetic_test-matrix_test.o: kinetic_tests/matrix_test.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kinetic_test-matrix_test.o -MD -MP -MF kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Tpo -c -o kinetic_tests/kinetic_test-matrix_test.o `test -f 'kinetic_tests/matrix_test.c' || echo '$(srcdir)/'`kinetic_tests/matrix_test.c
-	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Tpo kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Po
-#	$(AM_V_CC)source='kinetic_tests/matrix_test.c' object='kinetic_tests/kinetic_test-matrix_test.o' libtool=no \
+kinetic_tests/kalman_test-kalman_test.o: kinetic_tests/kalman_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kalman_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kalman_test-kalman_test.o -MD -MP -MF kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Tpo -c -o kinetic_tests/kalman_test-kalman_test.o `test -f 'kinetic_tests/kalman_test.c' || echo '$(srcdir)/'`kinetic_tests/kalman_test.c
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Tpo kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Po
+#	$(AM_V_CC)source='kinetic_tests/kalman_test.c' object='kinetic_tests/kalman_test-kalman_test.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kinetic_test-matrix_test.o `test -f 'kinetic_tests/matrix_test.c' || echo '$(srcdir)/'`kinetic_tests/matrix_test.c
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kalman_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kalman_test-kalman_test.o `test -f 'kinetic_tests/kalman_test.c' || echo '$(srcdir)/'`kinetic_tests/kalman_test.c
 
-kinetic_tests/kinetic_test-matrix_test.obj: kinetic_tests/matrix_test.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kinetic_test-matrix_test.obj -MD -MP -MF kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Tpo -c -o kinetic_tests/kinetic_test-matrix_test.obj `if test -f 'kinetic_tests/matrix_test.c'; then $(CYGPATH_W) 'kinetic_tests/matrix_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/matrix_test.c'; fi`
-	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Tpo kinetic_tests/$(DEPDIR)/kinetic_test-matrix_test.Po
-#	$(AM_V_CC)source='kinetic_tests/matrix_test.c' object='kinetic_tests/kinetic_test-matrix_test.obj' libtool=no \
+kinetic_tests/kalman_test-kalman_test.obj: kinetic_tests/kalman_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kalman_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kalman_test-kalman_test.obj -MD -MP -MF kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Tpo -c -o kinetic_tests/kalman_test-kalman_test.obj `if test -f 'kinetic_tests/kalman_test.c'; then $(CYGPATH_W) 'kinetic_tests/kalman_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/kalman_test.c'; fi`
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Tpo kinetic_tests/$(DEPDIR)/kalman_test-kalman_test.Po
+#	$(AM_V_CC)source='kinetic_tests/kalman_test.c' object='kinetic_tests/kalman_test-kalman_test.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kinetic_test-matrix_test.obj `if test -f 'kinetic_tests/matrix_test.c'; then $(CYGPATH_W) 'kinetic_tests/matrix_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/matrix_test.c'; fi`
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kalman_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kalman_test-kalman_test.obj `if test -f 'kinetic_tests/kalman_test.c'; then $(CYGPATH_W) 'kinetic_tests/kalman_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/kalman_test.c'; fi`
+
+kinetic_tests/kinetic_test-kinetic_test.o: kinetic_tests/kinetic_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kinetic_test-kinetic_test.o -MD -MP -MF kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Tpo -c -o kinetic_tests/kinetic_test-kinetic_test.o `test -f 'kinetic_tests/kinetic_test.c' || echo '$(srcdir)/'`kinetic_tests/kinetic_test.c
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Tpo kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Po
+#	$(AM_V_CC)source='kinetic_tests/kinetic_test.c' object='kinetic_tests/kinetic_test-kinetic_test.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kinetic_test-kinetic_test.o `test -f 'kinetic_tests/kinetic_test.c' || echo '$(srcdir)/'`kinetic_tests/kinetic_test.c
+
+kinetic_tests/kinetic_test-kinetic_test.obj: kinetic_tests/kinetic_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/kinetic_test-kinetic_test.obj -MD -MP -MF kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Tpo -c -o kinetic_tests/kinetic_test-kinetic_test.obj `if test -f 'kinetic_tests/kinetic_test.c'; then $(CYGPATH_W) 'kinetic_tests/kinetic_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/kinetic_test.c'; fi`
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Tpo kinetic_tests/$(DEPDIR)/kinetic_test-kinetic_test.Po
+#	$(AM_V_CC)source='kinetic_tests/kinetic_test.c' object='kinetic_tests/kinetic_test-kinetic_test.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(kinetic_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/kinetic_test-kinetic_test.obj `if test -f 'kinetic_tests/kinetic_test.c'; then $(CYGPATH_W) 'kinetic_tests/kinetic_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/kinetic_test.c'; fi`
+
+kinetic_tests/matrix_test-matrix_test.o: kinetic_tests/matrix_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(matrix_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/matrix_test-matrix_test.o -MD -MP -MF kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Tpo -c -o kinetic_tests/matrix_test-matrix_test.o `test -f 'kinetic_tests/matrix_test.c' || echo '$(srcdir)/'`kinetic_tests/matrix_test.c
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Tpo kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Po
+#	$(AM_V_CC)source='kinetic_tests/matrix_test.c' object='kinetic_tests/matrix_test-matrix_test.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(matrix_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/matrix_test-matrix_test.o `test -f 'kinetic_tests/matrix_test.c' || echo '$(srcdir)/'`kinetic_tests/matrix_test.c
+
+kinetic_tests/matrix_test-matrix_test.obj: kinetic_tests/matrix_test.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(matrix_test_CFLAGS) $(CFLAGS) -MT kinetic_tests/matrix_test-matrix_test.obj -MD -MP -MF kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Tpo -c -o kinetic_tests/matrix_test-matrix_test.obj `if test -f 'kinetic_tests/matrix_test.c'; then $(CYGPATH_W) 'kinetic_tests/matrix_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/matrix_test.c'; fi`
+	$(AM_V_at)$(am__mv) kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Tpo kinetic_tests/$(DEPDIR)/matrix_test-matrix_test.Po
+#	$(AM_V_CC)source='kinetic_tests/matrix_test.c' object='kinetic_tests/matrix_test-matrix_test.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(matrix_test_CFLAGS) $(CFLAGS) -c -o kinetic_tests/matrix_test-matrix_test.obj `if test -f 'kinetic_tests/matrix_test.c'; then $(CYGPATH_W) 'kinetic_tests/matrix_test.c'; else $(CYGPATH_W) '$(srcdir)/kinetic_tests/matrix_test.c'; fi`
 
 system_tests/system_test-startup_test.o: system_tests/startup_test.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(system_test_CFLAGS) $(CFLAGS) -MT system_tests/system_test-startup_test.o -MD -MP -MF system_tests/$(DEPDIR)/system_test-startup_test.Tpo -c -o system_tests/system_test-startup_test.o `test -f 'system_tests/startup_test.c' || echo '$(srcdir)/'`system_tests/startup_test.c
@@ -852,9 +922,23 @@ system_test.log: system_test$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+kalman_test.log: kalman_test$(EXEEXT)
+	@p='kalman_test$(EXEEXT)'; \
+	b='kalman_test'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 kinetic_test.log: kinetic_test$(EXEEXT)
 	@p='kinetic_test$(EXEEXT)'; \
 	b='kinetic_test'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+matrix_test.log: matrix_test$(EXEEXT)
+	@p='matrix_test$(EXEEXT)'; \
+	b='matrix_test'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

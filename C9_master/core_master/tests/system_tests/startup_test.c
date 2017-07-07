@@ -23,7 +23,6 @@
 #include <stdint.h>
 #include <check.h>
 #include "../ble-module/system/startup.h"
-#include "../ble-module/testing/ble_core_stubs.h"
 
 
 /* Variables */
@@ -48,7 +47,7 @@ START_TEST(test_startup)
 END_TEST
 
 
-Suite * money_suite(void)
+Suite * startup_suite(void)
 {
     Suite *s;
     TCase *tc_core;
@@ -82,7 +81,7 @@ int main(void)
 //    const char *fname = "My SRunner";
 //    void srunner_set_xml(SRunner *sr, const char *fname);
     
-    s = money_suite();
+    s = startup_suite();
     sr = srunner_create(s);
     
     srunner_run_all(sr, CK_NORMAL);

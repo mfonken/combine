@@ -61,7 +61,7 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_u_int64_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_dev_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_mode_t.h \
-  /opt/local/include/check.h \
+  check.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/__stddef_max_align_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/string.h \
@@ -71,6 +71,8 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/strings.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_string.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_common.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/math.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/float.h \
   /opt/local/include/check_stdint.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/types.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_blkcnt_t.h \
@@ -111,14 +113,15 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_va_list.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/stdio.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_stdio.h \
-  ../ble-module/system/../sensors/camera/cam_controller.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/stdbool.h \
+  ../ble-module/system/../sensors/camera/cam_controller.h \
   ../ble-module/system/../sensors/camera/../sensor_data_types.h \
-  ../ble-module/system/../sensors/camera/../imu/LSM9DS1.h \
-  ../ble-module/system/../sensors/camera/../imu/../../kinetic/kinetic_types.h \
   ../ble-module/system/../sensors/camera/../imu/LSM9DS1_regs.h \
+  ../ble-module/system/../sensors/camera/../../kinetic/kinetic_types.h \
   ../ble-module/system/../sensors/camera/../../system/utilities/data_types.h \
   ../ble-module/system/utilities/PCA9534A.h \
+  ../ble-module/system/../sensors/imu/LSM9DS1.h \
+  ../ble-module/system/../sensors/camera/../imu/../../kinetic/matrix.h \
   ../ble-module/system/../sensors/touch/CPT112S.h
 
 ../config.h:
@@ -245,7 +248,7 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/sys/_types/_mode_t.h:
 
-/opt/local/include/check.h:
+check.h:
 
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/stddef.h:
 
@@ -264,6 +267,10 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_string.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_common.h:
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/math.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/float.h:
 
 /opt/local/include/check_stdint.h:
 
@@ -345,20 +352,22 @@ system_tests/system_test-startup_test.o: system_tests/startup_test.c \
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk/usr/include/secure/_stdio.h:
 
-../ble-module/system/../sensors/camera/cam_controller.h:
-
 /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include/stdbool.h:
+
+../ble-module/system/../sensors/camera/cam_controller.h:
 
 ../ble-module/system/../sensors/camera/../sensor_data_types.h:
 
-../ble-module/system/../sensors/camera/../imu/LSM9DS1.h:
-
-../ble-module/system/../sensors/camera/../imu/../../kinetic/kinetic_types.h:
-
 ../ble-module/system/../sensors/camera/../imu/LSM9DS1_regs.h:
+
+../ble-module/system/../sensors/camera/../../kinetic/kinetic_types.h:
 
 ../ble-module/system/../sensors/camera/../../system/utilities/data_types.h:
 
 ../ble-module/system/utilities/PCA9534A.h:
+
+../ble-module/system/../sensors/imu/LSM9DS1.h:
+
+../ble-module/system/../sensors/camera/../imu/../../kinetic/matrix.h:
 
 ../ble-module/system/../sensors/touch/CPT112S.h:
