@@ -8,20 +8,24 @@
 #ifndef LSM9DS1_H_
 #define LSM9DS1_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Standard headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <math.h>
 
-#include "../utilities/i2c_sp.c"
+#include "../utilities/i2c_sp.h"
 
 /* Included types header */
 #include "LSM9DS1_types.h"
-#include "LSM9DS1_regs.c"
+#include "LSM9DS1_regs.h"
 #include "../kinetic/kinetic_types.h"
 
 /* Math headers */
-#include "../kinetic/matrix.c"
+#include "../kinetic/matrix.h"
 
 /***********************************************************************************************//**
  * @addtogroup Application
@@ -70,6 +74,8 @@
  *****************************************************************************/
 uint8_t IMU_GetRegister( uint8_t );
 
+uint8_t Mag_GetRegister( uint8_t );
+
 /**************************************************************************//**
  * \brief Set IMU Register
  * \param[in] reg Register to access
@@ -89,6 +95,7 @@ void IMU_Default(       LSM9DS1_t * );
  * \param[out] Initialization success
  *****************************************************************************/
 void IMU_Init(          LSM9DS1_t * );
+bool IMU_Verify( 	LSM9DS1_t * );
 void IMU_Update_All(    LSM9DS1_t * );
 void IMU_Update_Angles( LSM9DS1_t * );
 void IMU_Update_Accel(  LSM9DS1_t * );
@@ -126,5 +133,9 @@ double getTempC( void );
 
 /** @} (end addtogroup imu) */
 /** @} (end addtogroup Application) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* IMU_H_ */

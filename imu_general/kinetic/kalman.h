@@ -16,13 +16,7 @@ extern "C" {
 /* Standard headers */
 #include <stdio.h>
 #include <stdint.h>
-    
-#ifdef CHECK_TESTING
-//#include "../testing/ble_core_stubs.h"
-#else
-#include "clock_sp.h"
-#endif
-
+#include "../tests/test_stubs.h"
 
 /* Included types header */
 #include "kinetic_types.h"
@@ -68,14 +62,15 @@ void Kalman_Init( kalman_t *k,
  *  \param[in] k Pointer to kalman filter type
  *  \param[in] value_new    New value
  *  \param[in] rate_new     New rate
- *  \param[in] delta_time   Time difference
  **************************************************************************************************/
 void Kalman_Update( kalman_t *k,
                     double    value_new,
-                    double    rate_new,
-					double 	  delta_time );
+                    double    rate_new );
 
 /** @} (end addtogroup kinetic) */
 /** @} (end addtogroup Application) */
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* kalman_h */

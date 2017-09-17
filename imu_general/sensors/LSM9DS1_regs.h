@@ -8,12 +8,16 @@
 #ifndef LSM9DS1_REGS_h
 #define LSM9DS1_REGS_h
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
-#include "../utilities/i2c_sp.h"
-
-#define LSM9DS1_IMU_ADDR        0xd4
-#define LSM9DS1_MAG_ADDR        0x38
+#define LSM9DS1_IMU_ADDR        0x6b
+#define LSM9DS1_MAG_ADDR        0x1e
+#define IMU_WHO_AM_I_VAL	0x68
+#define MAG_WHO_AM_I_VAL	0x3d
 
 #define LSM9DS1_IMU_ADC_MAX		32768.0
 
@@ -981,5 +985,9 @@ void LSM9DS1_defaultInit( LSM9DS1_cfg_t * );
  * \brief Update LSM9DS1 registers with current global configuration
  *****************************************************************************/
 void LSM9DS1_updateRegisters( LSM9DS1_cfg_t * );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LSM9DS1_regs_h */

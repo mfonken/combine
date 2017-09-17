@@ -77,11 +77,11 @@ void Kalman_Init( kalman_t *k,
  **************************************************************************************************/
 void Kalman_Update( kalman_t *k,
                     double    value_new,
-                    double    rate_new,
-					double 	  delta_time )
+                    double    rate_new )
 {
     /* =-----= PREDICT =-----= */
     /* Predict values */
+    double delta_time = timestamp() - k->timestamp;
     k->rate       = rate_new - k->bias;
     k->value     += delta_time * k->rate;
     
@@ -111,7 +111,7 @@ void Kalman_Update( kalman_t *k,
     k->P_k[1][1] -= k->K[1] * k->P_k[0][1];
     
     k->timestamp = timestamp();
-};
+}
 
 /** @} (end addtogroup kinetic) */
 /** @} (end addtogroup Application) */

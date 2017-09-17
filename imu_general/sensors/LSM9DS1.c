@@ -40,9 +40,12 @@ double magResolutions[4] = { 0.00014, 0.00029, 0.00043, 0.00058 };
  *****************************************************************************/
 uint8_t IMU_GetRegister( uint8_t reg )
 {
-	uint8_t i2c_read_data[1];
-	I2C_Read_Reg( LSM9DS1_IMU_ADDR, reg, i2c_read_data, 1 );
-	return i2c_read_data[0];
+	return I2C_Read_Reg( LSM9DS1_IMU_ADDR, reg);
+}
+
+uint8_t Mag_GetRegister( uint8_t reg )
+{
+	return I2C_Read_Reg( LSM9DS1_MAG_ADDR, reg);
 }
 
 /**************************************************************************//**
@@ -139,6 +142,13 @@ void IMU_Init( LSM9DS1_t * imu )
 	imu->data.mag_res 		= mag_res;
 }
 
+bool IMU_Verify( LSM9DS1_t * imu )
+{
+	if(IMU_GetRegister(WHO_AM_I) != IMU_WHO_AM_I_VAL) return 0;
+	if(Mag_GetRegister(WHO_AM_I_M) != MAG_WHO_AM_I_VAL) return 0;
+	return 1;
+}
+
 /******************************************************************************
  * Motion Data Access
  *****************************************************************************/
@@ -172,7 +182,7 @@ void IMU_Update_Accel( LSM9DS1_t * imu )
 {
     /* Combine low and high byte values */
     uint8_t                    i2c_read_data[6];
-    I2C_Read_Reg( LSM9DS1_IMU_ADDR, XL_OUT, i2c_read_data, 6 );
+    I2C_Read_Regs( LSM9DS1_IMU_ADDR, XL_OUT, i2c_read_data, 6 );
     int16_t accel[3];
     accel[0] = ( i2c_read_data[1] << 8 ) | i2c_read_data[0];
     accel[1] = ( i2c_read_data[3] << 8 ) | i2c_read_data[2];
@@ -188,7 +198,7 @@ void IMU_Update_Gyro( LSM9DS1_t * imu )
 {
     /* Combine low and high byte values */
     uint8_t                    i2c_read_data[6];
-    I2C_Read_Reg( LSM9DS1_IMU_ADDR, G_OUT, i2c_read_data, 6 );
+    I2C_Read_Regs( LSM9DS1_IMU_ADDR, G_OUT, i2c_read_data, 6 );
     int16_t gyro[3];
     gyro[0] = ( i2c_read_data[1] << 8 ) | i2c_read_data[0];
     gyro[1] = ( i2c_read_data[3] << 8 ) | i2c_read_data[2];
@@ -204,7 +214,7 @@ void IMU_Update_Mag( LSM9DS1_t * imu )
 {
     /* Combine low and high byte values */
     uint8_t                    i2c_read_data[6];
-    I2C_Read_Reg( LSM9DS1_MAG_ADDR, M_OUT, i2c_read_data, 6 );
+    I2C_Read_Regs( LSM9DS1_MAG_ADDR, M_OUT, i2c_read_data, 6 );
     int16_t mag[3];
     mag[0] = ( i2c_read_data[1] << 8 ) | i2c_read_data[0];
     mag[1] = ( i2c_read_data[3] << 8 ) | i2c_read_data[2];

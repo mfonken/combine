@@ -12,9 +12,6 @@
 /***************************************************************************************************
  Local Variables
  **************************************************************************************************/
-/** Local change in time */
-//static double         delta_t;
-
 quaternion_t qp, qc, qb, qa;
 double  cos_precalc, sin_precalc;
 
@@ -25,7 +22,7 @@ double  cos_precalc, sin_precalc;
  **************************************************************************************************/
 void Kinetic_Init( LSM9DS1_t * imu, kinetic_t * kinetics )
 {
-    Camera_Rotation_Init();
+	Camera_Rotation_Init();
 	Filters_Init( imu, kinetics );
 }
 
@@ -35,9 +32,9 @@ void Kinetic_Init( LSM9DS1_t * imu, kinetic_t * kinetics )
 void Filters_Init( LSM9DS1_t * imu, kinetic_t * kinetics )
 {
 	IMU_Update_All( imu );
-    Kalman_Init( &kinetics->rotationFilter[0], imu->data.roll );
-    Kalman_Init( &kinetics->rotationFilter[1], imu->data.pitch );
-    Kalman_Init( &kinetics->rotationFilter[2], imu->data.yaw   );
+	Kalman_Init( &kinetics->rotationFilter[0], imu->data.roll );
+	Kalman_Init( &kinetics->rotationFilter[1], imu->data.pitch );
+	Kalman_Init( &kinetics->rotationFilter[2], imu->data.yaw   );
 }
 
 void Camera_Rotation_Init( void )
@@ -74,8 +71,7 @@ void Kinetic_Update_Rotation( LSM9DS1_t * imu, kinetic_t * kinetics )
     else
     {
         /* Calculate the true pitch using a kalman_t filter */
-        delta_time = seconds_since( kinetics->rotationFilter[0].timestamp );
-        Kalman_Update( &kinetics->rotationFilter[0], ang.x, imu->data.gyro[0] * DEG_TO_RAD, delta_time );
+        Kalman_Update( &kinetics->rotationFilter[0], ang.x, imu->data.gyro[0] * DEG_TO_RAD );
         kinetics->rotation[0] = kinetics->rotationFilter[0].value;
     }
     
@@ -85,13 +81,11 @@ void Kinetic_Update_Rotation( LSM9DS1_t * imu, kinetic_t * kinetics )
         imu->data.gyro[0] = -imu->data.gyro[0];
     }
     /* Calculate the true roll using a kalman_t filter */
-    delta_time = seconds_since( kinetics->rotationFilter[1].timestamp );
-    Kalman_Update( &kinetics->rotationFilter[1], ang.y, imu->data.gyro[1] * DEG_TO_RAD, delta_time );
+    Kalman_Update( &kinetics->rotationFilter[1], ang.y, imu->data.gyro[1] * DEG_TO_RAD );
     kinetics->rotation[1] = kinetics->rotationFilter[1].value;
     
     /* Calculate the true yaw using a kalman_t filter */
-    seconds_since( kinetics->rotationFilter[2].timestamp );
-    Kalman_Update( &kinetics->rotationFilter[2], ang.z, imu->data.gyro[2] * DEG_TO_RAD, delta_time );
+    Kalman_Update( &kinetics->rotationFilter[2], ang.z, imu->data.gyro[2] * DEG_TO_RAD );
     kinetics->rotation[2] = kinetics->rotationFilter[2].value;
 }
 
@@ -206,30 +200,27 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
 	Print_Char(',');
 	Print_Double_Ascii( r_f.k );
 	Print_Line("");
-    return;
 
     /* Get non-gravitational acceleration */
     vec3_t ngacc;
     IMU_Non_Grav_Get( imu, &qp, &ngacc );
-    double delta_time = 0;
     kinetics->truePositionFilter[0].value = ngacc.i;
     kinetics->truePositionFilter[1].value = ngacc.j;
     kinetics->truePositionFilter[2].value = ngacc.k;
     return;
     /* Filter calculated r_vec with acceleration > velocity */
+/*
     float n;
     n = kinetics->truePositionFilter[0].value;
-    delta_time = seconds_since( kinetics->truePositionFilter[0].timestamp );
     double x_vel = ngacc.i * delta_time;
-    Kalman_Update( &kinetics->truePositionFilter[0], r_f.i, x_vel, delta_time );
+    Kalman_Update( &kinetics->truePositionFilter[0], r_f.i, x_vel );
 
     n = kinetics->truePositionFilter[1].value;
-    delta_time = seconds_since( kinetics->truePositionFilter[1].timestamp );
 	double y_vel = ngacc.j * delta_time;
-	Kalman_Update( &kinetics->truePositionFilter[1], r_f.j, y_vel, delta_time );
+	Kalman_Update( &kinetics->truePositionFilter[1], r_f.j, y_vel );
 
 	n = kinetics->truePositionFilter[2].value;
-	delta_time = seconds_since( kinetics->truePositionFilter[2].timestamp );
 	double z_vel = ngacc.k * delta_time;
-	Kalman_Update( &kinetics->truePositionFilter[2], r_f.k, z_vel, delta_time );
+	Kalman_Update( &kinetics->truePositionFilter[2], r_f.k, z_vel );
+*/
 }

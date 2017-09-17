@@ -22,9 +22,7 @@ Local Functions
 *****************************************************************************/
 uint8_t LSM9DS1_GetRegister( uint8_t reg )
 {
-    uint8_t i2c_read_data[1];
-    I2C_Read_Reg( LSM9DS1_IMU_ADDR, reg, i2c_read_data, 1 );
-    return i2c_read_data[0];
+	return I2C_Read_Reg( LSM9DS1_IMU_ADDR, reg);
 }
 
 /**************************************************************************//**
@@ -47,9 +45,7 @@ void LSM9DS1_SetRegister( uint8_t reg, uint8_t val )
 *****************************************************************************/
 uint8_t LSM9DS1_GetMagRegister( uint8_t reg )
 {
-    uint8_t i2c_read_data[1];
-    I2C_Read_Reg( LSM9DS1_MAG_ADDR, reg, i2c_read_data, 1 );
-    return i2c_read_data[0];
+    return I2C_Read_Reg( LSM9DS1_MAG_ADDR, reg );
 }
 
 /**************************************************************************//**

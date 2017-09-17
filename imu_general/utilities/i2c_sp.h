@@ -20,14 +20,17 @@ extern "C" {
 #else
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
 #endif
 
-extern int file;
+extern size_t file;
 
 bool I2C_Init( void );
 bool I2C_Deinit( void );
 bool I2C_Read( uint8_t addr, uint8_t *i2c_read_data, uint8_t i2c_read_data_length);
-bool I2C_Read_Reg( uint8_t addr, uint8_t reg, uint8_t *i2c_read_data, uint8_t i2c_read_data_length);
+uint8_t I2C_Read_Reg( uint8_t addr, uint8_t reg);
+bool I2C_Read_Regs( uint8_t addr, uint8_t reg, uint8_t *i2c_read_data, uint8_t i2c_read_data_length);
 bool I2C_Write( uint8_t addr, uint8_t *i2c_write_data, uint8_t i2c_write_data_length);
 
 #ifdef __cplusplus

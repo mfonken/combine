@@ -28,17 +28,10 @@ extern "C" {
 #include "kinetic_types.h"
     
 /* Utilities */
-#ifdef CHECK_TESTING
-#include "../testing/ble_core_stubs.h"
-#else
-#include "usart_sp.h"
-#include "clock_sp.h"
-#endif
+#include "../tests/test_stubs.h"
 
 /* Sensors headers */
-#include "../sensors/imu/LSM9DS1.h"
-#include "../sensors/camera/cam_controller.h"
-#include "../sensors/sensor_data_types.h"
+#include "../sensors/LSM9DS1.h"
 
 /***********************************************************************************************//**
  * \defgroup Kinetic Motion Code
@@ -78,8 +71,6 @@ extern "C" {
 /** Physical distance between beacons */
 #define     D_FIXED     		1
 
-extern LSM9DS1_t this;
-
 /***************************************************************************************************
 Function Declarations
 ***************************************************************************************************/
@@ -109,6 +100,6 @@ void Camera_Rotation_Init( void );
 /** @} (end addtogroup Application) */
     
 #ifdef __cplusplus
-};
+}
 #endif
 #endif /* kinetic_h */
