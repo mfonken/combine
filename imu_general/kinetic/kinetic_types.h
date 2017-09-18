@@ -11,9 +11,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include <stdint.h>
-    
+
 /***********************************************************************************************//**
  * @addtogroup Application
  * @{
@@ -23,13 +23,13 @@ extern "C" {
  * @addtogroup kinetic
  * @{
  **************************************************************************************************/
-    
+
 /***************************************************************************************************
  Public Types
  ***************************************************************************************************/
 
 typedef double mfloat;
-    
+
 /** Kalman structure */
 typedef struct _kalman_t
 {
@@ -40,14 +40,14 @@ typedef struct _kalman_t
     mfloat      value;              /**< Value */
     uint32_t    timestamp;          /**< Timestamp */
 } kalman_t;
-    
+
 /** Kinetic Type */
 typedef struct _kinetic_t
 {
     mfloat     position[3];             /**< Raw position */
     mfloat     rotation[3];             /**< Raw rotation */
     mfloat     truePosition[3];         /**< Raw true location */
-    
+
     kalman_t   positionFilter[3];       /**< Filtered position */
     kalman_t   rotationFilter[3];       /**< Filtered rotation */
     kalman_t   truePositionFilter[3];   /**< Filtered true location */
@@ -75,7 +75,7 @@ typedef struct _vec3_t
     mfloat    j;             /**< \$f\hat{j}\$f value */
     mfloat    k;             /**< \$f\hat{k}\$f value */
 } vec3_t;
-    
+
 /*! Simple 3d Vector */
 typedef struct _mat3x3_t
 {
@@ -112,5 +112,5 @@ typedef struct
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif /* KINETIC_KINETIC_TYPES_H_ */

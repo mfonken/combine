@@ -16,12 +16,11 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h>
 #include <math.h>
-
-#include "../utilities/i2c_sp.h"
-
-/* Included types header */
+    
+/* Included headers */
 #include "LSM9DS1_types.h"
 #include "LSM9DS1_regs.h"
+#include "../utilities/i2c_sp.h"
 #include "../kinetic/kinetic_types.h"
 
 /* Math headers */

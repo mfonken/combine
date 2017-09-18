@@ -5,22 +5,19 @@
 *      Author: Matthew Fonken
 **************************************************************************************************/
 
-/* Standard headers */
-#include <stdbool.h>
-
 /* Own header */
 #include "i2c_sp.h"
 
-size_t file = 0xff;
+int file = 0xff;
 
-bool I2C_Init()
+bool I2C_Init( void )
 {
 	char *filename = (char*)"/dev/i2c-1";
 	if ((file = open(filename, O_RDWR)) < 0) return 0;
-	return 1;  
+	return 1;
 }
 
-bool I2C_Deinit( )
+bool I2C_Deinit( void )
 {
     return close(file);
 }
@@ -39,9 +36,9 @@ uint8_t I2C_Read_Reg( uint8_t addr, uint8_t reg)
 
 bool I2C_Read_Regs( uint8_t addr, uint8_t reg, uint8_t *i2c_read_data, uint8_t i2c_read_data_length)
 {
-    	if( ioctl(file, I2C_SLAVE, addr) < 0 ) return 0;
+    if( ioctl(file, I2C_SLAVE, addr) < 0 ) return 0;
 	i2c_smbus_read_byte_data(file, reg);
-    	return read(file,i2c_read_data,i2c_read_data_length);
+    return read(file,i2c_read_data,i2c_read_data_length);
 }
 
 bool I2C_Write( uint8_t addr, uint8_t *i2c_write_data, uint8_t i2c_write_data_length)
@@ -49,4 +46,3 @@ bool I2C_Write( uint8_t addr, uint8_t *i2c_write_data, uint8_t i2c_write_data_le
     if( ioctl(file, I2C_SLAVE, addr) < 0 ) return 0;
     return write(file, i2c_write_data, i2c_write_data_length);
 }
-

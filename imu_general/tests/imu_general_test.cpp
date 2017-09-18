@@ -8,21 +8,22 @@
 
 #include <stdio.h>
 #include "../utilities/i2c_sp.h"
-//#include "../sensors/LSM9DS1.h"
+#include "../sensors/LSM9DS1.h"
 //#include "../kinetic/kinetic.h"
 
 int main( int argc, char * args[] )
 {
 
    	printf("Starting...\n");
-	//LSM9DS1_t lsm9;
+	LSM9DS1_t lsm9;
 	//kinetic_t kinetics;
 	
 	printf("Initing I2C...\n");
 	I2C_Init();
+    printf("Initing IMU...\n");
+    IMU_Init(&lsm9);
+    
 /*
-    	printf("Initing IMU...\n");
-    	IMU_Init(&lsm9);
 
 	printf("Initing kinetics...\n");
 
