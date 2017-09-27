@@ -21,8 +21,8 @@ extern "C" {
 #include <math.h>
 
 /* Math headers */
-#include "kalman.h"
-#include "matrix.h"
+#include "kalman.c"
+#include "matrix.c"
 
 /* Types */
 #include "kinetic_types.h"
@@ -51,9 +51,6 @@ extern "C" {
 /***************************************************************************************************
  Global Definitions
 ***************************************************************************************************/
-
-/** Absolute value */
-#define 	absl(x) x > 0 ? x:-x
 
 /** Half PI */
 #define     PI      			3.141596

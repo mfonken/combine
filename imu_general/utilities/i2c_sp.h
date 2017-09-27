@@ -16,7 +16,7 @@ extern "C" {
 #include <stdint.h>
 
 #ifdef NONRASPI
-#include "../tests/nonpi_stubs.h"
+#include "../tests/nonpi_stubs.c"
 #else
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>

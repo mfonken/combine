@@ -16,7 +16,7 @@ extern "C" {
 /* Standard headers */
 #include <stdio.h>
 #include <stdint.h>
-#include "../tests/test_stubs.h"
+#include "../tests/test_stubs.c"
 
 /* Included types header */
 #include "kinetic_types.h"

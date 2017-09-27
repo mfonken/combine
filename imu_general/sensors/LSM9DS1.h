@@ -19,7 +19,7 @@ extern "C" {
     
 /* Included headers */
 #include "LSM9DS1_types.h"
-#include "LSM9DS1_regs.h"
+#include "LSM9DS1_regs.c"
 #include "../utilities/i2c_sp.h"
 #include "../kinetic/kinetic_types.h"
 
@@ -94,7 +94,7 @@ void IMU_Default(       LSM9DS1_t * );
  * \param[out] Initialization success
  *****************************************************************************/
 void IMU_Init(          LSM9DS1_t * );
-bool IMU_Verify( 	LSM9DS1_t * );
+bool IMU_Verify(        LSM9DS1_t * );
 void IMU_Update_All(    LSM9DS1_t * );
 void IMU_Update_Angles( LSM9DS1_t * );
 void IMU_Update_Accel(  LSM9DS1_t * );
