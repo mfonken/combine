@@ -166,14 +166,6 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     b[0]   = CAMERA_ALPHA_H * DEG_TO_RAD * ( ( beacons[1].y / CAMERA_HEIGHT ) - 0.5 ) - b_a.y;
     b[1]   = CAMERA_ALPHA_W * DEG_TO_RAD * ( ( beacons[1].x / CAMERA_WIDTH  ) - 0.5 ) - b_a.z;
 
-//    Print_String("beacons - (");
-//	Print_Double_Ascii( b_a[0] );
-//	Print_Char(',');
-//	Print_Double_Ascii( b_a[1] );
-//	Print_Char(',');
-//	Print_Double_Ascii( b_a[2] );
-//	Print_Line(")");
-
     /* Create quaternions (qc is precalculated in init) */
     Euler_To_Quaternion( &p_a, &qp );
     Euler_To_Quaternion( &b_a, &qb );
@@ -198,16 +190,6 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     Quaternion_To_Matrix( &qp, &m );
     Multiply_Vec_3x1( &m, &r, &r_f );
     
-    Print_Char('p');
-    Print_Char(',');
-	Print_Double_Ascii( r_f.i );
-	Print_Char(',');
-	Print_Double_Ascii( r_f.j );
-	Print_Char(',');
-	Print_Double_Ascii( r_f.k );
-	Print_Line("");
-    return;
-
     /* Get non-gravitational acceleration */
     vec3_t ngacc;
     IMU_Non_Grav_Get( imu, &qp, &ngacc );
@@ -215,7 +197,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     kinetics->truePositionFilter[0].value = ngacc.i;
     kinetics->truePositionFilter[1].value = ngacc.j;
     kinetics->truePositionFilter[2].value = ngacc.k;
-    return;
+
     /* Filter calculated r_vec with acceleration > velocity */
     float n;
     n = kinetics->truePositionFilter[0].value;

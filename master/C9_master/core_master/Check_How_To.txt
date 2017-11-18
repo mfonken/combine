@@ -1,0 +1,7 @@
+Compile:
+ - autoreconf --install
+ - ./configure
+ - make
+
+Run tests:
+ - make check -s  (-s is for silent output)
