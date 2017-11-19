@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "F2D1766E59EA354BB4EB0999F81B3AAAEC45ACF0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "EE9C904C95AE70892048F12DF43894F9010B926E" : 9223372036854775807,
+    "F2D1766E59EA354BB4EB0999F81B3AAAEC45ACF0" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "031A3462-EBC5-42F2-A4EC-0EEE0F5E36A3",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "EE9C904C95AE70892048F12DF43894F9010B926E" : "",
+    "F2D1766E59EA354BB4EB0999F81B3AAAEC45ACF0" : "combine\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "combine_core",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "general\/combine_bare\/combine_core.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/mfonken\/marbl.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "EE9C904C95AE70892048F12DF43894F9010B926E"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/mfonken\/combine.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F2D1766E59EA354BB4EB0999F81B3AAAEC45ACF0"
+    }
+  ]
+}

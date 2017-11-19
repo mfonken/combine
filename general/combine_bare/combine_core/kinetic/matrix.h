@@ -8,6 +8,10 @@
 #ifndef matrix_h
 #define matrix_h
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Standard headers */
 #include <stdbool.h>
 #include <stdint.h>
@@ -71,4 +75,8 @@ void mul3( double m, vec3_t * v, vec3_t * r );
 void add33( vec3_t * u, vec3_t * v, vec3_t * w, vec3_t * r);
 void Rotate_Vector_By_Quaternion(vec3_t * v, quaternion_t * q, vec3_t * r);
 
+#ifdef __cplusplus
+}
+#endif
+    
 #endif /* matrix_h */
