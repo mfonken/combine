@@ -9,16 +9,14 @@
 /* Own header */
 #include "kinetic.h"
 
-#define ZDIV_LNUM 1 << 10
-#define ZDIV(X,Y) Y==0?ZDIV_LNUM:X/Y
-
 /***************************************************************************************************
  Local Variables
  **************************************************************************************************/
 /** Local change in time */
 //static double         delta_t;
 
-quaternion_t qd, qc, qr, qg, qa;
+quaternion_t qd, qd_, qs, qs_, qc, qc_, qr, qg, qa;
+
 double  cos_precalc, sin_precalc;
 
 /** Local positional and rotational vectors */
@@ -91,129 +89,149 @@ void Kinetic_Update_Rotation( LSM9DS1_t * imu, kinetic_t * kinetics )
     /* Calculate the true yaw using a kalman_t filter */
     Kalman_Update( &kinetics->rotationFilter[2], ang.z, imu->data.gyro[2] * DEG_TO_RAD );
     kinetics->rotation[2] = kinetics->rotationFilter[2].value;
+    
 }
 
 /***********************************************************************************************//**
- *  \brief  Calculates system's absolute position and places value in truePosition[]
-
- \f{eqnarray*}{
-    &a_a = rot_{f_0}, a_b = rot_{f_1}, a_c = rot_{f_2} \\
-
-    &\mathbf{d} =
-    \begin{cases}
-        &d_{\hat{i}} = vis_{1_x} - vis_{0_x} \\
-        &d_{\hat{j}} = vis_{1_y} - vis_{0_y} \\
-        &d_{\hat{k}} = 0 \\
-    \end{cases} \\
-    &\mathbf{r} = \text{dAugment}(\mathbf{d}, \mathbf{a}) \\
-    &\mathbf{e} =
-    \begin{cases}
-        &e_{\hat{i}} = V_{center_x} - vis_{0_x} \\
-        &e_{\hat{j}} = V_{center_y} - vis_{0_y} \\
-        &e_{\hat{k}} = 0 \\
-    \end{cases} \\
-    &\mathbf{e_{true}} = \text{zxyTranform}(\mathbf{e}, \mathbf{a}, 1) \\
-    &\mathbf{p_{true}} = \mathbf{r} - \mathbf{e_{true}} \\
-    &\mathbf{n} = \text{getNonGravAcceleration()} \\
-    &\mathbf{v} =
-    \begin{cases}
-        &v_x = &n_{\hat{i}}\Delta{t} \\
-        &v_y = &n_{\hat{j}}\Delta{t} \\
-        &v_z = &n_{\hat{k}}\Delta{t} \\
-    \end{cases} \\
-   &\text{Update all position kalman_ts with } \mathbf{p_{true}}, \mathbf{v}, \text{ and } \Delta{t}
- \f}
+ *  \brief  Calculates system's absolute position and places value in position[]
  **************************************************************************************************/
 void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_t beacons[2] )
 {
-    /* Tait-Bryan (intrinsic) angles of imu */
-    ang3_t tbd, tbr;
-    tbd.x = kinetics->rotationFilter[0].value; // phi'
-    tbd.y = kinetics->rotationFilter[1].value; // theta'
-    tbd.z = kinetics->rotationFilter[2].value; // psi'
-    Euler_To_Quaternion( &tbd, &qd );
+    /*** LOCAL VARIABLES ***/
+    mat3x3_t m;
     
-    double the_1, the_2, the_r, phi_1, phi_2, phi_r, psi_r, rho_1, rho_r;
-    double x_1, x_2, y_1, y_2, d_x, d_y, d__l, r_l;
+    /* Local angles */
+    ang3_t a, r;
+    double the_B, the_A, phi_B, phi_A, psi_r, sigma_A, sigma_r, nu, up;
     
-    x_1 = beacons[0].x;
-    x_2 = beacons[1].x;
-    y_1 = beacons[0].y;
-    y_2 = beacons[1].y;
-    d_x = x_2 - x_1;
-    d_y = y_2 - y_1;
+    /* Local lengths */
+    double x_B, x_A, y_B, y_A, d_x, d_y, d__A_sq, d__l, d__n, d__u, r_l;
+   
+    /*** CALCULATING QUATERNIONS ***/
+    x_B = beacons[0].x - CAMERA_HALF_WIDTH;
+    x_A = beacons[1].x - CAMERA_HALF_WIDTH;
+    y_B = beacons[0].y - CAMERA_HALF_HEIGHT;
+    y_A = beacons[1].y - CAMERA_HALF_HEIGHT;
+    d_x = x_A - x_B;
+    d_y = y_A - y_B;
+    
+    /* Get pixel distance from (0,0) to beacon 1 */
+    d__A_sq = ( ( x_A * x_A ) + ( y_A * y_A ) );
+    
+    /* Get unit distance between beacons */
+    d__l = sqrt( ( d_x * d_x ) + ( d_y * d_y ) ) * PIXEL_TO_UNIT;
+    
     
     /* Get beacon angles */
-    the_1   = CAMERA_ALPHA_W * DEG_TO_RAD * ( ( x_1 / CAMERA_WIDTH  ) - 0.5 );
-    phi_1   = CAMERA_ALPHA_H * DEG_TO_RAD * ( ( y_1 / CAMERA_HEIGHT ) - 0.5 );
-    the_2   = CAMERA_ALPHA_W * DEG_TO_RAD * ( ( x_2 / CAMERA_WIDTH  ) - 0.5 );
-    phi_2   = CAMERA_ALPHA_H * DEG_TO_RAD * ( ( y_2 / CAMERA_HEIGHT ) - 0.5 );
+    the_B   = atan2( ( x_B * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    phi_B   = atan2( ( y_B * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    the_A   = atan2( ( x_A * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    phi_A   = atan2( ( y_A * PIXEL_TO_UNIT ), FOCAL_LENGTH);
     psi_r   = atan2( d_y, d_x );
     
     /* Get angles between beacons */
-    the_r = fabs( the_2 - the_1 );
-    phi_r = fabs( phi_2 - phi_1 );
-    rho_1 = acos( cos( the_1 ) * cos( phi_1 ) );
-    rho_r = acos( cos( the_r ) * cos( phi_r ) );
+    ///NOTE: acos(cos()cos()) only works for combining frame-perpendicular vectors (i.e. theta & phi) [ang3 is used instead for sigma_r]
+    sigma_A = acos( cos( the_A ) * cos( phi_A ) );
     
-    /* Get distance between beacons */
-    d__l = sqrt( ( d_x * d_x ) + ( d_y * d_y ) ) * PIXELS_TO_UNITS;
+    vec3_t A, B;
+    A.i = x_B;
+    A.j = y_B;
+    A.k = FOCAL_LENGTH * UNIT_TO_PIXEL;
+    B.i = x_A;
+    B.j = y_A;
+    B.k = FOCAL_LENGTH * UNIT_TO_PIXEL;
+    sigma_r = ang3( &A, &B );
     
-    double chi, mu, gam, gam_;
-    double sin_rho_r = sin( rho_r );
-    /* Calculate Chi */
-    chi = asin( ZDIV( ( FOCAL_LENGTH * UNITS_TO_PIXELS ), d__l ) * ZDIV( sin_rho_r, cos( rho_1 ) ) );
+    d__n = ZDIV( fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), d__l );
+    d__u = sqrt( d__A_sq - ( d__n * d__n ) );
+    nu = atan2( ( d__n * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    up = atan2( ( d__u * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    
+    /* Get proper device angles from kinetic */
+    r.x = kinetics->rotation[0];
+    r.y = kinetics->rotation[1];
+    r.z = kinetics->rotation[2];
     
     /* Generate Camera-Beacon quaternion */
-    tbr.x = phi_1;
-    tbr.y = the_1;
-    tbr.z = psi_r;
-    Euler_To_Quaternion( &tbr, &qr );
+    a.x = r.x + nu;
+    a.y = r.y + psi_r;
+    a.z = r.z - up;
+    Euler_To_Quaternion( &a, &qd );
+    Quaternion_Combine( &qd, &qc, &qa );
+    
+    ang3Rad_To_Deg(&a);
+    
+    ///NOTE: Initializing another quaternion QD' cuts a quaternion combination
+    a.x = r.x;
+    /*  a.y should doens't change from the calculation of QD
+     *  a.y = r.y + psi_r; */
+    a.z = r.z;
+    Euler_To_Quaternion( &a, &qd_ );
+    ang3Rad_To_Deg(&a);
+    
+    /** CALCULATING R ***/
+    double chi, mu, gam;
+    double sin_sigma_r = sin( sigma_r );
+    
+    /* Calculate Chi */
+    chi = RASIN( ZDIV( ZDIV( FOCAL_LENGTH, cos( sigma_A ) ), d__l ) * sin_sigma_r );
     
     /* Calculate mu */
-    mu = ( qr.w * qr.w ) - ( qr.x * qr.x ) - ( qr.y * qr.y ) + ( qr.z * qr.z );
+    Quaternion_To_Matrix(&qd_, &m);
+    mu = -asin( m.jj );
     
     /* Calculate gamma */
-    gam  = mu + chi;
-    gam_ = 180 * DEG_TO_RAD - gam;
+    gam  = chi - mu;
     
     /* Calculate r vector length */
-    r_l = ( sin( gam_ ) / sin_rho_r ) * d__l;
+    r_l = ZDIV( sin( gam ), sin_sigma_r ) * D_FIXED;
     
     /* r_vec - Vector length r on X-axis */
-    vec3_t r, r_f;
-    r.i = r_l;
-    r.j = 0;
-    r.k = 0;
+    vec3_t r_u, r_f;
+    r_u.i = 0;
+    r_u.j = r_l;
+    r_u.k = 0;
     
-    Quaternion_Combine( &qd, &qc, &qr, &qa );
-
+    Quaternion_To_Euler(&qa, &a);
+    a.z -= M_PI/2;
+    Euler_To_Quaternion(&a, &qa);
+    Quaternion_To_Euler(&qa, &a);
+    
+    /*** FILTERING R VECTOR ***/
     /* Calculate final r vector */
-    Rotate_Vector_By_Quaternion( &r, &qa, &r_f );
+    Rotate_Vector_By_Quaternion( &r_u, &qa, &r_f );
+    kinetics->positionFilter[0].value = r_f.i;
+    kinetics->positionFilter[1].value = r_f.j;
+    kinetics->positionFilter[2].value = r_f.k;
+    return;
     
     /* Kalman filter position */
     /* Get non-gravitational acceleration */
     vec3_t ngacc;
-    IMU_Non_Grav_Get( imu, &qa, &ngacc );
+    IMU_Non_Grav_Get( imu, &qd, &ngacc );
     double delta_time = 0;
-    kinetics->truePositionFilter[0].value = ngacc.i;
-    kinetics->truePositionFilter[1].value = ngacc.j;
-    kinetics->truePositionFilter[2].value = ngacc.k;
+    kinetics->positionFilter[0].value = ngacc.i;
+    kinetics->positionFilter[1].value = ngacc.j;
+    kinetics->positionFilter[2].value = ngacc.k;
 
     /* Filter calculated r_vec with acceleration > velocity */
     float n;
-    n = kinetics->truePositionFilter[0].value;
-    delta_time = seconds_since( kinetics->truePositionFilter[0].timestamp );
+    n = kinetics->positionFilter[0].value;
+    delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
     double x_vel = ngacc.i * delta_time;
-    Kalman_Update( &kinetics->truePositionFilter[0], r_f.i, x_vel );
+    Kalman_Update( &kinetics->positionFilter[0], r_f.i, x_vel );
 
-    n = kinetics->truePositionFilter[1].value;
-    delta_time = seconds_since( kinetics->truePositionFilter[0].timestamp );
+    n = kinetics->positionFilter[1].value;
+    delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
 	double y_vel = ngacc.j * delta_time;
-	Kalman_Update( &kinetics->truePositionFilter[1], r_f.j, y_vel );
+	Kalman_Update( &kinetics->positionFilter[1], r_f.j, y_vel );
 
-	n = kinetics->truePositionFilter[2].value;
-    delta_time = seconds_since( kinetics->truePositionFilter[0].timestamp );
+	n = kinetics->positionFilter[2].value;
+    delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
 	double z_vel = ngacc.k * delta_time;
-	Kalman_Update( &kinetics->truePositionFilter[2], r_f.k, z_vel );
+	Kalman_Update( &kinetics->positionFilter[2], r_f.k, z_vel );
+    
+    kinetics->position[0] = kinetics->positionFilter[0].value;
+    kinetics->position[1] = kinetics->positionFilter[1].value;
+    kinetics->position[2] = kinetics->positionFilter[2].value;
 }

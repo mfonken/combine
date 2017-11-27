@@ -59,7 +59,7 @@
 #define CAM_HEIGHT              320
 
 #define THRESHOLD_MAX           254
-#define THRESHOLD_MIN           100
+#define THRESHOLD_MIN           150
 #define THRESH_STEP             5
 
 #define THRESHOLD               THRESHOLD_MIN

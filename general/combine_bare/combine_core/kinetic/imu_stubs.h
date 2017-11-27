@@ -53,6 +53,9 @@ void Read_SERCOM_IMU_Packet(LSM9DS1_t * imu);
 
 void IMU_Init(LSM9DS1_t * a);
 void IMU_Update_All(LSM9DS1_t * a);
+void IMU_Normalize_All( LSM9DS1_t * imu );
+void IMU_Normalize_Accel( LSM9DS1_t * imu );
+void IMU_Normalize_Mag( LSM9DS1_t * imu );
 void IMU_Update_Roll( LSM9DS1_t * imu );
 void IMU_Update_Pitch( LSM9DS1_t * imu );
 void IMU_Update_Yaw( LSM9DS1_t * imu );

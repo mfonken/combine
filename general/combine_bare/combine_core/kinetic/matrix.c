@@ -1,110 +1,12 @@
 /***********************************************************************************************//**
- * \file   matrix.c
- * \brief  Matrix Math
- ***************************************************************************************************
- *      Author: Matthew Fonken
- **************************************************************************************************/
+                                                                                                  * \file   matrix.c
+                                                                                                  * \brief  Matrix Math
+                                                                                                  ***************************************************************************************************
+                                                                                                  *      Author: Matthew Fonken
+                                                                                                  **************************************************************************************************/
 
 /* Own header */
 #include "matrix.h"
-
-/***********************************************************************************************//**
- * @addtogroup Application
- * @{
- **************************************************************************************************/
-
-/***********************************************************************************************//**
- * @addtogroup kinetic
- * @{
- **************************************************************************************************/
-
-/***************************************************************************************************
- Static Function Definitions
- **************************************************************************************************/
-
-
-/***********************************************************************************************//**
- *  \brief  Subract two 3D vectors
- *  \param[in] x Subracted from and returned
- *  \param[in] y Values to subract
- ***************************************************************************************************
- * FORMULA:
-
- \f{eqnarray*}{
-    &x_\hat{i} = x_\hat{i} - y_\hat{i} \\
-    &x_\hat{j} = x_\hat{j} - y_\hat{j} \\
-    &x_\hat{k} = x_\hat{k} - y_\hat{k}
- \f}
- **************************************************************************************************/
-void subtractvec3_t( vec3_t * x,
-                     vec3_t * y )
-{
-    x->i = x->i - y->i;
-    x->j = x->j - y->j;
-    x->k = x->k - y->k;
-}
-/***********************************************************************************************//**
- *  \brief  Return length of 3D vector
- *  \param[out] Length of vector
- *  \param[in] x Vector measured
- ***************************************************************************************************
- * FORMULA:
- \f{eqnarray*}{
-    ||\mathbf{v}|| = \sqrt{v_\hat{i}^2 + v_\hat{j}^2 + v_\hat{k}^2}\\
- \f}
- **************************************************************************************************/
-double lengthOfvec3_t( vec3_t * vec )
-{
-    double i_2 = vec->i * vec->i;
-    double j_2 = vec->j * vec->j;
-    double k_2 = vec->k * vec->k;
-    return sqrt( i_2 + j_2 + k_2 );
-}
-
-double lengthOfvec2_t( vec2_t * vec )
-{
-    double i_2 = vec->i * vec->i;
-    double j_2 = vec->j * vec->j;
-    return sqrt( i_2 + j_2 );
-}
-
-/***********************************************************************************************//**
- *  \brief  Normalize a 3D Vector
- *  \param[in] vec Vector to normalize, returned as self
- ***************************************************************************************************
- * FORMULA:
- \f{eqnarray*}{
-    \mathbf{v_{norm}} = \frac{\mathbf{v}}{||\mathbf{v}||}
- \f}
- **************************************************************************************************/
-void normalizevec3_t( vec3_t * vec )
-{
-    double length = lengthOfvec3_t( vec );
-    if(!length) return;
-    vec->i /= length;
-    vec->j /= length;
-    vec->k /= length;
-}
-/***********************************************************************************************//**
- *  \brief  Distance between two 2D coordinates
- *  \param[out] Distance between
- *  \param[in] a First coordinate
- *  \param[in] b Second coordinate
- ***************************************************************************************************
- * FORMULA:
- \f{eqnarray*}{
- d = \sqrt{(x_b^2 - x_a^2) + (y_b^2 - y_a^2)}
- \f}
- **************************************************************************************************/
-double get2dDistance( cartesian2_t *a, cartesian2_t *b )
-{
-    double a_x = a->x;
-    double a_y = a->y;
-    double b_x = b->x;
-    double b_y = b->y;
-
-    return sqrt( ( ( b_x * b_x ) - ( a_x * a_x ) ) + ( ( b_y * b_y ) - ( a_y * a_y ) ) );
-}
 
 void Multiply_Vec_3x1( mat3x3_t * a, vec3_t * b, vec3_t * c )
 {
@@ -136,6 +38,22 @@ void Euler_To_Quaternion( ang3_t * ang, quaternion_t * quat )
     quat->x = sr * cpcy - cr * spsy;
     quat->y = cr * spcy + sr * cpsy;
     quat->z = cr * cpsy - sr * spcy;
+}
+
+void Quaternion_To_Euler( quaternion_t * quat, ang3_t * ang )
+{
+    long double w = quat->w, x = quat->x, y = quat->y, z = quat->z, a, b;
+    
+    a = 2*(w*x+y*z);
+    b = 1-2*(x*x+y*y);
+    ang->x = atan2(a, b);
+    
+    a = 2*(w*y-x*z);
+    ang->y = RASIN(a);
+    
+    a = 2*(w*z+x*y);
+    b = 1-2*(y*y+z*z);
+    ang->z = atan2(a, b);
 }
 
 void Quaternion_To_Matrix(quaternion_t * quat, mat3x3_t * m)
@@ -177,14 +95,14 @@ void Rotate_Vector_By_Quaternion(vec3_t * v, quaternion_t * q, vec3_t * r)
     mul3( s, &t, &c );
     add33( v, &b, &c, r );
     
-//    cross3( &u, v, &uxv );
-//    mul3( 2, &uxv, &a );
-//    mul3( s, &u, &b );
-//    add33( v, &a, &b, r );
+    //    cross3( &u, v, &uxv );
+    //    mul3( 2, &uxv, &a );
+    //    mul3( s, &u, &b );
+    //    add33( v, &a, &b, r );
 }
 
 /* Double quaternion Hamilton multiplication (Generic) */
-void Quaternion_Combine(quaternion_t * a, quaternion_t * b, quaternion_t * c, quaternion_t * d)
+void Quaternion_Combine(quaternion_t * a, quaternion_t * b, quaternion_t * c)
 {
     double A, B, C, D, E, F, G, H;
     A = ( a->w + a->x ) * ( b->w + b->x );
@@ -195,26 +113,70 @@ void Quaternion_Combine(quaternion_t * a, quaternion_t * b, quaternion_t * c, qu
     F = ( a->x - a->z ) * ( b->x - b->y );
     G = ( a->w + a->y ) * ( b->w - b->z );
     H = ( a->w - a->y ) * ( b->w + b->z );
-    d->w = B + ( -E - F + G + H ) / 2;
-    d->x = A - (  E + F + G + H ) / 2;
-    d->y = C + (  E - F + G - H ) / 2;
-    d->z = D + (  E - F - G + H ) / 2;
-    
-    A = ( d->w + d->x ) * ( c->w + c->x );
-    B = ( d->z - d->y ) * ( c->y - c->z );
-    C = ( d->w - d->x ) * ( c->y + c->z );
-    D = ( d->y + d->z ) * ( c->w - c->x );
-    E = ( d->x + d->z ) * ( c->x + c->y );
-    F = ( d->x - d->z ) * ( c->x - c->y );
-    G = ( d->w + d->y ) * ( c->w - c->z );
-    H = ( d->w - d->y ) * ( c->w + c->z );
-    d->w = B + ( -E - F + G + H ) / 2;
-    d->x = A - (  E + F + G + H ) / 2;
-    d->y = C + (  E - F + G - H ) / 2;
-    d->z = D + (  E - F - G + H ) / 2;
+    c->w = B + ( -E - F + G + H ) / 2;
+    c->x = A - (  E + F + G + H ) / 2;
+    c->y = C + (  E - F + G - H ) / 2;
+    c->z = D + (  E - F - G + H ) / 2;
+    //    c->w = ( a->w * b->w ) - ( a->x * b->x ) - ( a->y * b->y ) - ( a->z * b->z );
+    //    c->x = ( a->w * b->x ) + ( a->x * b->w ) + ( a->y * b->z ) - ( a->z * b->y );
+    //    c->y = ( a->w * b->y ) - ( a->x * b->z ) + ( a->y * b->w ) + ( a->z * b->x );
+    //    c->z = ( a->w * b->z ) + ( a->x * b->y ) - ( a->y * b->x ) + ( a->z * b->w );
 }
 
 /* Generic vector3 manipulations */
+double dist2( cartesian2_t *a, cartesian2_t *b )
+{
+    double a_x = a->x;
+    double a_y = a->y;
+    double b_x = b->x;
+    double b_y = b->y;
+    
+    return sqrt( ( ( b_x * b_x ) - ( a_x * a_x ) ) + ( ( b_y * b_y ) - ( a_y * a_y ) ) );
+}
+
+void sub3( vec3_t * x,
+          vec3_t * y )
+{
+    x->i = x->i - y->i;
+    x->j = x->j - y->j;
+    x->k = x->k - y->k;
+}
+
+double len3( vec3_t * vec )
+{
+    double i_2 = vec->i * vec->i;
+    double j_2 = vec->j * vec->j;
+    double k_2 = vec->k * vec->k;
+    return sqrt( i_2 + j_2 + k_2 );
+}
+
+double len2( vec2_t * vec )
+{
+    double i_2 = vec->i * vec->i;
+    double j_2 = vec->j * vec->j;
+    return sqrt( i_2 + j_2 );
+}
+
+void norm3( vec3_t * vec )
+{
+    double length = len3( vec );
+    if(!length) return;
+    vec->i /= length;
+    vec->j /= length;
+    vec->k /= length;
+}
+
+/* Angle between two vectors */
+double ang3( vec3_t * u, vec3_t * v)
+{
+    return acos( ZDIV( dot3( u, v ), ( len3(u) * len3(v) ) ) );
+}
+
+/* Dot product of two vectors */
+double dot3( vec3_t * u, vec3_t * v )
+{
+    return u->i*v->i + u->j*v->j + u->k*v->k;
+}
 /* Cross product of two vectors */
 void cross3( vec3_t * u, vec3_t * v, vec3_t * r )
 {
@@ -237,6 +199,20 @@ void add33( vec3_t * u, vec3_t * v, vec3_t * w, vec3_t * r)
     r->i = u->i + v->i + w->i;
     r->j = u->j + v->j + w->j;
     r->k = u->k + v->k + w->k;
+}
+
+void ang3Rad_To_Deg( ang3_t * a )
+{
+    a->x *= RAD_TO_DEG;
+    a->y *= RAD_TO_DEG;
+    a->z *= RAD_TO_DEG;
+}
+
+void ang3Deg_To_Rad( ang3_t * a )
+{
+    a->x *= DEG_TO_RAD;
+    a->y *= DEG_TO_RAD;
+    a->z *= DEG_TO_RAD;
 }
 
 /** @} (end addtogroup kinetic) */

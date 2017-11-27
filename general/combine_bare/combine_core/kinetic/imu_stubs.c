@@ -22,16 +22,26 @@
 
 #define PACKET_DEL '\r'
 
+double mag_cal[] = { -2.396, 38.040, 1.093 };
+
 const char port[] = "/dev/tty.usbmodem14121";
+const char port_alt[] = "/dev/tty.usbmodem14221";
 int uart0_filestream = -1;
 char line[BUFFER_LENGTH];
-
 
 void Init_SERCOM()
 {
     printf("Initing SERCOM at %s\n", port);
     uart0_filestream = open(port, O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
-    if (uart0_filestream == -1) printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
+    if (uart0_filestream == -1)
+    {
+        printf("Trying alternate port at %s\n", port_alt);
+        uart0_filestream = open(port_alt, O_RDWR | O_NOCTTY | O_NDELAY);
+        if (uart0_filestream == -1)
+            printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
+        else
+            printf("Successfull opened alternate port.\n");
+    }
     struct termios options;
     tcgetattr(uart0_filestream, &options);
     options.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
@@ -87,9 +97,9 @@ void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
     imu->data.gyro[0]  = v[3];
     imu->data.gyro[1]  = v[4];
     imu->data.gyro[2]  = v[5];
-    imu->data.mag[0]   = v[6];
-    imu->data.mag[1]   = v[7];
-    imu->data.mag[2]   = v[8];
+    imu->data.mag[1]   = v[6] - mag_cal[0];
+    imu->data.mag[0]   = v[7] - mag_cal[1];
+    imu->data.mag[2]   =-(v[8] - mag_cal[2]);
 }
 
 void IMU_Init(LSM9DS1_t * a)
@@ -100,46 +110,78 @@ void IMU_Init(LSM9DS1_t * a)
 void IMU_Update_All(LSM9DS1_t * a)
 {
     Read_SERCOM_IMU_Packet(a);
+    IMU_Normalize_All(a);
     IMU_Update_Roll(a);
     IMU_Update_Pitch(a);
     IMU_Update_Yaw(a);
     return;
 }
 
+void IMU_Normalize_All( LSM9DS1_t * imu )
+{
+    IMU_Normalize_Accel(imu);
+    IMU_Normalize_Mag(imu);
+}
+void IMU_Normalize_Accel( LSM9DS1_t * imu )
+{
+    double x,y,z,n;
+    x = imu->data.accel[0];
+    y = imu->data.accel[1];
+    z = imu->data.accel[2];
+    
+    n = sqrt( x*x + y*y + z*z );
+    imu->data.accel[0] /= n;
+    imu->data.accel[1] /= n;
+    imu->data.accel[2] /= n;
+}
+void IMU_Normalize_Mag( LSM9DS1_t * imu )
+{
+    double x,y,z,n;
+    x = imu->data.mag[0];
+    y = imu->data.mag[1];
+    z = imu->data.mag[2];
+    
+    n = sqrt( x*x + y*y + z*z );
+    imu->data.mag[0] /= n;
+    imu->data.mag[1] /= n;
+    imu->data.mag[2] /= n;
+}
+
 void IMU_Update_Roll( LSM9DS1_t * imu )
 {
     /* AN4248: Eq. 13 */
-    imu->data.roll = atan2( imu->data.accel[0], imu->data.accel[2] );
+    imu->data.roll = atan2( imu->data.accel[1], imu->data.accel[2] );
     
     /* AN3461: Eq. 37 */
     //    double den = sqrt( ( ( imu->data.accel[1] * imu->data.accel[1] ) + ( imu->data.accel[2] * imu->data.accel[2] ) ) );
     //    imu->data.roll = atan2( -imu->data.accel[0], den );
 }
 
+/* Note: Requires updated roll */
 void IMU_Update_Pitch( LSM9DS1_t * imu )
 {
     /* AN4248: Eq. 14 */
-    double den = ( imu->data.accel[0] * sin( imu->data.roll ) ) + ( imu->data.accel[2] * cos ( imu->data.roll ) );
-    imu->data.pitch = atan2( -imu->data.accel[1], den );
+    double den = ( imu->data.accel[1] * sin( imu->data.roll ) ) + ( imu->data.accel[2] * cos ( imu->data.roll ) );
+    imu->data.pitch = atan2( -imu->data.accel[0], den );
     
     /* AN3461: Eq. 38 */
     //    double den = sign( imu->data.accel[2] ) * sqrt( ( ( imu->data.accel[2] * imu->data.accel[2] ) + ( MU * ( imu->data.accel[0] * imu->data.accel[0] ) ) ) );
     //    imu->data.pitch = atan2( imu->data.accel[1], den );
 }
+
+/* Note: Requires updated pitch and roll */
 void IMU_Update_Yaw( LSM9DS1_t * imu )
 {
-    double Bx = imu->data.mag[1];
-    double By = imu->data.mag[0];
-    double Bz = -imu->data.mag[2];
+    /* NOTE: Magnetometer X and Y axes are switched between AN4248<>LSM9DS1 */
     
     /* AN4248: Eq. 22 */
     double sin_phi   = sin( imu->data.roll );
     double sin_theta = sin( imu->data.pitch );
     double cos_phi   = cos( imu->data.roll );
     double cos_theta = cos( imu->data.pitch );
-    double num = ( Bz * sin_phi ) - ( By * cos_phi );
-    double den = ( Bx * cos_theta ) + ( By * ( sin_theta * sin_phi ) ) + ( Bz * ( sin_theta * cos_phi ) );
-    imu->data.yaw = atan2( num, den );
+    double num = ( imu->data.mag[2] * sin_phi ) - ( imu->data.mag[1] * cos_phi );
+    double den = ( imu->data.mag[0] * cos_theta ) + ( imu->data.mag[1] * ( sin_theta * sin_phi ) ) + ( imu->data.mag[2] * ( sin_theta * cos_phi ) );
+    imu->data.yaw = -atan2( -num, den );
 }
 
 //double IMU_Roll_Error_Get( LSM9DS1_t * imu )
@@ -206,7 +248,9 @@ void tokenifyPacket( char * a, int l, double * d)
             else
             {
                 d[0] = 0xffff;
+#ifdef PACKET_DEBUG
                 printf("Ending tokenize\n");
+#endif
                 return;
             }
             free(*(tokens + i));
@@ -214,7 +258,9 @@ void tokenifyPacket( char * a, int l, double * d)
         if(i <= 9)
         {
             d[0] = 0xffff;
+#ifdef PACKET_DEBUG
             printf("Tokenize failed\n");
+#endif
         }
         free(tokens);
     }

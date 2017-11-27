@@ -26,6 +26,7 @@
 
 #define RAD_TO_DEG (180 / M_PI)
 #define NUM_THREADS 1
+#define SCALE 100
 
 using namespace cv;
 using namespace std;
@@ -60,7 +61,7 @@ void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
         roll    = (int)( kin.rotation[0] * RAD_TO_DEG );
         pitch   = (int)( kin.rotation[1] * RAD_TO_DEG );
         yaw     = (int)( kin.rotation[2] * RAD_TO_DEG );
-        printf("[R] %4d\t [P] %4d\t [Y] %4d\n", roll, pitch, yaw);
+//        printf("[R] %4d\t [P] %4d\t [Y] %4d\n", roll, pitch, yaw);
         
         Kinetic_Update_Position( &lsm, &kin, bea );
     }
@@ -68,9 +69,16 @@ void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
 
 int main( int argc, char * argv[] )
 {
-    printf("Starting...\n");
+    printf("Starting: ");
     
-    printf("Starting Tau thread.\n");
+    printf("IMU Thread... ");
+    pthread_t threads[NUM_THREADS];
+    int t1 = pthread_create(&threads[0], NULL, &IMU_THREAD, NULL);
+    if (t1) {
+        cout << "Error:unable to create IMU thread," << t1 << endl;
+        exit(-1);
+    }
+    printf("TAU Thread\n");
     int threshold = THRESHOLD;
     
     printf("Initializing Image Utility.\n");
@@ -89,7 +97,6 @@ int main( int argc, char * argv[] )
     Kinetic_Init( &lsm, &kin );
     
     printf("Starting IMU thread.\n");
-    int roll, pitch, yaw;
     
 #ifdef ITERATIONS
     for(int o = 0; o < num_orders; o++)
@@ -107,15 +114,6 @@ int main( int argc, char * argv[] )
 #ifdef TIME_FULL_LOOP
                 gettimeofday( &start, NULL);
 #endif
-                
-                Kinetic_Update_Rotation( &lsm, &kin );
-                roll    = (int)( kin.rotation[0] * RAD_TO_DEG );
-                pitch   = (int)( kin.rotation[1] * RAD_TO_DEG );
-                yaw     = (int)( kin.rotation[2] * RAD_TO_DEG );
-//                printf("[R] %4d\t [P] %4d\t [Y] %4d\n", roll, pitch, yaw);
-                
-                
-                
                 /* Re-init frame and out images every loop */
                 Mat frame, out(height, width, CV_8UC3, Scalar(0,0,0));
                 frame = util.getNextFrame();
@@ -130,20 +128,30 @@ int main( int argc, char * argv[] )
                 /* Update threshold */
                 updateThreshold(&threshold, stateNumber(tau.sys.state));
                 
-                bea[0].x = tau.predictions.x.primary;
-                bea[0].y = tau.predictions.y.primary;
-                bea[1].x = tau.predictions.x.secondary;
-                bea[1].y = tau.predictions.y.secondary;
+                bea[0].x = tau.predictions.y.primary;
+                bea[0].y = tau.predictions.x.primary;
+                bea[1].x = tau.predictions.y.secondary;
+                bea[1].y = tau.predictions.x.secondary;
                 
                 /* Reconstruct Position */
-                Kinetic_Update_Position( &lsm, &kin, bea );
                 
-                /*** Extract final coordinates ***/
-                int final_x, final_y, final_z;
-                final_x = kin.truePositionFilter[0].value;
-                final_y = kin.truePositionFilter[1].value;
-                final_z = kin.truePositionFilter[2].value;
-                printf("[X] %d | [Y] %d | [Z] %d\n", final_x, final_y, final_z);
+                if(tau.sys.state == STABLE_DOUBLE)
+                {
+                    double a,b,c;
+                    Kinetic_Update_Rotation( &lsm, &kin );
+                    Kinetic_Update_Position( &lsm, &kin, bea );
+                    a = kin.rotation[0];
+                    b = kin.rotation[1];
+                    c = kin.rotation[2];
+                    printf("[R] %.4f  [P] %.4f  [Y] %.4f (º)\n", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
+                    
+                    Kinetic_Update_Position( &lsm, &kin, bea );
+                    a = kin.position[0];
+                    b = kin.position[1];
+                    c = kin.position[2];
+                    printf("[X] %.4f  [Y] %.4f  [Z] %.4f (%s)\n", a * SCALE, b * SCALE, c * SCALE, UNITS);
+                    
+                }
                 /*************************/
                 
 #ifdef MAIN_DEBUG
@@ -192,19 +200,12 @@ int main( int argc, char * argv[] )
 
 //int main( int argc, char * argv[] )
 //{
-//    int t1 = 0, t2 = 0;
-//    arg_count = argc;
-//    arg_values = argv;
+//    int t1 = 0;
 //    printf("Starting with %d threads\n", NUM_THREADS);
 //    pthread_t threads[NUM_THREADS];
 //    t1 = pthread_create(&threads[0], NULL, &IMU_THREAD, NULL);
-//    t2 = pthread_create(&threads[1], NULL, &TAU_THREAD, NULL);
 //    if (t1) {
 //        cout << "Error:unable to create IMU thread," << t1 << endl;
-//        exit(-1);
-//    }
-//    if (t2) {
-//        cout << "Error:unable to create TAU thread," << t2 << endl;
 //        exit(-1);
 //    }
 //    while(1);

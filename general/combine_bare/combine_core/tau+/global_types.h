@@ -193,8 +193,8 @@ extern "C" {
         UNSTABLE_NONE,
         STABLE_SINGLE,
         UNSTABLE_SINGLE,
-        STABLE_FLOAT,
-        UNSTABLE_FLOAT,
+        STABLE_DOUBLE,
+        UNSTABLE_DOUBLE,
         STABLE_MANY,
         UNSTABLE_MANY,
         
