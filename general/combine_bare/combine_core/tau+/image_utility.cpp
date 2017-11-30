@@ -62,19 +62,17 @@ image_test::image_test(int argc, char * argv[])
     size.height = FNL_RESIZE;
     
 #ifdef HAS_CAMERA
-//    cam.set(CV_CAP_PROP_FRAME_WIDTH, width);
-//    cam.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    cam.set(CV_CAP_PROP_FRAME_WIDTH, width);
+    cam.set(CV_CAP_PROP_FRAME_HEIGHT, height);
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
     cam.read(frame);
-    printf("Init-ing camera: (%d, %d)\n", frame.cols, frame.rows);
+    printf("Initializing Camera: (%d, %d) - ", frame.cols, frame.rows);
 #else
     resize(image,frame,size);
 #endif
     
     width  = frame.cols;
     height = frame.rows;
-    
-    //    printf("Using frame size %dx%d.\n", width, height);
     
     live = false;
     
@@ -156,7 +154,7 @@ Vec3b preset(BRIGHTNESS,BRIGHTNESS,BRIGHTNESS);
 /*** UTILITY FUNCTIONS ***/
 void initImg( cimage_t i, int w, int h )
 {
-    printf("mallocing %lu-%dx%d %d bytes\n", sizeof(pixel_base_t), h, w, (int)sizeof(pixel_base_t) * h * w);
+    printf("Mallocing %lu-%dx%d %d bytes\n", sizeof(pixel_base_t), h, w, (int)sizeof(pixel_base_t) * h * w);
     i = (pixel_base_t *)malloc(sizeof(pixel_base_t) * h * w);
 }
 
@@ -170,12 +168,9 @@ void MatToCimage( uint16_t width, uint16_t height, cv::Mat mat, cimage_t img, in
         for(x = width; x > 0; )
         {
             --x;
-//            if(y != height && x != width )
-//            {
                 pixel = mat.at<Vec3b>(y, x);
                 img[z] = pixel[2] > threshold;
                 z++;
-//            }
         }
     }
 }
@@ -189,11 +184,8 @@ void cimageToBandW( uint16_t width, uint16_t height, cimage_t img, Mat mat )
         for(x = width; x > 0; )
         {
             --x;
-//            if(y != height && x != width )
-//            {
-                if(img[z++])
-                    mat.at<Vec3b>(y, x) = preset;
-//            }
+            if(img[z++])
+                mat.at<Vec3b>(y, x) = preset;
         }
     }
 }

@@ -1,10 +1,8 @@
-//
 //  test_setup.h
 //  tau+
 //
 //  Created by Matthew Fonken on 10/28/17.
 //  Copyright © 2017 Marbl. All rights reserved.
-//
 
 #ifndef test_setup_h
 #define test_setup_h
@@ -15,12 +13,13 @@
 #define SHOW_IMAGES
 #define HAS_CAMERA
 //#define TIME_FULL_LOOP
+//#define IMU_DEBUG
 
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define STATEM_DEBUG
-//#define KMAT_DEBUG
-//#define EXT_DEBUG
+#define KMAT_DEBUG
+#define EXT_DEBUG
 //#define IMUT_DEBUG
 //#define KIN_DEBUG
 
@@ -32,20 +31,20 @@
 #define MAX_KALMANS             3
 #define MAX_PEAKS               5
 //#define KALMAN_IS_TIMELESS            // NOTE: Currently breaks kalman gain and thus state machine
-#define MAX_DENSITY_DIFF        20      // Pixels
+#define MAX_DENSITY_DIFF        10      // Pixels
 #define KALMAN_SORT_SCALE_STEP  1       // Pixels
 #define KALMAN_PAIR_MAX         3       // Pair/sorting steps
 #define MIN_PROB                0.1     // Gain units
 #define SELECTION_THRESHOLD     0.01    // Gain units
 #define MIN_PEAK                20      // Pixels
-#define SIMILARITY_TOLERANCE    10      // Pixels
-#define PUNISH_FACTOR           0.8     // Gain / Gain
+#define SIMILARITY_TOLERANCE    20      // Pixels
+#define PUNISH_FACTOR           0.7     // Gain / Gain
 
 #define CHAOS                   5
 #define NUM_OF_SELECTIONS       1
 
 /* PROBABILITY BIASES */
-#define LOCATION_BIAS           0.5
+#define LOCATION_BIAS           0.9
 #define DENSITY_BIAS            1 - LOCATION_BIAS
 
 /* IMAGE PROCESSING */
@@ -75,6 +74,6 @@
 #define DEFAULT_GAUSS_LEN       15
 #define DEFAULT_SIGMA           3.0 //GAUSSIAN SIGMA
 #define MAX_PEAKS_RHO           10
-#define PEAK_LIST_SCAN_STEP     5
+#define PEAK_LIST_SCAN_STEP     2
 
 #endif /* test_setup_h */

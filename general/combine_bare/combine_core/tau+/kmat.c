@@ -125,7 +125,7 @@ void initKMat( kmat_t * m )
         for(int j = 0; j < MAX_PEAKS; j++)
         {
             kalman_t * k = &m->kalmans[i][j];
-            Kalman_Init(k, 0.0);
+            Kalman_Init(k, 0.0, IMAGE_MAX_KALMAN_LIFE, IMAGE_VALUE_UNCERTAINTY, IMAGE_BIAS_UNCERTAINTY, IMAGE_SENSOR_UNCERTAINTY);
         }
     }
     m->k_index = 0;
@@ -179,7 +179,8 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
         printf("i-%d il-%d\n",i, il);
 #endif
         m->k_index++;
-        // for(int j = 0; j < INIT_ITERATIONS; j++) Kalman_Update(kalp, p->map[i], (((rand() % 32) >> 5) - 0.5)); // Init with velocity variance
+#define INIT_ITERATIONS 100
+         for(int j = 0; j < INIT_ITERATIONS; j++) Kalman_Update(kalp, p->map[i], (((rand() % 32) >> 5) - 0.5)); // Init with velocity variance
     }
     m->p_index = m->k_index;
     int ml = m->k_index;
@@ -257,17 +258,17 @@ void selectRow( kmat_t * m, int pl, int il )
         
         /* Adjust weights */
         double r = k.density / ref;
-        if(r < 1000 && r > -1000) k.K[0] *= r;
+//        if(r < 1000 && r > -1000) k.K[0] *= r;
         
 #ifdef KMAT_DEBUG
         printf("\t[%d](%.3f>%.3f)",j,k.density,r);
 #endif
         
         /* Find max */
-        double n = k.K[0];
+        double n = k.K[0] * ((k.value > k.prev)?(k.prev/k.value):(k.value/k.prev));
         if( GTTHR(n, v, SELECTION_THRESHOLD) ) //k.K[0] > v)
         {
-            v = k.K[0];
+            v = n;
             s = j;
         }
     }
@@ -460,7 +461,7 @@ void purgeKMat( kmat_t * m )
         }
         else if( isExpired(kalp) )
         {
-            Kalman_Init(kalp, 0.0);
+            Kalman_Init(kalp, 0.0, IMAGE_MAX_KALMAN_LIFE, IMAGE_VALUE_UNCERTAINTY, IMAGE_BIAS_UNCERTAINTY, IMAGE_SENSOR_UNCERTAINTY);
         }
     }
     /* Recount useful kalmans */

@@ -36,9 +36,9 @@ void Kinetic_Init( LSM9DS1_t * imu, kinetic_t * kinetics )
 void Filters_Init( LSM9DS1_t * imu, kinetic_t * kinetics )
 {
 	IMU_Update_All( imu );
-    Kalman_Init( &kinetics->rotationFilter[0], imu->data.roll );
-    Kalman_Init( &kinetics->rotationFilter[1], imu->data.pitch );
-    Kalman_Init( &kinetics->rotationFilter[2], imu->data.yaw   );
+    Kalman_Init( &kinetics->rotationFilter[0], imu->data.roll, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY);
+    Kalman_Init( &kinetics->rotationFilter[1], imu->data.pitch, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY);
+    Kalman_Init( &kinetics->rotationFilter[2], imu->data.yaw, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY);
 }
 
 void Camera_Rotation_Init( void )
@@ -105,7 +105,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     double the_B, the_A, phi_B, phi_A, psi_r, sigma_A, sigma_r, nu, up;
     
     /* Local lengths */
-    double x_B, x_A, y_B, y_A, d_x, d_y, d__A_sq, d__l, d__n, d__u, r_l;
+    double x_B, x_A, y_B, y_A, d_x, d_y, A_l_sq, d__l, n_l, u_l, r_l;
    
     /*** CALCULATING QUATERNIONS ***/
     x_B = beacons[0].x - CAMERA_HALF_WIDTH;
@@ -116,7 +116,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     d_y = y_A - y_B;
     
     /* Get pixel distance from (0,0) to beacon 1 */
-    d__A_sq = ( ( x_A * x_A ) + ( y_A * y_A ) );
+    A_l_sq = ( ( x_A * x_A ) + ( y_A * y_A ) );
     
     /* Get unit distance between beacons */
     d__l = sqrt( ( d_x * d_x ) + ( d_y * d_y ) ) * PIXEL_TO_UNIT;
@@ -142,10 +142,10 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     B.k = FOCAL_LENGTH * UNIT_TO_PIXEL;
     sigma_r = ang3( &A, &B );
     
-    d__n = ZDIV( fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), d__l );
-    d__u = sqrt( d__A_sq - ( d__n * d__n ) );
-    nu = atan2( ( d__n * PIXEL_TO_UNIT ), FOCAL_LENGTH);
-    up = atan2( ( d__u * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    n_l = ZDIV( fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), d__l );
+    u_l = sqrt( A_l_sq - ( n_l * n_l ) );
+    nu = atan2( ( n_l * PIXEL_TO_UNIT ), FOCAL_LENGTH);
+    up = atan2( ( u_l * PIXEL_TO_UNIT ), FOCAL_LENGTH);
     
     /* Get proper device angles from kinetic */
     r.x = kinetics->rotation[0];
@@ -196,6 +196,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     a.z -= M_PI/2;
     Euler_To_Quaternion(&a, &qa);
     Quaternion_To_Euler(&qa, &a);
+    ang3Rad_To_Deg(&a);
     
     /*** FILTERING R VECTOR ***/
     /* Calculate final r vector */
@@ -203,12 +204,19 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     kinetics->positionFilter[0].value = r_f.i;
     kinetics->positionFilter[1].value = r_f.j;
     kinetics->positionFilter[2].value = r_f.k;
+    
+    kinetics->position[0] = r_f.i;
+    kinetics->position[1] = r_f.j;
+    kinetics->position[2] = r_f.k;
+    
+//    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d | H_a: <%4d,%4d,%4d> | r_l: %.4f\n", (int)(r.z*RAD_TO_DEG), (int)(nu*RAD_TO_DEG), (int)(up*RAD_TO_DEG), (int)(sigma_r*RAD_TO_DEG), (int)(chi*RAD_TO_DEG), (int)(mu*RAD_TO_DEG), (int)(gam*RAD_TO_DEG), (int)(a.x), (int)(a.y), (int)(a.z), r_l);
+    
     return;
     
     /* Kalman filter position */
     /* Get non-gravitational acceleration */
     vec3_t ngacc;
-    IMU_Non_Grav_Get( imu, &qd, &ngacc );
+    IMU_Get_Non_Grav( imu, &ngacc );
     double delta_time = 0;
     kinetics->positionFilter[0].value = ngacc.i;
     kinetics->positionFilter[1].value = ngacc.j;

@@ -53,11 +53,11 @@ void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
     printf("Initializing Kinetic Utility.\n");
     Kinetic_Init( &lsm, &kin );
     
-    printf("Starting IMU thread.\n");
     int roll, pitch, yaw;
     while(1)
     {
         Kinetic_Update_Rotation( &lsm, &kin );
+        kin.rotation[2] += M_PI/2;
         roll    = (int)( kin.rotation[0] * RAD_TO_DEG );
         pitch   = (int)( kin.rotation[1] * RAD_TO_DEG );
         yaw     = (int)( kin.rotation[2] * RAD_TO_DEG );
@@ -69,16 +69,17 @@ void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
 
 int main( int argc, char * argv[] )
 {
-    printf("Starting: ");
+    printf("Starting Combine Core\n");
     
-    printf("IMU Thread... ");
+#ifdef IMU_DEBUG
     pthread_t threads[NUM_THREADS];
+    printf("Starting IMU thread.\n");
     int t1 = pthread_create(&threads[0], NULL, &IMU_THREAD, NULL);
     if (t1) {
         cout << "Error:unable to create IMU thread," << t1 << endl;
         exit(-1);
     }
-    printf("TAU Thread\n");
+#endif
     int threshold = THRESHOLD;
     
     printf("Initializing Image Utility.\n");
@@ -89,14 +90,6 @@ int main( int argc, char * argv[] )
     
     printf("Initializing Tau Utility.\n");
     initTauA(&tau, width, height );
-    
-    printf("Initializing IMU.\n");
-    IMU_Init( &lsm );
-    
-    printf("Initializing Kinetic Utility.\n");
-    Kinetic_Init( &lsm, &kin );
-    
-    printf("Starting IMU thread.\n");
     
 #ifdef ITERATIONS
     for(int o = 0; o < num_orders; o++)
@@ -117,7 +110,7 @@ int main( int argc, char * argv[] )
                 /* Re-init frame and out images every loop */
                 Mat frame, out(height, width, CV_8UC3, Scalar(0,0,0));
                 frame = util.getNextFrame();
-                imshow("Frame", frame);
+//                imshow("Frame", frame);
                 
                 /* Convert image to filtered pixel array and back to black and white image */
                 MatToCimage( width, height, frame, pixels, threshold );
@@ -128,29 +121,20 @@ int main( int argc, char * argv[] )
                 /* Update threshold */
                 updateThreshold(&threshold, stateNumber(tau.sys.state));
                 
-                bea[0].x = tau.predictions.y.primary;
-                bea[0].y = tau.predictions.x.primary;
-                bea[1].x = tau.predictions.y.secondary;
-                bea[1].y = tau.predictions.x.secondary;
-                
                 /* Reconstruct Position */
-                
-                if(tau.sys.state == STABLE_DOUBLE)
+
+                if(tau.sys.state == STABLE_DOUBLE)// && 0)
                 {
                     double a,b,c;
-                    Kinetic_Update_Rotation( &lsm, &kin );
-                    Kinetic_Update_Position( &lsm, &kin, bea );
-                    a = kin.rotation[0];
-                    b = kin.rotation[1];
-                    c = kin.rotation[2];
-                    printf("[R] %.4f  [P] %.4f  [Y] %.4f (º)\n", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
+//                    a = kin.rotation[0];
+//                    b = kin.rotation[1];
+//                    c = kin.rotation[2];
+//                    printf("[R] %.4f  [P] %.4f  [Y] %.4f (º)\n", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
                     
-                    Kinetic_Update_Position( &lsm, &kin, bea );
                     a = kin.position[0];
                     b = kin.position[1];
                     c = kin.position[2];
                     printf("[X] %.4f  [Y] %.4f  [Z] %.4f (%s)\n", a * SCALE, b * SCALE, c * SCALE, UNITS);
-                    
                 }
                 /*************************/
                 
@@ -198,16 +182,3 @@ int main( int argc, char * argv[] )
         return 0;
 }
 
-//int main( int argc, char * argv[] )
-//{
-//    int t1 = 0;
-//    printf("Starting with %d threads\n", NUM_THREADS);
-//    pthread_t threads[NUM_THREADS];
-//    t1 = pthread_create(&threads[0], NULL, &IMU_THREAD, NULL);
-//    if (t1) {
-//        cout << "Error:unable to create IMU thread," << t1 << endl;
-//        exit(-1);
-//    }
-//    while(1);
-//    return 0;
-//}

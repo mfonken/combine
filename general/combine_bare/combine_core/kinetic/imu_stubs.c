@@ -31,7 +31,7 @@ char line[BUFFER_LENGTH];
 
 void Init_SERCOM()
 {
-    printf("Initing SERCOM at %s\n", port);
+    printf("Initializing SERCOM at %s\n", port);
     uart0_filestream = open(port, O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
     if (uart0_filestream == -1)
     {
@@ -198,29 +198,28 @@ void IMU_Update_Yaw( LSM9DS1_t * imu )
 //    return atan2( num, den );
 //}
 
-void IMU_Non_Grav_Get( LSM9DS1_t * imu, quaternion_t * q, vec3_t * ngacc )
+void IMU_Get_Non_Grav( LSM9DS1_t * imu, vec3_t * ngacc )
 {
     IMU_Update_All( imu );
     
+    quaternion_t q;
+    
     /* Create a vector of accelerometer values */
-    vec3_t avec;
-    avec.i = -imu->data.accel[0];
-    avec.j = -imu->data.accel[1];
-    avec.k = -imu->data.accel[2];
+    ang3_t a;
+    a.x = imu->data.pitch;
+    a.y = imu->data.roll;
+    a.z = 0;
+    Euler_To_Quaternion(&a, &q);
     
-    vec3_t nvec;
-    mat3x3_t m;
-    Quaternion_To_Matrix( q, &m );
-    Multiply_Vec_3x1( &m, &avec, &nvec );
-    
-//    ang3_t a;
-//    a.x = atan2(2*(q->w*q->x+q->y*q->z),1-2*(q->x*q->x+q->y*q->y)) * 57.295779; //yaw
-//    a.y = asin(2*((q->w*q->y) - (q->z*q->x))) * 57.295779;// roll
-//    a.z = atan2(2*(q->w*q->z+q->x*q->y),1-2*(q->y*q->y+q->z*q->z)) * 57.295779; // pitch
-    
-    ngacc->i = nvec.i;
-    ngacc->j = nvec.j;
-    ngacc->k = nvec.k + 1; // Negate gravity
+    vec3_t g,r;
+    g.i =  0;
+    g.j =  0;
+    g.k = -1;
+    Rotate_Vector_By_Quaternion(&g, &q, &r);
+
+    ngacc->i = imu->data.accel[0] - r.i;
+    ngacc->j = imu->data.accel[1] - r.j;
+    ngacc->k = imu->data.accel[2] - r.k;
 }
 
 

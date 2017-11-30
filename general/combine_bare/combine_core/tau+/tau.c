@@ -35,4 +35,15 @@ void performTauA(tau_t * t, double * times, cimage_t img )
     times[0] = timeDiff(a,b);
     times[1] = timeDiff(b,c);
     times[2] = timeDiff(c,d);
+    
+    if(t->predictions.x.primary > t->predictions.x.secondary)
+    {
+        double py, px;
+        py = t->predictions.y.primary;
+        px = t->predictions.x.primary;
+        t->predictions.y.primary = t->predictions.y.secondary;
+        t->predictions.x.primary = t->predictions.x.secondary;
+        t->predictions.y.secondary = py;
+        t->predictions.x.secondary = px;
+    }
 }

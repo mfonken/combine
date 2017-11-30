@@ -26,6 +26,12 @@ extern "C" {
 #define GTTHR(X,Y,T)    X>=(Y+T)
 #define INRANGE(X,Y,T)  (X>(Y-T)&&X<(Y+T))
     
+/* Kalman Defaults */
+#define IMAGE_MAX_KALMAN_LIFE     5.0 // (seconds)
+#define IMAGE_VALUE_UNCERTAINTY   0.1//0.01
+#define IMAGE_BIAS_UNCERTAINTY    0.005//0.003
+#define IMAGE_SENSOR_UNCERTAINTY  0.005//0.02
+    
     typedef int16_t         image_dimension_base_t;
     typedef uint8_t         pixel_base_t;
     typedef pixel_base_t*   cimage_t;

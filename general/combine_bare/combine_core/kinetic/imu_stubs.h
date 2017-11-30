@@ -60,7 +60,7 @@ void IMU_Update_Roll( LSM9DS1_t * imu );
 void IMU_Update_Pitch( LSM9DS1_t * imu );
 void IMU_Update_Yaw( LSM9DS1_t * imu );
 double IMU_Roll_Error_Get( LSM9DS1_t * imu );
-void IMU_Non_Grav_Get( LSM9DS1_t * imu, quaternion_t * q, vec3_t * ngacc );
+void IMU_Get_Non_Grav( LSM9DS1_t * imu, vec3_t * ngacc );
 
 void tokenifyPacket( char * a, int l, double * d);
 char** str_split(char* a_str, const char a_delim);

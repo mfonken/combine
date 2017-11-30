@@ -5,8 +5,7 @@
 #define TIMELESS
 #endif
 
-void Kalman_Init( kalman_t *k,
-                 double    v )
+void Kalman_Init( kalman_t *k, double v, double ls, double v_u, double b_u, double s_u )
 {
     k->K[0]        = 0;
     k->K[1]        = 0;
@@ -19,6 +18,11 @@ void Kalman_Init( kalman_t *k,
     k->value       = v;
     k->prev        = 0;
     k->density     = 0;
+    
+    k->lifespan    = ls;
+    k->uncertainty.value   = v_u;
+    k->uncertainty.bias    = b_u;
+    k->uncertainty.sensor  = s_u;
 }
 
 void Kalman_Update( kalman_t *k,
@@ -28,7 +32,7 @@ void Kalman_Update( kalman_t *k,
     double delta_time = timestamp() - k->timestamp;
     
     /* Quick expiration check */
-    if(delta_time > MAX_KALMAN_LIFE)
+    if(delta_time > k->lifespan)
     {
         k->timestamp = timestamp();
         return;
@@ -41,12 +45,12 @@ void Kalman_Update( kalman_t *k,
     k->P_k[0][0] +=   delta_time * ( ( delta_time * k->P_k[1][1] ) -
                                     k->P_k[0][1] -
                                     k->P_k[1][0] +
-                                    VALUE_UNCERTAINTY );
+                                    k->uncertainty.value );
     k->P_k[0][1] -=   P_k_diag;
     k->P_k[1][0] -=   P_k_diag;
-    k->P_k[1][1] +=   BIAS_UNCERTAINTY * delta_time;
+    k->P_k[1][1] +=   k->uncertainty.bias * delta_time;
     
-    double S      = k->P_k[0][0] + SENSOR_UNCERTAINTY;
+    double S      = k->P_k[0][0] + k->uncertainty.sensor;
     k->K[0]       = k->P_k[0][0] / S;
     k->K[1]       = k->P_k[1][0] / S;
     double delta_value = value_new - k->value;

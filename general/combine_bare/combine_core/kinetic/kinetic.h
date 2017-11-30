@@ -70,11 +70,11 @@ extern "C" {
 #define     CAMERA_OFFSET_ANGLE_Y   0       // degress
 #define     CAMERA_OFFSET_ANGLE_Z   0       // degrees
     
-#define     CAMERA_ALPHA_W          120     // degrees
-#define     CAMERA_ALPHA_H          75      // degrees
+//#define     CAMERA_ALPHA_W          120     // degrees
+//#define     CAMERA_ALPHA_H          75      // degrees
     
-#define     CAMERA_WIDTH            1280    // pixels
-#define     CAMERA_HEIGHT           800     // pixels
+#define     CAMERA_WIDTH            640//1280    // pixels
+#define     CAMERA_HEIGHT           400//800     // pixels
 #define     CAMERA_HALF_WIDTH       CAMERA_WIDTH/2
 #define     CAMERA_HALF_HEIGHT      CAMERA_HEIGHT/2
     

@@ -22,7 +22,7 @@
 
 void initRho( rho_t * r, uint16_t width, uint16_t height )
 {
-    printf("Init-ing rho: %dx%d\n", width, height);
+    printf("Initializing Rho: %dx%d\n", width, height);
     r->width  = width;
     r->height = height;
     
@@ -42,11 +42,8 @@ void performRho( rho_t * r, cimage_t img )
 void generateDensityMap( rho_t * r, cimage_t img )
 {
     int h = r->height, w = r->width;
-    int /*mapx[h], mapy[w], */velx[h], vely[w];
     memset(r->density_map_pair.y.map, 0, sizeof(int) * w);
     memset(r->density_map_pair.x.map, 0, sizeof(int) * h);
-    memset(vely, 0, sizeof(int) * w);
-    memset(velx, 0, sizeof(int) * h);
     
     int row_sum, z = 0, y = h, x;
     
@@ -67,8 +64,6 @@ void generateDensityMap( rho_t * r, cimage_t img )
     gaussianBlurInt( &r->gaussian, r->density_map_pair.y.map, w, 4);
     r->density_map_pair.y.length = w;
     r->density_map_pair.x.length = h;
-//    r->density_map_pair.y.map = mapy;
-//    r->density_map_pair.x.map = mapx;
 }
 
 void generatePeakListPair( density_map_pair_t * density_pair, peak_list_pair_t * peaks )
@@ -79,25 +74,25 @@ void generatePeakListPair( density_map_pair_t * density_pair, peak_list_pair_t *
 
 void generatePeakList( density_map_t * density_map, peak_list_t * peaks )
 {
-    int pos_thresh = 80, l = density_map->length, peak_index = 0;
+    int map_thresh = 60, l = density_map->length, peak_index = 0;
     int curr_vel = 0, last_vel = 0;
-    int curr_pos = 0, last_pos = 0;
+    int curr_map = 0, last_map = 0;
     
     for( int i = 1; i < l; i += PEAK_LIST_SCAN_STEP )
     {
-        curr_pos = density_map->map[i];
-        curr_vel = curr_pos - last_pos;
+        curr_map = density_map->map[i];
+        curr_vel = curr_map - last_map;
 
-        if( curr_pos >= pos_thresh
-            && falling(curr_vel, last_vel)
+        if( curr_map >= map_thresh
+            && fallingthresh(curr_vel, last_vel, 2)
            )
         {
             peaks->map[peak_index] = i;
-            peaks->den[peak_index] = curr_pos;
+            peaks->den[peak_index] = curr_map;
             peaks->dir[peak_index] = 0;
             if(peak_index < MAX_PEAKS_RHO) peak_index++;
         }
-        last_pos = curr_pos;
+        last_map = curr_map;
         last_vel = curr_vel;
     }
     peaks->length = peak_index;

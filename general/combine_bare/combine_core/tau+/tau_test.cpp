@@ -40,8 +40,8 @@ void drawTau(Mat M, density_map_pair_t * m, peak_list_pair_t * p, prediction_pai
     uint16_t pos = 0;
     
     int xp = e->x.primary;
-    int xs = e->x.secondary;
     int yp = e->y.primary;
+    int xs = e->x.secondary;
     int ys = e->y.secondary;
     
     for(int x=0; x<h; x++)
@@ -98,6 +98,10 @@ void drawTau(Mat M, density_map_pair_t * m, peak_list_pair_t * p, prediction_pai
     Mat overlay;
     float alpha = 0.3;
     M.copyTo(overlay);
+    
+    putText(overlay, "B", Point(yp,xp), FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,255,0), 3,8);
+    putText(overlay, "A", Point(ys,xs), FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,255), 3,8);
+    
     rectangle(overlay,Point(yp,xp), Point(ys,xs), Scalar(0,255,255), -1);
     addWeighted(overlay, alpha, M, 1 - alpha, 0, M);
 

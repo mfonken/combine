@@ -37,6 +37,12 @@ extern "C" {
 #define SIGN(X)   X>=0?1:-1
 #define RASIN(X)  X>-1&&X<1?asin(X):SIGN(X)*M_PI/2
     
+/* Kalman Defaults */
+#define MOTION_MAX_KALMAN_LIFE     10.0
+#define MOTION_VALUE_UNCERTAINTY   0.01
+#define MOTION_BIAS_UNCERTAINTY    0.003
+#define MOTION_SENSOR_UNCERTAINTY  0.02
+    
 /***************************************************************************************************
  Public Types
  ***************************************************************************************************/
