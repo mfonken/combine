@@ -124,10 +124,10 @@ void drawKalmanData( prediction_kalman_pair_t * k )
     
     /* GET P VALUES */
     string E("xp-P00: "),F("xs-P00: "),G("yp-P00: "),H("ys-P00: ");
-    a = k->x.primary.P_k[1][0];
-    b = k->x.secondary.P_k[1][0];
-    c = k->y.primary.P_k[1][0];
-    d = k->y.secondary.P_k[1][0];
+    a = k->x.primary.P[1][0];
+    b = k->x.secondary.P[1][0];
+    c = k->y.primary.P[1][0];
+    d = k->y.secondary.P[1][0];
     E.append(to_string(a));
     F.append(to_string(b));
     G.append(to_string(c));

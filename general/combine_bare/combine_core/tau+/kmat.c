@@ -238,7 +238,7 @@ void selectKMatPeaks( kmat_t * m, int pl )
 
 double getConfidence( kalman_t * k)
 {
-  return k.K[0] * ((k.value > k.prev)?(k.prev/k.value):(k.value/k.prev));
+  return k->K[0] * ((k->value > k->prev)?(k->prev/k->value):(k->value/k->prev));
 }
 
 void selectRow( kmat_t * m, int pl, int il )
@@ -545,8 +545,8 @@ void quickSortKMat(kmat_t * m, int l, int h, bool w )
     if( l < h )
     {
         int p;
-        if(w) p = partitionKMatUnweighted(m, l, h, w);
-        else p = partitionKMatWeighted(m, l, h, w);
+        if(w) p = partitionKMatUnweighted(m, l, h);
+        else p = partitionKMatWeighted(m, l, h);
         quickSortKMat(m, l, p - 1, w);
         quickSortKMat(m, p + 1, h, w);
     }
