@@ -138,7 +138,7 @@ void updateKMat( kmat_t * m, peak_list_t * p )
     selectKMatPeaks( m, p->length );
 
     /*** 3) Find density pairs in Kalman matrix and give them a sorting bias ***/
-    getKMatCouples( m );
+    //getKMatCouples( m );
 
     /*** 4) Sort Kalman Matrix ***/
     quickSortKMat( m, 0, m->k_index-1, WEIGHTED );
@@ -191,10 +191,9 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
 
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
-        kalman_t s = m->kalmans[il][m->selection[il]];
-        /* Start new rows for valid new peaks */
         for(int j = 0; j < pl; j++)
         {
+            kalman_t s = m->kalmans[il][m->selection[il]];
             int val = p->map[j];
             int den = p->den[j];
             if( den > MIN_PEAK )
@@ -237,12 +236,17 @@ void selectKMatPeaks( kmat_t * m, int pl )
 #endif
 }
 
+double getConfidence( kalman_t * k)
+{
+  return k.K[0] * ((k.value > k.prev)?(k.prev/k.value):(k.value/k.prev));
+}
+
 void selectRow( kmat_t * m, int pl, int il )
 {
     kalman_t k;
 
     int s = 0;
-    double v = m->kalmans[il][0].K[0];
+    double v = getConfidence( &m->kalmans[il][0] );
     double ref = m->kalmans[il][0].density;
 
 #ifdef KMAT_DEBUG
@@ -262,7 +266,7 @@ void selectRow( kmat_t * m, int pl, int il )
 #endif
 
         /* Find max */
-        double n = k.K[0] * ((k.value > k.prev)?(k.prev/k.value):(k.value/k.prev));
+        double n = getConfidence( &k );
         if( GTTHR(n, v, SELECTION_THRESHOLD) ) //k.K[0] > v)
         {
             v = n;
@@ -298,7 +302,6 @@ void getKMatCouples( kmat_t * m )
     int found_count = 0;
     bool coup_found = false;
 
-#define MIN_DENSITY 10
     for( int i = 0, il = 0; i <= ml; i++ )
     {
         if(i == ml)
@@ -314,7 +317,7 @@ void getKMatCouples( kmat_t * m )
             if(curr_den < MIN_DENSITY) coup_lev = 0;
         }
 
-        /* Finding first in density range (important: live matrix pair level should never go below 0) */
+        /* Finding first in density range (important: live matrix couple level should never go below 0) */
         if ( coup_lev == -1 )
         {
             min_den = curr_den - MAX_DENSITY_DIFF;
@@ -451,7 +454,7 @@ void purgeKMat( kmat_t * m )
             prev[pi++] = v;
         }
 
-        if(kalp->K[0] < MIN_PROB )
+        if(getConfidence(kalp) < MIN_PROB )
         {
             m->k_index = i;
             break;
@@ -503,9 +506,26 @@ void swapKMat( kmat_t * m, kmat_p a, kmat_p b )
     m->lookup[a] = m->lookup[b];
     m->lookup[b] = t;
 }
-int partitionKMat(kmat_t * m, int l, int h, bool w )
+int partitionKMatUnweighted(kmat_t * m, int l, int h )
 {
-    int pivot = (w)?weightedValue(m, l):m->value[m->lookup[l]];
+    int pivot = m->value[m->lookup[l]];
+    int i = h+1;
+
+    for (int j = h; j > l; j--)
+    {
+        if( m->value[m->lookup[j]] <= pivot) swapKMat(m,--i,j);
+    }
+#ifdef EXT_DEBUG
+#ifdef KMAT_DEBUG
+    printf("Pivot ");
+#endif
+#endif
+    swapKMat(m,i-1,l);
+    return (i - 1);
+}
+int partitionKMatWeighted(kmat_t * m, int l, int h)
+{
+    int pivot = weightedValue(m, l);
     int i = h+1;
 
     for (int j = h; j > l; j--)
@@ -524,7 +544,9 @@ void quickSortKMat(kmat_t * m, int l, int h, bool w )
 {
     if( l < h )
     {
-        int p = partitionKMat(m, l, h, w);
+        int p;
+        if(w) p = partitionKMatUnweighted(m, l, h, w);
+        else p = partitionKMatWeighted(m, l, h, w);
         quickSortKMat(m, l, p - 1, w);
         quickSortKMat(m, p + 1, h, w);
     }

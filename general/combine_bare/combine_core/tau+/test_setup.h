@@ -37,6 +37,7 @@
 #define MIN_PROB                0.1     // Gain units
 #define SELECTION_THRESHOLD     0.01    // Gain units
 #define MIN_PEAK                20      // Pixels
+#define MIN_DENSITY             10      // Pixels
 #define SIMILARITY_TOLERANCE    20      // Pixels
 #define PUNISH_FACTOR           0.7     // Gain / Gain
 
