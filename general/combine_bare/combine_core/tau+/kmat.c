@@ -6,9 +6,6 @@
 //  Copyright © 2017 Marbl. All rights reserved.
 //
 
-
-///TODO: Implement pair perging!!! (And the other perging)
-
 #include "kmat_print.h"
 
 
@@ -22,7 +19,7 @@ void initKMatPair( kmat_pair_t * m )
     printf("\n\tX:");
 #endif
     initKMat(&m->x);
-    
+
 #ifdef KMAT_DEBUG
     printf("\n\tY:");
 #endif
@@ -79,13 +76,13 @@ void getKMatPrediction( kmat_pair_t * m, prediction_pair_t * o )
     o->x.secondary              = xsv;
     o->x.secondary_probability  = xsp;
     o->x.alternate_probability  = xap;
-    
+
     o->y.primary                = ypv;
     o->y.primary_probability    = ypp;
     o->y.secondary              = ysv;
     o->y.secondary_probability  = ysp;
     o->y.alternate_probability  = yap;
-    
+
 #ifdef KMAT_DEBUG
     printf("O PREDICTION:\n\tVALUES: xp>%d & xs>%d | yp>%d & ys>%d\n", o->x.primary, o->x.secondary, o->y.primary, o->y.secondary);
     printf("\tPROBABILITIES:\n\t\tx - xpp>%f xsp>%f xap>%f\n", o->x.primary_probability, o->x.secondary_probability, o->x.alternate_probability);
@@ -99,7 +96,7 @@ void updateKMatPair( kmat_pair_t * m, peak_list_pair_t * p )
     printf("\n*=============================================== X ===============================================*\n");
 #endif
     updateKMat( &m->x, &p->x );
-    
+
 #ifdef KMAT_DEBUG
     printf("\n*=============================================== Y ===============================================*\n");
 #endif
@@ -118,7 +115,7 @@ void initKMat( kmat_t * m )
         m->pair[i].level        = 0;
         m->pair[i].persistence  = 0;
         m->density[i]           = 0;
-        
+
 #ifdef KMAT_DEBUG
         printf("\tk[%d]: lookup-%d selection-%d pair-%d density-%.1f\n", i, m->lookup[i], m->selection[i], m->pair[i].level, m->density[i]);
 #endif
@@ -139,16 +136,16 @@ void updateKMat( kmat_t * m, peak_list_t * p )
 
     /*** 2) Find highest kalman tracking values by tracking row ***/
     selectKMatPeaks( m, p->length );
-    
+
     /*** 3) Find density pairs in Kalman matrix and give them a sorting bias ***/
     getKMatCouples( m );
-    
+
     /*** 4) Sort Kalman Matrix ***/
     quickSortKMat( m, 0, m->k_index-1, WEIGHTED );
-    
+
     /*** 5) Purge kalmans by selection if expired or best is still too small ***/
     purgeKMat( m );
-    
+
 #ifdef KMAT_DEBUG
     printf("*****************AFTER UPDATE****************\n");
     printKM( m );
@@ -159,22 +156,22 @@ void updateKMat( kmat_t * m, peak_list_t * p )
 void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
 {
     kalman_t * kalp = NULL;
-    
+
     /* Set length of peaks to check */
     ///TODO: Figure out how to check all peaks with MAX limit
     int pl = (p->length < MAX_PEAKS)?p->length:MAX_PEAKS; // Use all peaks
-    
+
 #ifdef KMAT_DEBUG
     printf("Receiving %d %s\n", pl, PLURAL("peak", pl));
 #endif
-    
+
     for(int i = m->k_index, il = m->lookup[0]; i < pl && i < MAX_KALMANS; i++, il = m->lookup[i])
     {
         kalp                = &m->kalmans[il][i];
         kalp->value         = p->map[i];
         kalp->density       = p->den[i];
         m->selection[il]    = i;
-        
+
 #ifdef KMAT_DEBUG
         printf("i-%d il-%d\n",i, il);
 #endif
@@ -184,14 +181,14 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
     }
     m->p_index = m->k_index;
     int ml = m->k_index;
-    
+
 #ifdef EXT_DEBUG
 #ifdef KMAT_DEBUG
     printf("*****************AFTER ADD****************\n");
     printKM( m );
 #endif
 #endif
-    
+
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
         kalman_t s = m->kalmans[il][m->selection[il]];
@@ -223,7 +220,7 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
 void selectKMatPeaks( kmat_t * m, int pl )
 {
     int ml = m->k_index;
-    
+
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
         selectRow( m, pl, il );
@@ -231,7 +228,7 @@ void selectKMatPeaks( kmat_t * m, int pl )
         printf("\n");
 #endif
     }
-    
+
 #ifdef EXT_DEBUG
 #ifdef KMAT_DEBUG
     printf("*****************AFTER WEIGHTS****************\n");
@@ -239,31 +236,31 @@ void selectKMatPeaks( kmat_t * m, int pl )
 #endif
 #endif
 }
-                  
+
 void selectRow( kmat_t * m, int pl, int il )
 {
     kalman_t k;
-    
+
     int s = 0;
     double v = m->kalmans[il][0].K[0];
     double ref = m->kalmans[il][0].density;
-    
+
 #ifdef KMAT_DEBUG
     printf("Density referene is on kalman %d is %.2f\n",il, ref);
 #endif
-    
+
     for(int j = 1; j < pl; j++ )
     {
         k = m->kalmans[il][j];
-        
+
         /* Adjust weights */
         double r = k.density / ref;
 //        if(r < 1000 && r > -1000) k.K[0] *= r;
-        
+
 #ifdef KMAT_DEBUG
         printf("\t[%d](%.3f>%.3f)",j,k.density,r);
 #endif
-        
+
         /* Find max */
         double n = k.K[0] * ((k.value > k.prev)?(k.prev/k.value):(k.value/k.prev));
         if( GTTHR(n, v, SELECTION_THRESHOLD) ) //k.K[0] > v)
@@ -275,7 +272,7 @@ void selectRow( kmat_t * m, int pl, int il )
 #ifdef KMAT_DEBUG
     printf("\n");
 #endif
-    
+
     m->selection[il] = s;
     m->value[il] = v;
     m->density[il] = k.density;
@@ -287,20 +284,20 @@ void getKMatCouples( kmat_t * m )
     int ml = m->k_index;
     /* Sort matrix without weights */
     quickSortKMat( m, 0, m->k_index-1, UNWEIGHTED );
-    
+
     /* Start with higher pair level (higher sort bias) */
     uint8_t pair_level = KALMAN_PAIR_MAX;
-    
+
     int min_den = -1;
     int curr_den = -1;
     int curr_lev = -1;
-    
+
     int coup_ind[] = {0,0}; // coupling indeces
     int coup_lev = -1;      // coupling level
-    
+
     int found_count = 0;
     bool coup_found = false;
-    
+
 #define MIN_DENSITY 10
     for( int i = 0, il = 0; i <= ml; i++ )
     {
@@ -316,7 +313,7 @@ void getKMatCouples( kmat_t * m )
             curr_lev = m->pair[il].level;
             if(curr_den < MIN_DENSITY) coup_lev = 0;
         }
-        
+
         /* Finding first in density range (important: live matrix pair level should never go below 0) */
         if ( coup_lev == -1 )
         {
@@ -325,7 +322,7 @@ void getKMatCouples( kmat_t * m )
             found_count = 1;
             coup_lev = m->pair[il].level;
         }
-        
+
         /* Finding similar to first in density range */
         else
         {
@@ -342,7 +339,7 @@ void getKMatCouples( kmat_t * m )
                         if( curr_lev > coup_lev )
                         {
                             coup_lev = curr_lev;
-                            
+
                             /* Save if uncoupled indeces were saved in the first spot */
                             if( found_count == 1 )
                             {
@@ -386,7 +383,7 @@ void getKMatCouples( kmat_t * m )
                     m->pair[coup_ind[1]].level = pair_level;
                     encourageCouple( &m->pair[coup_ind[0]] );
                     encourageCouple( &m->pair[coup_ind[1]] );
-                    
+
                     /* Decrement pair level until zero */
                     !pair_level?0:pair_level--;
                     found_count = 0;
@@ -453,7 +450,7 @@ void purgeKMat( kmat_t * m )
             pis[pi] = il;
             prev[pi++] = v;
         }
-    
+
         if(kalp->K[0] < MIN_PROB )
         {
             m->k_index = i;
@@ -465,7 +462,7 @@ void purgeKMat( kmat_t * m )
         }
     }
     /* Recount useful kalmans */
-    
+
     int c = 0;
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
@@ -510,7 +507,7 @@ int partitionKMat(kmat_t * m, int l, int h, bool w )
 {
     int pivot = (w)?weightedValue(m, l):m->value[m->lookup[l]];
     int i = h+1;
-    
+
     for (int j = h; j > l; j--)
     {
         if( weightedValue(m, j) <= pivot) swapKMat(m,--i,j);

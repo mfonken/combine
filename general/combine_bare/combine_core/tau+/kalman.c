@@ -1,5 +1,7 @@
 #include "kalman.h"
 
+/** SOURCE: http://preview.tinyurl.com/9djhrem */
+
 #include "test_setup.h"
 #ifdef KALMAN_IS_TIMELESS
 #define TIMELESS
@@ -9,16 +11,16 @@ void Kalman_Init( kalman_t *k, double v, double ls, double v_u, double b_u, doub
 {
     k->K[0]        = 0;
     k->K[1]        = 0;
-    k->P_k[0][0]   = 0;
-    k->P_k[0][1]   = 0;
-    k->P_k[1][0]   = 0;
-    k->P_k[1][1]   = 0;
+    k->P[0][0]   = 0;
+    k->P[0][1]   = 0;
+    k->P[1][0]   = 0;
+    k->P[1][1]   = 0;
     k->rate        = 0;
     k->bias        = 0;
     k->value       = v;
     k->prev        = 0;
     k->density     = 0;
-    
+
     k->lifespan    = ls;
     k->uncertainty.value   = v_u;
     k->uncertainty.bias    = b_u;
@@ -30,7 +32,7 @@ void Kalman_Update( kalman_t *k,
                    double    rate_new )
 {
     double delta_time = timestamp() - k->timestamp;
-    
+
     /* Quick expiration check */
     if(delta_time > k->lifespan)
     {
@@ -40,28 +42,28 @@ void Kalman_Update( kalman_t *k,
     k->prev       = k->value;
     k->rate       = rate_new - k->bias;
     k->value     += delta_time * k->rate;
-    
-    double P_k_diag = delta_time * k->P_k[1][1];
-    k->P_k[0][0] +=   delta_time * ( ( delta_time * k->P_k[1][1] ) -
-                                    k->P_k[0][1] -
-                                    k->P_k[1][0] +
-                                    k->uncertainty.value );
-    k->P_k[0][1] -=   P_k_diag;
-    k->P_k[1][0] -=   P_k_diag;
-    k->P_k[1][1] +=   k->uncertainty.bias * delta_time;
-    
-    double S      = k->P_k[0][0] + k->uncertainty.sensor;
-    k->K[0]       = k->P_k[0][0] / S;
-    k->K[1]       = k->P_k[1][0] / S;
+
+    double dt_P_1_1 = delta_time * k->P[1][1];
+    k->P[0][0] +=   delta_time * ( dt_P_1_1 -
+                                   k->P[0][1] -
+                                   k->P[1][0] +
+                                   k->uncertainty.value );
+    k->P[0][1] -=   dt_P_1_1;
+    k->P[1][0] -=   dt_P_1_1;
+    k->P[1][1] +=   k->uncertainty.bias * delta_time;
+
+    double S      = k->P[0][0] + k->uncertainty.sensor;
+    k->K[0]       = k->P[0][0] / S;
+    k->K[1]       = k->P[1][0] / S;
     double delta_value = value_new - k->value;
     k->value     += k->K[0] * delta_value;
     k->bias      += k->K[1] * delta_value;
-    
-    k->P_k[0][0] -= k->K[0] * k->P_k[0][0];
-    k->P_k[0][1] -= k->K[0] * k->P_k[0][1];
-    k->P_k[1][0] -= k->K[1] * k->P_k[0][0];
-    k->P_k[1][1] -= k->K[1] * k->P_k[0][1];
-    
+
+    k->P[0][0] -= k->K[0] * k->P[0][0];
+    k->P[0][1] -= k->K[0] * k->P[0][1];
+    k->P[1][0] -= k->K[1] * k->P[0][0];
+    k->P[1][1] -= k->K[1] * k->P[0][1];
+
     k->timestamp = timestamp();
 };
 

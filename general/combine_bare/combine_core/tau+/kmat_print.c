@@ -13,14 +13,14 @@ void printKM( kmat_t * m )
 #ifdef DEBUG
     int ml = MAX_KALMANS;// m->k_index,
     int pl = MAX_PEAKS;
-    
+
     /* Draw matrix */
     printf("%d(%d)x%d(%d) Matrix:\n\t\t",ml,m->k_index,pl,m->p_index);
     for(int j = 0; j < pl; j++) printf("\t\t\t\t\t%d", j);
     printf("\n");
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
-        
+
         double s = m->value[il] + ( KALMAN_SORT_SCALE_STEP * m->pair[il].level );
         printf("%3d[%3d](%.0f)",i, il, s);
         for(int j = 0; j < pl; j++)
@@ -47,7 +47,7 @@ void printKM( kmat_t * m )
         for(int j = 0; j < pl; j++)
         {
             kalman_t k = m->kalmans[i][j];
-            double p00 = k.P_k[0][0], p01 = k.P_k[0][1];
+            double p00 = k.P[0][0], p01 = k.P[0][1];
             char c = ' ';
             if(j == m->selection[il]) c = '|';
             printf("\t%cP00>%.1f|P01>%.1f%c\t",c,p00,p01,c);
@@ -56,7 +56,7 @@ void printKM( kmat_t * m )
         for(int j = 0; j < pl; j++)
         {
             kalman_t k = m->kalmans[i][j];
-            double p10 = k.P_k[1][0], p11 = k.P_k[1][1];
+            double p10 = k.P[1][0], p11 = k.P[1][1];
             char c = ' ';
             if(j == m->selection[il]) c = '|';
             printf("\t%cP10>%.1f|P11>%.1f%c\t",c,p10,p11,c);
@@ -130,12 +130,12 @@ void printKM( kmat_t * m )
  printf(" > [%d][%d]\n",l[a],l[b]);
  #endif
  }
- 
+
  int partitionProbabilityList(probability_list_t * r, int l, int h)
  {
  int pivot = r->values[h];
  int i = (l - 1);
- 
+
  for (int j = l; j <= h-1; j++)
  {
  if (r->values[j] <= pivot) swap(r->lookup,++i,j);
@@ -143,7 +143,7 @@ void printKM( kmat_t * m )
  swap(r->lookup,i+1,h);
  return (i + 1);
  }
- 
+
  void quickSortProbabilityList(probability_list_t * r, int l, int h)
  {
  if( l < h )
@@ -153,7 +153,7 @@ void printKM( kmat_t * m )
  quickSortProbabilityList(r, p + 1, h);
  }
  }
- 
+
  void quickSortProbabilityListPair( probability_list_pair_t * r )
  {
  quickSortProbabilityList(&r->x.primary, 0, r->x.primary.length);
@@ -198,7 +198,7 @@ int partition (int arr[], int low, int high, int tab)
     printf("Pivot is %d at index %d", pivot, low);
 #endif
     int i = high + 1;  // Index of smaller element
-    
+
     for (int j = high; j > low; j--)
     {
 #ifdef EXT_DEBUG
@@ -227,7 +227,7 @@ int partition (int arr[], int low, int high, int tab)
 #ifdef EXT_DEBUG
     printNL(tab);
 #endif
-    
+
     int b = low, a = i - 1;
 #ifdef EXT_DEBUG
     printf("Pivot swapping i-%d <> j-%d", a, b);
@@ -278,4 +278,3 @@ int quickSort(int arr[], int low, int high, int tab)
 /*****************************************/
 
 /* QUICK SORT END */
-

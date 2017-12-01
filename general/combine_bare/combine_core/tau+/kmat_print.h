@@ -28,5 +28,5 @@ int quickSort(int arr[], int low, int high, int tab);
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif /* kmat_print_h */
