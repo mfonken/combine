@@ -69,7 +69,7 @@ void updateSystem( system_t * s, prediction_pair_t * p )
     double xpp = p->x.primary_probability, xsp = p->x.secondary_probability, ypp = p->y.primary_probability, ysp = p->y.secondary_probability;
     if( ( xpp > SHADOW_TOLERANCE || xsp > SHADOW_TOLERANCE ) && ( ypp > SHADOW_TOLERANCE || ysp > SHADOW_TOLERANCE ) )
     {
-        if(INRANGE(xpp, xsp, SHADOW_TOLERANCE) && !INRANGE(ypp, ysp, SHADOW_TOLERANCE))
+        if(EQTHR(xpp, xsp, SHADOW_TOLERANCE) && !EQTHR(ypp, ysp, SHADOW_TOLERANCE))
         {
 #ifdef STATEM_DEBUG
             printf("Using shadow handling on Y axis\n");
@@ -81,7 +81,7 @@ void updateSystem( system_t * s, prediction_pair_t * p )
             printf("\ta: xp>%.2f xs>%.2f yp%.2f ys>%.2f\n", xpp, xsp, ypp, ysp);
 #endif
         }
-        if(INRANGE(ypp, ysp, SHADOW_TOLERANCE) && !INRANGE(xpp, xsp, SHADOW_TOLERANCE))
+        if(EQTHR(ypp, ysp, SHADOW_TOLERANCE) && !EQTHR(xpp, xsp, SHADOW_TOLERANCE))
         {
 #ifdef STATEM_DEBUG
             printf("Using shadow handling on X axis\n");

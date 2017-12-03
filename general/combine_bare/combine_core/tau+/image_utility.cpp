@@ -12,7 +12,7 @@ using namespace cv;
 using namespace std;
 
 #ifdef HAS_CAMERA
-VideoCapture cam(1);
+VideoCapture cam(0);
 #endif
 
 image_test::image_test(int argc, char * argv[])

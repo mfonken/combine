@@ -72,6 +72,8 @@ void generatePeakListPair( density_map_pair_t * density_pair, peak_list_pair_t *
     generatePeakList( &density_pair->y, &peaks->y );
 }
 
+#define VEL_THRESH 1
+
 void generatePeakList( density_map_t * density_map, peak_list_t * peaks )
 {
     int map_thresh = 60, l = density_map->length, peak_index = 0;
@@ -84,7 +86,7 @@ void generatePeakList( density_map_t * density_map, peak_list_t * peaks )
         curr_vel = curr_map - last_map;
 
         if( curr_map >= map_thresh
-            && fallingthresh(curr_vel, last_vel, 2)
+            && fallingthresh(curr_vel, last_vel, VEL_THRESH)
            )
         {
             peaks->map[peak_index] = i;

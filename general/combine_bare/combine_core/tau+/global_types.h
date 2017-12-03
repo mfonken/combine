@@ -24,7 +24,7 @@ extern "C" {
 #define ABS(X)      ((X>=0)?X:-X)
     
 #define GTTHR(X,Y,T)    X>=(Y+T)
-#define INRANGE(X,Y,T)  (X>(Y-T)&&X<(Y+T))
+#define EQTHR(X,Y,T)  (X>(Y-T)&&X<(Y+T))
     
 /* Kalman Defaults */
 #define IMAGE_MAX_KALMAN_LIFE     5.0 // (seconds)

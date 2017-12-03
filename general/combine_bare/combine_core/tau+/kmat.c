@@ -108,6 +108,7 @@ void initKMat( kmat_t * m )
 #ifdef KMAT_DEBUG
     printf(" k%d x p%d\n", MAX_KALMANS, MAX_PEAKS);
 #endif
+    printf("Kalman matrix init:\n");
     for(int i = 0; i < MAX_KALMANS; i++)
     {
         m->lookup[i]            = i;
@@ -117,14 +118,19 @@ void initKMat( kmat_t * m )
         m->density[i]           = 0;
 
 #ifdef KMAT_DEBUG
-        printf("\tk[%d]: lookup-%d selection-%d pair-%d density-%.1f\n", i, m->lookup[i], m->selection[i], m->pair[i].level, m->density[i]);
+        //printf("\tk[%d]: lookup-%d selection-%d pair-%d density-%.1f\n", i, m->lookup[i], m->selection[i], m->pair[i].level, m->density[i]);
 #endif
         for(int j = 0; j < MAX_PEAKS; j++)
         {
-            kalman_t * k = &m->kalmans[i][j];
-            Kalman_Init(k, 0.0, IMAGE_MAX_KALMAN_LIFE, IMAGE_VALUE_UNCERTAINTY, IMAGE_BIAS_UNCERTAINTY, IMAGE_SENSOR_UNCERTAINTY);
+            
+            kalman_t k;
+            Kalman_Init(&k, 0.0, IMAGE_MAX_KALMAN_LIFE, IMAGE_VALUE_UNCERTAINTY, IMAGE_BIAS_UNCERTAINTY, IMAGE_SENSOR_UNCERTAINTY);
+            m->kalmans[i][j] = k;
+            printf("ID:%p", &m->kalmans[i][j]);
         }
+        printf("\n");
     }
+    
     m->k_index = 0;
     m->p_index = 0;
 }
@@ -141,7 +147,9 @@ void updateKMat( kmat_t * m, peak_list_t * p )
     //getKMatCouples( m );
 
     /*** 4) Sort Kalman Matrix ***/
+    printf("Sorting WEIGHTED\n");
     quickSortKMat( m, 0, m->k_index-1, WEIGHTED );
+    printKM( m );
 
     /*** 5) Purge kalmans by selection if expired or best is still too small ***/
     purgeKMat( m );
@@ -160,7 +168,7 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
     /* Set length of peaks to check */
     ///TODO: Figure out how to check all peaks with MAX limit
     int pl = (p->length < MAX_PEAKS)?p->length:MAX_PEAKS; // Use all peaks
-
+    p->length = pl;
 #ifdef KMAT_DEBUG
     printf("Receiving %d %s\n", pl, PLURAL("peak", pl));
 #endif
@@ -203,9 +211,12 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
                 s.density = den;
             }
             m->kalmans[il][j] = s;
+//            kalman_copy(&s, &m->kalmans[il][j]);
+//            printf("ID:%p ", &m->kalmans[il][j]);
             m->density[il] = den;
             m->value[il] = s.K[0];
         }
+//        printf("\n");
     }
 #ifdef EXT_DEBUG
 #ifdef KMAT_DEBUG
@@ -218,8 +229,8 @@ void updateKMatWithPeaks( kmat_t * m, peak_list_t * p )
 /*** SELECT ***/
 void selectKMatPeaks( kmat_t * m, int pl )
 {
+    printf("Running with a pl of %d\n", pl);
     int ml = m->k_index;
-
     for(int i = 0, il = m->lookup[0]; i < ml; i++, il = m->lookup[i])
     {
         selectRow( m, pl, il );
@@ -238,7 +249,7 @@ void selectKMatPeaks( kmat_t * m, int pl )
 
 double getConfidence( kalman_t * k)
 {
-  return k->K[0] * ((k->value > k->prev)?(k->prev/k->value):(k->value/k->prev));
+    return k->K[0] + k->K[1];// * ((k->value > k->prev)?(k->prev/k->value):(k->value/k->prev));
 }
 
 void selectRow( kmat_t * m, int pl, int il )
@@ -252,7 +263,7 @@ void selectRow( kmat_t * m, int pl, int il )
 #ifdef KMAT_DEBUG
     printf("Density referene is on kalman %d is %.2f\n",il, ref);
 #endif
-
+    
     for(int j = 1; j < pl; j++ )
     {
         k = m->kalmans[il][j];
@@ -262,13 +273,19 @@ void selectRow( kmat_t * m, int pl, int il )
 //        if(r < 1000 && r > -1000) k.K[0] *= r;
 
 #ifdef KMAT_DEBUG
-        printf("\t[%d](%.3f>%.3f)",j,k.density,r);
+        printf("\t[%d](%.3f>%.3f): ",j,k.density,r);
 #endif
 
         /* Find max */
         double n = getConfidence( &k );
-        if( GTTHR(n, v, SELECTION_THRESHOLD) ) //k.K[0] > v)
+        
+        /* If first until selection look like or are less than selection, update
+         * or check if current is threshold greater than selection */
+        printf("n(%.4f) vs v(%.4f) %s equal each other\n", n, v, EQTHR(n,v, SELECTION_THRESHOLD)?"":"do not" );
+        printf("Selection is %d and j is %d\n", m->selection[il], j);
+        if( ( j <= m->selection[il] && EQTHR(n,v, 0.001) ) || GTTHR(n, v, SELECTION_THRESHOLD) )
         {
+            printf("Setting new values\n");
             v = n;
             s = j;
         }
@@ -277,6 +294,7 @@ void selectRow( kmat_t * m, int pl, int il )
     printf("\n");
 #endif
 
+    printf("Selection on row %d is %d\n", il,s);
     m->selection[il] = s;
     m->value[il] = v;
     m->density[il] = k.density;
@@ -287,6 +305,7 @@ void getKMatCouples( kmat_t * m )
 {
     int ml = m->k_index;
     /* Sort matrix without weights */
+    printf("Sorting UNWEIGHTED\n");
     quickSortKMat( m, 0, m->k_index-1, UNWEIGHTED );
 
     /* Start with higher pair level (higher sort bias) */
@@ -430,7 +449,7 @@ void purgeKMat( kmat_t * m )
 #ifdef KMAT_DEBUG
                 printf("Checking c>%d vs p>%d (%d)\n", v, prev[j], il);
 #endif
-                if( il != pis[j] && INRANGE(v,prev[j],SIMILARITY_TOLERANCE) )
+                if( il != pis[j] && EQTHR(v,prev[j],SIMILARITY_TOLERANCE) )
                 {
 #ifdef KMAT_DEBUG
                     printf("k[%d](%.1f) ~= k[%d](%.1f)\n", il, m->kalmans[il][m->selection[il]].value, pis[j], m->kalmans[pis[j]][m->selection[pis[j]]].value);
@@ -442,11 +461,13 @@ void purgeKMat( kmat_t * m )
                         printf("Punishing row %d\n", il);
 #endif
                         punishRow(m, il);
+                        v = 0.0;
                     }
-#ifdef KMAT_DEBUG
-                    printf("Re-selecting row %d\n", il);
-#endif
-                    selectRow( m, pl, il );
+//#ifdef KMAT_DEBUG
+//                    printf("Re-selecting row %d\n", il);
+//#endif
+//                    selectRow( m, pl, il );
+//                    printf("New selection on row %d is %d\n", il, m->selection[il]);
                     il = m->lookup[++i];
                 }
             }
@@ -485,6 +506,8 @@ void punishRow( kmat_t * m, int i )
     for(int k = i; k < lim; k++)
         m->lookup[k] = m->lookup[k+1];
     m->lookup[lim] = t;
+    printf("Setting kalman at %d(%d) to 0\n", m->lookup[lim], lim);
+    m->value[m->lookup[lim]] = 0.0;
 }
 
 double weightedValue( kmat_t * m, int i )
@@ -506,14 +529,16 @@ void swapKMat( kmat_t * m, kmat_p a, kmat_p b )
     m->lookup[a] = m->lookup[b];
     m->lookup[b] = t;
 }
+
+/* Partition using density */
 int partitionKMatUnweighted(kmat_t * m, int l, int h )
 {
-    int pivot = m->value[m->lookup[l]];
+    int pivot = m->density[m->lookup[l]];
     int i = h+1;
 
     for (int j = h; j > l; j--)
     {
-        if( m->value[m->lookup[j]] <= pivot) swapKMat(m,--i,j);
+        if( m->density[m->lookup[j]] <= pivot) swapKMat(m,--i,j);
     }
 #ifdef EXT_DEBUG
 #ifdef KMAT_DEBUG
@@ -523,6 +548,8 @@ int partitionKMatUnweighted(kmat_t * m, int l, int h )
     swapKMat(m,i-1,l);
     return (i - 1);
 }
+
+/* Partition using weightedValue() function */
 int partitionKMatWeighted(kmat_t * m, int l, int h)
 {
     int pivot = weightedValue(m, l);

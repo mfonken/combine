@@ -9,6 +9,10 @@
 #include "tau_test.hpp"
 #include <string.h>
 
+#define SHOW_D_MAP
+#define SHOW_PEAKS
+#define SHOW_PREDICTIONS
+
 using namespace cv;
 using namespace std;
 
@@ -44,56 +48,68 @@ void drawTau(Mat M, density_map_pair_t * m, peak_list_pair_t * p, prediction_pai
     int xs = e->x.secondary;
     int ys = e->y.secondary;
     
+#ifdef SHOW_D_MAP
     for(int x=0; x<h; x++)
     {
-        pos = m->x.map[x] * x_scale * 2;
+        pos = m->x.map[x] * x_scale;
         if(pos >= w) pos = w-1;
         M.at<Vec3b>(x,pos) = pos_color;
     }
+#endif
     
-//    for(int i=0; i<h; i++)
-//    {
-//        int l = p->x.map[i];
-//        if(l >= h) l = h-1;
-//        for(int q = 0; q < p->x.den[i]; q++)
-//        {
-//            int dir = p->x.dir[i];
-//            if( dir == 1) M.at<Vec3b>(l,q) = red;
-//            else if( dir == 2 ) M.at<Vec3b>(l,q) = blue;
-//            else M.at<Vec3b>(l,q) = white;
-//        }
-//    }
+#ifdef SHOW_PEAKS
+    for(int x=0; x<p->x.length; x++)
+    {
+        int l = p->x.map[x];
+        if(l >= h) l = h-1;
+        for(int q = 0; q < p->x.den[x]; q++)
+        {
+            int dir = p->x.dir[x];
+            if( dir == 1) M.at<Vec3b>(l,q) = red;
+            else if( dir == 2 ) M.at<Vec3b>(l,q) = blue;
+            else M.at<Vec3b>(l,q) = white;
+        }
+    }
+#endif
 
+#ifdef SHOW_PREDICTIONS
     for(int x=0; x<w; x++)
     {
         M.at<Vec3b>(xp,x) = ap;
         M.at<Vec3b>(xs,x) = bp;
     }
-
+#endif
+    
+#ifdef SHOW_D_MAP
     for(int y=0; y<w; y++)
     {
-        pos = m->y.map[y] * y_scale * 2;
+        pos = m->y.map[y] * y_scale;
         if(pos >= width) pos = width-1;
         M.at<Vec3b>(pos,y) = pos_color;
     }
-
-//    for(int i=0; i<p->y.length; i++)
-//    {
-//        int l = p->y.map[i];
-//        for(int q = 0; q < p->y.den[i] && q < width; q++)
-//        {
-//            int dir = p->y.dir[i];
-//            if( dir == 1) M.at<Vec3b>(q,l) = red;
-//            else if( dir == 2 ) M.at<Vec3b>(q,l) = blue;
-//            else M.at<Vec3b>(q,l) = white;
-//        }
-//    }
+#endif
     
+#ifdef SHOW_PEAKS
+    for(int y=0; y<p->y.length; y++)
+    {
+        int l = p->y.map[y];
+        for(int q = 0; q < p->y.den[y] && q < width; q++)
+        {
+            int dir = p->y.dir[y];
+            if( dir == 1) M.at<Vec3b>(q,l) = red;
+            else if( dir == 2 ) M.at<Vec3b>(q,l) = blue;
+            else M.at<Vec3b>(q,l) = white;
+        }
+    }
+#endif
+    
+#ifdef SHOW_PREDICTIONS
     for(int y = 0; y < h; y++)
     {
         M.at<Vec3b>(y,yp) = ap;
         M.at<Vec3b>(y,ys) = bp;
     }
+#endif
     
     Mat overlay;
     float alpha = 0.3;

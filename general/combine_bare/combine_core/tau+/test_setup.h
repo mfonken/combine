@@ -11,7 +11,7 @@
 
 /* GLOBAL SETUP */
 #define SHOW_IMAGES
-#define HAS_CAMERA
+//#define HAS_CAMERA
 //#define TIME_FULL_LOOP
 //#define IMU_DEBUG
 
@@ -69,7 +69,7 @@
 #define DRAW_HEIGHT             300
 #define MAP_INSET               80
 #define MAP_SCALE               1
-#define FNL_RESIZE              500
+#define FNL_RESIZE              800
 
 /* RHO SETUP */
 #define DEFAULT_GAUSS_LEN       15

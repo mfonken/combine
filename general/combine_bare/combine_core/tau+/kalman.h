@@ -53,6 +53,7 @@ extern "C" {
 
     void Kalman_Init( kalman_t *k, double v, double ls, double v_u, double b_u, double s_u );
     void Kalman_Update( kalman_t *k, double value_new, double rate_new );
+    void kalman_copy( kalman_t * a, kalman_t * b );
     double timestamp(void);
     static inline int isExpired( kalman_t * k ) { return ((timestamp() - k->timestamp) > MAX_KALMAN_LIFE); }
 
