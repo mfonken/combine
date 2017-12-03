@@ -89,7 +89,7 @@ int main( int argc, char * argv[] )
     pixel_base_t pixels[width*height];
 
     printf("Initializing Tau Utility.\n");
-    initTauA(&tau, width, height );
+    initTau(&tau, width, height );
 
 #ifdef ITERATIONS
     for(int o = 0; o < num_orders; o++)
@@ -116,7 +116,7 @@ int main( int argc, char * argv[] )
                 MatToCimage( width, height, frame, pixels, threshold );
 
                 /* Run Tau */
-                performTauA(&tau, t, pixels);
+                performTau(&tau, t, pixels);
 
                 /* Update threshold */
                 updateThreshold(&threshold, stateNumber(tau.sys.state));

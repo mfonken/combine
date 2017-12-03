@@ -21,9 +21,9 @@ extern "C" {
 #include "sigma.h"
 #include "statem.h"
 
-void initTauA( tau_t * t, uint16_t width, uint16_t height );
+void initTau( tau_t * t, uint16_t width, uint16_t height );
 void deinitTau( tau_t * t );
-void performTauA( tau_t * t, double * times, cimage_t img );
+void performTau( tau_t * t, double * times, cimage_t img );
 
 #endif /* tau_h */
 

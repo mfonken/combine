@@ -19,7 +19,7 @@
 //#define MAIN_DEBUG
 //#define STATEM_DEBUG
 #define KMAT_DEBUG
-#define EXT_DEBUG
+//#define EXT_DEBUG
 //#define IMUT_DEBUG
 //#define KIN_DEBUG
 
@@ -76,5 +76,6 @@
 #define DEFAULT_SIGMA           3.0 //GAUSSIAN SIGMA
 #define MAX_PEAKS_RHO           10
 #define PEAK_LIST_SCAN_STEP     2
+#define MIN_PEAK_SEPARATION     20
 
 #endif /* test_setup_h */

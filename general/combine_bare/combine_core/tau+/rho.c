@@ -92,20 +92,25 @@ void generatePeakList( density_map_t * density_map, peak_list_t * peaks )
     int map_thresh = 60, l = density_map->length, peak_index = 0;
     int curr_vel = 0, last_vel = 0;
     int curr_map = 0, last_map = 0;
+    
+    int last_peak = 0;
 
     for( int i = 1; i < l; i += PEAK_LIST_SCAN_STEP )
     {
         curr_map = density_map->map[i];
         curr_vel = curr_map - last_map;
 
-        if( curr_map >= map_thresh
+        if( i > last_peak + MIN_PEAK_SEPARATION 
+            && curr_map >= map_thresh
             && fallingthresh(curr_vel, last_vel, VEL_THRESH)
            )
         {
             peaks->map[peak_index] = i;
             peaks->den[peak_index] = curr_map;
             peaks->dir[peak_index] = 0;
-            if(peak_index < MAX_PEAKS_RHO) peak_index++;
+            last_peak = i;
+            peak_index++;
+            if(peak_index >= MAX_PEAKS_RHO) break;
         }
         last_map = curr_map;
         last_vel = curr_vel;

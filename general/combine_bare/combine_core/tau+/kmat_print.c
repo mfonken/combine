@@ -22,7 +22,7 @@ void printKM( kmat_t * m )
     {
 
         double s = m->value[il] + ( KALMAN_SORT_SCALE_STEP * m->pair[il].level );
-        printf("%3d[%3d](%.0f)",i, il, s);
+        printf("%3d[%3d](%.3f)",i, il, s);
         for(int j = 0; j < pl; j++)
         {
             kalman_t k = m->kalmans[il][j];

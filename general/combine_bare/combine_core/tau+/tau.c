@@ -23,7 +23,7 @@ void deinitTau( tau_t * t )
   deinitRho( &t->rho );
 }
 
-void performTauA(tau_t * t, double * times, cimage_t img )
+void performTau(tau_t * t, double * times, cimage_t img )
 {
     struct timeval a,b,c,d;
     gettimeofday( &a, NULL);
