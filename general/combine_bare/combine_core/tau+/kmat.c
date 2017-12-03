@@ -339,19 +339,24 @@ void getKMatCouples( kmat_t * m )
         /* Finding first in density range (important: live matrix couple level should never go below 0) */
         if ( coup_lev == -1 )
         {
+          /* If last and without previous pair, end */
+          if( i == ml-1 ) break;
+          /* Otherwise treat as start of new pair */
+          else
+          {
             min_den = curr_den - MAX_DENSITY_DIFF;
             coup_ind[0] = il;
             found_count = 1;
             coup_lev = m->pair[il].level;
+          }
         }
-
         /* Finding similar to first in density range */
         else
         {
             /* If current is within first's density range */
             if( curr_den >= min_den )
             {
-                /* If already exist coupling */
+                /* If already has coupling */
                 if( curr_lev > 0 )
                 {
                     /* If two existing couple haven't already been found */
@@ -408,8 +413,13 @@ void getKMatCouples( kmat_t * m )
 
                     /* Decrement pair level until zero */
                     !pair_level?0:pair_level--;
-                    found_count = 0;
+
+                    /* Reset */
                     coup_found = false;
+                    found_count = 0;
+
+                    /* Re-run current */
+                    i--;
                 }
                 /* If no pair was found but an existing couple was found, discourage it */
                 else if( coup_lev > 0 )
@@ -520,10 +530,8 @@ void swapKMat( kmat_t * m, kmat_p a, kmat_p b )
 {
     if(a == b) return;
 #ifdef EXT_DEBUG
-#ifdef KMAT_DEBUG
     printf("\tSwapping lookup at %d and %d: [%d][%d]",a,b,m->lookup[a],m->lookup[b]);
     printf("\n");
-#endif
 #endif
     kmat_p t = m->lookup[a];
     m->lookup[a] = m->lookup[b];
@@ -572,8 +580,8 @@ void quickSortKMat(kmat_t * m, int l, int h, bool w )
     if( l < h )
     {
         int p;
-        if(w) p = partitionKMatUnweighted(m, l, h);
-        else p = partitionKMatWeighted(m, l, h);
+        if(w) p = partitionKMatWeighted(m, l, h);
+        else p = partitionKMatUnweighted(m, l, h);
         quickSortKMat(m, l, p - 1, w);
         quickSortKMat(m, p + 1, h, w);
     }

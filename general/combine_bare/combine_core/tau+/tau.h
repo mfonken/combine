@@ -14,7 +14,7 @@ extern "C" {
 #define tau_h
 
 #include "test_setup.h"
-    
+
 #include <stdio.h>
 #include "global_types.h"
 #include "rho.h"
@@ -22,6 +22,7 @@ extern "C" {
 #include "statem.h"
 
 void initTauA( tau_t * t, uint16_t width, uint16_t height );
+void deinitTau( tau_t * t );
 void performTauA( tau_t * t, double * times, cimage_t img );
 
 #endif /* tau_h */

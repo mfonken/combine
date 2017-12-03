@@ -11,18 +11,18 @@
 void gaussianBlurInt( gaussian_t * g, int * arr, size_t len, int scale )
 {
     size_t n, k_len = g->length;
-    
+
     double res[len + k_len - 1];
-    
+
     for (n = 0; n < len + k_len - 1; n++)
     {
         size_t kmin, kmax, k;
-        
+
         res[n] = 0;
-        
+
         kmin = (n >= k_len - 1) ? n - (k_len - 1) : 0;
         kmax = (n < len - 1) ? n : len - 1;
-        
+
         for (k = kmin; k <= kmax; k++)
         {
             res[n] += (GAUSS_FLOAT)arr[k] * g->array[n - k];
@@ -39,18 +39,18 @@ void gaussianBlurInt( gaussian_t * g, int * arr, size_t len, int scale )
 void gaussianBlur( gaussian_t * g, GAUSS_FLOAT * arr, size_t len )
 {
     size_t n, k_len = g->length;
-    
+
     double res[len + k_len - 1];
-    
+
     for (n = 0; n < len + k_len - 1; n++)
     {
         size_t kmin, kmax, k;
-        
+
         res[n] = 0;
-        
+
         kmin = (n >= k_len - 1) ? n - (k_len - 1) : 0;
         kmax = (n < len - 1) ? n : len - 1;
-        
+
         for (k = kmin; k <= kmax; k++)
         {
             res[n] += (GAUSS_FLOAT)arr[k] * g->array[n - k];
