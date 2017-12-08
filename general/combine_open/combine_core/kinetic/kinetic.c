@@ -64,8 +64,8 @@ void Kinetic_Update_Rotation( LSM9DS1_t * imu, kinetic_t * kinetics )
     
     /* Restrict pitch */
     double v = kinetics->rotationFilter[0].value;
-    if( ( ang.x < -HALF_PI && v >  HALF_PI ) ||
-        ( ang.x >  HALF_PI && v < -HALF_PI ) )
+    if( ( ang.x < -M_PI_2 && v >  M_PI_2 ) ||
+        ( ang.x >  M_PI_2 && v < -M_PI_2 ) )
     {
         kinetics->rotationFilter[0].value  = ang.x;
         kinetics->rotation[0]              = ang.x;

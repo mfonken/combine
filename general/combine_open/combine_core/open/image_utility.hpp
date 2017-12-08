@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sys/time.h>
 
+#include "../kinetic/kinetic.h"
 
 using namespace cv;
 
@@ -51,6 +52,8 @@ public:
 };
 
 bool thresh(uint8_t t, Vec3d p);
+
+void drawPosition(double x, double y, double z);
 
 //void initImg( cimage_t i, int w, int h );
 //void MatToCimage( uint16_t width, uint16_t height, Mat mat, cimage_t img, int threshold );

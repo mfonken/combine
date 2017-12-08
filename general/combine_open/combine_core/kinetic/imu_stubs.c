@@ -23,44 +23,24 @@
 #define PACKET_DEL '\r'
 
 double mag_cal[] = { -2.396, 38.040, 1.093 };
-
 const char port[] = "/dev/tty.usbmodem14121";
 const char port_alt[] = "/dev/tty.usbmodem14221";
 int uart0_filestream = -1;
 char line[BUFFER_LENGTH];
 
-void Init_SERCOM()
+void IMU_Init(LSM9DS1_t * a)
 {
-    printf("Initializing SERCOM at %s\n", port);
-    uart0_filestream = open(port, O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
-    if (uart0_filestream == -1)
-    {
-        printf("Trying alternate port at %s\n", port_alt);
-        uart0_filestream = open(port_alt, O_RDWR | O_NOCTTY | O_NDELAY);
-        if (uart0_filestream == -1)
-            printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
-        else
-            printf("Successfull opened alternate port.\n");
-    }
-    struct termios options;
-    tcgetattr(uart0_filestream, &options);
-    options.c_cflag = B115200 | CS8 | CLOCAL | CREAD;
-    options.c_iflag = IGNPAR;
-    options.c_oflag = 0;
-    options.c_lflag = 0;
-    tcflush(uart0_filestream, TCIFLUSH);
-    tcsetattr(uart0_filestream, TCSANOW, &options);
+    Init_SERCOM(&uart0_filestream, port, port_alt);
 }
-
 void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
 {
     char buffer[BUFFER_LENGTH];
-    write(uart0_filestream, buffer, BUFFER_LENGTH-1);
     int bytes_read = -1, ptr = 0, isnl = 0;
     while( !isnl && ptr < BUFFER_LENGTH-1)
     {
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = (int)read(uart0_filestream, buffer, (size_t)BUFFER_LENGTH);
+        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(uart0_filestream, buffer, (size_t)BUFFER_LENGTH);
+        Read_SERCOM_Bytes(uart0_filestream, buffer, (size_t)BUFFER_LENGTH);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -102,11 +82,56 @@ void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
     imu->data.mag[2]   =-(v[8] - mag_cal[2]);
 }
 
-void IMU_Init(LSM9DS1_t * a)
-{
-    Init_SERCOM();
-    return;
-}
+//void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
+//{
+//    char buffer[BUFFER_LENGTH];
+//    write(uart0_filestream, buffer, BUFFER_LENGTH-1);
+//    int bytes_read = -1, ptr = 0, isnl = 0;
+//    while( !isnl && ptr < BUFFER_LENGTH-1)
+//    {
+//        bytes_read = 0;
+//        while(bytes_read <= 0) bytes_read = (int)read(uart0_filestream, buffer, (size_t)BUFFER_LENGTH);
+//        for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
+//        {
+//            if(buffer[j] == PACKET_DEL)
+//            {
+//                line[i] = PACKET_DEL;
+//                isnl = 1;
+//            }
+//            else if(buffer[j] != '\n' && buffer[j] != '\\') line[i] = buffer[j];
+//            buffer[j] = 0;
+//        }
+//        ptr += bytes_read;
+//    }
+//    line[ptr] = ',';
+//    line[++ptr] = '\0';
+//    if(ptr < MIN_PACKET_LEN) return;
+//    
+//#ifdef PACKET_DEBUG
+//    printf("\nR(%d): %s\n", ptr, line);
+//#endif
+//    
+//    double v[9];
+//    tokenifyPacket( line, ptr, v);
+//    
+//    if( v[0] == 0xffff ) return;
+//#ifdef PACKET_DEBUG
+//    for(int i = 0; i < 9; i++)
+//        printf("(%d)%.2f ", i, v[i]);
+//    printf("\n");
+//#endif
+//    
+//    imu->data.accel[0] = v[0];
+//    imu->data.accel[1] = v[1];
+//    imu->data.accel[2] = v[2];
+//    imu->data.gyro[0]  = v[3];
+//    imu->data.gyro[1]  = v[4];
+//    imu->data.gyro[2]  = v[5];
+//    imu->data.mag[1]   = v[6] - mag_cal[0];
+//    imu->data.mag[0]   = v[7] - mag_cal[1];
+//    imu->data.mag[2]   =-(v[8] - mag_cal[2]);
+//}
+
 void IMU_Update_All(LSM9DS1_t * a)
 {
     Read_SERCOM_IMU_Packet(a);

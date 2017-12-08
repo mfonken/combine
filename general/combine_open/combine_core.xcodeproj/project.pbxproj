@@ -11,6 +11,7 @@
 		4948867E1FD4C487000149C5 /* image_utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 494886771FD4C487000149C5 /* image_utility.cpp */; };
 		4948867F1FD4C487000149C5 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 494886791FD4C487000149C5 /* kalman.c */; };
 		494886801FD4C487000149C5 /* open.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4948867B1FD4C487000149C5 /* open.cpp */; };
+		4968D60F1FDA026800A68C07 /* sercom.c in Sources */ = {isa = PBXBuildFile; fileRef = 4968D60D1FDA026800A68C07 /* sercom.c */; };
 		4991FD081FBD0F1A0025EA57 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4991FD071FBD0F1A0025EA57 /* main.cpp */; };
 		4993850C1FBD5CD0000F867E /* kinetic.c in Sources */ = {isa = PBXBuildFile; fileRef = 499385071FBD5CD0000F867E /* kinetic.c */; };
 		4993850D1FBD5CD0000F867E /* matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = 4993850A1FBD5CD0000F867E /* matrix.c */; };
@@ -39,6 +40,8 @@
 		4948867B1FD4C487000149C5 /* open.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = open.cpp; sourceTree = "<group>"; };
 		4948867C1FD4C487000149C5 /* open.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = open.hpp; sourceTree = "<group>"; };
 		4948867D1FD4C487000149C5 /* test_setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_setup.h; sourceTree = "<group>"; };
+		4968D60D1FDA026800A68C07 /* sercom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sercom.c; path = utilities/sercom.c; sourceTree = "<group>"; };
+		4968D60E1FDA026800A68C07 /* sercom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sercom.h; path = utilities/sercom.h; sourceTree = "<group>"; };
 		4991FCB01FBCFF9F0025EA57 /* combine_core */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = combine_core; sourceTree = BUILT_PRODUCTS_DIR; };
 		4991FD071FBD0F1A0025EA57 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		499385071FBD5CD0000F867E /* kinetic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kinetic.c; sourceTree = "<group>"; };
@@ -75,6 +78,15 @@
 			path = open;
 			sourceTree = "<group>";
 		};
+		4968D60C1FD9FCCF00A68C07 /* utilities */ = {
+			isa = PBXGroup;
+			children = (
+				4968D60D1FDA026800A68C07 /* sercom.c */,
+				4968D60E1FDA026800A68C07 /* sercom.h */,
+			);
+			name = utilities;
+			sourceTree = "<group>";
+		};
 		4991FCA71FBCFF9F0025EA57 = {
 			isa = PBXGroup;
 			children = (
@@ -95,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				4991FD071FBD0F1A0025EA57 /* main.cpp */,
+				4968D60C1FD9FCCF00A68C07 /* utilities */,
 				494886751FD4C487000149C5 /* open */,
 				499385061FBD5CD0000F867E /* kinetic */,
 				4993852D1FBE760C000F867E /* stubs */,
@@ -184,6 +197,7 @@
 			files = (
 				4948867E1FD4C487000149C5 /* image_utility.cpp in Sources */,
 				4948867F1FD4C487000149C5 /* kalman.c in Sources */,
+				4968D60F1FDA026800A68C07 /* sercom.c in Sources */,
 				494886801FD4C487000149C5 /* open.cpp in Sources */,
 				493076B91FBFB1DB00DB3693 /* imu_stubs.c in Sources */,
 				4993850D1FBD5CD0000F867E /* matrix.c in Sources */,

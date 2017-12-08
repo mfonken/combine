@@ -10,10 +10,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "utilities/sercom.h"
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <string>
 #include <sys/time.h>
+#include <unistd.h>
 #include <pthread.h>
 
 #include "open/test_setup.h"
@@ -21,6 +24,9 @@
 #include "open/image_utility.hpp"
 #include "open/open.hpp"
 #include "kinetic/kinetic.h"
+
+#define BT_FPS  30
+#define MAX_BUFFER 100
 
 #define RAD_TO_DEG (180 / M_PI)
 #define NUM_THREADS 1
@@ -44,41 +50,47 @@ LSM9DS1_t lsm;
 kinetic_t kin;
 open_t    tra;
 
-void drawPosition(double x, double y, double z)
+void * BT_THREAD( void *data )
 {
-    int width = 800, act_width = 600, height = 600, step = 50;
-    Mat P(height, width, CV_8UC3, Scalar(0,0,0));
+    const char bluetooth_port[] = "/dev/tty.Bluetooth-Incoming-Port";
+    const char bluetooth_port_alt[] = "/dev/cu.Bluetooth-Incoming-Port";
+    int bluetooth_filestream = -1;
     
-    const Vec3b white(255,255,255);
-    /* Draw Grid */
-    for(int x = 0; x <= act_width; x+=step) for(int y = 0; y < act_width; y++) P.at<Vec3b>(y,x) = white;
-    for(int y = 0; y < height; y+=step) for(int x = 0; x < act_width; x++) P.at<Vec3b>(y,x) = white;
+    Init_SERCOM(&bluetooth_filestream, bluetooth_port, bluetooth_port_alt);
     
-    int HORZ_INSET = 100;
+    printf("Waiting for start\n");
+    int received = -1;
+    while( received <= 0)
+    {
+        received = Test_SERCOM(bluetooth_filestream);
+        printf("Received %d bytes\n", received);
+        usleep(1000000);
+    }
     
+    printf("Sending handshake\n");
+    char test[] = "ab\r\n";
+    Write_SERCOM_Bytes(bluetooth_filestream, test, 4);
     
-    /* Draw Beacons */
-    Point A(HORZ_INSET, 200), B(HORZ_INSET, height - 200 );
-    int cir_rad = 5;
-    const Vec3b cir_col(0,0,255);
-    circle(P, A, cir_rad, cir_col, 2, 8, 0);
-    circle(P, B, cir_rad, cir_col, 2, 8, 0);
+    printf("Bluetooth thread started\n");
     
-    line(P, Point(act_width, 0), Point(act_width, height), white, 3, 8, 0);
-    for(int y = 0; y < height; y+=step*2) for(int x = act_width; x < width; x++) P.at<Vec3b>(y,x) = white;
+    int bt_sleep = 1000000 / BT_FPS;
+    int counter = 1;
+    while(1)
+    {
+        char kin_packet[MAX_BUFFER];
+        int l = sprintf(kin_packet, "f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,\r\n",  kin.rotation[0], kin.rotation[1], kin.rotation[2],  kin.position[0] * SCALE, kin.position[1] * SCALE, kin.position[2] * SCALE);
     
-    /* Draw Given (X,Y) */
-    Point C(y * DRAW_SCALE + HORZ_INSET, height/2 + x * DRAW_SCALE);
-    circle(P, C, 10, Vec3b(255,100,0), 2, 8, 0);
-    
-    /* Draw Given Z */
-    double thisZ = height/2 - z * DRAW_SCALE;
-    line(P, Point(act_width, thisZ), Point(width, thisZ), Vec3b(255,100,0), 3, 10, 0);
-    
-    imshow("Position", P);
+        Write_SERCOM_Bytes(bluetooth_filestream, kin_packet, l);
+        
+//        test[0] = (char)(int)(counter / 10) + 0x30;
+//        test[1] = (char)(int)(counter % 10) + 0x30;
+//        Write_SERCOM_Bytes(bluetooth_filestream, test, l);
+        if(++counter > BT_FPS) counter = 1;
+        usleep(bt_sleep);
+    }
 }
 
-void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
+void * IMU_THREAD( void *data )
 {
     printf("Initializing IMU.\n");
     IMU_Init( &lsm );
@@ -86,17 +98,10 @@ void * IMU_THREAD( void *data ) //LSM9DS1_t * lsm, kinetic_t * kin )
     printf("Initializing Kinetic Utility.\n");
     Kinetic_Init( &lsm, &kin );
 
-    int roll, pitch, yaw;
     while(1)
     {
         Kinetic_Update_Rotation( &lsm, &kin );
-        
         kin.rotation[2] += M_PI/2;
-        roll    = (int)( kin.rotation[0] * RAD_TO_DEG );
-        pitch   = (int)( kin.rotation[1] * RAD_TO_DEG );
-        yaw     = (int)( kin.rotation[2] * RAD_TO_DEG );
-        printf("[R] %4d\t [P] %4d\t [Y] %4d\n", roll, pitch, yaw);
-
         Kinetic_Update_Position( &lsm, &kin, bea );
     }
 }
@@ -105,16 +110,25 @@ int main( int argc, char * argv[] )
 {
     printf("Starting Combine Core\n");
 
-#ifdef IMU_DEBUG
     pthread_t threads[NUM_THREADS];
-    printf("Starting IMU thread.\n");
-    int t1 = pthread_create(&threads[0], NULL, &IMU_THREAD, NULL);
+    
+    printf("Starting BT thread.\n");
+    int t1, t2;
+    t1 = pthread_create(&threads[0], NULL, &BT_THREAD, NULL);
     if (t1) {
+        cout << "Error:unable to create BT thread," << t1 << endl;
+        exit(-1);
+    }
+    
+#ifdef IMU_DEBUG
+    printf("Starting IMU thread.\n");
+    t2 = pthread_create(&threads[1], NULL, &IMU_THREAD, NULL);
+    if (t2) {
         cout << "Error:unable to create IMU thread," << t1 << endl;
         exit(-1);
     }
 #endif
-
+    
     printf("Initializing Image Utility.\n");
     image_test util( argc, argv);
     int width = util.getWidth();
@@ -151,8 +165,6 @@ int main( int argc, char * argv[] )
                 std::vector<KeyPoint> kps;
                 kps = tra.detect(frame, out);
 
-                
-                
 #define TEXT_OFFSET_X -26
 #define TEXT_OFFSET_Y  18
 #define DETECT_BORDER_OFFSET 10
@@ -188,7 +200,7 @@ int main( int argc, char * argv[] )
                     }
                 }
                 
-                if(gkps.size() > 2)      threshold += THRESH_STEP;
+//                if(gkps.size() > 2)      threshold += THRESH_STEP;
 //                else if(gkps.size() < 2) threshold -= THRESH_STEP;
                 
                 /*************************/
@@ -196,15 +208,16 @@ int main( int argc, char * argv[] )
 //                times[l] = t[0]+t[1]+t[2];
 #endif
 #ifdef SHOW_IMAGES
+                putText(out, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
+                putText(out, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
                 imshow("Open Tracker", out);
 #endif
-
                 
                 double a,b,c;
-//                    a = kin.rotation[0];
-//                    b = kin.rotation[1];
-//                    c = kin.rotation[2];
-//                    printf("[R] %.4f  [P] %.4f  [Y] %.4f (º)\n", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
+                a = kin.rotation[0];
+                b = kin.rotation[1];
+                c = kin.rotation[2];
+                printf("[R] %.4f  [P] %.4f  [Y] %.4f (º) | ", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
                 
                 a = kin.position[0];
                 b = kin.position[1];

@@ -54,11 +54,6 @@ extern "C" {
     
 /** Absolute value */
 #define 	absl(x) x > 0 ? x:-x
-
-/** Half PI */
-#define     PI      			3.141596
-#define 	HALF_PI				PI / 2
-#define 	DEG_TO_RAD 			PI / 180
     
 /** Initial normal unit vector to beacon plane */
 #define     VISION_ZSTATE_I  0
@@ -83,10 +78,10 @@ extern "C" {
 #define     PIXEL_TO_UNIT           3e-6
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
     
-#define     FOCAL_REFRACTION        1.42e-6//0.945e-6  // units / units
+#define     FOCAL_REFRACTION        1.42e-6//1.42e-6//  // units / units
 #define     FOCAL_LENGTH          ( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
     
-#define     D_FIXED                 3.4e-2
+#define     D_FIXED                 5.08e-2//3.4e-2
     
 /***************************************************************************************************
 Function Declarations

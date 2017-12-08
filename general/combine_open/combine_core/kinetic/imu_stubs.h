@@ -15,6 +15,8 @@ extern "C" {
     
 //#define PACKET_DEBUG
 
+#include "../utilities/sercom.h"
+    
 #include <stdio.h>
 #include "kinetic_types.h"
 #include "matrix.h"
@@ -47,8 +49,7 @@ typedef struct
     imu_t               data;
     LSM9DS1_cfg_t       settings;
 } LSM9DS1_t;
-    
-void Init_SERCOM();
+   
 void Read_SERCOM_IMU_Packet(LSM9DS1_t * imu);
 
 void IMU_Init(LSM9DS1_t * a);

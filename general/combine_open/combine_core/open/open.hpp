@@ -34,14 +34,12 @@ public:
     open_t()
     {
         params.minDistBetweenBlobs = 10; //Minimum distance between blobs
-        params.filterByColor = true;
-        params.blobColor = 255;
         params.filterByCircularity = false;
         params.filterByConvexity = false;
         params.filterByInertia = false;
         
         params.filterByArea = true; // filter by area of the blob
-        params.minArea = 1 ;// Minimum area of the blob
+        params.minArea = 200 ;// Minimum area of the blob
         params.maxArea = 100000; // Maximum area of the blob
         params.filterByColor = true;
         params.blobColor = 255;

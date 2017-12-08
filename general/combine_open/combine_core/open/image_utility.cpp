@@ -170,3 +170,38 @@ bool image_test::isLive()
 
 Vec3b preset(BRIGHTNESS,BRIGHTNESS,BRIGHTNESS);
 
+void drawPosition(double x, double y, double z)
+{
+    int width = 800, act_width = 600, height = 600, step = 50;
+    Mat P(height, width, CV_8UC3, Scalar(0,0,0));
+    
+    const Vec3b white(255,255,255);
+    /* Draw Grid */
+    for(int x = 0; x <= act_width; x+=step) for(int y = 0; y < act_width; y++) P.at<Vec3b>(y,x) = white;
+    for(int y = 0; y < height; y+=step) for(int x = 0; x < act_width; x++) P.at<Vec3b>(y,x) = white;
+    
+    int HORZ_INSET = 100;
+    
+    /* Draw Beacons */
+    Point A(HORZ_INSET, 200), B(HORZ_INSET, height - 200);
+    int cir_rad = 5;
+    const Vec3b cir_col(0,0,255);
+    circle(P, A, cir_rad, cir_col, 2, 8, 0);
+    circle(P, B, cir_rad, cir_col, 2, 8, 0);
+    
+    line(P, Point(act_width, 0), Point(act_width, height), white, 3, 8, 0);
+    for(int y = 0; y < height; y+=step*2) for(int x = act_width; x < width; x++) P.at<Vec3b>(y,x) = white;
+    
+    double unit_scale = (B.y-A.y)/D_FIXED;
+    
+    /* Draw Given (X,Y) */
+    Point C( y * unit_scale + HORZ_INSET, height/2 + x * unit_scale - (B.y-A.y) );
+    circle(P, C, 10, Vec3b(255,100,0), 2, 8, 0);
+    
+    /* Draw Given Z */
+    double thisZ = height/2 - z * unit_scale;
+    line(P, Point(act_width, thisZ), Point(width, thisZ), Vec3b(255,100,0), 3, 10, 0);
+    
+    imshow("Position", P);
+}
+
