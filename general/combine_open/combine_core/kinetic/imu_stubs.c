@@ -233,7 +233,7 @@ void IMU_Get_Non_Grav( LSM9DS1_t * imu, vec3_t * ngacc )
     ang3_t a;
     a.x = imu->data.pitch;
     a.y = imu->data.roll;
-    a.z = 0;
+    a.z = imu->data.yaw;
     Euler_To_Quaternion(&a, &q);
     
     vec3_t g,r;
