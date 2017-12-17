@@ -94,11 +94,6 @@ void Rotate_Vector_By_Quaternion(vec3_t * v, quaternion_t * q, vec3_t * r)
     cross3( &u, &t, &b );
     mul3( s, &t, &c );
     add33( v, &b, &c, r );
-    
-    //    cross3( &u, v, &uxv );
-    //    mul3( 2, &uxv, &a );
-    //    mul3( s, &u, &b );
-    //    add33( v, &a, &b, r );
 }
 
 /* Double quaternion Hamilton multiplication (Generic) */

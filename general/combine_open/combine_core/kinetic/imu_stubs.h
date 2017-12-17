@@ -23,6 +23,8 @@ extern "C" {
 
 typedef struct
 {
+    double 	accel_raw[3];
+    
     double 	accel[3];
     double 	gyro[3];
     double 	mag[3];
@@ -41,7 +43,7 @@ typedef struct
 } imu_t;
 
 typedef struct {
-    
+    int RESERVED;
 } LSM9DS1_cfg_t;
 
 typedef struct

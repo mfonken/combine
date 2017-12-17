@@ -71,6 +71,10 @@ void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
     printf("\n");
 #endif
     
+    imu->data.accel_raw[0] = v[0];
+    imu->data.accel_raw[1] = v[1];
+    imu->data.accel_raw[2] = v[2];
+    
     imu->data.accel[0] = v[0];
     imu->data.accel[1] = v[1];
     imu->data.accel[2] = v[2];
@@ -81,56 +85,6 @@ void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
     imu->data.mag[0]   = v[7] - mag_cal[1];
     imu->data.mag[2]   =-(v[8] - mag_cal[2]);
 }
-
-//void Read_SERCOM_IMU_Packet( LSM9DS1_t * imu )
-//{
-//    char buffer[BUFFER_LENGTH];
-//    write(uart0_filestream, buffer, BUFFER_LENGTH-1);
-//    int bytes_read = -1, ptr = 0, isnl = 0;
-//    while( !isnl && ptr < BUFFER_LENGTH-1)
-//    {
-//        bytes_read = 0;
-//        while(bytes_read <= 0) bytes_read = (int)read(uart0_filestream, buffer, (size_t)BUFFER_LENGTH);
-//        for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
-//        {
-//            if(buffer[j] == PACKET_DEL)
-//            {
-//                line[i] = PACKET_DEL;
-//                isnl = 1;
-//            }
-//            else if(buffer[j] != '\n' && buffer[j] != '\\') line[i] = buffer[j];
-//            buffer[j] = 0;
-//        }
-//        ptr += bytes_read;
-//    }
-//    line[ptr] = ',';
-//    line[++ptr] = '\0';
-//    if(ptr < MIN_PACKET_LEN) return;
-//    
-//#ifdef PACKET_DEBUG
-//    printf("\nR(%d): %s\n", ptr, line);
-//#endif
-//    
-//    double v[9];
-//    tokenifyPacket( line, ptr, v);
-//    
-//    if( v[0] == 0xffff ) return;
-//#ifdef PACKET_DEBUG
-//    for(int i = 0; i < 9; i++)
-//        printf("(%d)%.2f ", i, v[i]);
-//    printf("\n");
-//#endif
-//    
-//    imu->data.accel[0] = v[0];
-//    imu->data.accel[1] = v[1];
-//    imu->data.accel[2] = v[2];
-//    imu->data.gyro[0]  = v[3];
-//    imu->data.gyro[1]  = v[4];
-//    imu->data.gyro[2]  = v[5];
-//    imu->data.mag[1]   = v[6] - mag_cal[0];
-//    imu->data.mag[0]   = v[7] - mag_cal[1];
-//    imu->data.mag[2]   =-(v[8] - mag_cal[2]);
-//}
 
 void IMU_Update_All(LSM9DS1_t * a)
 {
@@ -230,21 +184,36 @@ void IMU_Get_Non_Grav( LSM9DS1_t * imu, vec3_t * ngacc )
     quaternion_t q;
     
     /* Create a vector of accelerometer values */
-    ang3_t a;
-    a.x = imu->data.pitch;
-    a.y = imu->data.roll;
-    a.z = imu->data.yaw;
-    Euler_To_Quaternion(&a, &q);
+    ang3_t e;
+    e.y = imu->data.pitch;
+    e.x = imu->data.roll;
+    e.z = 0;//imu->data.yaw - M_PI_2;
+    Euler_To_Quaternion(&e, &q);
+    e.x *= RAD_TO_DEG;
+    e.y *= RAD_TO_DEG;
+    e.z *= RAD_TO_DEG;
     
-    vec3_t g,r;
-    g.i =  0;
-    g.j =  0;
-    g.k = -1;
+    /* Rotate acceleration vector by quaternion */
+    vec3_t a,g,r;
+    a.i =  imu->data.accel_raw[0];
+    a.j =  imu->data.accel_raw[1];
+    a.k =  imu->data.accel_raw[2];
+    
+    g.i = 0;
+    g.j = 0;
+    g.k = 1;
     Rotate_Vector_By_Quaternion(&g, &q, &r);
 
-    ngacc->i = imu->data.accel[0] - r.i;
-    ngacc->j = imu->data.accel[1] - r.j;
-    ngacc->k = imu->data.accel[2] - r.k;
+    /* Negate gravity: -(-1g) = +1g */
+    ngacc->i = 0;//a.i + r.i;
+    ngacc->j = 0;//a.j + r.j;
+    ngacc->k = 0;//-a.k + r.k;
+    
+    
+//#define NON_GRAV_MIN 0.0075
+//    if(fabs(ngacc->i) < NON_GRAV_MIN) ngacc->i = 0;
+//    if(fabs(ngacc->j) < NON_GRAV_MIN) ngacc->j = 0;
+//    if(fabs(ngacc->k) < NON_GRAV_MIN) ngacc->k = 0;
 }
 
 

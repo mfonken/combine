@@ -201,9 +201,6 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     /*** FILTERING R VECTOR ***/
     /* Calculate final r vector */
     Rotate_Vector_By_Quaternion( &r_u, &qa, &r_f );
-    kinetics->positionFilter[0].value = r_f.i;
-    kinetics->positionFilter[1].value = r_f.j;
-    kinetics->positionFilter[2].value = r_f.k;
     
     kinetics->position[0] = r_f.i;
     kinetics->position[1] = r_f.j;
@@ -211,7 +208,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     
 //    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d | H_a: <%4d,%4d,%4d> | r_l: %.4f\n", (int)(r.z*RAD_TO_DEG), (int)(nu*RAD_TO_DEG), (int)(up*RAD_TO_DEG), (int)(sigma_r*RAD_TO_DEG), (int)(chi*RAD_TO_DEG), (int)(mu*RAD_TO_DEG), (int)(gam*RAD_TO_DEG), (int)(a.x), (int)(a.y), (int)(a.z), r_l);
     
-    return;
+//    return;
     
     /* Kalman filter position */
     /* Get non-gravitational acceleration */
@@ -226,17 +223,17 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     float n;
     n = kinetics->positionFilter[0].value;
     delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
-    double x_vel = ngacc.i * delta_time;
+    double x_vel = ngacc.i * delta_time + kinetics->positionFilter[0].rate;
     Kalman_Update( &kinetics->positionFilter[0], r_f.i, x_vel );
 
     n = kinetics->positionFilter[1].value;
-    delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
-	double y_vel = ngacc.j * delta_time;
+    delta_time = seconds_since( kinetics->positionFilter[1].timestamp );
+	double y_vel = ngacc.j * delta_time + kinetics->positionFilter[1].rate;
 	Kalman_Update( &kinetics->positionFilter[1], r_f.j, y_vel );
 
 	n = kinetics->positionFilter[2].value;
-    delta_time = seconds_since( kinetics->positionFilter[0].timestamp );
-	double z_vel = ngacc.k * delta_time;
+    delta_time = seconds_since( kinetics->positionFilter[2].timestamp );
+	double z_vel = ngacc.k * delta_time + kinetics->positionFilter[2].rate;
 	Kalman_Update( &kinetics->positionFilter[2], r_f.k, z_vel );
     
     kinetics->position[0] = kinetics->positionFilter[0].value;

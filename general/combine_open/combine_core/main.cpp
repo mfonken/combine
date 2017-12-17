@@ -31,7 +31,7 @@
 #define MAX_BUFFER 74
 
 #define RAD_TO_DEG (180 / M_PI)
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 #define SCALE 100
 #define DRAW_SCALE 7000
 
@@ -79,7 +79,12 @@ void * BT_THREAD( void *data )
     while(1)
     {
         char kin_packet[MAX_BUFFER];
-        int l = sprintf(kin_packet, "f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,\r\n",  kin.rotation[0], kin.rotation[1], kin.rotation[2],  kin.position[0] * SCALE, kin.position[1] * SCALE, kin.position[2] * SCALE);
+//        int l = sprintf(kin_packet, "f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,\r\n",  kin.rotation[0], kin.rotation[1], kin.rotation[2],  kin.position[0] * SCALE, kin.position[1] * SCALE, kin.position[2] * SCALE);
+        
+        vec3_t n;
+        IMU_Get_Non_Grav( &lsm, &n );
+        int l = sprintf(kin_packet, "n,%.4f,%.4f,%.4f\r\n", n.i, n.j, n.k);
+        
         Write_SERCOM_Bytes(bluetooth_filestream, kin_packet, l);
         if(++counter > OUT_FPS) counter = 1;
         usleep(OUT_UDL);
@@ -104,10 +109,7 @@ void * DATA_WR_THREAD( void *data )
         outfile.open(file_name, ofstream::out | ofstream::trunc);
         char kin_packet[MAX_BUFFER];
         int l = sprintf(kin_packet, "f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\r\n",  kin.rotation[0], kin.rotation[1], kin.rotation[2],  kin.position[0] * SCALE, kin.position[1] * SCALE, kin.position[2] * SCALE);
-        
-//        vec3_t n;
-//        IMU_Get_Non_Grav( &lsm, &n );
-//        int l = sprintf(kin_packet, "n,%.4f,%.4f,%.4f\r\n", n.i, n.j, n.k);
+    
         outfile.write(kin_packet,l);
         outfile.close();
         
@@ -141,7 +143,7 @@ int main( int argc, char * argv[] )
     
     printf("Starting Data Output thread.\n");
     int t1, t2;
-    t1 = pthread_create(&threads[0], NULL, &DATA_WR_THREAD, NULL);
+    t1 = pthread_create(&threads[0], NULL, &BT_THREAD, NULL);
     if (t1) {
         cout << "Error:unable to create Data Output thread," << t1 << endl;
         exit(-1);
@@ -155,7 +157,7 @@ int main( int argc, char * argv[] )
         exit(-1);
     }
 #endif
-    
+    while(1);
     printf("Initializing Image Utility.\n");
     image_test util( argc, argv);
     int width = util.getWidth();
@@ -244,12 +246,19 @@ int main( int argc, char * argv[] )
                 a = kin.rotation[0];
                 b = kin.rotation[1];
                 c = kin.rotation[2];
-                printf("[R] %.4f  [P] %.4f  [Y] %.4f (º) | ", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
+                printf("[R] %.4f  [P] %.4f  [W] %.4f (º) | ", a * RAD_TO_DEG, b * RAD_TO_DEG, c * RAD_TO_DEG - 90);
                 
                 a = kin.position[0];
                 b = kin.position[1];
                 c = kin.position[2];
                 printf("[X] %.4f  [Y] %.4f  [Z] %.4f (%s)\n", a * SCALE, b * SCALE, c * SCALE, UNITS);
+                
+//                char kin_packet[MAX_BUFFER];
+//                vec3_t n;
+//                IMU_Get_Non_Grav( &lsm, &n );
+//                sprintf(kin_packet, "X: %.4f | Y: %.4f | Z: %.4f\r\n", n.i, n.j, n.k);
+////                sprintf(kin_packet, "XR: %.4f | YR: %.4f | ZR: %.4f\nXN: %.4f | YN: %.4f | ZN: %.4f\n\n", lsm.data.accel_raw[0], lsm.data.accel_raw[1], lsm.data.accel_raw[2], lsm.data.accel[0], lsm.data.accel[1], lsm.data.accel[2]);
+//                printf("%s", kin_packet);
                 
 //                drawPosition(a,b,c);
 
