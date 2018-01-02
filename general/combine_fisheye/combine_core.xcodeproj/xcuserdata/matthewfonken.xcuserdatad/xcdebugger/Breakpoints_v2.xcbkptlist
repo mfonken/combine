@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "217"
             endingLineNumber = "217"
-            landmarkName = "IMU_Get_Non_Grav"
+            landmarkName = "IMU_Get_Non_Grav()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -32,6 +32,22 @@
             startingLineNumber = "47"
             endingLineNumber = "47"
             landmarkName = "Kalman_Update"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "combine_core/kinetic/kinetic.c"
+            timestampString = "536444547.327779"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "181"
+            endingLineNumber = "181"
+            landmarkName = "updatePosition"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

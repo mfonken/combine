@@ -21,7 +21,7 @@ typedef struct
     double 	gyro[3];
     double 	mag[3];
     
-    double  	accel_res;
+    double  accel_res;
     double 	gyro_res;
     double 	mag_res;
     

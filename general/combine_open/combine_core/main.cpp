@@ -141,13 +141,13 @@ int main( int argc, char * argv[] )
 
     pthread_t threads[NUM_THREADS];
     
-    printf("Starting Data Output thread.\n");
-    int t1, t2;
-    t1 = pthread_create(&threads[0], NULL, &BT_THREAD, NULL);
-    if (t1) {
-        cout << "Error:unable to create Data Output thread," << t1 << endl;
-        exit(-1);
-    }
+//    printf("Starting Data Output thread.\n");
+//    int t1, t2;
+//    t1 = pthread_create(&threads[0], NULL, &BT_THREAD, NULL);
+//    if (t1) {
+//        cout << "Error:unable to create Data Output thread," << t1 << endl;
+//        exit(-1);
+//    }
     
 #ifdef IMU_DEBUG
     printf("Starting IMU thread.\n");
@@ -157,7 +157,7 @@ int main( int argc, char * argv[] )
         exit(-1);
     }
 #endif
-    while(1);
+//    while(1);
     printf("Initializing Image Utility.\n");
     image_test util( argc, argv);
     int width = util.getWidth();

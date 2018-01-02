@@ -22,16 +22,16 @@
 //#define EXT_DEBUG
 #define IMG_DEBUG
 //#define KIN_DEBUG
-//#define IMU_DEBUG
+#define IMU_DEBUG
 
 #ifndef SHOW_IMAGES
 #define ITERATIONS
 #endif
 
-#define REDSCALE
+//#define REDSCALE
 //#define GREYSCALE
 #define OPENCV_THRESHOLD
-#define FNL_RESIZE 300
+#define FNL_RESIZE 540
 
 /* IMAGE PROCESSING */
 #ifdef __APPLE__
@@ -39,12 +39,16 @@
 #else
 #define IMAGE_ROOT              "../"
 #endif
-#define FRAME_DELAY_MS          100
-#define CAM_WIDTH               640
-#define CAM_HEIGHT              320
+#define FRAME_DELAY_MS          10
+
+#define CAM_WIDTH               1920
+#define CAM_HEIGHT              1080
+#define FNL_RESIZE_S            2
+#define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
+#define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S
 
 #define THRESHOLD_MAX           254
-#define THRESHOLD_MIN           150
+#define THRESHOLD_MIN           250
 #define THRESH_STEP             5
 
 #define THRESHOLD_              THRESHOLD_MIN

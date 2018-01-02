@@ -142,6 +142,7 @@ void Kinetic_Update_Position( LSM9DS1_t * imu, kinetic_t * kinetics, cartesian2_
     B.k = FOCAL_LENGTH;
     sigma_r = ang3( &A, &B );
 
+    
     n_l = ZDIV( fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), d__l );
     u_l = sqrt( A_l_sq - ( n_l * n_l ) );
     nu = atan2( n_l, FOCAL_LENGTH );
