@@ -16,7 +16,7 @@ extern "C" {
 #include <stdio.h>
 #include <math.h>
     
-#include "qmath/qmath.h"
+#include "qmath.h"
     
     typedef struct
     {
@@ -31,6 +31,7 @@ extern "C" {
         double (*disq)( kpoint_t * );
         double (*angl)( kpoint_t * );
         double (*anga)( kpoint_t * );
+        void   (*copy)( kpoint_t *, kpoint_t * );
         void (*toVec3)( kpoint_t *, vec3_t * );
     };
     extern const kpoint KPoint;

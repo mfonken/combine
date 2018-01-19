@@ -11,28 +11,12 @@ extern "C" {
 #include <stdbool.h>
 #include <sys/time.h>
 
-    /** Maximum lifespan of an unused kalman */
-#define MAX_KALMAN_LIFE     3.0 // (seconds)
-
-    /** Uncertainty of value */
-#define VALUE_UNCERTAINTY   0.1//0.01
-
-    /** Uncertainty of bias */
-#define BIAS_UNCERTAINTY    0.005//0.003
-
-    /** Uncertainty of sensor */
-#define SENSOR_UNCERTAINTY  0.005//0.02
-
-    /** Uncertainty of density */
-//#define DENSITY_UNCERTAINTY 0.1
-
     /** Kalman Uncertainties */
     typedef struct _kalman_uncertainty_t
     {
         double value;
         double bias;
         double sensor;
-//        double density;
     } kalman_uncertainty_t;
     
     typedef enum
@@ -49,7 +33,7 @@ extern "C" {
         kalman_uncertainty_t uncertainty;
         /* Data */
         double      K[2];               /**< Gain matrix */
-        double      P[2][2];          /**< Error covariance matrix */
+        double      P[2][2];            /**< Error covariance matrix */
         double      rate;               /**< Rate */
         double      bias;               /**< Bias */
         double      value;              /**< Value */
@@ -64,10 +48,6 @@ extern "C" {
         void (*update)( kalman_t *, double, double, update_type_t );
         int  (*isExpired)( kalman_t * );
     };
-    
-//    void init( kalman_t * k, double v, double ls, double v_u, double b_u, double s_u );
-//    void update( kalman_t * k, double value_new, double rate_new );;
-//    int  isExpired( kalman_t * k);
     
     double timestamp(void);
     

@@ -23,12 +23,14 @@
 
 #define OUT_FPS  60
 #define OUT_UDL  1000000 / OUT_FPS
-#define MAX_BUFFER 74
+#define MAX_BUFFER 128
 
 #define RAD_TO_DEG (180 / M_PI)
 #define NUM_THREADS 2
 #define SCALE 100
 #define DRAW_SCALE 7000
+
+#define TILT_LINES
 
 using namespace cv;
 //using namespace std;
@@ -43,12 +45,7 @@ int width, height;
 struct timeval start,stop;
 #endif
 
-typedef struct
-{
-    double x, y;
-} cartesian2_t;
-
-cartesian2_t bea[2];
+kpoint_t bea[2];
 
 imu_t bno;
 kinetic_t kin;
@@ -111,7 +108,7 @@ void * DATA_WR_THREAD( void *data )
     {
         outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
         char kin_packet[MAX_BUFFER];
-        int l = sprintf(kin_packet, "f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\r\n",  kin.values.rotation[0], kin.values.rotation[1], kin.values.rotation[2],  kin.values.position[0] * SCALE, kin.values.position[1] * SCALE, kin.values.position[2] * SCALE);
+        int l = sprintf(kin_packet, "f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n",  kin.values.rotation[0], kin.values.rotation[1], kin.values.rotation[2],  kin.filters.position[0].value * SCALE, kin.filters.position[1].value * SCALE, -kin.filters.position[2].value * SCALE);
     
         outfile.write(kin_packet,l);
         outfile.close();
@@ -128,18 +125,17 @@ void * IMU_THREAD( void *data )
     IMU.init( &bno );
 
     printf("Initializing Kinetic Utility.\n");
-    Kinetic.init( &kin );
+    Kinetic.init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
 
-    ang3_t e, g = {0,0,0};//{ bno.gyro[0], bno.gyro[1], bno.gyro[2] };
+    ang3_t e, g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
     
     while(1)
     {
         IMU.update.orientation( &bno );
-        e = { bno.pitch * DEG_TO_RAD, -bno.roll * DEG_TO_RAD, -bno.yaw * DEG_TO_RAD + (3 * M_PI_2)};
-        double R[3] = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
-        double A[2] = { bea[1].x, bea[1].y }, B[2] = { bea[0].x, bea[0].y };
+        e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD };
+        vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
         Kinetic.updateRotation( &kin, &e, &g );
-        Kinetic.updatePosition( &kin, R, A, B );
+        Kinetic.updatePosition( &kin, &R, &bea[1], &bea[0] );
     }
 }
 
@@ -156,8 +152,8 @@ void getBeacons(Mat frame)
     std::vector<KeyPoint> kps;
     kps = tra.detect(threshed_frame, out);
     
-#define TEXT_OFFSET_X -26
-#define TEXT_OFFSET_Y  18
+#define TEXT_OFFSET_X 0//-26
+#define TEXT_OFFSET_Y 0// 18
 #define DETECT_BORDER_OFFSET 10
     std::vector<KeyPoint> gkps;
     for(int i = 0; i < kps.size(); i++)
@@ -173,8 +169,13 @@ void getBeacons(Mat frame)
     }
     
     //                printf("Found %lu good keypoints\n", gkps.size());
+    
+#define STRENGTH 2.0
+#define ZOOM     1.1
     if(gkps.size() >= 2)
     {
+        invfisheye(&gkps.at(0).pt, FNL_RESIZE_W, FNL_RESIZE_H, STRENGTH, ZOOM);
+        invfisheye(&gkps.at(1).pt, FNL_RESIZE_W, FNL_RESIZE_H, STRENGTH, ZOOM);
         if(gkps.at(1).pt.x < gkps.at(0).pt.x)
         {
             bea[0].x = gkps.at(1).pt.x;
@@ -198,6 +199,18 @@ void getBeacons(Mat frame)
 #ifdef ITERATIONS
     //                times[l] = t[0]+t[1]+t[2];
 #endif
+    
+#ifdef TILT_LINES
+    double top_x, bot_x, lef_y, rig_y, tr = tan(-bno.roll * DEG_TO_RAD);
+    top_x = FNL_RESIZE_W/2 - FNL_RESIZE_H/2*tr;
+    bot_x = FNL_RESIZE_W/2 + FNL_RESIZE_H/2*tr;
+    lef_y = FNL_RESIZE_H/2 + FNL_RESIZE_W/2*tr;
+    rig_y = FNL_RESIZE_H/2 - FNL_RESIZE_W/2*tr;
+    
+    line(out, Point(top_x,0), Point(bot_x,FNL_RESIZE_H), Vec3b(255,245,255));
+    line(out, Point(0,lef_y), Point(FNL_RESIZE_W,rig_y), Vec3b(255,245,255));
+#endif
+    
 #ifdef SHOW_IMAGES
     putText(out, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
     putText(out, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
@@ -218,6 +231,11 @@ void getBeacons(Mat frame)
 int main( int argc, char * argv[] )
 {
     printf("Starting Combine Core\n");
+    
+    printf("Initializing Image Utility.\n");
+    image_test util( argc, argv);
+    width = util.getWidth();
+    height = util.getHeight();
 
     pthread_t threads[NUM_THREADS];
     
@@ -237,20 +255,15 @@ int main( int argc, char * argv[] )
     }
 #endif
     
-    printf("Initializing Image Utility.\n");
-    image_test util( argc, argv);
-    width = util.getWidth();
-    height = util.getHeight();
-    
 #ifdef ITERATIONS
     for(int o = 0; o < num_orders; o++)
     {
         int iterations = orders[o];
         double times[iterations];
-        printf("Running for %d iterations\n", iterations);
+        printf("Running for %d iterations.\n", iterations);
         for(int l=0;l<iterations;l++) {
 #else
-            printf("Running with User Control\n");
+            printf("Running with User Control.\n");
             for(int l=0;l<1;)
             {
 #endif
@@ -264,7 +277,6 @@ int main( int argc, char * argv[] )
                 /* Get Beacons */
                 getBeacons(frame);
                 /***************/
-                
                 
 #ifdef TIME_FULL_LOOP
                 gettimeofday( &stop, NULL);
@@ -285,6 +297,6 @@ int main( int argc, char * argv[] )
 #else
     }
 #endif
-
+    printf("Ending Combine Core.\n");
     return 0;
 }

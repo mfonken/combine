@@ -47,10 +47,9 @@ image_test::image_test(int argc, char * argv[])
         counter = num_frames;
         file.append("frames/");
         file.append(argv[2]);
-        //        file.append("/1.png");
         printf("opening file: %s\n", file.c_str());
         image = imread(file+"/1.png", IMREAD_COLOR );
-        if( image.empty() )                      // Check for invalid input
+        if( image.empty() )
         {
             cout <<  "Could not open or find the image" << std::endl ;
             return;
@@ -73,8 +72,8 @@ image_test::image_test(int argc, char * argv[])
     resize(image,frame,size);
 #endif
     
-    width  = frame.cols;
-    height = frame.rows;
+    width  = size.width;
+    height = size.height;
     
 #ifdef GREYSCALE
     Mat grey;
@@ -125,8 +124,8 @@ Mat image_test::getNextFrame()
     {
 #ifdef HAS_CAMERA
         cam >> image;
-        resize(image, temp, size, 1, 1);
-        unfisheye(temp,frame);
+        resize(image, frame, size, 1, 1);
+//        invfisheye(temp,frame);
         imshow("Original", frame);
 #endif
     }
@@ -169,7 +168,6 @@ int image_test::getCounter()
 {
     return counter;
 }
-
 bool image_test::isLive()
 {
     return live;

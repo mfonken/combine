@@ -39,13 +39,6 @@ extern "C" {
     
     static FLOAT timeDiff( struct timeval a, struct timeval b ) { return ((b.tv_sec  - a.tv_sec) + (b.tv_usec - a.tv_usec)/1000000.0) + 0.0005; }
     
-//    static FLOAT seconds_since( double time )
-//    {
-//        struct timeval now;
-//        gettimeofday( &now, NULL );
-//        return (now.tv_sec + now.tv_usec/1000000.0) - time;
-//    }
-    
     typedef enum
     {
         UNWEIGHTED = 0,
@@ -53,9 +46,6 @@ extern "C" {
     } sorting_settingss;
     
 #define MAX_PERSISTENCE ( 1 << 7 ) - 1 // MAX OF SIGNED BYTE
-    
-    /* Kalman Internal Float Type */
-    typedef FLOAT kmat_f;
     
     typedef struct
     {

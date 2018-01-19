@@ -11,5 +11,6 @@
 
 #include "vector.h"
 #include "quaternion.h"
+#include "point.h"
     
 #endif /* imu_math_h */

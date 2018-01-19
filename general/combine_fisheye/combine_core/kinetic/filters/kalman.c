@@ -79,7 +79,7 @@ void update( kalman_t * k, double value_new, double rate_new, update_type_t type
 
 int isExpired( kalman_t * k)
 {
-    return ((timestamp() - k->timestamp) > MAX_KALMAN_LIFE);
+    return ((timestamp() - k->timestamp) > k->lifespan);
 }
 
 const struct kalman Kalman =
@@ -88,22 +88,6 @@ const struct kalman Kalman =
     .update = update,
     .isExpired = isExpired
 };
-
-//void kalman_copy( kalman_t * a, kalman_t * b )
-//{
-//    b->bias         = a->bias;
-//    b->density      = a->density;
-//    b->K[0]         = a->K[0];
-//    b->K[1]         = a->K[1];
-//    b->P[0][0]      = a->P[0][0];
-//    b->P[1][0]      = a->P[1][0];
-//    b->P[0][1]      = a->P[0][1];
-//    b->P[1][1]      = a->P[1][1];
-//    b->prev         = a->prev;
-//    b->timestamp    = a->timestamp;
-//    b->uncertainty  = a->uncertainty;
-//    b->value        = a->value;
-//}
 
 double timestamp(void)
 {

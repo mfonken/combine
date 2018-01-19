@@ -105,3 +105,55 @@ void unfisheye(Mat I, Mat O)
     putText(O, "Strength: " + std::to_string(strength), cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
     putText(O, "Zoom: " + std::to_string(zoom), cvPoint(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
 }
+
+void invfisheye(Mat I, Mat O)
+{
+    cvCreateTrackbar( "Strength", "Original", &strength_slider, max_strength );
+    cvCreateTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    
+    strength = (double) strength_slider / 10;
+    zoom = (double) zoom_slider / 10;
+    
+    double w = I.cols, h = I.rows;
+    double wh = w/2, hh = h/2;
+    Vec3b c = {0,0,0};
+    int x, y = 0, x_, y_, xn, yn;
+    double theta, r;
+    
+    double correctionRadius = sqrt((wh*wh)+(hh*hh)) / strength;
+    for(yn = -h/2, y = 0; y < h; yn++, y++ )
+    {
+        for(xn = -w/2, x = 0; x < w; xn++, x++ )
+        {
+            r = sqrt((xn*xn)+(yn*yn)) / correctionRadius;
+            if(!r) theta = 1;
+            else theta = r / ( atan(r) * zoom );
+            x_ = wh + xn * theta;
+            y_ = hh + yn * theta;
+            if(INR(x_, 0,w) && INR(y_, 0,h))
+                O.at<Vec3b>(y_,x_) = I.at<Vec3b>(y,x);
+        }
+    }
+    putText(O, "Strength: " + std::to_string(strength), cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+    putText(O, "Zoom: " + std::to_string(zoom), cvPoint(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+}
+
+void invfisheye(Point2f * p, int w, int h, double s, double z)
+{
+    double wh = w/2, hh = h/2;
+    double correctionRadius = sqrt((wh*wh)+(hh*hh)) / s;
+
+    int xn = p->x - wh, yn = p->y - hh, x_, y_;
+    double theta, r;
+
+    r = sqrt((xn*xn)+(yn*yn)) / correctionRadius;
+    if(!r) theta = 1;
+    else theta = r / ( atan(r) * zoom );
+    x_ = wh + xn * theta;
+    y_ = hh + yn * theta;
+    
+    if(x_ > w) x_ = w-1;
+    if(y_ > h) y_ = h-1;
+    p->x = x_;
+    p->y = y_;
+}

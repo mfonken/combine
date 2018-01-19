@@ -15,9 +15,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#define PERFORMANCE_TEST
+//#define PERFORMANCE_TEST
 //#define QUICK
-#define ALT_QUICK
+//#define ALT_QUICK
 
 #define INR(X,A,B) (X>=A&&X<B)
 
@@ -29,5 +29,8 @@ static inline double qatanr_r( double x ) { return 1.0301 - x*(0.0663*x - 0.1784
 
 void quickUnfisheye(Mat I, Mat O);
 void unfisheye(Mat I, Mat O);
+void invfisheye(Mat I, Mat O);
+
+void invfisheye(Point2f * p, int w, int h, double s, double z);
     
 #endif /* unfisheye_h */

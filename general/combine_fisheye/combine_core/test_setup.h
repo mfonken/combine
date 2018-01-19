@@ -31,7 +31,7 @@
 //#define REDSCALE
 //#define GREYSCALE
 #define OPENCV_THRESHOLD
-#define FNL_RESIZE 540
+#define FNL_RESIZE              540
 
 /* IMAGE PROCESSING */
 #ifdef __APPLE__

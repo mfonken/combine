@@ -16,6 +16,7 @@ static void init( kpoint_t * p, double offset_x, double offset_y, double scale, 
     p->phi = atan2( p->x, p->z);
     p->the = atan2( p->y, p->z);
 }
+
 static double dist( kpoint_t * p )
 {
     return sqrt( KPoint.disq(p) );
@@ -38,6 +39,16 @@ static double anga( kpoint_t * p )
     return acos( cos( p->the ) * cos( p->phi ) );
 }
 
+static void copy( kpoint_t * a, kpoint_t * b )
+{
+    b->x = a->x;
+    b->y = a->y;
+    b->z = a->z;
+    
+    b->the = a->the;
+    b->phi = a->phi;
+}
+
 static void toVec3( kpoint_t * p, vec3_t * v )
 {
     v->i = p->x;
@@ -52,5 +63,6 @@ const kpoint KPoint =
     .disq = disq,
     .angl = angl,
     .anga = anga,
+    .copy = copy,
     .toVec3 = toVec3
 };

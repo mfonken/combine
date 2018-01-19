@@ -1,5 +1,5 @@
 /***********************************************************************************************//**
- * \file   k->c
+ * \file   kinetic.c
  * \brief  Kinetic Motion code
  ***************************************************************************************************
  *  Created on: Nov 13, 2016
@@ -9,208 +9,203 @@
 /* Own header */
 #include "kinetic.h"
 
-/***************************************************************************************************
- Local Variables
- **************************************************************************************************/
-/** Local change in time */
-/** Local positional and rotational vectors */
-
 /***********************************************************************************************//**
  *  \brief  Initialize Kinetic Sensors
  **************************************************************************************************/
-static int init( kinetic_t * k )
+static int init( kinetic_t * k, int W, int H, double F, double L )
 {
+    k->W = W;
+    k->H = H;
+    k->f_l = F;
+    k->d_l = L;
     Camera_Rotation_Init(k);
+    Reference_Rotation_Init(k);
     Filters_Init(k);
     return 1;
 }
 
 static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 {
-    /* Restrict pitch */
+    /* Step 1: Update Pitch (Restricted) */
     double v = k->filters.rotation[0].value;
     if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
-       ( e->x >  M_PI_2 && v < -M_PI_2 ) )
+        ( e->x >  M_PI_2 && v < -M_PI_2 ) )
     {
-        k->filters.rotation[0].value  = e->x;
+        k->filters.rotation[0].value = e->x;
         k->values.rotation[0] = e->x;
     }
     else
     {
-        /* Calculate the true pitch using a kalman_t filter */
         Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
         k->values.rotation[0] = k->filters.rotation[0].value;
     }
     
-    if ( k->values.rotation[0] > 90 )
+    if ( k->values.rotation[0] > M_PI_2 )
     {
         /* Invert rate, so it fits the restricted accelerometer reading */
         g->x = -g->x;
     }
-    /* Calculate the true roll using a kalman_t filter */
+    
+    /* Step 2: Update Roll */
     Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
     k->values.rotation[1] = k->filters.rotation[1].value;
-    
-    /* Calculate the true yaw using a kalman_t filter */
+
+    /* Step 3: Update Yaw */
     Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
     k->values.rotation[2] = k->filters.rotation[2].value;
 }
 
-static void updatePosition( kinetic_t * k, double ngacc[3], double beaconA[2], double beaconB[2] )
+static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
 {
-    /*** LOCAL VARIABLES ***/
-    mat3x3_t m;
+    /* Step 1: Calculate Minor Angles */
+    Kinetic.minorAngles( k, A, B );
     
-    /* Local angles */
-    ang3_t a, r;
-    double the_B, the_A, phi_B, phi_A, psi_r, sigma_A, sigma_r, nu, up;
+    /* Step 2: Calculate Quaternion Rotations */
+    Kinetic.quaternions( k );
     
-    /* Local lengths */
-    double x_B, x_A, y_B, y_A, d_x, d_y, A_l_sq, d__l, n_l, u_l, r_l;
+    /* Step 3: Calculate Major Angles */
+    Kinetic.majorAngles( k );
     
-    /*** CALCULATING QUATERNIONS ***/
-    x_B = ( beaconB[0] - CAMERA_HALF_WIDTH  ) * PIXEL_TO_UNIT;
-    x_A = ( beaconA[0] - CAMERA_HALF_WIDTH  ) * PIXEL_TO_UNIT;
-    y_B = ( beaconB[1] - CAMERA_HALF_HEIGHT ) * PIXEL_TO_UNIT;
-    y_A = ( beaconA[1] - CAMERA_HALF_HEIGHT ) * PIXEL_TO_UNIT;
-    d_x = x_A - x_B;
-    d_y = y_A - y_B;
+    /* Step 4: Calculate r vector */
+    Kinetic.r( k );
     
-    /* Get unit distance squared from camera center to beacon 1 */
-    A_l_sq = ( ( x_A * x_A ) + ( y_A * y_A ) );
+    /* Step 5A: Update position values for tests */
+    k->values.position[1] = -k->r.i;
+    k->values.position[0] =  k->r.j;
+    k->values.position[2] =  k->r.k;
     
-    /* Get unit distance between beacons */
-    d__l = sqrt( ( d_x * d_x ) + ( d_y * d_y ) );
+    Kalman.update( &k->filters.position[1], -k->r.i, 0, VELOCITY );
+    Kalman.update( &k->filters.position[0],  k->r.j, 0, VELOCITY );
+    Kalman.update( &k->filters.position[2],  k->r.k, 0, VELOCITY );
     
-    /* Get beacon angles */
-    the_B   = atan2( x_B, FOCAL_LENGTH);
-    phi_B   = atan2( y_B, FOCAL_LENGTH);
-    the_A   = atan2( x_A, FOCAL_LENGTH);
-    phi_A   = atan2( y_A, FOCAL_LENGTH);
-    psi_r   = atan2( d_y, d_x );
-    
-    /* Get angles between beacons */
-    ///NOTE: acos(cos()cos()) only works for combining frame-perpendicular angles (i.e. theta & phi) [ang3 is used instead for sigma_r]
-    sigma_A = acos( cos( the_A ) * cos( phi_A ) );
-    
-    vec3_t A, B;
-    A.i = x_B;
-    A.j = y_B;
-    A.k = FOCAL_LENGTH;
-    B.i = x_A;
-    B.j = y_A;
-    B.k = FOCAL_LENGTH;
-    sigma_r = Vector.ang3( &A, &B );
-    
-    double temp = fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), f_len = FOCAL_LENGTH;
-//    n_l = ZDIV( fabs( ( phi_A * ( the_B - the_A ) ) - ( the_A * ( phi_B - phi_A ) ) ), d__l );
-//    u_l = sqrt( A_l_sq - ( n_l * n_l ) );
-    
-    /* Get proper device angles from kinetic */
-    r.x = k->values.rotation[0];
-    r.y = k->values.rotation[1];
-    r.z = k->values.rotation[2];
-    
-    /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizonatl and vertical angle offset */
-    double cos_ry = cos(r.y), sin_ry = sin(r.y);
-    n_l = cos_ry * (x_A-CAMERA_HALF_WIDTH) - sin_ry * (y_A-CAMERA_HALF_HEIGHT) + CAMERA_HALF_WIDTH;
-    u_l = sin_ry * (x_A-CAMERA_HALF_WIDTH) + cos_ry * (y_A-CAMERA_HALF_HEIGHT) + CAMERA_HALF_HEIGHT;
-    nu = atan2( n_l, FOCAL_LENGTH );
-    up = atan2( u_l, FOCAL_LENGTH );
-    
-    /* Generate Camera-Beacon quaternion */
-    a.x = r.x + nu;
-    a.y = r.y + psi_r;
-    a.z = r.z - up;
-    Quaternion.fromEuler( &a, &k->qd );
-    Quaternion.combine( &k->qd, &k->qc, &k->qa );
-    
-    ang3Rad_To_Deg(&a);
-    
-    ///NOTE: Initializing another quaternion QD' cuts a quaternion combination
-    a.x = r.x;
-    /*  a.y should doens't change from the calculation of QD
-     *  a.y = r.y + psi_r; */
-    a.z = r.z;
-    Quaternion.fromEuler( &a, &k->qd_ );
-    ang3Rad_To_Deg( &a );
-    
-    /** CALCULATING R ***/
-    double chi, mu, gam;
-    double sin_sigma_r = sin( sigma_r );
-    
-    /* Calculate Chi */
-    chi = RASIN( ZDIV( ZDIV( FOCAL_LENGTH, cos( sigma_A ) ), d__l ) * sin_sigma_r );
-    
-    /* Calculate mu */
-//    Quaternion.toMatrix(&k->qd_, &m);
-//    mu = -asin( m.jj );
-    double x = k->qd_.x, z = k->qd_.z;
-    mu = -asin( 1.0 - 2 * ( ( x * x ) + ( z * z ) ) );
-    
-    /* Calculate gamma */
-    gam  = chi - mu;
-    
-    /* Calculate r vector length */
-    r_l = ZDIV( sin( gam ), sin_sigma_r ) * D_FIXED;
-    
-    /* r_vec - Vector length r on X-axis */
-    vec3_t r_u, r_f;
-    r_u.i = 0;
-    r_u.j = r_l;
-    r_u.k = 0;
-    
-    Quaternion.toEuler(&k->qa, &a);
-    a.z -= M_PI/2;
-    Quaternion.fromEuler(&a, &k->qa);
-    ang3Rad_To_Deg(&a);
-    
-    /*** FILTERING R VECTOR ***/
-    /* Calculate final r vector */
-    Quaternion.rotVec( &r_u, &k->qa, &r_f );
-    
-    k->values.position[1] = -r_f.i;
-    k->values.position[0] = r_f.j;
-    k->values.position[2] = r_f.k;
-    
-    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d | H_a: <%4d,%4d,%4d> | r_l: %.4f\n", (int)(r.z*RAD_TO_DEG), (int)(nu*RAD_TO_DEG), (int)(up*RAD_TO_DEG), (int)(sigma_r*RAD_TO_DEG), (int)(chi*RAD_TO_DEG), (int)(mu*RAD_TO_DEG), (int)(gam*RAD_TO_DEG), (int)(a.x), (int)(a.y), (int)(a.z), r_l);
-    
-    Kalman.update( &k->filters.position[1], -r_f.i, 0, VELOCITY );
-    Kalman.update( &k->filters.position[0], r_f.j, 0, VELOCITY );
-    Kalman.update( &k->filters.position[2], r_f.k, 0, VELOCITY );
+    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gam*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
     return;
     
-    /* Get non-gravitational acceleration */
-    /* Create a vector of accelerometer values */
-    ang3_t e;
-    e.y = k->values.rotation[0];
-    e.x = k->values.rotation[1];
-    e.z = 0;//imu->data.yaw - M_PI_2;
+    /* Step 5B: Calculate Non-gravitational Data */
+    Kinetic.nongrav( k, n );
+}
+
+static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
+{
+    KPoint.copy(A, &k->A);
+    KPoint.copy(B, &k->B);
+    /* Get distance between beacons and origin */
+    KPoint.init( &k->A, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
+    KPoint.init( &k->B, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
+    kpoint_t d_ = { ( k->B.x - k->A.x ), ( k->B.y - k->A.y ) };
+    k->d__l = KPoint.dist( &d_ );
     
-    Quaternion.fromEuler(&e, &k->qg);
-    e.x *= RAD_TO_DEG;
-    e.y *= RAD_TO_DEG;
-    e.z *= RAD_TO_DEG;
+    /* Get beacon tilt on camera plane */
+    k->omega = KPoint.angl( &d_ );
     
-    /* Rotate acceleration vector by quaternion */
-    vec3_t g = {0,0,1},h;
-    Quaternion.rotVec(&g, &k->qg, &h);
+    /* Get angles between beacons */
+    k->sigmaA = KPoint.anga( &k->A );
     
-    /* Negate gravity: -(-1g) = +1g */
-    ngacc[0] += h.i;
-    ngacc[1] += h.j;
-    ngacc[2] -= h.k;
+    vec3_t Av, Bv;
+    KPoint.toVec3( &k->A, &Av );
+    KPoint.toVec3( &k->B, &Bv );
+    k->sigmaR = Vector.ang3( &Av, &Bv );
+}
+
+static void quaternions( kinetic_t * k )
+{
+    k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
+    k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
+    k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
     
+    /* Get proper device angles from kinetic */
+    k->e.x = k->values.rotation[0];
+    k->e.y = k->values.rotation[1];
+    k->e.z = k->values.rotation[2];
+    Quaternion.fromEuler( &k->e, &k->qd );
     
-    //#define NON_GRAV_MIN 0.0075
-    //    if(fabs(ngacc->i) < NON_GRAV_MIN) ngacc->i = 0;
-    //    if(fabs(ngacc->j) < NON_GRAV_MIN) ngacc->j = 0;
-    //    if(fabs(ngacc->k) < NON_GRAV_MIN) ngacc->k = 0;
+    /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizonatl and vertical angle offset */
+    double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
+    k->nu      = atan2( ( sin_ry * k->A.x + cos_ry * k->A.y ), k->f_l );
+    k->upsilon = atan2( ( sin_ry * k->A.y - cos_ry * k->A.x ), k->f_l );
     
-    /* Filter calculated r_vec with acceleration > velocity */
-    Kalman.update( &k->filters.position[0], r_f.i, ngacc[0], ACCELERATION );
-    Kalman.update( &k->filters.position[1], r_f.j, ngacc[1], ACCELERATION );
-    Kalman.update( &k->filters.position[2], r_f.k, ngacc[2], ACCELERATION );
+    /* Generate Camera-Beacon quaternion */
+    ang3_t a = { k->e.x + k->nu, k->e.y + k->omega, k->e.z + k->upsilon };
+    Quaternion.fromEuler( &a, &k->qd_ );
+    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
+    
+    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
+    Quaternion.fromEuler( &b, &k->qc_ );
+    
+/* OP1: Potential parallelization */
+//    Quaternion.fromEuler( &k->e, &k->qd );
+//    Quaternion.fromEuler( &a, &k->qd_ );
+//    Quaternion.fromEuler( &b, &k->qc_ );
+//    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
+}
+
+static void majorAngles( kinetic_t * k )
+{
+    Kinetic.chi( k );
+    Kinetic.mu(  k );
+    Kinetic.gam( k );
+}
+
+/* Calculation of chi - Secondary angle of inner triangle
+ * a - focal length
+ * b - length of vec d'
+ */
+static void chi( kinetic_t * k )
+{
+    double m, n;
+    m = ZDIV( k->f_l, cos(k->sigmaA) );
+    n = ZDIV( m, k->d__l );
+    k->chi = RASIN( n * sin(k->sigmaR) );
+}
+
+/* Calculation of mu - Real-visualized d vector offset angle
+ * a - quaternion x factor
+ * b - quaternion z factor
+ */
+static void mu( kinetic_t * k )
+{
+    double m, n, a = k->qc_.x, b = k->qc_.z;
+    m = ( a * a ) + ( b * b );
+    n = 1.0 - ( 2 * m );
+    //OP2A: k->mu = -RASIN( n );
+    k->mu = RASIN( n );
+}
+
+/* Calculation of gamma */
+static void gam( kinetic_t * k )
+{
+    //OP2B: k->gam = k->chi - k->mu;
+    k->gam = k->chi + k->mu;
+}
+
+/* Calculation of r vec length
+ * a - sin sigmaR
+ * b - d vec real length
+ */
+static void r_l( kinetic_t * k )
+{
+    double m,n;
+    m = sin( k->gam );
+    n = ZDIV( m , sin( k->sigmaR ) );
+    k->r_l = n * k->d_l;
+}
+
+/* Calculation of r vec */
+static void r( kinetic_t * k )
+{
+    Kinetic.r_l(k);
+    vec3_t r_u = { 0, k->r_l, 0 };
+    Quaternion.rotVec( &r_u, &k->qa, &k->r );
+}
+
+/* Calculation and filtering of nongraviation data */
+static void nongrav( kinetic_t * k, vec3_t * n )
+{
+    Quaternion.rotVec( n, &k->qd, &k->n );
+    
+    Kalman.update( &k->filters.position[1], k->r.i, k->n.i, ACCELERATION );
+    Kalman.update( &k->filters.position[0], k->r.j, k->n.j, ACCELERATION );
+    Kalman.update( &k->filters.position[2], k->r.k, k->n.k, ACCELERATION );
     
     k->values.position[0] = k->filters.position[0].value;
     k->values.position[1] = k->filters.position[1].value;
@@ -221,7 +216,16 @@ const kinetic Kinetic =
 {
     .init = init,
     .updateRotation = updateRotation,
-    .updatePosition = updatePosition
+    .updatePosition = updatePosition,
+    .minorAngles = minorAngles,
+    .quaternions = quaternions,
+    .majorAngles = majorAngles,
+    .chi = chi,
+    .mu = mu,
+    .gam = gam,
+    .r_l = r_l,
+    .r = r,
+    .nongrav = nongrav
 };
 
 /***********************************************************************************************//**
@@ -239,10 +243,13 @@ void Filters_Init( kinetic_t * k )
 
 void Camera_Rotation_Init( kinetic_t * k )
 {
-    ang3_t c_a;
-    c_a.x = CAMERA_OFFSET_ANGLE_X;
-    c_a.y = CAMERA_OFFSET_ANGLE_Y;
-    c_a.z = CAMERA_OFFSET_ANGLE_Z;
+    ang3_t c_a = { CAMERA_OFFSET_ANGLE_X, CAMERA_OFFSET_ANGLE_Y, CAMERA_OFFSET_ANGLE_Z };
     Quaternion.fromEuler( &c_a, &k->qc );
+}
+
+void Reference_Rotation_Init( kinetic_t * k )
+{
+    ang3_t r_a = { REFERENCE_OFFSET_ANGLE_X, REFERENCE_OFFSET_ANGLE_Y, REFERENCE_OFFSET_ANGLE_Z };
+    Quaternion.fromEuler( &r_a, &k->qr );
 }
 

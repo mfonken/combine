@@ -216,7 +216,7 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
 #endif
     
     double v[6];
-    tokenifyPacket( line, ptr, 6, 'o', v);
+    tokenifyPacket( line, ptr, 6, 'o', v );
     
     if( v[0] == 0xffff ) return;
 #ifdef PACKET_DEBUG
@@ -225,9 +225,9 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     printf("\n");
 #endif
     
-    imu->pitch = v[1];
-    imu->roll = v[2];
-    imu->yaw = v[0];
+    imu->pitch  =  v[0];
+    imu->roll   = -v[1];
+    imu->yaw    =  360-v[2];
     
     imu->accel_raw[0] = v[3];
     imu->accel_raw[1] = v[4];

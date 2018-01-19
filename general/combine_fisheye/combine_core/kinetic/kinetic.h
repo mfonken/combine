@@ -22,7 +22,7 @@ extern "C" {
 #include <sys/time.h>
 
 /* Math headers */
-#include "imu_math.h"
+#include "qmath.h"
 #include "../test_setup.h"
 
 /* Filters */
@@ -43,9 +43,13 @@ extern "C" {
 #define     VISION_ZSTATE_K -1
     
     /* Camera Precalculated values */
-#define     CAMERA_OFFSET_ANGLE_X   0       // degrees
-#define     CAMERA_OFFSET_ANGLE_Y   0       // degress
-#define     CAMERA_OFFSET_ANGLE_Z   0       // degrees
+#define     CAMERA_OFFSET_ANGLE_X   0       // radians
+#define     CAMERA_OFFSET_ANGLE_Y   0       // radians
+#define     CAMERA_OFFSET_ANGLE_Z   0       // radians
+    
+#define     REFERENCE_OFFSET_ANGLE_X   0    // radians
+#define     REFERENCE_OFFSET_ANGLE_Y   0    // radians
+#define     REFERENCE_OFFSET_ANGLE_Z   -110 * DEG_TO_RAD //M_PI_2 // radians
     
 //#define     CAMERA_ALPHA_W          120     // degrees
 //#define     CAMERA_ALPHA_H          75      // degrees
@@ -55,12 +59,14 @@ extern "C" {
 #define     CAMERA_HALF_WIDTH       FNL_RESIZE_W/2
 #define     CAMERA_HALF_HEIGHT      FNL_RESIZE_H/2
     
-    
 #define     UNITS                  "cm"
 #define     PIXEL_TO_UNIT           3e-6
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
     
-#define     FOCAL_REFRACTION        1.3e-6//1.42e-6//  // units / units
+#define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
+#define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
+    
+#define     FOCAL_REFRACTION        2.4e-6//1.3e-6//  // units / units
 #define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
     
 #define     D_FIXED                 5.0e-2
@@ -85,11 +91,31 @@ extern "C" {
         kalman_t position[3];             /**< Raw position */
         kalman_t rotation[3];             /**< Raw rotation */
     } kinetic_filters_t;
-    
+
     typedef struct _kinetic_t
     {
         kinetic_values_t values;
         kinetic_filters_t filters;
+        kpoint_t
+                A,
+                B;
+        double  omega,
+                sigmaA,
+                sigmaR,
+                nu,
+                upsilon,
+                chi,
+                mu,
+                gam;
+        int     W,
+                H;
+        double  f_l,
+                d_l,
+                d__l,
+                r_l;
+        ang3_t  e;
+        vec3_t  r,
+                n;
         quaternion_t
                 qd,
                 qd_,
@@ -105,15 +131,27 @@ extern "C" {
     typedef struct kinetic kinetic;
     struct kinetic
     {
-        int  (*init)( kinetic_t *);
+        int  (*init)( kinetic_t *, int, int, double, double);
         void (*updateRotation)( kinetic_t *, ang3_t * , ang3_t *);
-        void (*updatePosition)( kinetic_t *, double[3], double[2], double[2] );
+        void (*updatePosition)( kinetic_t *, vec3_t *, kpoint_t * , kpoint_t * );
+        
+        void (*minorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );
+        void (*quaternions)( kinetic_t * );
+        void (*majorAngles)( kinetic_t * );
+        void (*chi)( kinetic_t * );
+        void (*mu)( kinetic_t * );
+        void (*gam)( kinetic_t * );
+        void (*r_l)( kinetic_t * );
+        void (*r)( kinetic_t * );
+        void (*nongrav)( kinetic_t *, vec3_t * );
     };
     
     extern const kinetic Kinetic;
     
-void Filters_Init( kinetic_t * k );
+    
+void Filters_Init( kinetic_t *);
 void Camera_Rotation_Init( kinetic_t *);
+void Reference_Rotation_Init( kinetic_t *);
 
     
 #ifdef __cplusplus

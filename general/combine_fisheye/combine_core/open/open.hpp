@@ -39,7 +39,7 @@ public:
         params.filterByInertia = false;
         
         params.filterByArea = true; // filter by area of the blob
-        params.minArea = 50 ;// Minimum area of the blob
+        params.minArea = 20 ;// Minimum area of the blob
         params.maxArea = 100000; // Maximum area of the blob
         params.filterByColor = true;
         params.blobColor = 255;
