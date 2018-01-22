@@ -12,6 +12,11 @@
 #include <stdio.h>
 #include "environment.hpp"
 
-void * IMU_THREAD( void *data );
+class Sensor
+{
+public:
+    void * init( void *data );
+    void * trigger( void *data );
+};
 
 #endif /* sensor_utility_hpp */

@@ -16,10 +16,7 @@ extern "C" {
 #include <stdio.h>
 #include <math.h>
     
-#include "imu_stubs.h"
 #include "sercom.h"
-    
-//#define PACKET_DEBUG
     
 #define DEFAULT_INTERFACE SERCOM
     
@@ -35,7 +32,7 @@ extern "C" {
     typedef struct
     {
         INTERFACE interface;
-        int       file_descriptor;
+        int       descriptor;
     } channel_t;
     
     typedef struct

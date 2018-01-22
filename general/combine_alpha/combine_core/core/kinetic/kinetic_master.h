@@ -11,6 +11,6 @@
 
 #include "kinetic.h"
 #include "point.h"
-#include "utilities/imu_wrapper.h"
+#include "imu_wrapper.h"
 
 #endif /* kinetic_master_h */

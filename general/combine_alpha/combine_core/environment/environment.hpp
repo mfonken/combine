@@ -15,55 +15,59 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <string>
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
 
-#include "open_master.h"
-#include "kinetic_master.h"
+#include "environment_master.h"
+#include "sercom_wrapper.hpp"
 
 #define MAX_THREADS 3
-#define MAX_BUFFER 256
+#define MAX_RATE 200
 #define OUT_FPS  60
 #define OUT_UDL  1000000 / OUT_FPS
 
-#ifdef TIME_FULL_LOOP
-struct timeval start,stop;
-#endif
+using namespace std;
+
+class Test
+{
+public:
+    virtual void  init( void ) { };
+    virtual void  trigger( void ) { };
+    virtual string serialize( void ) { return NULL; };
+};
 
 class ThreadList
 {
 public:
     pthread_t list[MAX_THREADS];
+    int       rate[MAX_THREADS];
+    int       id[MAX_THREADS];
     int       num;
 };
 
-typedef struct _environment_t
+typedef struct
 {
-    kpoint_t  bea[2];
-    imu_t     bno;
-    kinetic_t kin;
-    int     width,
-            height;
-} environment_t;
+    int id,
+        rate;
+    class SERCOM sercom;
+    Test test;
+} event_t;
 
 class Environment
 {
 public:
-    environment_t data;
+    ThreadList  threads;
+    pthread_mutex_t lock;
     
-    ThreadList threads;
-    ImageUtility utility;
-    
-    Environment( int, char *[] );
-    int addThread(void *(*start_routine) (void *));
+    event_t *events;
+    int num_events;
+
+    bool live;
+
+    Environment( Test, class SERCOM, int );
+    ~Environment();
     void start();
 };
-
-
-void * IMU_THREAD( void *data );
 
 #endif /* environment_hpp */

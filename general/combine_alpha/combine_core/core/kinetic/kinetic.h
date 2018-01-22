@@ -23,7 +23,7 @@ extern "C" {
 
 /* Math headers */
 #include "qmath.h"
-#include "../test_setup.h"
+#include "test_setup.h"
 
 /* Filters */
 #include "filters/kalman.h"

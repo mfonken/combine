@@ -24,6 +24,8 @@
 #include "open.hpp"
 #include "kinetic.h"
 
+//#define TILT_LINES
+
 using namespace cv;
 
 class ImageUtility
@@ -46,15 +48,16 @@ private:
     open_t    tra;
     
 public:
-    ImageUtility( int argc, char * argv[] );
+    ImageUtility();
     void loop(char c);
-    cv::Mat getNextFrame();
+    
+    Mat getNextFrame();
     int getWidth();
     int getHeight();
     int getIteration();
     int getCounter();
     bool isLive();
-    void getBeacons(Mat frame);
+    void getBeacons();
     
     kpoint_t bea[2];
 };

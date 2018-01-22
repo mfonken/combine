@@ -15,61 +15,21 @@ using namespace std;
 VideoCapture cam(0);
 #endif
 
-ImageUtility::ImageUtility(int argc, char * argv[])
+ImageUtility::ImageUtility()
 {
-    no_file = true;
     Mat image,frame;
     counter = 0;
-    num_frames = 1;
-    file = IMAGE_ROOT;
-    
-    if(argc == 2)
-    {
-        std::string file(IMAGE_ROOT);
-        file.append(argv[1]);
-        file.append(".bmp");
-        printf("opening file: %s\n", file.c_str());
-        image = imread(file, IMREAD_COLOR );
-        no_file = false;
-        if( image.empty() )                      // Check for invalid input
-        {
-            cout <<  "Could not open or find the image" << std::endl ;
-            return;
-        }
-    }
-    else if(argc > 2)
-    {
-        no_file = false;
-        num_frames = atoi(argv[1]);
-        subdir = argv[2];
-        printf("Using gif with %d frames.\n",num_frames);
-        counter = num_frames;
-        file.append("frames/");
-        file.append(argv[2]);
-        printf("opening file: %s\n", file.c_str());
-        image = imread(file+"/1.png", IMREAD_COLOR );
-        if( image.empty() )
-        {
-            cout <<  "Could not open or find the image" << std::endl ;
-            return;
-        }
-    }
     
     width = CAM_WIDTH;
     height = CAM_HEIGHT;
     size.width = FNL_RESIZE_W;
     size.height = FNL_RESIZE_H;
-    
-#ifdef HAS_CAMERA
     cam.set(CV_CAP_PROP_FRAME_WIDTH, width);
     cam.set(CV_CAP_PROP_FRAME_HEIGHT, height);
     
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
     cam.read(frame);
-    printf("Initializing Camera: (%d, %d) - ", frame.cols, frame.rows);
-#else
-    resize(image,frame,size);
-#endif
+    printf("Initializing Camera: (%d, %d)\n", frame.cols, frame.rows);
     
     width  = size.width;
     height = size.height;
@@ -81,9 +41,6 @@ ImageUtility::ImageUtility(int argc, char * argv[])
 #endif
     
     live = true;
-    
-    if(no_file)printf("Using webcam.\n");
-    else printf("Using file.\n");
 }
 
 void ImageUtility::loop(char c)
@@ -96,42 +53,17 @@ void ImageUtility::loop(char c)
         printf("Last frame. %d\n ", counter);
     }
     else if (c == ' ') live = !live;
+    waitKey(live?FRAME_DELAY_MS:60000);
 }
 
 Mat ImageUtility::getNextFrame()
 {
     Mat image, frame(size, CV_8UC3, Scalar(0,0,0)), temp(size, CV_8UC3, Scalar(0,0,0));
-    
-    if(!no_file)
-    {
-        if(counter > 0)
-        {
-#ifdef IMG_DEBUG
-            printf("\tReading file...\n");
-#endif
-            counter %= num_frames;
-            counter++;
-            image = imread(file + "/" + to_string( counter ) + ".png", IMREAD_COLOR );
-            if( image.empty() )
-            {
-                cout <<  "Could not open or find the image " << file << std::endl ;
-                return frame;
-            }
-        }
-    }
-    else
-    {
-#ifdef HAS_CAMERA
-        cam >> image;
-        resize(image, frame, size, 1, 1);
+
+    cam >> image;
+    resize(image, frame, size, 1, 1);
 //        invfisheye(temp,frame);
-        imshow("Original", frame);
-#endif
-    }
-    
-#ifndef HAS_CAMERA
-    resize(image,frame,size);
-#endif
+    imshow("Original", frame);
     
 #ifdef REDSCALE
     Mat bgr[3];   //destination array
@@ -210,8 +142,9 @@ void drawPosition(double x, double y, double z)
 }
 
 
-void ImageUtility::getBeacons(Mat frame)
+void ImageUtility::getBeacons()
 {
+    Mat frame = getNextFrame();
 #ifdef OPENCV_THRESHOLD
     Mat threshed_frame(Size(frame.cols, frame.rows), CV_8UC3, Scalar(0,0,0)),
     out(Size(frame.cols, frame.rows), CV_8UC3, Scalar(0,0,0));
@@ -283,5 +216,7 @@ void ImageUtility::getBeacons(Mat frame)
     putText(out, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
     imshow("Out", out);
 #endif
+    
+    loop(' ');
 }
 

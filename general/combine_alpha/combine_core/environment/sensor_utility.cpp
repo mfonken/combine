@@ -8,23 +8,20 @@
 
 #include "sensor_utility.hpp"
 
-void * IMU_THREAD( void *data )
+void * Sensor::init( void *data )
 {
     environment_t edat = *( ( environment_t * ) data );
-    printf("Initializing IMU.\n");
-    IMU.init( &edat.bno );
+    pthread_mutex_lock(&edat.lock);
     
-    printf("Initializing Kinetic Utility.\n");
-    Kinetic.init( &edat.kin, edat.width, edat.height, FOCAL_LENGTH, D_FIXED );
+    pthread_mutex_unlock(&edat.lock);
+    return NULL;
+}
+
+void * Sensor::trigger( void *data )
+{
+    environment_t edat = *( ( environment_t * ) data );
+    pthread_mutex_lock(&edat.lock);
     
-    ang3_t e, g = { edat.bno.gyro[0], edat.bno.gyro[1], edat.bno.gyro[2] };
-    
-    while(1)
-    {
-        IMU.update.orientation( &edat.bno );
-        e = { edat.bno.pitch * DEG_TO_RAD, edat.bno.roll * DEG_TO_RAD, edat.bno.yaw * DEG_TO_RAD };
-        vec3_t R = { edat.bno.accel_raw[0], edat.bno.accel_raw[1], edat.bno.accel_raw[2] };
-        Kinetic.updateRotation( &edat.kin, &e, &g );
-        Kinetic.updatePosition( &edat.kin, &R, &edat.bea[1], &edat.bea[0] );
-    }
+    pthread_mutex_unlock(&edat.lock);
+    return NULL;
 }

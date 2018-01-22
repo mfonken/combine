@@ -15,10 +15,14 @@
 
 #include "environment.hpp"
 
-#define SCALE 100
-
-const char file_name[] = "/Users/matthewfonken/Desktop/out.txt";
-
-void * DATA_WR_THREAD( void *data );
+class FileWriter
+{
+    const char *file_name;
+public:
+    FileWriter();
+    
+    void * init( void * data );
+    void * trigger( void * data );
+};
 
 #endif /* usb_serial_hpp */

@@ -8,73 +8,39 @@
 
 #include "environment.hpp"
 
-#define TILT_LINES
-
-using namespace cv;
-
-Environment::Environment( int argc, char * argv[] ) : utility(0,NULL)
+Environment::Environment( Test test, SERCOM sercom, int rate )
 {
-    utility = ImageUtility( argc, argv );
+    live = false;
+    threads.num = 0;
+    if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
+    event_t e = {num_events, rate, sercom, test};
+    e.test.init();
+//    events[num_events] = malloc(sizeof(e));
+    events[num_events++] = e;
 }
 
-int Environment::addThread( void *(*start_routine) (void *) )
+Environment::~Environment()
 {
-    int id = pthread_create(&threads.list[0], NULL, start_routine, &data);
-    if (id) {
-        cout << "Error:unable to create thread: " << id << endl;
-        exit(-1);
-    }
-    return id;
+    pthread_mutex_destroy(&lock);
 }
 
 void Environment::start()
 {
-    printf("Starting Combine Core\n");
+    int counter = 0;
+    live = true;
     
-    printf("Initializing Image Utility.\n");
-    
-#ifdef ITERATIONS
-    for(int o = 0; o < num_orders; o++)
+    while(live)
     {
-        int iterations = orders[o];
-        double times[iterations];
-        printf("Running for %d iterations.\n", iterations);
-        for(int l=0;l<iterations;l++) {
-#else
-            printf("Running with User Control.\n");
-            for(int l=0;l<1;)
+        for(int i = 0; i < num_events; i++ )
+        {
+            event_t e = events[i];
+            if(counter % e.rate == 0)
             {
-#endif
-#ifdef TIME_FULL_LOOP
-                gettimeofday( &start, NULL);
-#endif
-                /* Re-init frame and out images every loop */
-                Mat frame;
-                frame = utility.getNextFrame();
-                
-                /* Get Beacons */
-                utility.getBeacons(frame);
-                /***************/
-                
-#ifdef TIME_FULL_LOOP
-                gettimeofday( &stop, NULL);
-                printf("Total loop time is %f (s)\n", timeDiff(start, stop));
-#endif
-                
-#ifdef SHOW_IMAGES
-                utility.loop(waitKey(utility.isLive()?FRAME_DELAY_MS:60000));
-#else
-                utility.loop(' ');
-#endif
-#ifdef ITERATIONS
-                long double average = 0;
-                for(int l = 0; l < iterations; l++) average += times[l];
-                average /= getBeaconsiterations;
-                printf("L-%d A-%Lf\n", iterations, average);
+                e.test.trigger();
+                e.sercom.write(e.test.serialize());
             }
-#else
         }
-#endif
-        printf("Ending Combine Core.\n");
+        if(++counter >= MAX_RATE) counter = 0;
     }
+}
 

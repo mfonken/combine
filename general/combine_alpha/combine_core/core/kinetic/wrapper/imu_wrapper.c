@@ -28,7 +28,7 @@ static int init( imu_t * imu )
     switch(imu->channel.interface)
     {
         case SERCOM:
-            imu->channel.file_descriptor = Init_SERCOM_Default();
+            imu->channel.descriptor = Init_SERCOM_Default();
             return (int)SERCOM;
             break;
         default:
@@ -139,8 +139,8 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
     while( !isnl && ptr < BUFFER_LENGTH-1)
     {
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.file_descriptor, buffer, (size_t)BUFFER_LENGTH);
-        Read_SERCOM_Bytes(imu->channel.file_descriptor, buffer, (size_t)BUFFER_LENGTH);
+        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -193,8 +193,8 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     while( !isnl && ptr < BUFFER_LENGTH-1)
     {
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.file_descriptor, buffer, (size_t)BUFFER_LENGTH);
-        Read_SERCOM_Bytes(imu->channel.file_descriptor, buffer, (size_t)BUFFER_LENGTH);
+        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)

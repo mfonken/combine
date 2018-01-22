@@ -10,8 +10,6 @@
 #define environment_master_h
 
 #include "environment.hpp"
-#include "bluetooth_serial.hpp"
-#include "usb_serial.hpp"
-#include "sensor_utility.hpp"
+#include "utility_master.h"
 
 #endif /* environment_master_h */
