@@ -8,6 +8,11 @@
 
 #include "combine.hpp"
 
+Combine::Combine()
+{
+    init();
+}
+
 string Combine::serialize()
 {
     char kin_packet[MAX_BUFFER];
@@ -30,7 +35,6 @@ void Combine::init()
     
     printf("Initializing Kinetic Utility.\n");
     Kinetic.init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
-
 }
 
 void Combine::trigger()

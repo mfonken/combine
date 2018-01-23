@@ -13,16 +13,17 @@
 #include <iostream>
 #include <fstream>
 
-#include "environment.hpp"
+//#include "environment.hpp"
 
 class FileWriter
 {
     const char *file_name;
 public:
     FileWriter();
+    FileWriter( const char *);
     
-    void * init( void * data );
-    void * trigger( void * data );
+    void init( const char * );
+    void trigger( std::string data );
 };
 
 #endif /* usb_serial_hpp */

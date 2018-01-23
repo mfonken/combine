@@ -17,7 +17,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-#include <sys/time.h>
+#include <unistd.h>
 
 #include "unfisheye.hpp"
 
@@ -40,14 +40,15 @@ private:
     bool no_file;
     int num_frames;
     
-    std::string subdir;
-    std::string file;
+    VideoCapture cam;
     
     cv::Size size;
     
     open_t    tra;
     
 public:
+    Mat outframe;
+    
     ImageUtility();
     void loop(char c);
     

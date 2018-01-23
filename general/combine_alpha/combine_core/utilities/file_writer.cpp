@@ -12,28 +12,35 @@ using namespace std;
 
 FileWriter::FileWriter()
 {
-    file_name = "/Users/matthewfonken/Desktop/out.txt";
+    file_name = NULL;
 }
 
-void * FileWriter::init( void *data )
+FileWriter::FileWriter( const char * name)
 {
+    file_name = name;
+}
+
+void FileWriter::init( const char * name )
+{
+    file_name = name;
     std::ofstream outfile;
     outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
     if (!outfile.is_open())
     {
+#ifdef UTILITY_VERBOSE
         printf("Failed to open %s\n", file_name);
+#endif
         while(1);
     }
+#ifdef UTILITY_VERBOSE
     printf("Opened %s\n", file_name);
-    return NULL;
+#endif
 }
 
-void * FileWriter::trigger( void *data )
+void FileWriter::trigger( std::string data )
 {
     std::ofstream outfile;
     outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
-    
-//    outfile.write(kin_packet,l);
+    outfile.write(data.c_str(),data.length());
     outfile.close();
-    return NULL;
 }

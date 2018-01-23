@@ -20,17 +20,30 @@ int Init_SERCOM( SERCOM_Channel * chan )
     chan->filestream = open(chan->port, O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
     if (chan->filestream == -1)
     {
+#ifdef UTILITY_VERBOSE
         printf("Trying alternate port at %s\n", chan->port_alt);
+#endif
         chan->filestream = open(chan->port_alt, O_RDWR | O_NOCTTY | O_NDELAY);
         if (chan->filestream == -1)
         {
+#ifdef UTILITY_VERBOSE
             printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
+#endif
             return chan->filestream;
         }
         else
+        {
+#ifdef UTILITY_VERBOSE
             printf("Initializing SERCOM at %s: success on alternate.\n", chan->port);
+#endif
+        }
     }
-    else printf("Initializing SERCOM at %s(%d): success on main.\n", chan->port, chan->filestream);
+#ifdef UTILITY_VERBOSE
+    else
+    {
+        printf("Initializing SERCOM at %s(%d): success on main.\n", chan->port, chan->filestream);
+    }
+#endif
     
     tcgetattr(chan->filestream, &chan->options);
     chan->options.c_cflag = chan->baud | chan->bits | CLOCAL | CREAD;

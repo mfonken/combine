@@ -11,13 +11,9 @@
 using namespace cv;
 using namespace std;
 
-#ifdef HAS_CAMERA
-VideoCapture cam(0);
-#endif
-
-ImageUtility::ImageUtility()
+ImageUtility::ImageUtility() : cam(0)
 {
-    Mat image,frame;
+    Mat image, frame;
     counter = 0;
     
     width = CAM_WIDTH;
@@ -27,8 +23,12 @@ ImageUtility::ImageUtility()
     cam.set(CV_CAP_PROP_FRAME_WIDTH, width);
     cam.set(CV_CAP_PROP_FRAME_HEIGHT, height);
     
+    
+    
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
     cam.read(frame);
+    Mat temp(size, CV_8UC3, Scalar(0,0,0));
+    outframe = temp;
     printf("Initializing Camera: (%d, %d)\n", frame.cols, frame.rows);
     
     width  = size.width;
@@ -53,25 +53,26 @@ void ImageUtility::loop(char c)
         printf("Last frame. %d\n ", counter);
     }
     else if (c == ' ') live = !live;
-    waitKey(live?FRAME_DELAY_MS:60000);
+    usleep(live?FRAME_DELAY_MS:60000);
+//    waitKey(live?FRAME_DELAY_MS:60000);
 }
 
 Mat ImageUtility::getNextFrame()
 {
-    Mat image, frame(size, CV_8UC3, Scalar(0,0,0)), temp(size, CV_8UC3, Scalar(0,0,0));
+    Mat image(size, CV_8UC3, Scalar(0,0,0)), frame(size, CV_8UC3, Scalar(0,0,0)), temp(size, CV_8UC3, Scalar(0,0,0));
 
     cam >> image;
     resize(image, frame, size, 1, 1);
 //        invfisheye(temp,frame);
-    imshow("Original", frame);
+//    imshow("Original", frame);
     
 #ifdef REDSCALE
     Mat bgr[3];   //destination array
     split(frame,bgr);
     frame = bgr[2];
-    imshow("R", bgr[2]);
-    imshow("G", bgr[1]);
-    imshow("B", bgr[0]);
+//    imshow("R", bgr[2]);
+//    imshow("G", bgr[1]);
+//    imshow("B", bgr[0]);
 #endif
     
 #ifdef GREYSCALE
@@ -138,7 +139,7 @@ void drawPosition(double x, double y, double z)
     double thisZ = height/2 - z * unit_scale;
     line(P, Point(act_width, thisZ), Point(width, thisZ), Vec3b(255,100,0), 3, 10, 0);
     
-    imshow("Position", P);
+//    imshow("Position", P);
 }
 
 
@@ -214,9 +215,9 @@ void ImageUtility::getBeacons()
 #ifdef SHOW_IMAGES
     putText(out, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
     putText(out, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
-    imshow("Out", out);
+//    imshow("Out", out);
 #endif
-    
+    outframe = out;
     loop(' ');
 }
 

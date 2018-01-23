@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "file_writer.hpp"
 #include "sercom.h"
 
 #define DEFAULT_HANDSHAKE_DELAY 1000000
@@ -32,21 +33,28 @@ typedef enum
 typedef enum
 {
     USB = 0,
-    BLUETOOTH
+    BLUETOOTH,
+    SFILE
 } SERCOM_TYPE;
 
 class SERCOM
 {
+    SERCOM_TYPE type;
     SERCOM_Channel channel;
+    FileWriter writer;
     
 public:
+    SERCOM();
     SERCOM( SERCOM_TYPE );
     SERCOM( SERCOM_TYPE, const char * );
     SERCOM_STATUS initUSB(const char *);
     SERCOM_STATUS initBluetooth(const char *);
+    SERCOM_STATUS initFile(const char *);
     SERCOM_STATUS init(char *, char *, const char *);
     SERCOM_STATUS handshake( const char * );
     SERCOM_STATUS handshake( const char *, int, int );
+    
+    int isInitialized();
     void write(std::string);
     std::string read(int);
 };

@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "combine.hpp"
 #include "environment_master.h"
 #include "sercom_wrapper.hpp"
 
@@ -27,47 +28,76 @@
 #define OUT_FPS  60
 #define OUT_UDL  1000000 / OUT_FPS
 
+#define MAX_EVENTS 3
+
 using namespace std;
 
-class Test
+class TestInterface
 {
 public:
-    virtual void  init( void ) { };
-    virtual void  trigger( void ) { };
-    virtual string serialize( void ) { return NULL; };
+    virtual void  init( void ) = 0;
+    virtual void  trigger( void ) = 0;
+    virtual string serialize( void ) = 0;
 };
 
-class ThreadList
+struct Event
 {
 public:
-    pthread_t list[MAX_THREADS];
-    int       rate[MAX_THREADS];
-    int       id[MAX_THREADS];
-    int       num;
-};
-
-typedef struct
-{
     int id,
         rate;
     class SERCOM sercom;
-    Test test;
-} event_t;
+    pthread_t * thread;
+    pthread_mutex_t * mutex;
+    Combine test;
+    
+    static void *eventThread(void * data);
+};
+
+class EventList
+{
+private:
+    Event   list[MAX_EVENTS];
+    
+public:
+    int     length;
+    pthread_t threads[MAX_EVENTS];
+    pthread_mutex_t * mutex;
+    
+    EventList();
+    int     addEvent(Event);
+    Event   getEvent(int);
+};
+
+typedef enum
+{
+    INITIALIZED = 0,
+    LIVE,
+    PAUSED,
+    ERROR
+} ENV_STATUS;
 
 class Environment
 {
-public:
-    ThreadList  threads;
+    ENV_STATUS status;
     pthread_mutex_t lock;
+    pthread_cond_t condition;
     
-    event_t *events;
-    int num_events;
-
-    bool live;
-
-    Environment( Test, class SERCOM, int );
+//    void * internalControl( void * );
+    
+    void controlTick();
+public:
+    EventList events;
+    pthread_t thread;
+    
+    Environment();
+    Environment( Combine, class SERCOM, int );
     ~Environment();
+    
+    void addTest( Combine, class SERCOM, int );
+    
     void start();
+    void pause();
+    void resume();
 };
 
 #endif /* environment_hpp */

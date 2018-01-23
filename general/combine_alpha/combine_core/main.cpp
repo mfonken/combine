@@ -10,12 +10,23 @@
 #include "environment_master.h"
 #include "utility_master.h"
 
+#define COMBINE_FPS 30
+#define COMBINE_DEL 1000/COMBINE_FPS
+
+const char * FILENAME = "/Users/matthewfonken/Desktop/out.txt";
+
 int main( int argc, char * argv[] )
 {
     Combine combine;
-    class SERCOM sercom(USB);
-    Environment test( combine, sercom, 60 );
+    class SERCOM comm(SFILE, FILENAME);
     
-    test.start();
+    Mat frame;
+    while(1)
+    {
+        combine.trigger();
+        comm.write(combine.serialize());
+//        imshow("Live Camera", combine.utility.outframe);
+        cv::waitKey(1);
+    }
     return 0;
 }

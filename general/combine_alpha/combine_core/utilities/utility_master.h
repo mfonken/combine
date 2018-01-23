@@ -9,7 +9,8 @@
 #ifndef utility_master_h
 #define utility_master_h
 
-#include "file_writer.hpp"
+//#define UTILITY_VERBOSE
+
 #include "sercom_wrapper.hpp"
 
 #endif /* utility_master_h */

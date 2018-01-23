@@ -8,24 +8,32 @@
 
 #include "sercom_wrapper.hpp"
 
+SERCOM::SERCOM(){}
+
 SERCOM::SERCOM( SERCOM_TYPE type )
 {
     SERCOM(type, NO_HANDSHAKE);
+    this->type = type;
 }
 
-SERCOM::SERCOM( SERCOM_TYPE type, const char * handshake_id )
+SERCOM::SERCOM( SERCOM_TYPE type, const char * data )
 {
     SERCOM_STATUS ret;
+    this->type = type;
     switch(type)
     {
         default:
         case USB:
-            ret = initUSB(handshake_id);
+            ret = initUSB(data);
             break;
         case BLUETOOTH:
-            ret = initBluetooth(handshake_id);
+            ret = initBluetooth(data);
+            break;
+        case SFILE:
+            ret = initFile(data);
             break;
     }
+#ifdef UTILITY_VERBOSE
     switch(ret)
     {
         case HANDSHAKE_SUCCEEDED:
@@ -41,6 +49,7 @@ SERCOM::SERCOM( SERCOM_TYPE type, const char * handshake_id )
             printf("Initialization failed.\n");
             break;
     }
+#endif
 }
 
 SERCOM_STATUS SERCOM::initUSB(const char * handshake_id)
@@ -56,6 +65,12 @@ SERCOM_STATUS SERCOM::initBluetooth(const char * handshake_id)
     channel.port_alt = "/dev/cu.Bluetooth-Incoming-Port";
     Init_SERCOM( &channel );
     return handshake(handshake_id);
+}
+
+SERCOM_STATUS SERCOM::initFile(const char * name)
+{
+    writer.init(name);
+    return HANDSHAKE_SKIPPED;
 }
 
 SERCOM_STATUS SERCOM::init( char * port, char * port_alt,const  char * handshake_id )
@@ -81,7 +96,9 @@ SERCOM_STATUS SERCOM::handshake(const  char * id, int delay, int attempts )
         if( Test_SERCOM(channel.filestream) <= 0 )
         {
             counter++;
+#ifdef UTILITY_VERBOSE
             printf("SERCOM attempt #%d.\n", counter );
+#endif
             usleep(delay);
         }
         else break;
@@ -94,9 +111,16 @@ SERCOM_STATUS SERCOM::handshake(const  char * id, int delay, int attempts )
     }
 }
 
+int SERCOM::isInitialized()
+{
+    if(channel.initialized) return 1;
+    else return 0;
+}
+
 void SERCOM::write( std::string data )
 {
-    Write_SERCOM_Bytes( channel.filestream, data.c_str(), (int)data.length() );
+    if(type == SFILE) writer.trigger(data);
+    else Write_SERCOM_Bytes( channel.filestream, data.c_str(), (int)data.length() );
 }
 
 std::string SERCOM::read( int l )
