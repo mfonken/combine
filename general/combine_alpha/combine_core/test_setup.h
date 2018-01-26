@@ -9,6 +9,8 @@
 
 #define TITLE_STRING   "Combine Core v0.1"
 
+#define MAX_RATE  30    //Hz
+
 /* GLOBAL SETUP */
 #define SHOW_IMAGES
 #define HAS_CAMERA
@@ -28,10 +30,16 @@
 #define ITERATIONS
 #endif
 
-//#define REDSCALE
+#define REDSCALE
 //#define GREYSCALE
 #define OPENCV_THRESHOLD
 #define FNL_RESIZE              540
+
+#define TEXT_OFFSET_X 0//-26
+#define TEXT_OFFSET_Y 0// 18
+#define DETECT_BORDER_OFFSET 10
+#define STRENGTH 2.0
+#define ZOOM     1.1
 
 /* IMAGE PROCESSING */
 #ifdef __APPLE__
@@ -41,8 +49,9 @@
 #endif
 #define FRAME_DELAY_MS          10
 
-#define CAM_WIDTH               1920
-#define CAM_HEIGHT              1080
+#define CAM_WIDTH               1280//1920
+#define CAM_HEIGHT              720//1080
+#define CAM_FRAME_RATE          60
 #define FNL_RESIZE_S            2
 #define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
 #define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S

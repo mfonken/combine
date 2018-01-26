@@ -8,26 +8,18 @@
 
 #include "environment.hpp"
 
-Environment::Environment()
+Environment::Environment( TestInterface* test, SerialWriter * sercom, int rate )
 {
     if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
-    events.mutex = &lock;
+    events.add( &lock, test, sercom, rate );
+    test->init();
     status = INITIALIZED;
 }
 
-Environment::Environment( Combine test, class SERCOM sercom, int rate )
+void Environment::addTest( TestInterface* test, SerialWriter* sercom, int rate)
 {
-    if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
-    
-    addTest(test, sercom, rate);
-    status = INITIALIZED;
-}
-
-void Environment::addTest( Combine test, class SERCOM sercom, int rate )
-{
-    Event e = {events.length, rate, sercom, &events.threads[events.length], &lock, test};
-    e.test.init();
-    if(events.addEvent(e) == 0) events.addEvent(e);
+    if(events.add( &lock, test, sercom, rate ))
+        test->init();
 }
 
 Environment::~Environment()
@@ -37,65 +29,120 @@ Environment::~Environment()
 
 void Environment::start()
 {
-    usleep(1000000);
     resume();
 }
 
 void Environment::pause()
 {
+    printf("Pausing environment\n");
     pthread_mutex_unlock(&lock);
     status = PAUSED;
 }
 
 void Environment::resume()
 {
+    printf("Resuming environment\n");
     pthread_mutex_lock(&lock);
-    for(int i = 0; i < events.length; i++ )
+    for( int i = 0; i < events.length(); i++ )
     {
-        Event e = events.getEvent(i);
-        pthread_create(&events.threads[i], NULL, &e.eventThread, (void*)&e);
+        Event * e = events.get(i);
+        pthread_create(&thread, NULL, &e->worker, (void*)e);
     }
     status = LIVE;
 }
 
-void * Event::eventThread( void * data )
+Event::Event( int id )
+{
+    this->id = -1;
+}
+Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * sercom, int rate )
+{
+    this->id = 0;
+    this->mutex = mutex;
+    this->test = test;
+    this->sercom = sercom;
+    this->rate = rate;
+}
+
+void * Event::worker( void * data )
 {
     Event e = *(Event*)data;
-    if( e.mutex == NULL /*|| &e.test == NULL*/) return NULL;
+    const char * n = e.test->serialize().c_str();
+    if( e.mutex == NULL)
+    {
+        printf("ALERT: Event %s has no mutex!\n", n);
+        return NULL;
+    }
+    
+    if( e.rate <= 0)
+    {
+        printf("ALERT: Event %s has invalid rate.\n", n);
+        return NULL;
+    }
     int sl = 1000000/e.rate;
+    
+    struct timeval time;
+    long curr_time, end_time;
     while( pthread_mutex_trylock(e.mutex) )
     {
-        e.test.trigger();
-        e.test.serialize();
-        usleep(sl);
+        end_time = getTime(time) + sl;
+    
+        e.test->trigger();
+//        e.sercom->write(e.test->serialize());
+        
+        e.id++;
+        
+        while( (curr_time = getTime(time)) < end_time );
     }
     pthread_mutex_unlock(e.mutex);
+    printf("Event %s has triggered %d times\n", n, e.id);
     return NULL;
 }
 
 EventList::EventList()
 {
-    mutex = NULL;
-    length = 0;
+    this->index = 0;
+    
+    for(int i = 0; i < MAX_EVENTS; i++)
+    {
+        list[i] = (Event *)malloc(sizeof(Event));
+    }
 }
 
-int EventList::addEvent(Event e)
+int EventList::add( pthread_mutex_t* mutex, TestInterface* test, SerialWriter* sercom, int rate )
 {
-    if( e.mutex == NULL /*|| e.test == NULL*/) return 0;
-    
-    int id = length;
-    if(id == MAX_EVENTS) return -1;
-    
-    list[id] = e;
-    
-    if(!e.rate) e.rate = 1;
-    length++;
-    
+    if( !validIndex(this->index, MAX_EVENTS-1) ) return 0;
+    Event * e = get(this->index++);
+    if(e == NULL) return 0;
+    e->id = this->index-1;
+    e->mutex = mutex;
+    e->test = test;
+    e->sercom = sercom;
+    e->rate = rate;
     return 1;
 }
 
-Event EventList::getEvent(int i)
+int EventList::validIndex( int i, int m )
 {
-    return list[i];
+    if( i >= m || i < 0 ) return 0;
+    return 1;
 }
 
+Event * EventList::get(int i)
+{
+    if( !validIndex(i, index) ) return NULL;
+    return list[i];
+}
+int EventList::remove(int i)
+{
+    if( !validIndex(i, index)  ) return 0;
+    for(; i < index-1; i++)
+        list[i] = list[i+1];
+    index--;
+    return 1;
+}
+
+int EventList::length()
+{
+    return index;
+}

@@ -19,53 +19,31 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include "combine.hpp"
-#include "environment_master.h"
-#include "sercom_wrapper.hpp"
+#include "serial_wrapper.hpp"
 
 #define MAX_THREADS 3
-#define MAX_RATE 200
+#define MAX_FPS     60
 #define OUT_FPS  60
 #define OUT_UDL  1000000 / OUT_FPS
 
-#define MAX_EVENTS 3
+#define MAX_EVENTS 6
 
 using namespace std;
+
+static inline long getTime( struct timeval tv )
+{
+    gettimeofday(&tv, NULL);
+    return long(tv.tv_usec + tv.tv_sec*1000000);
+}
 
 class TestInterface
 {
 public:
+    int id;
+    std::string name;
     virtual void  init( void ) = 0;
     virtual void  trigger( void ) = 0;
     virtual string serialize( void ) = 0;
-};
-
-struct Event
-{
-public:
-    int id,
-        rate;
-    class SERCOM sercom;
-    pthread_t * thread;
-    pthread_mutex_t * mutex;
-    Combine test;
-    
-    static void *eventThread(void * data);
-};
-
-class EventList
-{
-private:
-    Event   list[MAX_EVENTS];
-    
-public:
-    int     length;
-    pthread_t threads[MAX_EVENTS];
-    pthread_mutex_t * mutex;
-    
-    EventList();
-    int     addEvent(Event);
-    Event   getEvent(int);
 };
 
 typedef enum
@@ -76,24 +54,52 @@ typedef enum
     ERROR
 } ENV_STATUS;
 
+class Event
+{
+public:
+    int id,
+        rate;
+    pthread_t       thread;
+    pthread_mutex_t * mutex;
+    SerialWriter    * sercom;
+    TestInterface   * test;
+    
+    Event(int);
+    Event( pthread_mutex_t*, TestInterface*, SerialWriter*, int );
+    static void     * worker(void * data);
+};
+
+class EventList
+{
+private:
+    int     index;
+    Event * list[MAX_THREADS];
+public:
+    
+    EventList();
+    int add( pthread_mutex_t*, TestInterface*, SerialWriter*, int );
+    int validIndex(int, int);
+    Event * get(int);
+    int remove(int);
+    int length();
+};
+
 class Environment
 {
-    ENV_STATUS status;
+private:
     pthread_mutex_t lock;
-    pthread_cond_t condition;
-    
-//    void * internalControl( void * );
+    pthread_cond_t  condition;
     
     void controlTick();
 public:
+    ENV_STATUS status;
     EventList events;
     pthread_t thread;
     
-    Environment();
-    Environment( Combine, class SERCOM, int );
+    Environment( TestInterface*, SerialWriter*, int );
     ~Environment();
     
-    void addTest( Combine, class SERCOM, int );
+    void addTest( TestInterface*, SerialWriter*, int );
     
     void start();
     void pause();

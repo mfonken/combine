@@ -20,7 +20,7 @@
 		49B079152015CC61008FCFDD /* image_utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49B079082015CC61008FCFDD /* image_utility.cpp */; };
 		49F3DB292016F4110032AD5A /* environment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49F3DB1E2016F4110032AD5A /* environment.cpp */; };
 		49F3DB2A2016F4110032AD5A /* sercom.c in Sources */ = {isa = PBXBuildFile; fileRef = 49F3DB212016F4110032AD5A /* sercom.c */; };
-		49F3DB2B2016F4110032AD5A /* sercom_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49F3DB232016F4110032AD5A /* sercom_wrapper.cpp */; };
+		49F3DB2B2016F4110032AD5A /* serial_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49F3DB232016F4110032AD5A /* serial_wrapper.cpp */; };
 		49F3DB2C2016F4110032AD5A /* file_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49F3DB262016F4110032AD5A /* file_writer.cpp */; };
 /* End PBXBuildFile section */
 
@@ -66,11 +66,12 @@
 		49B079092015CC61008FCFDD /* global_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global_types.h; sourceTree = "<group>"; };
 		49B0790A2015CC61008FCFDD /* open.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = open.hpp; sourceTree = "<group>"; };
 		49B0790B2015CC61008FCFDD /* unfisheye.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = unfisheye.hpp; sourceTree = "<group>"; };
+		49E0F04A201AB0A6006713BB /* A.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = A.hpp; sourceTree = "<group>"; };
 		49F3DB1E2016F4110032AD5A /* environment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = environment.cpp; sourceTree = "<group>"; };
 		49F3DB202016F4110032AD5A /* file_writer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = file_writer.hpp; sourceTree = "<group>"; };
 		49F3DB212016F4110032AD5A /* sercom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sercom.c; sourceTree = "<group>"; };
-		49F3DB222016F4110032AD5A /* sercom_wrapper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sercom_wrapper.hpp; sourceTree = "<group>"; };
-		49F3DB232016F4110032AD5A /* sercom_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sercom_wrapper.cpp; sourceTree = "<group>"; };
+		49F3DB222016F4110032AD5A /* serial_wrapper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = serial_wrapper.hpp; sourceTree = "<group>"; };
+		49F3DB232016F4110032AD5A /* serial_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_wrapper.cpp; sourceTree = "<group>"; };
 		49F3DB242016F4110032AD5A /* sercom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sercom.h; sourceTree = "<group>"; };
 		49F3DB252016F4110032AD5A /* utility_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility_master.h; sourceTree = "<group>"; };
 		49F3DB262016F4110032AD5A /* file_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = file_writer.cpp; sourceTree = "<group>"; };
@@ -116,6 +117,7 @@
 		4991FCB21FBCFF9F0025EA57 /* combine_core */ = {
 			isa = PBXGroup;
 			children = (
+				49E0F04A201AB0A6006713BB /* A.hpp */,
 				4991FD071FBD0F1A0025EA57 /* main.cpp */,
 				49B078EC2015CC61008FCFDD /* core */,
 				49F3DB1D2016F4110032AD5A /* environment */,
@@ -212,8 +214,8 @@
 			isa = PBXGroup;
 			children = (
 				49F3DB252016F4110032AD5A /* utility_master.h */,
-				49F3DB222016F4110032AD5A /* sercom_wrapper.hpp */,
-				49F3DB232016F4110032AD5A /* sercom_wrapper.cpp */,
+				49F3DB222016F4110032AD5A /* serial_wrapper.hpp */,
+				49F3DB232016F4110032AD5A /* serial_wrapper.cpp */,
 				49F3DB202016F4110032AD5A /* file_writer.hpp */,
 				49F3DB262016F4110032AD5A /* file_writer.cpp */,
 				49F3DB242016F4110032AD5A /* sercom.h */,
@@ -290,7 +292,7 @@
 				49B079142015CC61008FCFDD /* unfisheye.cpp in Sources */,
 				49B079132015CC61008FCFDD /* quaternion.c in Sources */,
 				49B0790E2015CC61008FCFDD /* kalman.c in Sources */,
-				49F3DB2B2016F4110032AD5A /* sercom_wrapper.cpp in Sources */,
+				49F3DB2B2016F4110032AD5A /* serial_wrapper.cpp in Sources */,
 				49F3DB2C2016F4110032AD5A /* file_writer.cpp in Sources */,
 				49B079102015CC61008FCFDD /* kinetic.c in Sources */,
 				49B0790C2015CC61008FCFDD /* combine.cpp in Sources */,

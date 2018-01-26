@@ -11,6 +11,6 @@
 
 //#define UTILITY_VERBOSE
 
-#include "sercom_wrapper.hpp"
+#include "serial_wrapper.hpp"
 
 #endif /* utility_master_h */

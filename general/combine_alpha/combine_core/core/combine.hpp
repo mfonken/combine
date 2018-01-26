@@ -14,15 +14,19 @@
 
 #include "kinetic_master.h"
 #include "open_master.h"
-//#include "environment_master.h"
+#include "environment_master.h"
 
 #define MAX_BUFFER 256
 #define SCALE 100
 
-class Combine// : public TestInterface
+class Combine : public TestInterface
 {
 public:
-    Combine();
+    int id;
+    std::string name;
+    
+//    Combine();
+    Combine(std::string);
     virtual void init( void );
     virtual void trigger( void );
     virtual string serialize( void );

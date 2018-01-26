@@ -1,24 +1,24 @@
 //
-//  bluetooth_serial.cpp
+//  serial_wrapper.cpp
 //  combine_core
 //
 //  Created by Matthew Fonken on 1/20/18.
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include "sercom_wrapper.hpp"
+#include "serial_wrapper.hpp"
 
-SERCOM::SERCOM(){}
+SerialWriter::SerialWriter(){}
 
-SERCOM::SERCOM( SERCOM_TYPE type )
+SerialWriter::SerialWriter( SerialWriter_TYPE type )
 {
-    SERCOM(type, NO_HANDSHAKE);
+    SerialWriter(type, NO_HANDSHAKE);
     this->type = type;
 }
 
-SERCOM::SERCOM( SERCOM_TYPE type, const char * data )
+SerialWriter::SerialWriter( SerialWriter_TYPE type, const char * data )
 {
-    SERCOM_STATUS ret;
+    SerialWriter_STATUS ret;
     this->type = type;
     switch(type)
     {
@@ -52,13 +52,13 @@ SERCOM::SERCOM( SERCOM_TYPE type, const char * data )
 #endif
 }
 
-SERCOM_STATUS SERCOM::initUSB(const char * handshake_id)
+SerialWriter_STATUS SerialWriter::initUSB(const char * handshake_id)
 {
     Init_SERCOM_Default();
     return handshake(handshake_id);
 }
 
-SERCOM_STATUS SERCOM::initBluetooth(const char * handshake_id)
+SerialWriter_STATUS SerialWriter::initBluetooth(const char * handshake_id)
 {
     channel.filestream = -1;
     channel.port = "/dev/tty.Bluetooth-Incoming-Port";
@@ -67,13 +67,13 @@ SERCOM_STATUS SERCOM::initBluetooth(const char * handshake_id)
     return handshake(handshake_id);
 }
 
-SERCOM_STATUS SERCOM::initFile(const char * name)
+SerialWriter_STATUS SerialWriter::initFile(const char * name)
 {
     writer.init(name);
     return HANDSHAKE_SKIPPED;
 }
 
-SERCOM_STATUS SERCOM::init( char * port, char * port_alt,const  char * handshake_id )
+SerialWriter_STATUS SerialWriter::init( char * port, char * port_alt,const  char * handshake_id )
 {
     channel.filestream = -1;
     channel.port = port;
@@ -82,11 +82,11 @@ SERCOM_STATUS SERCOM::init( char * port, char * port_alt,const  char * handshake
     return handshake(handshake_id);
 }
 
-SERCOM_STATUS SERCOM::handshake(const  char * id )
+SerialWriter_STATUS SerialWriter::handshake(const  char * id )
 {
     return handshake(id, DEFAULT_HANDSHAKE_DELAY, DEFAULT_HANDSHAKE_ATTEMPTS);
 }
-SERCOM_STATUS SERCOM::handshake(const  char * id, int delay, int attempts )
+SerialWriter_STATUS SerialWriter::handshake(const  char * id, int delay, int attempts )
 {
     if( !channel.initialized ) return INITIALIZATION_FAILED;
     if( id != NULL ) return HANDSHAKE_SKIPPED;
@@ -97,7 +97,7 @@ SERCOM_STATUS SERCOM::handshake(const  char * id, int delay, int attempts )
         {
             counter++;
 #ifdef UTILITY_VERBOSE
-            printf("SERCOM attempt #%d.\n", counter );
+            printf("SerialWriter attempt #%d.\n", counter );
 #endif
             usleep(delay);
         }
@@ -111,19 +111,19 @@ SERCOM_STATUS SERCOM::handshake(const  char * id, int delay, int attempts )
     }
 }
 
-int SERCOM::isInitialized()
+int SerialWriter::isInitialized()
 {
     if(channel.initialized) return 1;
     else return 0;
 }
 
-void SERCOM::write( std::string data )
+void SerialWriter::write( std::string data )
 {
     if(type == SFILE) writer.trigger(data);
     else Write_SERCOM_Bytes( channel.filestream, data.c_str(), (int)data.length() );
 }
 
-std::string SERCOM::read( int l )
+std::string SerialWriter::read( int l )
 {
     char data[l];
     Read_SERCOM_Bytes( channel.filestream, data, l );

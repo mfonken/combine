@@ -11,68 +11,46 @@
 using namespace cv;
 using namespace std;
 
-ImageUtility::ImageUtility() : cam(0)
+ImageUtility::ImageUtility() : cam(0), image(Size(CAM_WIDTH, CAM_HEIGHT), CV_8UC3, Scalar(0,0,0)), frame(size, CV_8UC3, Scalar(0,0,0))
 {
-    Mat image, frame;
+}
+
+void ImageUtility::init()
+{
     counter = 0;
     
-    width = CAM_WIDTH;
-    height = CAM_HEIGHT;
+    cam.set(CV_CAP_PROP_FRAME_WIDTH,  CAM_WIDTH);
+    cam.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT);
+    cam.set(CV_CAP_PROP_FPS, CAM_FRAME_RATE);
+    
     size.width = FNL_RESIZE_W;
     size.height = FNL_RESIZE_H;
-    cam.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    cam.set(CV_CAP_PROP_FRAME_HEIGHT, height);
-    
-    
     
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
-    cam.read(frame);
-    Mat temp(size, CV_8UC3, Scalar(0,0,0));
-    outframe = temp;
-    printf("Initializing Camera: (%d, %d)\n", frame.cols, frame.rows);
+    cam.read(image);
     
-    width  = size.width;
-    height = size.height;
+    outframe = image;
+    printf("Initializing Camera: (%d, %d) @ %d fps\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
+
     
 #ifdef GREYSCALE
     Mat grey;
-    cv::cvtColor(frame, grey, cv::COLOR_BGR2GRAY);
-    frame = grey;
+    cv::cvtColor(image, grey, cv::COLOR_BGR2GRAY);
+    image = grey;
 #endif
     
     live = true;
 }
 
-void ImageUtility::loop(char c)
-{
-    if (c == 03) printf("Next frame.\n");
-    else if (c == 02)
-    {
-        counter -= 2;
-        if( counter < 0 ) counter += num_frames;
-        printf("Last frame. %d\n ", counter);
-    }
-    else if (c == ' ') live = !live;
-    usleep(live?FRAME_DELAY_MS:60000);
-//    waitKey(live?FRAME_DELAY_MS:60000);
-}
-
 Mat ImageUtility::getNextFrame()
 {
-    Mat image(size, CV_8UC3, Scalar(0,0,0)), frame(size, CV_8UC3, Scalar(0,0,0)), temp(size, CV_8UC3, Scalar(0,0,0));
-
     cam >> image;
     resize(image, frame, size, 1, 1);
-//        invfisheye(temp,frame);
-//    imshow("Original", frame);
     
 #ifdef REDSCALE
-    Mat bgr[3];   //destination array
+    Mat bgr[3];
     split(frame,bgr);
     frame = bgr[2];
-//    imshow("R", bgr[2]);
-//    imshow("G", bgr[1]);
-//    imshow("B", bgr[0]);
 #endif
     
 #ifdef GREYSCALE
@@ -82,23 +60,6 @@ Mat ImageUtility::getNextFrame()
 #endif
     
     return frame;
-}
-
-int ImageUtility::getWidth()
-{
-    return width;
-}
-int ImageUtility::getHeight()
-{
-    return height;
-}
-int ImageUtility::getIteration()
-{
-    return iteration;
-}
-int ImageUtility::getCounter()
-{
-    return counter;
 }
 bool ImageUtility::isLive()
 {
@@ -145,27 +106,23 @@ void drawPosition(double x, double y, double z)
 
 void ImageUtility::getBeacons()
 {
+//    Mat frame(size, CV_8UC3, Scalar(0,0,0));
     Mat frame = getNextFrame();
+    
+    Mat out(size, CV_8UC3, Scalar(0,0,0));
+
 #ifdef OPENCV_THRESHOLD
-    Mat threshed_frame(Size(frame.cols, frame.rows), CV_8UC3, Scalar(0,0,0)),
-    out(Size(frame.cols, frame.rows), CV_8UC3, Scalar(0,0,0));
-    cv::threshold(frame, threshed_frame, THRESHOLD_, 255, THRESH_BINARY);
-    //                frame = threshed_frame;
+    cv::threshold(frame, frame, THRESHOLD_, 255, THRESH_BINARY);
 #endif
-    //                imshow("Frame", threshed_frame);
     
-    std::vector<KeyPoint> kps;
-    kps = tra.detect(threshed_frame, out);
-    
-#define TEXT_OFFSET_X 0//-26
-#define TEXT_OFFSET_Y 0// 18
-#define DETECT_BORDER_OFFSET 10
-    std::vector<KeyPoint> gkps;
+    std::vector<KeyPoint> kps, gkps;
+    kps = tra.detect(frame, out);
+
     for(int i = 0; i < kps.size(); i++)
     {
         Point pt(kps.at(i).pt);
-        if(   pt.x > DETECT_BORDER_OFFSET && pt.x < ( width - DETECT_BORDER_OFFSET)
-           && pt.y > DETECT_BORDER_OFFSET && pt.y < ( height - DETECT_BORDER_OFFSET))
+        if(   pt.x > DETECT_BORDER_OFFSET && pt.x < ( size.width  - DETECT_BORDER_OFFSET)
+           && pt.y > DETECT_BORDER_OFFSET && pt.y < ( size.height - DETECT_BORDER_OFFSET))
         {
             Point opt(pt.x + TEXT_OFFSET_X, pt.y + TEXT_OFFSET_Y);
             putText(out, "+", opt, FONT_HERSHEY_SCRIPT_SIMPLEX, 2, Vec3b(0,0,255), 3, 8);
@@ -173,10 +130,7 @@ void ImageUtility::getBeacons()
         }
     }
     
-    //                printf("Found %lu good keypoints\n", gkps.size());
-    
-#define STRENGTH 2.0
-#define ZOOM     1.1
+
     if(gkps.size() >= 2)
     {
         invfisheye(&gkps.at(0).pt, FNL_RESIZE_W, FNL_RESIZE_H, STRENGTH, ZOOM);
@@ -196,11 +150,15 @@ void ImageUtility::getBeacons()
             bea[1].y = gkps.at(1).pt.y;
         }
     }
-    /*************************/
-#ifdef ITERATIONS
-    //                times[l] = t[0]+t[1]+t[2];
-#endif
-    
+
+//    outframe = out;
+    drawOutframe(outframe);
+}
+
+void ImageUtility::drawOutframe( Mat M )
+{
+    putText(outframe, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
+    putText(outframe, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
 #ifdef TILT_LINES
     double top_x, bot_x, lef_y, rig_y, tr = tan(-bno.roll * DEG_TO_RAD);
     top_x = FNL_RESIZE_W/2 - FNL_RESIZE_H/2*tr;
@@ -212,12 +170,5 @@ void ImageUtility::getBeacons()
     line(out, Point(0,lef_y), Point(FNL_RESIZE_W,rig_y), Vec3b(255,245,255));
 #endif
     
-#ifdef SHOW_IMAGES
-    putText(out, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
-    putText(out, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
-//    imshow("Out", out);
-#endif
-    outframe = out;
-    loop(' ');
 }
 

@@ -31,8 +31,6 @@ using namespace cv;
 class ImageUtility
 {
 private:
-    int width;
-    int height;
     int iteration;
     int counter;
     int args;
@@ -40,25 +38,20 @@ private:
     bool no_file;
     int num_frames;
     
-    VideoCapture cam;
-    
     cv::Size size;
-    
     open_t    tra;
     
 public:
-    Mat outframe;
+    VideoCapture cam;
+    Mat outframe, frame, image;
     
     ImageUtility();
-    void loop(char c);
+    void init();
     
     Mat getNextFrame();
-    int getWidth();
-    int getHeight();
-    int getIteration();
-    int getCounter();
     bool isLive();
     void getBeacons();
+    void drawOutframe( Mat );
     
     kpoint_t bea[2];
 };

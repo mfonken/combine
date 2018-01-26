@@ -8,7 +8,7 @@
 
 #include "combine_master.h"
 #include "environment_master.h"
-#include "utility_master.h"
+#include "A.hpp"
 
 #define COMBINE_FPS 30
 #define COMBINE_DEL 1000/COMBINE_FPS
@@ -17,16 +17,28 @@ const char * FILENAME = "/Users/matthewfonken/Desktop/out.txt";
 
 int main( int argc, char * argv[] )
 {
-    Combine combine;
-    class SERCOM comm(SFILE, FILENAME);
+    Combine combine("Combine");
+    SerialWriter comm(SFILE, FILENAME);
+    Environment env(&combine, &comm, MAX_FPS);
+
+    
+    env.start();
+    usleep(1000000);
+    env.pause();
     
     Mat frame;
     while(1)
     {
-        combine.trigger();
-        comm.write(combine.serialize());
-//        imshow("Live Camera", combine.utility.outframe);
-        cv::waitKey(1);
+        imshow("Live Camera", combine.utility.outframe);
+        char r = cv::waitKey(10);
+        
+        if( r == ' ' )
+        {
+            if(env.status != LIVE)
+                env.resume();
+            else
+                env.pause();
+        }
     }
     return 0;
 }
