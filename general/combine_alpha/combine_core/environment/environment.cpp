@@ -8,12 +8,18 @@
 
 #include "environment.hpp"
 
-Environment::Environment( TestInterface* test, SerialWriter * sercom, int rate )
+Environment::Environment( TestInterface * test, SerialWriter * sercom, int rate )
 {
     if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
-    events.add( &lock, test, sercom, rate );
-    test->init();
+    if(events.add( &lock, test, sercom, rate ))
+        test->init();
     status = INITIALIZED;
+}
+
+void Environment::addTest( TestInterface * test, int rate)
+{
+    if(events.add( &lock, test, NULL, rate ))
+        test->init();
 }
 
 void Environment::addTest( TestInterface* test, SerialWriter* sercom, int rate)
@@ -67,7 +73,7 @@ Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * serc
 void * Event::worker( void * data )
 {
     Event e = *(Event*)data;
-    const char * n = e.test->serialize().c_str();
+    const char * n = e.test->name.c_str();
     if( e.mutex == NULL)
     {
         printf("ALERT: Event %s has no mutex!\n", n);
@@ -88,7 +94,8 @@ void * Event::worker( void * data )
         end_time = getTime(time) + sl;
     
         e.test->trigger();
-//        e.sercom->write(e.test->serialize());
+        if(e.sercom != NULL)
+            e.sercom->write(e.test->serialize());
         
         e.id++;
         

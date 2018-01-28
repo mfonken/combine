@@ -19,17 +19,37 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "unfisheye.hpp"
+#include "environment_master.h"
 
+#include "unfisheye.hpp"
 #include "open.hpp"
 #include "kinetic.h"
 
-//#define TILT_LINES
+#define TILT_LINES
 
 using namespace cv;
 
-class ImageUtility
+class ImageUtility : public TestInterface
 {
+public:
+    int id;
+    std::string name;
+    virtual void init( void );
+    virtual void trigger( void );
+    virtual string serialize( void );
+    
+    VideoCapture cam;
+    Mat outframe, frame, image;
+    
+    ImageUtility( std::string );
+    
+    Mat getNextFrame();
+    bool isLive();
+    void getBeacons();
+    void drawOutframe();
+    
+    kpoint_t bea[2];
+    
 private:
     int iteration;
     int counter;
@@ -40,20 +60,6 @@ private:
     
     cv::Size size;
     open_t    tra;
-    
-public:
-    VideoCapture cam;
-    Mat outframe, frame, image;
-    
-    ImageUtility();
-    void init();
-    
-    Mat getNextFrame();
-    bool isLive();
-    void getBeacons();
-    void drawOutframe( Mat );
-    
-    kpoint_t bea[2];
 };
 
 bool thresh(uint8_t t, Vec3d p);

@@ -73,7 +73,7 @@ class EventList
 {
 private:
     int     index;
-    Event * list[MAX_THREADS];
+    Event * list[MAX_EVENTS];
 public:
     
     EventList();
@@ -99,6 +99,7 @@ public:
     Environment( TestInterface*, SerialWriter*, int );
     ~Environment();
     
+    void addTest( TestInterface*, int );
     void addTest( TestInterface*, SerialWriter*, int );
     
     void start();

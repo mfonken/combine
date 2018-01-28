@@ -78,11 +78,11 @@ static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * 
     Kalman.update( &k->filters.position[0],  k->r.j, 0, VELOCITY );
     Kalman.update( &k->filters.position[2],  k->r.k, 0, VELOCITY );
     
-//    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gam*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
-    return;
+    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gam*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+//    return;
     
     /* Step 5B: Calculate Non-gravitational Data */
-    Kinetic.nongrav( k, n );
+//    Kinetic.nongrav( k, n );
 }
 
 static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )

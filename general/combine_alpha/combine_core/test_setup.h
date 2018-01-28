@@ -30,7 +30,7 @@
 #define ITERATIONS
 #endif
 
-#define REDSCALE
+//#define REDSCALE
 //#define GREYSCALE
 #define OPENCV_THRESHOLD
 #define FNL_RESIZE              540
@@ -52,7 +52,7 @@
 #define CAM_WIDTH               1280//1920
 #define CAM_HEIGHT              720//1080
 #define CAM_FRAME_RATE          60
-#define FNL_RESIZE_S            2
+#define FNL_RESIZE_S            1
 #define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
 #define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S
 

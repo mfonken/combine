@@ -120,6 +120,7 @@
 				49E0F04A201AB0A6006713BB /* A.hpp */,
 				4991FD071FBD0F1A0025EA57 /* main.cpp */,
 				49B078EC2015CC61008FCFDD /* core */,
+				49B079042015CC61008FCFDD /* open */,
 				49F3DB1D2016F4110032AD5A /* environment */,
 				49F3DB1F2016F4110032AD5A /* utilities */,
 				4948867D1FD4C487000149C5 /* test_setup.h */,
@@ -136,7 +137,6 @@
 				49B078EF2015CC61008FCFDD /* combine_utility.cpp */,
 				49B078F02015CC61008FCFDD /* combine_utility.hpp */,
 				49B078F22015CC61008FCFDD /* kinetic */,
-				49B079042015CC61008FCFDD /* open */,
 			);
 			path = core;
 			sourceTree = "<group>";

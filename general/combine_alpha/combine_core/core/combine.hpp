@@ -24,14 +24,13 @@ class Combine : public TestInterface
 public:
     int id;
     std::string name;
-    
-//    Combine();
-    Combine(std::string);
     virtual void init( void );
     virtual void trigger( void );
     virtual string serialize( void );
-    ImageUtility utility;
+    
+    Combine(std::string, ImageUtility *);
 private:
+    ImageUtility * utility;
     int         width,
                 height;
     kpoint_t    bea[2];

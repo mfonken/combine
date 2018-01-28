@@ -9,7 +9,7 @@
 #ifndef utility_master_h
 #define utility_master_h
 
-//#define UTILITY_VERBOSE
+#define UTILITY_VERBOSE
 
 #include "serial_wrapper.hpp"
 
