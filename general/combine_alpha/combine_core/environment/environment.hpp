@@ -96,6 +96,7 @@ public:
     EventList events;
     pthread_t thread;
     
+    Environment( TestInterface*, int );
     Environment( TestInterface*, SerialWriter*, int );
     ~Environment();
     

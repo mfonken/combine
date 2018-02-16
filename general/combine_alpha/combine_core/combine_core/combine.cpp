@@ -39,7 +39,7 @@ void Combine::init()
     width  = FNL_RESIZE_W;
     height = FNL_RESIZE_H;
     
-    printf("Initializing IMU.\n");
+    printf("Initializing IMU utility.\n");
     IMU.init( &bno );
     
     printf("Initializing Kinetic Utility.\n");
@@ -48,9 +48,9 @@ void Combine::init()
 
 void Combine::trigger()
 {
-    ang3_t e, g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
     IMU.update.orientation( &bno );
-    e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD };
+    ang3_t e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD },
+           g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
     vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
     Kinetic.updateRotation( &kin, &e, &g );
     Kinetic.updatePosition( &kin, &R, &utility->bea[1], &utility->bea[0] );

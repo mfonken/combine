@@ -66,7 +66,6 @@
 		49B079092015CC61008FCFDD /* global_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global_types.h; sourceTree = "<group>"; };
 		49B0790A2015CC61008FCFDD /* open.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = open.hpp; sourceTree = "<group>"; };
 		49B0790B2015CC61008FCFDD /* unfisheye.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = unfisheye.hpp; sourceTree = "<group>"; };
-		49E0F04A201AB0A6006713BB /* A.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = A.hpp; sourceTree = "<group>"; };
 		49F3DB1E2016F4110032AD5A /* environment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = environment.cpp; sourceTree = "<group>"; };
 		49F3DB202016F4110032AD5A /* file_writer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = file_writer.hpp; sourceTree = "<group>"; };
 		49F3DB212016F4110032AD5A /* sercom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sercom.c; sourceTree = "<group>"; };
@@ -117,9 +116,8 @@
 		4991FCB21FBCFF9F0025EA57 /* combine_core */ = {
 			isa = PBXGroup;
 			children = (
-				49E0F04A201AB0A6006713BB /* A.hpp */,
 				4991FD071FBD0F1A0025EA57 /* main.cpp */,
-				49B078EC2015CC61008FCFDD /* core */,
+				49B078EC2015CC61008FCFDD /* combine_core */,
 				49B079042015CC61008FCFDD /* open */,
 				49F3DB1D2016F4110032AD5A /* environment */,
 				49F3DB1F2016F4110032AD5A /* utilities */,
@@ -128,17 +126,17 @@
 			path = combine_core;
 			sourceTree = "<group>";
 		};
-		49B078EC2015CC61008FCFDD /* core */ = {
+		49B078EC2015CC61008FCFDD /* combine_core */ = {
 			isa = PBXGroup;
 			children = (
 				49B078EE2015CC61008FCFDD /* combine_master.h */,
 				49B078F12015CC61008FCFDD /* combine.hpp */,
 				49B078ED2015CC61008FCFDD /* combine.cpp */,
-				49B078EF2015CC61008FCFDD /* combine_utility.cpp */,
 				49B078F02015CC61008FCFDD /* combine_utility.hpp */,
+				49B078EF2015CC61008FCFDD /* combine_utility.cpp */,
 				49B078F22015CC61008FCFDD /* kinetic */,
 			);
-			path = core;
+			path = combine_core;
 			sourceTree = "<group>";
 		};
 		49B078F22015CC61008FCFDD /* kinetic */ = {
@@ -192,8 +190,8 @@
 				49B079062015CC61008FCFDD /* open_master.h */,
 				49B0790A2015CC61008FCFDD /* open.hpp */,
 				49B079092015CC61008FCFDD /* global_types.h */,
-				49B079052015CC61008FCFDD /* unfisheye.cpp */,
 				49B0790B2015CC61008FCFDD /* unfisheye.hpp */,
+				49B079052015CC61008FCFDD /* unfisheye.cpp */,
 				49B079072015CC61008FCFDD /* image_utility.hpp */,
 				49B079082015CC61008FCFDD /* image_utility.cpp */,
 			);

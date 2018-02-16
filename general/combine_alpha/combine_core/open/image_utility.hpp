@@ -42,6 +42,15 @@ public:
     Mat outframe, frame, image;
     
     ImageUtility( std::string );
+    ImageUtility( std::string, std::string, int, int);
+    ImageUtility( std::string, std::string, int, int, int );
+    
+    void initFile();
+    void initCamera();
+    
+    Mat getNextImage();
+    Mat getImage();
+    void loop(char c);
     
     Mat getNextFrame();
     bool isLive();
@@ -49,25 +58,23 @@ public:
     void drawOutframe();
     
     kpoint_t bea[2];
+    open_t    tra;
     
 private:
+    std::string file, subdir;
     int iteration;
     int counter;
     int args;
     bool live;
-    bool no_file;
+    bool has_file;
     int num_frames;
     
     cv::Size size;
-    open_t    tra;
+    
 };
 
 bool thresh(uint8_t t, Vec3d p);
 
 void drawPosition(double x, double y, double z);
-
-//void initImg( cimage_t i, int w, int h );
-//void MatToCimage( uint16_t width, uint16_t height, Mat mat, cimage_t img, int threshold );
-//void cimageToBandW( uint16_t width, uint16_t height, cimage_t img, Mat mat );
 
 #endif /* image_utilities_hpp */

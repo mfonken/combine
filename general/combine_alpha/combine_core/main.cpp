@@ -15,12 +15,14 @@ const char * FILENAME = "/Users/matthewfonken/Desktop/out.txt";
 
 int main( int argc, char * argv[] )
 {
-    ImageUtility utility("ImageUtil");
+//    ImageUtility utility("ImageUtil");
+    ImageUtility utility("ImageUtility", "frames/small", 26, FNL_RESIZE_W, FNL_RESIZE_H);
     Combine combine("Combine", &utility);
     SerialWriter comm(SFILE, FILENAME);
     
-    Environment env(&combine, &comm, MAX_FPS);
-    env.addTest(&utility, MAX_FPS);
+    Environment env(&utility, MAX_FPS);
+//    env.addTest(&combine, &comm, MAX_FPS);
+    
     
     env.start();
     usleep(1000000);
@@ -30,12 +32,24 @@ int main( int argc, char * argv[] )
     while(1)
     {
         imshow("Live Camera", utility.outframe);
-        if( cv::waitKey(10) == ' ' )
+        switch(waitKey(10))
         {
-            if(env.status != LIVE)
-                env.resume();
-            else
+            case ' ':
+                if(env.status != LIVE) env.resume();
+                else env.pause();
+                break;
+            case 's':
                 env.pause();
+                usleep(10000);
+                utility.tra.avg = 0;
+                utility.tra.count = 0;
+                env.start();
+                usleep(10000000);
+                env.pause();
+                printf("Open Detect averaged %fms for %d iterations\n", utility.tra.avg*1000, utility.tra.count);
+                break;
+            default:
+                break;
         }
     }
     return 0;
