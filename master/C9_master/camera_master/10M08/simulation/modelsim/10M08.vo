@@ -17,7 +17,7 @@
 // PROGRAM "Quartus Prime"
 // VERSION "Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition"
 
-// DATE "06/11/2017 15:40:12"
+// DATE "02/23/2018 13:02:40"
 
 // 
 // Device: Altera 10M08SAE144C8GES Package EQFP144
@@ -69,26 +69,26 @@ output 	LED2;
 output 	LED3;
 output 	LED4;
 output 	LED5;
-inout 	A;
-inout 	B;
+output 	A;
+output 	B;
 input 	clock;
-inout 	cam_ena;
-inout 	mclk;
+output 	cam_ena;
+output 	mclk;
 output 	pwdn;
 input 	vsync;
 input 	href;
 input 	pclk;
 input 	[7:0] cpi;
-inout 	sda;
-inout 	scl;
+output 	sda;
+output 	scl;
 output 	umd_tx;
 input 	umd_rx;
-inout 	ram_rst;
-inout 	ram_cs_n;
-inout 	ram_ck_p;
-inout 	ram_ck_n;
-inout 	ram_rwds;
-inout 	[7:0] ram_dq;
+output 	ram_rst;
+output 	ram_cs_n;
+output 	ram_ck_p;
+output 	ram_ck_n;
+output 	ram_rwds;
+output 	[7:0] ram_dq;
 output 	ram_vcc;
 output 	ram_vccq;
 output 	t_ram_rst;
@@ -97,7 +97,7 @@ output 	t_ram_ck_p;
 output 	t_ram_ck_n;
 output 	t_ram_rwds;
 output 	[7:0] t_ram_dq;
-inout 	reset_n;
+output 	reset_n;
 
 // Design Ports Information
 // LED1	=>  Location: PIN_132,	 I/O Standard: 2.5 V,	 Current Strength: Default

@@ -1,5 +1,5 @@
 Analysis & Synthesis report for 10M08
-Sun Jun 11 15:39:52 2017
+Fri Feb 23 13:02:22 2018
 Quartus Prime Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
 
 
@@ -61,7 +61,7 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +------------------------------------+---------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Sun Jun 11 15:39:52 2017       ;
+; Analysis & Synthesis Status        ; Successful - Fri Feb 23 13:02:22 2018       ;
 ; Quartus Prime Version              ; 16.1.0 Build 196 10/24/2016 SJ Lite Edition ;
 ; Revision Name                      ; 10M08                                       ;
 ; Top-level Entity Name              ; master_bridge                               ;
@@ -183,23 +183,23 @@ agreement for further details.
 +----------------------------+-------------+
 
 
-+-------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Analysis & Synthesis Source Files Read                                                                                                                ;
-+----------------------------------+-----------------+-----------------+----------------------------------------------------------------------+---------+
-; File Name with User-Entered Path ; Used in Netlist ; File Type       ; File Name with Absolute Path                                         ; Library ;
-+----------------------------------+-----------------+-----------------+----------------------------------------------------------------------+---------+
-; ora.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd           ;         ;
-; OV9712.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/OV9712.vhd        ;         ;
-; ucp.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ucp.vhd           ;         ;
-; uart.vhd                         ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/uart.vhd          ;         ;
-; hrddr.vhd                        ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/hrddr.vhd         ;         ;
-; i2c_master.vhd                   ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/i2c_master.vhd    ;         ;
-; ora_math.vhd                     ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora_math.vhd      ;         ;
-; ora_types.vhd                    ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora_types.vhd     ;         ;
-; global_types.vhd                 ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/global_types.vhd  ;         ;
-; master.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd        ;         ;
-; master_bridge.vhd                ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd ;         ;
-+----------------------------------+-----------------+-----------------+----------------------------------------------------------------------+---------+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type       ; File Name with Absolute Path                                                                         ; Library ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
+; ora.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd           ;         ;
+; OV9712.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/OV9712.vhd        ;         ;
+; ucp.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ucp.vhd           ;         ;
+; uart.vhd                         ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd          ;         ;
+; hrddr.vhd                        ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd         ;         ;
+; i2c_master.vhd                   ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd    ;         ;
+; ora_math.vhd                     ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd      ;         ;
+; ora_types.vhd                    ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_types.vhd     ;         ;
+; global_types.vhd                 ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/global_types.vhd  ;         ;
+; master.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd        ;         ;
+; master_bridge.vhd                ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd ;         ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
 
 
 +---------------------------------------------------------------------------+
@@ -641,126 +641,126 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
-    Info: Processing started: Sun Jun 11 15:39:40 2017
+    Info: Processing started: Fri Feb 23 13:02:11 2018
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off 10M08 -c 10M08
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 4 of the 4 processors detected
 Info (12021): Found 2 design units, including 1 entities, in source file ora.vhd
-    Info (12022): Found design unit 1: ora-gbehaviour File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd Line: 70
-    Info (12023): Found entity 1: ora File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd Line: 17
+    Info (12022): Found design unit 1: ora-gbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 70
+    Info (12023): Found entity 1: ora File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 17
 Info (12021): Found 1 design units, including 0 entities, in source file ov9712.vhd
-    Info (12022): Found design unit 1: OV9712 File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/OV9712.vhd Line: 5
+    Info (12022): Found design unit 1: OV9712 File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/OV9712.vhd Line: 5
 Info (12021): Found 1 design units, including 0 entities, in source file ucp.vhd
-    Info (12022): Found design unit 1: ucp_lib File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ucp.vhd Line: 6
+    Info (12022): Found design unit 1: ucp_lib File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ucp.vhd Line: 6
 Info (12021): Found 2 design units, including 1 entities, in source file uart.vhd
-    Info (12022): Found design unit 1: uart-rtl File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/uart.vhd Line: 50
-    Info (12023): Found entity 1: uart File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/uart.vhd Line: 32
+    Info (12022): Found design unit 1: uart-rtl File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd Line: 50
+    Info (12023): Found entity 1: uart File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd Line: 32
 Info (12021): Found 2 design units, including 1 entities, in source file hrddr.vhd
-    Info (12022): Found design unit 1: hrddr-rtl File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/hrddr.vhd Line: 46
-    Info (12023): Found entity 1: hrddr File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/hrddr.vhd Line: 10
+    Info (12022): Found design unit 1: hrddr-rtl File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 46
+    Info (12023): Found entity 1: hrddr File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 10
 Info (12021): Found 2 design units, including 1 entities, in source file i2c_master.vhd
-    Info (12022): Found design unit 1: i2c_master-logic File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/i2c_master.vhd Line: 56
-    Info (12023): Found entity 1: i2c_master File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/i2c_master.vhd Line: 38
+    Info (12022): Found design unit 1: i2c_master-logic File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 56
+    Info (12023): Found entity 1: i2c_master File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 38
 Info (12021): Found 2 design units, including 0 entities, in source file ora_math.vhd
-    Info (12022): Found design unit 1: ora_math File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora_math.vhd Line: 7
-    Info (12022): Found design unit 2: ora_math-body File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora_math.vhd Line: 38
+    Info (12022): Found design unit 1: ora_math File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd Line: 7
+    Info (12022): Found design unit 2: ora_math-body File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd Line: 38
 Info (12021): Found 1 design units, including 0 entities, in source file ora_types.vhd
-    Info (12022): Found design unit 1: ora_types File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora_types.vhd Line: 5
+    Info (12022): Found design unit 1: ora_types File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_types.vhd Line: 5
 Info (12021): Found 1 design units, including 0 entities, in source file global_types.vhd
-    Info (12022): Found design unit 1: global_types File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/global_types.vhd Line: 5
+    Info (12022): Found design unit 1: global_types File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/global_types.vhd Line: 5
 Info (12021): Found 2 design units, including 1 entities, in source file master.vhd
-    Info (12022): Found design unit 1: master-mbehaviour File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 73
-    Info (12023): Found entity 1: master File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 24
+    Info (12022): Found design unit 1: master-mbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 73
+    Info (12023): Found entity 1: master File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 24
 Info (12021): Found 2 design units, including 1 entities, in source file master_bridge.vhd
-    Info (12022): Found design unit 1: master_bridge-gbehaviour File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 88
-    Info (12023): Found entity 1: master_bridge File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 34
+    Info (12022): Found design unit 1: master_bridge-gbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 88
+    Info (12023): Found entity 1: master_bridge File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 34
 Info (12127): Elaborating entity "master_bridge" for the top level hierarchy
-Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(70): used explicit default value for signal "ram_vcc" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 70
-Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(71): used explicit default value for signal "ram_vccq" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 71
-Warning (10036): Verilog HDL or VHDL warning at master_bridge.vhd(160): object "i2c_ack_err" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 160
-Warning (10665): Bidirectional port "reset_n" at master_bridge.vhd(81) has a one-way connection to bidirectional port "ram_rst" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 81
-Info (12128): Elaborating entity "master" for hierarchy "master:master_m" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 359
-Warning (10540): VHDL Signal Declaration warning at master.vhd(31): used explicit default value for signal "LED1" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 31
-Warning (10540): VHDL Signal Declaration warning at master.vhd(32): used explicit default value for signal "LED2" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 32
-Warning (10540): VHDL Signal Declaration warning at master.vhd(35): used explicit default value for signal "LED5" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 35
-Warning (10036): Verilog HDL or VHDL warning at master.vhd(98): object "hasAck" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 98
-Warning (10036): Verilog HDL or VHDL warning at master.vhd(99): object "hasNack" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 99
-Info (12128): Elaborating entity "i2c_master" for hierarchy "i2c_master:i2c_master_0" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 405
-Info (12128): Elaborating entity "uart" for hierarchy "uart:umd" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 427
-Info (12128): Elaborating entity "ora" for hierarchy "ora:ora_0" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 450
-Warning (10541): VHDL Signal Declaration warning at ora.vhd(46): used implicit default value for signal "ora_bytes_to_tx" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd Line: 46
-Warning (10036): Verilog HDL or VHDL warning at ora.vhd(172): object "x_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd Line: 172
-Warning (10036): Verilog HDL or VHDL warning at ora.vhd(173): object "y_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/ora.vhd Line: 173
-Info (12128): Elaborating entity "hrddr" for hierarchy "hrddr:hrddr_0" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 490
-Warning (10036): Verilog HDL or VHDL warning at hrddr.vhd(84): object "rwds_prev" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/hrddr.vhd Line: 84
+Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(70): used explicit default value for signal "ram_vcc" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 70
+Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(71): used explicit default value for signal "ram_vccq" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 71
+Warning (10036): Verilog HDL or VHDL warning at master_bridge.vhd(160): object "i2c_ack_err" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 160
+Warning (10665): Bidirectional port "reset_n" at master_bridge.vhd(81) has a one-way connection to bidirectional port "ram_rst" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 81
+Info (12128): Elaborating entity "master" for hierarchy "master:master_m" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 359
+Warning (10540): VHDL Signal Declaration warning at master.vhd(31): used explicit default value for signal "LED1" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 31
+Warning (10540): VHDL Signal Declaration warning at master.vhd(32): used explicit default value for signal "LED2" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 32
+Warning (10540): VHDL Signal Declaration warning at master.vhd(35): used explicit default value for signal "LED5" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 35
+Warning (10036): Verilog HDL or VHDL warning at master.vhd(98): object "hasAck" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 98
+Warning (10036): Verilog HDL or VHDL warning at master.vhd(99): object "hasNack" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 99
+Info (12128): Elaborating entity "i2c_master" for hierarchy "i2c_master:i2c_master_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 405
+Info (12128): Elaborating entity "uart" for hierarchy "uart:umd" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 427
+Info (12128): Elaborating entity "ora" for hierarchy "ora:ora_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 450
+Warning (10541): VHDL Signal Declaration warning at ora.vhd(46): used implicit default value for signal "ora_bytes_to_tx" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 46
+Warning (10036): Verilog HDL or VHDL warning at ora.vhd(172): object "x_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 172
+Warning (10036): Verilog HDL or VHDL warning at ora.vhd(173): object "y_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 173
+Info (12128): Elaborating entity "hrddr" for hierarchy "hrddr:hrddr_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 490
+Warning (10036): Verilog HDL or VHDL warning at hrddr.vhd(84): object "rwds_prev" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 84
 Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
 Warning (13034): The following nodes have both tri-state and non-tri-state drivers
-    Warning (13035): Inserted always-enabled tri-state buffer between "cam_ena" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 48
-    Warning (13035): Inserted always-enabled tri-state buffer between "mclk" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 49
-    Warning (13035): Inserted always-enabled tri-state buffer between "ram_cs_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 64
-    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_p" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 65
-    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 66
+    Warning (13035): Inserted always-enabled tri-state buffer between "cam_ena" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 48
+    Warning (13035): Inserted always-enabled tri-state buffer between "mclk" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_cs_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_p" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
 Warning (13039): The following bidirectional pins have no drivers
-    Warning (13040): bidirectional pin "A" has no driver File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 41
-    Warning (13040): bidirectional pin "B" has no driver File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 42
-    Warning (13040): bidirectional pin "reset_n" has no driver File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 81
+    Warning (13040): bidirectional pin "A" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 41
+    Warning (13040): bidirectional pin "B" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 42
+    Warning (13040): bidirectional pin "reset_n" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 81
 Info (13060): One or more bidirectional pins are fed by always enabled tri-state buffers
-    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "mclk" is moved to its source File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 49
-    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_rst" is moved to its source File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 63
-    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_cs_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 64
-    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_p" is moved to its source File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 65
-    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 66
-Info (13000): Registers with preset signals will power-up high File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/i2c_master.vhd Line: 64
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "mclk" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_rst" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 63
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_cs_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_p" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
+Info (13000): Registers with preset signals will power-up high File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 64
 Info (13003): DEV_CLRn pin will set, and not reset, register with preset signal due to NOT Gate Push-Back
 Warning (13009): TRI or OPNDRN buffers permanently enabled
-    Warning (13010): Node "cam_ena~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 48
-    Warning (13010): Node "mclk~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 49
-    Warning (13010): Node "ram_rst~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 63
-    Warning (13010): Node "ram_cs_n~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 64
-    Warning (13010): Node "ram_ck_p~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 65
-    Warning (13010): Node "ram_ck_n~synth" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 66
+    Warning (13010): Node "cam_ena~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 48
+    Warning (13010): Node "mclk~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Warning (13010): Node "ram_rst~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 63
+    Warning (13010): Node "ram_cs_n~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Warning (13010): Node "ram_ck_p~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Warning (13010): Node "ram_ck_n~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
 Warning (13024): Output pins are stuck at VCC or GND
-    Warning (13410): Pin "LED1" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 36
-    Warning (13410): Pin "LED2" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 37
-    Warning (13410): Pin "LED5" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 40
-    Warning (13410): Pin "pwdn" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 50
-    Warning (13410): Pin "ram_vcc" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 70
-    Warning (13410): Pin "ram_vccq" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 71
+    Warning (13410): Pin "LED1" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 36
+    Warning (13410): Pin "LED2" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 37
+    Warning (13410): Pin "LED5" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 40
+    Warning (13410): Pin "pwdn" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 50
+    Warning (13410): Pin "ram_vcc" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 70
+    Warning (13410): Pin "ram_vccq" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 71
 Info (286030): Timing-Driven Synthesis is running
-Warning (14632): Output pin "t_ram_rwds" driven by bidirectional pin "ram_rwds" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 77
-Warning (14632): Output pin "t_ram_dq[0]" driven by bidirectional pin "ram_dq[0]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[1]" driven by bidirectional pin "ram_dq[1]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[2]" driven by bidirectional pin "ram_dq[2]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[3]" driven by bidirectional pin "ram_dq[3]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[4]" driven by bidirectional pin "ram_dq[4]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[5]" driven by bidirectional pin "ram_dq[5]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[6]" driven by bidirectional pin "ram_dq[6]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_dq[7]" driven by bidirectional pin "ram_dq[7]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 78
-Warning (14632): Output pin "t_ram_rst" driven by bidirectional pin "reset_n" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 73
+Warning (14632): Output pin "t_ram_rwds" driven by bidirectional pin "ram_rwds" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 77
+Warning (14632): Output pin "t_ram_dq[0]" driven by bidirectional pin "ram_dq[0]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[1]" driven by bidirectional pin "ram_dq[1]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[2]" driven by bidirectional pin "ram_dq[2]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[3]" driven by bidirectional pin "ram_dq[3]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[4]" driven by bidirectional pin "ram_dq[4]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[5]" driven by bidirectional pin "ram_dq[5]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[6]" driven by bidirectional pin "ram_dq[6]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[7]" driven by bidirectional pin "ram_dq[7]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_rst" driven by bidirectional pin "reset_n" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 73
 Info (17049): 24 registers lost all their fanouts during netlist optimizations.
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
 Warning (21074): Design contains 11 input pin(s) that do not drive logic
-    Warning (15610): No output dependent on input pin "vsync" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 51
-    Warning (15610): No output dependent on input pin "href" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 52
-    Warning (15610): No output dependent on input pin "pclk" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 53
-    Warning (15610): No output dependent on input pin "cpi[0]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[1]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[2]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[3]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[4]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[5]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[6]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
-    Warning (15610): No output dependent on input pin "cpi[7]" File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "vsync" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 51
+    Warning (15610): No output dependent on input pin "href" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 52
+    Warning (15610): No output dependent on input pin "pclk" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 53
+    Warning (15610): No output dependent on input pin "cpi[0]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[1]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[2]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[3]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[4]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[5]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[6]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[7]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
 Info (21057): Implemented 642 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 13 input pins
     Info (21059): Implemented 22 output pins
     Info (21060): Implemented 20 bidirectional pins
     Info (21061): Implemented 587 logic cells
 Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 61 warnings
-    Info: Peak virtual memory: 687 megabytes
-    Info: Processing ended: Sun Jun 11 15:39:52 2017
-    Info: Elapsed time: 00:00:12
+    Info: Peak virtual memory: 750 megabytes
+    Info: Processing ended: Fri Feb 23 13:02:22 2018
+    Info: Elapsed time: 00:00:11
     Info: Total CPU time (on all processors): 00:00:21
 
 

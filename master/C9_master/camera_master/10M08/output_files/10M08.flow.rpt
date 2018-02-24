@@ -1,5 +1,5 @@
 Flow report for 10M08
-Sun Jun 11 15:40:12 2017
+Fri Feb 23 13:02:40 2018
 Quartus Prime Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
 
 
@@ -41,7 +41,7 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Flow Summary                                                                     ;
 +------------------------------------+---------------------------------------------+
-; Flow Status                        ; Successful - Sun Jun 11 15:40:12 2017       ;
+; Flow Status                        ; Successful - Fri Feb 23 13:02:40 2018       ;
 ; Quartus Prime Version              ; 16.1.0 Build 196 10/24/2016 SJ Lite Edition ;
 ; Revision Name                      ; 10M08                                       ;
 ; Top-level Entity Name              ; master_bridge                               ;
@@ -67,7 +67,7 @@ agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 06/11/2017 15:39:41 ;
+; Start date & time ; 02/23/2018 13:02:12 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; 10M08               ;
 +-------------------+---------------------+
@@ -78,7 +78,7 @@ agreement for further details.
 +-------------------------------------+----------------------------------------+---------------+---------------+----------------+
 ; Assignment Name                     ; Value                                  ; Default Value ; Entity Name   ; Section Id     ;
 +-------------------------------------+----------------------------------------+---------------+---------------+----------------+
-; COMPILER_SIGNATURE_ID               ; 48710643792706.149721718101552         ; --            ; --            ; --             ;
+; COMPILER_SIGNATURE_ID               ; 48710643792706.151941613212772         ; --            ; --            ; --             ;
 ; EDA_OUTPUT_DATA_FORMAT              ; Verilog Hdl                            ; --            ; --            ; eda_simulation ;
 ; EDA_SIMULATION_TOOL                 ; ModelSim-Altera (Verilog)              ; <None>        ; --            ; --             ;
 ; FLOW_ENABLE_POWER_ANALYZER          ; On                                     ; Off           ; --            ; --             ;
@@ -99,13 +99,13 @@ agreement for further details.
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis      ; 00:00:12     ; 1.0                     ; 687 MB              ; 00:00:21                           ;
-; Fitter                    ; 00:00:07     ; 1.1                     ; 1450 MB             ; 00:00:09                           ;
-; Assembler                 ; 00:00:01     ; 1.0                     ; 570 MB              ; 00:00:01                           ;
-; PowerPlay Power Analyzer  ; 00:00:02     ; 1.2                     ; 717 MB              ; 00:00:03                           ;
-; TimeQuest Timing Analyzer ; 00:00:03     ; 1.2                     ; 680 MB              ; 00:00:03                           ;
-; EDA Netlist Writer        ; 00:00:01     ; 1.0                     ; 541 MB              ; 00:00:01                           ;
-; Total                     ; 00:00:26     ; --                      ; --                  ; 00:00:38                           ;
+; Analysis & Synthesis      ; 00:00:11     ; 1.0                     ; 750 MB              ; 00:00:21                           ;
+; Fitter                    ; 00:00:07     ; 1.1                     ; 1613 MB             ; 00:00:07                           ;
+; Assembler                 ; 00:00:01     ; 1.0                     ; 624 MB              ; 00:00:01                           ;
+; PowerPlay Power Analyzer  ; 00:00:02     ; 1.2                     ; 794 MB              ; 00:00:02                           ;
+; TimeQuest Timing Analyzer ; 00:00:02     ; 1.2                     ; 754 MB              ; 00:00:02                           ;
+; EDA Netlist Writer        ; 00:00:01     ; 1.0                     ; 595 MB              ; 00:00:01                           ;
+; Total                     ; 00:00:24     ; --                      ; --                  ; 00:00:34                           ;
 +---------------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -114,12 +114,12 @@ agreement for further details.
 +---------------------------+------------------+------------+------------+----------------+
 ; Module Name               ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
 +---------------------------+------------------+------------+------------+----------------+
-; Analysis & Synthesis      ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
-; Fitter                    ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
-; Assembler                 ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
-; PowerPlay Power Analyzer  ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
-; TimeQuest Timing Analyzer ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
-; EDA Netlist Writer        ; DESKTOP-59LJVFR  ; Windows 10 ; 10.0       ; x86_64         ;
+; Analysis & Synthesis      ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
+; Fitter                    ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
+; Assembler                 ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
+; PowerPlay Power Analyzer  ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
+; TimeQuest Timing Analyzer ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
+; EDA Netlist Writer        ; Marbl            ; Windows 10 ; 10.0       ; x86_64         ;
 +---------------------------+------------------+------------+------------+----------------+
 
 

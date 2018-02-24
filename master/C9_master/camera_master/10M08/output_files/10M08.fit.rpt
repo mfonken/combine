@@ -1,5 +1,5 @@
 Fitter report for 10M08
-Sun Jun 11 15:40:00 2017
+Fri Feb 23 13:02:30 2018
 Quartus Prime Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
 
 
@@ -70,7 +70,7 @@ agreement for further details.
 +----------------------------------------------------------------------------------+
 ; Fitter Summary                                                                   ;
 +------------------------------------+---------------------------------------------+
-; Fitter Status                      ; Successful - Sun Jun 11 15:40:00 2017       ;
+; Fitter Status                      ; Successful - Fri Feb 23 13:02:30 2018       ;
 ; Quartus Prime Version              ; 16.1.0 Build 196 10/24/2016 SJ Lite Edition ;
 ; Revision Name                      ; 10M08                                       ;
 ; Top-level Entity Name              ; master_bridge                               ;
@@ -156,13 +156,14 @@ agreement for further details.
 ; Number detected on machine ; 8           ;
 ; Maximum allowed            ; 4           ;
 ;                            ;             ;
-; Average used               ; 1.13        ;
+; Average used               ; 1.14        ;
 ; Maximum used               ; 4           ;
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
 ;     Processor 1            ; 100.0%      ;
-;     Processor 2            ;   4.3%      ;
-;     Processors 3-4         ;   4.1%      ;
+;     Processor 2            ;   4.9%      ;
+;     Processor 3            ;   4.6%      ;
+;     Processor 4            ;   4.6%      ;
 +----------------------------+-------------+
 
 
@@ -249,7 +250,7 @@ agreement for further details.
 +--------------+
 ; Pin-Out File ;
 +--------------+
-The pin-out file can be found in C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/output_files/10M08.pin.
+The pin-out file can be found in C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/output_files/10M08.pin.
 
 
 +-------------------------------------------------------------------+
@@ -1440,11 +1441,11 @@ Info (332144): No user constrained base clocks found in the design
 Info (332143): No user constrained clock uncertainty found in the design. Calling "derive_clock_uncertainty"
 Info (332154): The derive_clock_uncertainty command did not apply clock uncertainty to any clock-to-clock transfers.
 Info (332130): Timing requirements not specified -- quality metrics such as performance may be sacrificed to reduce compilation time.
-Info (176353): Automatically promoted node clock~input (placed in PIN 27 (CLK0p, DIFFIO_RX_L18p, DIFFOUT_L18p, High_Speed)) File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 45
+Info (176353): Automatically promoted node clock~input (placed in PIN 27 (CLK0p, DIFFIO_RX_L18p, DIFFOUT_L18p, High_Speed)) File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 45
     Info (176355): Automatically promoted destinations to use location or clock signal Global Clock CLKCTRL_G4
     Info (176356): Following destination nodes may be non-global or may not use global or regional clocks
-        Info (176357): Destination node master:master_m|umd_clock~0 File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 40
-Info (176353): Automatically promoted node master:master_m|umd_clock~0  File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master.vhd Line: 40
+        Info (176357): Destination node master:master_m|umd_clock~0 File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 40
+Info (176353): Automatically promoted node master:master_m|umd_clock~0  File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 40
     Info (176355): Automatically promoted destinations to use location or clock signal Global Clock
 Info (176233): Starting register packing
 Info (176235): Finished register packing
@@ -1495,36 +1496,36 @@ Info (170195): Router estimated average interconnect usage is 0% of the availabl
 Info (170199): The Fitter performed an Auto Fit compilation.  Optimizations were skipped to reduce compilation time.
     Info (170201): Optimizations that may affect the design's routability were skipped
 Info (170194): Fitter routing operations ending: elapsed time is 00:00:01
-Info (11888): Total time spent on timing analysis during the Fitter is 0.72 seconds.
+Info (11888): Total time spent on timing analysis during the Fitter is 0.32 seconds.
 Info (334003): Started post-fitting delay annotation
 Warning (334000): Timing characteristics of device 10M08SAE144C8GES are preliminary
 Info (334004): Delay annotation completed successfully
 Info (334003): Started post-fitting delay annotation
 Warning (334000): Timing characteristics of device 10M08SAE144C8GES are preliminary
 Info (334004): Delay annotation completed successfully
-Info (11218): Fitter post-fit operations ending: elapsed time is 00:00:01
+Info (11218): Fitter post-fit operations ending: elapsed time is 00:00:02
 Warning (171167): Found invalid Fitter assignments. See the Ignored Assignments panel in the Fitter Compilation Report for more information.
 Warning (169064): Following 9 pins have no output enable or a GND or VCC output enable - later changes to this connectivity may change fitting results
-    Info (169065): Pin A has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 41
-    Info (169065): Pin B has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 42
-    Info (169065): Pin cam_ena has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 48
-    Info (169065): Pin mclk has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 49
-    Info (169065): Pin ram_rst has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 63
-    Info (169065): Pin ram_cs_n has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 64
-    Info (169065): Pin ram_ck_p has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 65
-    Info (169065): Pin ram_ck_n has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 66
-    Info (169065): Pin reset_n has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/master_bridge.vhd Line: 81
-Info (144001): Generated suppressed messages file C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/output_files/10M08.fit.smsg
+    Info (169065): Pin A has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 41
+    Info (169065): Pin B has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 42
+    Info (169065): Pin cam_ena has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 48
+    Info (169065): Pin mclk has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Info (169065): Pin ram_rst has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 63
+    Info (169065): Pin ram_cs_n has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Info (169065): Pin ram_ck_p has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Info (169065): Pin ram_ck_n has a permanently enabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
+    Info (169065): Pin reset_n has a permanently disabled output enable File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 81
+Info (144001): Generated suppressed messages file C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/output_files/10M08.fit.smsg
 Info: Quartus Prime Fitter was successful. 0 errors, 29 warnings
-    Info: Peak virtual memory: 1450 megabytes
-    Info: Processing ended: Sun Jun 11 15:40:01 2017
-    Info: Elapsed time: 00:00:08
-    Info: Total CPU time (on all processors): 00:00:10
+    Info: Peak virtual memory: 1613 megabytes
+    Info: Processing ended: Fri Feb 23 13:02:30 2018
+    Info: Elapsed time: 00:00:07
+    Info: Total CPU time (on all processors): 00:00:08
 
 
 +----------------------------+
 ; Fitter Suppressed Messages ;
 +----------------------------+
-The suppressed messages can be found in C:/Users/Matthew Fonken/Desktop/cam_vhdl_mod/10M08/output_files/10M08.fit.smsg.
+The suppressed messages can be found in C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/output_files/10M08.fit.smsg.
 
 
