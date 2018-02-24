@@ -201,11 +201,15 @@ static void r( kinetic_t * k )
 /* Calculation and filtering of nongraviation data */
 static void nongrav( kinetic_t * k, vec3_t * n )
 {
-    Quaternion.rotVec( n, &k->qd, &k->n );
+//    Quaternion.rotVec( n, &k->qd, &k->n );
     
-    Kalman.update( &k->filters.position[1], k->r.i, k->n.i, ACCELERATION );
-    Kalman.update( &k->filters.position[0], k->r.j, k->n.j, ACCELERATION );
-    Kalman.update( &k->filters.position[2], k->r.k, k->n.k, ACCELERATION );
+//    Kalman.update( &k->filters.position[1], k->r.i, k->n.i, ACCELERATION );
+//    Kalman.update( &k->filters.position[0], k->r.j, k->n.j, ACCELERATION );
+//    Kalman.update( &k->filters.position[2], k->r.k, k->n.k, ACCELERATION );
+    
+    Kalman.update( &k->filters.position[1], k->r.i, 0., VELOCITY );
+    Kalman.update( &k->filters.position[0], k->r.j, 0., VELOCITY );
+    Kalman.update( &k->filters.position[2], k->r.k, 0., VELOCITY );
     
     k->values.position[0] = k->filters.position[0].value;
     k->values.position[1] = k->filters.position[1].value;

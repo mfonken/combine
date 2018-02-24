@@ -43,7 +43,7 @@
 
 /* IMAGE PROCESSING */
 #ifdef __APPLE__
-#define IMAGE_ROOT              "/Users/matthewfonken/Desktop/test images/"
+#define IMAGE_ROOT              "/Users/matthewfonken/Desktop/CSResources/Test Images/"
 #else
 #define IMAGE_ROOT              "../"
 #endif
@@ -53,8 +53,8 @@
 #define CAM_HEIGHT              720//1080
 #define CAM_FRAME_RATE          60
 #define FNL_RESIZE_S            1
-#define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
-#define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S
+#define FNL_RESIZE_W            500//CAM_WIDTH/FNL_RESIZE_S
+#define FNL_RESIZE_H            500//CAM_HEIGHT/FNL_RESIZE_S
 
 #define THRESHOLD_MAX           254
 #define THRESHOLD_MIN           250

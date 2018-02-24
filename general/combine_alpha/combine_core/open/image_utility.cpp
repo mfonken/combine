@@ -11,12 +11,76 @@
 using namespace cv;
 using namespace std;
 
-ImageUtility::ImageUtility( std::string n ) : cam(0), image(Size(CAM_WIDTH, CAM_HEIGHT), CV_8UC3, Scalar(0,0,0)), frame(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0))
+ImageUtility::ImageUtility( std::string n ) : ImageUtility(n, "", 0, CAM_WIDTH, CAM_HEIGHT)
+{
+    printf("IU: Default\n");
+}
+
+ImageUtility::ImageUtility( std::string n, std::string f, int width, int height) : ImageUtility(n, f, 0, width, height)
+{
+    printf("IU: Still\n");
+}
+
+ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height ) : cam(0), image(Size(CAM_WIDTH, CAM_HEIGHT), CV_8UC3, Scalar(0,0,0)), frame(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0)), outframe(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0))
 {
     this->name = n;
+    this->subdir = f;
+    if(f.length() > 1) has_file = true;
+    else has_file = false;
+    num_frames = num;
+    if(num_frames) printf("IU: GIF\n");
+    size.width = width;
+    size.height = height;
 }
 
 void ImageUtility::init()
+{
+    printf("Initializing Image Utility: ");
+    if(has_file) initFile();
+    else initCamera();
+}
+
+
+void ImageUtility::initFile()
+{
+    Mat temp(size.height, size.width, CV_8UC3, Scalar(0,0,0));
+    frame = temp;
+    counter = 0;
+    file = IMAGE_ROOT;
+    
+    file.append(subdir);
+    file.append("/");
+    subdir = file;
+    if(num_frames > 0)
+    {
+        printf("With %d %dx%d frames.\n", num_frames, size.width, size.height);
+        counter = 1;
+        
+        file.append( to_string(counter) );
+        file.append(".png");
+    }
+    else
+    {
+        printf("With a single %dx%d frame.\n", size.width, size.height);
+        file.append(".bmp");
+    }
+    
+    
+    printf("\tOpening file: %s\n", file.c_str());
+    
+    image = imread(file, IMREAD_COLOR );
+    if( image.empty() )                      // Check for invalid input
+    {
+        cout <<  "Could not open or find the image" << std::endl ;
+        return;
+    }
+    
+    resize(image,frame,size);
+    outframe = frame;
+    live = true;
+}
+
+void ImageUtility::initCamera()
 {
     printf("Initializing Image Utility.\n");
     counter = 0;
@@ -31,9 +95,9 @@ void ImageUtility::init()
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
     cam.read(image);
     
-//    outframe = image;
+    //    outframe = image;
     printf("Initializing Camera: (%d, %d) @ %d fps\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
-
+    
     
 #ifdef GREYSCALE
     Mat grey;
@@ -52,6 +116,60 @@ void ImageUtility::trigger()
 std::string ImageUtility::serialize()
 {
     return this->name;
+}
+
+
+void ImageUtility::loop(char c)
+{
+    if (c == ' ')
+    {
+        live = !live;
+        getImage();
+        return;
+    }
+    if (c == 03)
+    {
+        counter %= num_frames;
+        counter++;
+        //        printf("Next frame.\n");
+    }
+    else if (c == 02)
+    {
+        counter--;
+        if( counter < 1 ) counter += num_frames;
+        
+        //        printf("Last frame. %d\n ", counter);
+    }
+    else return;
+    getImage();
+}
+
+Mat ImageUtility::getNextImage()
+{
+    if(!live) return(frame);
+    
+    if(counter > 0)
+    {
+        counter %= num_frames;
+        counter++;
+    }
+    return getImage();
+}
+
+Mat ImageUtility::getImage()
+{
+    file = subdir + to_string( counter ) + ".png";
+    //        cout <<  "Opening " << file << std::endl;
+    image = imread(file, IMREAD_COLOR );
+    if( image.empty() )
+    {
+        cout <<  "Could not open or find the image " << file << std::endl ;
+        return frame;
+    }
+    
+    resize(image,frame,size);
+    outframe = frame;
+    return frame;
 }
 
 Mat ImageUtility::getNextFrame()
@@ -76,7 +194,10 @@ Mat ImageUtility::getNextFrame()
 
 void ImageUtility::getBeacons()
 {
-    Mat out = getNextFrame();
+    Mat out;
+    if(has_file) out = getNextImage();
+    else out = getNextFrame();
+    
     Mat threshout(Size(CAM_WIDTH, CAM_HEIGHT), CV_8UC3, Scalar(0,0,0));
 
 #ifdef OPENCV_THRESHOLD

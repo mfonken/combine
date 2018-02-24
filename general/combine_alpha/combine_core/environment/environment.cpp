@@ -8,8 +8,14 @@
 
 #include "environment.hpp"
 
+
+Environment::Environment( TestInterface * test, int rate ) : Environment(test, NULL, rate)
+{
+}
+
 Environment::Environment( TestInterface * test, SerialWriter * sercom, int rate )
 {
+    printf("Initializing Test Environment.\n");
     if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
     if(events.add( &lock, test, sercom, rate ))
         test->init();

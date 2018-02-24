@@ -17,6 +17,8 @@
 using namespace cv;
 using namespace std;
 
+static void cma( double new_val, double *avg, int num ) { *avg += ( new_val - *avg ) / ( num + 1 ); }
+
 class open_t
 {
 private:
@@ -25,14 +27,21 @@ private:
     vector<KeyPoint> keypoints;
     Ptr<SimpleBlobDetector> detector;
     
+    
+    
     void invertMat(Mat I, Mat O)
     {
         O = cv::Scalar::all(255) - I;
     }
     
 public:
+    int                 count;
+    double              avg;
+    
     open_t()
     {
+        count = 0;
+        avg = 0;
         params.minDistBetweenBlobs = 10; //Minimum distance between blobs
         params.filterByCircularity = false;
         params.filterByConvexity = false;
@@ -46,10 +55,20 @@ public:
         detector = SimpleBlobDetector::create(params);
     }
     
-    std::vector<KeyPoint> detect( Mat M, Mat R)
+    static double timeDiff( struct timeval a, struct timeval b ){ return ((b.tv_sec  - a.tv_sec) + (b.tv_usec - a.tv_usec)/1000000.0) + 0.0005; }
+    
+    std::vector<KeyPoint> detect( Mat M, Mat R )
     {
+        struct timeval a,b;
+        gettimeofday( &a, NULL);
         detector->detect( M, keypoints);
+        
         drawKeypoints( M, keypoints, R, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+        
+        gettimeofday( &b, NULL);
+        double p = this->timeDiff(a, b);
+        cma(p, &avg, ++count);
+        
         return keypoints;
     }
     std::vector<KeyPoint> getKeypoints()
