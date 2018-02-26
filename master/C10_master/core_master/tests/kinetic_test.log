@@ -1,0 +1,8 @@
+Running suite(s): Kinetic
+100%: Checks: 5, Failures: 0, Errors: 0
+kinetic_tests/kinetic_test.c:63:P:Core:test_Filters_Init:0: Passed
+kinetic_tests/kinetic_test.c:72:P:Core:test_Kinetic_Init:0: Passed
+kinetic_tests/kinetic_test.c:76:P:Core:test_Camera_Rotation_Init:0: Passed
+kinetic_tests/kinetic_test.c:88:P:Core:test_Kinetic_Update_Rotation:0: Passed
+kinetic_tests/kinetic_test.c:101:P:Core:test_Kinetic_Update_Position:0: Passed
+PASS kinetic_test (exit status: 0)

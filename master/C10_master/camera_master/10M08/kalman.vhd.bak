@@ -1,0 +1,86 @@
+----------------------------------------------
+-- Package include
+----------------------------------------------
+-- IEEE packages
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.fixed_pkg.all;
+--use ieee.std_logic_integer.all;
+
+-- Project constants
+use work.ora_types.all;
+use work.ora_math.all;
+
+----------------------------------------------
+-- Object Recognition Architecture
+----------------------------------------------
+entity kalman is
+	generic
+	(
+		K0				: integer				:= 0;
+		K1				: integer				:= 0;
+		P00			: integer				:= 0;
+		P01			: integer				:= 0;
+		P10			: integer				:= 0;
+		P11			: integer				:= 0;
+		rate			: integer				:= 0;
+		bias			: integer				:= 0;
+		curr			: integer				:= 0;
+		last			: integer				:= 0;
+		prev			: integer				:= 0;
+		vel			: integer				:= 0;
+		tmst			: integer				:= 0;
+		vu				: integer				:= 0;
+		bu				: integer				:= 0;
+		su				: integer				:= 0;
+	);
+	port
+	(
+
+		-- Global clock
+		gclk        		: in    	std_logic;
+
+		-- Camera interface
+		reset_n				: inout	std_logic;
+		ena					: inout	std_logic;
+		pwdn					: out		std_logic;
+		mclk        		: inout 	std_logic;
+		vsync       		: in    	std_logic;
+		href       		 	: in    	std_logic;
+		pclk        		: in    	std_logic;
+		cpi         		: in    	std_logic_vector( 7 downto 0 );
+
+		ora_ack				: in		std_logic;
+		ora_has_packet		: inout	std_logic;
+		ora_bytes_to_tx	: out		integer;
+		ora_packet_buffer	: inout	packet_buffer_t;
+
+		r_rd_data       	: in   	std_logic_vector(  7 downto 0 );
+		r_rd_request    	: out    std_logic;
+		r_rd_length     	: out   	std_logic_vector(  7 downto 0 );
+
+		r_wr_data     		: out    std_logic_vector(  7 downto 0 );
+		r_wr_request    	: out    std_logic;
+		r_wr_length     	: inout  std_logic_vector(  7 downto 0 );
+
+		r_strobe        	: inout 	std_logic;
+		r_request_ack   	: in   	std_logic;
+
+		r_burst         	: out    std_logic;
+		r_as            	: out    std_logic;
+		r_row           	: out    std_logic_vector( 12 downto 0 );
+		r_col           	: out    std_logic_vector(  8 downto 0 )
+	);
+end ora;
+
+--------------------------------------------------------------------------------
+-- Main camera controller behaviour
+--------------------------------------------------------------------------------
+architecture gbehaviour of ora is
+--	signal frame 			: frame_t;--                := ( others => ( others => '0' ) );
+--	signal d_map 			: density_map_t;--          := ( others => '0' ), ( others => '0');
+--	signal x_convolve 	: convolve_result_t;
+--	signal y_convolve 	: convolve_result_t;
+--	signal x_peaks 		: x_peaks_a;
+--	signal y_peaks 		: y_peaks_a;

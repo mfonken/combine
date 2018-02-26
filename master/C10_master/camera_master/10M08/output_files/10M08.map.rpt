@@ -1,0 +1,766 @@
+Analysis & Synthesis report for 10M08
+Fri Feb 23 13:02:22 2018
+Quartus Prime Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. State Machine - |master_bridge|hrddr:hrddr_0|state
+  9. State Machine - |master_bridge|uart:umd|uart_tx_state
+ 10. State Machine - |master_bridge|uart:umd|uart_rx_state
+ 11. State Machine - |master_bridge|i2c_master:i2c_master_0|state
+ 12. State Machine - |master_bridge|master:master_m|next_state
+ 13. State Machine - |master_bridge|master:master_m|state_lock
+ 14. State Machine - |master_bridge|master:master_m|state
+ 15. Registers Removed During Synthesis
+ 16. Removed Registers Triggering Further Register Optimizations
+ 17. General Register Statistics
+ 18. Inverted Register Statistics
+ 19. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 20. Parameter Settings for User Entity Instance: master:master_m
+ 21. Parameter Settings for User Entity Instance: i2c_master:i2c_master_0
+ 22. Parameter Settings for User Entity Instance: uart:umd
+ 23. Parameter Settings for User Entity Instance: ora:ora_0
+ 24. Parameter Settings for User Entity Instance: hrddr:hrddr_0
+ 25. Port Connectivity Checks: "i2c_master:i2c_master_0"
+ 26. Port Connectivity Checks: "master:master_m"
+ 27. Post-Synthesis Netlist Statistics for Top Partition
+ 28. Elapsed Time Per Partition
+ 29. Analysis & Synthesis Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2016  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel MegaCore Function License Agreement, or other 
+applicable license agreement, including, without limitation, 
+that your use is for the sole purpose of programming logic 
+devices manufactured by Intel and sold by Intel or its 
+authorized distributors.  Please refer to the applicable 
+agreement for further details.
+
+
+
++----------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                     ;
++------------------------------------+---------------------------------------------+
+; Analysis & Synthesis Status        ; Successful - Fri Feb 23 13:02:22 2018       ;
+; Quartus Prime Version              ; 16.1.0 Build 196 10/24/2016 SJ Lite Edition ;
+; Revision Name                      ; 10M08                                       ;
+; Top-level Entity Name              ; master_bridge                               ;
+; Family                             ; MAX 10                                      ;
+; Total logic elements               ; 541                                         ;
+;     Total combinational functions  ; 533                                         ;
+;     Dedicated logic registers      ; 262                                         ;
+; Total registers                    ; 262                                         ;
+; Total pins                         ; 55                                          ;
+; Total virtual pins                 ; 0                                           ;
+; Total memory bits                  ; 0                                           ;
+; Embedded Multiplier 9-bit elements ; 0                                           ;
+; Total PLLs                         ; 0                                           ;
+; UFM blocks                         ; 0                                           ;
+; ADC blocks                         ; 0                                           ;
++------------------------------------+---------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                        ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                     ; Setting            ; Default Value      ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                     ; 10M08SAE144C8GES   ;                    ;
+; Top-level entity name                                                      ; master_bridge      ; 10M08              ;
+; Family name                                                                ; MAX 10             ; Cyclone V          ;
+; Use smart compilation                                                      ; Off                ; Off                ;
+; Enable parallel Assembler and TimeQuest Timing Analyzer during compilation ; On                 ; On                 ;
+; Enable compact report table                                                ; Off                ; Off                ;
+; Restructure Multiplexers                                                   ; Auto               ; Auto               ;
+; Create Debugging Nodes for IP Cores                                        ; Off                ; Off                ;
+; Preserve fewer node names                                                  ; On                 ; On                 ;
+; OpenCore Plus hardware evaluation                                          ; Enable             ; Enable             ;
+; Verilog Version                                                            ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                               ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                   ; Auto               ; Auto               ;
+; Safe State Machine                                                         ; Off                ; Off                ;
+; Extract Verilog State Machines                                             ; On                 ; On                 ;
+; Extract VHDL State Machines                                                ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                          ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                 ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                             ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                    ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                  ; On                 ; On                 ;
+; Parallel Synthesis                                                         ; On                 ; On                 ;
+; DSP Block Balancing                                                        ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                         ; On                 ; On                 ;
+; Power-Up Don't Care                                                        ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                               ; Off                ; Off                ;
+; Remove Duplicate Registers                                                 ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                       ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                     ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                      ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                  ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                       ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                        ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                             ; Off                ; Off                ;
+; Optimization Technique                                                     ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                         ; 70                 ; 70                 ;
+; Auto Carry Chains                                                          ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                       ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                      ; Off                ; Off                ;
+; Auto ROM Replacement                                                       ; On                 ; On                 ;
+; Auto RAM Replacement                                                       ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                 ; On                 ; On                 ;
+; Auto Shift Register Replacement                                            ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                            ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                              ; On                 ; On                 ;
+; Strict RAM Replacement                                                     ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                          ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                     ; Off                ; Off                ;
+; Auto RAM Block Balancing                                                   ; On                 ; On                 ;
+; Auto RAM to Logic Cell Conversion                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                      ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                              ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                        ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                          ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                    ; On                 ; On                 ;
+; Report Parameter Settings                                                  ; On                 ; On                 ;
+; Report Source Assignments                                                  ; On                 ; On                 ;
+; Report Connectivity Checks                                                 ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                         ; Off                ; Off                ;
+; Synchronization Register Chain Length                                      ; 2                  ; 2                  ;
+; PowerPlay Power Optimization During Synthesis                              ; Normal compilation ; Normal compilation ;
+; HDL message level                                                          ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                            ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                   ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                         ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                  ; 100                ; 100                ;
+; Clock MUX Protection                                                       ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                ; Off                ; Off                ;
+; Block Design Naming                                                        ; Auto               ; Auto               ;
+; SDC constraint protection                                                  ; Off                ; Off                ;
+; Synthesis Effort                                                           ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal               ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                       ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                         ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                     ; On                 ; On                 ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 8           ;
+; Maximum allowed            ; 4           ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 4           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processors 2-4         ;   0.0%      ;
++----------------------------+-------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path ; Used in Netlist ; File Type       ; File Name with Absolute Path                                                                         ; Library ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
+; ora.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd           ;         ;
+; OV9712.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/OV9712.vhd        ;         ;
+; ucp.vhd                          ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ucp.vhd           ;         ;
+; uart.vhd                         ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd          ;         ;
+; hrddr.vhd                        ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd         ;         ;
+; i2c_master.vhd                   ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd    ;         ;
+; ora_math.vhd                     ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd      ;         ;
+; ora_types.vhd                    ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_types.vhd     ;         ;
+; global_types.vhd                 ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/global_types.vhd  ;         ;
+; master.vhd                       ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd        ;         ;
+; master_bridge.vhd                ; yes             ; User VHDL File  ; C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd ;         ;
++----------------------------------+-----------------+-----------------+------------------------------------------------------------------------------------------------------+---------+
+
+
++---------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary                               ;
++---------------------------------------------+-----------------------------+
+; Resource                                    ; Usage                       ;
++---------------------------------------------+-----------------------------+
+; Estimated Total logic elements              ; 541                         ;
+;                                             ;                             ;
+; Total combinational functions               ; 533                         ;
+; Logic element usage by number of LUT inputs ;                             ;
+;     -- 4 input functions                    ; 219                         ;
+;     -- 3 input functions                    ; 91                          ;
+;     -- <=2 input functions                  ; 223                         ;
+;                                             ;                             ;
+; Logic elements by mode                      ;                             ;
+;     -- normal mode                          ; 420                         ;
+;     -- arithmetic mode                      ; 113                         ;
+;                                             ;                             ;
+; Total registers                             ; 262                         ;
+;     -- Dedicated logic registers            ; 262                         ;
+;     -- I/O registers                        ; 0                           ;
+;                                             ;                             ;
+; I/O pins                                    ; 55                          ;
+;                                             ;                             ;
+; Embedded Multiplier 9-bit elements          ; 0                           ;
+;                                             ;                             ;
+; Maximum fan-out node                        ; master:master_m|umd_clock~0 ;
+; Maximum fan-out                             ; 226                         ;
+; Total fan-out                               ; 2488                        ;
+; Average fan-out                             ; 2.69                        ;
++---------------------------------------------+-----------------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                                                                       ;
++------------------------------+---------------------+---------------------------+-------------+------------+--------------+---------+-----------+------+--------------+------------+----------------------------------------+---------------+--------------+
+; Compilation Hierarchy Node   ; Combinational ALUTs ; Dedicated Logic Registers ; Memory Bits ; UFM Blocks ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; ADC blocks ; Full Hierarchy Name                    ; Entity Name   ; Library Name ;
++------------------------------+---------------------+---------------------------+-------------+------------+--------------+---------+-----------+------+--------------+------------+----------------------------------------+---------------+--------------+
+; |master_bridge               ; 533 (1)             ; 262 (1)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 55   ; 0            ; 0          ; |master_bridge                         ; master_bridge ; work         ;
+;    |hrddr:hrddr_0|           ; 146 (146)           ; 56 (56)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 0    ; 0            ; 0          ; |master_bridge|hrddr:hrddr_0           ; hrddr         ; work         ;
+;    |i2c_master:i2c_master_0| ; 74 (74)             ; 30 (30)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 0    ; 0            ; 0          ; |master_bridge|i2c_master:i2c_master_0 ; i2c_master    ; work         ;
+;    |master:master_m|         ; 112 (112)           ; 73 (73)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 0    ; 0            ; 0          ; |master_bridge|master:master_m         ; master        ; work         ;
+;    |ora:ora_0|               ; 125 (125)           ; 50 (50)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 0    ; 0            ; 0          ; |master_bridge|ora:ora_0               ; ora           ; work         ;
+;    |uart:umd|                ; 75 (75)             ; 52 (52)                   ; 0           ; 0          ; 0            ; 0       ; 0         ; 0    ; 0            ; 0          ; |master_bridge|uart:umd                ; uart          ; work         ;
++------------------------------+---------------------+---------------------------+-------------+------------+--------------+---------+-----------+------+--------------+------------+----------------------------------------+---------------+--------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
+Encoding Type:  One-Hot
++--------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|hrddr:hrddr_0|state                                                                       ;
++---------------------+------------+----------+----------+---------------------+---------------+-------------+-------------+
+; Name                ; state.stop ; state.rd ; state.wr ; state.latency_delay ; state.command ; state.start ; state.ready ;
++---------------------+------------+----------+----------+---------------------+---------------+-------------+-------------+
+; state.ready         ; 0          ; 0        ; 0        ; 0                   ; 0             ; 0           ; 0           ;
+; state.start         ; 0          ; 0        ; 0        ; 0                   ; 0             ; 1           ; 1           ;
+; state.command       ; 0          ; 0        ; 0        ; 0                   ; 1             ; 0           ; 1           ;
+; state.latency_delay ; 0          ; 0        ; 0        ; 1                   ; 0             ; 0           ; 1           ;
+; state.wr            ; 0          ; 0        ; 1        ; 0                   ; 0             ; 0           ; 1           ;
+; state.rd            ; 0          ; 1        ; 0        ; 0                   ; 0             ; 0           ; 1           ;
+; state.stop          ; 1          ; 0        ; 0        ; 0                   ; 0             ; 0           ; 1           ;
++---------------------+------------+----------+----------+---------------------+---------------+-------------+-------------+
+
+
+Encoding Type:  One-Hot
++---------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|uart:umd|uart_tx_state                                                                           ;
++---------------------------------+--------------------------------+----------------------------+---------------------------------+
+; Name                            ; uart_tx_state.tx_send_stop_bit ; uart_tx_state.tx_send_data ; uart_tx_state.tx_send_start_bit ;
++---------------------------------+--------------------------------+----------------------------+---------------------------------+
+; uart_tx_state.tx_send_start_bit ; 0                              ; 0                          ; 0                               ;
+; uart_tx_state.tx_send_data      ; 0                              ; 1                          ; 1                               ;
+; uart_tx_state.tx_send_stop_bit  ; 1                              ; 0                          ; 1                               ;
++---------------------------------+--------------------------------+----------------------------+---------------------------------+
+
+
+Encoding Type:  One-Hot
++-----------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|uart:umd|uart_rx_state                                                                       ;
++--------------------------------+-------------------------------+---------------------------+--------------------------------+
+; Name                           ; uart_rx_state.rx_get_stop_bit ; uart_rx_state.rx_get_data ; uart_rx_state.rx_get_start_bit ;
++--------------------------------+-------------------------------+---------------------------+--------------------------------+
+; uart_rx_state.rx_get_start_bit ; 0                             ; 0                         ; 0                              ;
+; uart_rx_state.rx_get_data      ; 0                             ; 1                         ; 1                              ;
+; uart_rx_state.rx_get_stop_bit  ; 1                             ; 0                         ; 1                              ;
++--------------------------------+-------------------------------+---------------------------+--------------------------------+
+
+
+Encoding Type:  One-Hot
++--------------------------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|i2c_master:i2c_master_0|state                                                                                     ;
++----------------+------------+----------------+----------------+----------+----------+----------------+---------------+-------------+-------------+
+; Name           ; state.stop ; state.mstr_ack ; state.slv_ack2 ; state.rd ; state.wr ; state.slv_ack1 ; state.command ; state.start ; state.ready ;
++----------------+------------+----------------+----------------+----------+----------+----------------+---------------+-------------+-------------+
+; state.ready    ; 0          ; 0              ; 0              ; 0        ; 0        ; 0              ; 0             ; 0           ; 0           ;
+; state.start    ; 0          ; 0              ; 0              ; 0        ; 0        ; 0              ; 0             ; 1           ; 1           ;
+; state.command  ; 0          ; 0              ; 0              ; 0        ; 0        ; 0              ; 1             ; 0           ; 1           ;
+; state.slv_ack1 ; 0          ; 0              ; 0              ; 0        ; 0        ; 1              ; 0             ; 0           ; 1           ;
+; state.wr       ; 0          ; 0              ; 0              ; 0        ; 1        ; 0              ; 0             ; 0           ; 1           ;
+; state.rd       ; 0          ; 0              ; 0              ; 1        ; 0        ; 0              ; 0             ; 0           ; 1           ;
+; state.slv_ack2 ; 0          ; 0              ; 1              ; 0        ; 0        ; 0              ; 0             ; 0           ; 1           ;
+; state.mstr_ack ; 0          ; 1              ; 0              ; 0        ; 0        ; 0              ; 0             ; 0           ; 1           ;
+; state.stop     ; 1          ; 0              ; 0              ; 0        ; 0        ; 0              ; 0             ; 0           ; 1           ;
++----------------+------------+----------------+----------------+----------+----------+----------------+---------------+-------------+-------------+
+
+
+Encoding Type:  One-Hot
++-------------------------------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|master:master_m|next_state                                                                                             ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+; Name                  ; next_state.shutdown ; next_state.standby ; next_state.deactivate ; next_state.live ; next_state.activate ; next_state.startup ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+; next_state.startup    ; 0                   ; 0                  ; 0                     ; 0               ; 0                   ; 0                  ;
+; next_state.activate   ; 0                   ; 0                  ; 0                     ; 0               ; 1                   ; 1                  ;
+; next_state.live       ; 0                   ; 0                  ; 0                     ; 1               ; 0                   ; 1                  ;
+; next_state.deactivate ; 0                   ; 0                  ; 1                     ; 0               ; 0                   ; 1                  ;
+; next_state.standby    ; 0                   ; 1                  ; 0                     ; 0               ; 0                   ; 1                  ;
+; next_state.shutdown   ; 1                   ; 0                  ; 0                     ; 0               ; 0                   ; 1                  ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+
+
+Encoding Type:  One-Hot
++-------------------------------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|master:master_m|state_lock                                                                                             ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+; Name                  ; state_lock.shutdown ; state_lock.standby ; state_lock.deactivate ; state_lock.live ; state_lock.activate ; state_lock.startup ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+; state_lock.startup    ; 0                   ; 0                  ; 0                     ; 0               ; 0                   ; 0                  ;
+; state_lock.activate   ; 0                   ; 0                  ; 0                     ; 0               ; 1                   ; 1                  ;
+; state_lock.live       ; 0                   ; 0                  ; 0                     ; 1               ; 0                   ; 1                  ;
+; state_lock.deactivate ; 0                   ; 0                  ; 1                     ; 0               ; 0                   ; 1                  ;
+; state_lock.standby    ; 0                   ; 1                  ; 0                     ; 0               ; 0                   ; 1                  ;
+; state_lock.shutdown   ; 1                   ; 0                  ; 0                     ; 0               ; 0                   ; 1                  ;
++-----------------------+---------------------+--------------------+-----------------------+-----------------+---------------------+--------------------+
+
+
+Encoding Type:  One-Hot
++--------------------------------------------------------------------------------------------------------------------+
+; State Machine - |master_bridge|master:master_m|state                                                               ;
++------------------+----------------+---------------+------------------+------------+----------------+---------------+
+; Name             ; state.shutdown ; state.standby ; state.deactivate ; state.live ; state.activate ; state.startup ;
++------------------+----------------+---------------+------------------+------------+----------------+---------------+
+; state.startup    ; 0              ; 0             ; 0                ; 0          ; 0              ; 0             ;
+; state.activate   ; 0              ; 0             ; 0                ; 0          ; 1              ; 1             ;
+; state.live       ; 0              ; 0             ; 0                ; 1          ; 0              ; 1             ;
+; state.deactivate ; 0              ; 0             ; 1                ; 0          ; 0              ; 1             ;
+; state.standby    ; 0              ; 1             ; 0                ; 0          ; 0              ; 1             ;
+; state.shutdown   ; 1              ; 0             ; 0                ; 0          ; 0              ; 1             ;
++------------------+----------------+---------------+------------------+------------+----------------+---------------+
+
+
++--------------------------------------------------------------------------------------------+
+; Registers Removed During Synthesis                                                         ;
++------------------------------------------+-------------------------------------------------+
+; Register name                            ; Reason for Removal                              ;
++------------------------------------------+-------------------------------------------------+
+; hrddr:hrddr_0|rwds~reg0                  ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|pwdn                           ; Stuck at GND due to stuck port data_in          ;
+; ora_packet_buffer[2][7]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][6]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][5]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][4]                  ; Stuck at GND due to stuck port data_in          ;
+; ora_packet_buffer[2][3]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][2]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][1]                  ; Stuck at VCC due to stuck port data_in          ;
+; ora_packet_buffer[2][0]                  ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|prepare_packet                 ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|ora_has_packet~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_rd_length[2..7]              ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_rd_length[0,1]               ; Stuck at VCC due to stuck port data_in          ;
+; master:master_m|i2c_wr[0]                ; Stuck at GND due to stuck port data_in          ;
+; master:master_m|i2c_rw                   ; Stuck at GND due to stuck port data_in          ;
+; master:master_m|i2c_wr[7]                ; Stuck at VCC due to stuck port data_in          ;
+; master:master_m|i2c_wr[2,3]              ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_row[2]                       ; Merged with ora:ora_0|r_as                      ;
+; i2c_master:i2c_master_0|addr_rw[1..4,7]  ; Merged with i2c_master:i2c_master_0|addr_rw[0]  ;
+; i2c_master:i2c_master_0|data_tx[0,2,3]   ; Merged with i2c_master:i2c_master_0|addr_rw[0]  ;
+; i2c_master:i2c_master_0|addr_rw[6]       ; Merged with i2c_master:i2c_master_0|addr_rw[5]  ;
+; i2c_master:i2c_master_0|data_tx[7]       ; Merged with i2c_master:i2c_master_0|addr_rw[5]  ;
+; i2c_master:i2c_master_0|data_tx[6]       ; Merged with i2c_master:i2c_master_0|data_tx[1]  ;
+; master:master_m|i2c_wr[6]                ; Merged with master:master_m|i2c_wr[1]           ;
+; ora:ora_0|r_col[1..8]                    ; Merged with ora:ora_0|r_col[0]                  ;
+; ora:ora_0|r_row[0,1,3..12]               ; Merged with ora:ora_0|r_col[0]                  ;
+; ora:ora_0|r_wr_data[1,7]                 ; Merged with ora:ora_0|r_wr_data[0]              ;
+; master:master_m|i2c_wr[5]                ; Merged with master:master_m|i2c_wr[4]           ;
+; i2c_master:i2c_master_0|data_tx[5]       ; Merged with i2c_master:i2c_master_0|data_tx[4]  ;
+; ora:ora_0|r_col[0]                       ; Stuck at GND due to stuck port data_in          ;
+; i2c_master:i2c_master_0|addr_rw[0]       ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_as                           ; Stuck at VCC due to stuck port data_in          ;
+; i2c_master:i2c_master_0|addr_rw[5]       ; Stuck at VCC due to stuck port data_in          ;
+; ora:ora_0|r_wr_data[0]                   ; Stuck at VCC due to stuck port data_in          ;
+; uart:umd|rx_baud_counter[2]              ; Stuck at GND due to stuck port data_in          ;
+; hrddr:hrddr_0|latency[1]                 ; Merged with hrddr:hrddr_0|latency[0]            ;
+; ora:ora_0|r_wr_data[3]                   ; Merged with ora:ora_0|r_wr_data[2]              ;
+; ora:ora_0|r_wr_data[5,6]                 ; Merged with ora:ora_0|r_wr_data[4]              ;
+; master:master_m|state_lock.deactivate    ; Merged with master:master_m|state_lock.activate ;
+; master:master_m|state_lock.activate      ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|\hrddr_test:write_index[8..31] ; Lost fanout                                     ;
+; ora:ora_0|r_wr_length[7]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[6]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[5]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[4]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[3]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[2]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[1]~reg0            ; Stuck at GND due to stuck port data_in          ;
+; ora:ora_0|r_wr_length[0]~reg0            ; Stuck at VCC due to stuck port data_in          ;
+; hrddr:hrddr_0|request_ack                ; Merged with hrddr:hrddr_0|cs_n~reg0             ;
+; master:master_m|umd_rx_data[3]~reg0      ; Merged with master:master_m|umd_rx_data[2]~reg0 ;
+; Total Number of Removed Registers = 108  ;                                                 ;
++------------------------------------------+-------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------+
+; Removed Registers Triggering Further Register Optimizations                                                                                       ;
++---------------------------------------+---------------------------+-------------------------------------------------------------------------------+
+; Register name                         ; Reason for Removal        ; Registers Removed due to This Register                                        ;
++---------------------------------------+---------------------------+-------------------------------------------------------------------------------+
+; ora:ora_0|\hrddr_test:write_index[31] ; Lost Fanouts              ; ora:ora_0|\hrddr_test:write_index[30], ora:ora_0|\hrddr_test:write_index[29], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[28], ora:ora_0|\hrddr_test:write_index[27], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[26], ora:ora_0|\hrddr_test:write_index[25], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[24], ora:ora_0|\hrddr_test:write_index[23], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[22], ora:ora_0|\hrddr_test:write_index[21], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[20], ora:ora_0|\hrddr_test:write_index[19], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[18], ora:ora_0|\hrddr_test:write_index[17], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[16], ora:ora_0|\hrddr_test:write_index[15], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[14], ora:ora_0|\hrddr_test:write_index[13], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[12], ora:ora_0|\hrddr_test:write_index[11], ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[10], ora:ora_0|\hrddr_test:write_index[9],  ;
+;                                       ;                           ; ora:ora_0|\hrddr_test:write_index[8]                                          ;
+; ora:ora_0|prepare_packet              ; Stuck at GND              ; ora:ora_0|ora_has_packet~reg0                                                 ;
+;                                       ; due to stuck port data_in ;                                                                               ;
+; master:master_m|i2c_rw                ; Stuck at GND              ; i2c_master:i2c_master_0|addr_rw[0]                                            ;
+;                                       ; due to stuck port data_in ;                                                                               ;
++---------------------------------------+---------------------------+-------------------------------------------------------------------------------+
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 262   ;
+; Number of registers using Synchronous Clear  ; 75    ;
+; Number of registers using Synchronous Load   ; 15    ;
+; Number of registers using Asynchronous Clear ; 59    ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 113   ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++--------------------------------------------------------+
+; Inverted Register Statistics                           ;
++----------------------------------------------+---------+
+; Inverted Register                            ; Fan out ;
++----------------------------------------------+---------+
+; master:master_m|LED3                         ; 1       ;
+; master:master_m|LED4                         ; 2       ;
+; uart:umd|uart_tx_data                        ; 2       ;
+; uart:umd|uart_rx_bit                         ; 4       ;
+; hrddr:hrddr_0|\hrddr_process:tick_counter[2] ; 4       ;
+; hrddr:hrddr_0|\hrddr_process:tick_counter[1] ; 5       ;
+; hrddr:hrddr_0|latency[0]                     ; 2       ;
+; i2c_master:i2c_master_0|sda_int              ; 2       ;
+; uart:umd|uart_rx_filter[0]                   ; 3       ;
+; uart:umd|uart_rx_filter[1]                   ; 3       ;
+; i2c_master:i2c_master_0|bit_cnt[0]           ; 12      ;
+; i2c_master:i2c_master_0|bit_cnt[1]           ; 11      ;
+; i2c_master:i2c_master_0|bit_cnt[2]           ; 8       ;
+; uart:umd|uart_rx_data_sr[1]                  ; 2       ;
+; uart:umd|uart_rx_data_sr[0]                  ; 1       ;
+; Total number of inverted registers = 15      ;         ;
++----------------------------------------------+---------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                               ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                                     ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------------------------------+
+; 3:1                ; 2 bits    ; 4 LEs         ; 0 LEs                ; 4 LEs                  ; Yes        ; |master_bridge|i2c_master:i2c_master_0|data_tx[4]              ;
+; 3:1                ; 5 bits    ; 10 LEs        ; 5 LEs                ; 5 LEs                  ; Yes        ; |master_bridge|ora:ora_0|r_wr_data[2]                          ;
+; 3:1                ; 7 bits    ; 14 LEs        ; 7 LEs                ; 7 LEs                  ; Yes        ; |master_bridge|uart:umd|tx_baud_counter[4]                     ;
+; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; Yes        ; |master_bridge|uart:umd|rx_baud_counter[2]                     ;
+; 3:1                ; 8 bits    ; 16 LEs        ; 8 LEs                ; 8 LEs                  ; Yes        ; |master_bridge|uart:umd|uart_rx_data_vec[2]                    ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |master_bridge|uart:umd|uart_rx_bit_spacing[3]                 ;
+; 3:1                ; 32 bits   ; 64 LEs        ; 64 LEs               ; 0 LEs                  ; Yes        ; |master_bridge|ora:ora_0|\hrddr_test:write_index[7]            ;
+; 4:1                ; 6 bits    ; 12 LEs        ; 12 LEs               ; 0 LEs                  ; Yes        ; |master_bridge|master:master_m|packet_tx_i[0]                  ;
+; 4:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; Yes        ; |master_bridge|uart:umd|uart_rx_count[0]                       ;
+; 4:1                ; 5 bits    ; 10 LEs        ; 5 LEs                ; 5 LEs                  ; Yes        ; |master_bridge|hrddr:hrddr_0|ddr_ck_div_counter[2]             ;
+; 5:1                ; 32 bits   ; 96 LEs        ; 64 LEs               ; 32 LEs                 ; Yes        ; |master_bridge|ora:ora_0|\hrddr_test:state_counter[0]          ;
+; 6:1                ; 7 bits    ; 28 LEs        ; 14 LEs               ; 14 LEs                 ; Yes        ; |master_bridge|uart:umd|uart_tx_data_vec[0]                    ;
+; 6:1                ; 5 bits    ; 20 LEs        ; 5 LEs                ; 15 LEs                 ; Yes        ; |master_bridge|hrddr:hrddr_0|\hrddr_process:latency_counter[2] ;
+; 6:1                ; 3 bits    ; 12 LEs        ; 6 LEs                ; 6 LEs                  ; Yes        ; |master_bridge|hrddr:hrddr_0|\hrddr_process:data_counter[9]    ;
+; 7:1                ; 3 bits    ; 12 LEs        ; 3 LEs                ; 9 LEs                  ; Yes        ; |master_bridge|uart:umd|uart_tx_count[2]                       ;
+; 10:1               ; 8 bits    ; 48 LEs        ; 24 LEs               ; 24 LEs                 ; Yes        ; |master_bridge|hrddr:hrddr_0|\hrddr_process:data_counter[4]    ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 2 LEs                ; 2 LEs                  ; Yes        ; |master_bridge|uart:umd|uart_rx_data_sr[0]                     ;
+; 3:1                ; 3 bits    ; 6 LEs         ; 3 LEs                ; 3 LEs                  ; Yes        ; |master_bridge|i2c_master:i2c_master_0|bit_cnt[2]              ;
+; 10:1               ; 5 bits    ; 30 LEs        ; 20 LEs               ; 10 LEs                 ; Yes        ; |master_bridge|hrddr:hrddr_0|dq[3]~reg0                        ;
+; 18:1               ; 6 bits    ; 72 LEs        ; 12 LEs               ; 60 LEs                 ; No         ; |master_bridge|master:master_m|next_state                      ;
+; 7:1                ; 3 bits    ; 12 LEs        ; 9 LEs                ; 3 LEs                  ; No         ; |master_bridge|uart:umd|uart_tx_state                          ;
+; 7:1                ; 3 bits    ; 12 LEs        ; 9 LEs                ; 3 LEs                  ; No         ; |master_bridge|uart:umd|uart_rx_state                          ;
+; 62:1               ; 6 bits    ; 246 LEs       ; 246 LEs              ; 0 LEs                  ; No         ; |master_bridge|master:master_m|umd_rx_data                     ;
+; 7:1                ; 2 bits    ; 8 LEs         ; 6 LEs                ; 2 LEs                  ; No         ; |master_bridge|hrddr:hrddr_0|Selector1                         ;
+; 8:1                ; 2 bits    ; 10 LEs        ; 6 LEs                ; 4 LEs                  ; No         ; |master_bridge|hrddr:hrddr_0|Selector0                         ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+----------------------------------------------------------------+
+
+
++--------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: master:master_m ;
++----------------+----------+----------------------------------+
+; Parameter Name ; Value    ; Type                             ;
++----------------+----------+----------------------------------+
+; input_clk      ; 50000000 ; Signed Integer                   ;
++----------------+----------+----------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: i2c_master:i2c_master_0 ;
++----------------+----------+------------------------------------------+
+; Parameter Name ; Value    ; Type                                     ;
++----------------+----------+------------------------------------------+
+; input_clk      ; 50000000 ; Signed Integer                           ;
+; bus_clk        ; 100000   ; Signed Integer                           ;
++----------------+----------+------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-------------------------------------------------------+
+; Parameter Settings for User Entity Instance: uart:umd ;
++-----------------+----------+--------------------------+
+; Parameter Name  ; Value    ; Type                     ;
++-----------------+----------+--------------------------+
+; baud            ; 921600   ; Signed Integer           ;
+; clock_frequency ; 50000000 ; Signed Integer           ;
++-----------------+----------+--------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------+
+; Parameter Settings for User Entity Instance: ora:ora_0 ;
++----------------+----------+----------------------------+
+; Parameter Name ; Value    ; Type                       ;
++----------------+----------+----------------------------+
+; g_clk_r        ; 50000000 ; Signed Integer             ;
+; m_clk_r        ; 10000000 ; Signed Integer             ;
+; thresh         ; 200      ; Signed Integer             ;
+; kernel         ; 1111     ; Unsigned Binary            ;
+; buffer_c       ; 00       ; Unsigned Binary            ;
++----------------+----------+----------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: hrddr:hrddr_0 ;
++------------------+----------+------------------------------+
+; Parameter Name   ; Value    ; Type                         ;
++------------------+----------+------------------------------+
+; sys_ck_frequency ; 50000000 ; Signed Integer               ;
+; ddr_ck_frequency ; 5000000  ; Signed Integer               ;
+; latency_config   ; 6        ; Signed Integer               ;
++------------------+----------+------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "i2c_master:i2c_master_0"                                                                  ;
++------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port       ; Type   ; Severity ; Details                                                                             ;
++------------+--------+----------+-------------------------------------------------------------------------------------+
+; addr[5..4] ; Input  ; Info     ; Stuck at VCC                                                                        ;
+; addr[3..0] ; Input  ; Info     ; Stuck at GND                                                                        ;
+; addr[6]    ; Input  ; Info     ; Stuck at GND                                                                        ;
+; ack_error  ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "master:master_m"                                                                          ;
++-------------+-------+----------+-------------------------------------------------------------------------------------+
+; Port        ; Type  ; Severity ; Details                                                                             ;
++-------------+-------+----------+-------------------------------------------------------------------------------------+
+; umd_ena     ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; umd_rx_ack  ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; umd_tx_data ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; umd_tx_stb  ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; ora_ena     ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; ram_ena     ; Bidir ; Warning  ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-------------+-------+----------+-------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------+
+; Post-Synthesis Netlist Statistics for Top Partition ;
++-----------------------+-----------------------------+
+; Type                  ; Count                       ;
++-----------------------+-----------------------------+
+; boundary_port         ; 55                          ;
+; cycloneiii_ff         ; 262                         ;
+;     CLR               ; 12                          ;
+;     ENA               ; 46                          ;
+;     ENA CLR           ; 47                          ;
+;     ENA SCLR          ; 14                          ;
+;     ENA SLD           ; 6                           ;
+;     SCLR              ; 55                          ;
+;     SCLR SLD          ; 6                           ;
+;     SLD               ; 3                           ;
+;     plain             ; 73                          ;
+; cycloneiii_io_obuf    ; 20                          ;
+; cycloneiii_lcell_comb ; 537                         ;
+;     arith             ; 113                         ;
+;         2 data inputs ; 93                          ;
+;         3 data inputs ; 20                          ;
+;     normal            ; 424                         ;
+;         0 data inputs ; 2                           ;
+;         1 data inputs ; 21                          ;
+;         2 data inputs ; 111                         ;
+;         3 data inputs ; 71                          ;
+;         4 data inputs ; 219                         ;
+;                       ;                             ;
+; Max LUT depth         ; 10.00                       ;
+; Average LUT depth     ; 4.88                        ;
++-----------------------+-----------------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:01     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 16.1.0 Build 196 10/24/2016 SJ Lite Edition
+    Info: Processing started: Fri Feb 23 13:02:11 2018
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off 10M08 -c 10M08
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 4 of the 4 processors detected
+Info (12021): Found 2 design units, including 1 entities, in source file ora.vhd
+    Info (12022): Found design unit 1: ora-gbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 70
+    Info (12023): Found entity 1: ora File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 17
+Info (12021): Found 1 design units, including 0 entities, in source file ov9712.vhd
+    Info (12022): Found design unit 1: OV9712 File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/OV9712.vhd Line: 5
+Info (12021): Found 1 design units, including 0 entities, in source file ucp.vhd
+    Info (12022): Found design unit 1: ucp_lib File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ucp.vhd Line: 6
+Info (12021): Found 2 design units, including 1 entities, in source file uart.vhd
+    Info (12022): Found design unit 1: uart-rtl File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd Line: 50
+    Info (12023): Found entity 1: uart File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/uart.vhd Line: 32
+Info (12021): Found 2 design units, including 1 entities, in source file hrddr.vhd
+    Info (12022): Found design unit 1: hrddr-rtl File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 46
+    Info (12023): Found entity 1: hrddr File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 10
+Info (12021): Found 2 design units, including 1 entities, in source file i2c_master.vhd
+    Info (12022): Found design unit 1: i2c_master-logic File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 56
+    Info (12023): Found entity 1: i2c_master File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 38
+Info (12021): Found 2 design units, including 0 entities, in source file ora_math.vhd
+    Info (12022): Found design unit 1: ora_math File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd Line: 7
+    Info (12022): Found design unit 2: ora_math-body File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_math.vhd Line: 38
+Info (12021): Found 1 design units, including 0 entities, in source file ora_types.vhd
+    Info (12022): Found design unit 1: ora_types File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora_types.vhd Line: 5
+Info (12021): Found 1 design units, including 0 entities, in source file global_types.vhd
+    Info (12022): Found design unit 1: global_types File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/global_types.vhd Line: 5
+Info (12021): Found 2 design units, including 1 entities, in source file master.vhd
+    Info (12022): Found design unit 1: master-mbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 73
+    Info (12023): Found entity 1: master File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 24
+Info (12021): Found 2 design units, including 1 entities, in source file master_bridge.vhd
+    Info (12022): Found design unit 1: master_bridge-gbehaviour File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 88
+    Info (12023): Found entity 1: master_bridge File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 34
+Info (12127): Elaborating entity "master_bridge" for the top level hierarchy
+Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(70): used explicit default value for signal "ram_vcc" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 70
+Warning (10540): VHDL Signal Declaration warning at master_bridge.vhd(71): used explicit default value for signal "ram_vccq" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 71
+Warning (10036): Verilog HDL or VHDL warning at master_bridge.vhd(160): object "i2c_ack_err" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 160
+Warning (10665): Bidirectional port "reset_n" at master_bridge.vhd(81) has a one-way connection to bidirectional port "ram_rst" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 81
+Info (12128): Elaborating entity "master" for hierarchy "master:master_m" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 359
+Warning (10540): VHDL Signal Declaration warning at master.vhd(31): used explicit default value for signal "LED1" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 31
+Warning (10540): VHDL Signal Declaration warning at master.vhd(32): used explicit default value for signal "LED2" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 32
+Warning (10540): VHDL Signal Declaration warning at master.vhd(35): used explicit default value for signal "LED5" because signal was never assigned a value File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 35
+Warning (10036): Verilog HDL or VHDL warning at master.vhd(98): object "hasAck" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 98
+Warning (10036): Verilog HDL or VHDL warning at master.vhd(99): object "hasNack" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master.vhd Line: 99
+Info (12128): Elaborating entity "i2c_master" for hierarchy "i2c_master:i2c_master_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 405
+Info (12128): Elaborating entity "uart" for hierarchy "uart:umd" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 427
+Info (12128): Elaborating entity "ora" for hierarchy "ora:ora_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 450
+Warning (10541): VHDL Signal Declaration warning at ora.vhd(46): used implicit default value for signal "ora_bytes_to_tx" because signal was never assigned a value or an explicit default value. Use of implicit default value may introduce unintended design optimizations. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 46
+Warning (10036): Verilog HDL or VHDL warning at ora.vhd(172): object "x_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 172
+Warning (10036): Verilog HDL or VHDL warning at ora.vhd(173): object "y_peaks" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/ora.vhd Line: 173
+Info (12128): Elaborating entity "hrddr" for hierarchy "hrddr:hrddr_0" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 490
+Warning (10036): Verilog HDL or VHDL warning at hrddr.vhd(84): object "rwds_prev" assigned a value but never read File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/hrddr.vhd Line: 84
+Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
+Warning (13034): The following nodes have both tri-state and non-tri-state drivers
+    Warning (13035): Inserted always-enabled tri-state buffer between "cam_ena" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 48
+    Warning (13035): Inserted always-enabled tri-state buffer between "mclk" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_cs_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_p" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Warning (13035): Inserted always-enabled tri-state buffer between "ram_ck_n" and its non-tri-state driver. File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
+Warning (13039): The following bidirectional pins have no drivers
+    Warning (13040): bidirectional pin "A" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 41
+    Warning (13040): bidirectional pin "B" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 42
+    Warning (13040): bidirectional pin "reset_n" has no driver File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 81
+Info (13060): One or more bidirectional pins are fed by always enabled tri-state buffers
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "mclk" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_rst" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 63
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_cs_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_p" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Info (13061): Fan-out of permanently enabled tri-state buffer feeding bidirectional pin "ram_ck_n" is moved to its source File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
+Info (13000): Registers with preset signals will power-up high File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/i2c_master.vhd Line: 64
+Info (13003): DEV_CLRn pin will set, and not reset, register with preset signal due to NOT Gate Push-Back
+Warning (13009): TRI or OPNDRN buffers permanently enabled
+    Warning (13010): Node "cam_ena~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 48
+    Warning (13010): Node "mclk~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 49
+    Warning (13010): Node "ram_rst~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 63
+    Warning (13010): Node "ram_cs_n~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 64
+    Warning (13010): Node "ram_ck_p~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 65
+    Warning (13010): Node "ram_ck_n~synth" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 66
+Warning (13024): Output pins are stuck at VCC or GND
+    Warning (13410): Pin "LED1" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 36
+    Warning (13410): Pin "LED2" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 37
+    Warning (13410): Pin "LED5" is stuck at VCC File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 40
+    Warning (13410): Pin "pwdn" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 50
+    Warning (13410): Pin "ram_vcc" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 70
+    Warning (13410): Pin "ram_vccq" is stuck at GND File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 71
+Info (286030): Timing-Driven Synthesis is running
+Warning (14632): Output pin "t_ram_rwds" driven by bidirectional pin "ram_rwds" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 77
+Warning (14632): Output pin "t_ram_dq[0]" driven by bidirectional pin "ram_dq[0]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[1]" driven by bidirectional pin "ram_dq[1]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[2]" driven by bidirectional pin "ram_dq[2]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[3]" driven by bidirectional pin "ram_dq[3]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[4]" driven by bidirectional pin "ram_dq[4]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[5]" driven by bidirectional pin "ram_dq[5]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[6]" driven by bidirectional pin "ram_dq[6]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_dq[7]" driven by bidirectional pin "ram_dq[7]" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 78
+Warning (14632): Output pin "t_ram_rst" driven by bidirectional pin "reset_n" cannot be tri-stated File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 73
+Info (17049): 24 registers lost all their fanouts during netlist optimizations.
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 11 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "vsync" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 51
+    Warning (15610): No output dependent on input pin "href" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 52
+    Warning (15610): No output dependent on input pin "pclk" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 53
+    Warning (15610): No output dependent on input pin "cpi[0]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[1]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[2]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[3]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[4]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[5]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[6]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+    Warning (15610): No output dependent on input pin "cpi[7]" File: C:/Users/Matthew Fonken/Desktop/marbl/combine/master/C9_master/camera_master/10M08/master_bridge.vhd Line: 54
+Info (21057): Implemented 642 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 13 input pins
+    Info (21059): Implemented 22 output pins
+    Info (21060): Implemented 20 bidirectional pins
+    Info (21061): Implemented 587 logic cells
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 61 warnings
+    Info: Peak virtual memory: 750 megabytes
+    Info: Processing ended: Fri Feb 23 13:02:22 2018
+    Info: Elapsed time: 00:00:11
+    Info: Total CPU time (on all processors): 00:00:21
+
+
