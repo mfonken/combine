@@ -1,0 +1,5 @@
+Running suite(s): Kalman
+100%: Checks: 2, Failures: 0, Errors: 0
+kinetic_tests/kalman_test.c:68:P:Core:test_Kalman_Init:0: Passed
+kinetic_tests/kalman_test.c:84:P:Core:test_Kalman_Update:0: Passed
+PASS kalman_test (exit status: 0)
