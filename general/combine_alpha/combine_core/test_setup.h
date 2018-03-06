@@ -12,10 +12,8 @@
 #define MAX_RATE  30    //Hz
 
 /* GLOBAL SETUP */
-#define SHOW_IMAGES
-#define HAS_CAMERA
-//#define TIME_FULL_LOOP
 
+//#define HAS_CAMERA
 
 /* DEBUGGING */
 //#define MAIN_DEBUG
@@ -26,14 +24,9 @@
 //#define KIN_DEBUG
 #define IMU_DEBUG
 
-#ifndef SHOW_IMAGES
-#define ITERATIONS
-#endif
-
 //#define REDSCALE
 //#define GREYSCALE
 #define OPENCV_THRESHOLD
-#define FNL_RESIZE              540
 
 #define TEXT_OFFSET_X 0//-26
 #define TEXT_OFFSET_Y 0// 18
@@ -53,8 +46,14 @@
 #define CAM_HEIGHT              720//1080
 #define CAM_FRAME_RATE          60
 #define FNL_RESIZE_S            1
-#define FNL_RESIZE_W            500//CAM_WIDTH/FNL_RESIZE_S
-#define FNL_RESIZE_H            500//CAM_HEIGHT/FNL_RESIZE_S
+
+#ifdef HAS_CAMERA
+#define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
+#define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S
+#else
+#define FNL_RESIZE_W            700
+#define FNL_RESIZE_H            700
+#endif
 
 #define THRESHOLD_MAX           254
 #define THRESHOLD_MIN           250

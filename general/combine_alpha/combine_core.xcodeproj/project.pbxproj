@@ -117,11 +117,11 @@
 			isa = PBXGroup;
 			children = (
 				4991FD071FBD0F1A0025EA57 /* main.cpp */,
+				4948867D1FD4C487000149C5 /* test_setup.h */,
 				49B078EC2015CC61008FCFDD /* combine_core */,
 				49B079042015CC61008FCFDD /* open */,
 				49F3DB1D2016F4110032AD5A /* environment */,
 				49F3DB1F2016F4110032AD5A /* utilities */,
-				4948867D1FD4C487000149C5 /* test_setup.h */,
 			);
 			path = combine_core;
 			sourceTree = "<group>";

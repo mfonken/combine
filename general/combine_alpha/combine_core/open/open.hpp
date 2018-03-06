@@ -62,10 +62,9 @@ public:
         struct timeval a,b;
         gettimeofday( &a, NULL);
         detector->detect( M, keypoints);
-        
-        drawKeypoints( M, keypoints, R, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-        
         gettimeofday( &b, NULL);
+        drawKeypoints( M, keypoints, R, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    
         double p = this->timeDiff(a, b);
         cma(p, &avg, ++count);
         
