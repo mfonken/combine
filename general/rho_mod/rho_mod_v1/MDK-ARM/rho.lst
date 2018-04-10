@@ -1,0 +1,536 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         #line   1                "..\\Src\\rho.s"
+    1 00000000         ; 
+    2 00000000         ;
+    3 00000000         #line   12               "..\\Src\\rho.s"
+   12 00000000         
+   13 00000000         ; 
+   14 00000000         #line   20               "..\\Src\\rho.s"
+   20 00000000         
+   21 00000000                 area             rho, code, readonly
+   22 00000000                 entry
+   23 00000000         
+   24 00000000         ; 
+   25 00000000 0000000A 
+                       CAMERA_PORT
+                               equ              0x0000000a  ; 
+   26 00000000 20000000 
+                       sram    equ              0x20000000
+   27 00000000 20000000 
+                       Dx      equ              sram
+   28 00000000 20000280 
+                       Dy      equ              Dx  + 640
+   29 00000000 20000410 
+                       Q       equ              Dy  + 400
+   30 00000000 20000420 
+                       QT      equ              Q   + 16
+   31 00000000 20000424 
+                       QP_ADDR equ              QT  + 4
+   32 00000000 20000428 
+                       Ce      equ              QP_ADDR + 4 ; 
+   33 00000000 2000042C 
+                       Cf      equ              Ce  + 4     ; 
+   34 00000000 20000E2C 
+                       Cm      equ              Cf  + 2560  ; 
+   35 00000000 20000E2C 
+                       Cx      equ              Cm
+   36 00000000 20000284 
+                       Cy      equ              Dy  + 4
+   37 00000000 20000288 
+                       THRESH_ADDR
+                               equ              Cy + 4
+   38 00000000         
+   39 00000000                 align
+   40 00000000         rho_init
+                               proc
+   41 00000000                 export           rho_init
+   42 00000000 F04F 090A       ldr              r9, =CAMERA_PORT
+   43 00000004 4770            bx               lr
+   44 00000006                 endp
+   45 00000006         
+   46 00000006 00 00           align
+   47 00000008         frame_start
+                               proc
+   48 00000008                 export           frame_start
+   49 00000008         
+   50 00000008 F04F 5000       ldr              r0, =Dx     ; 
+   51 0000000C F04F 0100       mov              r1, #0
+   52 00000010 4A47            ldr              r2, =Cm
+   53 00000012 F840 1B04 
+                       zero    str              r1, [r0], #4
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   54 00000016 4290            cmp              r0, r2
+   55 00000018 DBFB            blt              zero
+   56 0000001A 4F46            ldr              r7, =Cf     ; 
+   57 0000001C F8DF 8114       ldr              r8, =Cf     ; 
+   58 00000020 4D45            ldr              r5, =THRESH_ADDR ; 
+   59 00000022 F04F 0600       mov              r6, #0      ; 
+   60 00000026 E7FE            b                rho_process ; 
+   61 00000028 4770            bx               lr
+   62 0000002A                 endp
+   63 0000002A         
+   64 0000002A 00 00           align
+   65 0000002C         asm_test
+                               proc
+   66 0000002C                 export           asm_test
+   67 0000002C 4843            ldr              r0, =Q
+   68 0000002E F04F 0101       mov              r1, #1
+   69 00000032 F840 1B04       str              r1, [r0], #4
+   70 00000036 F101 0101       add              r1, #1
+   71 0000003A F840 1B04       str              r1, [r0], #4
+   72 0000003E F101 0101       add              r1, #1
+   73 00000042 F840 1B04       str              r1, [r0], #4
+   74 00000046 F101 0101       add              r1, #1
+   75 0000004A 6001            str              r1, [r0]
+   76 0000004C 4770            bx               lr
+   77 0000004E                 endp
+   78 0000004E         
+   79 0000004E 00 00           align
+   80 00000050         frame_end
+                               proc
+   81 00000050                 export           frame_end
+   82 00000050 483B            ldr              r0, =Ce
+   83 00000052 6007            str              r7, [r0]
+   84 00000054 4839            ldr              r0, =Q      ; 
+   85 00000056 F850 2B04       ldr              r2, [r0], #4 ; 
+   86 0000005A F850 1B04       ldr              r1, [r0], #4
+   87 0000005E 440A            add              r2, r2, r1
+   88 00000060 F850 1B04       ldr              r1, [r0], #4
+   89 00000064 440A            add              r2, r2, r1
+   90 00000066 6801            ldr              r1, [r0]
+   91 00000068 440A            add              r2, r2, r1
+   92 0000006A 4836            ldr              r0, =QT
+   93 0000006C 6002            str              r2, [r0]
+   94 0000006E 4770            bx               lr
+   95 00000070                 endp
+   96 00000070         
+   97 00000070                 align
+   98 00000070         row_int proc
+   99 00000070                 export           row_int
+  100 00000070 F04F 00AA       mov              r0, #0xaa
+  101 00000074 6038            str              r0, [r7]    ; 
+  102 00000076 F107 0701       add              r7, r7, #1
+  103 0000007A F086 0601       eor              r6, r6, #0x01 ; 
+  104 0000007E 4634            mov              r4, r6      ; 
+  105 00000080 4770            bx               lr
+  106 00000082                 endp
+  107 00000082         
+  108 00000082 00 00           align
+  109 00000084         pclk_int_l
+                               proc
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+  110 00000084                 export           pclk_int_l
+  111 00000084 F104 0404       add              r4, r4, #4  ; 
+  112 00000088 4770            bx               lr
+  113 0000008A                 endp
+  114 0000008A         
+  115 0000008A 00 00           align
+  116 0000008C         pclk_int_h
+                               proc
+  117 0000008C                 export           pclk_int_h
+  118 0000008C F014 0F01       tst              r4, #0x01   ; 
+  119 00000090 D005            beq              burn_pixel
+  120 00000092 F8D9 3000       ldr              r3, [r9]    ; 
+  121 00000096 42AB            cmp              r3, r5
+  122 00000098 BFA8 F847 
+              4B01             strge            r4, [r7], #1 ; 
+  123 0000009E 4770    burn_pixel
+                               bx               lr
+  124 000000A0                 endp
+  125 000000A0         
+  126 000000A0                 align
+  127 000000A0         rho_process
+                               proc
+  128 000000A0                 export           rho_process
+  129 000000A0 F04F 0A00       mov              r10, #0     ; 
+  130 000000A4 F04F 0B00       mov              r11, #0
+  131 000000A8 45B8    read_loop
+                               cmp              r8, r7      ; 
+  132 000000AA D2FD            bcs              read_loop
+  133 000000AC F858 AB01       ldr              r10, [r8], #1 ; 
+  134 000000B0 F04F 00AA       mov              r0, #0xaa
+  135 000000B4 4582            cmp              r10, r0     ; 
+  136 000000B6 D120            bne              no_del
+  137 000000B8 4823            ldr              r0, =Cy
+  138 000000BA 4583            cmp              r11, r0     ; 
+  139 000000BC DA08            bge              higher
+  140 000000BE F00C 0CFD       and              r12, r12, #0xfd ; 
+  141 000000C2 481E            ldr              r0, =Q      ; 
+  142 000000C4 F850 1B04       ldr              r1, [r0], #4
+  143 000000C8 6802            ldr              r2, [r0]
+  144 000000CA EB01 0002       add              r0, r1, r2
+  145 000000CE E009            b                dx_store
+  146 000000D0 F04C 0C02 
+                       higher  orr              r12, r12, #0x02 ; 
+  147 000000D4 4819            ldr              r0, =Q      ; 
+  148 000000D6 F100 0008       add              r0, r0, #8
+  149 000000DA F850 1B04       ldr              r1, [r0], #4
+  150 000000DE 6802            ldr              r2, [r0]
+  151 000000E0 EB01 0002       add              r0, r1, r2
+  152 000000E4 4B19    dx_store
+                               ldr              r3, =QP_ADDR
+  153 000000E6 6819            ldr              r1, [r3]    ; 
+  154 000000E8 EBA0 0101       sub              r1, r0, r1
+  155 000000EC F04F 5200       ldr              r2, =Dx
+  156 000000F0 F842 100B       str              r1, [r2, r11]
+  157 000000F4 F10B 0B04       add              r11, r11, #4
+  158 000000F8 6018            str              r0, [r3]    ; 
+  159 000000FA 480D    no_del  ldr              r0, =Cx
+  160 000000FC 4582            cmp              r10, r0     ; 
+  161 000000FE DA02            bge              right
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  162 00000100 F00C 0CFE       and              r12, r12, #0xfe ; 
+  163 00000104 E001            b                dy_store
+  164 00000106 F04C 0C01 
+                       right   orr              r12, r12, #0x01 ; 
+  165 0000010A 4911    dy_store
+                               ldr              r1, =Dy
+  166 0000010C F851 000A       ldr              r0, [r1, r10] ; 
+  167 00000110 F100 0001       add              r0, r0, #1
+  168 00000114 F841 000A       str              r0, [r1, r10]
+  169 00000118 4908            ldr              r1, =Q
+  170 0000011A F851 000C       ldr              r0, [r1, r12] ; 
+  171 0000011E F100 0001       add              r0, r0, #1
+  172 00000122 F841 000C       str              r0, [r1, r12]
+  173 00000126         
+  174 00000126 4806            ldr              r0, =Ce     ; 
+  175 00000128 6800            ldr              r0, [r0]
+  176 0000012A 4580            cmp              r8, r0
+  177 0000012C DBBC            blt              read_loop
+  178 0000012E 4770            bx               lr
+  179 00000130                 endp
+  180 00000130                 end
+              20000E2C 
+              2000042C 
+              20000288 
+              20000410 
+              20000428 
+              20000420 
+              20000284 
+              20000424 
+              20000280 
+Command Line: --debug --xref --cpreproc --diag_suppress=9931 --cpu=Cortex-M4.fp
+ --apcs=interwork --depend=rho_mod_v1\rho.d -orho_mod_v1\rho.o -I.\RTE\_rho_mod
+_v1 -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include -IC:\Keil_v5\ARM\PACK\K
+eil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include --predefine="
+__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
+ETA 524" --predefine="_RTE_ SETA 1" --predefine="STM32L432xx SETA 1" --list=rho
+.lst ..\Src\rho.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+asm_test 0000002C
+
+Symbol: asm_test
+   Definitions
+      At line 65 in file ..\\Src\\rho.s
+   Uses
+      At line 66 in file ..\\Src\\rho.s
+Comment: asm_test used once
+burn_pixel 0000009E
+
+Symbol: burn_pixel
+   Definitions
+      At line 123 in file ..\\Src\\rho.s
+   Uses
+      At line 119 in file ..\\Src\\rho.s
+Comment: burn_pixel used once
+dx_store 000000E4
+
+Symbol: dx_store
+   Definitions
+      At line 152 in file ..\\Src\\rho.s
+   Uses
+      At line 145 in file ..\\Src\\rho.s
+Comment: dx_store used once
+dy_store 0000010A
+
+Symbol: dy_store
+   Definitions
+      At line 165 in file ..\\Src\\rho.s
+   Uses
+      At line 163 in file ..\\Src\\rho.s
+Comment: dy_store used once
+frame_end 00000050
+
+Symbol: frame_end
+   Definitions
+      At line 80 in file ..\\Src\\rho.s
+   Uses
+      At line 81 in file ..\\Src\\rho.s
+Comment: frame_end used once
+frame_start 00000008
+
+Symbol: frame_start
+   Definitions
+      At line 47 in file ..\\Src\\rho.s
+   Uses
+      At line 48 in file ..\\Src\\rho.s
+Comment: frame_start used once
+higher 000000D0
+
+Symbol: higher
+   Definitions
+      At line 146 in file ..\\Src\\rho.s
+   Uses
+      At line 139 in file ..\\Src\\rho.s
+Comment: higher used once
+no_del 000000FA
+
+Symbol: no_del
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 159 in file ..\\Src\\rho.s
+   Uses
+      At line 136 in file ..\\Src\\rho.s
+Comment: no_del used once
+pclk_int_h 0000008C
+
+Symbol: pclk_int_h
+   Definitions
+      At line 116 in file ..\\Src\\rho.s
+   Uses
+      At line 117 in file ..\\Src\\rho.s
+Comment: pclk_int_h used once
+pclk_int_l 00000084
+
+Symbol: pclk_int_l
+   Definitions
+      At line 109 in file ..\\Src\\rho.s
+   Uses
+      At line 110 in file ..\\Src\\rho.s
+Comment: pclk_int_l used once
+read_loop 000000A8
+
+Symbol: read_loop
+   Definitions
+      At line 131 in file ..\\Src\\rho.s
+   Uses
+      At line 132 in file ..\\Src\\rho.s
+      At line 177 in file ..\\Src\\rho.s
+
+rho 00000000
+
+Symbol: rho
+   Definitions
+      At line 21 in file ..\\Src\\rho.s
+   Uses
+      None
+Comment: rho unused
+rho_init 00000000
+
+Symbol: rho_init
+   Definitions
+      At line 40 in file ..\\Src\\rho.s
+   Uses
+      At line 41 in file ..\\Src\\rho.s
+Comment: rho_init used once
+rho_process 000000A0
+
+Symbol: rho_process
+   Definitions
+      At line 127 in file ..\\Src\\rho.s
+   Uses
+      At line 60 in file ..\\Src\\rho.s
+      At line 128 in file ..\\Src\\rho.s
+
+right 00000106
+
+Symbol: right
+   Definitions
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 164 in file ..\\Src\\rho.s
+   Uses
+      At line 161 in file ..\\Src\\rho.s
+Comment: right used once
+row_int 00000070
+
+Symbol: row_int
+   Definitions
+      At line 98 in file ..\\Src\\rho.s
+   Uses
+      At line 99 in file ..\\Src\\rho.s
+Comment: row_int used once
+zero 00000012
+
+Symbol: zero
+   Definitions
+      At line 53 in file ..\\Src\\rho.s
+   Uses
+      At line 55 in file ..\\Src\\rho.s
+Comment: zero used once
+17 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+CAMERA_PORT 0000000A
+
+Symbol: CAMERA_PORT
+   Definitions
+      At line 25 in file ..\\Src\\rho.s
+   Uses
+      At line 42 in file ..\\Src\\rho.s
+Comment: CAMERA_PORT used once
+Ce 20000428
+
+Symbol: Ce
+   Definitions
+      At line 32 in file ..\\Src\\rho.s
+   Uses
+      At line 33 in file ..\\Src\\rho.s
+      At line 82 in file ..\\Src\\rho.s
+      At line 174 in file ..\\Src\\rho.s
+
+Cf 2000042C
+
+Symbol: Cf
+   Definitions
+      At line 33 in file ..\\Src\\rho.s
+   Uses
+      At line 34 in file ..\\Src\\rho.s
+      At line 56 in file ..\\Src\\rho.s
+      At line 57 in file ..\\Src\\rho.s
+
+Cm 20000E2C
+
+Symbol: Cm
+   Definitions
+      At line 34 in file ..\\Src\\rho.s
+   Uses
+      At line 35 in file ..\\Src\\rho.s
+      At line 52 in file ..\\Src\\rho.s
+
+Cx 20000E2C
+
+Symbol: Cx
+   Definitions
+      At line 35 in file ..\\Src\\rho.s
+   Uses
+      At line 159 in file ..\\Src\\rho.s
+Comment: Cx used once
+Cy 20000284
+
+Symbol: Cy
+   Definitions
+      At line 36 in file ..\\Src\\rho.s
+   Uses
+      At line 37 in file ..\\Src\\rho.s
+      At line 137 in file ..\\Src\\rho.s
+
+Dx 20000000
+
+Symbol: Dx
+   Definitions
+      At line 27 in file ..\\Src\\rho.s
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Absolute symbols
+
+   Uses
+      At line 28 in file ..\\Src\\rho.s
+      At line 50 in file ..\\Src\\rho.s
+      At line 155 in file ..\\Src\\rho.s
+
+Dy 20000280
+
+Symbol: Dy
+   Definitions
+      At line 28 in file ..\\Src\\rho.s
+   Uses
+      At line 29 in file ..\\Src\\rho.s
+      At line 36 in file ..\\Src\\rho.s
+      At line 165 in file ..\\Src\\rho.s
+
+Q 20000410
+
+Symbol: Q
+   Definitions
+      At line 29 in file ..\\Src\\rho.s
+   Uses
+      At line 30 in file ..\\Src\\rho.s
+      At line 67 in file ..\\Src\\rho.s
+      At line 84 in file ..\\Src\\rho.s
+      At line 141 in file ..\\Src\\rho.s
+      At line 147 in file ..\\Src\\rho.s
+      At line 169 in file ..\\Src\\rho.s
+
+QP_ADDR 20000424
+
+Symbol: QP_ADDR
+   Definitions
+      At line 31 in file ..\\Src\\rho.s
+   Uses
+      At line 32 in file ..\\Src\\rho.s
+      At line 152 in file ..\\Src\\rho.s
+
+QT 20000420
+
+Symbol: QT
+   Definitions
+      At line 30 in file ..\\Src\\rho.s
+   Uses
+      At line 31 in file ..\\Src\\rho.s
+      At line 92 in file ..\\Src\\rho.s
+
+THRESH_ADDR 20000288
+
+Symbol: THRESH_ADDR
+   Definitions
+      At line 37 in file ..\\Src\\rho.s
+   Uses
+      At line 58 in file ..\\Src\\rho.s
+Comment: THRESH_ADDR used once
+sram 20000000
+
+Symbol: sram
+   Definitions
+      At line 26 in file ..\\Src\\rho.s
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Absolute symbols
+
+   Uses
+      At line 27 in file ..\\Src\\rho.s
+Comment: sram used once
+13 symbols
+368 symbols in table
