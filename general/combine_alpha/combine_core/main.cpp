@@ -15,14 +15,16 @@ const char * FILENAME = "/Users/matthewfonken/Desktop/out.txt";
 
 int main( int argc, char * argv[] )
 {
-//    ImageUtility utility("ImageUtil");
+#ifdef HAS_CAMERA
+    ImageUtility utility("ImageUtility");
+#else
     ImageUtility utility("ImageUtility", "frames/small", 26, FNL_RESIZE_W, FNL_RESIZE_H);
+#endif
     Combine combine("Combine", &utility);
     SerialWriter comm(SFILE, FILENAME);
     
     Environment env(&utility, MAX_FPS);
 //    env.addTest(&combine, &comm, MAX_FPS);
-    
     
     env.start();
     usleep(1000000);
