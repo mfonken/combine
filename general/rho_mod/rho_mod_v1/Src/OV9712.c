@@ -156,6 +156,7 @@ static void write( uint8_t r, uint8_t v )
 
 static void init( I2C_HandleTypeDef * i2c_port )
 {
+	for(int i = 0; i < INIT_DELAY_CYCLES; i++);
 	CAM_I2C_PORT = i2c_port;
 	cam_register_t reg;
 	for( int i = 0; ; i++ )

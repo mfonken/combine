@@ -17,6 +17,7 @@
 #define MAX_COVERAGE        0.01 // %
 #define C_FRAME_SIZE        2560
 #define IS_GREEN            0x01
+#define	PCLK_REQUEST		0x0A
 
     area    rho, code, readonly
     entry
@@ -106,15 +107,16 @@ row_int		proc
 			endp
 
 			align
-pclk_int_l	proc
-			export pclk_int_l
+pclk_int	proc
+			export pclk_int
 			add x, x, #4       		 	;/* x++ */
+			swi PCLK_REQUEST
 			bx lr
 			endp
 
 			align
-pclk_int_h	proc
-			export pclk_int_h
+pclk_swi	proc
+			export pclk_swi
 			tst x, #0x01         		;/* if( x & 0x01 ) burn */
 			beq burn_pixel
 			ldr r3, [cp]        		;/* if( cp > th ) */
