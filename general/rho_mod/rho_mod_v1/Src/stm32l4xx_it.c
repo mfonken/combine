@@ -41,6 +41,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
+extern DMA_HandleTypeDef hdma_tim2_up;
 extern UART_HandleTypeDef huart1;
 
 /******************************************************************************/
@@ -222,17 +223,17 @@ void EXTI1_IRQHandler(void)
 }
 
 /**
-* @brief This function handles EXTI line3 interrupt.
+* @brief This function handles DMA1 channel2 global interrupt.
 */
-void EXTI3_IRQHandler(void)
+void DMA1_Channel2_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI3_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
 
-  /* USER CODE END EXTI3_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
-  /* USER CODE BEGIN EXTI3_IRQn 1 */
+  /* USER CODE END DMA1_Channel2_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_tim2_up);
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 1 */
 
-  /* USER CODE END EXTI3_IRQn 1 */
+  /* USER CODE END DMA1_Channel2_IRQn 1 */
 }
 
 /**

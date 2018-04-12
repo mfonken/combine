@@ -31,6 +31,8 @@ rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c_ex.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h
+rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h
+rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
 rho_mod_v1\ov9712.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd.h

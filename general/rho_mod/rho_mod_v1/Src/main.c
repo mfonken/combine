@@ -59,6 +59,9 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
+TIM_HandleTypeDef htim2;
+DMA_HandleTypeDef hdma_tim2_up;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -69,8 +72,10 @@ UART_HandleTypeDef huart1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_TIM2_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -110,9 +115,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_USB_DEVICE_Init();
+  MX_TIM2_Init();
+ 
 	master_init( &hi2c1 );
 	HAL_Delay(1000);
 	master_test();
@@ -129,9 +137,17 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
+    /**Configure LSE Drive Capability 
+    */
+  HAL_PWR_EnableBkUpAccess();
+
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI
+                              |RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
@@ -225,6 +241,63 @@ static void MX_I2C1_Init(void)
 
 }
 
+/* TIM2 init function */
+static void MX_TIM2_Init(void)
+{
+
+  TIM_SlaveConfigTypeDef sSlaveConfig;
+  TIM_MasterConfigTypeDef sMasterConfig;
+  TIM_IC_InitTypeDef sConfigIC;
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 0;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIM_IC_Init(&htim2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_EXTERNAL1;
+  sSlaveConfig.InputTrigger = TIM_TS_ETRF;
+  sSlaveConfig.TriggerPolarity = TIM_TRIGGERPOLARITY_NONINVERTED;
+  sSlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1;
+  sSlaveConfig.TriggerFilter = 0;
+  if (HAL_TIM_SlaveConfigSynchronization(&htim2, &sSlaveConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIMEx_RemapConfig(&htim2, TIM_TIM2_ITR1_USB_SOF|TIM_TIM2_ETR_LSE) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+  sConfigIC.ICFilter = 0;
+  if (HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /* USART1 init function */
 static void MX_USART1_UART_Init(void)
 {
@@ -243,6 +316,21 @@ static void MX_USART1_UART_Init(void)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
+
+}
+
+/** 
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void) 
+{
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
 
 }
 
@@ -278,11 +366,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : VSYNC_Pin PCLK_Pin */
-  GPIO_InitStruct.Pin = VSYNC_Pin|PCLK_Pin;
+  /*Configure GPIO pin : VSYNC_Pin */
+  GPIO_InitStruct.Pin = VSYNC_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(VSYNC_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : HREF_Pin */
   GPIO_InitStruct.Pin = HREF_Pin;
@@ -314,13 +402,10 @@ static void MX_GPIO_Init(void)
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 1);
-  //HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
   HAL_NVIC_SetPriority(EXTI1_IRQn, 2, 0);
-  //HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-  //HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
 }
 

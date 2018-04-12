@@ -22,24 +22,20 @@ Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho_mod\rho_mod_v1\MDK-ARM\rho_mod_v1.uvprojx
-Project File Date:  04/10/2018
+Project File Date:  04/11/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'rho_mod_v1'
 compiling master.c...
-..\Src\master.c(33): warning:  #111-D: statement is unreachable
-    if ((Len%64==0) && (result==USBD_OK))
-..\Src\master.c(53): warning:  #177-D: variable "tBuffer"  was declared but never referenced
-  	uint8_t tBuffer[100];
-..\Src\master.c(54): warning:  #177-D: variable "tLen"  was declared but never referenced
-    uint32_t tLen;
-..\Src\master.c: 3 warnings, 0 errors
+..\Src\master.c(51): warning:  #111-D: statement is unreachable
+  	rho_init();
+..\Src\master.c: 1 warning, 0 errors
 linking...
 rho_mod_v1\rho_mod_v1.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
-Program Size: Code=15624 RO-data=500 RW-data=412 ZI-data=5900  
+Program Size: Code=16592 RO-data=500 RW-data=408 ZI-data=6040  
 Finished: 0 information, 1 warning and 0 error messages.
-"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 4 Warning(s).
+"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -62,7 +58,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.1
-Build Time Elapsed:  00:00:04
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

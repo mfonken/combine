@@ -87,7 +87,6 @@
 #define CAM_EN_GPIO_Port GPIOA
 #define PCLK_Pin GPIO_PIN_3
 #define PCLK_GPIO_Port GPIOB
-#define PCLK_EXTI_IRQn EXTI3_IRQn
 #define LED_Pin GPIO_PIN_4
 #define LED_GPIO_Port GPIOB
 #define CAM__CS_Pin GPIO_PIN_5

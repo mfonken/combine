@@ -3,9 +3,9 @@
 #define x   r4  // Column index
 #define th  r5  // Threshold
 #define tg  r6  // Green toggle
-#define wr  r7  // Write index
-#define rd  r8  // Read index
-#define cp  r9  // Camera Port
+#define wr  r7  // Write index of process buffer
+#define rd  r8  // Read index of process buffer
+#define rb  r9  // Read index of pclk buffer
 #define rx  r10 // Read col index
 #define ry  r11 // Read row index
 #define QS  r12 // Quadrant selection
@@ -36,11 +36,11 @@ Cm 			equ Cf  + C_FRAME_SIZE 		;/* Capture max */
 Cx			equ	Cm
 Cy			equ	Dy  + 4
 THRESH_ADDR equ Cy	+ 4
+Ym			equ THRESH_ADDR + 4 
 
 			align
 rho_init	proc
 			export rho_init
-			ldr cp, =CAMERA_PORT
 			bx	lr
 			endp
 				
@@ -58,6 +58,7 @@ zero		str	r1, [r0], #4
 			ldr rd, =Cf                 ;/* rd = Cf; */
 			ldr th, =THRESH_ADDR       	;/* th = THRESH_ADDR; */
 			mov tg, #0                  ;/* Reset operation variables */
+			mov rb, #1
 			b   rho_process             ;/* Start processing loop */
 			bx  lr
 			endp
@@ -101,28 +102,23 @@ row_int		proc
 			mov r0, #Y_DEL
 			str r0, [wr]     			;/* (*(wr) = Y_DEL)++; */
 			add wr, wr, #1
-			eor tg, tg, #0x01    		;/* tg ^= 0x01; */
-			mov x, tg           		;/* x = tg; */
+			tst	tg, #1					;/* if tg is odd */
+			bne	rg_row
+			add rb, rb, #1				;/* GB row */
+			b	x_reset
+rg_row		sub rb, rb, #1				;/* RG row */
+x_reset		mov x, #W           			;/* x = W; */
+			eor tg, tg, #1    			;/* tg ^= 1; */
 			bx	lr
 			endp
 
 			align
 pclk_int	proc
 			export pclk_int
-			add x, x, #4       		 	;/* x++ */
-			swi PCLK_REQUEST
-			bx lr
-			endp
-
-			align
-pclk_swi	proc
-			export pclk_swi
-			tst x, #0x01         		;/* if( x & 0x01 ) burn */
-			beq burn_pixel
-			ldr r3, [cp]        		;/* if( cp > th ) */
-			cmp r3, th
+			sub x, x, #1       		 	;/* x++ */
+			ldr r3, [rb], #1       		
+			cmp r3, th					;/* if( cp > th ) */
 			strge x, [wr], #1   		;/* (*(wr) = x)++; */
-burn_pixel  bx lr
 			endp
 				
 			align
@@ -156,7 +152,12 @@ dx_store   	ldr	r3,	=QP_ADDR
 			sub r1, r0, r1
 			ldr	r2, =Dx
 			str r1, [r2, ry]
-			add ry, ry, #4
+			ldr r2, =Ym					;/* if r1 > y_max, set as y_max */
+			ldr r2, [r2]
+			cmp r1, r2					
+			ble	no_max
+			str r1, [r2]
+no_max		add ry, ry, #4
 			str r0, [r3]           		;/* QP = QN; */
 no_del      ldr	r0, =Cx
 			cmp rx, r0              	;/* if( rx < Cx ) */

@@ -3,11 +3,7 @@
 
 uint8_t readyString[] = "Ready\r\n",
 				testStartString[] = "Starting Test\r\n",
-				alertString[] = "!\r\n";
-				
-#define USER_DATA_SIZE (1<<8)
-uint8_t ReadBuffer[USER_DATA_SIZE];
-uint32_t ptrIn=0,ptrOut=0;
+				alertString[] = "Alert!\r\n";
 
 extern void rho_init(void);
 extern void frame_start(void);
@@ -29,7 +25,6 @@ static uint8_t USB_TX(uint8_t* Buf)
 
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
   result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-	return result;
   if ((Len%64==0) && (result==USBD_OK))
   {
     USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, 0);
@@ -41,19 +36,17 @@ static uint8_t USB_TX(uint8_t* Buf)
 void master_init( I2C_HandleTypeDef * i2c_port )
 {
 	HAL_GPIO_WritePin( CAM_EN_GPIO_Port, CAM_EN_Pin, GPIO_PIN_SET );
-	Camera.init(i2c_port);
+	//Camera.init(i2c_port);
 	USB_TX( readyString );
 }
 
 void master_test( void )
 {
 	USB_TX( testStartString );
+	HAL_Delay(1000);
+	USB_TX( alertString );
 	
-	
-	uint8_t tBuffer[100];
-  uint32_t tLen;
-	
-	USB_TX(testStartString);
+	while(1);
 	
 	rho_init();
 	frame_start();
@@ -61,9 +54,6 @@ void master_test( void )
 	frame_end();
 	row_int();
 	pclk_int();
-	pclk_swi();
-	pclk_int();
-	pclk_swi();
 	rho_process();
 	while(1);
 }
