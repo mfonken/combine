@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		49ECA58A207D5EF200D0A53D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49ECA589207D5EF200D0A53D /* main.cpp */; };
+		49ECF7D3207D6C2000D0A53D /* aws_mqtt_lib_private.c in Sources */ = {isa = PBXBuildFile; fileRef = 49ECF7BA207D6C2000D0A53D /* aws_mqtt_lib_private.c */; };
+		49ECF7D4207D6C2000D0A53D /* aws_greengrass_lib_private.c in Sources */ = {isa = PBXBuildFile; fileRef = 49ECF7C4207D6C2000D0A53D /* aws_greengrass_lib_private.c */; };
+		49ECF7D5207D6C2000D0A53D /* aws_system_init.c in Sources */ = {isa = PBXBuildFile; fileRef = 49ECF7D2207D6C2000D0A53D /* aws_system_init.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		49ECA584207D5EF200D0A53D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		49ECA586207D5EF200D0A53D /* combine_rtos_10 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = combine_rtos_10; sourceTree = BUILT_PRODUCTS_DIR; };
+		49ECA589207D5EF200D0A53D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		49ECF7A3207D6C2000D0A53D /* timers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timers.h; sourceTree = "<group>"; };
+		49ECF7A4207D6C2000D0A53D /* aws_mqtt_agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_agent.h; sourceTree = "<group>"; };
+		49ECF7A5207D6C2000D0A53D /* task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = task.h; sourceTree = "<group>"; };
+		49ECF7A6207D6C2000D0A53D /* message_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = message_buffer.h; sourceTree = "<group>"; };
+		49ECF7A7207D6C2000D0A53D /* semphr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = semphr.h; sourceTree = "<group>"; };
+		49ECF7A8207D6C2000D0A53D /* aws_shadow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_shadow.h; sourceTree = "<group>"; };
+		49ECF7A9207D6C2000D0A53D /* aws_system_init.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_system_init.h; sourceTree = "<group>"; };
+		49ECF7AA207D6C2000D0A53D /* aws_mqtt_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_lib.h; sourceTree = "<group>"; };
+		49ECF7AB207D6C2000D0A53D /* event_groups.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event_groups.h; sourceTree = "<group>"; };
+		49ECF7AC207D6C2000D0A53D /* aws_tls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_tls.h; sourceTree = "<group>"; };
+		49ECF7AD207D6C2000D0A53D /* aws_wifi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_wifi.h; sourceTree = "<group>"; };
+		49ECF7AE207D6C2000D0A53D /* aws_crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_crypto.h; sourceTree = "<group>"; };
+		49ECF7AF207D6C2000D0A53D /* aws_secure_sockets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_secure_sockets.h; sourceTree = "<group>"; };
+		49ECF7B1207D6C2000D0A53D /* aws_doubly_linked_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_doubly_linked_list.h; sourceTree = "<group>"; };
+		49ECF7B2207D6C2000D0A53D /* aws_helper_secure_connect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_helper_secure_connect.h; sourceTree = "<group>"; };
+		49ECF7B3207D6C2000D0A53D /* aws_mqtt_agent_config_defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_agent_config_defaults.h; sourceTree = "<group>"; };
+		49ECF7B4207D6C2000D0A53D /* aws_greengrass_lib_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_greengrass_lib_private.h; sourceTree = "<group>"; };
+		49ECF7B5207D6C2000D0A53D /* aws_lib_init.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_lib_init.h; sourceTree = "<group>"; };
+		49ECF7B6207D6C2000D0A53D /* deprecated_definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = deprecated_definitions.h; sourceTree = "<group>"; };
+		49ECF7B7207D6C2000D0A53D /* mpu_wrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mpu_wrappers.h; sourceTree = "<group>"; };
+		49ECF7B8207D6C2000D0A53D /* aws_rsprintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_rsprintf.h; sourceTree = "<group>"; };
+		49ECF7B9207D6C2000D0A53D /* aws_ota_pal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_ota_pal.h; sourceTree = "<group>"; };
+		49ECF7BA207D6C2000D0A53D /* aws_mqtt_lib_private.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aws_mqtt_lib_private.c; sourceTree = "<group>"; };
+		49ECF7BB207D6C2000D0A53D /* aws_ota_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_ota_types.h; sourceTree = "<group>"; };
+		49ECF7BC207D6C2000D0A53D /* aws_mqtt_config_defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_config_defaults.h; sourceTree = "<group>"; };
+		49ECF7BD207D6C2000D0A53D /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		49ECF7BE207D6C2000D0A53D /* aws_mqtt_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_buffer.h; sourceTree = "<group>"; };
+		49ECF7BF207D6C2000D0A53D /* aws_shadow_json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_shadow_json.h; sourceTree = "<group>"; };
+		49ECF7C0207D6C2000D0A53D /* portable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = portable.h; sourceTree = "<group>"; };
+		49ECF7C1207D6C2000D0A53D /* aws_secure_sockets_config_defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_secure_sockets_config_defaults.h; sourceTree = "<group>"; };
+		49ECF7C2207D6C2000D0A53D /* aws_default_root_certificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_default_root_certificates.h; sourceTree = "<group>"; };
+		49ECF7C3207D6C2000D0A53D /* aws_bufferpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_bufferpool.h; sourceTree = "<group>"; };
+		49ECF7C4207D6C2000D0A53D /* aws_greengrass_lib_private.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aws_greengrass_lib_private.c; sourceTree = "<group>"; };
+		49ECF7C5207D6C2000D0A53D /* projdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projdefs.h; sourceTree = "<group>"; };
+		49ECF7C6207D6C2000D0A53D /* aws_ggd_config_defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_ggd_config_defaults.h; sourceTree = "<group>"; };
+		49ECF7C7207D6C2000D0A53D /* aws_ota_cbor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_ota_cbor.h; sourceTree = "<group>"; };
+		49ECF7C8207D6C2000D0A53D /* aws_shadow_config_defaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_shadow_config_defaults.h; sourceTree = "<group>"; };
+		49ECF7C9207D6C2000D0A53D /* aws_mqtt_lib_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_mqtt_lib_private.h; sourceTree = "<group>"; };
+		49ECF7CA207D6C2000D0A53D /* stack_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack_macros.h; sourceTree = "<group>"; };
+		49ECF7CB207D6C2000D0A53D /* stream_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_buffer.h; sourceTree = "<group>"; };
+		49ECF7CC207D6C2000D0A53D /* aws_ota_agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_ota_agent.h; sourceTree = "<group>"; };
+		49ECF7CD207D6C2000D0A53D /* aws_pkcs11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_pkcs11.h; sourceTree = "<group>"; };
+		49ECF7CE207D6C2000D0A53D /* FreeRTOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeRTOS.h; sourceTree = "<group>"; };
+		49ECF7CF207D6C2000D0A53D /* aws_greengrass_discovery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aws_greengrass_discovery.h; sourceTree = "<group>"; };
+		49ECF7D0207D6C2000D0A53D /* queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = queue.h; sourceTree = "<group>"; };
+		49ECF7D2207D6C2000D0A53D /* aws_system_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aws_system_init.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		49ECA583207D5EF200D0A53D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		49ECA57D207D5EF200D0A53D = {
+			isa = PBXGroup;
+			children = (
+				49ECA588207D5EF200D0A53D /* combine_rtos_10 */,
+				49ECA587207D5EF200D0A53D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		49ECA587207D5EF200D0A53D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				49ECA586207D5EF200D0A53D /* combine_rtos_10 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		49ECA588207D5EF200D0A53D /* combine_rtos_10 */ = {
+			isa = PBXGroup;
+			children = (
+				49ECA589207D5EF200D0A53D /* main.cpp */,
+				49ECF7A1207D6C2000D0A53D /* Free-RTOS */,
+			);
+			path = combine_rtos_10;
+			sourceTree = "<group>";
+		};
+		49ECF7A1207D6C2000D0A53D /* Free-RTOS */ = {
+			isa = PBXGroup;
+			children = (
+				49ECF7A2207D6C2000D0A53D /* include */,
+				49ECF7D1207D6C2000D0A53D /* utils */,
+			);
+			path = "Free-RTOS";
+			sourceTree = "<group>";
+		};
+		49ECF7A2207D6C2000D0A53D /* include */ = {
+			isa = PBXGroup;
+			children = (
+				49ECF7A3207D6C2000D0A53D /* timers.h */,
+				49ECF7A4207D6C2000D0A53D /* aws_mqtt_agent.h */,
+				49ECF7A5207D6C2000D0A53D /* task.h */,
+				49ECF7A6207D6C2000D0A53D /* message_buffer.h */,
+				49ECF7A7207D6C2000D0A53D /* semphr.h */,
+				49ECF7A8207D6C2000D0A53D /* aws_shadow.h */,
+				49ECF7A9207D6C2000D0A53D /* aws_system_init.h */,
+				49ECF7AA207D6C2000D0A53D /* aws_mqtt_lib.h */,
+				49ECF7AB207D6C2000D0A53D /* event_groups.h */,
+				49ECF7AC207D6C2000D0A53D /* aws_tls.h */,
+				49ECF7AD207D6C2000D0A53D /* aws_wifi.h */,
+				49ECF7AE207D6C2000D0A53D /* aws_crypto.h */,
+				49ECF7AF207D6C2000D0A53D /* aws_secure_sockets.h */,
+				49ECF7B0207D6C2000D0A53D /* private */,
+				49ECF7CB207D6C2000D0A53D /* stream_buffer.h */,
+				49ECF7CC207D6C2000D0A53D /* aws_ota_agent.h */,
+				49ECF7CD207D6C2000D0A53D /* aws_pkcs11.h */,
+				49ECF7CE207D6C2000D0A53D /* FreeRTOS.h */,
+				49ECF7CF207D6C2000D0A53D /* aws_greengrass_discovery.h */,
+				49ECF7D0207D6C2000D0A53D /* queue.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		49ECF7B0207D6C2000D0A53D /* private */ = {
+			isa = PBXGroup;
+			children = (
+				49ECF7B1207D6C2000D0A53D /* aws_doubly_linked_list.h */,
+				49ECF7B2207D6C2000D0A53D /* aws_helper_secure_connect.h */,
+				49ECF7B3207D6C2000D0A53D /* aws_mqtt_agent_config_defaults.h */,
+				49ECF7B4207D6C2000D0A53D /* aws_greengrass_lib_private.h */,
+				49ECF7B5207D6C2000D0A53D /* aws_lib_init.h */,
+				49ECF7B6207D6C2000D0A53D /* deprecated_definitions.h */,
+				49ECF7B7207D6C2000D0A53D /* mpu_wrappers.h */,
+				49ECF7B8207D6C2000D0A53D /* aws_rsprintf.h */,
+				49ECF7B9207D6C2000D0A53D /* aws_ota_pal.h */,
+				49ECF7BA207D6C2000D0A53D /* aws_mqtt_lib_private.c */,
+				49ECF7BB207D6C2000D0A53D /* aws_ota_types.h */,
+				49ECF7BC207D6C2000D0A53D /* aws_mqtt_config_defaults.h */,
+				49ECF7BD207D6C2000D0A53D /* list.h */,
+				49ECF7BE207D6C2000D0A53D /* aws_mqtt_buffer.h */,
+				49ECF7BF207D6C2000D0A53D /* aws_shadow_json.h */,
+				49ECF7C0207D6C2000D0A53D /* portable.h */,
+				49ECF7C1207D6C2000D0A53D /* aws_secure_sockets_config_defaults.h */,
+				49ECF7C2207D6C2000D0A53D /* aws_default_root_certificates.h */,
+				49ECF7C3207D6C2000D0A53D /* aws_bufferpool.h */,
+				49ECF7C4207D6C2000D0A53D /* aws_greengrass_lib_private.c */,
+				49ECF7C5207D6C2000D0A53D /* projdefs.h */,
+				49ECF7C6207D6C2000D0A53D /* aws_ggd_config_defaults.h */,
+				49ECF7C7207D6C2000D0A53D /* aws_ota_cbor.h */,
+				49ECF7C8207D6C2000D0A53D /* aws_shadow_config_defaults.h */,
+				49ECF7C9207D6C2000D0A53D /* aws_mqtt_lib_private.h */,
+				49ECF7CA207D6C2000D0A53D /* stack_macros.h */,
+			);
+			path = private;
+			sourceTree = "<group>";
+		};
+		49ECF7D1207D6C2000D0A53D /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				49ECF7D2207D6C2000D0A53D /* aws_system_init.c */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		49ECA585207D5EF200D0A53D /* combine_rtos_10 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 49ECA58D207D5EF200D0A53D /* Build configuration list for PBXNativeTarget "combine_rtos_10" */;
+			buildPhases = (
+				49ECA582207D5EF200D0A53D /* Sources */,
+				49ECA583207D5EF200D0A53D /* Frameworks */,
+				49ECA584207D5EF200D0A53D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = combine_rtos_10;
+			productName = combine_rtos_10;
+			productReference = 49ECA586207D5EF200D0A53D /* combine_rtos_10 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		49ECA57E207D5EF200D0A53D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Marbl;
+				TargetAttributes = {
+					49ECA585207D5EF200D0A53D = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 49ECA581207D5EF200D0A53D /* Build configuration list for PBXProject "combine_rtos_10" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 49ECA57D207D5EF200D0A53D;
+			productRefGroup = 49ECA587207D5EF200D0A53D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				49ECA585207D5EF200D0A53D /* combine_rtos_10 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		49ECA582207D5EF200D0A53D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				49ECF7D5207D6C2000D0A53D /* aws_system_init.c in Sources */,
+				49ECA58A207D5EF200D0A53D /* main.cpp in Sources */,
+				49ECF7D3207D6C2000D0A53D /* aws_mqtt_lib_private.c in Sources */,
+				49ECF7D4207D6C2000D0A53D /* aws_greengrass_lib_private.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		49ECA58B207D5EF200D0A53D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		49ECA58C207D5EF200D0A53D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		49ECA58E207D5EF200D0A53D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S102_GCC/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S102_Rowley/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S316_IAR/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/IAR",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/Keil",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/Rowley",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/arm-none-eabi-gcc",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/ethernet/lwip-1.4.0/ports/win32/WinPCap",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S811_GCC/hw_include",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		49ECA58F207D5EF200D0A53D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S102_GCC/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S102_Rowley/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S316_IAR/hw_include",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/IAR",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/Keil",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/Rowley",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/drivers/LuminaryMicro/arm-none-eabi-gcc",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/Common/ethernet/lwip-1.4.0/ports/win32/WinPCap",
+					"$(PROJECT_DIR)/combine_rtos_10/FreeRTOS/Demo/CORTEX_LM3S811_GCC/hw_include",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		49ECA581207D5EF200D0A53D /* Build configuration list for PBXProject "combine_rtos_10" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49ECA58B207D5EF200D0A53D /* Debug */,
+				49ECA58C207D5EF200D0A53D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		49ECA58D207D5EF200D0A53D /* Build configuration list for PBXNativeTarget "combine_rtos_10" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49ECA58E207D5EF200D0A53D /* Debug */,
+				49ECA58F207D5EF200D0A53D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 49ECA57E207D5EF200D0A53D /* Project object */;
+}
