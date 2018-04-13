@@ -13,7 +13,8 @@
 ;/* System Constants */
 #define W                   640
 #define H                   400
-#define Y_DEL               0xaa
+#define Y_DEL               0x00aa
+#define Y_DEL_DOUBLE        0xaaaa
 #define MAX_COVERAGE        0.01 // %
 #define C_FRAME_SIZE        2560
 #define IS_GREEN            0x01
@@ -38,6 +39,21 @@ Cy			equ	Dy  + 4
 THRESH_ADDR equ Cy	+ 4
 Ym			equ THRESH_ADDR + 4 
 
+            align
+asm_test    proc
+            export asm_test
+            ldr r0, =Q
+            mov r1, #1
+            str r1, [r0], #4
+            add r1, #1
+            str r1, [r0], #4
+            add r1, #1
+            str r1, [r0], #4
+            add r1, #1
+            str r1, [r0]
+            bx  lr
+            endp
+
 			align
 rho_init	proc
 			export rho_init
@@ -47,7 +63,6 @@ rho_init	proc
 			align
 frame_start	proc
 			export frame_start
-
 			ldr r0, =Dx                 ;/* Clear RAM */
 			mov r1, #0
 			ldr r2, =Cm
@@ -61,21 +76,6 @@ zero		str	r1, [r0], #4
 			mov rb, #1
 			b   rho_process             ;/* Start processing loop */
 			bx  lr
-			endp
-
-			align
-asm_test	proc
-			export asm_test
-			ldr r0, =Q
-			mov	r1, #1
-			str r1, [r0], #4
-			add r1, #1
-			str r1, [r0], #4
-			add r1, #1
-			str r1, [r0], #4
-			add r1, #1
-			str r1, [r0]
-			bx	lr
 			endp
 
 			align
@@ -99,15 +99,16 @@ frame_end	proc
 			align
 row_int		proc
 			export row_int
-			mov r0, #Y_DEL
-			str r0, [wr]     			;/* (*(wr) = Y_DEL)++; */
-			add wr, wr, #1
+            movh r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
+            strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
 			tst	tg, #1					;/* if tg is odd */
 			bne	rg_row
 			add rb, rb, #1				;/* GB row */
+            cmp rb, #WxH                ;/* If all pixels are processed go to density processor*/
+            beq rho_process
 			b	x_reset
 rg_row		sub rb, rb, #1				;/* RG row */
-x_reset		mov x, #W           			;/* x = W; */
+x_reset		mov x, #W           	    ;/* x = W; */
 			eor tg, tg, #1    			;/* tg ^= 1; */
 			bx	lr
 			endp
@@ -115,10 +116,10 @@ x_reset		mov x, #W           			;/* x = W; */
 			align
 pclk_int	proc
 			export pclk_int
-			sub x, x, #1       		 	;/* x++ */
-			ldr r3, [rb], #1       		
-			cmp r3, th					;/* if( cp > th ) */
-			strge x, [wr], #1   		;/* (*(wr) = x)++; */
+pclk_start  ldr r3, [rb], #1       		;/* current_pixel = next in buffer */
+			cmp r3, th					;/* if( current_pixel > th ) */
+			strge rb, [wr], #1   		;/* (*(wr) = x)++; */
+            b pclk_start
 			endp
 				
 			align
@@ -173,7 +174,6 @@ dy_store	ldr	r1, =Dy
 			ldr r0, [r1, QS]         	;/* (*(&Q+QS))++; */
 			add r0, r0, #1
 			str r0, [r1, QS]
-
 			ldr r0, =Ce   				;/* if( rd < *C_FRAME_END ) */
 			ldr r0, [r0]
 			cmp rd, r0
