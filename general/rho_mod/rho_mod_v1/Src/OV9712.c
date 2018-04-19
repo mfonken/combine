@@ -4,13 +4,54 @@ I2C_HandleTypeDef * CAM_I2C_PORT;
 
 cam_register_t OV9712_regs[] =
 {
-    {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
-/* Clock Selection */
-//{REG5C,				0x79}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
-//{REG5D,     	0xf4}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
-//{COM7,        0x40}, // [1]Color bar with pixel overlay
-//{DSP_CTRL_1,	0x2a}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
-    {ENDR}
+	{DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
+	{REG5C,				0x7f}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
+	//{REG5D,     	0xf4}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
+	{COM7,        0x42}, // [1]Color bar with pixel overlay
+	{DSP_CTRL_1,	0x2a}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
+	{ENDR}
+};
+
+static void write( uint8_t r, uint8_t v )
+{
+	uint8_t data[2], read[1];
+
+	data[0] = r;
+	data[1] = v;
+	HAL_I2C_Master_Transmit(CAM_I2C_PORT, OV9712_ADDR, data, 2, 100);  // data is the start pointer of our array
+}
+
+static void enable()
+{
+	HAL_GPIO_WritePin( CAM_EN_GPIO_Port, CAM_EN_Pin, GPIO_PIN_SET );
+}
+
+static void disable()
+{
+	HAL_GPIO_WritePin( CAM_EN_GPIO_Port, CAM_EN_Pin, GPIO_PIN_RESET );
+}
+
+static void init( I2C_HandleTypeDef * i2c_port )
+{
+	enable();
+	HAL_Delay(10);
+	for(int i = 0; i < INIT_DELAY_CYCLES; i++);
+	CAM_I2C_PORT = i2c_port;
+	cam_register_t reg;
+	for( int i = 0; ; i++ )
+	{
+		reg = OV9712_regs[i];
+		if( reg.id == ENDR ) break;
+		write( reg.id, reg.value );
+	}
+}
+
+OV9712 Camera = 
+{
+	.init = init,
+	.write = write,
+	.enable = enable,
+	.disable = disable
 };
 
 cam_register_t dummy[] =
@@ -143,32 +184,4 @@ cam_register_t dummy[] =
     {DVP_CTRL_12,		0x00}, // [5]f_tog_en|[4]ddr_en|[3:2]clipmin[1:0]|[1:0]clip_max[1:0]	
 
 		{ENDR}
-};
-
-static void write( uint8_t r, uint8_t v )
-{
-	uint8_t data[2], read[1];
-
-	data[0] = r;
-	data[1] = v;
-	HAL_I2C_Master_Transmit(CAM_I2C_PORT, OV9712_ADDR, data, 2, 100);  // data is the start pointer of our array
-}
-
-static void init( I2C_HandleTypeDef * i2c_port )
-{
-	for(int i = 0; i < INIT_DELAY_CYCLES; i++);
-	CAM_I2C_PORT = i2c_port;
-	cam_register_t reg;
-	for( int i = 0; ; i++ )
-	{
-		reg = OV9712_regs[i];
-		if( reg.id == ENDR ) break;
-		write( reg.id, reg.value );
-	}
-}
-
-OV9712 Camera = 
-{
-	.init = init,
-	.write = write
 };
