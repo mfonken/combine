@@ -17,12 +17,12 @@
 
 /* DEBUGGING */
 //#define MAIN_DEBUG
-#define TAU_DEBUG
+//#define TAU_DEBUG
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define IMUT_DEBUG
 
-#ifndef HAS_CAMERA
+#ifdef HAS_CAMERA
 #define FISHEYE
 #endif
 
@@ -42,6 +42,7 @@
 
 #define FILENAME                "/Users/matthewfonken/Desktop/out.txt"
 
+#define DEFAULT_COVERAGE        60
 
 #define CAM_WIDTH               1280
 #define CAM_HEIGHT              720

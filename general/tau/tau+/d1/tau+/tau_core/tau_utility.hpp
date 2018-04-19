@@ -49,6 +49,8 @@ public:
     RhoDetector         rhodetector;
     PredictionPair      predictions;
     pthread_mutex_t     predictions_mutex;
+    KalmanFilter        AxKalman, AyKalman,
+                        BxKalman, ByKalman;
 };
 
 #endif /* tau_utility_hpp */

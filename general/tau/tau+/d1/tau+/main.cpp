@@ -26,13 +26,14 @@ int main( int argc, const char * argv[] )
 #ifdef HAS_CAMERA
     ImageUtility utility("ImageUtility");
 #else
-    ImageUtility utility("ImageUtility", "frames/noiseS3", 22, FNL_RESIZE_W, FNL_RESIZE_H);
+    ImageUtility utility("ImageUtility", "frames/noiseS5", 22, FNL_RESIZE_W, FNL_RESIZE_H);
 #endif
     Tau tau("Tau", &utility, FNL_RESIZE_W, FNL_RESIZE_H);
     Combine combine("Combine", &tau, FNL_RESIZE_W, FNL_RESIZE_H);
     SerialWriter comm(SFILE, FILENAME);
     
-    Environment env(&utility, 10);
+    
+    Environment env(&utility, 15);
     env.addTest(&tau, 60);
     env.addTest(&combine, &comm, 60);
     
@@ -53,9 +54,10 @@ int main( int argc, const char * argv[] )
         pthread_mutex_lock(&utility.outframe_mutex);
         drawer.drawDensitiesOnFrame(utility.outframe);
         imshow("Outframe", utility.outframe);
-//        imshow("Rho X Map", drawer.RMX);
-//        imshow("Rho Y Map", drawer.RMY);
-//        drawer.drawKalmans();
+#ifdef DRAW_RHO_MAPS
+        imshow("Rho X Map", drawer.RMX);
+        imshow("Rho Y Map", drawer.RMY);
+#endif
         pthread_mutex_unlock(&utility.outframe_mutex);
 #endif
         

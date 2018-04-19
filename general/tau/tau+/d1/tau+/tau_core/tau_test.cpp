@@ -46,42 +46,6 @@ void TauDraw::drawDensitiesOnFrame(Mat M)
     putText(M, "B", Point(tau->B.x, tau->B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
 }
 
-Vec3b TauDraw::densityColor( int v )
-{
-    int h, s;
-    h = v * 120 / 255;
-    s = abs(v - (255/2));
-    Vec3b hsv(h,s,200), ret(0,0,0);
-    ret = hsv2bgr(hsv);
-    return ret;
-}
-
-Vec3b TauDraw::hsv2bgr(Vec3b hsv)
-{
-    float h = hsv[0] *   2.0f; // 0-360
-    float s = hsv[1] / 255.0f; // 0.0-1.0
-    float v = hsv[2] / 255.0f; // 0.0-1.0
-    
-    float r = 0, g = 0, b = 0; // 0.0-1.0
-    
-    int   hi = (int)(h / 60.0f) % 6;
-    float f  = (h / 60.0f) - hi;
-    float p  = v * (1.0f - s);
-    float q  = v * (1.0f - s * f);
-    float t  = v * (1.0f - s * (1.0f - f));
-    
-    switch(hi) {
-        case 0: r = v; g = t; b = p; break;
-        case 1: r = q; g = v; b = p; break;
-        case 2: r = p; g = v; b = t; break;
-        case 3: r = p; g = q; b = v; break;
-        case 4: r = t; g = p; b = v; break;
-        case 5: r = v; g = p; b = q; break;
-    }
-    
-    return Vec3b(r*255,g*255,b*255);
-}
-
 void TauDraw::drawKalmans()
 {
     string xks = tau->predictions.x.primary.toString();

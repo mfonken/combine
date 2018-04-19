@@ -24,7 +24,7 @@ extern "C" {
 #include <string.h>
 #include <assert.h>
     
-//#define PACKET_DEBUG
+#define PACKET_DEBUG
 
 #define DEFAULT_SERCOM_PORT     "/dev/tty.usbmodem14121"
 #define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem14221"
@@ -50,7 +50,7 @@ void Write_SERCOM_Bytes( int filestream, const char * a, int l );
 int Read_SERCOM_Bytes( int filestream, char * a, int l );
 int Read_SERCOM_Byte( int filestream, char * b );
 int Test_SERCOM( int filestream );
-void tokenifyPacket( char * a, int l, int n, char s, double * d);
+char tokenifyPacket( char * a, int l, int n, double * d, char null_id );
 char** str_split(char* a_str, const char a_delim);
     
 #ifdef __cplusplus

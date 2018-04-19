@@ -37,7 +37,6 @@ RhoDetector::RhoDetector( int width, int height )
     this->width  = width;
     this->height = height;
 
-    
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     
@@ -53,6 +52,8 @@ RhoDetector::RhoDetector( int width, int height )
     detector = SimpleBlobDetector::create(params);
 }
 
+static bool sizeSort( KeyPoint a, KeyPoint b ) { return a.size > b.size; }
+
 static void keyPointsToPredictionPair( KeyPoint a, KeyPoint b, PredictionPair * r )
 {
     r->y.primary    = a.pt.x;
@@ -67,15 +68,15 @@ void RhoDetector::perform( Mat M, PredictionPair * r )
     detector->detect( M, points );
     
     size_t num_points = points.size();
-//    printf("Num keypoints: %zu\n", num_points );
     
     if( num_points < 2 ) return;
+    sort( points.begin(), points.end(), sizeSort );
     keyPointsToPredictionPair( points.at(0), points.at(1), r );
     
-    float total_size = 0;
+    float total_size = DEFAULT_COVERAGE;
     for( size_t i = 0; i < num_points; i++ )
         total_size += points.at(i).size;
-    
+
     float a_cov = points.at(0).size/total_size;
     float b_cov = points.at(1).size/total_size;
     float c_cov = 1 - (a_cov + b_cov);
@@ -91,17 +92,3 @@ void RhoDetector::perform( Mat M, PredictionPair * r )
     
     drawKeypoints( M, keypoints, M, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

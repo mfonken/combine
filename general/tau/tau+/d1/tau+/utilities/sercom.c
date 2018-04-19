@@ -85,46 +85,33 @@ int Test_SERCOM( int filestream )
 }
 
 
-void tokenifyPacket( char * a, int l, int n, char s, double * d)
+char tokenifyPacket( char * a, int l, int n, double * d, char null_id )
 {
     char **tokens;
+    int s = 0;
+    char t = a[s];
+    for(; t != '\0'; t = a[s], s++);
+    if( s < 4)
+        return null_id;
+#ifdef PACKET_DEBUG
+    printf("RX: %s\n", a);
+#endif
     tokens = str_split(a, ',');
     
-    if (tokens)
+    char id = null_id;
+    id = (tokens)[0][0];
+    char * str = (tokens)[1];
+    for(int i = 2; str; str = (tokens)[i], i++)
     {
-        int i;
-        if(*(tokens)[0] != s)
-        {
-            d[0] = 0xffff;
-            return;
-        }
-        for (i = 1; *(tokens + i) && i <= n; i++)
-        {
-            char * c = *(tokens + i);
 #ifdef PACKET_DEBUG
-            size_t l = sizeof(c);
-            printf("%d - token %s(%lu)\n", i, c, l);
+        printf("[%d]%s\n", i, str);
 #endif
-            if(l) d[i-1] = atof(c);
-            else
-            {
-                d[0] = 0xffff;
-#ifdef PACKET_DEBUG
-                printf("Ending tokenize\n");
-#endif
-                return;
-            }
-            free(*(tokens + i));
-        }
-        if(i <= n)
-        {
-            d[0] = 0xffff;
-#ifdef PACKET_DEBUG
-            printf("Tokenize failed\n");
-#endif
-        }
-        free(tokens);
+        size_t l = sizeof(str);
+        if(l) d[i-1] = atof(str);
+        free(*(tokens + i));
     }
+    free(tokens);
+    return id;
 }
 
 char** str_split(char* a_str, const char a_delim)
@@ -171,6 +158,5 @@ char** str_split(char* a_str, const char a_delim)
         //        assert(idx == count - 1);
         *(result + idx) = 0;
     }
-    
     return result;
 }

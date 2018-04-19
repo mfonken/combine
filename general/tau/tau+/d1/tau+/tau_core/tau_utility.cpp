@@ -103,7 +103,13 @@ void Tau::updatePrediction()
     invfisheye(&a, FNL_RESIZE_W, FNL_RESIZE_H, STRENGTH, ZOOM);
     invfisheye(&b, FNL_RESIZE_W, FNL_RESIZE_H, STRENGTH, ZOOM);
 #endif
-    A = { a.x, a.y };
-    B = { b.x, b.y };
+    
+    AxKalman.update(a.x, a.x - AxKalman.value);
+    AyKalman.update(a.y, a.y - AyKalman.value);
+    BxKalman.update(b.x, b.x - BxKalman.value);
+    ByKalman.update(b.y, b.y - ByKalman.value);
+    
+    A = { AxKalman.value, AyKalman.value };
+    B = { BxKalman.value, ByKalman.value };
 }
 

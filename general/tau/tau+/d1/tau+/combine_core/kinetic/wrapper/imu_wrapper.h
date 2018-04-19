@@ -20,6 +20,21 @@ extern "C" {
     
 #define DEFAULT_INTERFACE SERCOM
     
+/* Generic messages enum */
+#define MESSAGE_TOKEN_ID       -1
+#define MESSAGE_TOKEN_INDEX     1
+#define SYSTEM_CAL_TOKEN_INDEX  2
+#define ACCEL_CAL_TOKEN_INDEX   3
+#define GYRO_CAL_TOKEN_INDEX    4
+#define MAG_CAL_TOKEN_INDEX     5
+    
+#define FULL_CALIBRATION        0b11
+    
+#define CALIBRATION_INDEX       4
+#define CALIBRATED              1 << CALIBRATION_INDEX
+#define ACTIVE_INDEX            3
+#define ACTIVE                  1 << ACTIVE_INDEX
+    
 #define LSM9DS1
     
     typedef enum
@@ -34,6 +49,40 @@ extern "C" {
         INTERFACE interface;
         int       descriptor;
     } channel_t;
+    
+    typedef enum
+    {
+        NULL_PACKET_ID  = 0xff,
+        MESSAGE_ID      = 'm',
+        ORIENTATION_ID  = 'o'
+    } packet_id_t;
+
+    
+    static char * state_action_strings[] = { "NULL", "CALIBRATING", "ACTIVATING", "RUNNING" };
+    typedef enum
+    {
+        CALIBRATING = 1,
+        ACTIVATING,
+        RUNNING
+    } state_action_t;
+    
+    typedef struct
+    {
+    uint16_t
+        calibrated:1,
+        active:1,
+        sc:2,
+        ac:2,
+        gc:2,
+        mc:2,
+        padding:6;
+    } status_register;
+    
+    typedef struct
+    {
+        state_action_t action;
+        status_register status;
+    } imu_state_t;
     
     typedef struct
     {
@@ -56,51 +105,22 @@ extern "C" {
         double	yaw;
         
         channel_t channel;
+        imu_state_t state;
     } imu_t;
-    
-    struct imu_update_ops
-    {
-        void (*all)(imu_t * imu);
-        void (*accel)(imu_t * imu);
-        void (*gyro)(imu_t * imu);
-        void (*mag)(imu_t * imu);
-        
-        void (*orientation)(imu_t * imu);
-        void (*roll)(imu_t * imu);
-        void (*pitch)(imu_t * imu);
-        void (*yaw)(imu_t * imu);
-    };
-    
-    struct imu_normalize_ops
-    {
-        void (*all)(imu_t * imu);
-        void (*accel)(imu_t * imu);
-        void (*mag)(imu_t * imu);
-    };
     
     typedef struct imu imu;
     struct imu
     {
-        struct imu_update_ops update;
-        struct imu_normalize_ops normalize;
+        void (*update)(imu_t * imu);
         int (*init)(imu_t * imu);
     };
     extern const imu IMU;
-    
-    void Read_SERCOM_IMU_Packet( imu_t * imu );
-    void Read_SERCOM_IMU_Orientation( imu_t * imu );
+
+    int Read_SERCOM_IMU_Packet( imu_t *, char * );
     
     void IMU_SERCOM_Init(imu_t * imu);
-    void IMU_Update_All(imu_t * imu);
-    void IMU_Update_Orientation(imu_t * imu);
-    void IMU_Normalize_All( imu_t * imu );
-    void IMU_Normalize_Accel( imu_t * imu );
-    void IMU_Normalize_Mag( imu_t * imu );
-    void IMU_Update_Roll( imu_t * imu );
-    void IMU_Update_Pitch( imu_t * imu );
-    void IMU_Update_Yaw( imu_t * imu );
-    double IMU_Roll_Error_Get( imu_t * imu );
-
+    void IMU_Update(imu_t * imu);
+    
 #ifdef __cplusplus
 }
 #endif
