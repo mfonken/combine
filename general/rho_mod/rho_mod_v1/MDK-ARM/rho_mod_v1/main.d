@@ -44,6 +44,7 @@ rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 rho_mod_v1\main.o: ../Src/master.h
 rho_mod_v1\main.o: ../Src/OV9712.h
 rho_mod_v1\main.o: ../Src/OV9712_regs.h
+rho_mod_v1\main.o: ../Inc/stm32l4xx_it.h
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h

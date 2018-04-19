@@ -39,6 +39,7 @@ rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
 rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd.h
 rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_usb.h
 rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd_ex.h
+rho_mod_v1\master.o: ../Inc/stm32l4xx_it.h
 rho_mod_v1\master.o: ../Inc/usb_device.h
 rho_mod_v1\master.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h
 rho_mod_v1\master.o: ../Inc/usbd_conf.h
