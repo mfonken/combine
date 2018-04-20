@@ -27,7 +27,6 @@
 "rho_mod_v1\stm32l4xx_it.o"
 "rho_mod_v1\master.o"
 "rho_mod_v1\ov9712.o"
-"rho_mod_v1\rho.o"
 "rho_mod_v1\usbd_conf.o"
 "rho_mod_v1\usbd_cdc_if.o"
 "rho_mod_v1\usbd_desc.o"
@@ -36,6 +35,9 @@
 "rho_mod_v1\usbd_ctlreq.o"
 "rho_mod_v1\usbd_ioreq.o"
 "rho_mod_v1\usbd_cdc.o"
+"rho_mod_v1\rho.o"
+"rho_mod_v1\rho_kalman.o"
+"rho_mod_v1\rho_utility.o"
 --library_type=microlib --strict --scatter "rho_mod_v1\rho_mod_v1.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

@@ -1,6 +1,6 @@
 ;/* REGISTERS: */
 ;//  r0-r3 - Reserved
-#define ce  r4  // Column index
+#define tx  r4  // Column index
 #define th  r5  // Threshold
 #define tg  r6  // Green toggle
 #define wr  r7  // Write index of process buffer
@@ -21,7 +21,7 @@
 #define IS_GREEN            0x01
 #define	PCLK_REQUEST		0x0A
 
-#define BAYER_TOGGLE
+;//#define BAYER_TOGGLE
 
     area    rho, code, readonly
 	preserve8
@@ -46,22 +46,6 @@
 		
 	extern 	proc_flag
     entry
-
-;/* RAM types - Pre-assigned */
-;CAMERA_PORT equ 0x0000000a 				;/* GPIO_PORTA_L */
-;sram		equ 0x20000000
-;Dx			equ sram
-;Dy			equ Dx  + W
-;Q			equ Dy  + H
-;QT			equ Q   + 16
-;QP_ADDR		equ QT  + 4
-;Ce  		equ QP_ADDR + 4 			;/* Capture end */
-;Cf			equ Ce  + 4 				;/* Capture frame */
-;Cm 			equ Cf  + C_FRAME_SIZE 		;/* Capture max */
-;Cx			equ	Cm
-;Cy			equ	Dy  + 4
-;THRESH_ADDR equ Cy	+ 4
-;Ym			equ THRESH_ADDR + 4 
 
             align
 asm_test    proc
@@ -100,7 +84,7 @@ frame_start	proc
             ldmia  sp!, {lr}
 			mov tg, #0                  ;/* Reset operation variables */
 			ldr rb, =CAPTURE_BUFFER
-			add rb, rb, #1
+			;add rb, rb, #1
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
             ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
             ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
@@ -117,9 +101,6 @@ frame_start	proc
 			align
 frame_end	proc
 			export frame_end
-; Set final end of thresh buffer for frame
-			ldr r0, =THRESH_BUFFER_END
-			str wr, [r0]
 ; Add the four quadrants into QUADRANT_TOTAL
 			ldr r0, =QUADRANT_BUFFER    ;/* int * Qp = &Q; */
 			ldr r2, [r0], #4            ;/* QT += *(Qp++); x4 */
@@ -143,10 +124,10 @@ row_int		proc
 			export row_int
 
 ; Increment End of capture buffer
-			ldr ce, =CAPTURE_BUFFER_END
-			ldr r0, [ce]
+			ldr r1, =CAPTURE_BUFFER_END
+			ldr r0, [r1]
 			add r0, r0, #W
-			str r0, [ce]
+			str r0, [r1]
 ; Store Y delimiter in thresh buffer
             mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
             strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
@@ -160,7 +141,13 @@ rg_row		sub rb, rb, #2				;/* RG row */
 check_rmax  ldr r0, =CAPTURE_BUFFER_MAX
             ldr r0, [r0]
             cmp rb, r0                  ;/* If all pixels are processed go to density processor */
-            bge  rho_process
+            ble not_done
+			
+			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
+			str wr, [r0]
+			b	rho_process
+			
+not_done	nop
 #ifdef BAYER_TOGGLE
 		    eor tg, tg, #1    			;/* Otherwise toggle tg register */
 #endif
@@ -170,8 +157,6 @@ check_rmax  ldr r0, =CAPTURE_BUFFER_MAX
 			align
 pclk_int	proc
 			export pclk_int
-;			ldr r0, =CAPTURE_BUFFER_END
-;			ldr r0, [r0]
 			ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
 			ldr	th, [r1]
 			
@@ -179,7 +164,9 @@ pclk_start  ldrb r3, [rb], #1       		;/* current_pixel = next in buffer */
 			cmp r3, th					;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			
-			cmp rb, ce
+			ldr r1, =CAPTURE_BUFFER_END
+			ldr r0, [r1]
+			cmp rb, r0
             blt pclk_start
 			bx	lr
 			endp
@@ -192,13 +179,14 @@ rho_process proc
 			mov ry, #0
 
 read_loop	ldrh rx, [rd], #2         	;/* rx = *(rd++); */
-			cmp rx, #Y_DEL_DOUBLE       ;/* if( rx == Y_DEL ) */
+			mov r0, #Y_DEL_DOUBLE
+			cmp rx, r0       ;/* if( rx == Y_DEL ) */
 			bne no_del
 
 ; Process Row
             ldr r0, =QUADRANT_BUFFER
 			ldr	r1, =CENTROID_Y
-			ldr r1, [r1]
+			ldrh r1, [r1]
 			cmp ry, r1              	;/* if( ry < Cy ) */
 			bge higher
 			and qs, qs, #0xfd  			;/* QS &= 0xfd; */
@@ -218,23 +206,32 @@ dx_store   	ldr	r1,	=QUADRANT_PREVIOUS
 			ldr	r2, =DENSITY_X
 			str r0, [r2, ry]
             add ry, ry, #4
-			ldr r2, =DENSITY_Y_MAX		;/* if r1 > y_max, set as y_max */
-			ldr r2, [r2]
+			ldr r3, =DENSITY_Y_MAX		;/* if r1 > y_max, set as y_max */
+			ldr r2, [r3]
+			ldr r1, [r1]
 			cmp r1, r2					
-            ble	inc_qs                  ; Contiunue (to quadrant increment) if less than or equal
-            str r1, [r2]                ; Store as new max if greater
-            b	inc_qs
+            ble	rho_lcheck              ; Contiunue (to quadrant increment) if less than or equal
+            str r1, [r3]                ; Store as new max if greater
+            b	rho_lcheck
 
 ; Process Pixel
-no_del      ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
+no_del  	ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
             mov	r1, #0x0000ffff
             and r0, r0, r1              ; Keep bottom half in r0
+			cmp	rx, r0
+			blt	rho_lcheck				; Check for valid value
             sub rx, rx, r0              ; Remove address offset from rx
-			ldr	r1, =CENTROID_X
-			ldr r1, [r1]
+			sub rx, rx, #1
+			mov	r0, #W
+sudo_mod	cmp rx, r0
+			blt	rx_corr
+			sub rx, rx, r0
+			b	sudo_mod
+rx_corr		ldr	r1, =CENTROID_X
+			ldrh r1, [r1]
 			cmp rx, r1              	;/* if( rx < Cx ) */
 			bge right
-			and qs, qs, #0xfe	    	;/* QS &= 0xfe; */
+left		and qs, qs, #0xfe	    	;/* QS &= 0xfe; */
 			b 	dy_store 
 right		orr qs, qs, #0x01	    	;/* QS |= 0x01; */
 dy_store	ldr	r1, =DENSITY_Y
@@ -253,13 +250,14 @@ inc_qs		ldr r1, =QUADRANT_BUFFER
 			str r0, [r1, r2]
 
 ; Loop until Thresh Buffer End
-			ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
+rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 			ldr r0, [r0]
 			cmp rd, r0
 			blt read_loop
 
 			stmdb  sp!, {lr}
-			bl 	frame_end
+			bl	frame_end
+			mov	r0, #10
 			bl 	printBuffers
 			ldmia  sp!, {lr}
 			bx	lr

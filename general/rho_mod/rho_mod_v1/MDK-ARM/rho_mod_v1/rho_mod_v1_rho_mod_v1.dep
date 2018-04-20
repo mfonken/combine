@@ -856,7 +856,7 @@ I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h)(0x5AC83FEF)
 I (../Inc/usbd_conf.h)(0x5AD6D855)
 I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x588C5634)
 I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x588C5634)
-I (../Src/master.h)(0x5AD82599)
+I (../Src/master.h)(0x5AD93E41)
 I (../Src/OV9712.h)(0x5AD5A0A9)
 I (../Src/OV9712_regs.h)(0x5ACC6582)
 I (../Inc/stm32l4xx_it.h)(0x5AD6D855)
@@ -864,6 +864,10 @@ I (../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h)(0x5AC83F
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h)(0x5AC83FEF)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h)(0x5AC83FEF)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h)(0x5AC83FEF)
+I (../Src/rho\rho_utility.h)(0x5AD95569)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588C5634)
+I (../Src/rho\rho_kalman.h)(0x5AD93A6C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x588C5634)
 F (../Src/stm32l4xx_hal_msp.c)(0x5AD6D855)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\stm32l4xx_hal_msp.o --omf_browse rho_mod_v1\stm32l4xx_hal_msp.crf --depend rho_mod_v1\stm32l4xx_hal_msp.d)
 I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h)(0x5AC83FEA)
 I (../Inc/stm32l4xx_hal_conf.h)(0x5AD6D856)
@@ -939,9 +943,9 @@ I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd.h)(0x5AC83FEA)
 I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_usb.h)(0x5AC83FEA)
 I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd_ex.h)(0x5AC83FEA)
 I (../Inc/stm32l4xx_it.h)(0x5AD6D855)
-F (..\Src\master.h)(0x5AD82599)()
-F (..\Src\master.c)(0x5AD834B6)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\master.o --omf_browse rho_mod_v1\master.crf --depend rho_mod_v1\master.d)
-I (..\Src\master.h)(0x5AD82599)
+F (..\Src\master.h)(0x5AD93E41)()
+F (..\Src\master.c)(0x5AD95DC5)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\master.o --omf_browse rho_mod_v1\master.crf --depend rho_mod_v1\master.d)
+I (..\Src\master.h)(0x5AD93E41)
 I (..\Src\OV9712.h)(0x5AD5A0A9)
 I (..\Src\OV9712_regs.h)(0x5ACC6582)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588C5634)
@@ -990,6 +994,10 @@ I (../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc/usbd_cdc.h)(0x5AC83F
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h)(0x5AC83FEF)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h)(0x5AC83FEF)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h)(0x5AC83FEF)
+I (..\Src\rho\rho_utility.h)(0x5AD95569)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588C5634)
+I (..\Src\rho\rho_kalman.h)(0x5AD93A6C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x588C5634)
 F (..\Src\OV9712.h)(0x5AD5A0A9)()
 F (..\Src\OV9712.c)(0x5AD5A0D5)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\ov9712.o --omf_browse rho_mod_v1\ov9712.crf --depend rho_mod_v1\ov9712.d)
 I (..\Src\OV9712.h)(0x5AD5A0A9)
@@ -1031,7 +1039,6 @@ I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd.h)(0x5AC83FEA)
 I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_usb.h)(0x5AC83FEA)
 I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd_ex.h)(0x5AC83FEA)
 F (..\Src\OV9712_regs.h)(0x5ACC6582)()
-F (..\Src\rho.s)(0x5AD83496)(--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" --cpreproc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include--pd "__UVISION_VERSION SETA 524" --pd "_RTE_ SETA 1" --pd "STM32L432xx SETA 1"--list rho.lst --xref -o rho_mod_v1\rho.o --depend rho_mod_v1\rho.d)
 F (../Src/usbd_conf.c)(0x5AD6D855)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\usbd_conf.o --omf_browse rho_mod_v1\usbd_conf.crf --depend rho_mod_v1\usbd_conf.d)
 I (../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h)(0x5AC83FE6)
 I (../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l432xx.h)(0x5AC83FE6)
@@ -1394,3 +1401,20 @@ I (../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd_ex.h)(0x5AC83FEA)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h)(0x5AC83FEF)
 I (../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h)(0x5AC83FEF)
 I (../Inc/usbd_desc.h)(0x5AD6D855)
+F (..\Src\rho\rho.s)(0x5AD95D85)(--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1" --cpreproc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include--pd "__UVISION_VERSION SETA 524" --pd "_RTE_ SETA 1" --pd "STM32L432xx SETA 1"--list rho.lst --xref -o rho_mod_v1\rho.o --depend rho_mod_v1\rho.d)
+F (..\Src\rho\rho_kalman.c)(0x5AD93D5B)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\rho_kalman.o --omf_browse rho_mod_v1\rho_kalman.crf --depend rho_mod_v1\rho_kalman.d)
+I (..\Src\rho\rho_kalman.h)(0x5AD93A6C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x588C5634)
+F (..\Src\rho\rho_kalman.h)(0x5AD93A6C)()
+F (..\Src\rho\rho_utility.c)(0x5AD93C96)(--c99 -c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc -I ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc -I ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc-I.\RTE\_rho_mod_v1-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32L432xx -DUSE_HAL_DRIVER -DSTM32L432xx-o rho_mod_v1\rho_utility.o --omf_browse rho_mod_v1\rho_utility.crf --depend rho_mod_v1\rho_utility.d)
+I (..\Src\rho\rho_utility.h)(0x5AD95569)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x588C5634)
+I (..\Src\rho\rho_kalman.h)(0x5AD93A6C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x588C5634)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x588C5634)
+F (..\Src\rho\rho_utility.h)(0x5AD95569)()

@@ -11,8 +11,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <unistd.h>
-
 /* RHO PIXEL CHECK */
 #define RPC(X)      if(X&0xf8)
 #define RPCB(X,Y)   {RPC(X){Q##Y++;mapy[x]++;}}
@@ -49,47 +47,7 @@ void Init(rho_c_utility * utility, int w, int h)
     
     memset(&utility->prediction_pair.x.probabilities, 0, sizeof(double)*3);
     memset(&utility->prediction_pair.y.probabilities, 0, sizeof(double)*3);
-    
-    /* Connect to Interrupt Model variable structure */
-    RhoVariables.ram.Dx      =  utility->density_map_pair.x.map;
-    RhoVariables.ram.Dy      =  utility->density_map_pair.y.map;
-    RhoVariables.ram.Q       =  utility->Q;
-    RhoVariables.ram.CX_ADDR = &utility->Cx;
-    RhoVariables.ram.CY_ADDR = &utility->Cy;
-    RhoVariables.ram.C_FRAME =  utility->cframe;
-    RhoVariables.ram.THRESH_ADDR = &utility->thresh;
-    
-    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
-    RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W    =  utility->width;
-    RhoVariables.global.H    =  utility->height;
-    
-    RhoInterrupts.FRAME_INIT();
-    pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
-    pthread_mutex_lock(&RhoVariables.global.rho_int_mutex);
 }
-
-/* Interrupt (Simulated Hardware-Driven) Density map generator */
-/*
-void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage_t image )
-{
-    pixel_base_t test_port = 0;
-    RhoVariables.ram.CAM_PORT = &test_port;
-    RhoInterrupts.FRAME_START();
-    pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
-    int p = 0;
-    for( int y = 0; y < image.height; y++ )
-    {
-        RhoInterrupts.ROW_INT();
-        for( int x = 0; x < image.width; x++, p++ )
-        {
-            *(RhoVariables.ram.CAM_PORT) = image.pixels[p];
-            RhoInterrupts.PCLK_INT();
-        }
-    }
-    RhoInterrupts.FRAME_END();
-}
-*/
 
 void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, PredictionC * r )
 {
@@ -251,10 +209,9 @@ void Update_Prediction( rho_c_utility * utility )
 
 const struct rho_functions RhoFunctions =
 {
-    .Init = Init,
-    .Generate_Density_Map_Using_Interrupt_Model = Generate_Density_Map_Using_Interrupt_Model,
-    .Filter_and_Select_Pairs = Filter_and_Select_Pairs,
-    .Filter_and_Select = Filter_and_Select,
-    .Update_Prediction = Update_Prediction
+	.Init = Init,
+	.Filter_and_Select_Pairs = Filter_and_Select_Pairs,
+	.Filter_and_Select = Filter_and_Select,
+	.Update_Prediction = Update_Prediction
 };
 

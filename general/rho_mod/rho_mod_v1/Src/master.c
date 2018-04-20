@@ -57,6 +57,15 @@ uint32_t flag = 0;
 uint8_t hex[HEX_LEN];
 uint16_t x, y;
 
+static void spoofPixels( void )
+{
+	for(int i = 0; i < CAPTURE_BUFFER_SIZE-1; i+=2 )
+	{
+		CAPTURE_BUFFER[i] = 0xcd;
+		CAPTURE_BUFFER[i+1] = 0xbb;
+	}
+}
+
 /***************************************************************************************/
 /*                                      Core                                           */
 /***************************************************************************************/
@@ -69,11 +78,14 @@ void master_init( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma, I2C_Handle
     RhoFunctions.Init( &Rho, CAPTURE_WIDTH, CAPTURE_HEIGHT );
 	initTimerDMA( timer, dma );
 	//Camera.init(i2c);
-    
+	
+	printAddresses();
+  
 	USB_TX( readyString );
 	HAL_Delay(4000);
 	USB_TX("-");
 	HAL_Delay(1000);
+	spoofPixels();
 	while(1)
 	{		
 		pclk_int();
@@ -95,11 +107,11 @@ void master_test( void )
 /***************************************************************************************/
 void zero_memory( void )
 {
-    memset(CAPTURE_BUFFER,     0x11, sizeof(capture_t) * CAPTURE_BUFFER_SIZE);
-    memset(THRESH_BUFFER,     0, sizeof(byte_t)         * THRESH_BUFFER_SIZE    );
-    memset(DENSITY_X,                0, sizeof(density_t) * CAPTURE_WIDTH             );
-    memset(DENSITY_Y,                0, sizeof(density_t) * CAPTURE_HEIGHT            );
-    memset(QUADRANT_BUFFER,    0, sizeof(density_t) * 4                                    );
+    memset(CAPTURE_BUFFER,	0, sizeof(capture_t) * CAPTURE_BUFFER_SIZE );
+    memset(THRESH_BUFFER,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
+    memset(DENSITY_X,       0, sizeof(density_t)  	* CAPTURE_WIDTH       );
+    memset(DENSITY_Y,       0, sizeof(density_t) 		* CAPTURE_HEIGHT      );
+    memset(QUADRANT_BUFFER,	0, sizeof(density_t) 		* 4                   );
     QUADRANT_PREVIOUS = 0;
 }
 
@@ -109,11 +121,11 @@ void init_memory( void )
     CAMERA_PORT = (address_t)&(GPIOA->IDR);
     CAPTURE_BUFFER_END = (address_t)CAPTURE_BUFFER;
     CAPTURE_BUFFER_MAX = (address_t)CAPTURE_BUFFER + CAPTURE_BUFFER_SIZE;
-    THRESH_BUFFER_MAX = (address_t)THRESH_BUFFER + THRESH_BUFFER_SIZE;
-    THRESH_BUFFER_END = THRESH_BUFFER_MAX; //(address_t)THRESH_BUFFER;
-    CENTROID_X = 5;
-    CENTROID_Y = 2;
-    THRESH_VALUE = 0x10;
+    THRESH_BUFFER_MAX = (address_t)THRESH_BUFFER + sizeof(index_t)*THRESH_BUFFER_SIZE;
+    THRESH_BUFFER_END = (address_t)THRESH_BUFFER;
+    CENTROID_X = 3;
+    CENTROID_Y = 3;
+    THRESH_VALUE = DEFAULT_THRESH;
 }
 
 //static void TransferComplete(DMA_HandleTypeDef *DmaHandle) { flag = 1; }
@@ -158,16 +170,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 /***************************************************************************************/
 /*                                    Printers                                         */
 /***************************************************************************************/
-void printBuffers( void )
+void printBuffers( uint32_t s )
 {
     USB_TX( "Printing Thresh Buffer\r\n" );
     printBuffer(THRESH_BUFFER, THRESH_BUFFER_SIZE);
     
     USB_TX( "Printing Dx\r\n" );
-    drawDensityMap(DENSITY_X, THRESH_BUFFER_SIZE);
+    drawDensityMap(DENSITY_X, s);
     
     USB_TX( "Printing Dy\r\n" );
-    drawDensityMap(DENSITY_Y, THRESH_BUFFER_SIZE);
+    drawDensityMap(DENSITY_Y, s);
     
     frame_start();
 }
@@ -186,6 +198,8 @@ void printAddresses( void )
     printAddress("C end", (uint32_t)CAPTURE_BUFFER_END);
     printAddress("C max", (uint32_t)CAPTURE_BUFFER_MAX);
     printAddress("T bfr", (uint32_t)THRESH_BUFFER);
+		printAddress("T end", (uint32_t)THRESH_BUFFER_END);
+		printAddress("T max", (uint32_t)THRESH_BUFFER_MAX);
     printAddress("   Dx", (uint32_t)DENSITY_X);
     printAddress("   Dy", (uint32_t)DENSITY_Y);
     printAddress("    Q", (uint32_t)QUADRANT_BUFFER);
@@ -194,7 +208,6 @@ void printAddresses( void )
     printAddress("   Cx", (uint32_t)&CENTROID_X);
     printAddress("   Cy", (uint32_t)&CENTROID_Y);
     printAddress("   Ym", (uint32_t)&DENSITY_Y_MAX);
-    printAddress("T end", (uint32_t)&THRESH_BUFFER_END);
     printAddress("T val", (uint32_t)&THRESH_VALUE);
     printAddress("M end", (uint32_t)&RHO_MEM_END);
 }

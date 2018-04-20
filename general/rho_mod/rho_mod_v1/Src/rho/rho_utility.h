@@ -22,9 +22,23 @@ extern "C" {
     
 //#include "rho_interrupt_model.h"
 
+/* Camera Config */
+#define CAMERA_WIDTH 	640
+#define CAMERA_HEIGHT	400
+
+/* Capture Config */
+#define CAPTURE_DIV			1
+#define CAPTURE_WIDTH 	(CAMERA_WIDTH/CAPTURE_DIV)
+#define CAPTURE_HEIGHT	(CAMERA_HEIGHT/CAPTURE_DIV)
+#define	CAPTURE_BUFFER_WIDTH	6
+#define CAPTURE_BUFFER_HEIGHT 6
+#define CAPTURE_BUFFER_SIZE (CAPTURE_BUFFER_WIDTH*CAPTURE_BUFFER_HEIGHT)
+#define THRESH_BUFFER_SIZE 	(CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1))+2
+#define DEFAULT_THRESH			0xba
+	
 #define MAX_PEAKS           3
 
-#define RHO_SQRT_HEIGHT     sqrt(FNL_RESIZE_H)
+#define RHO_SQRT_HEIGHT     sqrt(CAPTURE_HEIGHT)
 #define RHO_DIM_INFLUENCE   0.1
 #define RHO_K_TARGET_IND    0.3
 #define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
@@ -46,15 +60,10 @@ extern "C" {
 #define RHO_DEFAULT_VU      0.001
 #define RHO_DEFAULT_BU      0.5
 #define RHO_DEFAULT_SU      0.7
-    
-#define MAX_COVERAGE        0.5
-#define C_FRAME_SIZE        ((int)(MAX_COVERAGE * ( FNL_RESIZE_W * FNL_RESIZE_H )))
-#define Y_DEL               0xaaaaaaaa
 
 static void cma( double new_val, double *avg, int num ) { *avg+=(new_val-*avg)/(double)(num+1); }
 static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n )
 {double n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
-//static void fswap( double *a, double *b ) { double t=(*a);*a=*b;*b=t; }
 static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
 
 typedef struct
@@ -112,18 +121,14 @@ typedef struct
             Q[4],
             QT;
     double  QF, FT;
-
-    int cframe[C_FRAME_SIZE];
-    pthread_mutex_t rho_int_mutex;
 } rho_c_utility;
 
 struct rho_functions
 {
-    void (*Init)(rho_c_utility *, int, int);
-    void (*Generate_Density_Map_Using_Interrupt_Model)( rho_c_utility * utility, cimage_t image );
-    void (*Filter_and_Select_Pairs)( rho_c_utility * );
-    void (*Filter_and_Select)( rho_c_utility *, DensityMapC *, PredictionC * );
-    void (*Update_Prediction)( rho_c_utility * );
+	void (*Init)(rho_c_utility *, int, int);
+	void (*Filter_and_Select_Pairs)( rho_c_utility * );
+	void (*Filter_and_Select)( rho_c_utility *, DensityMapC *, PredictionC * );
+	void (*Update_Prediction)( rho_c_utility * );
 };
 
 //extern rho_c_utility utility;

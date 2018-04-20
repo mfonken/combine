@@ -7,22 +7,10 @@
 #include "usb_device.h"
 #include "usbd_cdc.h"
 
-#incldue "rho_utility.h"
+#include "rho\rho_utility.h"
 
 void master_init( TIM_HandleTypeDef *, DMA_HandleTypeDef *, I2C_HandleTypeDef * );
 void master_test( void );
-
-/* Camera Config */
-#define CAMERA_WIDTH 	640
-#define CAMERA_HEIGHT	400
-
-/* Capture Config */
-#define CAPTURE_DIV			1
-#define CAPTURE_WIDTH 	(CAMERA_WIDTH/CAPTURE_DIV)
-#define CAPTURE_HEIGHT	(CAMERA_HEIGHT/CAPTURE_DIV)
-#define CAPTURE_BUFFER_SIZE 36
-#define CAPTURE_BUFFER_WIDTH CAPTURE_BUFFER_SIZE/6
-#define THRESH_BUFFER_SIZE CAPTURE_BUFFER_SIZE
 
 /* DMA Config */
 #define TIM2_DMA_ID 	TIM_DMA_ID_CC2
@@ -40,7 +28,7 @@ typedef uint32_t	address_t;
 void init_memory( void );
 void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
 void zero_memory( void );
-void printBuffers( void );
+void printBuffers( uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );
 void printBuffer( index_t *, int );

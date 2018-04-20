@@ -551,11 +551,6 @@
               <FilePath>..\Src\OV9712_regs.h</FilePath>
             </File>
             <File>
-              <FileName>rho.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\Src\rho.s</FilePath>
-            </File>
-            <File>
               <FileName>usbd_conf.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/usbd_conf.c</FilePath>
@@ -599,6 +594,36 @@
               <FileName>usbd_cdc.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Rho</GroupName>
+          <Files>
+            <File>
+              <FileName>rho.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\Src\rho\rho.s</FilePath>
+            </File>
+            <File>
+              <FileName>rho_kalman.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rho\rho_kalman.c</FilePath>
+            </File>
+            <File>
+              <FileName>rho_kalman.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\rho\rho_kalman.h</FilePath>
+            </File>
+            <File>
+              <FileName>rho_utility.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rho\rho_utility.c</FilePath>
+            </File>
+            <File>
+              <FileName>rho_utility.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Src\rho\rho_utility.h</FilePath>
             </File>
           </Files>
         </Group>

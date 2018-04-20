@@ -61,6 +61,8 @@ static void update( rho_kalman_t * k, double value_new, double rate_new )
     k->timestamp = timestamp();
 };
 
+static double timestamp( void ) { return 0; }
+
 static int isExpired( rho_kalman_t * k )
 {
     return ((timestamp() - k->timestamp) > k->lifespan);

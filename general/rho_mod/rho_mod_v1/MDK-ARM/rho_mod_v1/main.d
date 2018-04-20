@@ -50,3 +50,7 @@ rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_iore
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h
 rho_mod_v1\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
+rho_mod_v1\main.o: ../Src/rho\rho_utility.h
+rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+rho_mod_v1\main.o: ../Src/rho\rho_kalman.h
+rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
