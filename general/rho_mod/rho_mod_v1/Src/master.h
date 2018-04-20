@@ -7,6 +7,8 @@
 #include "usb_device.h"
 #include "usbd_cdc.h"
 
+#incldue "rho_utility.h"
+
 void master_init( TIM_HandleTypeDef *, DMA_HandleTypeDef *, I2C_HandleTypeDef * );
 void master_test( void );
 
@@ -34,9 +36,15 @@ typedef uint8_t 	capture_t;
 typedef uint32_t	density_t;
 typedef uint32_t	address_t;
 
+
+void init_memory( void );
+void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
 void zero_memory( void );
 void printBuffers( void );
-void delay( uint32_t ms );
+void printAddress( const char *, uint32_t );
+void printAddresses( void );
+void printBuffer( index_t *, int );
+void drawDensityMap( density_t *, int );
 
 static uint8_t USB_TX(uint8_t* Buf)
 {
@@ -57,5 +65,6 @@ static uint8_t USB_TX(uint8_t* Buf)
   return result;
 }
 
+extern rho_c_utility Rho;
 
 #endif
