@@ -22,6 +22,8 @@ string Combine::serialize()
     
     double r[3], p[3];
     int c[4];
+    
+    /* Packet Generation Switch */
     switch( bno.state.action )
     {
         case CALIBRATING:
@@ -35,9 +37,9 @@ string Combine::serialize()
             sprintf(kin_packet, "%c,%c\r\n", (char)MESSAGE_ID, (char)ACTIVATING );
             break;
         case RUNNING:
-            r[0] = kin.values.rotation[0];
+            r[0] = kin.values.rotation[2];
             r[1] = kin.values.rotation[1];
-            r[2] = kin.values.rotation[2];
+            r[2] = kin.values.rotation[0];
             p[0] = kin.values.position[0] * SCALE;
             p[1] = kin.values.position[1] * SCALE;
             p[2] = kin.values.position[2] * SCALE;
@@ -46,7 +48,9 @@ string Combine::serialize()
         default:
             break;
     }
-        
+#ifdef RHO_DEBUG
+    //printf("IMU>%s",kin_packet);
+#endif
     return string(kin_packet);
 }
 
@@ -62,10 +66,11 @@ void Combine::init()
 void Combine::trigger()
 {
     IMU.update( &bno );
-    ang3_t e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD },
-           g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
-    Kinetic.updateRotation( &kin, &e, &g );
+    ang3_t
+//        g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] },
+        e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD };
+    Kinetic.updateRotation( &kin, &e, NULL );//&g );
     
-    vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
-    Kinetic.updatePosition( &kin, &R, &tau->B, &tau->A );
+    //vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
+    //Kinetic.updatePosition( &kin, NULL/*&R*/, &tau->B, &tau->A );
 }

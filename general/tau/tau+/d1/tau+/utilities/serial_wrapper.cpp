@@ -60,6 +60,7 @@ SerialWriter_STATUS SerialWriter::initUSB(const char * handshake_id)
 
 SerialWriter_STATUS SerialWriter::initBluetooth(const char * handshake_id)
 {
+    /// NOTE: Current implementation is for macOS
     channel.filestream = -1;
     channel.port = "/dev/tty.Bluetooth-Incoming-Port";
     channel.port_alt = "/dev/cu.Bluetooth-Incoming-Port";

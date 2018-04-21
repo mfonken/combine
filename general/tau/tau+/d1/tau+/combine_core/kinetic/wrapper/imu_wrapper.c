@@ -32,7 +32,7 @@ static int init( imu_t * imu )
         default:
         case SERCOM:
             imu->channel.descriptor = Init_SERCOM_Default();
-            Write_SERCOM_Byte(imu->channel.descriptor, 'l');
+            Write_SERCOM_Byte(imu->channel.descriptor, INIT_TRIGGER_VAL);
             return (int)SERCOM;
             break;
     }
@@ -82,6 +82,7 @@ void IMU_Update(imu_t * imu)
             return;
         case MESSAGE_ID: // Message
             m = (state_action_t)tokens[MESSAGE_TOKEN_INDEX];
+            if( m < 0 || m >= NUM_ACTIONS ) m = 0;
             imu->state.action = m;
             switch(m)
             {
@@ -107,9 +108,12 @@ void IMU_Update(imu_t * imu)
                 default:
                     break;
             }
+#ifdef IMU_DEBUG
             printf("Receiving message packet: act:%s sc:%d ac:%d gc:%d mc:%d\n", state_action_strings[imu->state.action], (int)imu->state.status.sc, (int)imu->state.status.ac, (int)imu->state.status.gc, (int)imu->state.status.mc);
+#endif
             break;
         case ORIENTATION_ID: // Orientation
+            imu->state.action = RUNNING;
             n = correctOrientationPacket( tokens, v );
             if( n >= 3 )
             {

@@ -21,6 +21,9 @@ using namespace std;
 #define FPS         10
 #define KEY_DELAY   1000/FPS
 
+#define PAUSE_ENVIRONMENT_KEY   ' '
+#define PERFORMANCE_TEST_KEY    'p'
+
 int main( int argc, const char * argv[] )
 {
 #ifdef HAS_CAMERA
@@ -31,7 +34,6 @@ int main( int argc, const char * argv[] )
     Tau tau("Tau", &utility, FNL_RESIZE_W, FNL_RESIZE_H);
     Combine combine("Combine", &tau, FNL_RESIZE_W, FNL_RESIZE_H);
     SerialWriter comm(SFILE, FILENAME);
-    
     
     Environment env(&utility, 15);
     env.addTest(&tau, 60);
@@ -60,22 +62,15 @@ int main( int argc, const char * argv[] )
 #endif
         pthread_mutex_unlock(&utility.outframe_mutex);
 #endif
-        
+    
         char c = waitKey(KEY_DELAY);
         switch(c)
         {
-            case ' ':
+            case PAUSE_ENVIRONMENT_KEY:
                 if(env.status != LIVE) env.resume();
                 else env.pause();
                 break;
-            default:
-                if(utility.loop(c))
-                {
-                    utility.trigger();
-                    tau.trigger();
-                }
-                break;
-            case 's':
+            case PERFORMANCE_TEST_KEY:
                 env.pause();
                 usleep(10000);
                 tau.avg = 0;
@@ -84,6 +79,13 @@ int main( int argc, const char * argv[] )
                 usleep(10000000);
                 env.pause();
                 printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
+                break;
+            default:
+                if(utility.loop(c))
+                {
+                    utility.trigger();
+                    tau.trigger();
+                }
                 break;
         }
     }

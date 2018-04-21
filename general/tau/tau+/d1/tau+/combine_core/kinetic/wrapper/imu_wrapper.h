@@ -35,6 +35,8 @@ extern "C" {
 #define ACTIVE_INDEX            3
 #define ACTIVE                  1 << ACTIVE_INDEX
     
+#define INIT_TRIGGER_VAL        '\n'
+    
 #define LSM9DS1
     
     typedef enum
@@ -58,12 +60,13 @@ extern "C" {
     } packet_id_t;
 
     
-    static char * state_action_strings[] = { "NULL", "CALIBRATING", "ACTIVATING", "RUNNING" };
+    static const char * state_action_strings[] = { "NULL", "CALIBRATING", "ACTIVATING", "RUNNING" };
     typedef enum
     {
         CALIBRATING = 1,
         ACTIVATING,
-        RUNNING
+        RUNNING,
+        NUM_ACTIONS
     } state_action_t;
     
     typedef struct

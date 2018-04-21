@@ -24,7 +24,7 @@ extern "C" {
 #include <string.h>
 #include <assert.h>
     
-#define PACKET_DEBUG
+//#define PACKET_DEBUG
 
 #define DEFAULT_SERCOM_PORT     "/dev/tty.usbmodem14121"
 #define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem14221"

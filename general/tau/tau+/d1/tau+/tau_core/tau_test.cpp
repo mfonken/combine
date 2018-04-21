@@ -34,8 +34,7 @@ RMY(Size(tau->height, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
     printf("Initializing Tau Drawer.\n");
     this->tau = tau;
     w = tau->width; h = tau->height;
-    W = w + SIDEBAR_WIDTH; H = h + SIDEBAR_WIDTH;
-    Mat N(H, W, CV_8UC3, Scalar(0));
+    Mat N(h, w, CV_8UC3, Scalar(0));
     inframe.copyTo(N(Rect(0,0,w,h)));
     frame = N;
 }

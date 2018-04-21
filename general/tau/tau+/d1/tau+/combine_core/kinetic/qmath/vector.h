@@ -17,11 +17,9 @@ extern "C" {
 #include <stdint.h>
 #include <math.h>
     
-//#include "matrix.h"
-//#include "math_types.h"
-    
+/* Zero-checked division - Returns LNUM (Large number) on divide by zero */
 #define ZDIV_LNUM 1 << 10
-#define ZDIV(X,Y) Y==0?ZDIV_LNUM:X/Y
+#define ZDIV(X,Y) (!Y?ZDIV_LNUM:(X/Y))
     
     /*! Simple 3d Vector */
     typedef struct _vec3_t

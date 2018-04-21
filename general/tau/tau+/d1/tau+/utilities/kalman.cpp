@@ -11,18 +11,6 @@ double now()
     return stamp.tv_sec + stamp.tv_usec/1000000.0;
 }
 
-KalmanFilter::KalmanFilter() : KalmanFilter(0.)
-{
-}
-
-KalmanFilter::KalmanFilter( double v ) : KalmanFilter(v, DEFAULT_LS, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
-{
-}
-
-KalmanFilter::KalmanFilter( double v, double ls ) : KalmanFilter(v, ls, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
-{
-}
-
 KalmanFilter::KalmanFilter( double v, double ls, double v_u, double b_u, double s_u )
 {
     K[0]        = 0;

@@ -22,10 +22,7 @@
 #include "serial_wrapper.hpp"
 
 #define MAX_THREADS 3
-#define MAX_FPS     60
-#define OUT_FPS  60
-#define OUT_UDL  1000000 / OUT_FPS
-
+#define MAX_FPS  100
 #define MAX_EVENTS 6
 
 using namespace std;

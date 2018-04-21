@@ -34,15 +34,12 @@ extern "C" {
 #define MOTION_BIAS_UNCERTAINTY    0.003
 #define MOTION_SENSOR_UNCERTAINTY  0.02
     
-/** Absolute value */
-#define 	absl(x) x > 0 ? x:-x
-    
 /** Initial normal unit vector to beacon plane */
 #define     VISION_ZSTATE_I  0
 #define     VISION_ZSTATE_J  0
 #define     VISION_ZSTATE_K -1
     
-    /* Camera Precalculated values */
+/* Camera Precalculated values */
 #define     CAMERA_OFFSET_ANGLE_X   0       // radians
 #define     CAMERA_OFFSET_ANGLE_Y   0       // radians
 #define     CAMERA_OFFSET_ANGLE_Z   0       // radians
@@ -58,18 +55,20 @@ extern "C" {
 //#define     CAMERA_HEIGHT           540//800     // pixels
 #define     CAMERA_HALF_WIDTH       FNL_RESIZE_W/2
 #define     CAMERA_HALF_HEIGHT      FNL_RESIZE_H/2
-    
+
 #define     UNITS                  "cm"
-#define     PIXEL_TO_UNIT           3e-6
+#define     PIXEL_TO_UNIT           3e-6            // meters
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
     
 #define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
 #define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
     
-#define     FOCAL_REFRACTION        2.4e-6//1.3e-6//  // units / units
-#define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
+//#define     FOCAL_REFRACTION        1.3e-6        // units / units
+//#define     FOCAL_LENGTH          ( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
+#define     FOCAL_REFRACTION        2.4e-6          // units / units
+#define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
     
-#define     D_FIXED                 5.0e-2
+#define     D_FIXED                 5.0e-2          // meters
     
     typedef struct timeval timeval;
     static double seconds_since( double time )

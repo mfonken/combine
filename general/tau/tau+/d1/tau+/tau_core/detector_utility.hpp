@@ -17,6 +17,8 @@
 
 #include "tau_structures.hpp"
 
+#define KEYPOINTS_COLOR Scalar(0,0,255)
+
 class RhoDetector
 {
 public:
@@ -24,7 +26,6 @@ public:
     std::vector<cv::KeyPoint> keypoints;
     cv::Ptr<cv::SimpleBlobDetector> detector;
     
-
     int                 width,
     height,
     Cx, Cy,
@@ -33,13 +34,8 @@ public:
     
     cv::Mat             image;
     
-    pthread_mutex_t     density_map_pair_mutex;
-    pthread_mutex_t     c_mutex;
-    
     RhoDetector( int, int );
     void perform( cv::Mat, PredictionPair * );
-    //std::vector<cv::KeyPoint> detect( cv::Mat );
-//    void updatePredictions( PredictionPair * );
 };
 
 #endif /* detector_utility_hpp */

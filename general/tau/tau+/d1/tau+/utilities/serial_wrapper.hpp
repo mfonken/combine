@@ -15,7 +15,7 @@
 #include "file_writer.hpp"
 #include "sercom.h"
 
-#define DEFAULT_HANDSHAKE_DELAY 1000000
+#define DEFAULT_HANDSHAKE_DELAY     1000000
 #define DEFAULT_HANDSHAKE_ATTEMPTS  3
 #define DEFAULT_HANDSHAKE_ID        "ab\r\n"
 #define NO_HANDSHAKE                NULL

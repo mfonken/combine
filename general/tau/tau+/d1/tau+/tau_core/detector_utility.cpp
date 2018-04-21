@@ -14,31 +14,14 @@
 
 #include <unistd.h>
 
-/* RHO PIXEL CHECK */
-#define RPC(X) if(X&0xf0)
-#define RPCB(X,Y) {RPC(X){Q##Y++;mapy[x]++;}}
-
-#define FOR(L) for( int i = L; i > 0; --i )
-#define FORA(L,A) for( int i = L; i > 0; --i, A[i] )
-#define ZDIV(X,Y) (!Y?2<<10:X/Y)
-
-#define RHO_DIM_INFLUENCE   0.1
-#define RHO_K_TARGET_IND    0.3
-#define RHO_K_TARGET        RHO_K_TARGET_IND+(10/sqrt(FNL_RESIZE_H)*RHO_DIM_INFLUENCE)          //0.3
-#define RHO_VARIANCE_NORMAL sqrt(FNL_RESIZE_H)/5.0             //5
-#define RHO_VARIANCE_SCALE  sqrt(FNL_RESIZE_H)/3.0//1.32        //20
-
 using namespace cv;
 using namespace std;
 
 RhoDetector::RhoDetector( int width, int height )
 {
-    printf("Initializing RhoDetector: %dx%d & [%.3f, %.3f, %.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
+    printf("Initializing RhoDetector: %dx%d\n", width, height);
     this->width  = width;
     this->height = height;
-
-    pthread_mutex_init(&density_map_pair_mutex, NULL);
-    pthread_mutex_init(&c_mutex, NULL);
     
     params.minDistBetweenBlobs  = 10; //Minimum distance between blobs
     params.filterByCircularity  = false;
@@ -56,10 +39,10 @@ static bool sizeSort( KeyPoint a, KeyPoint b ) { return a.size > b.size; }
 
 static void keyPointsToPredictionPair( KeyPoint a, KeyPoint b, PredictionPair * r )
 {
-    r->y.primary    = a.pt.x;
-    r->y.secondary  = b.pt.x;
-    r->x.primary    = a.pt.y;
-    r->x.secondary  = b.pt.y;
+    r->y.primary.value    = a.pt.x;
+    r->y.secondary.value  = b.pt.x;
+    r->x.primary.value    = a.pt.y;
+    r->x.secondary.value  = b.pt.y;
 }
 
 void RhoDetector::perform( Mat M, PredictionPair * r )
@@ -90,5 +73,5 @@ void RhoDetector::perform( Mat M, PredictionPair * r )
 
     keypoints = points;
     
-    drawKeypoints( M, keypoints, M, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    drawKeypoints( M, keypoints, M, KEYPOINTS_COLOR, DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 }

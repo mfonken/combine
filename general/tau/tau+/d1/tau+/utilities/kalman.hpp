@@ -43,10 +43,7 @@ public:
                 timestamp;
     kalman_uncertainty_t uncertainty;
     
-    KalmanFilter();
-    KalmanFilter( double );
-    KalmanFilter( double, double );
-    KalmanFilter( double, double, double, double, double );
+    KalmanFilter( double v = 0., double ls = DEFAULT_LS, double v_u = DEFAULT_VU, double b_u = DEFAULT_BU, double s_u = DEFAULT_SU);
     void update( double, double );
     void copyTo(KalmanFilter *);
     std::string toString();

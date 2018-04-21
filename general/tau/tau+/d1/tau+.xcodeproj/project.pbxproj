@@ -64,7 +64,6 @@
 		49954A42202D3173003748EC /* utility_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility_functions.cpp; sourceTree = "<group>"; };
 		49954A43202D3173003748EC /* utility_functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = utility_functions.hpp; sourceTree = "<group>"; };
 		49954A46202D63BB003748EC /* combine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = combine.cpp; sourceTree = "<group>"; };
-		49954A47202D63BB003748EC /* combine_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = combine_master.h; sourceTree = "<group>"; };
 		49954A4A202D63BB003748EC /* combine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = combine.hpp; sourceTree = "<group>"; };
 		49954A4F202D63BB003748EC /* kinetic_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kinetic_master.h; sourceTree = "<group>"; };
 		49954A51202D63BB003748EC /* imu_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imu_wrapper.h; sourceTree = "<group>"; };
@@ -182,7 +181,6 @@
 		49954A45202D63BB003748EC /* combine_core */ = {
 			isa = PBXGroup;
 			children = (
-				49954A47202D63BB003748EC /* combine_master.h */,
 				49954A4A202D63BB003748EC /* combine.hpp */,
 				49954A46202D63BB003748EC /* combine.cpp */,
 				49954A4B202D63BB003748EC /* kinetic */,

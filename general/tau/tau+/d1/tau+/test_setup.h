@@ -12,7 +12,7 @@
 #define TITLE_STRING   "Tau+ Demo v1.0"
 
 /* GLOBAL SETUP */
-//#define HAS_CAMERA
+#define HAS_CAMERA
 #define CAMERA_ID 0
 
 /* DEBUGGING */
@@ -20,7 +20,7 @@
 //#define TAU_DEBUG
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
-//#define IMUT_DEBUG
+//#define IMU_DEBUG
 
 #ifdef HAS_CAMERA
 #define FISHEYE

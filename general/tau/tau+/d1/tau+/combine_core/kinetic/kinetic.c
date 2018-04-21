@@ -9,8 +9,8 @@
 /* Own header */
 #include "kinetic.h"
 
-/***********************************************************************************************//**
- *  \brief  Initialize Kinetic Sensors
+/**************************************************************************************************
+ *  Initialize Kinetic Sensors
  **************************************************************************************************/
 static int init( kinetic_t * k, int W, int H, double F, double L )
 {
@@ -24,37 +24,52 @@ static int init( kinetic_t * k, int W, int H, double F, double L )
     return 1;
 }
 
+/**************************************************************************************************
+ * Update Kinetic Rotation
+ **************************************************************************************************/
 static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 {
-    /* Step 1: Update Pitch (Restricted) */
-    double v = k->filters.rotation[0].value;
-    if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
-        ( e->x >  M_PI_2 && v < -M_PI_2 ) )
+    if( g == NULL )
     {
-        k->filters.rotation[0].value = e->x;
         k->values.rotation[0] = e->x;
+        k->values.rotation[1] = e->y;
+        k->values.rotation[2] = e->z;
     }
     else
     {
-        Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
-        k->values.rotation[0] = k->filters.rotation[0].value;
-    }
-    
-    if ( k->values.rotation[0] > M_PI_2 )
-    {
-        /* Invert rate, so it fits the restricted accelerometer reading */
-        g->x = -g->x;
-    }
-    
-    /* Step 2: Update Roll */
-    Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
-    k->values.rotation[1] = k->filters.rotation[1].value;
+        /* Step 1: Update Pitch (Restricted) */
+        double v = k->filters.rotation[0].value;
+        if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
+            ( e->x >  M_PI_2 && v < -M_PI_2 ) )
+        {
+            k->filters.rotation[0].value = e->x;
+            k->values.rotation[0] = e->x;
+        }
+        else
+        {
+            Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
+            k->values.rotation[0] = k->filters.rotation[0].value;
+        }
+        
+        if ( k->values.rotation[0] > M_PI_2 )
+        {
+            /* Invert rate, so it fits the restricted accelerometer reading */
+            g->x = -g->x;
+        }
+        
+        /* Step 2: Update Roll */
+        Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
+        k->values.rotation[1] = k->filters.rotation[1].value;
 
-    /* Step 3: Update Yaw */
-    Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
-    k->values.rotation[2] = k->filters.rotation[2].value;
+        /* Step 3: Update Yaw */
+        Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
+        k->values.rotation[2] = k->filters.rotation[2].value;
+    }
 }
 
+/**************************************************************************************************
+ * Update Kinetic Position
+ **************************************************************************************************/
 static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
 {
     /* Step 1: Calculate Minor Angles */
@@ -82,7 +97,7 @@ static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * 
 //    return;
     
     /* Step 5B: Calculate Non-gravitational Data */
-//    Kinetic.nongrav( k, n );
+    if( n != NULL )  Kinetic.nongrav( k, n );
 }
 
 static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
@@ -173,7 +188,7 @@ static int mu( kinetic_t * k )
     double m, n, a = k->qc_.x, b = k->qc_.z;
     m = ( a * a ) + ( b * b );
     n = 1.0 - ( 2 * m );
-    //OP2A: k->mu = -RASIN( n );
+    //OP2A: k->mu = -asin( n );
     if( fabs(n) < 1 )
     {
         k->mu = asin( n );
@@ -245,8 +260,8 @@ const kinetic Kinetic =
     .nongrav = nongrav
 };
 
-/***********************************************************************************************//**
- *  \brief  Initialize Filters for Kinetic Data
+/**************************************************************************************************
+ * Initialize Filters & Static Quaternions for Kinetic Data
  **************************************************************************************************/
 void Filters_Init( kinetic_t * k )
 {
@@ -258,12 +273,14 @@ void Filters_Init( kinetic_t * k )
     Kalman.init(&k->filters.position[2], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
 }
 
+/* Camera offset from imu (should be fixed) */
 void Camera_Rotation_Init( kinetic_t * k )
 {
     ang3_t c_a = { CAMERA_OFFSET_ANGLE_X, CAMERA_OFFSET_ANGLE_Y, CAMERA_OFFSET_ANGLE_Z };
     Quaternion.fromEuler( &c_a, &k->qc );
 }
 
+/* Beacon offset from geo-North */
 void Reference_Rotation_Init( kinetic_t * k )
 {
     ang3_t r_a = { REFERENCE_OFFSET_ANGLE_X, REFERENCE_OFFSET_ANGLE_Y, REFERENCE_OFFSET_ANGLE_Z };
