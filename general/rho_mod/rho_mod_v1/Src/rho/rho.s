@@ -35,7 +35,7 @@
 	extern	QUADRANT_PREVIOUS												
 	extern	CENTROID_X
 	extern	CENTROID_Y
-	extern	DENSITY_Y_MAX
+	extern	DENSITY_X_MAX
 	extern	CAPTURE_BUFFER_END
 	extern 	CAPTURE_BUFFER_MAX
 	extern	THRESH_BUFFER_END	
@@ -84,7 +84,9 @@ frame_start	proc
             ldmia  sp!, {lr}
 			mov tg, #0                  ;/* Reset operation variables */
 			ldr rb, =CAPTURE_BUFFER
-			;add rb, rb, #1
+#ifdef BAYER_TOGGLE
+			add rb, rb, #1
+#endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
             ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
             ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
@@ -134,9 +136,9 @@ row_int		proc
 #ifdef BAYER_TOGGLE
 			tst	tg, #1					;/* if tg is odd */
 			bne	rg_row
-			add rb, rb, #2				;/* GB row */
+			add rb, rb, #1				;/* GB row */
             b   check_rmax
-rg_row		sub rb, rb, #2				;/* RG row */
+rg_row		sub rb, rb, #1				;/* RG row */
 #endif
 check_rmax  ldr r0, =CAPTURE_BUFFER_MAX
             ldr r0, [r0]
@@ -206,7 +208,7 @@ dx_store   	ldr	r1,	=QUADRANT_PREVIOUS
 			ldr	r2, =DENSITY_X
 			str r0, [r2, ry]
             add ry, ry, #4
-			ldr r3, =DENSITY_Y_MAX		;/* if r1 > y_max, set as y_max */
+			ldr r3, =DENSITY_X_MAX		;/* if r1 > x_max, set as x_max */
 			ldr r2, [r3]
 			ldr r1, [r1]
 			cmp r1, r2					

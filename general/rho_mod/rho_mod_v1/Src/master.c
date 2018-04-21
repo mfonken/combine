@@ -18,36 +18,12 @@ extern void rho_process(void);
 
 extern void asm_test(void);
 
-rho_c_utility Rho;
+rho_utility Rho;
 
-/************************************************/
-/******************** Memory ********************/
-/************************************************/
-capture_t
-	CAPTURE_BUFFER[CAPTURE_BUFFER_SIZE];	/* Raw capture buffer for DMA */
-index_t
-	THRESH_BUFFER[THRESH_BUFFER_SIZE];		/* Threshold processing buffer */
-density_t
-	DENSITY_X[CAPTURE_WIDTH],										/* Processed density X array */
-	DENSITY_Y[CAPTURE_HEIGHT],										/* Processed density Y array */
-	QUADRANT_BUFFER[4],																	/* Quadrant density array */
-	QUADRANT_TOTAL,															/* Total density */
-	QUADRANT_PREVIOUS;																/* Previous row density */
-index_t
-	CENTROID_X,
-	CENTROID_Y;
-density_t
-	DENSITY_Y_MAX;
-address_t
-	CAPTURE_BUFFER_END,
-	CAPTURE_BUFFER_MAX,
-	THRESH_BUFFER_END,										/* Max threshold buffering size */
-	THRESH_BUFFER_MAX,
-	THRESH_VALUE,													/* Shared threshold value */
-	RHO_MEM_END;
-
-
-/************************************************/
+#define RHO_DEFAULT_LS      5
+#define RHO_DEFAULT_VU      0.001
+#define RHO_DEFAULT_BU      0.5
+#define RHO_DEFAULT_SU      0.7
 
 uint32_t CAMERA_PORT;
 uint8_t proc_flag = 0;
@@ -97,6 +73,7 @@ void master_test( void )
 {
 	USB_TX( testStartString );
 	HAL_Delay(1000);
+    Rho.density_map_pair.x.max = DENSITY_X_MAX;
     RhoFunctions.Filter_and_Select_Pairs( &Rho );
     RhoFunctions.Update_Prediction( &Rho );
 	while(1);
@@ -107,11 +84,11 @@ void master_test( void )
 /***************************************************************************************/
 void zero_memory( void )
 {
-    memset(CAPTURE_BUFFER,	0, sizeof(capture_t) * CAPTURE_BUFFER_SIZE );
+    memset(CAPTURE_BUFFER,	0, sizeof(capture_t)    * CAPTURE_BUFFER_SIZE );
     memset(THRESH_BUFFER,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
     memset(DENSITY_X,       0, sizeof(density_t)  	* CAPTURE_WIDTH       );
-    memset(DENSITY_Y,       0, sizeof(density_t) 		* CAPTURE_HEIGHT      );
-    memset(QUADRANT_BUFFER,	0, sizeof(density_t) 		* 4                   );
+    memset(DENSITY_Y,       0, sizeof(density_t) 	* CAPTURE_HEIGHT      );
+    memset(QUADRANT_BUFFER,	0, sizeof(density_t) 	* 4                   );
     QUADRANT_PREVIOUS = 0;
 }
 
@@ -126,6 +103,22 @@ void init_memory( void )
     CENTROID_X = 3;
     CENTROID_Y = 3;
     THRESH_VALUE = DEFAULT_THRESH;
+    
+    /* Initialize Rho Type */
+    Rho.density_map_pair.x.length   = CAPTURE_HEIGHT;
+    Rho.density_map_pair.y.length   = CAPTURE_WIDTH;
+    Rho.density_map_pair.x.max      = 0;
+    Rho.density_map_pair.y.max      = 0;
+    Rho.density_map_pair.x.variance = 0.;
+    Rho.density_map_pair.y.variance = 0.;
+    
+    rho_kalman_t * kpx = &Rho.density_map_pair.x.kalman,
+                 * kpy = &Rho.density_map_pair.y.kalman;
+    RhoKalman.init(kpx, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(kpy, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    
+    Rho.density_map_pair.x.map = DENSITY_X;
+    Rho.density_map_pair.y.map = DENSITY_X;
 }
 
 //static void TransferComplete(DMA_HandleTypeDef *DmaHandle) { flag = 1; }
@@ -141,15 +134,15 @@ void initTimerDMA( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma )
     __HAL_TIM_ENABLE_IT(timer, TIM2_IT_CC);
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
-//static void pauseDMA( TIM_HandleTypeDef * timer )
-//{
-//    TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
-//}
+void pauseDMA( TIM_HandleTypeDef * timer )
+{
+    TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
+}
 
-//static void resumeDMA( TIM_HandleTypeDef * timer )
-//{
-//    TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
-//}
+void resumeDMA( TIM_HandleTypeDef * timer )
+{
+    TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
+}
 
 /***************************************************************************************/
 /*                                    Callbacks                                        */
@@ -198,8 +191,8 @@ void printAddresses( void )
     printAddress("C end", (uint32_t)CAPTURE_BUFFER_END);
     printAddress("C max", (uint32_t)CAPTURE_BUFFER_MAX);
     printAddress("T bfr", (uint32_t)THRESH_BUFFER);
-		printAddress("T end", (uint32_t)THRESH_BUFFER_END);
-		printAddress("T max", (uint32_t)THRESH_BUFFER_MAX);
+    printAddress("T end", (uint32_t)THRESH_BUFFER_END);
+    printAddress("T max", (uint32_t)THRESH_BUFFER_MAX);
     printAddress("   Dx", (uint32_t)DENSITY_X);
     printAddress("   Dy", (uint32_t)DENSITY_Y);
     printAddress("    Q", (uint32_t)QUADRANT_BUFFER);
@@ -207,7 +200,7 @@ void printAddresses( void )
     printAddress("Q prv", (uint32_t)&QUADRANT_PREVIOUS);
     printAddress("   Cx", (uint32_t)&CENTROID_X);
     printAddress("   Cy", (uint32_t)&CENTROID_Y);
-    printAddress("   Ym", (uint32_t)&DENSITY_Y_MAX);
+    printAddress("   Xm", (uint32_t)&DENSITY_X_MAX);
     printAddress("T val", (uint32_t)&THRESH_VALUE);
     printAddress("M end", (uint32_t)&RHO_MEM_END);
 }

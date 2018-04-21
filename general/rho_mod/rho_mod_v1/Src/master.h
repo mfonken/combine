@@ -24,7 +24,8 @@ typedef uint8_t 	capture_t;
 typedef uint32_t	density_t;
 typedef uint32_t	address_t;
 
-
+void pauseDMA( TIM_HandleTypeDef * );
+void resumeDMA( TIM_HandleTypeDef * );
 void init_memory( void );
 void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
 void zero_memory( void );
@@ -33,6 +34,29 @@ void printAddress( const char *, uint32_t );
 void printAddresses( void );
 void printBuffer( index_t *, int );
 void drawDensityMap( density_t *, int );
+
+/***************************** Memory *****************************/
+capture_t
+    CAPTURE_BUFFER[CAPTURE_BUFFER_SIZE];    /* Raw capture buffer for DMA */
+index_t
+    THRESH_BUFFER[THRESH_BUFFER_SIZE],        /* Threshold processing buffer */
+    CENTROID_X,
+    CENTROID_Y;
+density_t
+    DENSITY_X[CAPTURE_WIDTH],                                        /* Processed density X array */
+    DENSITY_Y[CAPTURE_HEIGHT],                                        /* Processed density Y array */
+    QUADRANT_BUFFER[4],                                                                    /* Quadrant density array */
+    QUADRANT_TOTAL,                                                            /* Total density */
+    QUADRANT_PREVIOUS,                                                                /* Previous row density */
+    DENSITY_X_MAX;
+address_t
+    CAPTURE_BUFFER_END,
+    CAPTURE_BUFFER_MAX,
+    THRESH_BUFFER_END,                                        /* Max threshold buffering size */
+    THRESH_BUFFER_MAX,
+    THRESH_VALUE,                                                    /* Shared threshold value */
+    RHO_MEM_END;
+/******************************************************************/
 
 static uint8_t USB_TX(uint8_t* Buf)
 {

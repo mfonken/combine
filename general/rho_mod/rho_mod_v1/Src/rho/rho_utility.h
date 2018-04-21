@@ -9,18 +9,11 @@
 #ifndef rho_utility_h
 #define rho_utility_h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-//#include "test_setup.h"
 #include "rho_kalman.h"
-    
-//#include "rho_interrupt_model.h"
 
 /* Camera Config */
 #define CAMERA_WIDTH 	640
@@ -61,57 +54,52 @@ extern "C" {
 #define RHO_DEFAULT_BU      0.5
 #define RHO_DEFAULT_SU      0.7
 
-static void cma( double new_val, double *avg, int num ) { *avg+=(new_val-*avg)/(double)(num+1); }
-static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n )
-{double n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
+static void cma( FLOAT new_val, FLOAT *avg, int num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
+static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, int * n )
+{FLOAT n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
 static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
+    
+typedef FLOAT double;
 
 typedef struct
 {
-    int *        map;
-    int          length;
-    int          max;
-    double       variance;
+    int *       map;
+    int         length;
+    int         max;
+    FLOAT       variance;
     rho_kalman_t kalman;
-} DensityMapC;
+} DensityMap;
 
 typedef struct
 {
-    DensityMapC x,y;
-} DensityMapPairC;
+    DensityMap x,y;
+} DensityMapPair;
 
 typedef struct
 {
-    double  primary,
-    secondary,
-    alternate;
-} prediction_probabilities_c;
-
-typedef enum
-{
-    SIM = 0,
-    OPP
-} selection_pair_c;
+    FLOAT   primary,
+            secondary,
+            alternate;
+} prediction_probabilities;
 
 typedef struct
 {
     rho_kalman_t    primary,
                     secondary;
-    double          primary_new,
+    FLOAT           primary_new,
                     secondary_new;
-    prediction_probabilities_c probabilities;
-} PredictionC;
+    prediction_probabilities probabilities;
+} Prediction;
 
 typedef struct
 {
-    PredictionC         x,y;
-    selection_pair_c    selection_pair;
-} PredictionPairC;
+    Prediction         x,y;
+} PredictionPair;
 
 typedef struct
 {
-    DensityMapPairC  density_map_pair;
-    PredictionPairC  prediction_pair;
+    DensityMapPair  density_map_pair;
+    PredictionPair  prediction_pair;
     
     int     width,
             height,
@@ -120,22 +108,19 @@ typedef struct
             Cy,
             Q[4],
             QT;
-    double  QF, FT;
-} rho_c_utility;
+    FLOAT  QF, FT;
+} rho_utility;
 
 struct rho_functions
 {
-	void (*Init)(rho_c_utility *, int, int);
+	void (*Init)(rho_utility *, int, int);
+    void (*Find_Map_Max)( DensityMap * d );
 	void (*Filter_and_Select_Pairs)( rho_c_utility * );
-	void (*Filter_and_Select)( rho_c_utility *, DensityMapC *, PredictionC * );
-	void (*Update_Prediction)( rho_c_utility * );
+	void (*Filter_and_Select)( rho_utility *, DensityMap *, Prediction * );
+	void (*Update_Prediction)( rho_utility * );
 };
 
 //extern rho_c_utility utility;
 extern const struct rho_functions RhoFunctions;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
