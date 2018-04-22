@@ -40,7 +40,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern PCD_HandleTypeDef hpcd_USB_FS;
 extern DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 extern UART_HandleTypeDef huart1;
 
@@ -248,20 +247,6 @@ void USART1_IRQHandler(void)
   /* USER CODE BEGIN USART1_IRQn 1 */
 
   /* USER CODE END USART1_IRQn 1 */
-}
-
-/**
-* @brief This function handles USB event interrupt through EXTI line 17.
-*/
-void USB_IRQHandler(void)
-{
-  /* USER CODE BEGIN USB_IRQn 0 */
-
-  /* USER CODE END USB_IRQn 0 */
-  HAL_PCD_IRQHandler(&hpcd_USB_FS);
-  /* USER CODE BEGIN USB_IRQn 1 */
-
-  /* USER CODE END USB_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

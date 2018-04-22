@@ -60,7 +60,6 @@ void EXTI0_IRQHandler(void);
 void EXTI1_IRQHandler(void);
 void DMA1_Channel7_IRQHandler(void);
 void USART1_IRQHandler(void);
-void USB_IRQHandler(void);
 
 #ifdef __cplusplus
 }

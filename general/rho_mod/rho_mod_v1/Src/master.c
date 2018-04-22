@@ -61,7 +61,7 @@ static void UART_Clear( void )
 	HAL_UART_Transmit( this_uart, &ascii_clear, 1, UART_TIMEOUT );
 }
 
-static void UART_TX(uint8_t* Buf)
+static void print(uint8_t* Buf)
 {
 	HAL_UART_Transmit( this_uart, Buf, strlen((const char *)Buf), UART_TIMEOUT );
 }
@@ -114,14 +114,27 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
 	UART_Clear();
   /* Debug delay */
 	HAL_Delay(1000);
-	//USB_TX( startingString );
-	UART_TX( startingString );
+	print( startingString );
+	
+	HAL_NVIC_DisableIRQ(VSYNC_EXTI_IRQn);
+	HAL_NVIC_DisableIRQ(HREF_EXTI_IRQn);
 	
 	init_memory();
+	printAddresses();
+	Camera.init(i2c);
+	HAL_Delay(100);
+	//RhoFunctions.Init( &Rho, uart, CAPTURE_WIDTH, CAPTURE_HEIGHT );
+	//while(!flag);
+	while( HAL_GPIO_ReadPin( HREF_GPIO_Port, HREF_Pin ));
+	while( !HAL_GPIO_ReadPin( HREF_GPIO_Port, HREF_Pin ));
+	initTimerDMA( timer, dma );
+	//HAL_NVIC_EnableIRQ(VSYNC_EXTI_IRQn);
+	//HAL_NVIC_EnableIRQ(HREF_EXTI_IRQn);
 	
-	RhoFunctions.Init( &Rho, uart, CAPTURE_WIDTH, CAPTURE_HEIGHT );
-	//initTimerDMA( timer, dma );
-	//Camera.init(i2c);
+	HAL_Delay(2);
+	pauseDMA(timer);
+	print( "DMA Paused\r\n" );
+	while(1);
 	
 	master_test();
 
@@ -141,14 +154,14 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
 
 void master_test( void )
 {
-	USB_TX( testStartString );
+	print( testStartString );
 	
 	spoofDensityMaps();
 	
-	UART_TX( "Printing Dx\r\n" );
+	print( "Printing Dx\r\n" );
 	drawDensityMap(DENSITY_X, CAPTURE_HEIGHT);
 	
-	UART_TX( "Printing Dy\r\n" );
+	print( "Printing Dy\r\n" );
 	drawDensityMap(DENSITY_Y, CAPTURE_WIDTH);
 	
 	for( volatile int i = 0; i < 100; i++)
@@ -161,9 +174,9 @@ void master_test( void )
 		int yp = (int)Rho.prediction_pair.y.primary.value;
 		int xs = (int)Rho.prediction_pair.x.secondary.value;
 		int ys = (int)Rho.prediction_pair.y.secondary.value;
-		UART_TX("Printing predictions ");
+		print("Printing predictions ");
 		sprintf((char *)hex, "\t\t\tP(%d, %d) | S(%d, %d)\r\n", xp, yp, xs, ys);
-		UART_TX( hex );
+		print( hex );
 	}
 	while(1);
 }
@@ -173,14 +186,12 @@ void master_test( void )
 /***************************************************************************************/
 void zero_memory( void )
 {
-    //memset(CAPTURE_BUFFER,	0, sizeof(capture_t)    * CAPTURE_BUFFER_SIZE );
+    memset(CAPTURE_BUFFER,	0, sizeof(capture_t)    * CAPTURE_BUFFER_SIZE );
     memset(THRESH_BUFFER,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
     memset(DENSITY_X,       0, sizeof(density_t)  	* CAPTURE_WIDTH       );
     memset(DENSITY_Y,       0, sizeof(density_t) 		* CAPTURE_HEIGHT      );
     memset(QUADRANT_BUFFER,	0, sizeof(density_t) 		* 4                   );
     QUADRANT_PREVIOUS = 0;
-	
-		spoofPixels();
 }
 
 void init_memory( void )
@@ -222,9 +233,9 @@ void init_memory( void )
 
 void initTimerDMA( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma )
 {
-    USB_TX("Starting DMA from ");
+    print("Starting DMA from ");
     sprintf((char *)hex, "0x%8x > 0x%8x\r\n", (uint32_t)CAMERA_PORT, (uint32_t)CAPTURE_BUFFER);
-    USB_TX( hex );
+    print( hex );
     //timer->hdma[TIM2_DMA_ID]->XferCpltCallback = TransferComplete;
     if(HAL_DMA_Start_IT(timer->hdma[TIM2_DMA_ID], CAMERA_PORT, (uint32_t)CAPTURE_BUFFER, CAPTURE_BUFFER_SIZE) != HAL_OK) Error_Handler();
     __HAL_TIM_ENABLE_DMA(timer, TIM2_DMA_CC);
@@ -249,6 +260,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	switch(GPIO_Pin)
 	{
 		case VSYNC_Pin:
+			flag = !flag;
 			frame_start();
 		case HREF_Pin:
 			row_int();
@@ -263,24 +275,24 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void printBuffers( uint32_t r, uint32_t s )
 {
 #ifndef DYNAMIC_BUFFER
-	//USB_TX( "Printing Capture Buffer\r\n" );
+	//print( "Printing Capture Buffer\r\n" );
 	//printCapture();
 #endif
 	
-	USB_TX( "Printing Thresh Buffer\r\n" );
+	print( "Printing Thresh Buffer\r\n" );
 	printBuffer(THRESH_BUFFER, r);
 	
-	USB_TX( "Printing Dx\r\n" );
+	print( "Printing Dx\r\n" );
 	drawDensityMap(DENSITY_X, s);
 	
-	USB_TX( "Printing Dy\r\n" );
+	print( "Printing Dy\r\n" );
 	drawDensityMap(DENSITY_Y, s);
 }
 
 void printAddress( const char * s, uint32_t addr )
 {
     sprintf((char *)hex, "%s: %8x\r\n", s, addr);
-    UART_TX( hex );
+    print( hex );
     HAL_Delay(100);
 }
 
@@ -313,9 +325,9 @@ void printCapture( void )
 		{
 			uint32_t p = x + y * CAPTURE_BUFFER_WIDTH;
 			sprintf((char *)hex, " 0x%2x", CAPTURE_BUFFER[p]);
-			USB_TX( hex );
+			print( hex );
 		}
-		USB_TX( "\r\n" );
+		print( "\r\n" );
 	}
 }
 
@@ -328,9 +340,9 @@ void printBuffer( index_t * a, int l )
             sprintf((char *)hex, "\r\n(%d):", i);
         else
             sprintf((char *)hex, " 0x%x", curr);
-        USB_TX( hex );
+        print( hex );
     }
-    USB_TX("\r\n");
+    print("\r\n");
 }
 
 void drawDensityMap( density_t * a, int l )
@@ -339,10 +351,10 @@ void drawDensityMap( density_t * a, int l )
     {
         density_t curr = a[i];
         sprintf((char *)hex, "%4d[%2d]", curr, i);
-        UART_TX( hex );
+        print( hex );
         if( curr > 10 ) curr = 10;
-        for( ; curr > 0; curr--) UART_TX( " " );
-        UART_TX( "|\r\n" );
+        for( ; curr > 0; curr--) print( " " );
+        print( "|\r\n" );
     }
 }
 

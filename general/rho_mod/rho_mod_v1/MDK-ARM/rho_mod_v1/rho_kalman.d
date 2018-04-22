@@ -35,6 +35,3 @@ rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h
 rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
 rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h
 rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
-rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd.h
-rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_usb.h
-rho_mod_v1\rho_kalman.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pcd_ex.h

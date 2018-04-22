@@ -15,7 +15,7 @@
 #define Y_DEL_DOUBLE        0xaaaa
 #define PRINT_HEIGHT		10
 
-#define STATIC_BUFFER
+;#define STATIC_BUFFER
 #define BAYER_TOGGLE
 
     area    rho, code, readonly
@@ -147,7 +147,7 @@ row_int		proc
 #ifdef STATIC_BUFFER
 rg_row		sub rb, rb, #1				;/* RG row */
 #else		
-			nop
+rg_row		nop
 #endif
 #endif
 check_rmax  ldr r0, =CAPTURE_BUFFER_MAX

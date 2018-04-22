@@ -4,8 +4,6 @@
 #include "OV9712.h"
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_it.h"
-#include "usb_device.h"
-#include "usbd_cdc.h"
 
 #include "rho\rho_utility.h"
 
@@ -37,6 +35,7 @@ static void printc(uint8_t* Buf)
 	for( ; c != '\0'; c = Buf[Len++] ) ITM_SendChar(c);
 }
 
+/*
 static uint8_t USB_TX(uint8_t* Buf)
 {
 	uint16_t Len = 0;
@@ -55,6 +54,7 @@ static uint8_t USB_TX(uint8_t* Buf)
 	HAL_Delay(0);
   return result;
 }
+*/
 
 extern rho_utility Rho;
 
