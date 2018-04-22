@@ -11,17 +11,12 @@
 #define qs  r12 // Quadrant selection
 
 ;/* System Constants */
-#define W                   6;//640
-#define H                   3;//400
-#define	WxH					9;//256000
-#define Y_DEL               0x00aa
+#define HALF_WORD_WIDTH     10
 #define Y_DEL_DOUBLE        0xaaaa
-#define MAX_COVERAGE        0.01; // %
-#define C_FRAME_SIZE        5 ;//2560
-#define IS_GREEN            0x01
-#define	PCLK_REQUEST		0x0A
+#define PRINT_HEIGHT		10
 
-;//#define BAYER_TOGGLE
+#define STATIC_BUFFER
+#define BAYER_TOGGLE
 
     area    rho, code, readonly
 	preserve8
@@ -52,7 +47,7 @@ asm_test    proc
             export asm_test
             ldr wr, =THRESH_BUFFER
 			ldr rd, =THRESH_BUFFER
-			mov r2, #Y_DEL
+			mov r2, #Y_DEL_DOUBLE
 add_row		strh r2, [wr], #2
 			mov r1, #1
 			ldr r0, =THRESH_BUFFER_MAX  ;/* if( rd < *C_FRAME_END ) */
@@ -72,6 +67,7 @@ nonl		cmp wr, r0
 			align
 rho_init	proc
 			export rho_init
+
 			bx	lr
 			endp
 				
@@ -82,10 +78,12 @@ frame_start	proc
 			stmdb  sp!, {lr}
 			bl	zero_memory
             ldmia  sp!, {lr}
-			mov tg, #0                  ;/* Reset operation variables */
+			mov tg, #1                  ;/* Reset operation variables */
 			ldr rb, =CAPTURE_BUFFER
 #ifdef BAYER_TOGGLE
+#ifdef STATIC_BUFFER
 			add rb, rb, #1
+#endif
 #endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
             ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
@@ -125,11 +123,19 @@ frame_end	proc
 row_int		proc
 			export row_int
 
-; Increment End of capture buffer
+#ifdef STATIC_BUFFER
+; Increment end of capture buffer if static
 			ldr r1, =CAPTURE_BUFFER_END
 			ldr r0, [r1]
-			add r0, r0, #W
+			mov r2, #HALF_WORD_WIDTH
+			lsl	r2, #1
+			add r0, r0, r2
 			str r0, [r1]
+#else
+; Otherwise, buffer is refilling so reset read index to start
+			ldr r0, =CAPTURE_BUFFER
+			mov rb, r0
+#endif
 ; Store Y delimiter in thresh buffer
             mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
             strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
@@ -138,12 +144,16 @@ row_int		proc
 			bne	rg_row
 			add rb, rb, #1				;/* GB row */
             b   check_rmax
+#ifdef STATIC_BUFFER
 rg_row		sub rb, rb, #1				;/* RG row */
+#else		
+			nop
+#endif
 #endif
 check_rmax  ldr r0, =CAPTURE_BUFFER_MAX
             ldr r0, [r0]
             cmp rb, r0                  ;/* If all pixels are processed go to density processor */
-            ble not_done
+            blt not_done
 			
 			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r0]
@@ -162,7 +172,7 @@ pclk_int	proc
 			ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
 			ldr	th, [r1]
 			
-pclk_start  ldrb r3, [rb], #1       		;/* current_pixel = next in buffer */
+pclk_start  ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
 			cmp r3, th					;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			
@@ -179,7 +189,8 @@ rho_process proc
 			export rho_process
 			mov rx, #0					;/* int rx = 0, ry = 0; */
 			mov ry, #0
-
+			mov qs, #0
+			
 read_loop	ldrh rx, [rd], #2         	;/* rx = *(rd++); */
 			mov r0, #Y_DEL_DOUBLE
 			cmp rx, r0       ;/* if( rx == Y_DEL ) */
@@ -210,10 +221,9 @@ dx_store   	ldr	r1,	=QUADRANT_PREVIOUS
             add ry, ry, #4
 			ldr r3, =DENSITY_X_MAX		;/* if r1 > x_max, set as x_max */
 			ldr r2, [r3]
-			ldr r1, [r1]
-			cmp r1, r2					
+			cmp r0, r2					
             ble	rho_lcheck              ; Contiunue (to quadrant increment) if less than or equal
-            str r1, [r3]                ; Store as new max if greater
+            str r0, [r3]                ; Store as new max if greater
             b	rho_lcheck
 
 ; Process Pixel
@@ -224,7 +234,7 @@ no_del  	ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
 			blt	rho_lcheck				; Check for valid value
             sub rx, rx, r0              ; Remove address offset from rx
 			sub rx, rx, #1
-			mov	r0, #W
+			mov	r0, #HALF_WORD_WIDTH
 sudo_mod	cmp rx, r0
 			blt	rx_corr
 			sub rx, rx, r0
@@ -259,7 +269,13 @@ rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 
 			stmdb  sp!, {lr}
 			bl	frame_end
-			mov	r0, #10
+			ldr r0, =THRESH_BUFFER_END
+			ldr r0, [r0]
+			ldr r1, =THRESH_BUFFER
+			sub r0, r0, r1
+			lsr r0, #1
+			sub r0, r0, #1
+			mov r1, #PRINT_HEIGHT
 			bl 	printBuffers
 			ldmia  sp!, {lr}
 			bx	lr

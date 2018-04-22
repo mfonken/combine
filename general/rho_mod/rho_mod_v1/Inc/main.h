@@ -91,6 +91,10 @@
 #define LED_GPIO_Port GPIOB
 #define CAM__CS_Pin GPIO_PIN_5
 #define CAM__CS_GPIO_Port GPIOB
+#define UTX_Pin GPIO_PIN_6
+#define UTX_GPIO_Port GPIOB
+#define URX_Pin GPIO_PIN_7
+#define URX_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**

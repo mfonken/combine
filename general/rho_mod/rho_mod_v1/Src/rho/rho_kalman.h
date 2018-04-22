@@ -1,15 +1,12 @@
 #ifndef rho_kalman_h
 #define rho_kalman_h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
     /* Standard headers */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-//#include <sys/time.h>
+#include "stm32l4xx_hal.h"
     
     /** Kalman Uncertainties */
     typedef struct
@@ -32,8 +29,8 @@ extern "C" {
                     bias,
                     value,
                     prev,
-                    velocity,
-                    timestamp;
+                    velocity;
+				double 		timestamp;
     } rho_kalman_t;
     
     struct rho_kalman {
@@ -42,12 +39,9 @@ extern "C" {
         int  (*isExpired)( rho_kalman_t * );
     };
     
-    double timestamp(void);
+    double timestamp( rho_kalman_t * );
     
     extern const struct rho_kalman RhoKalman;
-    
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* kalman_h */
