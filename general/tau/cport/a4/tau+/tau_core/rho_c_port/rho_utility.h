@@ -54,8 +54,7 @@ extern "C" {
 #define Y_DEL               0xaaaaaaaa
 
 static void cma( double new_val, double *avg, int num ) { *avg+=(new_val-*avg)/(double)(num+1); }
-static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n )
-{double n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
+static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n ) { double n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_; }
 static void fswap( double *a, double *b ) { double t=(*a);*a=*b;*b=t; }
 static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
 
