@@ -49,21 +49,21 @@ void master_init( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma, I2C_Handle
 {
     /* Debug delay */
 	HAL_Delay(2000);
-    
+
 	init_memory();
     RhoFunctions.Init( &Rho, CAPTURE_WIDTH, CAPTURE_HEIGHT );
 	initTimerDMA( timer, dma );
 	//Camera.init(i2c);
-	
+
 	printAddresses();
-  
+
 	USB_TX( readyString );
 	HAL_Delay(4000);
 	USB_TX("-");
 	HAL_Delay(1000);
 	spoofPixels();
 	while(1)
-	{		
+	{
 		pclk_int();
 		row_int();
 	}
@@ -103,7 +103,7 @@ void init_memory( void )
     CENTROID_X = 3;
     CENTROID_Y = 3;
     THRESH_VALUE = DEFAULT_THRESH;
-    
+
     /* Initialize Rho Type */
     Rho.density_map_pair.x.length   = CAPTURE_HEIGHT;
     Rho.density_map_pair.y.length   = CAPTURE_WIDTH;
@@ -111,12 +111,12 @@ void init_memory( void )
     Rho.density_map_pair.y.max      = 0;
     Rho.density_map_pair.x.variance = 0.;
     Rho.density_map_pair.y.variance = 0.;
-    
+
     rho_kalman_t * kpx = &Rho.density_map_pair.x.kalman,
                  * kpy = &Rho.density_map_pair.y.kalman;
     RhoKalman.init(kpx, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
     RhoKalman.init(kpy, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    
+
     Rho.density_map_pair.x.map = DENSITY_X;
     Rho.density_map_pair.y.map = DENSITY_X;
 }
@@ -147,7 +147,7 @@ void resumeDMA( TIM_HandleTypeDef * timer )
 /***************************************************************************************/
 /*                                    Callbacks                                        */
 /***************************************************************************************/
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	switch(GPIO_Pin)
 	{
@@ -167,13 +167,13 @@ void printBuffers( uint32_t s )
 {
     USB_TX( "Printing Thresh Buffer\r\n" );
     printBuffer(THRESH_BUFFER, THRESH_BUFFER_SIZE);
-    
+
     USB_TX( "Printing Dx\r\n" );
     drawDensityMap(DENSITY_X, s);
-    
+
     USB_TX( "Printing Dy\r\n" );
     drawDensityMap(DENSITY_Y, s);
-    
+
     frame_start();
 }
 
@@ -231,4 +231,3 @@ void drawDensityMap( density_t * a, int l )
         USB_TX( "|\r\n" );
     }
 }
-

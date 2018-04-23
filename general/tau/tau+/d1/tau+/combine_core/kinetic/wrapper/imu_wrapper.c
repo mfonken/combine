@@ -40,6 +40,9 @@ static int init( imu_t * imu )
     imu->state.status.calibrated = 0;
     imu->state.status.active = 0;
     imu->state.action = CALIBRATING;
+    imu->state.reference.x = 0.;
+    imu->state.reference.y = 0.;
+    imu->state.reference.z = 0.;
     return -1;
 }
 
@@ -54,9 +57,9 @@ static int correctOrientationPacket( double tokens[7], double values[6] )
     int n = tokens[1];
     if( n >= 3 )
     {
-        values[0] = tokens[2];
-        values[1] = -tokens[3];
-        values[2] = 360-tokens[4];
+        values[0] =       tokens[2]   * DEG_TO_RAD;
+        values[1] =      -tokens[3]   * DEG_TO_RAD;
+        values[2] = ( 360-tokens[4] ) * DEG_TO_RAD;
     }
     if( n >= 6 )
     {
@@ -65,6 +68,11 @@ static int correctOrientationPacket( double tokens[7], double values[6] )
         values[5] = tokens[7];
     }
     return n;
+}
+
+static int correctOffsetPacket( double tokens[7], double values[6] )
+{
+    return correctOrientationPacket( tokens, values );
 }
 
 void IMU_Update(imu_t * imu)
@@ -128,6 +136,16 @@ void IMU_Update(imu_t * imu)
                 imu->accel_raw[2]   = v[5];
             }
             //printf("Receiving orientation packet: %f %f %f\n", v[0], v[1], v[2]);
+            break;
+        case OFFSET_ID:
+            imu->state.action = UPDATING;
+            n = correctOffsetPacket( tokens, v );
+            if( n >= 3 )
+            {
+                imu->state.reference.x = v[0];
+                imu->state.reference.y = v[1];
+                imu->state.reference.z = v[2];
+            }
             break;
         default:
             break;

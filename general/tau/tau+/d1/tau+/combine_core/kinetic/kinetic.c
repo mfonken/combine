@@ -244,6 +244,12 @@ static void nongrav( kinetic_t * k, vec3_t * n )
     k->values.position[2] = k->filters.position[2].value;
 }
 
+/* Update beacon offset from geo-North */
+static void updateReference( kinetic_t * k, ang3_t * r_a )
+{
+    Quaternion.fromEuler( r_a, &k->qr );
+}
+
 const kinetic Kinetic =
 {
     .init = init,
@@ -257,7 +263,8 @@ const kinetic Kinetic =
     .gam = gam,
     .r_l = r_l,
     .r = r,
-    .nongrav = nongrav
+    .nongrav = nongrav,
+    .updateReference = updateReference
 };
 
 /**************************************************************************************************
@@ -286,4 +293,3 @@ void Reference_Rotation_Init( kinetic_t * k )
     ang3_t r_a = { REFERENCE_OFFSET_ANGLE_X, REFERENCE_OFFSET_ANGLE_Y, REFERENCE_OFFSET_ANGLE_Z };
     Quaternion.fromEuler( &r_a, &k->qr );
 }
-

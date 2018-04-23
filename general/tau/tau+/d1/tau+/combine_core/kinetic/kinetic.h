@@ -138,8 +138,9 @@ extern "C" {
     struct kinetic
     {
         int  (*init)( kinetic_t *, int, int, double, double);
-        void (*updateRotation)( kinetic_t *, ang3_t * , ang3_t *);
-        void (*updatePosition)( kinetic_t *, vec3_t *, kpoint_t * , kpoint_t * );
+        void (*updateRotation)(  kinetic_t *, ang3_t * , ang3_t *);
+        void (*updatePosition)(  kinetic_t *, vec3_t *, kpoint_t * , kpoint_t * );
+        void (*updateReference)( kinetic_t *, ang3_t * );
         
         void (*minorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );
         void (*quaternions)( kinetic_t * );

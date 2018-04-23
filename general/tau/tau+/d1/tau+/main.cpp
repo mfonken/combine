@@ -12,7 +12,7 @@
 #include "utility_master.h"
 #include "environment_master.h"
 #include "tau_master.h"
-#include "combine_master.h"
+#include "combine.hpp"
 
 using namespace cv;
 using namespace std;

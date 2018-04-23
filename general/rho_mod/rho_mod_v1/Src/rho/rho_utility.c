@@ -23,13 +23,13 @@ void Init(rho_utility * utility, int w, int h)
 {
     utility->width  = w;
     utility->height = h;
-    
+
     utility->density_map_pair.x.map = (int*)malloc(sizeof(int)*h);
     utility->density_map_pair.x.length = h;
     utility->density_map_pair.x.max = 0;
     utility->density_map_pair.x.variance = 0;
     RhoKalman.init(&utility->density_map_pair.x.kalman, 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
-    
+
     utility->density_map_pair.y.map = (int*)malloc(sizeof(int)*w);
     utility->density_map_pair.y.length = w;
     utility->density_map_pair.y.max = 0;
@@ -44,12 +44,12 @@ void Init(rho_utility * utility, int w, int h)
     utility->prediction_pair.x.secondary_new = 0.;
     utility->prediction_pair.y.primary_new   = 0.;
     utility->prediction_pair.y.secondary_new = 0.;
-    
+
     memset(&utility->prediction_pair.x.probabilities, 0, sizeof(FLOAT)*3);
     memset(&utility->prediction_pair.y.probabilities, 0, sizeof(FLOAT)*3);
 }
 
-void Find_Map_Max( DensityMap * d )
+void Find_Map_Max( density_map_t * d )
 {
     int m = 0, c;
     /* Find max and update kalman */
@@ -58,7 +58,7 @@ void Find_Map_Max( DensityMap * d )
     d->max = m;
 }
 
-void Filter_and_Select( rho_utility * utility, DensityMap * d, Prediction * r )
+void Filter_and_Select( rho_utility * utility, density_map_t * d, Prediction * r )
 {
     utility->QF = 0;
     int     l       = d->length,
@@ -74,12 +74,12 @@ void Filter_and_Select( rho_utility * utility, DensityMap * d, Prediction * r )
             den[]   = {0,0},
             loc[]   = {0,0},
             max[]   = {0,0,0};
-    
+
     FLOAT   t    = 0.,
             v    = 0.,
             cavg = 0.,
             mavg = 0.;
-    
+
     RhoKalman.update(&d->kalman, d->max, 0.);
     d->variance = v;
     t = d->kalman.value;
@@ -87,7 +87,7 @@ void Filter_and_Select( rho_utility * utility, DensityMap * d, Prediction * r )
     if( v < t && v > 0) g = t - v;
     else return;
     /* * * * * * * * * * * * * * */
-    
+
     /* Find blob centers and sort out the top 2 */
     FORA( l, c1 = d->map )
     {
@@ -126,23 +126,23 @@ void Filter_and_Select( rho_utility * utility, DensityMap * d, Prediction * r )
 #ifdef RHO_DEBUG
     printf("* Filtered coverage is %.3f%%\n", FT*100);
 #endif
-    
+
     if( !loc[0] || !loc[1] ) return;
-    
+
     /* Update prediction with best peaks */
     r->primary_new   = loc[0];
     r->secondary_new = loc[1];
-    
+
     FLOAT v_ = ZDIV(1.0,v);
     r->probabilities.primary   = ((FLOAT)max[0]) * v_;
     r->probabilities.secondary = ((FLOAT)max[1]) * v_;
-    
+
     FLOAT comp = 1 - utility->FT/FILTERED_CONVERAGE_TARGET;
     if(comp < 0)
         r->probabilities.alternate = ((FLOAT)max[2]) * v_;
     else
         r->probabilities.alternate = comp;
-    
+
 #ifdef RHO_DEBUG
     printf("Alternate probability is %.3f\n", r->probabilities.alternate);
 #endif
@@ -163,7 +163,7 @@ void Update_Prediction( rho_utility * utility )
         Bx = utility->prediction_pair.x.secondary_new,
         By = utility->prediction_pair.y.secondary_new;
     int Cx = utility->Cx, Cy = utility->Cy;
-    
+
     bool nondiag = false;
     signed char qcheck = ( utility->Q[0] > utility->Q[1] ) + ( utility->Q[2] < utility->Q[3] ) - 1;
     if( ( Ax < Cx ) ^ ( Bx > Cx ) ) /* X ambiguous */
@@ -186,31 +186,34 @@ void Update_Prediction( rho_utility * utility )
         printf("Y Ambiguity (%d,%d,%d)\n", Ay, By, Cy);
 #endif
     }
-    
+
     if ( !nondiag )
     {
         if( Ax > Bx ) iswap(&Ax, &Bx);
         if ( ( qcheck > 0 ) ^ ( Ay < By ) ) iswap(&Ay, &By);
-        
+
 #ifdef RHO_DEBUG
         if( qcheck < 0 ) printf("Secondary diagonal\n");
         if( qcheck > 0 ) printf("Primary diagonal\n");
 #endif
     }
-    
+
     RhoKalman.update( &utility->prediction_pair.x.primary,   Ax, 0);
     RhoKalman.update( &utility->prediction_pair.x.secondary, Bx, 0);
     RhoKalman.update( &utility->prediction_pair.y.primary,   Ay, 0);
     RhoKalman.update( &utility->prediction_pair.y.secondary, By, 0);
-    
-    Cy = (int)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) / 2;
-    Cx = (int)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) / 2;
+
+    Cy = (int)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value) / 2 );
+    Cx = (int)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value) / 2 );
     if( Cx < 0               ) Cx = 0;
     if( Cy < 0               ) Cy = 0;
     if( Cx > utility->width  ) Cx = utility->width;
     if( Cy > utility->height ) Cy = utility->height;
     utility->Cx = Cx;
     utility->Cy = Cy;
+
+    /* Update State */
+    BayesianSystem.update( &sys, &prediction_pair );
 }
 
 const struct rho_functions RhoFunctions =
@@ -221,4 +224,3 @@ const struct rho_functions RhoFunctions =
 	.Filter_and_Select = Filter_and_Select,
 	.Update_Prediction = Update_Prediction
 };
-

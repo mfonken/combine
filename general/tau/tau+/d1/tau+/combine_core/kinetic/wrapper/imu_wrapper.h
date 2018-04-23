@@ -16,6 +16,7 @@ extern "C" {
 #include <stdio.h>
 #include <math.h>
     
+#include "qmath.h"
 #include "sercom.h"
     
 #define DEFAULT_INTERFACE SERCOM
@@ -56,7 +57,8 @@ extern "C" {
     {
         NULL_PACKET_ID  = 0xff,
         MESSAGE_ID      = 'm',
-        ORIENTATION_ID  = 'o'
+        ORIENTATION_ID  = 'o',
+        OFFSET_ID       = 'r'
     } packet_id_t;
 
     
@@ -66,6 +68,7 @@ extern "C" {
         CALIBRATING = 1,
         ACTIVATING,
         RUNNING,
+        UPDATING,
         NUM_ACTIONS
     } state_action_t;
     
@@ -83,8 +86,9 @@ extern "C" {
     
     typedef struct
     {
-        state_action_t action;
+        state_action_t  action;
         status_register status;
+        ang3_t          reference;
     } imu_state_t;
     
     typedef struct
