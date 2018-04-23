@@ -5,10 +5,20 @@ I2C_HandleTypeDef * CAM_I2C_PORT;
 cam_register_t OV9712_regs[] =
 {
 	{DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
-	{REG5C,				0x7f}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
-	//{REG5D,     	0xf4}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
+	{REG5C,				0x69}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
+	{REG5D,     	0xf4}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
+	
+	//{LENC_CTRL_23,0x05}, // [2]V_skip|[0]H_skip - Normal image output(b0) or Sub-sampling output(b1)
 	{COM7,        0x42}, // [1]Color bar with pixel overlay
-	{DSP_CTRL_1,	0x2a}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
+	//{DSP_CTRL_1,	0x2a}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
+	/*
+	{HSTART, 			0x13},
+	{AHSIZE, 			0x51},
+	//{REG32, 			0x00},
+	{VSTART, 			0x00},
+	{AVSIZE, 			0x64},
+	{REG03, 			0x01},
+	*/
 	{ENDR}
 };
 
