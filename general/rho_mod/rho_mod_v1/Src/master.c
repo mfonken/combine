@@ -12,14 +12,12 @@ extern void rho_init(void);
 extern void frame_start(void);
 extern void frame_end(void);
 extern void row_int(void);
-extern void pclk_int(void);
-extern void pclk_swi(void);
-extern void rho_process(void);
+extern void pixel_proc(void);
+extern void rho_proc(void);
 
 extern void asm_test(void);
 
 rho_utility Rho;
-
 
 /***************************** Memory *****************************/
 capture_t
@@ -46,14 +44,15 @@ address_t
 
 uint32_t CAMERA_PORT;
 uint8_t proc_flag = 0;
-uint32_t flag = 0;
-
+volatile uint8_t flag = 0, frame_flag = 0, row_flag = 0;
+volatile uint16_t vcounter = 0, hcounter = 0;
 #define HEX_LEN 20
 uint8_t hex[HEX_LEN];
 uint16_t x, y;
 
-#define UART_TIMEOUT	10
+#define UART_TIMEOUT	100
 UART_HandleTypeDef * this_uart;
+TIM_HandleTypeDef * this_timer;
 
 static void UART_Clear( void )
 {
@@ -66,6 +65,7 @@ static void print(uint8_t* Buf)
 	HAL_UART_Transmit( this_uart, Buf, strlen((const char *)Buf), UART_TIMEOUT );
 }
 
+/*
 static void spoofPixels( void )
 {
 	bool t = 0;
@@ -80,6 +80,7 @@ static void spoofPixels( void )
 		t = !t;
 	}
 }
+*/
 
 static void spoofDensityMaps( void )
 {
@@ -100,46 +101,53 @@ static void spoofDensityMaps( void )
 	DENSITY_X[12] = 0x33;
 }
 
-static double now( void ) 
-{ 
-	return (double)HAL_GetTick()/1000;
-}
+//static double now( void ) { return (double)HAL_GetTick()/1000; }
 
 /***************************************************************************************/
 /*                                      Core                                           */
 /***************************************************************************************/
 void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma, UART_HandleTypeDef * uart )
 {
+	this_uart = uart;
+	this_timer = timer;
+	HAL_Delay(50);
+	HAL_NVIC_DisableIRQ(VSYNC_EXTI_IRQn);
+  HAL_NVIC_DisableIRQ(HREF_EXTI_IRQn);
     /* Debug delay */
-	HAL_Delay(2000);
-
+	UART_Clear();
+	
+	print( startingString );
 	init_memory();
-	printAddresses();
-	Camera.init(i2c);
-	HAL_Delay(100);
+	
+  
 	//RhoFunctions.Init( &Rho, uart, CAPTURE_WIDTH, CAPTURE_HEIGHT );
-	//while(!flag);
-	while( HAL_GPIO_ReadPin( HREF_GPIO_Port, HREF_Pin ));
-	while( !HAL_GPIO_ReadPin( HREF_GPIO_Port, HREF_Pin ));
+
+	Camera.init(i2c);
+	
+	
 	initTimerDMA( timer, dma );
-	//Camera.init(i2c);
-
+	//HAL_Delay(20);
+	//double before = now();
+	//asm_test();
+	while(  HAL_GPIO_ReadPin( VSYNC_GPIO_Port, VSYNC_Pin ));
+	while( !HAL_GPIO_ReadPin( VSYNC_GPIO_Port, VSYNC_Pin ));
+	HAL_NVIC_EnableIRQ(VSYNC_EXTI_IRQn);
+  HAL_NVIC_EnableIRQ(HREF_EXTI_IRQn);
+	while(!frame_flag);
+	//while(!row_flag)
+		//pixel_proc();
+	HAL_Delay(20);
+	//double after = now();
+	pauseDMA(timer);
+	//rho_proc();
+	
+	print( "DMA Paused\r\n" );
+	sprintf( (char *)hex, "\tV: %d | H: %d\r\n", vcounter, hcounter );
+	print( hex );
+	//sprintf((char *)hex, "\tTime elapsed: %f\r\n", after-before);
+	//print( hex );
 	printAddresses();
-
-	USB_TX( readyString );
-	HAL_Delay(4000);
-	USB_TX("-");
-	HAL_Delay(1000);
-	spoofPixels();
-	while(1)
-	{
-		pclk_int();
-		row_int();
-		counter--;
-	}
-	
-	//master_test();
-	
+  while(1);
 }
 
 void master_test( void )
@@ -170,6 +178,54 @@ void master_test( void )
 	}
 	while(1);
 }
+
+/***************************************************************************************/
+/*                                    Callbacks                                        */
+/***************************************************************************************/
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	switch(GPIO_Pin)
+	{
+		case VSYNC_Pin:
+			if( !HAL_GPIO_ReadPin( VSYNC_GPIO_Port, VSYNC_Pin ) )
+			{
+				if( !frame_flag )
+				{
+					frame_start();
+					row_int();
+					vcounter++;
+				}
+				frame_flag = !frame_flag;
+			}
+			else 
+			{
+				if( frame_flag )
+				{
+					Camera.disable();
+				}
+			}
+			
+			break;
+		case HREF_Pin:
+			if( frame_flag )
+			{
+				if( row_flag )
+				{
+					row_int();
+				}
+				else
+				{
+					
+				}
+					
+				hcounter++;
+				row_flag = !row_flag;
+			}
+		default:
+			break;
+	}
+}
+
 
 /***************************************************************************************/
 /*                                  Initializers                                       */
@@ -230,48 +286,30 @@ void initTimerDMA( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma )
     __HAL_TIM_ENABLE_IT(timer, TIM2_IT_CC);
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
-void pauseDMA( TIM_HandleTypeDef * timer )
+inline void pauseDMA( TIM_HandleTypeDef * timer )
 {
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
 }
 
-void resumeDMA( TIM_HandleTypeDef * timer )
+inline void resumeDMA( TIM_HandleTypeDef * timer )
 {
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
 
-/***************************************************************************************/
-/*                                    Callbacks                                        */
-/***************************************************************************************/
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	switch(GPIO_Pin)
-	{
-		case VSYNC_Pin:
-			flag = !flag;
-			frame_start();
-		case HREF_Pin:
-			row_int();
-		default:
-			break;
-	}
-}
 
 /***************************************************************************************/
 /*                                    Printers                                         */
 /***************************************************************************************/
 void printBuffers( uint32_t r, uint32_t s )
 {
-    USB_TX( "Printing Thresh Buffer\r\n" );
+    print( "Printing Thresh Buffer\r\n" );
     printBuffer(THRESH_BUFFER, THRESH_BUFFER_SIZE);
 
-    USB_TX( "Printing Dx\r\n" );
+    print( "Printing Dx\r\n" );
     drawDensityMap(DENSITY_X, s);
 
-    USB_TX( "Printing Dy\r\n" );
+    print( "Printing Dy\r\n" );
     drawDensityMap(DENSITY_Y, s);
-
-    frame_start();
 }
 
 void printAddress( const char * s, uint32_t addr )

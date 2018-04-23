@@ -1,17 +1,16 @@
 ;/* REGISTERS: */
 ;//  r0-r3 - Reserved
-#define tx  r4  // Column index
-#define th  r5  // Threshold
+;//#define th  r5  // Threshold
 #define tg  r6  // Green toggle
-#define wr  r7  // Write index of process buffer
-#define rd  r8  // Read index of process buffer
-#define rb  r9  // Read index of pclk buffer
+#define rb  r7  // Write index of process buffer
+#define wr  r8  // Read index of process buffer
+#define rd  r9  // Read index of pclk buffer
 #define rx  r10 // Read col index
 #define ry  r11 // Read row index
 #define qs  r12 // Quadrant selection
 
 ;/* System Constants */
-#define HALF_WORD_WIDTH     10
+#define HALF_WORD_WIDTH     160
 #define Y_DEL_DOUBLE        0xaaaa
 #define PRINT_HEIGHT		10
 
@@ -45,22 +44,19 @@
             align
 asm_test    proc
             export asm_test
-            ldr wr, =THRESH_BUFFER
-			ldr rd, =THRESH_BUFFER
-			mov r2, #Y_DEL_DOUBLE
-add_row		strh r2, [wr], #2
+            mov r0, #0
 			mov r1, #1
-			ldr r0, =THRESH_BUFFER_MAX  ;/* if( rd < *C_FRAME_END ) */
-			ldr r0, [r0]
-			
-fill_buff	strh r1, [wr], #2
-			add r1, r1, #1
-			tst r1, #1
-			bne nonl
-			strh r2, [wr], #2
-nonl		cmp wr, r0
-			blt	fill_buff
-			b	rho_process
+			mov r2, #2
+			mov r3, #3
+			mov r4, #4
+			mov r5, #5
+			mov r6, #6
+			mov r7, #7
+			mov r8, #8
+			mov r9, #9
+			mov r10, #10
+			mov r11, #11
+			mov r12, #12
             bx  lr
             endp
 
@@ -87,8 +83,8 @@ frame_start	proc
 #endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
             ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
-            ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
-            ldr th, [r0]
+            ;ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
+            ;ldr th, [r0]
 
 ; Set process flag
 			ldr r0, =proc_flag
@@ -134,7 +130,7 @@ row_int		proc
 #else
 ; Otherwise, buffer is refilling so reset read index to start
 			ldr r0, =CAPTURE_BUFFER
-			mov rb, r0
+			mov r0, rb
 #endif
 ; Store Y delimiter in thresh buffer
             mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
@@ -150,30 +146,33 @@ rg_row		sub rb, rb, #1				;/* RG row */
 rg_row		nop
 #endif
 #endif
-check_rmax  ldr r0, =CAPTURE_BUFFER_MAX
+check_rmax  nop
+#ifdef STATIC_BUFFER
+			ldr r0, =CAPTURE_BUFFER_MAX
             ldr r0, [r0]
             cmp rb, r0                  ;/* If all pixels are processed go to density processor */
             blt not_done
 			
 			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r0]
-			b	rho_process
+			b	rho_proc
 			
 not_done	nop
 #ifdef BAYER_TOGGLE
 		    eor tg, tg, #1    			;/* Otherwise toggle tg register */
 #endif
+#endif
 			bx	lr
 			endp
 
 			align
-pclk_int	proc
-			export pclk_int
+pixel_proc	proc
+			export pixel_proc
 			ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
-			ldr	th, [r1]
+			ldr	r2, [r1]
 			
 pclk_start  ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
-			cmp r3, th					;/* if( current_pixel > th ) */
+			cmp r3, r2					;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			
 			ldr r1, =CAPTURE_BUFFER_END
@@ -184,9 +183,12 @@ pclk_start  ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
 			endp
 				
 			align
-rho_process proc
+rho_proc proc
 			import printBuffers
-			export rho_process
+			export rho_proc
+			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
+			str wr, [r0]
+
 			mov rx, #0					;/* int rx = 0, ry = 0; */
 			mov ry, #0
 			mov qs, #0

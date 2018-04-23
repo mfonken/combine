@@ -11,13 +11,18 @@
 
 #include "rho_kalman.h"
 
-typedef FLOAT double;
+typedef double FLOAT;
+typedef uint8_t		byte_t;
+typedef uint16_t	index_t;
+typedef uint8_t 	capture_t;
+typedef uint32_t	density_t;
+typedef uint32_t	address_t;
 
 typedef struct
 {
-    int *       map;
-    int         length;
-    int         max;
+    density_t * map;
+    uint16_t    length;
+    density_t   max;
     FLOAT       variance;
     rho_kalman_t kalman;
 } density_map_t;
@@ -41,27 +46,12 @@ typedef struct
     FLOAT           primary_new,
                     secondary_new;
     prediction_probabilities probabilities;
-} Prediction;
+} prediction_t;
 
 typedef struct
 {
-    Prediction         x,y;
-} PredictionPair;
-
-typedef struct
-{
-    density_map_pair_t  density_map_pair;
-    PredictionPair  prediction_pair;
-
-    int     width,
-            height,
-            thresh,
-            Cx,
-            Cy,
-            Q[4],
-            QT;
-    FLOAT  QF, FT;
-} rho_utility;
+    prediction_t         x,y;
+} prediction_pair_t;
 
 
 #endif /* rho_c_types_h */

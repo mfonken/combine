@@ -27,6 +27,7 @@
 "rho_mod_v1\rho.o"
 "rho_mod_v1\rho_kalman.o"
 "rho_mod_v1\rho_utility.o"
+"rho_mod_v1\state_machine_utility.o"
 --library_type=microlib --strict --scatter "rho_mod_v1\rho_mod_v1.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

@@ -37,8 +37,10 @@ rho_mod_v1\main.o: ../Src/master.h
 rho_mod_v1\main.o: ../Src/OV9712.h
 rho_mod_v1\main.o: ../Src/OV9712_regs.h
 rho_mod_v1\main.o: ../Inc/stm32l4xx_it.h
-rho_mod_v1\main.o: ../Src/rho\rho_utility.h
+rho_mod_v1\main.o: ../Src/Rho\rho_utility.h
 rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
-rho_mod_v1\main.o: ../Src/rho\rho_kalman.h
+rho_mod_v1\main.o: ../Src/Rho\rho_types.h
+rho_mod_v1\main.o: ../Src/Rho\rho_kalman.h
 rho_mod_v1\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+rho_mod_v1\main.o: ../Src/Rho\state_machine_utility.h

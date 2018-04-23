@@ -5,7 +5,7 @@
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_it.h"
 
-#include "rho\rho_utility.h"
+#include "Rho\rho_utility.h"
 
 void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, DMA_HandleTypeDef *, UART_HandleTypeDef * );
 void master_test( void );

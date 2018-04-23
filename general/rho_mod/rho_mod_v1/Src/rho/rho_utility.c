@@ -80,7 +80,7 @@ void Find_Map_Max( density_map_t * d )
 	d->max = m;
 }
 
-void Filter_and_Select( rho_utility * utility, density_map_t * d, Prediction * r )
+void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t * r )
 {
 	utility->QF = 0;
 	int     l       = d->length,
@@ -265,7 +265,7 @@ void Update_Prediction( rho_utility * utility )
     utility->Cy = Cy;
 
     /* Update State */
-    BayesianSystem.update( &sys, &prediction_pair );
+    BayesianSystem.update( &utility->sys, &utility->prediction_pair );
 }
 
 const struct rho_functions RhoFunctions =
