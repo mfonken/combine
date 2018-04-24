@@ -18,6 +18,7 @@ void master_test( void );
 
 void pauseDMA( TIM_HandleTypeDef * );
 void resumeDMA( TIM_HandleTypeDef * );
+
 void init_memory( void );
 void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
 void zero_memory( void );
@@ -46,7 +47,7 @@ static uint8_t USB_TX(uint8_t* Buf)
 	uint16_t Len = 0;
 	uint8_t c = 0xff;
 	for( ; c != '\0'; c = Buf[Len]) Len++;
-	
+
   uint8_t result = USBD_OK;
 
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);

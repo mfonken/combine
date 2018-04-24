@@ -71,7 +71,7 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
   HAL_NVIC_DisableIRQ(HREF_EXTI_IRQn);
     /* Debug delay */
 	UART_Clear();
-	
+
 	print( startingString );
 	
 	init_memory();
@@ -134,13 +134,13 @@ void master_test( void )
 {
 	
 	print( testStartString );
-	
+
 	spoofDensityMaps();
 	
 	/*
 	print( "Printing Dx\r\n" );
 	drawDensityMap(DENSITY_X, CAPTURE_HEIGHT);
-	
+
 	print( "Printing Dy\r\n" );
 	drawDensityMap(DENSITY_Y, CAPTURE_WIDTH);
 	*/
@@ -205,7 +205,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 				}
 				frame_flag = 1;
 			}
-			else 
+			else
 			{
 				if( frame_flag )
 				{
@@ -346,10 +346,57 @@ inline void resumeDMA( TIM_HandleTypeDef * timer )
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
 
+/***************************************************************************************/
+/*                                Spoof Generation                                     */
+/***************************************************************************************/
+void spoofPixels( void )
+{
+	bool t = 0;
+	for(int y = 0; y < CAPTURE_BUFFER_HEIGHT; y++ )
+	{
+		for(int x = 0; x < CAPTURE_BUFFER_WIDTH; x+=2 )
+		{
+			int p = x + y * CAPTURE_BUFFER_WIDTH;
+			CAPTURE_BUFFER[p+t] 	= 0xcd;
+			CAPTURE_BUFFER[p+1-t] = 0xab;
+		}
+		t = !t;
+	}
+}
+
+void spoofDensityMaps( void )
+{
+	for(int x = 0; x < CAPTURE_WIDTH;  x++ )
+		DENSITY_Y[x] = 0x00;
+	DENSITY_Y[3] = 0x3a;
+	DENSITY_Y[4] = 0x30;
+	DENSITY_Y[15] = 0x3a;
+	DENSITY_Y[16] = 0x30;
+
+	for(int y = 0; y < CAPTURE_HEIGHT; y++ )
+		DENSITY_X[y] = 0x00;
+	DENSITY_X[1] = 0x30;
+	DENSITY_X[2] = 0x3a;
+	DENSITY_X[3] = 0x30;
+	DENSITY_X[10] = 0x33;
+	DENSITY_X[11] = 0x3a;
+	DENSITY_X[12] = 0x33;
+}
 
 /***************************************************************************************/
 /*                                    Printers                                         */
 /***************************************************************************************/
+void UART_Clear( void )
+{
+	uint8_t ascii_clear = 0x0c;
+	HAL_UART_Transmit( this_uart, &ascii_clear, 1, UART_TIMEOUT );
+}
+
+void print( uint8_t * Buf )
+{
+	HAL_UART_Transmit( this_uart, Buf, strlen((const char *)Buf), UART_TIMEOUT );
+}
+
 void printBuffers( uint32_t r, uint32_t s )
 {
     print( "Printing Thresh Buffer\r\n" );
