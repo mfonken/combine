@@ -34,9 +34,9 @@
 #else
 #define CAPTURE_BUFFER_SIZE (CAPTURE_BUFFER_WIDTH*CAPTURE_BUFFER_HEIGHT)
 #endif
-#define COVERAGE_NORMAL_MAX	0.01			
+#define COVERAGE_NORMAL_MAX	0.02			
 #define THRESH_BUFFER_SIZE 	((uint32_t)((CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1.))*COVERAGE_NORMAL_MAX)+2)
-#define DEFAULT_THRESH			0x20
+#define DEFAULT_THRESH			0xfc
 	
 #define MAX_PEAKS           3
 
@@ -61,9 +61,7 @@
 #define RHO_DEFAULT_LS      5
 #define RHO_DEFAULT_VU      0.001//0.001
 #define RHO_DEFAULT_BU      0.5//0.5
-#define RHO_DEFAULT_SU      0.1//0.7
-
-
+#define RHO_DEFAULT_SU      0.01//0.7
 
 static void cma( FLOAT new_val, FLOAT *avg, int num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
 static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, int * n )

@@ -1,24 +1,28 @@
 ;/* REGISTERS: */
 ;//  r0-r3 - Reserved
-;//#define th  r5  // Threshold
-#define tg  r6  // Green toggle
-#define rb  r7  // Write index of process buffer
-#define wr  r8  // Read index of process buffer
-#define rd  r9  // Read index of pclk buffer
-#define rx  r10 // Read col index
-#define ry  r11 // Read row index
-#define qs  r12 // Quadrant selection
+#define tg  r8  // Green toggle
+#define rb  r9  // Write index of process buffer
+#define wr  r10  // Read index of process buffer
+#define rd  r11  // Read index of pclk buffer
+#define th	r11	// Threshold (Shares with rd)
+
+#define rx  r6 // Read col index
+#define ry  r7 // Read row index
+#define qs  r8 // Quadrant selection
 
 ;/* System Constants */
 #define HALF_WORD_WIDTH     160
 #define Y_DEL_DOUBLE        0xaaaa
-#define PRINT_HEIGHT		10
+#define PRINT_HEIGHT		200
 
 ;#define STATIC_BUFFER
 #define BAYER_TOGGLE
 
     area    rho, code, readonly
 	preserve8
+	
+	extern WR
+	extern RB
 		
 	extern	CAPTURE_BUFFER	
 	extern	THRESH_BUFFER
@@ -74,23 +78,17 @@ frame_start	proc
 			stmdb  sp!, {lr}
 			bl	zero_memory
             ldmia  sp!, {lr}
-			mov tg, #1                  ;/* Reset operation variables */
 			ldr rb, =CAPTURE_BUFFER
 #ifdef BAYER_TOGGLE
+			mov tg, #0                  ;/* Reset operation variables */
 #ifdef STATIC_BUFFER
 			add rb, rb, #1
 #endif
 #endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
-            ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
-            ;ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
-            ;ldr th, [r0]
-
-; Set process flag
-			ldr r0, =proc_flag
-			mov	r1, #1
-			str r1, [r0]
-
+            ;ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
+            ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
+            ldr th, [r0]
 			bx  lr
 			endp
 
@@ -118,24 +116,30 @@ frame_end	proc
 			align
 row_int		proc
 			export row_int
-
-#ifdef STATIC_BUFFER
+				
+			ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
+            ldr th, [r0]
+			
+			; Store Y delimiter in thresh buffer
+            mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
+            strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
+			ldr r1, =WR
+			str	wr, [r1]
+#ifndef STATIC_BUFFER
+			ldr r0, =CAPTURE_BUFFER
+			mov r0, rb
+#else
 ; Increment end of capture buffer if static
 			ldr r1, =CAPTURE_BUFFER_END
 			ldr r0, [r1]
 			mov r2, #HALF_WORD_WIDTH
 			lsl	r2, #1
 			add r0, r0, r2
-			str r0, [r1]
-#else
-; Otherwise, buffer is refilling so reset read index to start
-			ldr r0, =CAPTURE_BUFFER
-			mov r0, rb
+			str r0, [r1]		
 #endif
-; Store Y delimiter in thresh buffer
-            mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
-            strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
+
 #ifdef BAYER_TOGGLE
+			eor tg, tg, #1    			;/* Otherwise toggle tg register */
 			tst	tg, #1					;/* if tg is odd */
 			bne	rg_row
 			add rb, rb, #1				;/* GB row */
@@ -145,8 +149,8 @@ rg_row		sub rb, rb, #1				;/* RG row */
 #else		
 rg_row		nop
 #endif
-#endif
 check_rmax  nop
+#endif
 #ifdef STATIC_BUFFER
 			ldr r0, =CAPTURE_BUFFER_MAX
             ldr r0, [r0]
@@ -158,9 +162,6 @@ check_rmax  nop
 			b	rho_proc
 			
 not_done	nop
-#ifdef BAYER_TOGGLE
-		    eor tg, tg, #1    			;/* Otherwise toggle tg register */
-#endif
 #endif
 			bx	lr
 			endp
@@ -169,16 +170,32 @@ not_done	nop
 pixel_proc	proc
 			export pixel_proc
 			ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
-			ldr	r2, [r1]
+			ldr	th, [r1]			
+			ldr r0, =RB
+			ldr	rb, [r0]
+			ldr r1, =WR
+			ldr	wr, [r1]
+			ldr r2, =THRESH_BUFFER_MAX
+			ldr	r2, [r2]
+			cmp wr, r2
+			blt	rb_check
+			bx 	lr
+rb_check	ldr r2, =CAPTURE_BUFFER_MAX
+			ldr	r2, [r2]
+			cmp rd, r2
+			blt	pxl_start
+			bx 	lr
 			
-pclk_start  ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
-			cmp r3, r2					;/* if( current_pixel > th ) */
+pxl_start  	ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
+			cmp r3, th					;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			
-			ldr r1, =CAPTURE_BUFFER_END
-			ldr r0, [r1]
-			cmp rb, r0
-            blt pclk_start
+			;cmp rb, r0
+			;blt pxl_start
+			
+			str rb, [r0]
+			str wr, [r1]
+			
 			bx	lr
 			endp
 				
@@ -188,7 +205,8 @@ rho_proc proc
 			export rho_proc
 			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r0]
-
+			
+			ldr rd, =THRESH_BUFFER
 			mov rx, #0					;/* int rx = 0, ry = 0; */
 			mov ry, #0
 			mov qs, #0
@@ -271,14 +289,14 @@ rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 
 			stmdb  sp!, {lr}
 			bl	frame_end
-			ldr r0, =THRESH_BUFFER_END
-			ldr r0, [r0]
-			ldr r1, =THRESH_BUFFER
-			sub r0, r0, r1
-			lsr r0, #1
-			sub r0, r0, #1
-			mov r1, #PRINT_HEIGHT
-			bl 	printBuffers
+			;ldr r0, =THRESH_BUFFER_END
+			;ldr r0, [r0]
+			;ldr r1, =THRESH_BUFFER
+			;sub r0, r0, r1
+			;lsr r0, #1
+			;sub r0, r0, #1
+			;mov r1, #PRINT_HEIGHT
+			;bl 	printBuffers
 			ldmia  sp!, {lr}
 			bx	lr
 			endp

@@ -21,13 +21,18 @@ void resumeDMA( TIM_HandleTypeDef * );
 void init_memory( void );
 void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
 void zero_memory( void );
+
+void spoofPixels( void );
+void spoofDensityMaps( void );
+	
 void printBuffers( uint32_t, uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );
 void printCapture( void );
 void printBuffer( index_t *, int );
 void drawDensityMap( density_t *, int );
-
+void UART_Clear( void );
+void print(uint8_t* Buf);
 static void printc(uint8_t* Buf)
 {
 	uint16_t Len = 0;

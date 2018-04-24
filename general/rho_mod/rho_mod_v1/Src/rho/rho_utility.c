@@ -12,11 +12,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-
-/* RHO PIXEL CHECK */
-#define RPC(X)      if(X&0xf8)
-#define RPCB(X,Y)   {RPC(X){Q##Y++;mapy[x]++;}}
-
 #define FOR(L)      for( int i = L; i > 0; --i)
 #define FORA(L,A)   for( int i = L-1; i >= 0; i--, A[i] )
 #define ZDIV(X,Y)   (!Y?2<<10:X/Y)
@@ -42,13 +37,11 @@ void Init(rho_utility * utility, UART_HandleTypeDef * u, int w, int h)
 	utility->width  = w;
 	utility->height = h;
 	
-	//utility->density_map_pair.x.map = (density_t*)malloc(sizeof(density_t)*h);
 	utility->density_map_pair.x.length = h;
 	utility->density_map_pair.x.max = 0;
 	utility->density_map_pair.x.variance = 0;
 	RhoKalman.init(&utility->density_map_pair.x.kalman, 0., RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
 	
-	//utility->density_map_pair.y.map = (density_t*)malloc(sizeof(density_t)*w);
 	utility->density_map_pair.y.length = w;
 	utility->density_map_pair.y.max = 0;
 	utility->density_map_pair.y.variance = 0;
@@ -69,10 +62,10 @@ void Init(rho_utility * utility, UART_HandleTypeDef * u, int w, int h)
 
 void Find_Map_Max( density_map_t * d )
 {
-	uint32_t m = 0, c, l = d->length;
+	uint32_t m = 0, i = 0, c, l = d->length;
 	/* Find max and update kalman */
 	//FORA( d->length, c = d->map ) if( c > m ) m = c;
-	for( uint32_t i = 0; i < l; i++ )
+	for( ; i < l; i++ )
 	{
 		c = d->map[i];
 		if( c > m ) m = c;
@@ -104,7 +97,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	//PRINT2( "Max: %d\r\n", d->max );
 	//PRINT2( "B:%f\r\n", d->kalman.value );
 	RhoKalman.update(&d->kalman, (double)d->max, 0.);
-	PRINT2( "Value:%f\r\n", d->kalman.value );
+	//PRINT2( "Value:%f\r\n", d->kalman.value );
 	d->variance = v;
 	t = d->kalman.value;
 					
@@ -114,27 +107,29 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	c = 1 + b;
 	v = RHO_VARIANCE_NORMAL * c;
 	
+	/*
 	PRINT2( "\tK:%f\r\n", d->kalman.K[0] );				
 	PRINT2( "\ta:%f\r\n", a );
 	PRINT2( "\tb:%f\r\n", b );
 	PRINT2( "\tc:%f\r\n", c );
 	PRINT3( "\t %f(v) < %f(t)?\r\n", v, t );
 	PRINT2( "Variance:%f\r\n", v );
+	*/
 	//v = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - d->kalman.K[0] ) );
 	if( v < t && v > 0) g = t - v;
 	else return;
-	PRINT2( "g:%f\r\n", g );
+	//PRINT2( "g:%f\r\n", g );
 	/* * * * * * * * * * * * * * */
 	
 	/* Find blob centers and sort out the top 2 */
 	//FORA( l, c1 = d->map )
 	for( uint32_t i = 0; i < l; i++, c1 = (double)d->map[i] )
 	{
-		PRINT3( "\t\t(%d)%f\r\n", i, c1 );
+		//PRINT3( "\t\t(%d)%f\r\n", i, c1 );
 		if(c1 > (t+1)) 
 		{
 			c1 = t - RHO_PUNISH_FACTOR*(c1 - t);
-			PRINT2( "\t\tcor>%f\r\n", c1 );
+			//PRINT2( "\t\tcor>%f\r\n", c1 );
 		}
 		if(c1 > g)
 		{
@@ -168,10 +163,12 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	}
 	utility->FT = utility->QF/(utility->width*utility->height*100);
 	if(!utility->FT) return;
+	/*
 	PRINT2( "QF: %f\r\n", utility->QF);
 	PRINT2( "Coverage: %f%%\r\n", utility->FT);
 	PRINT3( "\t0:%d | %d\r\n", loc[0], den[0] );				
 	PRINT3( "\t1:%d | %d\r\n", loc[1], den[1] );	
+	*/
 
 	if( !loc[0] && !loc[1] ) return;
 	
@@ -180,8 +177,10 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	r->secondary_new = loc[1];
 	
 	FLOAT v_ = ZDIV(1.0,v);
+	/*
 	PRINT2( "v: %f\r\n", v);
 	PRINT2( "v_: %f\r\n", v_);
+	*/
 	r->probabilities.primary   = ((FLOAT)max[0]) * v_;
 	r->probabilities.secondary = ((FLOAT)max[1]) * v_;
 	
@@ -190,20 +189,21 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 			r->probabilities.alternate = ((FLOAT)max[2]) * v_;
 	else
 			r->probabilities.alternate = comp;
-	
+	/*
 	PRINT2( "  Primary probability: %f\r\n", r->probabilities.primary);
 	PRINT2( "Secondary probability: %f\r\n", r->probabilities.secondary);
 	PRINT2( "Alternate probability: %f\r\n", r->probabilities.alternate);
+	*/
 }
 
 void Filter_and_Select_Pairs( rho_utility * utility )
 {
-	///Note: Dx max is already calculated in density map generation.
-	print( "Processing Dx\r\n");
+	///Note: Dx max should be already calculated in density map generation.
+	//print( "Processing Dx\r\n");
 	Find_Map_Max( &utility->density_map_pair.x );
 	Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
 
-	print( "Processing Dy\r\n");
+	//print( "Processing Dy\r\n");
 	Find_Map_Max( &utility->density_map_pair.y );
 	Filter_and_Select( utility, &utility->density_map_pair.y, &utility->prediction_pair.y );
 }

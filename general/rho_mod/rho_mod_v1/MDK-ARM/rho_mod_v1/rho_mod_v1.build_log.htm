@@ -27,12 +27,19 @@ Project File Date:  04/23/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'rho_mod_v1'
+compiling rho_utility.c...
 compiling master.c...
+..\Src\master.c(83): warning:  #111-D: statement is unreachable
+  	Camera.init(i2c);
+..\Src\master.c(163): warning:  #128-D: loop is not reachable
+  	while(1);
+..\Src\master.c: 2 warnings, 0 errors
+compiling main.c...
 linking...
 rho_mod_v1\rho_mod_v1.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
-Program Size: Code=16392 RO-data=512 RW-data=156 ZI-data=6724  
+Program Size: Code=19248 RO-data=548 RW-data=132 ZI-data=8620  
 Finished: 0 information, 1 warning and 0 error messages.
-"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 1 Warning(s).
+"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
