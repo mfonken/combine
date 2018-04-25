@@ -36,7 +36,7 @@
 #endif
 #define COVERAGE_NORMAL_MAX	0.02			
 #define THRESH_BUFFER_SIZE 	((uint32_t)((CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1.))*COVERAGE_NORMAL_MAX)+2)
-#define DEFAULT_THRESH			0xfc
+#define DEFAULT_THRESH			0x15//fc
 	
 #define MAX_PEAKS           3
 

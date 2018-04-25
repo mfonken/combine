@@ -3,7 +3,7 @@
 #define tg  r8  // Green toggle
 #define rb  r9  // Write index of process buffer
 #define wr  r10  // Read index of process buffer
-#define rd  r11  // Read index of pclk buffer
+#define rd  r12  // Read index of pclk buffer
 #define th	r11	// Threshold (Shares with rd)
 
 #define rx  r6 // Read col index
@@ -16,13 +16,13 @@
 #define PRINT_HEIGHT		200
 
 ;#define STATIC_BUFFER
-#define BAYER_TOGGLE
+;#define BAYER_TOGGLE
 
     area    rho, code, readonly
 	preserve8
 	
-	extern WR
-	extern RB
+	;extern WR
+	;extern RB
 		
 	extern	CAPTURE_BUFFER	
 	extern	THRESH_BUFFER
@@ -61,6 +61,7 @@ asm_test    proc
 			mov r10, #10
 			mov r11, #11
 			mov r12, #12
+			;vmov.f32 s24, #24
             bx  lr
             endp
 
@@ -106,10 +107,6 @@ frame_end	proc
 			add r2, r2, r1
 			ldr r0, =QUADRANT_TOTAL
 			str r2, [r0]
-; Reset process flag
-			ldr r0, =proc_flag
-			mov	r1, #0
-			str r1, [r0]
 			bx	lr
 			endp
 
@@ -123,11 +120,15 @@ row_int		proc
 			; Store Y delimiter in thresh buffer
             mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
             strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
-			ldr r1, =WR
-			str	wr, [r1]
+			;;ldr r1, =WR
+			;;str	wr, [r1]
 #ifndef STATIC_BUFFER
 			ldr r0, =CAPTURE_BUFFER
 			mov r0, rb
+; Reset process flag
+			ldr r0, =proc_flag
+			mov	r1, #0
+			str r1, [r0]
 #else
 ; Increment end of capture buffer if static
 			ldr r1, =CAPTURE_BUFFER_END
@@ -169,33 +170,47 @@ not_done	nop
 			align
 pixel_proc	proc
 			export pixel_proc
-			ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
-			ldr	th, [r1]			
-			ldr r0, =RB
-			ldr	rb, [r0]
-			ldr r1, =WR
-			ldr	wr, [r1]
-			ldr r2, =THRESH_BUFFER_MAX
-			ldr	r2, [r2]
-			cmp wr, r2
-			blt	rb_check
-			bx 	lr
+
+			;ldr r1, =THRESH_VALUE       	;/* th = THRESH_ADDR; */
+			;ldr	th, [r1]
+			;ldr r0, =RB
+			;ldr	rb, [r0]
+			;ldr r1, =WR
+			;ldr	wr, [r1]
+			;ldr r2, =THRESH_BUFFER_MAX
+			;ldr	r2, [r2]
+			;cmp wr, r2
+			;blt	rb_check
+			;bx 	lr
 rb_check	ldr r2, =CAPTURE_BUFFER_MAX
 			ldr	r2, [r2]
-			cmp rd, r2
-			blt	pxl_start
-			bx 	lr
+			;cmp rd, r2
+			;blt	pxl_start
+			;bx 	lr
+; Set process flag, will be reset by row_int
+			ldr r0, =proc_flag
+			mov	r1, #1
+			str r1, [r0]
 			
-pxl_start  	ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
+			
+pxl_start  	;dmb
+			ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
 			cmp r3, th					;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			
-			;cmp rb, r0
-			;blt pxl_start
+			cmp rb, r2
+			blt pxl_start
 			
-			str rb, [r0]
-			str wr, [r1]
+			mov	r1, #0
+row_wait	dmb
+			ldr r0, =proc_flag
+			ldr r0, [r0]
+			cmp r1, r0
+			bne row_wait
 			
+			;str rb, [r0]
+			;str wr, [r1]
+			;nop
 			bx	lr
 			endp
 				
@@ -203,6 +218,7 @@ pxl_start  	ldrb r3, [rb], #2       		;/* current_pixel = next in buffer */
 rho_proc proc
 			import printBuffers
 			export rho_proc
+			stmdb  sp!, {r0-r12,lr}
 			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r0]
 			
@@ -213,7 +229,7 @@ rho_proc proc
 			
 read_loop	ldrh rx, [rd], #2         	;/* rx = *(rd++); */
 			mov r0, #Y_DEL_DOUBLE
-			cmp rx, r0       ;/* if( rx == Y_DEL ) */
+			cmp rx, r0       			;/* if( rx == Y_DEL ) */
 			bne no_del
 
 ; Process Row
@@ -289,6 +305,7 @@ rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 
 			stmdb  sp!, {lr}
 			bl	frame_end
+			ldmia  sp!, {lr}
 			;ldr r0, =THRESH_BUFFER_END
 			;ldr r0, [r0]
 			;ldr r1, =THRESH_BUFFER
@@ -297,7 +314,7 @@ rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 			;sub r0, r0, #1
 			;mov r1, #PRINT_HEIGHT
 			;bl 	printBuffers
-			ldmia  sp!, {lr}
+			ldmia  sp!, {r0-r12,lr}
 			bx	lr
 			endp
     end
