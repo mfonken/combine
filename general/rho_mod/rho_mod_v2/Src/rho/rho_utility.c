@@ -73,7 +73,7 @@ void Find_Map_Max( density_map_t * d )
 {
 	uint32_t m = 0, c, l = d->length;
 	/* Find max and update kalman */
-	uint32_t i = l
+	uint32_t i = 0;
 	for( ; i < l; i++ )
 	{
 		c = d->map[i];

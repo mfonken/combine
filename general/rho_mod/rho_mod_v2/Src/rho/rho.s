@@ -79,9 +79,6 @@ frame_start	proc
 			ldr rb, =CAPTURE_BUFFER
 #ifdef BAYER_TOGGLE
 			mov tg, #0                  ;/* Reset operation variables */
-#ifdef STATIC_BUFFER
-			add rb, rb, #1
-#endif
 #endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
             ;ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
@@ -112,62 +109,29 @@ row_int		proc
 			export row_int
 
 			ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
-      ldr th, [r0]
+			ldr th, [r0]
 
 			; Store Y delimiter in thresh buffer
-      mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
-      strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
-			;;ldr r1, =WR
-			;;str	wr, [r1]
-#ifndef STATIC_BUFFER
+			mov  r0, #Y_DEL_DOUBLE      ;/* Load double Y_DEL to cover both RG & GB rows */
+			strh r0, [wr], #2           ;/* (*(wr) = Y_DEL)++; */
 			ldr r0, =CAPTURE_BUFFER
 			mov r0, rb
-; Reset process flag
-#else
-; Increment end of capture buffer if static
-			ldr r1, =CAPTURE_BUFFER_END
-			ldr r0, [r1]
-			mov r2, #HALF_WORD_WIDTH
-			lsl	r2, #1
-			add r0, r0, r2
-			str r0, [r1]
-#endif
 
 #ifdef BAYER_TOGGLE
 			eor tg, tg, #1    			;/* Otherwise toggle tg register */
 			tst	tg, #1					;/* if tg is odd */
-			bne	rg_row
+			bne	row_ret
 			add rb, rb, #1				;/* GB row */
-            b   check_rmax
-#ifdef STATIC_BUFFER
-rg_row		sub rb, rb, #1				;/* RG row */
-#else
-rg_row		nop
 #endif
-check_rmax  nop
-#endif
-#ifdef STATIC_BUFFER
-			ldr r0, =CAPTURE_BUFFER_MAX
-            ldr r0, [r0]
-            cmp rb, r0                  ;/* If all pixels are processed go to density processor */
-            blt not_done
-
-			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
-			str wr, [r0]
-			b	rho_proc
-
-not_done	nop
-#endif
-			bx	lr
+row_ret		bx	lr
 			endp
 
 			align
 pixel_proc	proc
 			export pixel_proc
 
-pxl_start  	;dmb
-			ldrb r3, [rb], #2       	;/* current_pixel = next in buffer */
-			cmp r3, th				       	;/* if( current_pixel > th ) */
+pxl_start  	ldrb r3, [rb], #1       	;/* current_pixel = next in buffer */
+			cmp r3, th				    ;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			bx	lr
 			endp
@@ -225,6 +189,9 @@ no_del  	ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
             mov	r1, #0x0000ffff
             and r0, r0, r1              ; Keep bottom half in r0
 			cmp	rx, r0
+			
+			b	rx_corr
+			
 			blt	rho_lcheck				; Check for valid value
             sub rx, rx, r0              ; Remove address offset from rx
 			sub rx, rx, #1
@@ -264,14 +231,6 @@ rho_lcheck	ldr r0, =THRESH_BUFFER_END  ;/* if( rd < *C_FRAME_END ) */
 			stmdb  sp!, {lr}
 			bl	frame_end
 			ldmia  sp!, {lr}
-			;ldr r0, =THRESH_BUFFER_END
-			;ldr r0, [r0]
-			;ldr r1, =THRESH_BUFFER
-			;sub r0, r0, r1
-			;lsr r0, #1
-			;sub r0, r0, #1
-			;mov r1, #PRINT_HEIGHT
-			;bl 	printBuffers
 			ldmia  sp!, {r0-r12,lr}
 			bx	lr
 			endp

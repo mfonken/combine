@@ -12,7 +12,7 @@ extern void rho_init(void);
 extern void frame_start(void);
 extern void frame_end(void);
 extern void row_int(void);
-extern void pixel_proc(void);
+extern inline void pixel_proc(void);
 extern void rho_proc(void);
 
 extern void asm_test(void);
@@ -50,7 +50,7 @@ address_t
 
 uint32_t CAMERA_PORT, WR, RB;
 uint8_t proc_flag = 0;
-volatile uint16_t vcounter = 0, hcounter = 0, fcounter = 0;
+volatile uint16_t vcounter = 0, hcounter = 0, fcounter = 0, tcounter = 0;
 #define HEX_LEN 20
 uint8_t hex[HEX_LEN];
 uint16_t x, y;
@@ -63,6 +63,7 @@ TIM_HandleTypeDef * this_timer;
 
 //static double now( void ) { return (double)HAL_GetTick()/1000; }
 static void tog( void ) { HAL_GPIO_TogglePin( CAM__CS_GPIO_Port, CAM__CS_Pin ); }
+static void set( GPIO_PinState s ) { HAL_GPIO_WritePin( CAM__CS_GPIO_Port, CAM__CS_Pin, s ); }
 inline void irqEnable( void ) { irq = 1; }
 inline void irqDisable( void ) { irq = 0; }
 
@@ -70,51 +71,40 @@ inline void irqDisable( void ) { irq = 0; }
 #define rb  r9  // Write index of capture buffer
 #define wr  r10 // Read index of threshold buffer
 #define th	r11	// Threshold register
-static void frameProcessor( void )
+#define tp	r0
+
+uint32_t rb, th, wr, tp;
+
+void frameProcessor( void )
 {
 	hcounter = 0;
 	vcounter = 0;
 	while(!frame_flag);
 	zero_memory();
 	/* * * * * Register Protection Start * * * * */
-	volatile asm( /* Frame Process */
-		"ldr wr, =THRESH_BUFFER      ; Reset Twrite index register\r\n\t"
-		"ldr r0, =THRESH_VALUE       ; Reset threshold register		\r\n\t"
-		"mov tg, #1                  ; Reset row parity toggle 	  \r\n\t"
-		"ldr th, [r0]																										"
-	);
+	frame_start();
 	while(frame_flag)
 	{
-		active_flag = 1;
-		volatile asm(	/* Row Process */
-			"mov  r0, #Y_DEL_DOUBLE     ; Load double y-delimiter 	\r\n\t"
-      "strh r0, [wr], #2          ; Store in thresh buffer 		\r\n\t"
-			"ldr 	rb, =CAPTURE_BUFFER		; Reset read index register	\r\n\t"
-			"tst	tg, #1								; Check if tg is odd				\r\n\t"
-			"bne	rg_row								; If not skip offset				\r\n\t"
-			"add 	rb, rb, #1						; Otherwise add offset			\r\n\t"
-			"rg_row											; Offset skip	address				\r\n\t"
-			"eor 	tg, tg, #1						; Toggle row parity								"
-		);
+		while(!row_flag);
+		hcounter = 0;
+
 		row_flag = 0;
-		while( !row_flag )
+		row_int();
+		
+		while( hcounter++ < CAPTURE_WIDTH && !row_flag )
 		{
-			volatile asm( /* Pixel Process */
-				"ldrb 	r3, [rb], #2      ; Get next pixel (byte) 		\r\n\t"
-				"cmp 		r3, th				    ; Compare against threshold \r\n\t"
-				"strgeh rb, [wr], #2   		; Store index if ≥ (half-word) 		"
-			);
-			hcounter++;
+			if( CAPTURE_BUFFER[hcounter] > THRESH_VALUE )
+				THRESH_BUFFER[tcounter++] = hcounter;
 		}
 		vcounter++;
 	}
-	active_flag = 0;
 	rho_proc();
 	/* * * * *  Register Protection End  * * * * */
 
-	//Rho.density_map_pair.x.max = DENSITY_X_MAX;
-	//RhoFunctions.Filter_and_Select_Pairs( &Rho );
-	//RhoFunctions.Update_Prediction( &Rho );
+	Rho.density_map_pair.x.max = DENSITY_X_MAX;
+	RhoFunctions.Filter_and_Select_Pairs( &Rho );
+	RhoFunctions.Update_Prediction( &Rho );
+	//tog();
 }
 
 /***************************************************************************************/
@@ -143,41 +133,31 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
 	Camera.init(i2c);
 	irqEnable();
 	fcounter = 0;
-	while( fcounter < 100 )
+	while( fcounter < 10 )
 	{
 		frameProcessor();
 		fcounter++;
+		sprintf( (char *)hex, "\tF: %d | V: %d | R: %d\r\n", fcounter, vcounter, hcounter );
+		print( hex );
+		vcounter = 0;
+		tcounter = 0;
+		
+		irqDisable();
+		tog();
+		HAL_UART_Transmit( this_uart, (uint8_t *)DENSITY_X, sizeof(density_t)*CAPTURE_BUFFER_HEIGHT, UART_TIMEOUT );
+		tog();
+		HAL_UART_Transmit( this_uart, (uint8_t *)DENSITY_Y, sizeof(density_t)*CAPTURE_BUFFER_WIDTH,  UART_TIMEOUT );
+		tog();
+		irqEnable();
+		//printPredictionPair( &Rho.prediction_pair );
 	}
 	irqDisable();
 	Camera.disable();
 	pauseDMA(timer);
 
-	sprintf( (char *)hex, "\tvcounter after: \t%d\r\n", Rho.density_map_pair.x.max );
-	print( hex );
-	/*
-	spoofDensityMaps();
-	double before = now();
-	rho_proc();
-	Rho.density_map_pair.x.max = DENSITY_X_MAX;
-	RhoFunctions.Filter_and_Select_Pairs( &Rho );
-	RhoFunctions.Update_Prediction( &Rho );
-	double after = now();
-	sprintf( (char *)hex, "\tTime elapsed: %f\r\n", ((after-before)*1) );
-	print( hex );
-	*/
-	//sprintf( (char *)hex, "\trb: 0x%8x | wr: 0x%8x\r\n", RB, WR );
-	//print( hex );
-	//HAL_Delay(1);
+	printAddresses();
 
-
-	//print( "DMA Paused\r\n" );
-	//sprintf( (char *)hex, "\tV: %d | H: %d\r\n", vcounter, hcounter );
-	//print( hex );
-	//sprintf((char *)hex, "\tTime elapsed: %f\r\n", after-before);
-	//print( hex );
-	//printAddresses();
-
-	master_test();
+	//master_test();
   while(1);
 }
 
@@ -188,12 +168,13 @@ void master_test( void )
 
 	//spoofDensityMaps();
 
+	/*
 	print( "Printing Dx\r\n" );
 	drawDensityMap(DENSITY_X, CAPTURE_HEIGHT);
 
 	print( "Printing Dy\r\n" );
 	drawDensityMap(DENSITY_Y, CAPTURE_WIDTH);
-
+	*/
 
 	for( volatile int i = 0; i < 100; i++)
 	{
@@ -222,10 +203,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	switch(GPIO_Pin)
 	{
 		case VSYNC_Pin:
-			frame_flag = !(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
+			if(!(VSYNC_GPIO_Port->IDR & VSYNC_Pin))	
+				frame_flag = 1;
+			else 
+				frame_flag = 0;
 			return;
 		case HREF_Pin:
-			row_flag = (HREF_GPIO_Port->IDR & HREF_Pin);
+			if(HREF_GPIO_Port->IDR & HREF_Pin) 
+				row_flag = 1;
 			return;
 		default:
 			return;
@@ -281,12 +266,18 @@ void spoofDensityMaps( void )
 /***************************************************************************************/
 void zero_memory( void )
 {
-    memset(CAPTURE_BUFFER,	0, sizeof(capture_t)    * CAPTURE_BUFFER_SIZE );
-    memset(THRESH_BUFFER,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
-    memset(DENSITY_X,       0, sizeof(density_t)  	* CAPTURE_HEIGHT      );
-    memset(DENSITY_Y,       0, sizeof(density_t) 		* CAPTURE_WIDTH      	);
-    memset(QUADRANT_BUFFER,	0, sizeof(density_t) 		* 4                   );
-    QUADRANT_PREVIOUS = 0;
+	//memset(CAPTURE_BUFFER,	0, sizeof(capture_t)    * CAPTURE_BUFFER_SIZE );
+	memset(THRESH_BUFFER,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
+	memset(DENSITY_X,       0, sizeof(density_t)  	* CAPTURE_HEIGHT      );
+	memset(DENSITY_Y,       0, sizeof(density_t) 		* CAPTURE_WIDTH      	);
+	memset(QUADRANT_BUFFER,	0, sizeof(density_t) 		* 4                   );
+	QUADRANT_PREVIOUS = 0;
+	/*
+	frame_flag = 0;
+	row_flag = 0;
+	active_flag = 0;
+	process_flag = 0;
+	*/
 }
 
 void init_memory( void )
@@ -442,4 +433,15 @@ void drawDensityMap( density_t * a, int l )
         for( ; curr > 0; curr--) print( " " );
         print( "|\r\n" );
     }
+}
+
+void printPredictionPair( prediction_pair_t * pr )
+{
+	int xp = (int)pr->x.primary.value;
+	int yp = (int)pr->y.primary.value;
+	int xs = (int)pr->x.secondary.value;
+	int ys = (int)pr->y.secondary.value;
+	print("Printing predictions ");
+	sprintf((char *)hex, "\t\t\tP(%d, %d) | S(%d, %d)\r\n", xp, yp, xs, ys);
+	print( hex );
 }
