@@ -23,6 +23,7 @@ using namespace std;
 
 #define PAUSE_ENVIRONMENT_KEY   ' '
 #define PERFORMANCE_TEST_KEY    'p'
+#define REQUEST_IMU_OFFSET_KEY  'c'
 
 int main( int argc, const char * argv[] )
 {
@@ -37,10 +38,11 @@ int main( int argc, const char * argv[] )
     
     Environment env(&utility, 15);
     env.addTest(&tau, 60);
-    env.addTest(&combine, &comm, 60);
+    env.addTest(&combine, &comm, 10);
     
     env.start();
-    usleep(500000);
+    usleep(50000);
+    combine.request();
     env.pause();
     
     pthread_mutex_lock(&utility.outframe_mutex);
@@ -79,6 +81,10 @@ int main( int argc, const char * argv[] )
                 usleep(10000000);
                 env.pause();
                 printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
+                break;
+            case REQUEST_IMU_OFFSET_KEY:
+                printf("Sending imu offset request\n");
+                combine.request();
                 break;
             default:
                 if(utility.loop(c))

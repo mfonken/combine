@@ -19,6 +19,10 @@ extern "C" {
 #include "qmath.h"
 #include "sercom.h"
     
+#include <sys/time.h>
+    
+
+    
 #define DEFAULT_INTERFACE SERCOM
     
 /* Generic messages enum */
@@ -69,6 +73,7 @@ extern "C" {
         ACTIVATING,
         RUNNING,
         UPDATING,
+        REQUEST,
         NUM_ACTIONS
     } state_action_t;
     
@@ -123,10 +128,11 @@ extern "C" {
     };
     extern const imu IMU;
 
-    int Read_SERCOM_IMU_Packet( imu_t *, char * );
+    int Read_SERCOM_IMU_Packet( imu_t *, char *, long timeout );
     
-    void IMU_SERCOM_Init(imu_t * imu);
-    void IMU_Update(imu_t * imu);
+    void IMU_SERCOM_Init(imu_t *);
+    void IMU_Update(imu_t *);
+    void IMU_Request( imu_t *, char);
     
 #ifdef __cplusplus
 }

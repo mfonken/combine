@@ -77,8 +77,6 @@
 #define FNL_RESIZE              500
 
 /* RHO SETUP */
-#define DEFAULT_GAUSS_LEN       15
-#define DEFAULT_SIGMA           3.0 //GAUSSIAN SIGMA
 #define MAX_PEAKS_RHO           10
 #define PEAK_LIST_SCAN_STEP     5
 

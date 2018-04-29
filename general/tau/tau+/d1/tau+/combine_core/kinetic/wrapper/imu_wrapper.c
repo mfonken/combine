@@ -55,11 +55,19 @@ const imu IMU =
 static int correctOrientationPacket( double tokens[7], double values[6] )
 {
     int n = tokens[1];
+    
     if( n >= 3 )
     {
-        values[0] =       tokens[2]   * DEG_TO_RAD;
-        values[1] =      -tokens[3]   * DEG_TO_RAD;
-        values[2] = ( 360-tokens[4] ) * DEG_TO_RAD;
+        for( int i = 2; i <= 4; i++ )
+        {
+            if( !tokens[i] ) return 0;
+        }
+        values[0] = -tokens[2] * DEG_TO_RAD;
+        values[1] =  tokens[4] * DEG_TO_RAD;
+        values[2] =  tokens[3] * DEG_TO_RAD;
+//        values[0] =       tokens[2]   * DEG_TO_RAD;
+//        values[1] =      -tokens[3]   * DEG_TO_RAD;
+//        values[2] = 360 - ( tokens[4] * DEG_TO_RAD );
     }
     if( n >= 6 )
     {
@@ -77,8 +85,9 @@ static int correctOffsetPacket( double tokens[7], double values[6] )
 
 void IMU_Update(imu_t * imu)
 {
+    IMU_Request( imu, 'o' );
     char line[BUFFER_LENGTH];
-    int len = Read_SERCOM_IMU_Packet( imu, line );
+    int len = Read_SERCOM_IMU_Packet( imu, line, 100 );
     double tokens[MAX_TOKENS] = {0}, v[6] = {0};
     packet_id_t packet_id = (packet_id_t)tokenifyPacket( line, len, 6, tokens, (char)NULL_PACKET_ID );
 
@@ -135,7 +144,9 @@ void IMU_Update(imu_t * imu)
                 imu->accel_raw[1]   = v[4];
                 imu->accel_raw[2]   = v[5];
             }
-            //printf("Receiving orientation packet: %f %f %f\n", v[0], v[1], v[2]);
+#ifdef IMU_DEBUG
+            printf("Receiving orientation packet: %f %f %f\n", v[0], v[1], v[2]);
+#endif
             break;
         case OFFSET_ID:
             imu->state.action = UPDATING;
@@ -152,15 +163,35 @@ void IMU_Update(imu_t * imu)
     }
 }
 
-int Read_SERCOM_IMU_Packet( imu_t * imu, char * out )
+static inline long now( void )
 {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (long)(tv.tv_usec + tv.tv_sec*1000000);
+}
+
+static bool isTimedout( long stamp, long timeout )
+{
+    return ( ( now() - stamp ) > timeout );
+}
+
+int Read_SERCOM_IMU_Packet( imu_t * imu, char * out, long timeout )
+{
+    
+    long stamp = now();
+
     char buffer[BUFFER_LENGTH];
     int bytes_read = -1, ptr = 0, isnl = 0, started = 0;
     while( !isnl && ptr < BUFFER_LENGTH-1 )
     {
+        if( isTimedout(stamp, timeout) ) return 0;
         /* Wait for new bytes */
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+        while(bytes_read <= 0 )
+        {
+            bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+            if( isTimedout(stamp, timeout) ) return 0;
+        }
         Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
         
         /* Process new bytes */
@@ -195,4 +226,9 @@ int Read_SERCOM_IMU_Packet( imu_t * imu, char * out )
 //    printf("\nR(%d): %s\n", ptr, out);
     
     return ptr;
+}
+
+void IMU_Request( imu_t * imu, char c )
+{
+    Write_SERCOM_Byte(imu->channel.descriptor, c);
 }
