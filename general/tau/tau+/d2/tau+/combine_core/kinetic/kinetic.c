@@ -134,36 +134,33 @@ static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 
 static void quaternions( kinetic_t * k )
 {
-//    k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
-//    k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
-//    k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
-    
     /* Get proper device angles from kinetic */
     k->e.x = -k->values.rotation[0];
     k->e.y = -k->values.rotation[1];
     k->e.z = -k->values.rotation[2];
     Quaternion.fromEuler( &k->e, &k->qd );
     
-    /* Rotate beacon A around origin by roll(e.y) and calculate nu and upsilon as horizontal and vertical angle offset */
-    KPoint.rot( &k->A, -k->e.y );
+    /* Rotate beacon A around origin by angle of d' vector (omega) */
+    KPoint.rot( &k->A, -k->omega );
+    
+    /* Calculate nu and upsilon as horizontal and vertical angle offsets */
     k->upsilon = atan2( k->A.x, k->f_l );
     k->nu      = atan2( k->A.y, k->f_l );
     
     /* Generate Camera-Beacon quaternion */
     ang3_t a = {k->nu, k->omega, k->upsilon};
-    Quaternion.fromEuler( &a, &k->qd_ );
-    quaternion_t qt1;
+    Quaternion.fromEuler( &a, &k->qc_ );
 
-    Quaternion.combine( &k->qr, &k->qd, &qt1 );
-    Quaternion.combine( &qt1, &k->qc, &k->qc_ );
-    Quaternion.combine( &k->qc_, &k->qd_, &k->qa );
-//    Quaternion.combine( &k->qd_, &k->qc, &qtemp );
-//    Quaternion.combine( &qtemp, &k->qr, &k->qa );
+    /* Combine quaternions */
+    Quaternion.combine( &k->qr, &k->qd, &k->qr_ );
+    Quaternion.combine( &k->qr_, &k->qc, &k->qd_ );
+    Quaternion.combine( &k->qd_, &k->qc_, &k->qa );
     
+    /* Debug quaternions into angles */
     ang3_t ad, ar, ad_, aa;
     Quaternion.toEuler( &k->qr, &ar );
     Quaternion.toEuler( &k->qd, &ad );
-    Quaternion.toEuler( &k->qd_, &ad_ );
+    Quaternion.toEuler( &k->qc_, &ad_ );
     Quaternion.toEuler( &k->qa, &aa );
     printf("B>R(%4d, %4d, %4d) | R>D(%4d, %4d, %4d) | D>C'(%4d, %4d, %4d) | B>C'(%4d, %4d, %4d)\n", (int)(ar.x*RAD_TO_DEG), (int)(ar.y*RAD_TO_DEG), (int)(ar.z*RAD_TO_DEG), (int)(ad.x*RAD_TO_DEG), (int)(ad.y*RAD_TO_DEG), (int)(ad.z*RAD_TO_DEG), (int)(ad_.x*RAD_TO_DEG), (int)(ad_.y*RAD_TO_DEG), (int)(ad_.z*RAD_TO_DEG), (int)(aa.x*RAD_TO_DEG), (int)(aa.y*RAD_TO_DEG), (int)(aa.z*RAD_TO_DEG));
     

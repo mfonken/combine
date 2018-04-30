@@ -121,16 +121,16 @@ extern "C" {
         ang3_t  e;
         vec3_t  r,
                 n;
+        
+        /* Beacon(T-True) > Reference > Device > Camera to Beacon(V-visualized) */
         quaternion_t
-                qd,
-                qd_,
-                qs,
-                qs_,
-                qc,
-                qc_,
-                qr,
-                qg,
-                qa;
+                qr,     /* Beacon(T) > Reference */
+                qd,     /* Reference > Device    */
+                qr_,    /* Beacon(T) > Device    */
+                qc,     /* Device    > Camera    */
+                qd_,    /* Beacon(T) > Camera    */
+                qc_,    /* Camera    > Beacon(V) */
+                qa;     /* Beacon(T) > Beacon(V) */
         ang3_t  offset;
     } kinetic_t;
     
