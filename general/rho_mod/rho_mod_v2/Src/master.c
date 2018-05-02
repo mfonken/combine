@@ -7,6 +7,7 @@ uint8_t startingString[] = "******************\r\nStarting.\r\n",
 				alertString[] = "Alert!\r\n",
 				interruptString[] = "Interrupt #";
 
+uint16_t BUFFER_TX_DEL = (0xabcd);
 
 extern void rho_init(void);
 extern void frame_start(void);
@@ -48,7 +49,7 @@ address_t
     RHO_MEM_END;
 /******************************************************************/
 
-uint32_t CAMERA_PORT, WR, RB;
+uint32_t CAMERA_PORT, UART_TX_ADDRESS, WR, RB;
 uint8_t proc_flag = 0;
 volatile uint16_t vcounter = 0, hcounter = 0, fcounter = 0, tcounter = 0;
 #define HEX_LEN 20
@@ -74,6 +75,26 @@ inline void irqDisable( void ) { irq = 0; }
 #define tp	r0
 
 uint32_t rb, th, wr, tp;
+
+void spoofFrameProcessor( void )
+{
+	zero_memory();
+	frame_start();
+	spoofPixels();
+	
+	uint16_t x = 0, y = 0, t = 0;
+	for( ; y < CAPTURE_HEIGHT; y++ )
+	{
+		THRESH_BUFFER[t++] = 0xaaaa;
+		for( x = 0; x < CAPTURE_WIDTH; x++ )
+		{
+			if( CAPTURE_BUFFER[x] > THRESH_VALUE )
+				THRESH_BUFFER[t++] = x;
+		}
+	}
+	
+	rho_proc();
+}
 
 void frameProcessor( void )
 {
@@ -101,16 +122,20 @@ void frameProcessor( void )
 	rho_proc();
 	/* * * * *  Register Protection End  * * * * */
 
+	/*
 	Rho.density_map_pair.x.max = DENSITY_X_MAX;
 	RhoFunctions.Filter_and_Select_Pairs( &Rho );
 	RhoFunctions.Update_Prediction( &Rho );
+	*/
 	//tog();
 }
+
+
 
 /***************************************************************************************/
 /*                                      Core                                           */
 /***************************************************************************************/
-void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma, UART_HandleTypeDef * uart )
+void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_HandleTypeDef * uart )
 {
 	this_uart = uart;
 	this_timer = timer;
@@ -122,40 +147,36 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
 	print( startingString );
 
 	init_memory();
-
+	printAddresses();
 	/*
 	RhoFunctions.Init( &Rho, uart, CAPTURE_WIDTH, CAPTURE_HEIGHT );
 	master_test();
 	while(1);
 	*/
-
-	initTimerDMA( timer, dma );
-	Camera.init(i2c);
+	//master_test();
+	
+	//initTimerDMA( timer );
+	//Camera.init(i2c);
 	irqEnable();
 	fcounter = 0;
-	while( fcounter < 10 )
+	while( fcounter < 1 )
 	{
-		frameProcessor();
+		//frameProcessor();
+		spoofFrameProcessor();
 		fcounter++;
 		sprintf( (char *)hex, "\tF: %d | V: %d | R: %d\r\n", fcounter, vcounter, hcounter );
 		print( hex );
 		vcounter = 0;
 		tcounter = 0;
-		
-		irqDisable();
-		tog();
-		HAL_UART_Transmit( this_uart, (uint8_t *)DENSITY_X, sizeof(density_t)*CAPTURE_BUFFER_HEIGHT, UART_TIMEOUT );
-		tog();
-		HAL_UART_Transmit( this_uart, (uint8_t *)DENSITY_Y, sizeof(density_t)*CAPTURE_BUFFER_WIDTH,  UART_TIMEOUT );
-		tog();
-		irqEnable();
+	
+		dprintBuffers();
 		//printPredictionPair( &Rho.prediction_pair );
 	}
 	irqDisable();
 	Camera.disable();
 	pauseDMA(timer);
 
-	printAddresses();
+	//printAddresses();
 
 	//master_test();
   while(1);
@@ -163,19 +184,14 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, DMA_Handle
 
 void master_test( void )
 {
+	HAL_Delay(10);
+	//print( testStartString );
 
-	print( testStartString );
+	spoofDensityMaps();
 
-	//spoofDensityMaps();
-
-	/*
-	print( "Printing Dx\r\n" );
-	drawDensityMap(DENSITY_X, CAPTURE_HEIGHT);
-
-	print( "Printing Dy\r\n" );
-	drawDensityMap(DENSITY_Y, CAPTURE_WIDTH);
-	*/
-
+	dprintBuffers();
+	
+	while(1);
 	for( volatile int i = 0; i < 100; i++)
 	{
 		//HAL_Delay(10);
@@ -236,11 +252,11 @@ void spoofPixels( void )
 
 void spoofDensityMaps( void )
 {
-	density_t S = 100;
+	density_t S = 100, B = 10;
 	int a,b;
 	a = CAPTURE_WIDTH / 4; b = 3 * a;
 	for(int x = 0; x < CAPTURE_WIDTH;  x++ )
-		DENSITY_Y[x] = 0;
+		DENSITY_Y[x] = B;
 	DENSITY_Y[a] 		= S;
 	DENSITY_Y[a+1] 	= S;
 	DENSITY_Y[b] 		= S;
@@ -249,7 +265,7 @@ void spoofDensityMaps( void )
 
 	a = CAPTURE_HEIGHT / 4; b = 3 * a;
 	for(int y = 0; y < CAPTURE_HEIGHT; y++ )
-		DENSITY_X[y] = 0;
+		DENSITY_X[y] = B;
 	DENSITY_X[a] 		= S;
 	DENSITY_X[a+1] 	= S;
 	DENSITY_X[b] 		= S;
@@ -287,7 +303,8 @@ void init_memory( void )
 		RB = (address_t)CAPTURE_BUFFER;
 		WR = (address_t)THRESH_BUFFER;
 
-    CAMERA_PORT = (address_t)&(GPIOA->IDR);
+    CAMERA_PORT 		= (address_t)&(GPIOA->IDR);
+		UART_TX_ADDRESS = (address_t)&(USART1->TDR);
 #ifdef DYNAMIC_BUFFER
 	CAPTURE_BUFFER_END = (address_t)CAPTURE_BUFFER+CAPTURE_WIDTH;
 #else
@@ -319,7 +336,7 @@ void init_memory( void )
 
 //static void TransferComplete(DMA_HandleTypeDef *DmaHandle) { tog(); }
 
-void initTimerDMA( TIM_HandleTypeDef * timer, DMA_HandleTypeDef * dma )
+void initTimerDMA( TIM_HandleTypeDef * timer )
 {
     //print("Starting DMA from ");
     //sprintf((char *)hex, "0x%8x > 0x%8x\r\n", (uint32_t)CAMERA_PORT, (uint32_t)CAPTURE_BUFFER);
@@ -340,9 +357,16 @@ inline void resumeDMA( TIM_HandleTypeDef * timer )
     TIM_CCxChannelCmd(timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
 
+
+
 /***************************************************************************************/
 /*                                    Printers                                         */
 /***************************************************************************************/
+void dprint( uint8_t * scrAddr, uint16_t len )
+{
+	if(HAL_UART_Transmit_DMA( this_uart, scrAddr, len ) != HAL_OK) Error_Handler();
+}
+
 void UART_Clear( void )
 {
 	uint8_t ascii_clear = 0x0c;
@@ -352,6 +376,18 @@ void UART_Clear( void )
 void print( uint8_t * Buf )
 {
 	HAL_UART_Transmit( this_uart, Buf, strlen((const char *)Buf), UART_TIMEOUT );
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	uint8_t temp_buff[2] = { 0xef, 0x12 };
+	HAL_UART_Transmit( this_uart, temp_buff, 2, UART_TIMEOUT );
+}
+
+void dprintBuffers( void )
+{
+	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_DEL, 2, UART_TIMEOUT );
+	dprint( (uint8_t *)DENSITY_Y, sizeof(density_t)*(CAPTURE_BUFFER_WIDTH + CAPTURE_BUFFER_HEIGHT ) );
 }
 
 void printBuffers( uint32_t r, uint32_t s )

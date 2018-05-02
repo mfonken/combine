@@ -7,8 +7,9 @@
 
 #include "Rho\rho_utility.h"
 
+void spoofFrameProcessor( void );
 void frameProcessor( void );
-void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, DMA_HandleTypeDef *, UART_HandleTypeDef * );
+void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, UART_HandleTypeDef * );
 void master_test( void );
 
 /* DMA Config */
@@ -21,12 +22,14 @@ void pauseDMA( TIM_HandleTypeDef * );
 void resumeDMA( TIM_HandleTypeDef * );
 
 void init_memory( void );
-void initTimerDMA( TIM_HandleTypeDef *, DMA_HandleTypeDef * );
+void initTimerDMA( TIM_HandleTypeDef * );
 void zero_memory( void );
 
 void spoofPixels( void );
 void spoofDensityMaps( void );
 	
+void dprint( uint8_t *, uint16_t);
+void dprintBuffers( void );
 void printBuffers( uint32_t, uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );

@@ -92,13 +92,13 @@ ARM Macro Assembler    Page 2
                                proc
    77 0000003C                 import           zero_memory
    78 0000003C                 export           frame_start
-   79 0000003C F8DF 912C       ldr              r9, =CAPTURE_BUFFER
+   79 0000003C F8DF 9134       ldr              r9, =CAPTURE_BUFFER
    80 00000040         
    81 00000040         
    82 00000040         
-   83 00000040 F8DF A12C       ldr              r10, =THRESH_BUFFER ; 
+   83 00000040 F8DF A134       ldr              r10, =THRESH_BUFFER ; 
    84 00000044         ;ldr r12, =THRESH_BUFFER      ; 
-   85 00000044 484B            ldr              r0, =THRESH_VALUE ; 
+   85 00000044 484D            ldr              r0, =THRESH_VALUE ; 
    86 00000046 F8D0 B000       ldr              r11, [r0]
    87 0000004A 4770            bx               lr
    88 0000004C                 endp
@@ -108,7 +108,7 @@ ARM Macro Assembler    Page 2
                                proc
    92 0000004C                 export           frame_end
    93 0000004C         ; Add the four quadrants into QUADRANT_TOTAL
-   94 0000004C 484A            ldr              r0, =QUADRANT_BUFFER ; 
+   94 0000004C 484C            ldr              r0, =QUADRANT_BUFFER ; 
    95 0000004E F850 2B04       ldr              r2, [r0], #4 ; 
    96 00000052 F850 1B04       ldr              r1, [r0], #4
    97 00000056 440A            add              r2, r2, r1
@@ -116,7 +116,7 @@ ARM Macro Assembler    Page 2
    99 0000005C 440A            add              r2, r2, r1
   100 0000005E 6801            ldr              r1, [r0]
   101 00000060 440A            add              r2, r2, r1
-  102 00000062 4846            ldr              r0, =QUADRANT_TOTAL
+  102 00000062 4848            ldr              r0, =QUADRANT_TOTAL
   103 00000064 6002            str              r2, [r0]
   104 00000066 4770            bx               lr
   105 00000068                 endp
@@ -125,7 +125,7 @@ ARM Macro Assembler    Page 2
   108 00000068         row_int proc
   109 00000068                 export           row_int
   110 00000068         
-  111 00000068 4842            ldr              r0, =THRESH_VALUE ; 
+  111 00000068 4844            ldr              r0, =THRESH_VALUE ; 
   112 0000006A F8D0 B000       ldr              r11, [r0]
   113 0000006E         
 
@@ -137,7 +137,7 @@ ARM Macro Assembler    Page 3
   114 0000006E         ; Store Y delimiter in thresh buffer
   115 0000006E F64A 20AA       mov              r0, #0xaaaa ; 
   116 00000072 F82A 0B02       strh             r0, [r10], #2 ; 
-  117 00000076 483D            ldr              r0, =CAPTURE_BUFFER
+  117 00000076 483F            ldr              r0, =CAPTURE_BUFFER
   118 00000078 4648            mov              r0, r9
   119 0000007A         
   120 0000007A         #line   126              "..\\Src\\rho\\rho.s"
@@ -164,138 +164,143 @@ ARM Macro Assembler    Page 3
   141 0000008C                 import           printBuffers
   142 0000008C                 export           rho_proc
   143 0000008C E92D 5FFF       stmdb            sp!, {r0-r12,lr}
-  144 00000090 483B            ldr              r0, =THRESH_BUFFER_END ; Set fi
+  144 00000090         
+  145 00000090 483D            ldr              r0, =THRESH_BUFFER_MAX
+  146 00000092 F8D0 A000       ldr              r10, [r0]
+  147 00000096         
+  148 00000096 483D            ldr              r0, =THRESH_BUFFER_END ; Set fi
                                                             nal end of thresh b
                                                             uffer for frame
-  145 00000092 F8C0 A000       str              r10, [r0]
-  146 00000096         
-  147 00000096 F8DF C0D8       ldr              r12, =THRESH_BUFFER
-  148 0000009A F04F 0600       mov              r6, #0      ; 
-  149 0000009E F04F 0700       mov              r7, #0
-  150 000000A2 F04F 0800       mov              r8, #0
-  151 000000A6         
-  152 000000A6 F83C 6B02 
+  149 00000098 F8C0 A000       str              r10, [r0]
+  150 0000009C         
+  151 0000009C F8DF C0D8       ldr              r12, =THRESH_BUFFER
+  152 000000A0 F04F 0600       mov              r6, #0      ; 
+  153 000000A4 F04F 0700       mov              r7, #0
+  154 000000A8 F04F 0800       mov              r8, #0
+  155 000000AC         
+  156 000000AC F83C 6B02 
                        read_loop
                                ldrh             r6, [r12], #2 ; 
-  153 000000AA F64A 20AA       mov              r0, #0xaaaa
-  154 000000AE 4286            cmp              r6, r0      ; 
-  155 000000B0 D124            bne              no_del
-  156 000000B2         
-  157 000000B2         ; Process Row
-  158 000000B2 4831            ldr              r0, =QUADRANT_BUFFER
-  159 000000B4 4933            ldr              r1, =CENTROID_Y
-  160 000000B6 8809            ldrh             r1, [r1]
-  161 000000B8 428F            cmp              r7, r1      ; 
-  162 000000BA DA07            bge              higher
-  163 000000BC F008 08FD       and              r8, r8, #0xfd ; 
-  164 000000C0 F850 1B04       ldr              r1, [r0], #4 ; 
-  165 000000C4 6802            ldr              r2, [r0]
-  166 000000C6 EB01 0002       add              r0, r1, r2
-  167 000000CA E008            b                dx_store
-  168 000000CC F048 0802 
+  157 000000B0 F64A 20AA       mov              r0, #0xaaaa
+  158 000000B4 4286            cmp              r6, r0      ; 
+  159 000000B6 D124            bne              no_del
+  160 000000B8         
+  161 000000B8         ; Process Row
+  162 000000B8 4831            ldr              r0, =QUADRANT_BUFFER
+  163 000000BA 4935            ldr              r1, =CENTROID_Y
+  164 000000BC 8809            ldrh             r1, [r1]
+  165 000000BE 428F            cmp              r7, r1      ; 
+  166 000000C0 DA07            bge              higher
+  167 000000C2 F008 08FD       and              r8, r8, #0xfd ; 
+  168 000000C6 F850 1B04       ldr              r1, [r0], #4 ; 
 
 
 
 ARM Macro Assembler    Page 4 
 
 
+  169 000000CA 6802            ldr              r2, [r0]
+  170 000000CC EB01 0002       add              r0, r1, r2
+  171 000000D0 E008            b                dx_store
+  172 000000D2 F048 0802 
                        higher  orr              r8, r8, #0x02 ; 
-  169 000000D0 F100 0008       add              r0, r0, #8  ; 
-  170 000000D4 F850 1B04       ldr              r1, [r0], #4
-  171 000000D8 6802            ldr              r2, [r0]
-  172 000000DA EB01 0002       add              r0, r1, r2  ; Calculate QN into
+  173 000000D6 F100 0008       add              r0, r0, #8  ; 
+  174 000000DA F850 1B04       ldr              r1, [r0], #4
+  175 000000DE 6802            ldr              r2, [r0]
+  176 000000E0 EB01 0002       add              r0, r1, r2  ; Calculate QN into
                                                              r0
-  173 000000DE 492A    dx_store
+  177 000000E4 492B    dx_store
                                ldr              r1, =QUADRANT_PREVIOUS
-  174 000000E0 680A            ldr              r2, [r1]    ; 
-  175 000000E2 6008            str              r0, [r1]    ; 
-  176 000000E4 EBA0 0002       sub              r0, r0, r2  ; Calculate QN - QP
+  178 000000E6 680A            ldr              r2, [r1]    ; 
+  179 000000E8 6008            str              r0, [r1]    ; 
+  180 000000EA EBA0 0002       sub              r0, r0, r2  ; Calculate QN - QP
                                                              into r0
-  177 000000E8 4A28            ldr              r2, =DENSITY_X
-  178 000000EA 51D0            str              r0, [r2, r7]
-  179 000000EC F107 0704       add              r7, r7, #4
-  180 000000F0 4B27            ldr              r3, =DENSITY_X_MAX ; 
-  181 000000F2 681A            ldr              r2, [r3]
-  182 000000F4 4290            cmp              r0, r2
-  183 000000F6 DD2D            ble              rho_lcheck  ; Contiunue (to qua
+  181 000000EE 4A2A            ldr              r2, =DENSITY_X
+  182 000000F0 51D0            str              r0, [r2, r7]
+  183 000000F2 F107 0704       add              r7, r7, #4
+  184 000000F6 4B29            ldr              r3, =DENSITY_X_MAX ; 
+  185 000000F8 681A            ldr              r2, [r3]
+  186 000000FA 4290            cmp              r0, r2
+  187 000000FC DD2D            ble              rho_lcheck  ; Contiunue (to qua
                                                             drant increment) if
                                                              less than or equal
                                                             
-  184 000000F8 6018            str              r0, [r3]    ; Store as new max 
+  188 000000FE 6018            str              r0, [r3]    ; Store as new max 
                                                             if greater
-  185 000000FA E02B            b                rho_lcheck
-  186 000000FC         
-  187 000000FC         ; Process Pixel
-  188 000000FC 481B    no_del  ldr              r0, =CAPTURE_BUFFER ; Load capt
+  189 00000100 E02B            b                rho_lcheck
+  190 00000102         
+  191 00000102         ; Process Pixel
+  192 00000102 481C    no_del  ldr              r0, =CAPTURE_BUFFER ; Load capt
                                                             ure buffer to corre
                                                             ct offset
-  189 000000FE F64F 71FF       mov              r1, #0x0000ffff
-  190 00000102 EA00 0001       and              r0, r0, r1  ; Keep bottom half 
+  193 00000104 F64F 71FF       mov              r1, #0x0000ffff
+  194 00000108 EA00 0001       and              r0, r0, r1  ; Keep bottom half 
                                                             in r0
-  191 00000106 4286            cmp              r6, r0
-  192 00000108         
-  193 00000108 E00B            b                rx_corr
-  194 0000010A         
-  195 0000010A DB23            blt              rho_lcheck  ; Check for valid v
+  195 0000010C 4286            cmp              r6, r0
+  196 0000010E         
+  197 0000010E E00B            b                rx_corr
+  198 00000110         
+  199 00000110 DB23            blt              rho_lcheck  ; Check for valid v
                                                             alue
-  196 0000010C EBA6 0600       sub              r6, r6, r0  ; Remove address of
+  200 00000112 EBA6 0600       sub              r6, r6, r0  ; Remove address of
                                                             fset from r6
-  197 00000110 F1A6 0601       sub              r6, r6, #1
-  198 00000114 F04F 00A0       mov              r0, #160
-  199 00000118 4286    sudo_mod
+  201 00000116 F1A6 0601       sub              r6, r6, #1
+  202 0000011A F04F 00A0       mov              r0, #160
+  203 0000011E 4286    sudo_mod
                                cmp              r6, r0
-  200 0000011A DB02            blt              rx_corr
-  201 0000011C EBA6 0600       sub              r6, r6, r0
-  202 00000120 E7FA            b                sudo_mod
-  203 00000122 491C    rx_corr ldr              r1, =CENTROID_X
-  204 00000124 8809            ldrh             r1, [r1]
-  205 00000126 428E            cmp              r6, r1      ; 
-  206 00000128 DA02            bge              right
-  207 0000012A F008 08FE 
+  204 00000120 DB02            blt              rx_corr
+  205 00000122 EBA6 0600       sub              r6, r6, r0
+  206 00000126 E7FA            b                sudo_mod
+  207 00000128 491D    rx_corr ldr              r1, =CENTROID_X
+  208 0000012A 8809            ldrh             r1, [r1]
+  209 0000012C 428E            cmp              r6, r1      ; 
+  210 0000012E DA02            bge              right
+  211 00000130 F008 08FE 
                        left    and              r8, r8, #0xfe ; 
-  208 0000012E E001            b                dy_store
-  209 00000130 F048 0801 
-                       right   orr              r8, r8, #0x01 ; 
-  210 00000134 4918    dy_store
-                               ldr              r1, =DENSITY_Y
+  212 00000134 E001            b                dy_store
 
 
 
 ARM Macro Assembler    Page 5 
 
 
-  211 00000136 EB06 0206       add              r2, r6, r6  ; Calcalute r6 x4 i
+  213 00000136 F048 0801 
+                       right   orr              r8, r8, #0x01 ; 
+  214 0000013A 491A    dy_store
+                               ldr              r1, =DENSITY_Y
+  215 0000013C EB06 0206       add              r2, r6, r6  ; Calcalute r6 x4 i
                                                             nto r2
-  212 0000013A 4412            add              r2, r2, r2  ; (r6 is byte width
+  216 00000140 4412            add              r2, r2, r2  ; (r6 is byte width
                                                              while Dx is word w
                                                             idth)
-  213 0000013C 5888            ldr              r0, [r1, r2] ; 
-  214 0000013E F100 0001       add              r0, r0, #1
-  215 00000142 5088            str              r0, [r1, r2]
-  216 00000144         
-  217 00000144         ; Increment Quandrants
-  218 00000144 490C    inc_qs  ldr              r1, =QUADRANT_BUFFER
-  219 00000146 EB08 0208       add              r2, r8, r8  ; Multiply r8 by wo
+  217 00000142 5888            ldr              r0, [r1, r2] ; 
+  218 00000144 F100 0001       add              r0, r0, #1
+  219 00000148 5088            str              r0, [r1, r2]
+  220 0000014A         
+  221 0000014A         ; Increment Quandrants
+  222 0000014A 490D    inc_qs  ldr              r1, =QUADRANT_BUFFER
+  223 0000014C EB08 0208       add              r2, r8, r8  ; Multiply r8 by wo
                                                             rd length
-  220 0000014A 4412            add              r2, r2, r2
-  221 0000014C 5888            ldr              r0, [r1, r2] ; 
-  222 0000014E F100 0001       add              r0, r0, #1
-  223 00000152 5088            str              r0, [r1, r2]
-  224 00000154         
-  225 00000154         ; Loop until Thresh Buffer End
-  226 00000154 480A    rho_lcheck
+  224 00000150 4412            add              r2, r2, r2
+  225 00000152 5888            ldr              r0, [r1, r2] ; 
+  226 00000154 F100 0001       add              r0, r0, #1
+  227 00000158 5088            str              r0, [r1, r2]
+  228 0000015A         
+  229 0000015A         ; Loop until Thresh Buffer End
+  230 0000015A 480C    rho_lcheck
                                ldr              r0, =THRESH_BUFFER_END ; 
-  227 00000156 6800            ldr              r0, [r0]
-  228 00000158 4584            cmp              r12, r0
-  229 0000015A DBA4            blt              read_loop
-  230 0000015C         
-  231 0000015C B500            stmdb            sp!, {lr}
-  232 0000015E F7FF FFFE       bl               frame_end
-  233 00000162 F85D EB04       ldmia            sp!, {lr}
-  234 00000166 E8BD 5FFF       ldmia            sp!, {r0-r12,lr}
-  235 0000016A 4770            bx               lr
-  236 0000016C                 endp
-  237 0000016C                 end
+  231 0000015C 6800            ldr              r0, [r0]
+  232 0000015E 4584            cmp              r12, r0
+  233 00000160 DBA4            blt              read_loop
+  234 00000162         
+  235 00000162 B500            stmdb            sp!, {lr}
+  236 00000164 F7FF FFFE       bl               frame_end
+  237 00000168 F85D EB04       ldmia            sp!, {lr}
+  238 0000016C E8BD 5FFF       ldmia            sp!, {r0-r12,lr}
+  239 00000170 4770            bx               lr
+  240 00000172                 endp
+  241 00000172                 end
+              00 00 00000000 
               00000000 
               00000000 
               00000000 
@@ -328,21 +333,21 @@ Symbol: asm_test
    Uses
       At line 50 in file ..\\Src\\rho\\rho.s
 Comment: asm_test used once
-dx_store 000000DE
+dx_store 000000E4
 
 Symbol: dx_store
    Definitions
-      At line 173 in file ..\\Src\\rho\\rho.s
+      At line 177 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 167 in file ..\\Src\\rho\\rho.s
+      At line 171 in file ..\\Src\\rho\\rho.s
 Comment: dx_store used once
-dy_store 00000134
+dy_store 0000013A
 
 Symbol: dy_store
    Definitions
-      At line 210 in file ..\\Src\\rho\\rho.s
+      At line 214 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 208 in file ..\\Src\\rho\\rho.s
+      At line 212 in file ..\\Src\\rho\\rho.s
 Comment: dy_store used once
 frame_end 0000004C
 
@@ -351,7 +356,7 @@ Symbol: frame_end
       At line 91 in file ..\\Src\\rho\\rho.s
    Uses
       At line 92 in file ..\\Src\\rho\\rho.s
-      At line 232 in file ..\\Src\\rho\\rho.s
+      At line 236 in file ..\\Src\\rho\\rho.s
 
 frame_start 0000003C
 
@@ -361,23 +366,23 @@ Symbol: frame_start
    Uses
       At line 78 in file ..\\Src\\rho\\rho.s
 Comment: frame_start used once
-higher 000000CC
+higher 000000D2
 
 Symbol: higher
    Definitions
-      At line 168 in file ..\\Src\\rho\\rho.s
+      At line 172 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 162 in file ..\\Src\\rho\\rho.s
+      At line 166 in file ..\\Src\\rho\\rho.s
 Comment: higher used once
-inc_qs 00000144
+inc_qs 0000014A
 
 Symbol: inc_qs
    Definitions
-      At line 218 in file ..\\Src\\rho\\rho.s
+      At line 222 in file ..\\Src\\rho\\rho.s
    Uses
       None
 Comment: inc_qs unused
-left 0000012A
+left 00000130
 
 
 
@@ -387,17 +392,17 @@ Relocatable symbols
 
 Symbol: left
    Definitions
-      At line 207 in file ..\\Src\\rho\\rho.s
+      At line 211 in file ..\\Src\\rho\\rho.s
    Uses
       None
 Comment: left unused
-no_del 000000FC
+no_del 00000102
 
 Symbol: no_del
    Definitions
-      At line 188 in file ..\\Src\\rho\\rho.s
+      At line 192 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 155 in file ..\\Src\\rho\\rho.s
+      At line 159 in file ..\\Src\\rho\\rho.s
 Comment: no_del used once
 pixel_proc 0000007C
 
@@ -415,13 +420,13 @@ Symbol: pxl_start
    Uses
       None
 Comment: pxl_start unused
-read_loop 000000A6
+read_loop 000000AC
 
 Symbol: read_loop
    Definitions
-      At line 152 in file ..\\Src\\rho\\rho.s
+      At line 156 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 229 in file ..\\Src\\rho\\rho.s
+      At line 233 in file ..\\Src\\rho\\rho.s
 Comment: read_loop used once
 rho 00000000
 
@@ -439,11 +444,11 @@ Symbol: rho_init
    Uses
       At line 70 in file ..\\Src\\rho\\rho.s
 Comment: rho_init used once
-rho_lcheck 00000154
+rho_lcheck 0000015A
 
 Symbol: rho_lcheck
    Definitions
-      At line 226 in file ..\\Src\\rho\\rho.s
+      At line 230 in file ..\\Src\\rho\\rho.s
 
 
 
@@ -451,9 +456,9 @@ ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
 
    Uses
-      At line 183 in file ..\\Src\\rho\\rho.s
-      At line 185 in file ..\\Src\\rho\\rho.s
-      At line 195 in file ..\\Src\\rho\\rho.s
+      At line 187 in file ..\\Src\\rho\\rho.s
+      At line 189 in file ..\\Src\\rho\\rho.s
+      At line 199 in file ..\\Src\\rho\\rho.s
 
 rho_proc 0000008C
 
@@ -463,13 +468,13 @@ Symbol: rho_proc
    Uses
       At line 142 in file ..\\Src\\rho\\rho.s
 Comment: rho_proc used once
-right 00000130
+right 00000136
 
 Symbol: right
    Definitions
-      At line 209 in file ..\\Src\\rho\\rho.s
+      At line 213 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 206 in file ..\\Src\\rho\\rho.s
+      At line 210 in file ..\\Src\\rho\\rho.s
 Comment: right used once
 row_int 00000068
 
@@ -487,22 +492,22 @@ Symbol: row_ret
    Uses
       None
 Comment: row_ret unused
-rx_corr 00000122
+rx_corr 00000128
 
 Symbol: rx_corr
    Definitions
-      At line 203 in file ..\\Src\\rho\\rho.s
+      At line 207 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 193 in file ..\\Src\\rho\\rho.s
-      At line 200 in file ..\\Src\\rho\\rho.s
+      At line 197 in file ..\\Src\\rho\\rho.s
+      At line 204 in file ..\\Src\\rho\\rho.s
 
-sudo_mod 00000118
+sudo_mod 0000011E
 
 Symbol: sudo_mod
    Definitions
-      At line 199 in file ..\\Src\\rho\\rho.s
+      At line 203 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 202 in file ..\\Src\\rho\\rho.s
+      At line 206 in file ..\\Src\\rho\\rho.s
 Comment: sudo_mod used once
 21 symbols
 
@@ -527,7 +532,7 @@ Symbol: CAPTURE_BUFFER
    Uses
       At line 79 in file ..\\Src\\rho\\rho.s
       At line 117 in file ..\\Src\\rho\\rho.s
-      At line 188 in file ..\\Src\\rho\\rho.s
+      At line 192 in file ..\\Src\\rho\\rho.s
 
 CAPTURE_BUFFER_END 00000000
 
@@ -551,7 +556,7 @@ Symbol: CENTROID_X
    Definitions
       At line 34 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 203 in file ..\\Src\\rho\\rho.s
+      At line 207 in file ..\\Src\\rho\\rho.s
 Comment: CENTROID_X used once
 CENTROID_Y 00000000
 
@@ -559,7 +564,7 @@ Symbol: CENTROID_Y
    Definitions
       At line 35 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 159 in file ..\\Src\\rho\\rho.s
+      At line 163 in file ..\\Src\\rho\\rho.s
 Comment: CENTROID_Y used once
 DENSITY_X 00000000
 
@@ -567,7 +572,7 @@ Symbol: DENSITY_X
    Definitions
       At line 29 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 177 in file ..\\Src\\rho\\rho.s
+      At line 181 in file ..\\Src\\rho\\rho.s
 Comment: DENSITY_X used once
 DENSITY_X_MAX 00000000
 
@@ -581,7 +586,7 @@ Symbol: DENSITY_X_MAX
    Definitions
       At line 36 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 180 in file ..\\Src\\rho\\rho.s
+      At line 184 in file ..\\Src\\rho\\rho.s
 Comment: DENSITY_X_MAX used once
 DENSITY_Y 00000000
 
@@ -589,7 +594,7 @@ Symbol: DENSITY_Y
    Definitions
       At line 30 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 210 in file ..\\Src\\rho\\rho.s
+      At line 214 in file ..\\Src\\rho\\rho.s
 Comment: DENSITY_Y used once
 QUADRANT_BUFFER 00000000
 
@@ -598,8 +603,8 @@ Symbol: QUADRANT_BUFFER
       At line 31 in file ..\\Src\\rho\\rho.s
    Uses
       At line 94 in file ..\\Src\\rho\\rho.s
-      At line 158 in file ..\\Src\\rho\\rho.s
-      At line 218 in file ..\\Src\\rho\\rho.s
+      At line 162 in file ..\\Src\\rho\\rho.s
+      At line 222 in file ..\\Src\\rho\\rho.s
 
 QUADRANT_PREVIOUS 00000000
 
@@ -607,7 +612,7 @@ Symbol: QUADRANT_PREVIOUS
    Definitions
       At line 33 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 173 in file ..\\Src\\rho\\rho.s
+      At line 177 in file ..\\Src\\rho\\rho.s
 Comment: QUADRANT_PREVIOUS used once
 QUADRANT_TOTAL 00000000
 
@@ -632,7 +637,7 @@ Symbol: THRESH_BUFFER
       At line 28 in file ..\\Src\\rho\\rho.s
    Uses
       At line 83 in file ..\\Src\\rho\\rho.s
-      At line 147 in file ..\\Src\\rho\\rho.s
+      At line 151 in file ..\\Src\\rho\\rho.s
 
 THRESH_BUFFER_END 00000000
 
@@ -646,8 +651,8 @@ Symbol: THRESH_BUFFER_END
    Definitions
       At line 39 in file ..\\Src\\rho\\rho.s
    Uses
-      At line 144 in file ..\\Src\\rho\\rho.s
-      At line 226 in file ..\\Src\\rho\\rho.s
+      At line 148 in file ..\\Src\\rho\\rho.s
+      At line 230 in file ..\\Src\\rho\\rho.s
 
 THRESH_BUFFER_MAX 00000000
 
@@ -655,8 +660,8 @@ Symbol: THRESH_BUFFER_MAX
    Definitions
       At line 40 in file ..\\Src\\rho\\rho.s
    Uses
-      None
-Comment: THRESH_BUFFER_MAX unused
+      At line 145 in file ..\\Src\\rho\\rho.s
+Comment: THRESH_BUFFER_MAX used once
 THRESH_VALUE 00000000
 
 Symbol: THRESH_VALUE

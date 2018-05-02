@@ -141,6 +141,10 @@ rho_proc proc
 			import printBuffers
 			export rho_proc
 			stmdb  sp!, {r0-r12,lr}
+			
+			ldr r0, =THRESH_BUFFER_MAX
+			ldr	wr, [r0]
+			
 			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r0]
 
