@@ -13,14 +13,14 @@
 
 /* GLOBAL SETUP */
 #define HAS_CAMERA
-#define CAMERA_ID 0
+#define CAMERA_ID 1
 
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define TAU_DEBUG
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
-//#define IMU_DEBUG
+#define IMU_DEBUG
 
 #ifdef HAS_CAMERA
 #define FISHEYE

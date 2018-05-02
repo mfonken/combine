@@ -43,12 +43,18 @@ string Combine::serialize()
             p[0] = kin.values.position[0] * SCALE;
             p[1] = kin.values.position[1] * SCALE;
             p[2] = kin.values.position[2] * SCALE;
-            sprintf(kin_packet, "%c,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", (char)ORIENTATION_ID, r[0], r[1], r[2], p[0], p[1], -p[2] );
+            sprintf(kin_packet, "%c,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", (char)ORIENTATION_ID, r[0], r[1], r[2], p[0], p[1], p[2] );
             break;
         case UPDATING:
             bno.state.action = RUNNING;
             sprintf(kin_packet, "%c,%c\r\n", (char)MESSAGE_ID, (char)UPDATING );
             Kinetic.updateReference( &kin, &bno.state.reference );
+            break;
+        case REQUEST:
+            bno.state.action = RUNNING;
+            IMU_Request( &bno, 'c' );
+            sprintf(kin_packet, "\r\n" );
+            break;
         default:
             break;
     }
@@ -71,10 +77,18 @@ void Combine::trigger()
 {
     IMU.update( &bno );
     ang3_t
-//        g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] },
+        g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] },
         e = { bno.pitch, bno.roll, bno.yaw };
-    Kinetic.updateRotation( &kin, &e, NULL );//&g );
+    Kinetic.updateRotation( &kin, &e,
+//                           NULL );
+                           &g );
     
-    //vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
-    //Kinetic.updatePosition( &kin, NULL/*&R*/, &tau->B, &tau->A );
+//    vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
+//    Kinetic.updatePosition( &kin, NULL/*&R*/, &tau->B, &tau->A );
+}
+
+void Combine::request()
+{
+    bno.state.action = REQUEST;
+    serialize();
 }

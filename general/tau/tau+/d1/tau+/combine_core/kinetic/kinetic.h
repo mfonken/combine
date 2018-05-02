@@ -125,6 +125,7 @@ extern "C" {
                 qr,
                 qg,
                 qa;
+        ang3_t  offset;
     } kinetic_t;
     
     typedef struct _serial_kinetic_t

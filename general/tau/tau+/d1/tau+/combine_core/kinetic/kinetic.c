@@ -31,9 +31,9 @@ static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 {
     if( g == NULL )
     {
-        k->values.rotation[0] = e->x;
-        k->values.rotation[1] = e->y;
-        k->values.rotation[2] = e->z;
+        k->values.rotation[0] = e->x - k->offset.x;
+        k->values.rotation[1] = e->y - k->offset.y;
+        k->values.rotation[2] = e->z - k->offset.z;
     }
     else
     {
@@ -48,7 +48,7 @@ static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
         else
         {
             Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
-            k->values.rotation[0] = k->filters.rotation[0].value;
+            k->values.rotation[0] = k->filters.rotation[0].value - k->offset.x;
         }
         
         if ( k->values.rotation[0] > M_PI_2 )
@@ -59,11 +59,11 @@ static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
         
         /* Step 2: Update Roll */
         Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
-        k->values.rotation[1] = k->filters.rotation[1].value;
+        k->values.rotation[1] = k->filters.rotation[1].value - k->offset.y;
 
         /* Step 3: Update Yaw */
         Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
-        k->values.rotation[2] = k->filters.rotation[2].value;
+        k->values.rotation[2] = k->filters.rotation[2].value - k->offset.z;
     }
 }
 
@@ -248,6 +248,7 @@ static void nongrav( kinetic_t * k, vec3_t * n )
 static void updateReference( kinetic_t * k, ang3_t * r_a )
 {
     Quaternion.fromEuler( r_a, &k->qr );
+    k->offset = *r_a;
 }
 
 const kinetic Kinetic =
@@ -291,5 +292,6 @@ void Camera_Rotation_Init( kinetic_t * k )
 void Reference_Rotation_Init( kinetic_t * k )
 {
     ang3_t r_a = { REFERENCE_OFFSET_ANGLE_X, REFERENCE_OFFSET_ANGLE_Y, REFERENCE_OFFSET_ANGLE_Z };
+    k->offset = r_a;
     Quaternion.fromEuler( &r_a, &k->qr );
 }

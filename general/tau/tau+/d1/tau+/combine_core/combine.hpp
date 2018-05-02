@@ -31,7 +31,8 @@ public:
     
     Combine(std::string, Tau *, int, int);
     
-private:
+    void request( void );
+    
     int         width,
                 height;
     Tau       * tau;
