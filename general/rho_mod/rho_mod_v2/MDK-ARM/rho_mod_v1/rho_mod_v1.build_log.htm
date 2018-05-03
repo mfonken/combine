@@ -27,13 +27,17 @@ Project File Date:  04/30/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'rho_mod_v1'
-assembling rho.s...
-..\Src\rho\rho.s(241): warning: A1581W: Added 2 bytes of padding at address 0x172
+compiling master.c...
+..\Src\master.c(227): warning:  #128-D: loop is not reachable
+  	while(1);
+..\Src\master.c(72): warning:  #177-D: function "set"  was declared but never referenced
+  static void set( GPIO_PinState s ) { HAL_GPIO_WritePin( CAM__CS_GPIO_Port, CAM__CS_Pin, s ); }
+..\Src\master.c: 2 warnings, 0 errors
 linking...
 rho_mod_v1\rho_mod_v1.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
-Program Size: Code=16752 RO-data=552 RW-data=152 ZI-data=5136  
+Program Size: Code=20252 RO-data=588 RW-data=128 ZI-data=37184  
 Finished: 0 information, 1 warning and 0 error messages.
-"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 2 Warning(s).
+"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 

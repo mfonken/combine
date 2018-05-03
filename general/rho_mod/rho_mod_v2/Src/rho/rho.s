@@ -13,10 +13,17 @@
 ;/* System Constants */
 #define HALF_WORD_WIDTH     160
 #define Y_DEL_DOUBLE        0xaaaa
-#define PRINT_HEIGHT		200
 
 ;#define STATIC_BUFFER
 ;#define BAYER_TOGGLE
+#define SPOOF
+
+
+#ifdef BAYER_TOGGLE
+#define PXL_JMP 2
+#else
+#define PXL_JMP 1
+#endif
 
     area    rho, code, readonly
 	preserve8
@@ -81,7 +88,6 @@ frame_start	proc
 			mov tg, #0                  ;/* Reset operation variables */
 #endif
             ldr wr, =THRESH_BUFFER      ;/* wr = Cf; */
-            ;ldr rd, =THRESH_BUFFER      ;/* rd = Cf; */
             ldr r0, =THRESH_VALUE       ;/* th = THRESH_ADDR; */
             ldr th, [r0]
 			bx  lr
@@ -130,7 +136,7 @@ row_ret		bx	lr
 pixel_proc	proc
 			export pixel_proc
 
-pxl_start  	ldrb r3, [rb], #1       	;/* current_pixel = next in buffer */
+pxl_start  	ldrb r3, [rb], #PXL_JMP    	;/* current_pixel = next in buffer */
 			cmp r3, th				    ;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
 			bx	lr
@@ -142,11 +148,13 @@ rho_proc proc
 			export rho_proc
 			stmdb  sp!, {r0-r12,lr}
 			
-			ldr r0, =THRESH_BUFFER_MAX
-			ldr	wr, [r0]
+#ifdef SPOOF
+			ldr wr, =THRESH_BUFFER
+			add wr, wr, r0
+#endif
 			
-			ldr r0, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
-			str wr, [r0]
+			ldr r1, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
+			str wr, [r1]
 
 			ldr rd, =THRESH_BUFFER
 			mov rx, #0					;/* int rx = 0, ry = 0; */
@@ -193,8 +201,10 @@ no_del  	ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
             mov	r1, #0x0000ffff
             and r0, r0, r1              ; Keep bottom half in r0
 			cmp	rx, r0
-			
+
+#ifdef SPOOF
 			b	rx_corr
+#endif
 			
 			blt	rho_lcheck				; Check for valid value
             sub rx, rx, r0              ; Remove address offset from rx
