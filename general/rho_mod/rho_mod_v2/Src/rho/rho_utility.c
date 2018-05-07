@@ -12,26 +12,34 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-// #define RHO_DEBUG
+//#define RHO_DEBUG 0
 
 #define FOR(L)      for( int i = L; i > 0; --i)
 #define FORA(L,A)   for( int i = L-1; i >= 0; i--, A[i] )
 #define ZDIV(X,Y)   (!Y?2<<10:X/Y)
 
-#ifdef RHO_DEBUG
-#define PRINT1(A)			sprintf( out_buffer, A ); print(out_buffer);
-#define PRINT2(A,B) 	sprintf( out_buffer, A, B ); print(out_buffer);
-#define PRINT3(A,B,C) sprintf( out_buffer, A, B, C ); print(out_buffer);
+//#ifdef RHO_DEBUG
+/*
+#define PRINT1(A)			sprintf( out_buffer, A ); \
+											print(out_buffer);
+#define PRINT2(A,B) 	sprintf( out_buffer, A, B ); \
+											print(out_buffer);
+#define PRINT3(A,B,C) sprintf( out_buffer, A, B, C ); \
+											print(out_buffer);
+*/
+/*
 #else
-#define PRINT1(A)
-#define PRINT2(A,B)
-#define PRINT3(A,B,C)
-#endif
+*/
+#define PRINT1(A)			;
+#define PRINT2(A,B)		;
+#define PRINT3(A,B,C)	;
+//#endif
+//*/
 
 #define UART_TIMEOUT 100
 UART_HandleTypeDef * uart;
 
-char out_buffer[100];
+char out_buffer[125];
 
 static void print(char * Buf )
 {
@@ -103,18 +111,19 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 					cavg 		= 0.,
 					mavg		= 0.;
 
-	//PRINT2( "Max: %d\r\n", d->max );
-	//PRINT2( "B:%f\r\n", d->kalman.value );
+	PRINT2( "Max: %d\r\n", d->max );
+	PRINT2( "Value before:%f\r\n", d->kalman.value );
 	RhoKalman.update(&d->kalman, (double)d->max, 0.);
-	//PRINT2( "Value:%f\r\n", d->kalman.value );
-	d->variance = v;
+	PRINT2( "Value after:%f\r\n", d->kalman.value );
 	t = d->kalman.value;
 
 	FLOAT a, b, c;
 	a = ( RHO_K_TARGET - d->kalman.K[0] );
+	if(a < 0) a = 0;
 	b = RHO_VARIANCE_SCALE * a;
 	c = 1 + b;
 	v = RHO_VARIANCE_NORMAL * c;
+	d->variance = v;
 
 
 	PRINT2( "\tK:%f\r\n", d->kalman.K[0] );
@@ -209,7 +218,7 @@ void Filter_and_Select_Pairs( rho_utility * utility )
 {
 	///Note: Dx max should be already calculated in density map generation.
 	//print( "Processing Dx\r\n");
-	Find_Map_Max( &utility->density_map_pair.x );
+	//Find_Map_Max( &utility->density_map_pair.x );
 	Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
 
 	//print( "Processing Dy\r\n");

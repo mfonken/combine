@@ -30,7 +30,7 @@ void spoofDensityMaps( void );
 	
 void dprint( uint8_t *, uint16_t);
 void dprintBuffers( void );
-void printBuffers( uint32_t, uint32_t );
+void printBuffers( uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );
 void printCapture( void );

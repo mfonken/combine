@@ -11,7 +11,7 @@
 
 #include "rho_kalman.h"
 
-typedef double FLOAT;
+typedef float FLOAT;
 typedef uint8_t		byte_t;
 typedef uint16_t	index_t;
 typedef uint8_t 	capture_t;
