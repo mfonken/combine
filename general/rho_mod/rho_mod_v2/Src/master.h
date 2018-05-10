@@ -11,6 +11,8 @@ void spoofFrameProcessor( void );
 void frameProcessor( void );
 void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, UART_HandleTypeDef * );
 void master_test( void );
+void frameTx( void );
+void spoofFrameTx( void );
 
 /* DMA Config */
 #define TIM2_DMA_ID 	TIM_DMA_ID_CC2
@@ -30,6 +32,7 @@ void spoofDensityMaps( void );
 	
 void dprint( uint8_t *, uint16_t);
 void dprintBuffers( void );
+void dprintCapture( void );
 void printBuffers( uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );

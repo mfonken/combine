@@ -22,22 +22,34 @@ Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho_mod\rho_mod_v2\MDK-ARM\rho_mod_v1.uvprojx
-Project File Date:  04/30/2018
+Project File Date:  05/10/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'rho_mod_v1'
+compiling main.c...
+compiling OV9712.c...
+compiling rho_utility.c...
+..\Src\rho\rho_utility.c(197): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	FLOAT v_ = 
+DIV(1.0,v);
+..\Src\rho\rho_utility.c(205): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	FLOAT comp = 1 - utility->FT/
+ILTERED_CONVERAGE_TARGET;
+..\Src\rho\rho_utility.c: 2 warnings, 0 errors
 compiling master.c...
-..\Src\master.c(227): warning:  #128-D: loop is not reachable
+..\Src\master.c(271): warning:  #128-D: loop is not reachable
   	while(1);
-..\Src\master.c(72): warning:  #177-D: function "set"  was declared but never referenced
+..\Src\master.c(75): warning:  #177-D: function "set"  was declared but never referenced
   static void set( GPIO_PinState s ) { HAL_GPIO_WritePin( CAM__CS_GPIO_Port, CAM__CS_Pin, s ); }
-..\Src\master.c: 2 warnings, 0 errors
+..\Src\master.c(135): warning:  #177-D: function "RowFinished"  was declared but never referenced
+  static void RowFinished( void )
+..\Src\master.c: 3 warnings, 0 errors
 linking...
 rho_mod_v1\rho_mod_v1.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
-Program Size: Code=20252 RO-data=588 RW-data=128 ZI-data=37184  
+Program Size: Code=20060 RO-data=548 RW-data=160 ZI-data=7496  
 Finished: 0 information, 1 warning and 0 error messages.
-"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 3 Warning(s).
+"rho_mod_v1\rho_mod_v1.axf" - 0 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,7 +72,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.1
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>
