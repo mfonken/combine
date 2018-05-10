@@ -162,7 +162,7 @@ static void quaternions( kinetic_t * k )
     Quaternion.toEuler( &k->qd, &ad );
     Quaternion.toEuler( &k->qc_, &ad_ );
     Quaternion.toEuler( &k->qa, &aa );
-    printf("B>R(%4d, %4d, %4d) | R>D(%4d, %4d, %4d) | D>C'(%4d, %4d, %4d) | B>C'(%4d, %4d, %4d)\n", (int)(ar.x*RAD_TO_DEG), (int)(ar.y*RAD_TO_DEG), (int)(ar.z*RAD_TO_DEG), (int)(ad.x*RAD_TO_DEG), (int)(ad.y*RAD_TO_DEG), (int)(ad.z*RAD_TO_DEG), (int)(ad_.x*RAD_TO_DEG), (int)(ad_.y*RAD_TO_DEG), (int)(ad_.z*RAD_TO_DEG), (int)(aa.x*RAD_TO_DEG), (int)(aa.y*RAD_TO_DEG), (int)(aa.z*RAD_TO_DEG));
+//    printf("B>R(%4d, %4d, %4d) | R>D(%4d, %4d, %4d) | D>C'(%4d, %4d, %4d) | B>C'(%4d, %4d, %4d)\n", (int)(ar.x*RAD_TO_DEG), (int)(ar.y*RAD_TO_DEG), (int)(ar.z*RAD_TO_DEG), (int)(ad.x*RAD_TO_DEG), (int)(ad.y*RAD_TO_DEG), (int)(ad.z*RAD_TO_DEG), (int)(ad_.x*RAD_TO_DEG), (int)(ad_.y*RAD_TO_DEG), (int)(ad_.z*RAD_TO_DEG), (int)(aa.x*RAD_TO_DEG), (int)(aa.y*RAD_TO_DEG), (int)(aa.z*RAD_TO_DEG));
     
     
 //    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };

@@ -20,7 +20,7 @@
 //#define TAU_DEBUG
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
-#define IMU_DEBUG
+//#define IMU_DEBUG
 
 #ifdef HAS_CAMERA
 #define FISHEYE

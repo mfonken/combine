@@ -117,9 +117,9 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, PredictionC * 
         if( c > m ) m = c;
     RhoKalman.update(&d->kalman, m, 0.);
     d->max = m;
-    d->variance = v;
     t = d->kalman.value;
     v = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - d->kalman.K[0] ) );
+    d->variance = v;
     if( v < t && v > 0) g = t - v;
     else return;
     /* * * * * * * * * * * * * * */

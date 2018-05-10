@@ -96,10 +96,7 @@ void ImageUtility::initCamera()
     if (!cam.isOpened()) cout << "cannot open camera" << endl;
     cam.read(image);
     
-    
-    
     printf("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
-    
     
 #ifdef GREYSCALE
     Mat grey;
@@ -139,10 +136,7 @@ int ImageUtility::loop(char c)
         case ' ':
             live = !live;
             break;
-        case 03:    
-//            counter %= num_frames;
-////            counter++;
-//          printf("Next frame.\n");
+        case 03:
             break;
         case 02:
             counter-=2;
