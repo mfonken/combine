@@ -62,7 +62,7 @@ void RhoDetector::perform( Mat M, PredictionPair * r )
 
     float a_cov = points.at(0).size/total_size;
     float b_cov = points.at(1).size/total_size;
-    float c_cov = 1 - (a_cov + b_cov);
+    float c_cov = 1 - ( a_cov + b_cov );
     
     r->x.probabilities.primary   = a_cov;
     r->y.probabilities.primary   = a_cov;

@@ -24,7 +24,7 @@ int main( int argc, const char * argv[] )
 //    SerialWriter comm(SFILE, FILENAME);
     
     Environment env(&utility, 20);
-    env.addTest( (TestInterface *)&tau, 60);
+    env.addTest( (TestInterface *)&tau, 20);
 //    env.addTest(&combine, &comm, 20);
     
     env.start();
@@ -43,9 +43,9 @@ int main( int argc, const char * argv[] )
         pthread_mutex_lock(&utility.outframe_mutex);
         drawer.drawDensitiesOnFrame(utility.outframe);
         imshow("Outframe",  drawer.frame);
-        imshow("Rho X Map", drawer.RMX);
-        imshow("Rho Y Map", drawer.RMY);
-        drawer.drawKalmans();
+//        imshow("Rho X Map", drawer.RMX);
+//        imshow("Rho Y Map", drawer.RMY);
+//        drawer.drawKalmans();
         pthread_mutex_unlock(&utility.outframe_mutex);
         
         char c = waitKey(KEY_DELAY);
