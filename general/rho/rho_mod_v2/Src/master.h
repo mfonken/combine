@@ -20,11 +20,11 @@ void spoofFrameTx( void );
 #define TIM2_IT_CC		TIM_IT_CC2
 #define TIM2_CHANNEL 	TIM_CHANNEL_2
 
-void pauseDMA( TIM_HandleTypeDef * );
-void resumeDMA( TIM_HandleTypeDef * );
+void pauseDMA( void );
+void resumeDMA( void );
 
 void init_memory( void );
-void initTimerDMA( TIM_HandleTypeDef * );
+void initTimerDMA( void );
 void zero_memory( void );
 
 void spoofPixels( void );

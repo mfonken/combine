@@ -16,7 +16,7 @@
 
 ;#define STATIC_BUFFER
 ;#define BAYER_TOGGLE
-#define SPOOF
+;#define SPOOF
 
 
 #ifdef BAYER_TOGGLE
@@ -135,10 +135,18 @@ row_ret		bx	lr
 			align
 pixel_proc	proc
 			export pixel_proc
-
+			
+			ldr r1, =THRESH_BUFFER_MAX
+			ldr r1, [r1]
+			cmp wr, r1
+			blt pxl_start
+			mov	r0, #0
+			bx	lr
+			
 pxl_start  	ldrb r3, [rb], #PXL_JMP    	;/* current_pixel = next in buffer */
 			cmp r3, th				    ;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
+			mov	r0, #1
 			bx	lr
 			endp
 
