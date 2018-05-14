@@ -22,6 +22,7 @@ void spoofFrameTx( void );
 
 void pauseDMA( void );
 void resumeDMA( void );
+void resetDMA( void );
 
 void init_memory( void );
 void initTimerDMA( void );

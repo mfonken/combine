@@ -1,6 +1,6 @@
 #include "OV9712.h"
 
-#define CAMERA_DIV	2
+#define CAMERA_DIV			2
 #define	CAMERA_WIDTH_F	(1280>>CAMERA_DIV)
 #define CAMERA_HEIGHT_F	(800>>CAMERA_DIV)
 #define CAMERA_WIDTH_MSB 	((CAMERA_WIDTH_F >> 3) & 0xff)

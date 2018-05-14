@@ -269,7 +269,7 @@ ARM Macro Assembler    Page 5
   218 0000011A EBA6 0600       sub              r6, r6, r0  ; Remove address of
                                                             fset from r6
   219 0000011E F1A6 0601       sub              r6, r6, #1
-  220 00000122 F04F 00A0       mov              r0, #160
+  220 00000122 F44F 70A0       mov              r0, #320
   221 00000126 4286    sudo_mod
                                cmp              r6, r0
   222 00000128 DB02            blt              rx_corr

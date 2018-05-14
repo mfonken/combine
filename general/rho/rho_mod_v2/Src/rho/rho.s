@@ -11,7 +11,7 @@
 #define qs  r8 // Quadrant selection
 
 ;/* System Constants */
-#define HALF_WORD_WIDTH     160
+#define HALF_WORD_WIDTH     320
 #define Y_DEL_DOUBLE        0xaaaa
 
 ;#define STATIC_BUFFER
