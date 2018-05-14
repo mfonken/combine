@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
-<ProjectName>C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho_mod\rho_mod_v2\\rho_mod_v1</ProjectName>
+<ProjectName>C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v2\\rho_mod_v1</ProjectName>
 <ProjectNature>C</ProjectNature> 
 <CMSIS>..\Drivers\CMSIS</CMSIS>
 <HAL_Driver>C:\Users\Matthew Fonken\STM32Cube\Repository\STM32Cube_FW_L4_V1.11.0\Drivers\CMSIS</HAL_Driver>
