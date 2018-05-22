@@ -11,6 +11,8 @@ void spoofFrameProcessor( void );
 void frameProcessor( void );
 void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, UART_HandleTypeDef * );
 void master_test( void );
+void frameTx( void );
+void spoofFrameTx( void );
 
 /* DMA Config */
 #define TIM2_DMA_ID 	TIM_DMA_ID_CC2
@@ -18,11 +20,12 @@ void master_test( void );
 #define TIM2_IT_CC		TIM_IT_CC2
 #define TIM2_CHANNEL 	TIM_CHANNEL_2
 
-void pauseDMA( TIM_HandleTypeDef * );
-void resumeDMA( TIM_HandleTypeDef * );
+void pauseDMA( void );
+void resumeDMA( void );
+void resetDMA( void );
 
 void init_memory( void );
-void initTimerDMA( TIM_HandleTypeDef * );
+void initTimerDMA( void );
 void zero_memory( void );
 
 void spoofPixels( void );
@@ -30,6 +33,7 @@ void spoofDensityMaps( void );
 	
 void dprint( uint8_t *, uint16_t);
 void dprintBuffers( void );
+void dprintCapture( void );
 void printBuffers( uint32_t );
 void printAddress( const char *, uint32_t );
 void printAddresses( void );

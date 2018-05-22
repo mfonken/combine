@@ -113,7 +113,7 @@ int main(void)
 
   /* Initialize interrupts */
   MX_NVIC_Init();
-  
+ 
 	master_init( &hi2c1, &htim2, &huart1 );
 }
 
@@ -166,7 +166,7 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_4);
+  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_2);
 
     /**Configure the main internal regulator output voltage 
     */
@@ -194,10 +194,10 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* EXTI0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 2, 1);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 1);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
   /* EXTI1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 1);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 
@@ -275,7 +275,7 @@ static void MX_TIM2_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 1;
@@ -314,14 +314,15 @@ static void MX_DMA_Init(void)
 {
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* DMA interrupt init */
-  /* DMA1_Channel4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
   /* DMA1_Channel7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+  /* DMA2_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
 
 }
 
@@ -357,17 +358,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : VSYNC_Pin */
-  GPIO_InitStruct.Pin = VSYNC_Pin;
+  /*Configure GPIO pins : VSYNC_Pin HREF_Pin */
+  GPIO_InitStruct.Pin = VSYNC_Pin|HREF_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(VSYNC_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : HREF_Pin */
-  GPIO_InitStruct.Pin = HREF_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(HREF_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : MCLK_Pin */
   GPIO_InitStruct.Pin = MCLK_Pin;
