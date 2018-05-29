@@ -223,11 +223,9 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
     {
         for( x1 = range[i]; x1 > range[j]; --x1, c = d->map[x1], b1 = b->map[x1] )
         {
-//            c = abs(c - b1);
             if( c < d->length/8 )
             {
                 utility->QT += c;
-                d->map[x1] = c;
                 if( c > m[i] ) m[i] = c;
             }
         }
@@ -284,11 +282,11 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
                 /* Count gaps for all invalid values */
                 else gapc++;
             }
-            utility->FT = ((double)utility->QF)/((double)utility->QT);
-#ifdef RHO_DEBUG
-//            printf("* Filtered coverage is %.5f%%\n", utility->FT*100);
-#endif
         }
+        utility->FT = ((double)utility->QF)/((double)utility->QT);
+#ifdef RHO_DEBUG
+//        printf("* Filtered coverage is %.5f%%\n", utility->FT*100);
+#endif
     }
 #ifdef RHO_DEBUG
     printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", loc[0], den[0], max[0], loc[1], den[1], max[1]);
