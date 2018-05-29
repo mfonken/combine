@@ -343,17 +343,17 @@ Mat ImageUtility::generateImage()
         return frame;
     }
     pthread_mutex_unlock(&tau_cross_mutex);
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, -1);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, -1);
-    double tick = 0;
+    double phase = (double)path_tick/(double)path_num_ticks,
+    cphase = 2 * M_PI * phase;
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+phase), TARGET_COLOR, -1);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.5-phase), TARGET_COLOR, -1);
     switch( path )
     {
         case CIRCLE_CENTERED:
-            tick = 2 * M_PI * (double)path_tick/(double)path_num_ticks;
-            p_x = path_center_x + PATH_OFFSET * cos( tick ) + 0.3*PATH_OFFSET * cos( tick ) + TARGET_RADIUS;
-            p_y = path_center_y + 1.2*PATH_OFFSET * sin( tick );
-            s_x = path_center_x - PATH_OFFSET * cos( tick ) + 0.5*PATH_OFFSET * cos( tick );
-            s_y = path_center_y - 1.5*PATH_OFFSET * sin( tick ) - TARGET_RADIUS;
+            p_x = path_center_x + PATH_OFFSET * cos( cphase ) + 0.3*PATH_OFFSET * cos( cphase ) + TARGET_RADIUS;
+            p_y = path_center_y + 1.2*PATH_OFFSET * sin( cphase );
+            s_x = path_center_x - PATH_OFFSET * cos( cphase ) + 0.5*PATH_OFFSET * cos( cphase );
+            s_y = path_center_y - 1.5*PATH_OFFSET * sin( cphase ) - TARGET_RADIUS;
             break;
         case HORIZONTAL:
             break;

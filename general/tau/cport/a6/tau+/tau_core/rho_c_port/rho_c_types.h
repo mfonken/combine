@@ -15,9 +15,8 @@ typedef struct
 {
     int         *map,
                  length,
-                 max[2],
-                 centroid;
-    double       variance[2];
+                 centroid,
+                 max[2];
     rho_kalman_t kalmans[2];
 } DensityMapC;
 

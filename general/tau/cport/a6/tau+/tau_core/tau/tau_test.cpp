@@ -47,52 +47,67 @@ void TauDraw::drawDensitiesOnFrame(Mat M)
     pthread_mutex_lock(&drawer_mutex);
     M.copyTo(frame(Rect(0,0,w,h)));
     drawDensityGraph(frame);
-    //    drawDensityMaps(frame);
+    drawDensityMaps(frame);
     
     pthread_mutex_lock(&tau->rho.c_mutex);
     
-    int Qv[] = { tau->rho.utility.Q[0], tau->rho.utility.Q[1], tau->rho.utility.Q[2], tau->rho.utility.Q[3] };
+    int Qv[] = { tau->rho.utility.Q[0], tau->rho.utility.Q[1], tau->rho.utility.Q[2], tau->rho.utility.Q[3] },
+    Qb[] = { tau->rho.utility.Qb[0], tau->rho.utility.Qb[1], tau->rho.utility.Qb[2], tau->rho.utility.Qb[3] };
     //    qsort(Qv, 4, sizeof(int), compare);
 #define inseta_ 10
 #define insetb_ 40
 #define fontsize_ 1.4
-#define fontcolor_ Vec3b(100,100,0)
-    //    putText(frame, to_string(Qv[0]), Point(inseta_, insetb_), FONT_HERSHEY_PLAIN, fontsize_, fontcolor_, 4);
-    //    putText(frame, to_string(Qv[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_), FONT_HERSHEY_PLAIN, fontsize_, fontcolor_, 4);
-    //    putText(frame, to_string(Qv[2]), Point(inseta_, h-inseta_), FONT_HERSHEY_PLAIN, fontsize_,fontcolor_, 4);
-    //    putText(frame, to_string(Qv[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_), FONT_HERSHEY_PLAIN, fontsize_, fontcolor_, 4);
-    //
-    //    putText(frame, "Thresh: " + to_string(tau->utility->thresh), Point(0, 18), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
-    //
-    //    putText(frame, "X (" + to_string(tau->rho.utility.Cx) + ", " + to_string(tau->rho.utility.Cy) + ")", Point(tau->rho.utility.Cx, tau->rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
+#define fontcolora_ Vec3b(100,100,0)
+    putText(frame, to_string(Qv[0]), Point(inseta_, insetb_),                       FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
+    putText(frame, to_string(Qv[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_),      FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
+    putText(frame, to_string(Qv[2]), Point(inseta_, h-inseta_),                     FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
+    putText(frame, to_string(Qv[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_),    FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
+    
+#define fontcolorb_ Vec3b(0,100,100)
+    putText(frame, to_string(Qb[0]), Point(inseta_, insetb_+18),                    FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
+    putText(frame, to_string(Qb[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_+18),   FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
+    putText(frame, to_string(Qb[2]), Point(inseta_, h-inseta_+18),                  FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
+    putText(frame, to_string(Qb[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_+18), FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
+    
+    putText(frame, "Thresh: " + to_string(tau->utility->thresh), Point(0, 18), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
+    
+//    putText(frame, "X (" + to_string(tau->rho.utility.Cx) + ", " + to_string(tau->rho.utility.Cy) + ")", Point(tau->rho.utility.Cx, tau->rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
     pthread_mutex_unlock(&tau->rho.c_mutex);
     pthread_mutex_unlock(&drawer_mutex);
 }
 
 void TauDraw::drawDensityGraph(Mat M)
 {
-    int u, v, w = tau->width, h = tau->height;
+    int v, w = tau->width, h = tau->height;
     Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
     
-    int x1 = 0, x2 = 0, y1 = 0, y2 = 0, rangex[2] = { tau->rho.utility.Cx, w }, rangey[2] = { tau->rho.utility.Cy, h };
-    for( int i = 0; i < 2; i++ )
+    int x1 = w, x2 = w, y1 = h, y2 = h,
+    rangex[3] = { w, tau->rho.utility.Cx, 0 },
+    rangey[3] = { h, tau->rho.utility.Cy, 0 },
+    Bx = tau->rho.utility.background_map_pair.x.centroid,
+    By = tau->rho.utility.background_map_pair.y.centroid;
+    line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
+    line(M, Point(0,rangey[1]),   Point(W,rangey[1]), redish);
+    
+    for( int i = 0, j = 1; i < 2; i++, j++ )
     {
         /* Kalman Values */
         rho_kalman_t yk = tau->rho.utility.density_map_pair.x.kalmans[i], xk = tau->rho.utility.density_map_pair.y.kalmans[i];
-        int mYv = tau->rho.utility.density_map_pair.x.variance[i], mXv = tau->rho.utility.density_map_pair.y.variance[i];
+        int mYv = tau->rho.utility.density_map_pair.x.kalmans[i].variance, mXv = tau->rho.utility.density_map_pair.y.kalmans[i].variance;
         
         int m = OP_ALIGN((xk.value/DENSITY_SCALE),h), n = OP_ALIGN((yk.value/DENSITY_SCALE),w);
         int mv1 = OP_ALIGN((mXv/DENSITY_SCALE),m), mv2 = OP_ALIGN(-(mXv/DENSITY_SCALE),m), nv1 = OP_ALIGN((mYv/DENSITY_SCALE),n), nv2 = OP_ALIGN(-(mYv/DENSITY_SCALE),n);
         
         double ndm = INR(OP_ALIGN(yk.value/DENSITY_SCALE,w),w), mdm = INR(OP_ALIGN(xk.value/DENSITY_SCALE,h),h);
         
-        line(M, Point(n,0),   Point(n,H), orangish);
-        line(M, Point(nv1,0), Point(nv1,H), yellowish);
-        line(M, Point(nv2,0), Point(nv2,H), yellowish);
+        int k = i, l = j;
+        line(M, Point(n,rangey[k]),   Point(n,rangey[l]), orangish);
+        line(M, Point(nv1,rangey[k]), Point(nv1,rangey[l]), yellowish);
+        line(M, Point(nv2,rangey[k]), Point(nv2,rangey[l]), yellowish);
         
-        line(M, Point(0,m),   Point(W,m), orangish);
-        line(M, Point(0,mv1), Point(W,mv1), yellowish);
-        line(M, Point(0,mv2), Point(W,mv2), yellowish);
+        line(M, Point(rangex[k],m),   Point(rangex[l],m), orangish);
+        line(M, Point(rangex[k],mv1), Point(rangex[l],mv1), yellowish);
+        line(M, Point(rangex[k],mv2), Point(rangex[l],mv2), yellowish);
         
 #ifdef DRAW_RHO_MAPS
         RMX = Scalar(255,255,255);
@@ -104,12 +119,12 @@ void TauDraw::drawDensityGraph(Mat M)
         /* Density Maps */
         pthread_mutex_lock(&tau->rho.density_map_pair_mutex);
         int dX[h], dY[w], fX[h], fY[w];
-        for(; y1 < rangey[i]; y1++ )
+        for( y1 = rangey[i]; y1 > rangey[j]; --y1 )
         {
             dX[y1] = tau->rho.utility.density_map_pair.x.map[y1];
             fX[y1] = tau->rho.utility.background_map_pair.x.map[y1];
         }
-        for(; x1 < rangex[i]; x1++ )
+        for( x1 = rangex[i]; x1 > rangex[j]; --x1 )
         {
             dY[x1] = tau->rho.utility.density_map_pair.y.map[x1];
             fY[x1] = tau->rho.utility.background_map_pair.y.map[x1];
@@ -121,7 +136,7 @@ void TauDraw::drawDensityGraph(Mat M)
         line(RMY, Point(0,nv1d), Point(H,nv1d), yellowish);
         line(RMY, Point(0,nv2d), Point(H,nv2d), yellowish);
 #endif
-        for( ; y2 < rangey[i]; y2++ )
+        for( y2 = rangey[i]; y2 > rangey[j]; --y2 )
         {
             v = INR(OP_ALIGN((dX[y2]/DENSITY_SCALE),w),w);
             
@@ -164,7 +179,7 @@ void TauDraw::drawDensityGraph(Mat M)
         line(RMX, Point(0,mv1d), Point(W,mv1d), yellowish);
         line(RMX, Point(0,mv2d), Point(W,mv2d), yellowish);
 #endif
-        for( ; x2 < rangex[i]; x2++ )
+        for( x2 = rangex[i] ; x2 > rangex[j]; --x2 )
         {
             v = INR(OP_ALIGN((dY[x2]/DENSITY_SCALE),h),h);
             
@@ -220,8 +235,11 @@ void TauDraw::drawDensityGraph(Mat M)
     line(M, Point(b.y, 0), Point(b.y, h), bluish);
     line(M, Point(0, a.x), Point(w, a.x), bluish);
     line(M, Point(0, b.x), Point(w, b.x), bluish);
-    putText(M, "A", Point(tau->A.x, tau->A.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,150), 3);
-    putText(M, "B", Point(tau->B.x, tau->B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
+    
+    line(M, Point(0,Bx),Point(w,Bx), greenish);
+    line(M, Point(By,0),Point(By,h), greenish);
+    //    putText(M, "A", Point(tau->A.x, tau->A.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,150), 3);
+    //    putText(M, "B", Point(tau->B.x, tau->B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
 }
 
 void TauDraw::drawDensityMaps(Mat M)

@@ -21,6 +21,7 @@ static void init( rho_kalman_t * k, double v, double ls, double vu, double bu, d
     k->value       = v;
     k->prev        = 0;
     k->velocity    = 0;
+    k->variance    = 0;
 
     k->lifespan    = ls;
     k->uncertainty.value   = vu;
@@ -65,6 +66,7 @@ static void update( rho_kalman_t * k, double value_new, double rate_new )
     k->P[1][1] -= k->K[1] * k->P[0][1];
     
     k->timestamp = timestamp();
+    k->variance = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - k->K[0] ) );
 };
 
 static int isExpired( rho_kalman_t * k )

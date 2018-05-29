@@ -10,6 +10,14 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/time.h>
+#include "global_types.h"
+    
+#define RHO_SQRT_HEIGHT     sqrt(FNL_RESIZE_H)
+#define RHO_DIM_INFLUENCE   0.1
+#define RHO_K_TARGET_IND    0.3
+#define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
+#define RHO_VARIANCE_NORMAL RHO_SQRT_HEIGHT/5.0             //5
+#define RHO_VARIANCE_SCALE  RHO_SQRT_HEIGHT/3.0//1.32        //20
     
     /** Kalman Uncertainties */
     typedef struct
@@ -33,7 +41,8 @@ extern "C" {
                     value,
                     prev,
                     velocity,
-                    timestamp;
+                    timestamp,
+                    variance;
     } rho_kalman_t;
     
     struct rho_kalman {

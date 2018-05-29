@@ -26,14 +26,7 @@ extern "C" {
 
 #define MAX_PEAKS           3
 
-#define RHO_SQRT_HEIGHT     sqrt(FNL_RESIZE_H)
-#define RHO_DIM_INFLUENCE   0.1
-#define RHO_K_TARGET_IND    0.3
-#define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
-#define RHO_VARIANCE_NORMAL RHO_SQRT_HEIGHT/5.0             //5
-#define RHO_VARIANCE_SCALE  RHO_SQRT_HEIGHT/3.0//1.32        //20
-
-#define RHO_PUNISH_FACTOR   2
+#define RHO_PUNISH_FACTOR   1
 
 #define RHO_GAP_MAX 10
 
@@ -79,16 +72,37 @@ typedef struct
     int cframe[C_FRAME_SIZE];
     pthread_mutex_t rho_int_mutex;
 } rho_c_utility;
+     
+typedef struct
+{
+    int area[9];
+} area_list_t;
+
+typedef struct
+{
+    int
+        background[4][4],
+        current[4][4],
+        factor[4][4],
+        length[4];
+} density_redistribution_lookup_config_t;
+
+typedef struct
+{
+    density_redistribution_lookup_config_t config[4];
+} density_redistribution_lookup_t;
 
 struct rho_functions
 {
-    void (*Init)(rho_c_utility *, int, int);
-    void (*Generate_Density_Map_Using_Interrupt_Model)( rho_c_utility * utility, cimage_t image, bool backgrounding );
-    void (*Filter_and_Select_Pairs)( rho_c_utility * );
-    void (*Filter_and_Select)( rho_c_utility *, DensityMapC *, DensityMapC *, PredictionC * );
-    void (*Update_Prediction)( rho_c_utility * );
+    void (*Init)(                                       rho_c_utility *, int, int);
+    void (*Generate_Density_Map_Using_Interrupt_Model)( rho_c_utility *, cimage_t, bool );
+    void (*Redistribute_Densities)(                     rho_c_utility *, const density_redistribution_lookup_t * );
+    void (*Filter_and_Select_Pairs)(                    rho_c_utility * );
+    void (*Filter_and_Select)(                          rho_c_utility *, DensityMapC *, DensityMapC *, PredictionC * );
+    void (*Update_Prediction)(                          rho_c_utility * );
 };
 
+extern const density_redistribution_lookup_t rlookup;
 extern const struct rho_functions RhoFunctions;
 
 #ifdef __cplusplus

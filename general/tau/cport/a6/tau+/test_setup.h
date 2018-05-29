@@ -15,7 +15,7 @@
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
-//#define HAS_FILE
+#define HAS_FILE
 #define HAS_GENERATOR
 
 /* DEBUGGING */
