@@ -25,24 +25,32 @@
 #include "unfisheye.hpp"
 #include "kinetic.h"
 
-#define TILT_LINES
-#define GREYSCALE
+//#define TILT_LINES
+//#define GREYSCALE
 
 #define THRESH_IMAGE
 
 #define PATH_NUM_TICKS  250
 #define PATH_OFFSET     200
 #define TARGET_RADIUS   20
-#define DEFAULT_PATH    CIRCLE_CENTERED
+#define DEFAULT_PATH    CIRCLE_DUAL
 #define TARGET_COLOR    Scalar(255,255,255)
+#define PATH_OFFSET_A   0.2
+#define PATH_OFFSET_B   1.1
+#define PATH_OFFSET_C   1.5
 
 #define DEFAULT_NOISE   NONE//STATIC_SMALL
-#define NOISE_RATE      10  //Hz
-#define NOISE_COLOR     Scalar(0,0,255)
+#define NOISE_RATE      10  //Hz 
+#define NOISE_COLOR     Scalar(255,255,255)
+#define NOISE_ORIGIN_X  50
+#define NOISE_ORIGIN_Y  200
+#define NOISE_WIDTH     150
+#define NOISE_HEIGHT    100
 
 typedef enum
 {
     CIRCLE_CENTERED = 0,
+    CIRCLE_DUAL,
     HORIZONTAL
 } path_t;
 
@@ -94,6 +102,7 @@ public:
     kpoint_t bea[2];
     int thresh;
     bool    generator_active,
+            background_request,
             background_ready;
 private:
     

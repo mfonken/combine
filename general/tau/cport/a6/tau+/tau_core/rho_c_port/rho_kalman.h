@@ -11,6 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <sys/time.h>
 #include "global_types.h"
+#include <math.h>
     
 #define RHO_SQRT_HEIGHT     sqrt(FNL_RESIZE_H)
 #define RHO_DIM_INFLUENCE   0.1

@@ -54,9 +54,10 @@ static void cimageFromMat( cv::Mat mat, cimage_t * img )
     int w = mat.cols, h = mat.rows, p = 0;
     for(int y = 0; y < h; y++ )
     {
-        for(int x = 0; x < w; x++)
+        for(int x = 0; x < w; x++, p++ )
         {
-            img->pixels[p++] = (pixel_base_t)pixelDist(mat.at<cv::Vec3b>(y,x));
+            cv::Vec3b c = mat.at<cv::Vec3b>(y,x);
+            img->pixels[p] = pixelDist(c);
         }
     }
 }

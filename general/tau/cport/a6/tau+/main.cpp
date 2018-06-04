@@ -9,9 +9,9 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        10
-#define UTILITY_FPS     45
-#define TAU_FPS         45
+#define MAIN_FPS        20
+#define UTILITY_FPS     60
+#define TAU_FPS         60
 #define COMBINE_FPS     30
 
 #define KEY_DELAY   1E3/MAIN_FPS

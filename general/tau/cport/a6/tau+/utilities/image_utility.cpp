@@ -23,7 +23,7 @@ ImageUtility::ImageUtility( std::string n, std::string f, int width, int height)
 
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height ) : frame(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0)), preoutframe(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0)), outframe(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_CAMERA
-,cam(0)
+,cam(CAMERA_ID)
 ,image(Size(CAM_WIDTH, CAM_HEIGHT), CV_8UC3, Scalar(0,0,0))
 #endif
 {
@@ -152,21 +152,35 @@ void ImageUtility::initGenerator()
 
 void ImageUtility::trigger()
 {
+    
+    
+    
     ++counter;
     if(has_file)      getNextImage();
     if(has_camera)    getNextFrame();
-    if(has_generator) generateImage();
+    
+    if( background_request )
+    {
+        pthread_mutex_lock(&tau_cross_mutex);
+        putText(frame, "BACKGROUNDING", Point(10,100), FONT_HERSHEY_PLAIN, 1, Vec3b(0,245,15), 2);
+        preoutframe = frame;
+        background_ready = true;
+        background_request = false;
+        pthread_mutex_unlock(&tau_cross_mutex);
+    }
+    else if(has_generator) generateImage();
+    
     pthread_mutex_lock(&outframe_mutex);
 #ifdef THRESH_IMAGE
     cv::threshold(preoutframe, outframe, thresh, BRIGHTNESS, 0);
 #else
     preoutframe.copyTo(outframe);
 #endif
-    pthread_mutex_unlock(&outframe_mutex);
 
     pthread_mutex_lock(&outimage_mutex);
     cimageFromMat(outframe, &outimage);
     pthread_mutex_unlock(&outimage_mutex);
+    pthread_mutex_unlock(&outframe_mutex);
 }
 
 std::string ImageUtility::serialize()
@@ -191,8 +205,8 @@ int ImageUtility::loop(char c)
         default:
             return 0;
     }
-    if( has_file || has_camera)
-        getImage();
+    if( has_file ) getImage();
+    if( has_camera ) getNextFrame();
     return 1;
 }
 
@@ -312,7 +326,7 @@ Mat ImageUtility::generateImage()
     switch(noise)
     {
         case STATIC_SMALL:
-            rectangle(frame, Point(300,300), Point(400,400), NOISE_COLOR, -1);
+            rectangle(frame, Point(NOISE_ORIGIN_X,NOISE_ORIGIN_Y), Point(NOISE_ORIGIN_X+NOISE_WIDTH,NOISE_ORIGIN_Y+NOISE_HEIGHT), NOISE_COLOR, -1);
             break;
         case STATIC_LARGE:
             break;
@@ -332,28 +346,32 @@ Mat ImageUtility::generateImage()
             break;
     }
     
-    pthread_mutex_lock(&tau_cross_mutex);
-    if( !generator_active )
-    {
-//        printf("Background event.\n");
-        putText(frame, "BACKGROUNDING", Point(10,100), FONT_HERSHEY_PLAIN, 1, Vec3b(0,245,15), 2);
-        preoutframe = frame;
-        background_ready = true;
-        pthread_mutex_unlock(&tau_cross_mutex);
-        return frame;
-    }
-    pthread_mutex_unlock(&tau_cross_mutex);
     double phase = (double)path_tick/(double)path_num_ticks,
-    cphase = 2 * M_PI * phase;
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+phase), TARGET_COLOR, -1);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.5-phase), TARGET_COLOR, -1);
+        cphase = 2 * M_PI * phase,
+        ocoscp = PATH_OFFSET * cos(cphase),
+        osincp = PATH_OFFSET * sin(cphase),
+        path_left = path_center_x - size.width/4,
+        path_right = path_center_x + size.width/4,
+        path_top = path_center_y - size.height/4,
+        path_bottom = path_center_y + size.height/4,
+        radius_offset = abs(0.5 - phase)*2;
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+radius_offset), TARGET_COLOR, -1);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.5-radius_offset), TARGET_COLOR, -1);
+//    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(1.0+radius_offset), TARGET_COLOR, -1);
+//    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0+radius_offset), TARGET_COLOR, -1);
     switch( path )
     {
         case CIRCLE_CENTERED:
-            p_x = path_center_x + PATH_OFFSET * cos( cphase ) + 0.3*PATH_OFFSET * cos( cphase ) + TARGET_RADIUS;
-            p_y = path_center_y + 1.2*PATH_OFFSET * sin( cphase );
-            s_x = path_center_x - PATH_OFFSET * cos( cphase ) + 0.5*PATH_OFFSET * cos( cphase );
-            s_y = path_center_y - 1.5*PATH_OFFSET * sin( cphase ) - TARGET_RADIUS;
+            p_x = path_center_x + PATH_OFFSET_B*ocoscp + TARGET_RADIUS;
+            p_y = path_center_y + PATH_OFFSET_C*osincp;
+            s_x = path_center_x - PATH_OFFSET_A*ocoscp;
+            s_y = path_center_y - PATH_OFFSET_B*osincp - TARGET_RADIUS;
+            break;
+        case CIRCLE_DUAL:
+            p_x = path_left     + PATH_OFFSET_A*ocoscp + TARGET_RADIUS;
+            p_y = path_top      + PATH_OFFSET_A*osincp;
+            s_x = path_right    - PATH_OFFSET_A*ocoscp;
+            s_y = path_bottom   - PATH_OFFSET_A*osincp - TARGET_RADIUS;
             break;
         case HORIZONTAL:
             break;

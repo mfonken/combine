@@ -45,11 +45,14 @@ void Rho::perform( cimage_t * img, PredictionPair * p )
     pthread_mutex_unlock(&density_map_pair_mutex);
     pthread_mutex_unlock(&c_mutex);
     
-    p->x.primary.value           = utility.prediction_pair.x.primary.value;
-    p->x.secondary.value         = utility.prediction_pair.x.secondary.value;
-    p->y.primary.value           = utility.prediction_pair.y.primary.value;
-    p->y.secondary.value         = utility.prediction_pair.y.secondary.value;
-    p->x.probabilities.primary   = utility.prediction_pair.x.probabilities.primary;
-    p->x.probabilities.secondary = utility.prediction_pair.x.probabilities.secondary;
-    p->x.probabilities.alternate = utility.prediction_pair.x.probabilities.alternate;
+    p->x.primary.value           = utility.prediction_pair.y.primary.value;
+    p->x.secondary.value         = utility.prediction_pair.y.secondary.value;
+    p->y.primary.value           = utility.prediction_pair.x.primary.value;
+    p->y.secondary.value         = utility.prediction_pair.x.secondary.value;
+    p->x.probabilities.primary   = utility.prediction_pair.y.probabilities.primary;
+    p->x.probabilities.secondary = utility.prediction_pair.y.probabilities.secondary;
+    p->x.probabilities.alternate = utility.prediction_pair.y.probabilities.alternate;
+    p->y.probabilities.primary   = utility.prediction_pair.x.probabilities.primary;
+    p->y.probabilities.secondary = utility.prediction_pair.x.probabilities.secondary;
+    p->y.probabilities.alternate = utility.prediction_pair.x.probabilities.alternate;
 }

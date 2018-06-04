@@ -19,7 +19,7 @@
 #include "state_machine_utility.h"
 
 #define MAX_COUNT               10000
-#define BACKGROUNDING_PERIOD    10
+#define BACKGROUNDING_PERIOD    2000
 
 class Tau : public TestInterface
 {

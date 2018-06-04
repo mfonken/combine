@@ -11,26 +11,23 @@
 
 #define TITLE_STRING            "Tau+ CPort Alpha v0.6"
 #define IMAGE_SOURCE_PATH       "noise/dynamic_clouds"
-#define IMAGE_SOURCE_NUM_FRAMES 1
+#define IMAGE_SOURCE_NUM_FRAMES 4
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
-#define HAS_FILE
+//#define HAS_FILE
 #define HAS_GENERATOR
 
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define TAU_DEBUG
-//#define RHO_DEBUG
+#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define IMUT_DEBUG
 
 #ifdef HAS_CAMERA
 #define FISHEYE
 #endif
-
-#define CHAOS                   5
-#define NUM_OF_SELECTIONS       1
 
 #define STRENGTH 2.0
 #define ZOOM     1.1
@@ -48,18 +45,18 @@
 
 #define FILENAME                "/Users/matthewfonken/Desktop/out.txt"
 
-
+#define CAMERA_ID               1
 #define CAM_WIDTH               1280//1920
 #define CAM_HEIGHT              720//1080
 #define CAM_FRAME_RATE          60
-#define FNL_RESIZE_S            1
+#define FNL_RESIZE_S            2
 
 #ifdef HAS_CAMERA
 #define FNL_RESIZE_W            CAM_WIDTH/FNL_RESIZE_S
 #define FNL_RESIZE_H            CAM_HEIGHT/FNL_RESIZE_S
 #else
-#define FNL_RESIZE_W            700
-#define FNL_RESIZE_H            FNL_RESIZE_W
+#define FNL_RESIZE_W            700//1280/FNL_RESIZE_S
+#define FNL_RESIZE_H            350//720/FNL_RESIZE_S//
 #endif
 
 #define FNL_RESIZE_W_HALF       FNL_RESIZE_W/2
@@ -67,7 +64,7 @@
 
 #define THRESH_STEP             2
 #define THRESHOLD_MAX           255-THRESH_STEP
-#define THRESHOLD_MIN           100
+#define THRESHOLD_MIN           195
 
 #define THRESHOLD               230
 #define BRIGHTNESS              155

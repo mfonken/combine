@@ -52,7 +52,7 @@ void FRAME_END( void )
 void ROW_INT( void )
 {
     *(RhoVariables.registers.wr++) = RhoVariables.global.y_delimiter;
-    RhoVariables.registers.PTOG = !RhoVariables.registers.PTOG;
+//    RhoVariables.registers.PTOG = !RhoVariables.registers.PTOG;
     RhoVariables.registers.x = 0;
 }
 

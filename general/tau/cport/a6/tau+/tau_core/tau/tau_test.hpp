@@ -34,7 +34,7 @@
 #define OP_ALIGN(X,Y) (Y-X)
 
 //#define DRAW_RHO_MAPS
-#define RHO_MAPS_HEIGHT 100
+#define RHO_MAPS_HEIGHT 200
 #define RHO_MAPS_INSET 10
 
 using namespace cv;
@@ -50,11 +50,11 @@ public:
     
     TauDraw( Tau * tau, cv::Mat );
     void drawDensitiesOnFrame(Mat);
-    void drawDensityGraph(Mat M);
-    void drawDensityMaps(Mat M);
-    Vec3b densityColor( int v );
-    int pixelDensity( Vec3b p );
-    Vec3b hsv2bgr(Vec3b hsv);
+    void drawDensityGraph(Mat);
+    void drawDensityMaps(Mat);
+    Vec3b densityColor( int );
+    int pixelDensity( Vec3b );
+    Vec3b hsv2bgr(Vec3b);
     void drawKalmans();
 };
 

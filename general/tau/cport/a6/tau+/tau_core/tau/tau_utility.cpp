@@ -60,13 +60,12 @@ double Tau::perform( cimage_t * img )
         rho.backgrounding_event = true;
         rho.perform( img, &predictions );
         utility->background_ready = false;
-        utility->generator_active = true;
         tick = 0;
         pthread_mutex_unlock(&utility->tau_cross_mutex);
     }
     else if( ++tick >= BACKGROUNDING_PERIOD )
     {
-        utility->generator_active = false;
+        utility->background_request = true;
         pthread_mutex_unlock(&utility->tau_cross_mutex);
     }
     else

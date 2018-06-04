@@ -24,17 +24,17 @@ extern "C" {
     
 #include "rho_interrupt_model.h"
 
-#define MAX_PEAKS           3
+//#define MAX_PEAKS           3
 
 #define RHO_PUNISH_FACTOR   1
 
 #define RHO_GAP_MAX 10
 
-#define FILTERED_CONVERAGE_TARGET  0.003
+#define FILTERED_CONVERAGE_TARGET  0.001
 
 #define RHO_PREDICTION_LS   1.0
 #define RHO_PREDICTION_VU   0.05
-#define RHO_PREDICTION_BU   0.01
+#define RHO_PREDICTION_BU   0.001
 #define RHO_PREDICTION_SU   0.01
 
 #define RHO_DEFAULT_LS      5
@@ -43,11 +43,24 @@ extern "C" {
 #define RHO_DEFAULT_SU      0.7
     
 #define MAX_COVERAGE        1
-#define C_FRAME_SIZE        ((int)(MAX_COVERAGE * ( FNL_RESIZE_W * FNL_RESIZE_H )))
+#define FRAME_SIZE          ( FNL_RESIZE_W * FNL_RESIZE_H )
+#define C_FRAME_SIZE        ((int)(MAX_COVERAGE * FRAME_SIZE))
 #define Y_DEL               0xaaaaaaaa
+    
+#define BACKGROUND_PERCENT_MIN  0.02
+#define BACKGROUND_COVERAGE_MIN ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
 
-static void cma( double new_val, double *avg, int num ) { *avg+=(new_val-*avg)/(double)(num+1); }
-static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n ) { double n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_; }
+static void cma( double new_val, double *avg, int num )
+    {
+        *avg+=(new_val-*avg)/(double)(num+1);
+    }
+static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n )
+    {
+        double n_=1/((double)(++(*n)));
+        *m0+=((v-*m0)*n_);
+        *m1+=(((v*i)-*m1)*n_);
+        
+    }
 static void fswap( double *a, double *b ) { double t=(*a);*a=*b;*b=t; }
 static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
 
@@ -64,8 +77,11 @@ typedef struct
             thresh,
             Cx,
             Cy,
+            Bx,
+            By,
             Q[4],
             Qb[4],
+            Qf[4],
             QT;
     double  QF, FT;
 

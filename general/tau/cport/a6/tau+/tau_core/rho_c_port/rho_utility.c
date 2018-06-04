@@ -13,14 +13,14 @@
 
 #include <unistd.h>
 
-//#define ALLOW_NEGATIVE_REDISTRIBUTION
+#define INR(X,H)     (X<0?0:((X>H)?(H-1):X))
+
+#define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define FOR(L)       for( int i = L; i > 0; --i)
 #define FORA(L,A)    for( int i = L; i > 0; --i, A[i] )
 #define FORA2(L,A,B) for( int i = L; i > 0; --i, A[i], B[i] )
 #define ZDIV(X,Y)    (!Y?2<<10:X/Y)
-
-#define N -1
 
 const density_redistribution_lookup_t rlookup =
 {
@@ -54,8 +54,8 @@ const density_redistribution_lookup_t rlookup =
 
 static void Redistribute_Densities( rho_c_utility * utility, const density_redistribution_lookup_t * lookup )
 {
-    int Bx = utility->background_map_pair.x.centroid,
-        By = utility->background_map_pair.y.centroid,
+    int Bx = utility->Bx,
+        By = utility->By,
         Cx = utility->Cx,
         Cy = utility->Cy,
         x0 = Bx, x1 = Cx, y0 = By, y1 = Cy,
@@ -82,10 +82,10 @@ static void Redistribute_Densities( rho_c_utility * utility, const density_redis
             bd += ZDIV( a, b ) * utility->Qb[q];
         }
 #ifndef ALLOW_NEGATIVE_REDISTRIBUTION
-        if( bd > utility->Q[q] ) utility->Q[q] = 0;
+        if( bd > utility->Q[q] ) utility->Qf[q] = 0;
         else
 #endif
-            utility->Q[q] -= bd;
+            utility->Qf[q] = utility->Q[q] - bd;
     }
 }
 
@@ -154,9 +154,9 @@ void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage
     {
         RhoVariables.ram.Dx      =  utility->background_map_pair.x.map;
         RhoVariables.ram.Dy      =  utility->background_map_pair.y.map;
+        RhoVariables.ram.CX_ADDR = &utility->By;
+        RhoVariables.ram.CY_ADDR = &utility->Bx;
         RhoVariables.ram.Q       =  utility->Qb;
-        utility->background_map_pair.x.centroid =  utility->Cx;
-        utility->background_map_pair.y.centroid =  utility->Cy;
     }
     pixel_base_t test_port = 0;
     RhoVariables.ram.CAM_PORT = &test_port;
@@ -176,8 +176,36 @@ void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage
     
     if( backgrounding )
     {
+        if( RhoVariables.ram.QT < BACKGROUND_COVERAGE_MIN )
+        {
+            memset(RhoVariables.ram.Q, 0, sizeof(RhoVariables.ram.Q[0])*4);
+            utility->Bx = 0;
+            utility->By = 0;
+//            printf("Insignificant background.\n");
+        }
+        else
+        {
+            int xcnt = 0, ycnt = 0;
+            double xavg = 0, xmag = 0, yavg = 0, ymag = 0;
+            for( int i = 0, l = utility->background_map_pair.x.length; i < l; i++ )
+            {
+                int c = utility->background_map_pair.x.map[i];
+                if( c > 10 ) cma_M0_M1(c, i, &xavg, &xmag, &xcnt);
+            }
+            
+            for( int i = 0, l = utility->background_map_pair.y.length; i < l; i++ )
+            {
+                int c = utility->background_map_pair.y.map[i];
+                if( c > 10 ) cma_M0_M1(c, i, &yavg, &ymag, &ycnt);
+            }
+            utility->Bx = xmag/xavg;
+            utility->By = ymag/yavg;
+        }
+    
         RhoVariables.ram.Dx      =  utility->density_map_pair.x.map;
         RhoVariables.ram.Dy      =  utility->density_map_pair.y.map;
+        RhoVariables.ram.CX_ADDR = &utility->Cx;
+        RhoVariables.ram.CY_ADDR = &utility->Cy;
         RhoVariables.ram.Q       =  utility->Q;
     }
     else
@@ -193,7 +221,7 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
     fvar    = 0,
     fbandl  = 0,
     c       = 0,
-    m[2]    = {0,0},
+    m       = 0,
     c1      = 0,
     c2      = 0,
     b1      = 0,
@@ -215,23 +243,27 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
     /* Find max and update kalman */
     int range[3] = { l, d->centroid, 0 };
 #ifdef RHO_DEBUG
-    printf("Map centroid is %d\n", range[1]);
+    printf("Range is <%d, %d, %d>\n", range[2], range[1], range[0]);
+//    printf("Map centroid is %d\n", range[1]);
 #endif
     int x1 = l, x2 = l;
     
     for( int i = 1, j = 2; i >= 0; i--, j-- )
     {
+        m = 0;
         for( x1 = range[i]; x1 > range[j]; --x1, c = d->map[x1], b1 = b->map[x1] )
         {
+//            c = abs( b1 - c ) ;
+            d->map[x1] = c;
             if( c < d->length/8 )
             {
                 utility->QT += c;
-                if( c > m[i] ) m[i] = c;
+                if( c > m ) m = c;
             }
         }
         
-        RhoKalman.update(&d->kalmans[i], m[i], 0.);
-        d->max[i] = m[i];
+        RhoKalman.update(&d->kalmans[i], m, 0.);
+        d->max[i] = m;
         fpeak = d->kalmans[i].value;
         fvar = d->kalmans[i].variance;
         
@@ -239,7 +271,7 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
         {
             fbandl = fpeak - fvar;
 #ifdef RHO_DEBUG
-            printf("Map(%d): max>%d | peak>%d | var>%d | bandl>%d\n", i, m[i], fpeak, fvar, fbandl);
+//            printf("Map(%d): max>%d | peak>%d | var>%d | bandl>%d\n", i, m[i], fpeak, fvar, fbandl);
 #endif
             /* Find blob centroids and sort out the top 2 */
             for( x2 = range[i]; x2 > range[j]; --x2, c1 = d->map[x2] )
@@ -253,7 +285,7 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
                     /* De-offset valid values */
                     c2 = c1 - fbandl;
                     
-                    cma_M0_M1((double)c2, x2, &cavg, &mavg, &count);
+                    cma_M0_M1(c2, x2, &cavg, &mavg, &count);
                     if(c2 > maxc) maxc = c2;
                     has = 1; gapc = 0;
                 }
@@ -289,9 +321,10 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
 #endif
     }
 #ifdef RHO_DEBUG
-    printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", loc[0], den[0], max[0], loc[1], den[1], max[1]);
+//    printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", loc[0], den[0], max[0], loc[1], den[1], max[1]);
 #endif
-        if( !loc[0] && !loc[1] ) return;
+//    if( !loc[0] || !loc[1] ) return;
+    if( utility->FT > 1 || utility->FT < 0 ) utility->FT = 0;
     
     /* Update prediction with best peaks */
     r->primary_new   = loc[0];
@@ -319,28 +352,33 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
 
 void Filter_and_Select_Pairs( rho_c_utility * utility )
 {
+//    printf("X Map:\n");
     Filter_and_Select( utility, &utility->density_map_pair.x, &utility->background_map_pair.x, &utility->prediction_pair.x );
+//    printf("Y Map:\n");
     Filter_and_Select( utility, &utility->density_map_pair.y, &utility->background_map_pair.y, &utility->prediction_pair.y );
 }
 
 void Update_Prediction( rho_c_utility * utility )
 {
-    int Ax = utility->prediction_pair.x.primary_new,
-    Ay = utility->prediction_pair.y.primary_new,
-    Bx = utility->prediction_pair.x.secondary_new,
-    By = utility->prediction_pair.y.secondary_new;
+    int
+        Ax = utility->prediction_pair.y.primary_new,
+        Ay = utility->prediction_pair.x.primary_new,
+        Bx = utility->prediction_pair.y.secondary_new,
+        By = utility->prediction_pair.x.secondary_new;
+    if(Ax > Bx) iswap(&Ax, &Bx);
+    if(Ay > By) iswap(&Ay, &By);
+    
     int Cx = utility->Cx, Cy = utility->Cy;
     
-    bool nondiag = false;
-    signed char qcheck = ( utility->Q[0] > utility->Q[1] ) + ( utility->Q[2] < utility->Q[3] ) - 1;
+    bool diag = true;
     if( ( Ax < Cx ) ^ ( Bx > Cx ) ) /* X ambiguous */
     {
         double x1 = utility->prediction_pair.x.primary.value + utility->prediction_pair.x.primary.velocity;
         double p1 = fabs(x1-Ax), p2 = fabs(x1-Bx);
         if( p1 > p2 ) iswap(&Ax, &Bx);
-        nondiag = true;
+        diag = false;
 #ifdef RHO_DEBUG
-        printf("X Ambiguity (%d,%d,%d)\n", Ax, Bx, Cx);
+        printf("X Ambiguous (%d,%d,%d)\n", Ax, Bx, Cx);
 #endif
     }
     if( ( Ay < Cy ) ^ ( By > Cy ) ) /* Y ambiguous */
@@ -348,38 +386,39 @@ void Update_Prediction( rho_c_utility * utility )
         double y1 = utility->prediction_pair.y.primary.value + utility->prediction_pair.y.primary.velocity;
         double p1 = fabs(y1-Ay), p2 = fabs(y1-By);
         if( p1 > p2 ) iswap(&Ay, &By);
-        nondiag = true;
+        diag = false;
 #ifdef RHO_DEBUG
-        printf("Y Ambiguity (%d,%d,%d)\n", Ay, By, Cy);
+        printf("Y Ambiguous (%d,%d,%d)\n", Ay, By, Cy);
 #endif
     }
-    
-    if ( !nondiag )
+
+//    diag = false;
+    if ( diag )
     {
+//        signed char qcheck = ( utility->Q[0] > utility->Q[1] ) + ( utility->Q[2] < utility->Q[3] ) - 1;
+        signed char qcheck = ( utility->Qf[0] > utility->Qf[1] ) + ( utility->Qf[2] < utility->Qf[3] ) - 1;
         if( Ax > Bx ) iswap(&Ax, &Bx);
         if ( ( qcheck > 0 ) ^ ( Ay < By ) ) iswap(&Ay, &By);
-        
 #ifdef RHO_DEBUG
-        //        if( qcheck < 0 ) printf("Secondary diagonal\n");
-        //        if( qcheck > 0 ) printf("Primary diagonal\n");
+        printf("Quadrant Check %d\n", qcheck);
 #endif
     }
     
-    RhoKalman.update( &utility->prediction_pair.x.primary,   Ax, 0);
-    RhoKalman.update( &utility->prediction_pair.x.secondary, Bx, 0);
-    RhoKalman.update( &utility->prediction_pair.y.primary,   Ay, 0);
-    RhoKalman.update( &utility->prediction_pair.y.secondary, By, 0);
+    if( Ax ) RhoKalman.update( &utility->prediction_pair.x.primary,   Ax, 0);
+    if( Bx ) RhoKalman.update( &utility->prediction_pair.x.secondary, Bx, 0);
+    if( Ay ) RhoKalman.update( &utility->prediction_pair.y.primary,   Ay, 0);
+    if( By ) RhoKalman.update( &utility->prediction_pair.y.secondary, By, 0);
     
-    Cy = (int)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) / 2;
-    Cx = (int)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) / 2;
-    if( Cx < 0               ) Cx = 0;
-    if( Cy < 0               ) Cy = 0;
-    if( Cx > utility->width  ) Cx = utility->width;
-    if( Cy > utility->height ) Cy = utility->height;
+    Cx = (int)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) / 2;
+    Cy = (int)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) / 2;
+    
+    Cx = INR(Cx, utility->width);
+    Cy = INR(Cy, utility->height);
+    
     utility->Cx = Cx;
     utility->Cy = Cy;
-    utility->density_map_pair.x.centroid = Cx;
-    utility->density_map_pair.y.centroid = Cy;
+    utility->density_map_pair.x.centroid = Cy;
+    utility->density_map_pair.y.centroid = Cx;
 }
 
 const struct rho_functions RhoFunctions =
