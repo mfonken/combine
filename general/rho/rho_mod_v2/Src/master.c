@@ -102,7 +102,7 @@ void frameProcessor( void )
 		//if( wr_index < limit )
 		//{
 			tog();
-			resetDMA();
+			//resetDMA();
 			//row_int();
 			THRESH_BUFFER[wr_index++] = (index_t)0xaaaa;
 
@@ -146,9 +146,9 @@ void frameProcessor( void )
 	
 	/* * * * *  Register Protection End  * * * * */
 	
-	//Rho.density_map_pair.x.max = DENSITY_X_MAX;
-	//RhoFunctions.Filter_and_Select_Pairs( &Rho );
-	//RhoFunctions.Update_Prediction( &Rho );
+	Rho.density_map_pair.x.max = DENSITY_X_MAX;
+	RhoFunctions.Filter_and_Select_Pairs( &Rho );
+	RhoFunctions.Update_Prediction( &Rho );
 	tog();
 }
 
