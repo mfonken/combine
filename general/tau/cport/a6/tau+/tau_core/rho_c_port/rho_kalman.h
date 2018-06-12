@@ -48,7 +48,7 @@ extern "C" {
     
     struct rho_kalman {
         void (*init)( rho_kalman_t *, double, double, double, double, double );
-        void (*update)( rho_kalman_t *, double, double );
+        void (*update)( rho_kalman_t *, double, double, bool );
         int  (*isExpired)( rho_kalman_t * );
     };
     

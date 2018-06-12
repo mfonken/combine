@@ -29,7 +29,7 @@ static void init( rho_kalman_t * k, double v, double ls, double vu, double bu, d
     k->uncertainty.sensor  = su;
 }
 
-static void update( rho_kalman_t * k, double value_new, double rate_new )
+static void update( rho_kalman_t * k, double value_new, double rate_new, bool update_variance )
 {
     double delta_time = timestamp() - k->timestamp;
 
@@ -45,13 +45,13 @@ static void update( rho_kalman_t * k, double value_new, double rate_new )
     k->value     += delta_time * k->rate;
 
     double dt_P_1_1 = delta_time * k->P[1][1];
-    k->P[0][0] +=   delta_time * ( dt_P_1_1 -
+    k->P[0][0]   +=   delta_time * ( dt_P_1_1 -
                                    k->P[0][1] -
                                    k->P[1][0] +
                                    k->uncertainty.value );
-    k->P[0][1] -=   dt_P_1_1;
-    k->P[1][0] -=   dt_P_1_1;
-    k->P[1][1] +=   k->uncertainty.bias * delta_time;
+    k->P[0][1]   -=   dt_P_1_1;
+    k->P[1][0]   -=   dt_P_1_1;
+    k->P[1][1]   +=   k->uncertainty.bias * delta_time;
 
     double S_     = 1 / ( k->P[0][0] + k->uncertainty.sensor );
     k->K[0]       = k->P[0][0] * S_;
@@ -60,13 +60,13 @@ static void update( rho_kalman_t * k, double value_new, double rate_new )
     k->value     += k->K[0] * delta_value;
     k->bias      += k->K[1] * delta_value;
 
-    k->P[0][0] -= k->K[0] * k->P[0][0];
-    k->P[0][1] -= k->K[0] * k->P[0][1];
-    k->P[1][0] -= k->K[1] * k->P[0][0];
-    k->P[1][1] -= k->K[1] * k->P[0][1];
+    k->P[0][0]   -= k->K[0] * k->P[0][0];
+    k->P[0][1]   -= k->K[0] * k->P[0][1];
+    k->P[1][0]   -= k->K[1] * k->P[0][0];
+    k->P[1][1]   -= k->K[1] * k->P[0][1];
     
-    k->timestamp = timestamp();
-    k->variance = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - k->K[0] ) );
+    k->timestamp  = timestamp();
+    if( update_variance ) k->variance   = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - k->K[0] ) );
 };
 
 static int isExpired( rho_kalman_t * k )

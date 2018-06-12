@@ -262,7 +262,7 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
             }
         }
         
-        RhoKalman.update(&d->kalmans[i], m, 0.);
+        RhoKalman.update(&d->kalmans[i], m, 0., true);
         d->max[i] = m;
         fpeak = d->kalmans[i].value;
         fvar = d->kalmans[i].variance;
@@ -404,10 +404,10 @@ void Update_Prediction( rho_c_utility * utility )
 #endif
     }
     
-    if( Ax ) RhoKalman.update( &utility->prediction_pair.x.primary,   Ax, 0);
-    if( Bx ) RhoKalman.update( &utility->prediction_pair.x.secondary, Bx, 0);
-    if( Ay ) RhoKalman.update( &utility->prediction_pair.y.primary,   Ay, 0);
-    if( By ) RhoKalman.update( &utility->prediction_pair.y.secondary, By, 0);
+    if( Ax ) RhoKalman.update( &utility->prediction_pair.x.primary,   Ax, 0, false );
+    if( Bx ) RhoKalman.update( &utility->prediction_pair.x.secondary, Bx, 0, false );
+    if( Ay ) RhoKalman.update( &utility->prediction_pair.y.primary,   Ay, 0, false );
+    if( By ) RhoKalman.update( &utility->prediction_pair.y.secondary, By, 0, false );
     
     Cx = (int)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) / 2;
     Cy = (int)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) / 2;
