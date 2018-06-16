@@ -14,13 +14,15 @@
 #include <unistd.h>
 
 #define INR(X,H)     (X<0?0:((X>H)?(H-1):X))
+#define MAX(A,B)     ((A>B)?A:B)
+#define XRNG(A,B,C)  (A<(B-C)?-1:(A>(B+C)?1:0)) //Exceeds range
 
 #define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define FOR(L)       for( int i = L; i > 0; --i)
 #define FORA(L,A)    for( int i = L; i > 0; --i, A[i] )
 #define FORA2(L,A,B) for( int i = L; i > 0; --i, A[i], B[i] )
-#define ZDIV(X,Y)    (!Y?2<<10:X/Y)
+#define ZDIV(X,Y)    (!X?0:(!Y?2<<10:X/Y))
 
 const density_redistribution_lookup_t rlookup =
 {
@@ -93,6 +95,8 @@ void Init(rho_c_utility * utility, int w, int h)
 {
     utility->width  = w;
     utility->height = h;
+
+    RhoKalman.init(&utility->thresh_filter, 0, RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
     
     utility->density_map_pair.x.map = (int*)malloc(sizeof(int)*h);
     utility->density_map_pair.x.length = h;
@@ -176,30 +180,42 @@ void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage
     
     if( backgrounding )
     {
+        /* Check for insignificant background */
         if( RhoVariables.ram.QT < BACKGROUND_COVERAGE_MIN )
         {
             memset(RhoVariables.ram.Q, 0, sizeof(RhoVariables.ram.Q[0])*4);
             utility->Bx = 0;
             utility->By = 0;
-//            printf("Insignificant background.\n");
+            utility->QbT = 0;
         }
+        /* Otherwise calculate background centroids in X & Y */
         else
         {
-            int xcnt = 0, ycnt = 0;
+            int xcnt = 0, ycnt = 0, xtot = 0, ytot = 0;
+            
             double xavg = 0, xmag = 0, yavg = 0, ymag = 0;
             for( int i = 0, l = utility->background_map_pair.x.length; i < l; i++ )
             {
                 int c = utility->background_map_pair.x.map[i];
-                if( c > 10 ) cma_M0_M1(c, i, &xavg, &xmag, &xcnt);
+                if( c > 10 )
+                {
+                    cma_M0_M1(c, i, &xavg, &xmag, &xcnt);
+                    xtot += c;
+                }
             }
             
             for( int i = 0, l = utility->background_map_pair.y.length; i < l; i++ )
             {
                 int c = utility->background_map_pair.y.map[i];
-                if( c > 10 ) cma_M0_M1(c, i, &yavg, &ymag, &ycnt);
+                if( c > 10 )
+                {
+                    cma_M0_M1(c, i, &yavg, &ymag, &ycnt);
+                    ytot += c;
+                }
             }
             utility->Bx = xmag/xavg;
             utility->By = ymag/yavg;
+            utility->QbT = MAX( xtot, ytot );
         }
     
         RhoVariables.ram.Dx      =  utility->density_map_pair.x.map;
@@ -315,37 +331,45 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
                 else gapc++;
             }
         }
-        utility->FT = ((double)utility->QF)/((double)utility->QT);
+        utility->FT = ZDIV((double)utility->QF,(double)utility->QT);
 #ifdef RHO_DEBUG
-//        printf("* Filtered coverage is %.5f%%\n", utility->FT*100);
+        printf("* Filtered coverage is %.5f%%\n", utility->FT*100);
 #endif
     }
 #ifdef RHO_DEBUG
-//    printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", loc[0], den[0], max[0], loc[1], den[1], max[1]);
+    printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", loc[0], den[0], max[0], loc[1], den[1], max[1]);
 #endif
 //    if( !loc[0] || !loc[1] ) return;
-    if( utility->FT > 1 || utility->FT < 0 ) utility->FT = 0;
+//    if( utility->FT > 1 || utility->FT < 0 ) utility->FT = 0;
     
     /* Update prediction with best peaks */
     r->primary_new   = loc[0];
     r->secondary_new = loc[1];
     
-    double comp = utility->FT/FILTERED_CONVERAGE_TARGET;
-    if(comp > 1)
+    double Ad, Af, Pf, Sf, Qf = (double)utility->QF;
+    Ad = den[0] + den[1];
+    Af = ( 1 - ( Ad / Qf ) ) * ALTERNATE_TUNING_FACTOR;
+    Pf = den[0]/Qf;
+    Sf = den[1]/Qf;
+    
+    if( utility->FT > FILTERED_COVERAGE_TARGET )
     {
-        double v_ = ZDIV(1.0,fvar);
-        r->probabilities.primary   = ((double)den[0]) * v_;
-        r->probabilities.secondary = ((double)den[1]) * v_;
-        r->probabilities.alternate = ((double)den[2]) * v_;
+        double v_ = 1.0;//ZDIV(1.0,fvar);
+        r->probabilities.primary   = Pf * v_;
+        r->probabilities.secondary = Sf * v_;
+        r->probabilities.alternate = Af * v_;
+        r->probabilities.absence   = 0.;
     }
     else
     {
-        r->probabilities.primary   = comp;
-        r->probabilities.secondary = comp;
-        r->probabilities.alternate = 1 - comp;
+        r->probabilities.primary   = 0.;
+        r->probabilities.secondary = 0.;
+        r->probabilities.alternate = 0.;
+        r->probabilities.absence   = 1.;
     }
     
 #ifdef RHO_DEBUG
+    printf("Rho: pri-%.3f sec-%.3f alt-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate);
 //    printf("Alternate probability is %.3f\n", r->probabilities.alternate);
 #endif
 }
@@ -421,6 +445,61 @@ void Update_Prediction( rho_c_utility * utility )
     utility->density_map_pair.y.centroid = Cx;
 }
 
+int Update_Threshold( rho_c_utility * utility )
+{
+    int thresh = utility->thresh;
+    
+    
+    /* Hard-Tune on significant background */
+#ifdef RHO_DEBUG
+    printf("Coverage compare: Actual>%d vs. Target>%d\n", utility->QbT, BACKGROUND_COVERAGE_MIN);
+#endif
+    char cov = XRNG( utility->QbT, 0, BACKGROUND_COVERAGE_TOL_PX );
+    switch(cov)
+    {
+        case -1:
+            thresh -= THRESH_STEP*2;
+            break;
+        case 1:
+            thresh += THRESH_STEP*4;
+            break;
+        case 0:
+        default:
+            break;
+    }
+    
+    /* Soft-Tune on State */
+    switch(utility->sys.state)
+    {
+        case UNSTABLE_MANY:
+        case STABLE_MANY:
+            thresh += THRESH_STEP;
+            break;
+        case UNSTABLE_NONE:
+            thresh -= THRESH_STEP;
+        case STABLE_NONE:
+            thresh -= THRESH_STEP*2;
+            break;
+        case UNSTABLE_SINGLE:
+        case STABLE_SINGLE:
+            thresh -= THRESH_STEP;
+            break;
+        default:
+            break;
+    }
+    if(thresh < THRESHOLD_MIN) thresh = THRESHOLD_MIN;
+    else if(thresh > THRESHOLD_MAX) thresh = THRESHOLD_MAX;
+    if(thresh != utility->thresh)
+    {
+        RhoKalman.update( &utility->thresh_filter, thresh, 0., false );
+        utility->thresh = utility->thresh_filter.value;
+#ifdef RHO_DEBUG
+        printf("*** THRESH IS %d ***\n", thresh);
+#endif
+    }
+    return 0;
+}
+
 const struct rho_functions RhoFunctions =
 {
     .Init = Init,
@@ -428,6 +507,7 @@ const struct rho_functions RhoFunctions =
     .Redistribute_Densities = Redistribute_Densities,
     .Filter_and_Select_Pairs = Filter_and_Select_Pairs,
     .Filter_and_Select = Filter_and_Select,
-    .Update_Prediction = Update_Prediction
+    .Update_Prediction = Update_Prediction,
+    .Update_Threshold = Update_Threshold
 };
 

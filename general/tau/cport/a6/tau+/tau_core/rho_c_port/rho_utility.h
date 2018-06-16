@@ -30,8 +30,10 @@ extern "C" {
 
 #define RHO_GAP_MAX 10
 
-#define FILTERED_CONVERAGE_TARGET  0.001
-
+#define ALTERNATE_TUNING_FACTOR    0.5
+#define FILTERED_COVERAGE_TARGET   0.004
+#define FILTERED_COVERAGE_PIXELS   ((int)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
+    
 #define RHO_PREDICTION_LS   1.0
 #define RHO_PREDICTION_VU   0.05
 #define RHO_PREDICTION_BU   0.001
@@ -42,6 +44,11 @@ extern "C" {
 #define RHO_DEFAULT_BU      0.5
 #define RHO_DEFAULT_SU      0.7
     
+#define RHO_THRESH_LS      10
+#define RHO_THRESH_VU      0.5
+#define RHO_THRESH_BU      0.01
+#define RHO_THRESH_SU      0.05
+    
 #define MAX_COVERAGE        1
 #define FRAME_SIZE          ( FNL_RESIZE_W * FNL_RESIZE_H )
 #define C_FRAME_SIZE        ((int)(MAX_COVERAGE * FRAME_SIZE))
@@ -49,6 +56,8 @@ extern "C" {
     
 #define BACKGROUND_PERCENT_MIN  0.02
 #define BACKGROUND_COVERAGE_MIN ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
+#define BACKGROUND_COVERAGE_TOL_PR   0.001
+#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
 static void cma( double new_val, double *avg, int num )
     {
@@ -59,9 +68,7 @@ static void cma_M0_M1( double v, double i, double *m0, double *m1, int * n )
         double n_=1/((double)(++(*n)));
         *m0+=((v-*m0)*n_);
         *m1+=(((v*i)-*m1)*n_);
-        
     }
-static void fswap( double *a, double *b ) { double t=(*a);*a=*b;*b=t; }
 static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
 
 #include "state_machine_utility.h"
@@ -72,6 +79,7 @@ typedef struct
                         background_map_pair;
     PredictionPairC     prediction_pair;
     bayesian_system_t   sys;
+    rho_kalman_t        thresh_filter;
     int     width,
             height,
             thresh,
@@ -82,7 +90,8 @@ typedef struct
             Q[4],
             Qb[4],
             Qf[4],
-            QT;
+            QT,
+            QbT;
     double  QF, FT;
 
     int cframe[C_FRAME_SIZE];
@@ -96,7 +105,7 @@ typedef struct
 
 typedef struct
 {
-    int
+    unsigned char
         background[4][4],
         current[4][4],
         factor[4][4],
@@ -116,6 +125,7 @@ struct rho_functions
     void (*Filter_and_Select_Pairs)(                    rho_c_utility * );
     void (*Filter_and_Select)(                          rho_c_utility *, DensityMapC *, DensityMapC *, PredictionC * );
     void (*Update_Prediction)(                          rho_c_utility * );
+    int  (*Update_Threshold)(                           rho_c_utility * );
 };
 
 extern const density_redistribution_lookup_t rlookup;

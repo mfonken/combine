@@ -18,10 +18,22 @@
 #define STATE_DISTANCE                  2.0
 #define SHADOW_TOLERANCE                0.2
 
+#define DOUBT_BASE                      4.0
+#define DOUBT_FACTOR                    0.5
+#define DOUBT_STABILITY                 0.5
+
 #define INRANGE(X,Y,T)  (X>(Y-T)&&X<(Y+T))
 
 /* Temporary macros */
 #define numberOfSelectedPeaks 1
+
+static double DOUBT( int i, state_t cs )
+{
+    double ret = ((double)(i<<1)+1.)/NUM_STATES;
+    if( isStable(cs) && i < stateNumber(cs) )
+        ret *= DOUBT_STABILITY;
+    return ret;
+}
 
 static void initMap( bayesian_map_t * bm )
 {
@@ -142,51 +154,44 @@ static void update( bayesian_system_t * sys, PredictionPairC * p )
         printf("\tShadow> a: xp>%.2f xs>%.2f yp%.2f ys>%.2f\n", xpp, xsp, ypp, ysp);
 #endif
     }
-//    if( p->selection_pair == SIMILAR )
-//    {
-        prob[1] = DISTANCE_SQ(xpp, ypp);
-        prob[2] = DISTANCE_SQ(xsp, ysp);
-//    }
-//    else if( p->selection_pair == OPPOSITE )
-//    {
-//        prob[1] = DISTANCE_SQ(xpp, ysp);
-//        prob[2] = DISTANCE_SQ(xsp, ypp);
-//    }
-    /* Alternate probability is 2D chaos related, thus dependent on both existing */
-    prob[3] = p->x.probabilities.alternate * p->y.probabilities.alternate;
+    
+    prob[0] = DISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence)/2;
+    prob[1] = DISTANCE_SQ(xpp, ypp);
+    prob[2] = DISTANCE_SQ(xsp, ysp);
+    prob[3] = DISTANCE_SQ(p->x.probabilities.alternate, p->y.probabilities.alternate);
     
 #ifdef STATEM_DEBUG
     printf("Before: non-%.3f pri-%.3f sec-%.3f alt-%.3f\n", prob[0], prob[1], prob[2], prob[3]);
 #endif
     
     int num_selections = 0;
-    prob[0] = ABSENCE_FACTOR;
+//    prob[0] = ABSENCE_FACTOR;
     bool ch[4] = { 0,
                    prob[1] > PROBABILITY_TUNING_THRESHOLD,
                    prob[2] > PROBABILITY_TUNING_THRESHOLD,
                    prob[3] > PROBABILITY_TUNING_THRESHOLD };
     num_selections += ch[1] + ch[2] + ch[3];
-    ch[0] = ( num_selections > 0 );
-    for(int i = 0; i < num_selections; i++) prob[i] *= ch[i];
+//    ch[0] = ( num_selections > 0 );
+//    for(int i = 0; i < num_selections; i++) prob[i] *= (double)ch[i];
     
 #ifdef STATEM_DEBUG
     printf("After: non-%.3f pri-%.3f sec-%.3f alt-%.3f\n", prob[0], prob[1], prob[2], prob[3]);
 #endif
     
     sys->selection_index      = num_selections;
-    sys->stability.primary    = 0.0;
-    sys->stability.secondary  = 0.0;
-    sys->stability.alternate  = 0.0;
-    
+//    sys->stability.primary    = 0.0;
+//    sys->stability.secondary  = 0.0;
+//    sys->stability.alternate  = 0.0;
+//    
     int k = sys->selection_index;
     
-    double out[4] = {0,0,0,0};
+    double out[4] = { prob[0], prob[1], prob[2], prob[3] };
     double f;
     for(int i = 0; i <= k; i++)
     {
         out[i] = 0.0;
         double p = prob[i] * PROBABILITY_TUNING_FACTOR;
-        f = (double)( i ) / 3.0;
+        f = (double)DOUBT(i, sys->state);
         out[i] = p * f;
 #ifdef STATEM_DEBUG
         printf("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", i, p, f, out[i]);
@@ -201,7 +206,7 @@ static void update( bayesian_system_t * sys, PredictionPairC * p )
     BayesianMap.normalizeState( &sys->probabilities, sys->state );
     BayesianSystem.updateState( sys );
 #ifdef STATEM_DEBUG
-//    print( &sys->probabilities, sys->state );
+    print( &sys->probabilities, sys->state );
 #endif
 }
 
