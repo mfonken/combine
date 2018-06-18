@@ -82,7 +82,7 @@ const density_redistribution_lookup_t rlookup =
 };
 
 /* Generic centroid and mass calculator */
-static int calculateCentroid( DensityMapC * dmap, int * C, register int thresh )
+static int calculateCentroid( DensityMap * dmap, int * C, register int thresh )
 {
     double avg = 0, mavg = 0;
     int cnt = 0, tot = 0;
@@ -205,7 +205,7 @@ void Generate_Background( rho_c_utility * utility )
 }
 
 /* Calculate and process data in variance band from density filter to generate predictions */
-void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * b, PredictionC * r )
+void Filter_and_Select( rho_c_utility * utility, density_map_t * d, density_map_t * b, prediction_t * r )
 {
     int l = d->length,
         fpeak   = 0,
@@ -228,12 +228,9 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
 				filtered_density = 0;
 
     double
-    cavg    = 0.,
-    mavg    = 0.,
-		filtered_coverage = 0.;
-    // utility->QF = 0;
-    // utility->QT = 0;
-
+		    cavg    = 0.,
+		    mavg    = 0.,
+				filtered_coverage = 0.;
 
 		/* Split anaylsis above and below centroid */
     int range[3] = { l, d->centroid, 0 };

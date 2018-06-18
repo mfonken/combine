@@ -109,7 +109,7 @@ static void init( bayesian_system_t * sys )
     BayesianMap.initMap( &sys->probabilities );
 }
 
-static void update( bayesian_system_t * sys, PredictionPairC * p )
+static void update( bayesian_system_t * sys, prediction_pair_t * p )
 {
     /** Assumptions
      *  - Column is current state

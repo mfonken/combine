@@ -89,11 +89,11 @@ void frameProcessor( void )
 	tog();
 	vcounter = 1;
 	zero_memory();
-	
+
 	/* * * * * Register Protection Start * * * * */
 	//frame_start();
 	while(!row_flag);
-	
+
 	uint32_t wr_index = 0, row_sum = 0, limit = THRESH_BUFFER_MAX - 10;
 	//while( frame_flag )
 	while( vcounter < CAPTURE_HEIGHT && wr_index < limit )
@@ -108,9 +108,9 @@ void frameProcessor( void )
 
 			pcounter = 0;
 			hcounter = 0;
-			
-			while( ++hcounter < CAPTURE_WIDTH && !row_flag 
-				//&& pixel_proc() 
+
+			while( ++hcounter < CAPTURE_WIDTH && !row_flag
+				//&& pixel_proc()
 			)//;
 			{
 				if( CAPTURE_BUFFER[hcounter] > THRESH_VALUE )
@@ -143,9 +143,9 @@ void frameProcessor( void )
 	//rho_proc(0);
 	DENSITY_X[CAPTURE_BUFFER_HEIGHT-1] = 0xef;
 	dprintBuffers();
-	
+
 	/* * * * *  Register Protection End  * * * * */
-	
+
 	Rho.density_map_pair.x.max = DENSITY_X_MAX;
 	RhoFunctions.Filter_and_Select_Pairs( &Rho );
 	RhoFunctions.Update_Prediction( &Rho );
@@ -168,9 +168,9 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_Handl
 
 	init_memory();
 	printAddresses();
-	
+
 	//RhoFunctions.Init( &Rho, uart, CAPTURE_WIDTH, CAPTURE_HEIGHT );
-	
+
 #ifdef ACTIVE_CAMERA
 	Camera.init(i2c);
 	initTimerDMA();
@@ -180,13 +180,13 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_Handl
 	while( fcounter < 1000 )
 	{
 		fcounter++;
-		
+
 #ifdef ACTIVE_CAMERA
 	#ifdef TX_FRAME
 			frameTx();
 	#else
 			frameProcessor();
-	#endif	
+	#endif
 #else
 	#ifdef TX_FRAME
 			spoofFrameTx();
@@ -195,7 +195,7 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_Handl
 	#endif
 	HAL_Delay(5);
 #endif
-	
+
 		//sprintf( (char *)hex, "\tF: %d | V: %d | H: %d\r\n", fcounter, vcounter, hcounter );
 		//print( hex );
 		//printBuffers( CAPTURE_BUFFER_WIDTH );
@@ -224,13 +224,24 @@ void master_test( void )
 	spoofDensityMaps();
 
 	dprintBuffers();
-	
+
 	for( volatile int i = 0; i < 100; i++)
 	{
 		//HAL_Delay(10);
 		//Rho.density_map_pair.x.max = DENSITY_X_MAX;
-		RhoFunctions.Filter_and_Select_Pairs( &Rho );
-		RhoFunctions.Update_Prediction( &Rho );
+
+		if(background_event)
+		{
+			RhoFunctions.Generate_Background( &Rho );
+		}
+		else
+		{
+			RhoFunctions.Redistribute_Densities( &Rho );
+			RhoFunctions.Filter_and_Select_Pairs( &Rho );
+			RhoFunctions.Update_Prediction( &Rho );
+			BayesianSystem.update( &Rho.sys, &Rho.prediction_pair );
+			RhoFunctions.Update_Threshold( &Rho );
+		}
 	}
 	int xp = (int)Rho.prediction_pair.x.primary.value;
 	int yp = (int)Rho.prediction_pair.y.primary.value;
@@ -283,7 +294,7 @@ void spoofFrameProcessor( void )
 	zero_memory();
 	spoofPixels();
 	frame_start();
-	
+
 	uint16_t x = 0, y = 0, p = 0, t = 0;
 	for( ; y < CAPTURE_HEIGHT; y++ )
 	{
@@ -296,7 +307,7 @@ void spoofFrameProcessor( void )
 	}
 	thresh_buffer_size = t - CAPTURE_HEIGHT + 1;
 	rho_proc( thresh_buffer_size << 1 );
-	
+
 	Rho.density_map_pair.x.max = DENSITY_X_MAX;
 	RhoFunctions.Filter_and_Select_Pairs( &Rho );
 	RhoFunctions.Update_Prediction( &Rho );
@@ -314,7 +325,7 @@ void frameTx( void )
 	{
 		while(!row_flag);
 		HAL_UART_Transmit_DMA( this_uart, (uint8_t *)CAPTURE_BUFFER, CAPTURE_WIDTH );
-		while(row_flag && frame_flag);		
+		while(row_flag && frame_flag);
 	}
 	tog();
 	HAL_Delay(2);
@@ -335,7 +346,7 @@ void spoofFrameTx( void )
 	}
 	HAL_Delay(1);
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_END, 2, UART_TIMEOUT );
-	
+
 }
 
 /***************************************************************************************/
@@ -356,7 +367,7 @@ void spoofPixels( void )
 		t = !t;
 	}
 	*/
-	
+
 	capture_t c = THRESH_VALUE;
 	int p, y, x;
 	/*
@@ -367,13 +378,13 @@ void spoofPixels( void )
 			p = x + y * CAPTURE_BUFFER_WIDTH;
 			CAPTURE_BUFFER[p] 	= c;
 		}
-		
+
 		for( x = 100; x < 110; x++ )
 		{
 			p = x + y * CAPTURE_BUFFER_WIDTH;
 			CAPTURE_BUFFER[p] 	= c;
 		}
-		
+
 	}
 	for( y = 80; y < 90; y++ )
 	{
@@ -382,7 +393,7 @@ void spoofPixels( void )
 			p = x + y * CAPTURE_BUFFER_WIDTH;
 			CAPTURE_BUFFER[p] 	= c;
 		}
-		
+
 		for( x = 100; x < 110; x++ )
 		{
 			p = x + y * CAPTURE_BUFFER_WIDTH;
@@ -444,7 +455,7 @@ void zero_memory( void )
 void init_memory( void )
 {
 		uart_dma_busy = 0;
-		
+
 		frame_flag = 0;
 		row_flag = 0;
 		//active_flag = 0;
