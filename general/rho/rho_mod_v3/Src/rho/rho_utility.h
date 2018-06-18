@@ -95,8 +95,8 @@ typedef struct
 
 struct rho_functions
 {
-	void (*Init)(rho_utility *, UART_HandleTypeDef *, int, int);
-	void (*Find_Map_Max)( density_map_t * d );
+	void (*Init)( rho_utility *, UART_HandleTypeDef *, int, int );
+  void (*Perform)( rho_utility *, bool );
 	void (*Filter_and_Select_Pairs)( rho_utility * );
 	void (*Filter_and_Select)( rho_utility *, density_map_t *, prediction_t * );
 	void (*Update_Prediction)( rho_utility * );

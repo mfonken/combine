@@ -229,19 +229,8 @@ void master_test( void )
 	{
 		//HAL_Delay(10);
 		//Rho.density_map_pair.x.max = DENSITY_X_MAX;
-
-		if(background_event)
-		{
-			RhoFunctions.Generate_Background( &Rho );
-		}
-		else
-		{
-			RhoFunctions.Redistribute_Densities( &Rho );
-			RhoFunctions.Filter_and_Select_Pairs( &Rho );
-			RhoFunctions.Update_Prediction( &Rho );
-			BayesianSystem.update( &Rho.sys, &Rho.prediction_pair );
-			RhoFunctions.Update_Threshold( &Rho );
-		}
+		bool background_event = !(bool)(i%10);
+		RhoFunctions.Perform( &Rho, background_event );
 	}
 	int xp = (int)Rho.prediction_pair.x.primary.value;
 	int yp = (int)Rho.prediction_pair.y.primary.value;

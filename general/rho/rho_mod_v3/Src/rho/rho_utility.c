@@ -99,7 +99,7 @@ static int calculateCentroid( DensityMap * dmap, int * C, register int thresh )
     return tot;
 }
 
-static void Redistribute_Densities( rho_c_utility * utility )
+void Redistribute_Densities( rho_c_utility * utility )
 {
     uint16_t
 				x0 = utility->Bx,
@@ -182,6 +182,21 @@ void Init(rho_c_utility * utility, int w, int h)
     /* Prediction probabilities */
     memset(&utility->prediction_pair.x.probabilities, 0, sizeof(double)*3);
     memset(&utility->prediction_pair.y.probabilities, 0, sizeof(double)*3);
+}
+
+void Perform( rho_utility * utility, bool background_event )
+{
+	if(background_event)
+	{
+		RhoFunctions.Generate_Background( utility );
+	}
+	else
+	{
+		RhoFunctions.Redistribute_Densities( utility );
+		RhoFunctions.Filter_and_Select_Pairs( utility );
+		RhoFunctions.Update_Prediction( utility );
+		RhoFunctions.Update_Threshold( utility );
+	}
 }
 
 /* Interrupt (Simulated Hardware-Driven) Density map generator */
@@ -426,6 +441,8 @@ void Update_Prediction( rho_c_utility * utility )
     utility->Cy = Cy;
     utility->density_map_pair.x.centroid = Cy;
     utility->density_map_pair.y.centroid = Cx;
+
+		BayesianSystem.update( utility.sys, utility.prediction_pair );
 }
 
 /* Use background and state information to update image threshold */
@@ -484,7 +501,7 @@ void Update_Threshold( rho_c_utility * utility )
 const struct rho_functions RhoFunctions =
 {
 	.Init = Init,
-	.Find_Map_Max = Find_Map_Max,
+	.Perform = Perform,
 	.Filter_and_Select_Pairs = Filter_and_Select_Pairs,
 	.Filter_and_Select = Filter_and_Select,
 	.Update_Prediction = Update_Prediction,
