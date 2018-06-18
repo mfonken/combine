@@ -27,6 +27,7 @@
 #define CAPTURE_DIV			2
 #define CAPTURE_WIDTH 	(CAMERA_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT	(CAMERA_HEIGHT>>CAPTURE_DIV)
+#define FRAME_SIZE 			(CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define	CAPTURE_BUFFER_WIDTH	(uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT (uint32_t)CAPTURE_HEIGHT
 #ifdef DYNAMIC_BUFFER
@@ -37,8 +38,6 @@
 #define COVERAGE_NORMAL_MAX	0.45
 #define THRESH_BUFFER_SIZE 	((uint32_t)((CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1.))*COVERAGE_NORMAL_MAX)+2)
 #define DEFAULT_THRESH			0xfa//fc
-
-#define MAX_PEAKS           3
 
 #define RHO_SQRT_HEIGHT     sqrt((float)CAPTURE_HEIGHT)
 #define RHO_DIM_INFLUENCE   0.1
@@ -53,6 +52,8 @@
 
 #define FILTERED_CONVERAGE_TARGET  0.00002//0.01
 
+#define MAX_ABSENCE_PROBABILITY		0.5
+
 #define RHO_PREDICTION_LS   1.0
 #define RHO_PREDICTION_VU   0.5
 #define RHO_PREDICTION_BU   0.01
@@ -63,6 +64,27 @@
 #define RHO_DEFAULT_BU      0.5//0.5
 #define RHO_DEFAULT_SU      0.01//0.7
 
+#define RHO_THRESH_LS				10
+#define RHO_THRESH_VU				0.5
+#define RHO_THRESH_BU				0.01
+#define RHO_THRESH_SU				0.05
+
+#define MAX_COVERAGE						1
+#define BACKGROUND_PERCENT_MIN	0.02
+#define BACKGROUND_COVERAGE_MIN	( (uint32_t)( BACKGROUND_PERCENT_MIN * FRAME_SIZE ) )
+#define BACKGORUND_COVERAGE_TOL_PR 0.001
+#define	BACKGROUND_COVERAGE_TOL_PX ( (uint32_t)( BACKGORUND_COVERAGE_TOL_PR * FRAME_SIZE ) )
+
+#define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
+
+#define ALTERNATE_TUNING_FACTOR 	0.5
+#define FILTERED_COVERAGE_TARGET	0.004
+#define FILTERED_COVERAGE_PIXELS	( (uint32_t)( FILTERED_COVERAGE_TARGET*FRAME_SIZE ) )
+
+#define THRESH_STEP	1
+#define THRESH_MIN	100
+#define THRESH_MAX 	255
+
 static void cma( FLOAT new_val, FLOAT *avg, int num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
 static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, int * n )
 {FLOAT n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
@@ -70,9 +92,9 @@ static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
 
 typedef struct
 {
-    DensityMapPairC     density_map_pair,
+    density_map_pair_t     density_map_pair,
                         background_map_pair;
-    PredictionPairC     prediction_pair;
+    prediction_pair_t     prediction_pair;
     bayesian_system_t   sys;
     rho_kalman_t        thresh_filter;
     index_t
@@ -82,7 +104,7 @@ typedef struct
             Cy,
             Bx,
             By;
-    uint8_t thresh;
+    byte_t thresh;
 
     density_t
             Q[4],
@@ -91,12 +113,14 @@ typedef struct
             QT,
             QbT;
     // double  QF, FT;
-} rho_c_utility;
+} rho_utility;
 
 struct rho_functions
 {
 	void (*Init)( rho_utility *, UART_HandleTypeDef *, int, int );
   void (*Perform)( rho_utility *, bool );
+	void (*Redistribute_Densities)( rho_utility * );
+	void (*Generate_Background)( rho_utility * );
 	void (*Filter_and_Select_Pairs)( rho_utility * );
 	void (*Filter_and_Select)( rho_utility *, density_map_t *, prediction_t * );
 	void (*Update_Prediction)( rho_utility * );

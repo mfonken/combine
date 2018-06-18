@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>rho_mod_v1</TargetName>
+    <TargetName>rho_mod_v3</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

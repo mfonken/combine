@@ -1,0 +1,167 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.24.2.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Matthew Fonken, Marbl Limited, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.24.1
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 5 (build 528)
+Assembler:       Armasm.exe V5.06 update 5 (build 528)
+Linker/Locator:  ArmLink.exe V5.06 update 5 (build 528)
+Library Manager: ArmAr.exe V5.06 update 5 (build 528)
+Hex Converter:   FromElf.exe V5.06 update 5 (build 528)
+CPU DLL:         SARMCM3.DLL V5.24.1
+Dialog DLL:      DCM.DLL V1.16.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
+Dialog DLL:      TCM.DLL V1.32.0.0
+ 
+<h2>Project:</h2>
+C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v3\MDK-ARM\rho_mod_v1.uvprojx
+Project File Date:  06/17/2018
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'rho_mod_v1'
+compiling state_machine_utility.c...
+..\Src\Rho\state_machine_utility.c(144): error:  #136: struct "<unnamed>"  has no field "absence"
+      prob[0] = 
+ISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence);
+..\Src\Rho\state_machine_utility.c(144): error:  #136: struct "<unnamed>"  has no field "absence"
+      prob[0] = 
+ISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence);
+..\Src\Rho\state_machine_utility.c(144): error:  #136: struct "<unnamed>"  has no field "absence"
+      prob[0] = 
+ISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence);
+..\Src\Rho\state_machine_utility.c(144): error:  #136: struct "<unnamed>"  has no field "absence"
+      prob[0] = 
+ISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence);
+..\Src\Rho\state_machine_utility.c: 0 warnings, 4 errors
+compiling rho_utility.c...
+..\Src\rho\rho_utility.h(73): error:  #20: identifier "DensityMapPairC" is undefined
+      DensityMapPairC     density_map_pair,
+..\Src\rho\rho_utility.h(75): error:  #20: identifier "PredictionPairC" is undefined
+      PredictionPairC     prediction_pair;
+..\Src\rho\rho_utility.h(98): error:  #20: identifier "rho_utility" is undefined
+  	void (*Init)( rho_utility *, UART_HandleTypeDef *, int, int );
+..\Src\rho\rho_utility.h(99): error:  #20: identifier "rho_utility" is undefined
+    void (*Perform)( rho_utility *, bool );
+..\Src\rho\rho_utility.h(100): error:  #20: identifier "rho_utility" is undefined
+  	void (*Filter_and_Select_Pairs)( rho_utility * );
+..\Src\rho\rho_utility.h(101): error:  #20: identifier "rho_utility" is undefined
+  	void (*Filter_and_Select)( rho_utility *, density_map_t *, prediction_t * );
+..\Src\rho\rho_utility.h(102): error:  #20: identifier "rho_utility" is undefined
+  	void (*Update_Prediction)( rho_utility * );
+..\Src\rho\rho_utility.h(103): error:  #20: identifier "rho_utility" is undefined
+    void (*Update_Threshold)( rho_utility * );
+..\Src\rho\rho_utility.c(85): error:  #20: identifier "DensityMap" is undefined
+  static int calculateCentroid( DensityMap * dmap, int * C, register int thresh )
+..\Src\rho\rho_utility.c(94): error:  #167: argument of type "double *" is incompatible with parameter of type "FLOAT *"
+              cma_M0_M1(c, i, &avg, &mavg, &cnt);
+..\Src\rho\rho_utility.c(94): error:  #167: argument of type "double *" is incompatible with parameter of type "FLOAT *"
+              cma_M0_M1(c, i, &avg, &mavg, &cnt);
+..\Src\rho\rho_utility.c(110): error:  #20: identifier "Cx" is undefined
+      if( Cx < Bx ) { x0 = utility->Cx; x1 = utility->Bx; }
+..\Src\rho\rho_utility.c(110): error:  #20: identifier "Bx" is undefined
+      if( Cx < Bx ) { x0 = utility->Cx; x1 = utility->Bx; }
+..\Src\rho\rho_utility.c(111): error:  #20: identifier "Cy" is undefined
+      if( Cy < By ) { y0 = utility->Cy; y1 = utility->By; }
+..\Src\rho\rho_utility.c(111): error:  #20: identifier "By" is undefined
+      if( Cy < By ) { y0 = utility->Cy; y1 = utility->By; }
+..\Src\rho\rho_utility.c(146): error:  #20: identifier "RHO_THRESH_LS" is undefined
+      RhoKalman.init(&utility->thresh_filter, 0., RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
+..\Src\rho\rho_utility.c(146): error:  #20: identifier "RHO_THRESH_VU" is undefined
+      RhoKalman.init(&utility->thresh_filter, 0., RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
+..\Src\rho\rho_utility.c(146): error:  #20: identifier "RHO_THRESH_BU" is undefined
+      RhoKalman.init(&utility->thresh_filter, 0., RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
+..\Src\rho\rho_utility.c(146): error:  #20: identifier "RHO_THRESH_SU" is undefined
+      RhoKalman.init(&utility->thresh_filter, 0., RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
+..\Src\rho\rho_utility.c(187): error:  #20: identifier "rho_utility" is undefined
+  void Perform( rho_utility * utility, bool background_event )
+..\Src\rho\rho_utility.c(191): error:  #136: struct "rho_functions"  has no field "Generate_Background"
+  		RhoFunctions.Generate_Background( utility );
+..\Src\rho\rho_utility.c(195): error:  #136: struct "rho_functions"  has no field "Redistribute_Densities"
+  		RhoFunctions.Redistribute_Densities( utility );
+..\Src\rho\rho_utility.c(206): error:  #20: identifier "BACKGROUND_COVERAGE_MIN" is undefined
+  	if( utility->QT < BACKGROUND_COVERAGE_MIN )
+..\Src\rho\rho_utility.c(208): error:  #167: argument of type "density_t" is incompatible with parameter of type "void *"
+  	  memset(utility->Q[0], 0, sizeof(utility->Q[0])*4);
+..\Src\rho\rho_utility.c(216): error:  #20: identifier "BACKGROUND_CENTROID_CALC_THRESH" is undefined
+  	  int xt = calculateCentroid( &utility->background_map_pair.x, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+..\Src\rho\rho_utility.c(216): error:  #167: argument of type "index_t *" is incompatible with parameter of type "int *"
+  	  int xt = calculateCentroid( &utility->background_map_pair.x, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+..\Src\rho\rho_utility.c(217): error:  #167: argument of type "index_t *" is incompatible with parameter of type "int *"
+  	  int yt = calculateCentroid( &utility->background_map_pair.y, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
+..\Src\rho\rho_utility.c(243): error:  #20: identifier "filtered_density" is undefined
+  				filtered_density = 0;
+..\Src\rho\rho_utility.c(251): error:  #136: struct "<unnamed>"  has no field "centroid"
+      int range[3] = { l, d->centroid, 0 };
+..\Src\rho\rho_utility.c(268): error:  #136: struct "<unnamed>"  has no field "kalmans"
+          RhoKalman.update(&d->kalmans[i], m, 0., true);
+..\Src\rho\rho_utility.c: 0 warnings, 30 errors
+compiling master.c...
+..\Src\Rho\rho_utility.h(73): error:  #20: identifier "DensityMapPairC" is undefined
+      DensityMapPairC     density_map_pair,
+..\Src\Rho\rho_utility.h(75): error:  #20: identifier "PredictionPairC" is undefined
+      PredictionPairC     prediction_pair;
+..\Src\Rho\rho_utility.h(98): error:  #20: identifier "rho_utility" is undefined
+  	void (*Init)( rho_utility *, UART_HandleTypeDef *, int, int );
+..\Src\Rho\rho_utility.h(99): error:  #20: identifier "rho_utility" is undefined
+    void (*Perform)( rho_utility *, bool );
+..\Src\Rho\rho_utility.h(100): error:  #20: identifier "rho_utility" is undefined
+  	void (*Filter_and_Select_Pairs)( rho_utility * );
+..\Src\Rho\rho_utility.h(101): error:  #20: identifier "rho_utility" is undefined
+  	void (*Filter_and_Select)( rho_utility *, density_map_t *, prediction_t * );
+..\Src\Rho\rho_utility.h(102): error:  #20: identifier "rho_utility" is undefined
+  	void (*Update_Prediction)( rho_utility * );
+..\Src\Rho\rho_utility.h(103): error:  #20: identifier "rho_utility" is undefined
+    void (*Update_Threshold)( rho_utility * );
+..\Src\master.h(75): error:  #20: identifier "rho_utility" is undefined
+  extern rho_utility Rho;
+..\Src\master.c(27): error:  #20: identifier "rho_utility" is undefined
+  rho_utility Rho;
+..\Src\master.c(128): warning:  #767-D: conversion from pointer to smaller integer
+  	index_t buff_w = (index_t)CAPTURE_BUFFER, x = 0, c = 0, y = 0, p = 0;
+..\Src\master.c(128): warning:  #69-D: integer conversion resulted in truncation
+  	index_t buff_w = (index_t)CAPTURE_BUFFER, x = 0, c = 0, y = 0, p = 0;
+..\Src\master.c(128): warning:  #177-D: variable "buff_w"  was declared but never referenced
+  	index_t buff_w = (index_t)CAPTURE_BUFFER, x = 0, c = 0, y = 0, p = 0;
+..\Src\master.c(128): warning:  #177-D: variable "x"  was declared but never referenced
+  	index_t buff_w = (index_t)CAPTURE_BUFFER, x = 0, c = 0, y = 0, p = 0;
+..\Src\master.c(243): warning:  #128-D: loop is not reachable
+  	while(1);
+..\Src\master.c(77): warning:  #177-D: function "set"  was declared but never referenced
+  static void set( GPIO_PinState s ) { HAL_GPIO_WritePin( CAM__CS_GPIO_Port, CAM__CS_Pin, s ); }
+..\Src\master.c: 6 warnings, 10 errors
+"rho_mod_v1\rho_mod_v1.axf" - 44 Error(s), 6 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.3.0.pack
+                ARM.CMSIS.5.3.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.1.1
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32L4xx_DFP.2.0.0.pack
+                Keil.STM32L4xx_DFP.2.0.0
+                STMicroelectronics STM32L4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_rho_mod_v1
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.1.1
+Target not created.
+Build Time Elapsed:  00:00:04
+</pre>
+</body>
+</html>

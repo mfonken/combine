@@ -146,9 +146,8 @@ void frameProcessor( void )
 
 	/* * * * *  Register Protection End  * * * * */
 
-	Rho.density_map_pair.x.max = DENSITY_X_MAX;
-	RhoFunctions.Filter_and_Select_Pairs( &Rho );
-	RhoFunctions.Update_Prediction( &Rho );
+	//Rho.density_map_pair.x.max = DENSITY_X_MAX;
+	//RhoFunctions.Perform( &Rho, false );
 	tog();
 }
 
@@ -297,7 +296,7 @@ void spoofFrameProcessor( void )
 	thresh_buffer_size = t - CAPTURE_HEIGHT + 1;
 	rho_proc( thresh_buffer_size << 1 );
 
-	Rho.density_map_pair.x.max = DENSITY_X_MAX;
+	//Rho.density_map_pair.x.max = DENSITY_X_MAX;
 	RhoFunctions.Filter_and_Select_Pairs( &Rho );
 	RhoFunctions.Update_Prediction( &Rho );
 }
@@ -471,15 +470,20 @@ void init_memory( void )
     /* Initialize Rho Type */
     Rho.density_map_pair.x.length   = CAPTURE_HEIGHT;
     Rho.density_map_pair.y.length   = CAPTURE_WIDTH;
-    Rho.density_map_pair.x.max      = 0;
-    Rho.density_map_pair.y.max      = 0;
-    Rho.density_map_pair.x.variance = 0.;
-    Rho.density_map_pair.y.variance = 0.;
+    Rho.density_map_pair.x.max[0]   = 0;
+		Rho.density_map_pair.x.max[1]   = 0;
+		Rho.density_map_pair.y.max[0]   = 0;
+		Rho.density_map_pair.y.max[1]   = 0;
 
-    rho_kalman_t * kpx = &Rho.density_map_pair.x.kalman,
-                 * kpy = &Rho.density_map_pair.y.kalman;
-    RhoKalman.init(kpx, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(kpy, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    rho_kalman_t 
+					* kpxl = &Rho.density_map_pair.x.kalmans[0],
+					* kpxh = &Rho.density_map_pair.x.kalmans[1],
+          * kpyl = &Rho.density_map_pair.y.kalmans[0],
+					* kpyh = &Rho.density_map_pair.y.kalmans[1];
+    RhoKalman.init(kpxl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+		RhoKalman.init(kpxh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(kpyl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(kpyh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
 
     Rho.density_map_pair.x.map = DENSITY_X;
     Rho.density_map_pair.y.map = DENSITY_Y;

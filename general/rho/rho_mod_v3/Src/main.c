@@ -39,7 +39,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_hal.h"
-#include "master.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -113,8 +112,22 @@ int main(void)
 
   /* Initialize interrupts */
   MX_NVIC_Init();
- 
-	master_init( &hi2c1, &htim2, &huart1 );
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
+
+  }
+  /* USER CODE END 3 */
+
 }
 
 /**
@@ -166,7 +179,7 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_2);
+  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_4);
 
     /**Configure the main internal regulator output voltage 
     */
@@ -261,7 +274,7 @@ static void MX_TIM2_Init(void)
 
   sSlaveConfig.SlaveMode = TIM_SLAVEMODE_COMBINED_RESETTRIGGER;
   sSlaveConfig.InputTrigger = TIM_TS_TI2FP2;
-  sSlaveConfig.TriggerPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+  sSlaveConfig.TriggerPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sSlaveConfig.TriggerFilter = 0;
   if (HAL_TIM_SlaveConfigSynchronization(&htim2, &sSlaveConfig) != HAL_OK)
   {

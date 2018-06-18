@@ -20,11 +20,11 @@ typedef uint32_t	address_t;
 
 typedef struct
 {
-    density_t * map;
-    uint16_t    length;
-    density_t   max;
-    FLOAT       variance;
-    rho_kalman_t kalman;
+    density_t 	 *map;
+    uint16_t    	length,
+									centroid;
+    density_t  		max[2];
+    rho_kalman_t 	kalmans[2];
 } density_map_t;
 
 typedef struct
@@ -36,7 +36,8 @@ typedef struct
 {
     FLOAT   primary,
             secondary,
-            alternate;
+            alternate,
+						absence;
 } prediction_probabilities;
 
 typedef struct
@@ -50,7 +51,7 @@ typedef struct
 
 typedef struct
 {
-    prediction_t         x,y;
+    prediction_t    x,y;
 } prediction_pair_t;
 
 typedef struct
