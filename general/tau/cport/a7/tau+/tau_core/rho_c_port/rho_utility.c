@@ -19,9 +19,9 @@
 
 #define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define FOR(L)       for( int i = L; i > 0; --i)
-#define FORA(L,A)    for( int i = L; i > 0; --i, A[i] )
-#define FORA2(L,A,B) for( int i = L; i > 0; --i, A[i], B[i] )
+//#define FOR(L)       for( int i = L; i > 0; --i)
+//#define FORA(L,A)    for( int i = L; i > 0; --i, A[i] )
+//#define FORA2(L,A,B) for( int i = L; i > 0; --i, A[i], B[i] )
 #define ZDIV(X,Y)    (!X?0:(!Y?2<<10:X/Y))
 
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
@@ -171,6 +171,7 @@ void Init(rho_c_utility * utility, int w, int h)
     RhoVariables.ram.CY_ADDR = &utility->Cy;
     RhoVariables.ram.C_FRAME =  utility->cframe;
     RhoVariables.ram.THRESH_ADDR = &utility->thresh;
+    RhoVariables.ram.CAM_PORT = &test_port;
     
     RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
     RhoVariables.global.y_delimiter = Y_DEL;
@@ -198,7 +199,7 @@ void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage
         RhoVariables.ram.Q       =  utility->Qb;
     }
 
-    RhoVariables.ram.CAM_PORT = &test_port;
+    
     RhoInterrupts.FRAME_START();
     pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
     int p = 0;
@@ -378,7 +379,7 @@ void Filter_and_Select( rho_c_utility * utility, DensityMapC * d, DensityMapC * 
         r->probabilities.primary   = 0.;
         r->probabilities.secondary = 0.;
         r->probabilities.alternate = 0.;
-        r->probabilities.absence   = 1.;
+        r->probabilities.absence   = MAX_ABSENCE_PROBABIILITY;
     }
     
 #ifdef RHO_DEBUG

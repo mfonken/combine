@@ -140,22 +140,10 @@ static void update( bayesian_system_t * sys, PredictionPairC * p )
     
     /* Update self-diagnostics based on state */
     double prob[] = {0.0, 0.0, 0.0, 0.0};
-    double xpp = p->x.probabilities.primary, xsp = p->x.probabilities.secondary, ypp = p->y.probabilities.primary, ysp = p->y.probabilities.secondary;
-    
-    if( ( ( xpp > SHADOW_TOLERANCE ) ^ ( xsp > SHADOW_TOLERANCE ) ) && ( ( ypp > SHADOW_TOLERANCE ) ^ ( ysp > SHADOW_TOLERANCE ) ) )
-    {
-        bool xc = INRANGE(xpp, xsp, SHADOW_TOLERANCE),
-             yc = INRANGE(ypp, ysp, SHADOW_TOLERANCE);
-        if( xc && !yc ) copymax(&ypp, &ysp);
-        if( !xc && yc ) copymax(&xpp, &xsp);
-#ifdef STATEM_DEBUG
-        printf("\tShadow> a: xp>%.2f xs>%.2f yp%.2f ys>%.2f\n", xpp, xsp, ypp, ysp);
-#endif
-    }
-    
-    prob[0] = DISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence)/2;
-    prob[1] = DISTANCE_SQ(xpp, ypp);
-    prob[2] = DISTANCE_SQ(xsp, ysp);
+
+    prob[0] = DISTANCE_SQ(p->x.probabilities.absence, p->y.probabilities.absence);
+    prob[1] = DISTANCE_SQ(p->x.probabilities.primary, p->y.probabilities.primary);
+    prob[2] = DISTANCE_SQ(p->x.probabilities.secondary, p->y.probabilities.secondary);
     prob[3] = DISTANCE_SQ(p->x.probabilities.alternate, p->y.probabilities.alternate);
     
 #ifdef STATEM_DEBUG
@@ -181,11 +169,11 @@ static void update( bayesian_system_t * sys, PredictionPairC * p )
 //    sys->stability.secondary  = 0.0;
 //    sys->stability.alternate  = 0.0;
 //    
-    int k = sys->selection_index;
+//    int k = sys->selection_index;
     
     double out[4] = { prob[0], prob[1], prob[2], prob[3] };
     double f;
-    for(int i = 0; i <= k; i++)
+    for(int i = 0; i <= num_selections; i++)
     {
         out[i] = 0.0;
         double p = prob[i] * PROBABILITY_TUNING_FACTOR;
