@@ -51,9 +51,6 @@ int main( int argc, const char * argv[] )
         pthread_mutex_lock(&drawer.drawer_mutex);
         imshow("Outframe",  drawer.frame);
         pthread_mutex_unlock(&drawer.drawer_mutex);
-//        imshow("Rho X Map", drawer.RMX);
-//        imshow("Rho Y Map", drawer.RMY);
-//        drawer.drawKalmans();
         pthread_mutex_unlock(&utility.outframe_mutex);
         
         char c = waitKey(KEY_DELAY);

@@ -27,10 +27,7 @@
 
     area    rho, code, readonly
 	preserve8
-
-	;extern WR
-	;extern RB
-
+  
 	extern	CAPTURE_BUFFER
 	extern	THRESH_BUFFER
 	extern	DENSITY_X
@@ -135,14 +132,14 @@ row_ret		bx	lr
 			align
 pixel_proc	proc
 			export pixel_proc
-			
+
 			ldr r1, =THRESH_BUFFER_MAX
 			ldr r1, [r1]
 			cmp wr, r1
 			blt pxl_start
 			mov	r0, #0
 			bx	lr
-			
+
 pxl_start  	ldrb r3, [rb], #PXL_JMP    	;/* current_pixel = next in buffer */
 			cmp r3, th				    ;/* if( current_pixel > th ) */
 			strgeh rb, [wr], #2   		;/* (*(wr) = x)++; */
@@ -155,12 +152,12 @@ rho_proc proc
 			import printBuffers
 			export rho_proc
 			stmdb  sp!, {r0-r12,lr}
-			
+
 #ifdef SPOOF
 			ldr wr, =THRESH_BUFFER
 			add wr, wr, r0
 #endif
-			
+
 			ldr r1, =THRESH_BUFFER_END	; Set final end of thresh buffer for frame
 			str wr, [r1]
 
@@ -213,7 +210,7 @@ no_del  	ldr r0, =CAPTURE_BUFFER		; Load capture buffer to correct offset
 #ifdef SPOOF
 			b	rx_corr
 #endif
-			
+
 			blt	rho_lcheck				; Check for valid value
             sub rx, rx, r0              ; Remove address offset from rx
 			sub rx, rx, #1

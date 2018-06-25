@@ -45,8 +45,9 @@
 #define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
 #define RHO_VARIANCE_NORMAL (float)(RHO_SQRT_HEIGHT/5.0)             //5
 #define RHO_VARIANCE_SCALE  (float)(RHO_SQRT_HEIGHT/3.0)//1.32        //20
+#define RHO_VARIANCE(X)     ( RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) ) )
 
-#define RHO_PUNISH_FACTOR   2
+#define RHO_PUNISH(X)       (X<<1)
 
 #define RHO_GAP_MAX 2//10
 
@@ -85,15 +86,14 @@
 #define THRESH_MIN	100
 #define THRESH_MAX 	255
 
-static void cma( FLOAT new_val, FLOAT *avg, int num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
-static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, int * n )
+static void cma( FLOAT new_val, FLOAT *avg, index_t num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
+static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, index_t * n )
 {FLOAT n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
-static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
+static inline void iswap(uw*a,uw*b){uw t=*a;*a=*b;*b=t;}
 
 typedef struct
 {
-    density_map_pair_t     density_map_pair,
-                        background_map_pair;
+    density_map_pair_t     density_map_pair;
     prediction_pair_t     prediction_pair;
     bayesian_system_t   sys;
     rho_kalman_t        thresh_filter;
@@ -117,7 +117,7 @@ typedef struct
 
 struct rho_functions
 {
-	void (*Init)( rho_utility *, UART_HandleTypeDef *, int, int );
+	void (*Init)( rho_utility *, UART_HandleTypeDef *, index_t, index_t );
   void (*Perform)( rho_utility *, bool );
 	void (*Redistribute_Densities)( rho_utility * );
 	void (*Generate_Background)( rho_utility * );

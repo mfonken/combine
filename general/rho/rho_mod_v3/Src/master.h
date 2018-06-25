@@ -6,6 +6,7 @@
 #include "stm32l4xx_it.h"
 
 #include "Rho\rho_utility.h"
+#include "printers.h"
 
 void spoofFrameProcessor( void );
 void frameProcessor( void );
@@ -30,7 +31,7 @@ void zero_memory( void );
 
 void spoofPixels( void );
 void spoofDensityMaps( void );
-	
+
 void dprint( uint8_t *, uint16_t);
 void dprintBuffers( void );
 void dprintCapture( void );
