@@ -16,11 +16,11 @@
 
 #define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define POW2(X) <<X
+#define POW2(X) 			<<X
 #define INR(X,H)     (X<0?0:((X>H)?(H-1):X))
 #define MAX(A,B)     ((A>B)?A:B)
 #define XRNG(A,B,C)  (A<(B-C)?-1:(A>(B+C)?1:0)) //Check if exceeds range
-#define ZDIV(X,Y)    (!X?0:(!Y?2POW2(10):(FLOAT)X/(FLOAT)Y))
+#define ZDIV(X,Y)    (!X?0:(!Y?2 POW2(10):(FLOAT)X/(FLOAT)Y))
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
 #define UDIFF(A,B)	 	 (B<A?A-B:B-A)
 
@@ -49,7 +49,7 @@ UART_HandleTypeDef * uart;
 
 char out_buffer[125];
 
-static void print(char * Buf )
+static void print(const char * Buf )
 {
 	HAL_UART_Transmit( uart, (uint8_t *)Buf, strlen((const char *)Buf), UART_TIMEOUT );
 }
@@ -119,7 +119,7 @@ static void Redistribute_Densities( rho_utility * utility )
 				xl[3] = {x0, x1-x0, utility->width-x1},
         yl[3] = {y0, y1-y0, utility->height-y1};
 
-		byte_t a, b, c, d, q, x, y;
+		byte_t a, b, c, d, l, l_, p, q, x, y;
     for( y = 0, p = 0; y < 3; y++ )
         for( x = 0; x < 3; x++ )
             area[p++] = xl[x]* yl[y];
@@ -228,8 +228,6 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 {
 		rho_selection_variables _ = {d->length, 0};
 
-    utility->QF = 0;
-    utility->QT = 0;
     index_t
 				x1 = _.len, x2 = _.len, cyc, cyc_,
 				range[3] = { _.len, d->centroid, 0 };
@@ -238,20 +236,20 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     printf("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
 #endif
 		/* Find max and update kalman */
-    for( cyc = 1, cyc_ = 2; cyc >= 0; cyc--, cyc_-- )
+    for( cyc = 1, cyc_ = 2; cyc_ > 0; cyc--, cyc_-- )
     {
         _.cmax = 0;
         for( x1 = range[cyc]; x1 > range[cyc_]; --x1, _.c1 = d->map[x1], _.b = d->background[x1] )
         {
             _.c1 = abs( _.b - _.c1 ) ;
-            d->filtered[x1] = _.c1;
+            d->map[x1] = _.c1;
             _.tden += _.c1;
             if( _.c1 > _.cmax ) _.cmax = _.c1;
         }
-        RhoKalman.update(&d->kalmans[cyc], _.cmax, 0., true);
+        RhoKalman.update(&d->kalmans[cyc], _.cmax, 0.);
         d->max[cyc] = _.cmax;
         _.fpeak = d->kalmans[cyc].value;
-        _.fvar = d->kalmans[cyc].variance;
+        _.fvar = RHO_VARIANCE(  d->kalmans[cyc].K[0] );
 
 				/* Check for valid variance band */
         if( _.fvar < _.fpeak && _.fvar > 0)
@@ -262,7 +260,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 //            printf("Map(%d): max>%d | peak>%d | var>%d | bandl>%d\n", i, m[i], fpeak, fvar, fbandl);
 #endif
             /* Find blob centroids and sort out the top 2 */
-            for( x2 = range[cyc]; x2 > range[cyc_]; --x2, _.c1 = d->filtered[x2] )
+            for( x2 = range[cyc]; x2 > range[cyc_]; --x2, _.c1 = d->map[x2] )
             {
                 /* Punish values above the filter peak */
                 if( _.c1 > _.fpeak )
@@ -312,17 +310,17 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 
 		/* Find coverage values */
 			_.fdnf 	= ZDIV(1, _.fden);
-	    _.tdnf 	= _.den[0] + _.den[1];
+	    _.tdnf 	= _.blobs[0].den + _.blobs[1].den;
 	    _.afac	= ( 1. - ( _.tdnf * _.fdnf ) ) * ALTERNATE_TUNING_FACTOR;
-	    _.pfac	= _.den[0] * _.fdnf;
-	    _.sfac	= _.den[1] * _.fdnf;
+	    _.pfac	= _.blobs[_.sel].den * _.fdnf;
+	    _.sfac	= _.blobs[!_.sel].den * _.fdnf;
 
     if( _.fcov > FILTERED_COVERAGE_TARGET )
     {
         _.fvf_ = 1.0;//ZDIV( 1.0, _.fvar );
-        r->probabilities.primary   = _.pfac * _.fvrf;
-        r->probabilities.secondary = _.sfac * _.fvrf;
-        r->probabilities.alternate = _.afac * _.fvrf;
+        r->probabilities.primary   = _.pfac * _.fvf_;
+        r->probabilities.secondary = _.sfac * _.fvf_;
+        r->probabilities.alternate = _.afac * _.fvf_;
         r->probabilities.absence   = 0.;
     }
     else
@@ -332,13 +330,6 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
         r->probabilities.alternate = 0.;
         r->probabilities.absence   = MAX_ABSENCE_PROBABILITY;
     }
-
-		utility->QT = _.tden;
-		utility->QF = _.fden;
-		utility->FT = _.fcov;
-#ifdef RHO_DEBUG
-		printf("* Filtered coverage is %.5f%%\n", utility->FT*100);
-#endif
 #ifdef RHO_DEBUG
 		printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.loc[0], _.den[0], _.max[0], _.loc[1], _.den[1], _.max[1]);
 #endif
@@ -354,17 +345,17 @@ void Filter_and_Select_Pairs( rho_utility * utility )
 #ifdef RHO_DEBUG
     printf("X Map:\n");
 #endif
-    Filter_and_Select( utility, &utility->density_map_pair.x, &utility->background_map_pair.x, &utility->prediction_pair.x );
+    Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
 #ifdef RHO_DEBUG
     printf("Y Map:\n");
 #endif
-    Filter_and_Select( utility, &utility->density_map_pair.y, &utility->background_map_pair.y, &utility->prediction_pair.y );
+    Filter_and_Select( utility, &utility->density_map_pair.y, &utility->prediction_pair.y );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
 void Update_Prediction( rho_utility * utility )
 {
-		FLOAT x1, x2;
+		FLOAT x1, y1;
     index_t
 				Ax = utility->prediction_pair.y.primary_new,
         Ay = utility->prediction_pair.x.primary_new,
@@ -387,8 +378,9 @@ void Update_Prediction( rho_utility * utility )
     }
     if( ( Ay < Cy ) ^ ( By > Cy ) ) /* Y ambiguous */
     {
-        y1 = utility->prediction_pair.y.primary.value + utility->prediction_pair.y.primary.velocity,
-        if( fabs( y1 - Ay ) > fabs( y1 - By ) ) iswap( &Ay, &By );
+        y1 = utility->prediction_pair.y.primary.value + utility->prediction_pair.y.primary.velocity;
+        if( fabs( y1 - Ay ) > fabs( y1 - By ) ) 
+					iswap( &Ay, &By );
         diag = false;
 #ifdef RHO_DEBUG
         printf("Y Ambiguous (%d,%d,%d)\n", Ay, By, Cy);

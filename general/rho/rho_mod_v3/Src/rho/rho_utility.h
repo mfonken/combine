@@ -47,7 +47,7 @@
 #define RHO_VARIANCE_SCALE  (float)(RHO_SQRT_HEIGHT/3.0)//1.32        //20
 #define RHO_VARIANCE(X)     ( RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) ) )
 
-#define RHO_PUNISH(X)       (X<<1)
+#define RHO_PUNISH(X)       ((X)<<1)
 
 #define RHO_GAP_MAX 2//10
 

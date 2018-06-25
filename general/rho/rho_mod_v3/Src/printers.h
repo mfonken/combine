@@ -1,6 +1,8 @@
 #ifndef printers_h
 #define printers_h
 
+#include "Rho\rho_utility.h"
+
 void dprintBuffers( void );
 void dprintCapture( void );
 void printBuffers( uint32_t s );

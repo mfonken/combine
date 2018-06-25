@@ -114,7 +114,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
 
-  master_init( hi2c1, htim2, huart1 );
+  master_init( &hi2c1, &htim2, &huart1 );
 }
 
 /**

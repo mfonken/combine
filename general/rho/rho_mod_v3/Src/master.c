@@ -3,7 +3,7 @@
 
 /*
 #include "master.h"
-master_init( hi2c1, htim2, huart1 );
+master_init( &hi2c1, &htim2, &huart1 );
 */
 
 //#define TX_FRAME
@@ -26,7 +26,7 @@ const uint8_t
 				interruptString[] = "Interrupt #";
 
 const uint16_t BUFFER_TX_DEL = (0xabcd),
-			uint16_t BUFFER_TX_END = (0x12ef);
+							 BUFFER_TX_END = (0x12ef);
 
 uint16_t thresh_buffer_size = THRESH_BUFFER_SIZE;
 
@@ -106,20 +106,20 @@ void frameProcessor( void )
 	while( vcounter < CAPTURE_HEIGHT && wr_index < limit )
 	{
 		while(row_flag);
-			tog();
-			THRESH_BUFFER[wr_index++] = (index_t)0xaaaa;
+		tog();
+		THRESH_BUFFER[wr_index++] = (index_t)0xaaaa;
 
-			pcounter = 0;
-			hcounter = 0;
+		pcounter = 0;
+		hcounter = 0;
 
-			while( ++hcounter < CAPTURE_WIDTH && !row_flag
-				//&& pixel_proc()
-			)//;
-			{
-				if( CAPTURE_BUFFER[hcounter] > THRESH_VALUE )
-					THRESH_BUFFER[wr_index++] = (index_t)hcounter;
-			}
-			tog();
+		while( ++hcounter < CAPTURE_WIDTH && !row_flag
+			//&& pixel_proc()
+		)//;
+		{
+			if( CAPTURE_BUFFER[hcounter] > THRESH_VALUE )
+				THRESH_BUFFER[wr_index++] = (index_t)hcounter;
+		}
+		tog();
 		//}
 		while(!row_flag);
 		vcounter++;
@@ -268,9 +268,9 @@ void UART_Clear( void )
 	uint8_t ascii_clear = 0x0c;
 	HAL_UART_Transmit( this_uart, &ascii_clear, 1, UART_TIMEOUT );
 }
-void print( uint8_t * Buf )
+void print( const uint8_t * Buf )
 {
-	HAL_UART_Transmit( this_uart, Buf, strlen((const char *)Buf), UART_TIMEOUT );
+	HAL_UART_Transmit( this_uart, (uint8_t *)Buf, strlen((const char *)Buf), UART_TIMEOUT );
 }
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -451,4 +451,98 @@ void dprint( uint8_t * scrAddr, uint16_t len )
 	while(uart_dma_busy);
 	uart_dma_busy = 1;
 	while(HAL_UART_Transmit_DMA( this_uart, scrAddr, len ) != HAL_OK);// Error_Handler();
+}
+
+/***************************************************************************************/
+/*                                    Printers                                         */
+/***************************************************************************************/
+void printBuffers( uint32_t s )
+{
+    print( "Printing Thresh Buffer\r\n" );
+    printBuffer( THRESH_BUFFER, thresh_buffer_size );
+
+    print( "Printing Dx\r\n" );
+    drawDensityMap(DENSITY_X, CAPTURE_BUFFER_HEIGHT);
+
+    print( "Printing Dy\r\n" );
+    drawDensityMap(DENSITY_Y, CAPTURE_BUFFER_WIDTH);
+}
+
+void printAddress( const char * s, uint32_t addr )
+{
+    sprintf((char *)hex, "%s: %8x\r\n", s, addr);
+    print( hex );
+}
+
+void printAddresses( void )
+{
+    printAddress("CamPt", (uint32_t)CAMERA_PORT);
+    printAddress("C bfr", (uint32_t)CAPTURE_BUFFER);
+    printAddress("C end", (uint32_t)CAPTURE_BUFFER_END);
+    printAddress("C max", (uint32_t)CAPTURE_BUFFER_MAX);
+    printAddress("T bfr", (uint32_t)THRESH_BUFFER);
+    printAddress("T end", (uint32_t)THRESH_BUFFER_END);
+    printAddress("T max", (uint32_t)THRESH_BUFFER_MAX);
+    printAddress("   Dx", (uint32_t)DENSITY_X);
+    printAddress("   Dy", (uint32_t)DENSITY_Y);
+    printAddress("    Q", (uint32_t)QUADRANT_BUFFER);
+    printAddress("Q tot", (uint32_t)&QUADRANT_TOTAL);
+    printAddress("Q prv", (uint32_t)&QUADRANT_PREVIOUS);
+    printAddress("   Cx", (uint32_t)&CENTROID_X);
+    printAddress("   Cy", (uint32_t)&CENTROID_Y);
+    printAddress("   Xm", (uint32_t)&DENSITY_X_MAX);
+    printAddress("T val", (uint32_t)&THRESH_VALUE);
+    printAddress("M end", (uint32_t)&RHO_MEM_END);
+}
+
+void printCapture( void )
+{
+	for(int y = 0; y < CAPTURE_BUFFER_HEIGHT; y++ )
+	{
+		for(int x = 0; x < CAPTURE_BUFFER_WIDTH; x++ )
+		{
+			uint32_t p = x + y * CAPTURE_BUFFER_WIDTH;
+			sprintf((char *)hex, " 0x%2x", CAPTURE_BUFFER[p]);
+			print( hex );
+		}
+		print( "\r\n" );
+	}
+}
+
+void printBuffer( index_t * a, int l )
+{
+    for( int i = 0; i < l; i++ )
+    {
+        index_t curr = a[i];
+        if( curr == 0xaaaa )
+            sprintf((char *)hex, "\r\n(%d):", i);
+        else
+            sprintf((char *)hex, " 0x%x", curr);
+        print( hex );
+    }
+    print("\r\n");
+}
+
+void drawDensityMap( density_t * a, int l )
+{
+    for( int i = 0; i < l; i++ )
+    {
+        density_t curr = a[i];
+        sprintf((char *)hex, "%4d[%2d]", curr, i);
+        print( hex );
+        if( curr > 10 ) curr = 10;
+        for( ; curr > 0; curr--) print( " " );
+        print( "|\r\n" );
+    }
+}
+
+void printPredictionPair( prediction_pair_t * pr )
+{
+	int xp = (int)pr->x.primary.value;
+	int yp = (int)pr->y.primary.value;
+	int xs = (int)pr->x.secondary.value;
+	int ys = (int)pr->y.secondary.value;
+	print("Printing predictions ");
+	sprintf((char *)hex, "\t\t\tP(%d, %d) | S(%d, %d)\r\n", xp, yp, xs, ys);
+	print( hex );
 }
