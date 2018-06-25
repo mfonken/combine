@@ -42,7 +42,7 @@ void printCapture( void );
 void printBuffer( index_t *, int );
 void drawDensityMap( density_t *, int );
 void UART_Clear( void );
-void print(uint8_t* Buf);
+void print( const uint8_t* Buf);
 void printPredictionPair( prediction_pair_t * pr );
 
 static void printc(uint8_t* Buf)

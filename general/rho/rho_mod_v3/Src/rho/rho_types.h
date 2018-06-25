@@ -34,7 +34,7 @@ typedef struct
 {
     density_t 	 *map,
                  *background;
-    index_t    	length,
+    index_t    		length,
 									centroid;
     density_t  		max[2];
     rho_kalman_t 	kalmans[2];

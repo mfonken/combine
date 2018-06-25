@@ -44,4 +44,5 @@ rho_mod_v1\master.o: ..\Src\Rho\rho_types.h
 rho_mod_v1\master.o: ..\Src\Rho\rho_kalman.h
 rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 rho_mod_v1\master.o: ..\Src\Rho\state_machine_utility.h
+rho_mod_v1\master.o: ..\Src\printers.h
 rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
