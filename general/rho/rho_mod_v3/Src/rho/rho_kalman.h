@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "stm32l4xx_hal.h"
-    
+
     /** Kalman Uncertainties */
     typedef struct
     {
@@ -15,7 +15,7 @@
         double bias;
         double sensor;
     } rho_kalman_uncertainty_c;
-    
+
     /** Kalman structure */
     typedef struct
     {
@@ -32,15 +32,13 @@
                     velocity;
 				double 		timestamp;
     } rho_kalman_t;
-    
+
     struct rho_kalman {
         void (*init)( rho_kalman_t *, double, double, double, double, double );
         void (*update)( rho_kalman_t *, double, double );
         int  (*isExpired)( rho_kalman_t * );
     };
-    
-    double timestamp( rho_kalman_t * );
-    
+
     extern const struct rho_kalman RhoKalman;
 
 

@@ -31,7 +31,7 @@ extern "C" {
 #define RHO_GAP_MAX 10
 
 #define ALTERNATE_TUNING_FACTOR    0.5
-#define FILTERED_COVERAGE_TARGET   0.006
+#define FILTERED_COVERAGE_TARGET   0.004
 #define FILTERED_COVERAGE_PIXELS   ((int)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
     
 #define MAX_ABSENCE_PROBABIILITY   0.5
@@ -62,6 +62,14 @@ extern "C" {
 #define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
     
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
+    
+#define RHO_SQRT_HEIGHT     sqrt(FNL_RESIZE_H)
+#define RHO_DIM_INFLUENCE   0.1
+#define RHO_K_TARGET_IND    0.3
+#define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
+#define RHO_VARIANCE_NORMAL RHO_SQRT_HEIGHT/5.0             //5
+#define RHO_VARIANCE_SCALE  RHO_SQRT_HEIGHT/3.0//1.32        //20
+#define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) );
 
 static void cma( double new_val, double *avg, int num )
     {
@@ -94,8 +102,9 @@ typedef struct
             Qb[4],
             Qf[4],
             QT,
-            QbT;
-    double  QF, FT;
+            QbT,
+            QF;
+    double  FT;
 
     int cframe[C_FRAME_SIZE];
     pthread_mutex_t rho_int_mutex;

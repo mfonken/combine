@@ -13,12 +13,13 @@
 
 typedef struct
 {
-    int         *map,
+    uint16_t    *map,
                 *background,
                 *filtered,
                  length,
                  centroid,
                  max[2];
+    bool         has_background;
     rho_kalman_t kalmans[2];
 } DensityMapC;
 

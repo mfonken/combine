@@ -110,7 +110,7 @@ void TauDraw::drawDensityGraph(Mat M)
         /* Kalman Values */
         rho_kalman_t yk = tau->rho.utility.density_map_pair.x.kalmans[i], xk = tau->rho.utility.density_map_pair.y.kalmans[i];
         int mYv = tau->rho.utility.density_map_pair.x.kalmans[i].variance, mXv = tau->rho.utility.density_map_pair.y.kalmans[i].variance;
-        
+       
         int m = OP_ALIGN((xk.value/DENSITY_SCALE),h), n = OP_ALIGN((yk.value/DENSITY_SCALE),w);
         int mv1 = OP_ALIGN((mXv/DENSITY_SCALE),m), mv2 = OP_ALIGN(-(mXv/DENSITY_SCALE),m), nv1 = OP_ALIGN((mYv/DENSITY_SCALE),n), nv2 = OP_ALIGN(-(mYv/DENSITY_SCALE),n);
         
@@ -287,7 +287,7 @@ void TauDraw::drawDensityMaps(Mat M)
         int mX = tau->rho.utility.density_map_pair.x.max[1-i], mY = tau->rho.utility.density_map_pair.y.max[1-i];
         if(!mX) mX = 1;
         if(!mY) mY = 1;
-        int *dX = tau->rho.utility.density_map_pair.x.map, *dY = tau->rho.utility.density_map_pair.y.map;
+        uint16_t *dX = tau->rho.utility.density_map_pair.x.map, *dY = tau->rho.utility.density_map_pair.y.map;
         
         for(; y < rangey[i]; y++ )
         {

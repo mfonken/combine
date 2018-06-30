@@ -73,6 +73,11 @@ static uint8_t USB_TX(uint8_t* Buf)
 }
 */
 
+static FLOAT timestamp( void )
+{
+	return (FLOAT)HAL_GetTick()/1000;
+}
+
 extern rho_utility Rho;
 
 #endif

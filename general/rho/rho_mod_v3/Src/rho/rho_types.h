@@ -29,6 +29,7 @@ typedef uint8_t 	capture_t;
 typedef uint32_t	density_t;
 typedef uint32_t	address_t;
 typedef volatile bool flag_t;
+typedef FLOAT     timestamp_t;
 
 typedef struct
 {
@@ -65,6 +66,8 @@ typedef struct
 typedef struct
 {
     prediction_t    x,y;
+    prediction_probabilities
+                    probabilities;
 } prediction_pair_t;
 
 typedef struct
@@ -97,10 +100,23 @@ typedef struct
 
 typedef struct
 {
-  blob_t
-        blobs[2];
+  index_t
+  	xl[3],
+  	yl[3],
+    area[9],
+
+	byte_t a, b, c, d, l, l_, p, q, x, y;
+} redistribution_variables;
+
+typedef struct
+{
   index_t
         len,     /* data set/map length */
+        range[3],
+        cyc,
+        cyc_,
+        x1,
+        x2,
         fpeak,   /* filter peak */
         fvar,    /* filter variance */
         fbandl,  /* filter band lower edge value */
@@ -110,6 +126,8 @@ typedef struct
         cloc,    /* current location value */
         gapc,    /* gap counter value */
         avgc;    /* averaging counter value */
+    blob_t
+        blobs[2];
 
     density_t
         cmax,   /* current maximum value */
@@ -134,5 +152,47 @@ typedef struct
         tdnf,   /* target density (float) */
         fvf_;   /* filtered variance inverse (float) */
 } rho_selection_variables;
+
+typedef struct
+{
+	index_t
+		Ax,
+		Ay,
+		Bx,
+		By,
+		Cx,
+		Cy;
+  FLOAT
+    x1,
+    y1;
+	byte_t non_diag,
+  int8_t q_check;
+} preduction_update_variables;
+
+typedef struct
+{
+  FLOAT
+    avg,
+    mavg;
+  density_t
+    c;
+  index_t
+    cnt,
+    tot,
+    i;
+} centroid_calculation_variables;
+
+typedef struct
+{
+  packet_t * packet;
+  address_t pdPtr,
+            llPtr,
+					* alPtr;
+	byte_t    includes,
+            i,
+            j,
+            l,
+            t;
+} packet_generation_variables;
 
 #endif /* rho_c_types_h */

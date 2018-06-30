@@ -77,7 +77,7 @@ extern inline bool pixel_proc(void);
 extern inline void rho_proc( uint32_t t );
 extern inline void asm_test(void);
 
-//static double now( void ) { return (double)HAL_GetTick()/1000; }
+//static FLOAT now( void ) { return (FLOAT)HAL_GetTick()/1000; }
 static void tog( void )
 { HAL_GPIO_TogglePin( CAM__CS_GPIO_Port, CAM__CS_Pin ); }
 static void set( GPIO_PinState s )

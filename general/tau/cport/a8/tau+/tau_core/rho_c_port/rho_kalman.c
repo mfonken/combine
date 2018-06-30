@@ -29,7 +29,7 @@ static void init( rho_kalman_t * k, double v, double ls, double vu, double bu, d
     k->uncertainty.sensor  = su;
 }
 
-static void update( rho_kalman_t * k, double value_new, double rate_new, bool update_variance )
+static void update( rho_kalman_t * k, double value_new, double rate_new )
 {
     double delta_time = timestamp() - k->timestamp;
 
@@ -66,7 +66,6 @@ static void update( rho_kalman_t * k, double value_new, double rate_new, bool up
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
     k->timestamp  = timestamp();
-    if( update_variance ) k->variance   = RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - k->K[0] ) );
 };
 
 static int isExpired( rho_kalman_t * k )

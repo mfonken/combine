@@ -20,18 +20,18 @@ static void init( rho_kalman_t * k, double v, double ls, double vu, double bu, d
 	k->uncertainty.value   = vu;
 	k->uncertainty.bias    = bu;
 	k->uncertainty.sensor  = su;
-	
-	k->timestamp 	= timestamp(k);
+
+	k->timestamp 	= timestamp();
 }
 
 static void update( rho_kalman_t * k, double value_new, double rate_new )
 {
-    double delta_time = timestamp(k) - k->timestamp;
+    double delta_time = timestamp() - k->timestamp;
 
     /* Quick expiration check */
     if(delta_time > k->lifespan)
     {
-        k->timestamp = timestamp(k);
+        k->timestamp = timestamp();
         return;
     }
     k->velocity   = k->value - k->prev;
@@ -59,18 +59,13 @@ static void update( rho_kalman_t * k, double value_new, double rate_new )
     k->P[0][1] -= k->K[0] * k->P[0][1];
     k->P[1][0] -= k->K[1] * k->P[0][0];
     k->P[1][1] -= k->K[1] * k->P[0][1];
-    
-    k->timestamp = timestamp( k );
-};
 
-static double timestamp( rho_kalman_t * k ) 
-{ 
-	return (double)HAL_GetTick()/1000;
-}
+    k->timestamp = timestamp();
+};
 
 static int isExpired( rho_kalman_t * k )
 {
-    return ((timestamp(k) - k->timestamp) > k->lifespan);
+    return ((timestamp() - k->timestamp) > k->lifespan);
 }
 
 const struct rho_kalman RhoKalman =
@@ -79,5 +74,3 @@ const struct rho_kalman RhoKalman =
     .update = update,
     .isExpired = isExpired
 };
-
-

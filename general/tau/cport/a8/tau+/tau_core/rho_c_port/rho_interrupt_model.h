@@ -62,9 +62,10 @@ typedef struct
         QN,
         QN_;
 
-    int *Q,
+    uint16_t
         *Dx,
-        *Dy,
+        *Dy;
+    int *Q,
         *CX_ADDR,
         *CY_ADDR,
         *C_FRAME,

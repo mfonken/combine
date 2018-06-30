@@ -9,7 +9,7 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        20
+#define MAIN_FPS        30
 #define UTILITY_FPS     30
 #define TAU_FPS         30
 #define COMBINE_FPS     30
