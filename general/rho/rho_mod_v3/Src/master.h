@@ -26,8 +26,8 @@ void resumeDMA( void );
 void resetDMA( void );
 
 void init_memory( void );
-void initTimerDMA( void );
 void zero_memory( void );
+void initTimerDMA( void );
 
 void spoofPixels( void );
 void spoofDensityMaps( void );
@@ -51,27 +51,6 @@ static void printc(uint8_t* Buf)
 	uint8_t c = 0xff;
 	for( ; c != '\0'; c = Buf[Len++] ) ITM_SendChar(c);
 }
-
-/*
-static uint8_t USB_TX(uint8_t* Buf)
-{
-	uint16_t Len = 0;
-	uint8_t c = 0xff;
-	for( ; c != '\0'; c = Buf[Len]) Len++;
-
-  uint8_t result = USBD_OK;
-
-  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-  if ((Len%64==0) && (result==USBD_OK))
-  {
-    USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, 0);
-    result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-  }
-	HAL_Delay(0);
-  return result;
-}
-*/
 
 static FLOAT timestamp( void )
 {

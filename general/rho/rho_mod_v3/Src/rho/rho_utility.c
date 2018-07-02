@@ -24,8 +24,6 @@
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
 #define UDIFF(A,B)	 	 (B<A?A-B:B-A)
 
-
-
 //#ifdef RHO_DEBUG
 /*
 #define PRINT1(A)			sprintf( out_buffer, A ); \
@@ -34,8 +32,6 @@ print(out_buffer);
 print(out_buffer);
 #define PRINT3(A,B,C) sprintf( out_buffer, A, B, C ); \
 print(out_buffer);
-*/
-/*
 #else
 */
 #define PRINT1(A)			;
@@ -58,67 +54,6 @@ static void print(const char * Buf )
 /* Quadrant density redistribution lookup table */
 const density_redistribution_lookup_t rlookup =
 {{{{{0,1,3,4},{2,5},{6,7},{8}},{{0},{1,2},{3,6},{4,5,7,8}},{{0,1,2,3},{1,3},{2,3},{3}},{4,2,2,1}},{{{0,3},{1,2,4,5},{6},{7,8}},{{0,1},{2},{3,4,6,7},{5,8}},{{0,2},{0,1,2,3},{2},{2,3}},{2,4,1,2}},{{{0,1},{2},{3,4,6,7},{5,8}},{{0,3},{1,2,4,5},{6},{7,8}},{{0,1},{1},{0,1,2,3},{1,3}},{2,1,4,2}},{{{0},{1,2},{3,6},{4,5,7,8}},{{0,1,3,4},{2,5},{6,7},{8}},{{0},{0,1},{0,2},{0,1,2,3}},{1,2,2,4}}}};
-
-/* Generic centroid and mass calculator */
-static index_t calculateCentroid( density_t * map, index_t l, index_t * C, byte_t thresh )
-{
-	centroid_calculation_variables _ = { 0 };
-	for( _.i; _.i < l; _.i++ )
-	{
-		_.c = map[_.i];
-		if( _.c > thresh )
-		{
-			cma_M0_M1(_.c, _.i, &_.avg, &_.mavg, &_.cnt);
-			_.tot += _.c;
-		}
-	}
-	*C = (index_t)ZDIV(_.mavg, _.avg);
-	return _.tot;
-}
-
-static void Redistribute_Densities( rho_utility * utility )
-{
-	redistribution_variables _ =
-	{
-		{ utility->Bx, abs(utility->Cx-utility->Bx), utility->width-utility->Cx  },
-		{ utility->By, abs(utility->Cy-utility->By), utility->height-utility->Cy },
-		{ 0 }, 0
-	}
-	if( utility->Cx < utility->Bx )
-	{
-		_.xl[0] = utility->Cx;
-		_.xl[2] = utility->width-utility->Bx;
-		_.c |= 0x01;
-	}
-	if( utility->Cy < utility->By )
-	{
-		_.yl[0] = utility->Cy;
-		_.yl[2] = utility->width-utility->By;
-		_.c |= 0x02;
-	}
-
-	while( _.y < 3 )
-		for( _.x = 0; _.x < 3; )
-			_.area[_.p++] = _.xl[_.x++]* _.yl[_.y++];
-
-	for( ; _.q < 4; _.q++ )
-	{
-		_.l  = rlookup.config[_.c].length[ _.q ];
-		_.l_ = rlookup.config[_.c].length[3-_.q];
-		for( _.x = 0, _.b = 0; _.x < _.l; _.x++ )
-		{
-			_.a = _.area[rlookup.config[_.c].current[_.q][_.x]];
-			for( _.y = 0; _.y < _.l_; _.y++ )
-				_.b += _.area[rlookup.config[c].background[rlookup.config[_.c].factor[_.q][_.x]][_.y]];
-			_.d += ZDIV( _.a, _.b ) * utility->Qb[_.q];
-		}
-#ifndef ALLOW_NEGATIVE_REDISTRIBUTION
-		if( _.d > utility->Q[_.q] ) utility->Qf[_.q] = 0;
-		else
-#endif
-		utility->Qf[_.q] = utility->Q[_.q] - _.d;
-	}
-}
 
 void Init(rho_utility * utility, index_t  w, index_t h)
 {
@@ -184,6 +119,67 @@ void Perform( rho_utility * utility, bool background_event )
 	}
 }
 
+/* Generic centroid and mass calculator */
+static index_t calculateCentroid( density_t * map, index_t l, index_t * C, byte_t thresh )
+{
+	centroid_calculation_variables _ = { 0 };
+	for( _.i; _.i < l; _.i++ )
+	{
+		_.c = map[_.i];
+		if( _.c > thresh )
+		{
+			cma_M0_M1(_.c, _.i, &_.avg, &_.mavg, &_.cnt);
+			_.tot += _.c;
+		}
+	}
+	*C = (index_t)ZDIV(_.mavg, _.avg);
+	return _.tot;
+}
+
+void Redistribute_Densities( rho_utility * utility )
+{
+	redistribution_variables _ =
+	{
+		{ utility->Bx, abs(utility->Cx-utility->Bx), utility->width - utility->Cx  },
+		{ utility->By, abs(utility->Cy-utility->By), utility->height - utility->Cy },
+		{ 0 }, 0
+	}
+	if( utility->Cx < utility->Bx )
+	{
+		_.xl[0] = utility->Cx;
+		_.xl[2] = utility->width - utility->Bx;
+		_.c |= 0x01;
+	}
+	if( utility->Cy < utility->By )
+	{
+		_.yl[0] = utility->Cy;
+		_.yl[2] = utility->width - utility->By;
+		_.c |= 0x02;
+	}
+
+	while( _.y < 3 )
+		for( _.x = 0; _.x < 3; )
+			_.area[_.p++] = _.xl[_.x++]* _.yl[_.y++];
+
+	for( ; _.q < 4; _.q++ )
+	{
+		_.l  = rlookup.config[_.c].length[    _.q];
+		_.l_ = rlookup.config[_.c].length[3 - _.q];
+		for( _.x = 0, _.b = 0; _.x < _.l; _.x++ )
+		{
+			_.a = _.area[rlookup.config[_.c].current[_.q][_.x]];
+			for( _.y = 0; _.y < _.l_; _.y++ )
+				_.b += _.area[rlookup.config[_.c].background[rlookup.config[_.c].factor[_.q][_.x]][_.y]];
+			_.d += ZDIV( _.a, _.b ) * utility->Qb[_.q];
+		}
+#ifndef ALLOW_NEGATIVE_REDISTRIBUTION
+		if( _.d > utility->Q[_.q] ) utility->Qf[_.q] = 0;
+		else
+#endif
+		utility->Qf[_.q] = utility->Q[_.q] - _.d;
+	}
+}
+
 /* Interrupt (Simulated Hardware-Driven) Density map generator */
 void Generate_Background( rho_utility * utility )
 {
@@ -214,12 +210,10 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 		1, 2,	/* cyc, cyc_ */
 		0
 	};
-
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("Range is <%d | %d | %d>\n", _.range[2], _.range[1], _.range[0]);
-	#endif
-	/* Find max and update kalman */
-	for( ; _.cyc_ > 0; _.cyc--, _.cyc_-- )
+#endif
+	for( ; _.cyc_ > 0; _.cyc--, _.cyc_-- ) /* Find max and update kalman */
 	{
 		_.cmax = 0;
 		for( _.x1 = _.range[_.cyc]; _.x1 > _.range[_.cyc_]; --_.x1, _.c1 = d->map[_.x1], _.b = d->background[_.x1] )
@@ -234,33 +228,25 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 		_.fpeak = d->kalmans[_.cyc].value;
 		_.fvar = RHO_VARIANCE(  d->kalmans[_.cyc].K[0] );
 
-		/* Check for valid variance band */
-		if( _.fvar < _.fpeak && _.fvar > 0)
+		if( _.fvar < _.fpeak && _.fvar > 0) /* Check for valid variance band */
 		{
-			/* Find blobs in band - centroids, densities, and maximums */
-			_.fbandl = _.fpeak - _.fvar;
-			#ifdef RHO_DEBUG
-			//            printf("Map(%d): max>%d | peak>%d | var>%d | bandl>%d\n", i, m[i], fpeak, fvar, fbandl);
-			#endif
+			_.fbandl = _.fpeak - _.fvar; /* Find blobs in band - centroids, densities, and maximums */
+#ifdef RHO_DEBUG
+			// printf("Map(%d): max>%d | peak>%d | var>%d | bandl>%d\n", i, m[i], fpeak, fvar, fbandl);
+#endif
 			/* Find blob centroids and sort out the top 2 */
 			for( _.x2 = _.range[_.cyc]; _.x2 > _.range[_.cyc_]; --_.x2, _.c1 = d->map[_.x2] )
 			{
-				/* Punish values above the filter peak */
-				if( _.c1 > _.fpeak )
-				_.c1 = _.fpeak - RHO_PUNISH( _.c1 - _.fpeak );
-
-				/* Check if CMA value is in band */
-				if( _.c1 > _.fbandl )
+				if( _.c1 > _.fpeak ) /* Punish values above the filter peak */
+					_.c1 = _.fpeak - RHO_PUNISH( _.c1 - _.fpeak );
+				if( _.c1 > _.fbandl ) /* Check if CMA value is in band */
 				{
-					/* De-offset valid values */
-					_.c2 = _.c1 - _.fbandl;
-
-					cma_M0_M1(_.c2, x2, &_.cavg, &_.mavg, &_.avgc);
+					_.c2 = _.c1 - _.fbandl; /* De-offset valid values */
+					cma_M0_M1(_.c2, _.x2, &_.cavg, &_.mavg, &_.avgc);
 					if(_.c2 > _.cmax) _.cmax = _.c2;
-					_.has = 1; _.gapc = 0;
+						_.has = 1; _.gapc = 0;
 				}
-				/* Process completed blobs */
-				else if(_.has && _.gapc > RHO_GAP_MAX)
+				else if(_.has && _.gapc > RHO_GAP_MAX) /* Process completed blobs */
 				{
 					_.cden = (density_t)_.cavg;
 					if( _.cden > _.blobs[!_.sel].den )
@@ -276,8 +262,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 					_.mavg = 0.; _.cavg = 0.;
 					_.has = 0; _.avgc = 0; _.gapc = 0;
 				}
-				/* Count gaps for all invalid values */
-				else _.gapc++;
+				else _.gapc++; /* Count gaps for all invalid values */
 			}
 		}
 	}
@@ -288,14 +273,13 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	r->primary_new   = _.blobs[_.sel].loc;
 	r->secondary_new = _.blobs[!_.sel].loc;
 
-	_.fcov = ZDIV(_.fden, _.tden);
-
 	/* Find coverage values */
-	_.fdnf 	= ZDIV(1, _.fden);
-	_.tdnf 	= _.blobs[0].den + _.blobs[1].den;
-	_.afac	= ( 1. - ( _.tdnf * _.fdnf ) ) * ALTERNATE_TUNING_FACTOR;
-	_.pfac	= _.blobs[_.sel].den * _.fdnf;
-	_.sfac	= _.blobs[!_.sel].den * _.fdnf;
+	_.fcov = ZDIV(_.fden, _.tden);
+	_.fdnf = ZDIV(     1, _.fden);
+	_.tdnf = _.blobs[0].den + _.blobs[1].den;
+	_.pfac = _.blobs[ _.sel].den * _.fdnf;
+	_.sfac = _.blobs[!_.sel].den * _.fdnf;
+	_.afac = ( 1. - ( _.tdnf * _.fdnf ) ) * ALTERNATE_TUNING_FACTOR;
 
 	if( _.fcov > FILTERED_COVERAGE_TARGET )
 	{
@@ -312,25 +296,25 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 		r->probabilities.alternate = 0.;
 		r->probabilities.absence   = MAX_ABSENCE_PROBABILITY;
 	}
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.loc[0], _.den[0], _.max[0], _.loc[1], _.den[1], _.max[1]);
-	#endif
+#endif
 
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("Rho: pri-%.3f sec-%.3f alt-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate);
 	//    printf("Alternate probability is %.3f\n", r->probabilities.alternate);
-	#endif
+#endif
 }
 
 void Filter_and_Select_Pairs( rho_utility * utility )
 {
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("X Map:\n");
-	#endif
+#endif
 	Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("Y Map:\n");
-	#endif
+#endif
 	Filter_and_Select( utility, &utility->density_map_pair.y, &utility->prediction_pair.y );
 }
 
@@ -355,28 +339,27 @@ void Update_Prediction( rho_utility * utility )
 		_.x1 = utility->prediction_pair.x.primary.value + utility->prediction_pair.x.primary.velocity;
 		if( fabs( _.x1 - _.Ax ) > fabs( _.x1 - _.Bx ) ) iswap( &_.Ax, &_.Bx );
 		_.non_diag = true;
-		#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 		printf("X Ambiguous (%d,%d,%d)\n", _.Ax, _.Bx, _.Cx);
-		#endif
+#endif
 	}
 	if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* Y ambiguous */
 	{
 		_.y1 = utility->prediction_pair.y.primary.value + utility->prediction_pair.y.primary.velocity;
-		if( fabs( _.y1 - _.Ay ) > fabs( _.y1 -_. By ) )
-		iswap( &_.Ay, &_.By );
+		if( fabs( _.y1 - _.Ay ) > fabs( _.y1 -_. By ) ) iswap( &_.Ay, &_.By );
 		_.non_diag = true;
-		#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 		printf("Y Ambiguous (%d,%d,%d)\n", _.Ay, _.By, _.Cy);
-		#endif
+#endif
 	}
 
 	if ( !_.non_diag )
 	{
 		_.qcheck = ( utility->Qf[0] > utility->Qf[1] ) + ( utility->Qf[2] < utility->Qf[3] ) - 1;
 		if( ( _.Ax > _.Bx ) ^ ( ( _.qcheck > 0 ) ^ ( _.Ay < _.By ) ) ) iswap(&_.Ax, &_.Bx);
-		#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 		printf("Quadrant Check %d\n", _.qcheck);
-		#endif
+#endif
 	}
 
 	if( _.Ax ) RhoKalman.update( &utility->prediction_pair.x.primary,   _.Ax, 0 );
@@ -408,21 +391,20 @@ void Update_Threshold( rho_utility * utility )
 	byte_t thresh = utility->thresh;
 
 	/* Hard-Tune on significant background */
-	#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 	printf("Coverage compare: Actual>%d vs. Target>%d\n", utility->QbT, BACKGROUND_COVERAGE_MIN);
-	#endif
-	char cov = XRNG( utility->QbT, 0, BACKGROUND_COVERAGE_TOL_PX );
-	switch(cov)
+#endif
+	switch( XRNG( utility->QbT, 0, BACKGROUND_COVERAGE_TOL_PX ) )
 	{
 		case -1:
-		thresh -= THRESH_STEP POW2(1);
-		break;
+			thresh -= THRESH_STEP POW2(1);
+			break;
 		case 1:
-		thresh += THRESH_STEP POW2(2);
-		break;
+			thresh += THRESH_STEP POW2(2);
+			break;
 		case 0:
 		default:
-		break;
+			break;
 	}
 
 	/* Soft-Tune on State */
@@ -430,28 +412,28 @@ void Update_Threshold( rho_utility * utility )
 	{
 		case UNSTABLE_MANY:
 		case STABLE_MANY:
-		thresh += THRESH_STEP;
+			thresh += THRESH_STEP;
 		break;
 		case UNSTABLE_NONE:
-		thresh -= THRESH_STEP;
+			thresh -= THRESH_STEP;
 		case STABLE_NONE:
-		thresh -= THRESH_STEP POW2(1);
-		break;
+			thresh -= THRESH_STEP POW2(1);
+			break;
 		case UNSTABLE_SINGLE:
 		case STABLE_SINGLE:
-		thresh -= THRESH_STEP;
-		break;
+			thresh -= THRESH_STEP;
+			break;
 		default:
-		break;
+			break;
 	}
 	thresh = BOUND(thresh, THRESH_MIN, THRESH_MAX);
 	if(thresh != utility->thresh)
 	{
 		RhoKalman.update( &utility->thresh_filter, thresh, 0. );
 		utility->thresh = utility->thresh_filter.value;
-		#ifdef RHO_DEBUG
+#ifdef RHO_DEBUG
 		printf("*** THRESH IS %d ***\n", thresh);
-		#endif
+#endif
 	}
 }
 
@@ -465,21 +447,19 @@ void Generate_Packet( rho_utility * utility )
 		(address_t*)&packet_value_lookup,
 	};
 	packet->timestamp = timestamp();
-
-	for( ; _.i < NUM_PACKET_ELEMENTS; _.i++ )
+	while( _.i++ < NUM_PACKET_ELEMENTS )
 	{
 		if( _.includes & 1 )
 		{
-			if(!_.t) _.l = (*(packing_template_t *)_.llPtr).a;
-			else 		 _.l = (*(packing_template_t *)_.llPtr).b;
+			if(!_.t) _.l = (*(packing_template_t*)_.llPtr).a;
+			else 		 _.l = (*(packing_template_t*)_.llPtr).b;
 			for( _.j = 0; _.j < _.l; _.j++)
-			((byte_t*)_.pdPtr)[_.j] = *(((byte_t*)*_.alPtr)+_.j);
+				((byte_t*)_.pdPtr)[_.j] = *(((byte_t*)*_.alPtr)+_.j);
 			_.pdPtr += _.l;
 		}
 		_.alPtr++;
 		_.includes >>= 1;
-		_.t = !_.t;
-		if(!_.t) _.llPtr++;
+		if((_.t=!_.t )) _.llPtr++;
 	}
 }
 

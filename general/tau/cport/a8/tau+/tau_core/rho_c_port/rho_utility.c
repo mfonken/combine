@@ -194,7 +194,6 @@ void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage
         RhoVariables.ram.CY_ADDR = &utility->Bx;
         RhoVariables.ram.Q       =  utility->Qb;
     }
-
     
     RhoInterrupts.FRAME_START();
     pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
