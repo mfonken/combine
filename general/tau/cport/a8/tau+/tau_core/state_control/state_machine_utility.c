@@ -232,6 +232,8 @@ static void updateProbabilities( bayesian_system_t * sys, double p[4] )
 #endif
             sys->probabilities.map[k][c] += p[i];
         }
+        else
+            k = -100;
     }
 }
 

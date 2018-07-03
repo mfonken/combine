@@ -14,6 +14,26 @@
 #include <stdint.h>
 #include "rho_types.h"
 
+/***************************************************************************************/
+/*                          DEFINITIONS & MACROS                                       */
+/***************************************************************************************/
+#define PROBABILITY_TUNING_FACTOR       0.5
+#define PROBABILITY_TUNING_FACTOR_SQ    ( PROBABILITY_TUNING_FACTOR*PROBABILITY_TUNING_FACTOR )
+#define PROBABILITY_THRESHOLD           0.1
+#define PROBABILITY_ALTERNATE_THRESH    0.9
+#define ABSENCE_FACTOR                  PROBABILITY_TUNING_FACTOR
+#define PROBABILITY_TUNING_THRESHOLD    ( PROBABILITY_THRESHOLD * PROBABILITY_THRESHOLD )
+#define PROBABILITY_STABILITY_THRESHOLD 0.5
+#define STATE_DISTANCE                  2.0
+#define SHADOW_TOLERANCE                0.2
+#define DOUBT_STABILITY                 0.5
+
+#define SQUARE(X)                       ( X * X )
+#define DISTANCE_SQ(X,Y)                ( SQUARE(X) + SQUARE(Y) )
+#define INRANGE(X,Y,T)                  ( abs( X - Y ) < T )
+
+/***************************************************************************************/
+
 /** Goals **
  *  - Column is current state
  *  - Row is next state
@@ -24,7 +44,9 @@
  */
 
 /* Tau states */
-typedef enum
+#define state_dimension_t uint8_t
+#define loop_variables_state_dimension_t loop_variables_##state_dimension_t
+typedef enum : state_dimension_t
 {
     UNKNOWN_STATE = 0,
     STABLE_NONE,
@@ -39,63 +61,68 @@ typedef enum
     NUM_STATES
 } state_t;
 
-static inline int stateToSelection(int s) {return ((int)((s+1)/2) - 1);};
-static inline const char *stateString(int s)
+static inline state_dimension_t stateToSelection(state_t s) {return ((state_dimension_t)((s+1)/2) - 1);};
+static inline const char *stateString(state_t s)
 {
     static const char *strings[] = { "UN", "S0", "U0", "S1", "U1", "S2", "U2", "SM", "UM" };
-    return strings[s];
+    return strings[(state_dimension_t)s];
 }
 
 /* Stability tracking for selec tions */
 typedef struct
 {
-    double primary;
-    double secondary;
-    double alternate;
-    double overall;
+    FLOAT primary;
+    FLOAT secondary;
+    FLOAT alternate;
+    FLOAT overall;
 } stability_t;
 
 /* Markov state tree with bayesian base */
 typedef struct
 {
-    double  map[NUM_STATES][NUM_STATES];
-    int     length;
+    FLOAT map[NUM_STATES][NUM_STATES];
+    state_dimension_t length;
 } bayesian_map_t;
-
-struct bayesian_map_functions
-{
-    void    (*initMap)(        bayesian_map_t * );
-    void    (*normalizeMap)(   bayesian_map_t * );
-    void    (*normalizeState)( bayesian_map_t *, int );
-    void    (*resetState)(     bayesian_map_t *, int );
-    void    (*print)(          bayesian_map_t *, state_t s );
-};
-extern const struct bayesian_map_functions BayesianMap;
 
 /* System self-diagnostic state control type */
 typedef struct
 {
-    state_t     state;
-    state_t     prev;
-    state_t     next;
-    int         selection_index;
-    stability_t stability;
-    bayesian_map_t probabilities;
+    state_t         state;
+    state_t         prev;
+    state_t         next;
+    state_dimension_t  selection_index;
+    stability_t     stability;
+    bayesian_map_t  probabilities;
 } bayesian_system_t;
+
+struct bayesian_map_functions
+{
+    void (*initMap)(            bayesian_map_t * );
+    void (*normalizeMap)(       bayesian_map_t * );
+    void (*normalizeState)(     bayesian_map_t *, state_dimension_t );
+    void (*resetState)(         bayesian_map_t *, state_dimension_t );
+    void (*print)(              bayesian_map_t *, state_t s );
+};
 
 struct bayesian_system_functions
 {
     void (*init)(                bayesian_system_t * );
-    void (*updateProbabilities)( bayesian_system_t *, double[4] );
+    void (*updateProbabilities)( bayesian_system_t *, FLOAT[4] );
     void (*updateState)(         bayesian_system_t * );
     void (*update)(              bayesian_system_t *, prediction_pair_t * );
 };
 
-extern const struct bayesian_system_functions BayesianSystem;
+struct bayesian_functions
+{
+  struct bayesian_map_functions    map;
+  struct bayesian_system_functions sys;
+}
 
-static inline void copymax(double * a, double * b) { if(*a>*b)*b=*a;else*a=*b; }
-static inline bool isStable( int s ) { return (s % 2); }
-static inline int stateNumber( int s ) { return (int)( ( s - 1 ) / 2 ); }
+extern const struct bayesian_functions BayesianFunctions;
 
+static inline void copymax(FLOAT * a, FLOAT * b) { if(*a>*b)*b=*a;else*a=*b; }
+static inline bool isStable( state_t s ) { return ((state_t)s % 2); }
+static inline state_dimension_t stateNumber( state_t s ) { return (state_dimension_t)( ( s - 1 ) / 2 ); }
 
+#define define_loop_variable_template(T, N)struct { T l, i, j; FLOAT u, v;}N;
 #endif /* state_machine_utility_hpp */

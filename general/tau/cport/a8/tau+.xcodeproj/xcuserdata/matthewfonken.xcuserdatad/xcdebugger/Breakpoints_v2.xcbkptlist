@@ -38,32 +38,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "tau+/tau_core/state_control/state_machine_utility.c"
-            timestampString = "551677643.998827"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
-            landmarkName = "update"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "tau+/tau_core/rho_c_port/rho_utility.c"
-            timestampString = "551677643.998932"
+            filePath = "tau+/tau_core/state_control/state_machine_utility.c"
+            timestampString = "552270414.628794"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "391"
-            endingLineNumber = "391"
-            landmarkName = "Filter_and_Select"
+            startingLineNumber = "236"
+            endingLineNumber = "236"
+            landmarkName = "updateProbabilities"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

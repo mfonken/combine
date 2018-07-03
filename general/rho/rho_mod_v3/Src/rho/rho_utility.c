@@ -382,7 +382,7 @@ void Update_Prediction( rho_utility * utility )
 	utility->prediction_pair.probabilities.secondary = sqrt( utility->prediction_pair.x.secondary * utility->prediction_pair.y.secondary );
 	utility->prediction_pair.probabilities.alternate = sqrt( utility->prediction_pair.x.alternate * utility->prediction_pair.y.alternate );
 
-	BayesianSystem.update( &utility->sys, &utility->prediction_pair );
+	BayesianFunctions.sys.update( &utility->sys, &utility->prediction_pair );
 }
 
 /* Use background and state information to update image threshold */
