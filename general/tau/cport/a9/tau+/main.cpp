@@ -15,7 +15,6 @@ using namespace std;
 #define COMBINE_FPS     30
 
 #define sleep(X) usleep(X*1E6)
-
 #define KEY_DELAY   1E3/MAIN_FPS
 
 int main( int argc, const char * argv[] )
@@ -25,16 +24,17 @@ int main( int argc, const char * argv[] )
 #else
     ImageUtility utility("ImageUtility", IMAGE_SOURCE_PATH, IMAGE_SOURCE_NUM_FRAMES, FNL_RESIZE_W, FNL_RESIZE_H);
 #endif
+    
     Tau tau("Tau", &utility, FNL_RESIZE_W, FNL_RESIZE_H);
-    //    Combine combine("Combine", &tau, FNL_RESIZE_W, FNL_RESIZE_H);
-    //    SerialWriter comm(SFILE, FILENAME);
-    
     Environment env(&utility, UTILITY_FPS);
-    env.addTest( (TestInterface *)&tau, TAU_FPS);
-//    env.addTest(&combine, &comm, COMBINE_FPS);
+    env.addTest( &tau, TAU_FPS);
     
-//    env.start();
-//    usleep(1000000);
+#ifdef HAS_IMU
+    Combine combine("Combine", &tau, FNL_RESIZE_W, FNL_RESIZE_H);
+    SerialWriter comm(SFILE, FILENAME);
+    env.addTest(&combine, &comm, COMBINE_FPS);
+#endif
+
     env.pause();
     
     pthread_mutex_lock(&utility.outframe_mutex);
@@ -69,11 +69,11 @@ int main( int argc, const char * argv[] )
                 break;
             case 's':
                 env.pause();
-                usleep(10000);
+                sleep(0.01);
                 tau.avg = 0;
                 tau.count = 0;
                 env.start();
-                usleep(10000000);
+                sleep(1);
                 env.pause();
                 printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
                 break;

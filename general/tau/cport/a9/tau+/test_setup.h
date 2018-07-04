@@ -9,12 +9,13 @@
 #ifndef test_setup_h
 #define test_setup_h
 
-#define TITLE_STRING            "Tau+ CPort Alpha v0.8"
+#define TITLE_STRING            "Tau+ CPort Alpha v0.9"
 #define IMAGE_SOURCE_PATH       "noise/dynamic_clouds"
 #define IMAGE_SOURCE_NUM_FRAMES 1
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
+//#define HAS_IMU
 //#define HAS_FILE
 #define HAS_GENERATOR
 

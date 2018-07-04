@@ -91,7 +91,7 @@ typedef struct
     y1;
 	byte_t non_diag;
   int8_t qcheck;
-} preduction_update_variables;
+} prediction_update_variables;
 
 typedef struct
 {

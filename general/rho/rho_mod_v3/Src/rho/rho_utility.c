@@ -269,7 +269,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	//    if( utility->FT > 1 || utility->FT < 0 ) utility->FT = 0;
 
 	/* Update prediction with best peaks */
-	r->primary_new   = _.blobs[_.sel].loc;
+	r->primary_new   = _.blobs[ _.sel].loc;
 	r->secondary_new = _.blobs[!_.sel].loc;
 
 	/* Find coverage values */
@@ -320,7 +320,7 @@ void Filter_and_Select_Pairs( rho_utility * utility )
 /* Correct and factor predictions from variance band filtering into global model */
 void Update_Prediction( rho_utility * utility )
 {
-	preduction_update_variables _ =
+	prediction_update_variables _ =
 	{
 		utility->prediction_pair.y.primary_new,
 		utility->prediction_pair.x.primary_new,
