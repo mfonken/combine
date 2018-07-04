@@ -28,7 +28,7 @@ typedef float 		FLOAT;
 typedef uint8_t		byte_t;
 typedef uint16_t	index_t;
 typedef uint8_t 	capture_t;
-typedef uint16_t	density_t;
+typedef uint32_t	density_t;
 typedef uint32_t	address_t;
 typedef volatile bool flag_t;
 typedef FLOAT     timestamp_t;
@@ -41,8 +41,8 @@ typedef FLOAT     timestamp_t;
 
 /* Capture Config */
 #define CAPTURE_DIV			2
-#define CAPTURE_WIDTH 	1//(CAMERA_WIDTH>>CAPTURE_DIV)
-#define CAPTURE_HEIGHT	1//(CAMERA_HEIGHT>>CAPTURE_DIV)
+#define CAPTURE_WIDTH 	(CAMERA_WIDTH>>CAPTURE_DIV)
+#define CAPTURE_HEIGHT	(CAMERA_HEIGHT>>CAPTURE_DIV)
 #define FRAME_SIZE 			(CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define	CAPTURE_BUFFER_WIDTH	(uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT (uint32_t)CAPTURE_HEIGHT

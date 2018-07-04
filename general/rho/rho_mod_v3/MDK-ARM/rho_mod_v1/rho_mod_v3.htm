@@ -3,7 +3,7 @@
 <title>Static Call Graph - [rho_mod_v1\rho_mod_v3.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image rho_mod_v1\rho_mod_v3.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Jul 03 21:27:11 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060528: Last Updated: Tue Jul 03 21:34:23 2018
 <BR><P>
 <H3>Maximum Stack Usage =        324 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -648,6 +648,8 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Prediction
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Redistribute_Densities
+<LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calculateCentroid
+<LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zero_memory
 <LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fclose_internal
 <LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fopen
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_initio
@@ -1222,8 +1224,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32l432xx.o(RESET)
 </UL>
-<P><STRONG><a name="[6f]"></a>Filter_and_Select</STRONG> (Thumb, 1342 bytes, Stack size 152 bytes, rho_utility.o(i.Filter_and_Select))
-<BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
+<P><STRONG><a name="[6f]"></a>Filter_and_Select</STRONG> (Thumb, 1284 bytes, Stack size 176 bytes, rho_utility.o(i.Filter_and_Select))
+<BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cma_M0_M1
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrt
@@ -1243,7 +1245,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> rho_utility.o(.constdata)
 </UL>
 <P><STRONG><a name="[6e]"></a>Filter_and_Select_Pairs</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, rho_utility.o(i.Filter_and_Select_Pairs))
-<BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = Filter_and_Select_Pairs &rArr; Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
+<BR><BR>[Stack]<UL><LI>Max Depth = 256<LI>Call Chain = Filter_and_Select_Pairs &rArr; Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Filter_and_Select
 </UL>
@@ -1251,8 +1253,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> rho_utility.o(.constdata)
 </UL>
-<P><STRONG><a name="[6d]"></a>Generate_Background</STRONG> (Thumb, 50 bytes, Stack size 16 bytes, rho_utility.o(i.Generate_Background))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = Generate_Background &rArr; calculateCentroid
+<P><STRONG><a name="[6d]"></a>Generate_Background</STRONG> (Thumb, 88 bytes, Stack size 16 bytes, rho_utility.o(i.Generate_Background))
+<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Generate_Background &rArr; calculateCentroid &rArr; __aeabi_memclr4
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;calculateCentroid
 </UL>
@@ -1705,7 +1707,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32l432xx.o(RESET)
 </UL>
 <P><STRONG><a name="[6b]"></a>Perform</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, rho_utility.o(i.Perform))
-<BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = Perform &rArr; Filter_and_Select_Pairs &rArr; Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
+<BR><BR>[Stack]<UL><LI>Max Depth = 264<LI>Call Chain = Perform &rArr; Filter_and_Select_Pairs &rArr; Filter_and_Select &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Threshold
 <LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_Prediction
@@ -1829,7 +1831,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32l432xx.o(RESET)
 </UL>
-<P><STRONG><a name="[70]"></a>Update_Prediction</STRONG> (Thumb, 894 bytes, Stack size 64 bytes, rho_utility.o(i.Update_Prediction))
+<P><STRONG><a name="[70]"></a>Update_Prediction</STRONG> (Thumb, 890 bytes, Stack size 64 bytes, rho_utility.o(i.Update_Prediction))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = Update_Prediction &rArr; __hardfp_sqrt &rArr; _dsqrt &rArr; __fpl_dnaninf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[14b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;iswap
@@ -1845,7 +1847,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> rho_utility.o(.constdata)
 </UL>
-<P><STRONG><a name="[71]"></a>Update_Threshold</STRONG> (Thumb, 112 bytes, Stack size 8 bytes, rho_utility.o(i.Update_Threshold))
+<P><STRONG><a name="[71]"></a>Update_Threshold</STRONG> (Thumb, 118 bytes, Stack size 8 bytes, rho_utility.o(i.Update_Threshold))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = Update_Threshold &rArr; __aeabi_d2uiz
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ui2d
@@ -1900,7 +1902,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
 </UL>
-<P><STRONG><a name="[14d]"></a>dprintBuffers</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, master.o(i.dprintBuffers))
+<P><STRONG><a name="[14d]"></a>dprintBuffers</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, master.o(i.dprintBuffers))
 <BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = dprintBuffers &rArr; dprint &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
@@ -1916,8 +1918,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> _printf_char_file.o(.text)
 </UL>
-<P><STRONG><a name="[b]"></a>frameProcessor</STRONG> (Thumb, 228 bytes, Stack size 24 bytes, master.o(i.frameProcessor))
-<BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = frameProcessor &rArr; dprintBuffers &rArr; dprint &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
+<P><STRONG><a name="[b]"></a>frameProcessor</STRONG> (Thumb, 268 bytes, Stack size 32 bytes, master.o(i.frameProcessor))
+<BR><BR>[Stack]<UL><LI>Max Depth = 100<LI>Call Chain = frameProcessor &rArr; dprintBuffers &rArr; dprint &rArr; HAL_UART_Transmit_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zero_memory
 <LI><a href="#[14d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dprintBuffers
@@ -1925,7 +1927,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
 </UL>
-<P><STRONG><a name="[d]"></a>initTimerDMA</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, master.o(i.initTimerDMA))
+<P><STRONG><a name="[d]"></a>initTimerDMA</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, master.o(i.initTimerDMA))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = initTimerDMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_Start_IT
@@ -1936,8 +1938,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
 </UL>
-<P><STRONG><a name="[12]"></a>init_memory</STRONG> (Thumb, 322 bytes, Stack size 64 bytes, master.o(i.init_memory))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = init_memory
+<P><STRONG><a name="[12]"></a>init_memory</STRONG> (Thumb, 324 bytes, Stack size 64 bytes, master.o(i.init_memory))
+<BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = init_memory &rArr; zero_memory &rArr; __aeabi_memclr4
 </UL>
 <BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;zero_memory
 </UL>
@@ -1962,7 +1964,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[154]"></a>master_init</STRONG> (Thumb, 118 bytes, Stack size 0 bytes, master.o(i.master_init))
+<P><STRONG><a name="[154]"></a>master_init</STRONG> (Thumb, 122 bytes, Stack size 0 bytes, master.o(i.master_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = master_init &rArr; printAddresses &rArr; printAddress &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -1983,7 +1985,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
 </UL>
-<P><STRONG><a name="[c]"></a>performBackgroundEvent</STRONG> (Thumb, 36 bytes, Stack size 16 bytes, master.o(i.performBackgroundEvent))
+<P><STRONG><a name="[c]"></a>performBackgroundEvent</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, master.o(i.performBackgroundEvent))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = performBackgroundEvent
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
@@ -2008,7 +2010,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[156]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printAddresses
 </UL>
 
-<P><STRONG><a name="[156]"></a>printAddresses</STRONG> (Thumb, 168 bytes, Stack size 8 bytes, master.o(i.printAddresses))
+<P><STRONG><a name="[156]"></a>printAddresses</STRONG> (Thumb, 166 bytes, Stack size 8 bytes, master.o(i.printAddresses))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = printAddresses &rArr; printAddress &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -2027,8 +2029,12 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
 </UL>
-<P><STRONG><a name="[13]"></a>zero_memory</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, master.o(i.zero_memory))
-<BR><BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_memory
+<P><STRONG><a name="[13]"></a>zero_memory</STRONG> (Thumb, 48 bytes, Stack size 8 bytes, master.o(i.zero_memory))
+<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = zero_memory &rArr; __aeabi_memclr4
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
+</UL>
+<BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_memory
 <LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;frameProcessor
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> master.o(.data)
@@ -2508,10 +2514,11 @@ Local Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> rho_kalman.o(.constdata)
 </UL>
-<P><STRONG><a name="[f8]"></a>calculateCentroid</STRONG> (Thumb, 168 bytes, Stack size 48 bytes, rho_utility.o(i.calculateCentroid))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = calculateCentroid
+<P><STRONG><a name="[f8]"></a>calculateCentroid</STRONG> (Thumb, 160 bytes, Stack size 48 bytes, rho_utility.o(i.calculateCentroid))
+<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = calculateCentroid &rArr; __aeabi_memclr4
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;cma_M0_M1
+<LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
 </UL>
 <BR>[Called By]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Generate_Background
 </UL>
