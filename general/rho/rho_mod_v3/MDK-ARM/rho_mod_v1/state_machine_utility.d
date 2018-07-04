@@ -4,7 +4,6 @@ rho_mod_v1\state_machine_utility.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 rho_mod_v1\state_machine_utility.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 rho_mod_v1\state_machine_utility.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 rho_mod_v1\state_machine_utility.o: ..\Src\Rho\rho_types.h
-rho_mod_v1\state_machine_utility.o: ..\Src\Rho\rho_kalman.h
 rho_mod_v1\state_machine_utility.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h
 rho_mod_v1\state_machine_utility.o: ../Inc/stm32l4xx_hal_conf.h
 rho_mod_v1\state_machine_utility.o: ../Inc/main.h
@@ -37,3 +36,4 @@ rho_mod_v1\state_machine_utility.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4x
 rho_mod_v1\state_machine_utility.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
 rho_mod_v1\state_machine_utility.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h
 rho_mod_v1\state_machine_utility.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
+rho_mod_v1\state_machine_utility.o: ..\Src\Rho\rho_kalman.h

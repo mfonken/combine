@@ -28,14 +28,29 @@ const uint8_t
 const uint16_t BUFFER_TX_DEL = (0xabcd),
 							 BUFFER_TX_END = (0x12ef);
 
-uint16_t thresh_buffer_size = svb.thresh_SIZE;
-
 #define UART_TIMEOUT	100
 /******************************************************************/
 
 /***************************** Memory *****************************/
 
-system_variables system = DEFAULT_SYSTEM_INITIALIZATION;
+system_t rho_system = DEFAULT_SYSTEM_INITIALIZATION;
+
+capture_t * CAPTURE_BUFFER 	= svb.capture;
+index_t 	* THRESH_BUFFER		= svb.thresh;
+density_t * DENSITY_X				= svb.density_x,
+					* DENSITY_Y				= svb.density_y,
+					* QUADRANT_BUFFER = svb.quadrant;
+
+density_t * QUADRANT_TOTAL 		= &svd.quadrant_total,
+					*	QUADRANT_PREVIOUS = &svd.quadrant_previous,
+					*	DENSITY_X_MAX 		= &svd.density_x_max;
+index_t		*	CENTROID_X				= &svd.CENTROID_X,
+					*	CENTROID_Y				= &svd.CENTROID_Y;
+address_t	*	THRESH_BUFFER_END = &svd.thresh_end,
+					*	THRESH_BUFFER_MAX = &svd.thresh_max,
+					* THRESH_VALUE			= &svd.thresh_value;
+
+uint16_t thresh_buffer_size = THRESH_BUFFER_SIZE;
 /******************************************************************/
 
 /*************** Static, Inline, & Extern Functions ***************/
@@ -58,25 +73,25 @@ inline void rowFlagSet( void ) { svf.row = 1; }
 inline void rowFlagReset( void ) { svf.row = 0; }
 inline flag_t rowFlagGet( void ) { return svf.row; }
 inline void frameFlagSet( void ) { svf.frame = 1; }
-inline void frameFlagReset( void ) { system.variables.flag.frame = 0; }
+inline void frameFlagReset( void ) { svf.frame = 0; }
 /******************************************************************/
 
 inline void Point_Dmaps_To_Background( void )
 {
-	Rho.density_map_pair.x.background = svb.density_x;
-	Rho.density_map_pair.y.background = svb.density_y;
+	rho_system.variables.rho.density_map_pair.x.background = svb.density_x;
+	rho_system.variables.rho.density_map_pair.y.background = svb.density_y;
 }
 
 inline void Point_Dmaps_To_Foreground( void )
 {
-	Rho.density_map_pair.x.map = svb.density_x;
-	Rho.density_map_pair.y.map = svb.density_y;
+	rho_system.variables.rho.density_map_pair.x.map = svb.density_x;
+	rho_system.variables.rho.density_map_pair.y.map = svb.density_y;
 }
 
 void performBackgroundEvent( void )
 {
 	Point_Dmaps_To_Background();
-	RhoFunctions.Perform( &Rho, true );
+	RhoFunctions.Perform( &rho_system.variables.rho, true );
 	Point_Dmaps_To_Foreground();
 }
 
@@ -84,15 +99,15 @@ void frameProcessor( void )
 {
 	while(!svf.frame);
 	tog();
-	vcounter = 1;
+	svc.v = 1;
 	zero_memory();
 
 	/* * * * * Register Protection Start * * * * */
 	//frame_start();
-	while(!row_flag);
+	while(!svf.row);
 	svc.w = 0;
-	uint32_t row_sum = 0, limit = svb.thresh_MAX - 10;
-	while( vcounter < CAPTURE_HEIGHT && svc.w < limit )
+	uint32_t row_sum = 0, limit = svd.thresh_max - 10;
+	while( svc.v < CAPTURE_HEIGHT && svc.w < limit )
 	{
 		while(svf.row);
 		tog();
@@ -117,7 +132,7 @@ void frameProcessor( void )
 	row_sum = 0;
 
 	/* Rho Process (C) */
-	index_t buff_w = (index_t)svb.capture, x = 0, c = 0, y = 0, p = 0;
+	index_t c = 0, y = 0, p = 0;
 	for( ; p < svc.w; p++ )
 	{
 		c = svb.thresh[p];
@@ -133,11 +148,11 @@ void frameProcessor( void )
 		}
 	}
 	//rho_proc(0);
-	svb.density_x[svb.capture_HEIGHT-1] = 0xef;
+	svb.density_x[CAPTURE_BUFFER_HEIGHT-1] = 0xef;
 	dprintBuffers();
 
 	/* * * * *  Register Protection End  * * * * */
-	//Rho.density_map_pair.x.max = svb.density_x_MAX;
+	//rho_system.variables.rho.density_map_pair.x.max = svb.density_x_max;
 	//RhoFunctions.Perform( &Rho, false );
 	tog();
 }
@@ -168,12 +183,12 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_Handl
 	{
 		svc.f++;
 		if( !(bool)(svc.f%10) )
-			system.functions.Perform_Background_Event();
+			rho_system.functions.perform.Perform_Background_Event();
 #ifdef ACTIVE_CAMERA
 	#ifdef TX_FRAME
 			frameTx();
 	#else
-			system.functions.Process_Frame();
+			rho_system.functions.perform.Process_Frame();
 	#endif
 #else
 	#ifdef TX_FRAME
@@ -188,7 +203,7 @@ void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, UART_Handl
 #ifdef ACTIVE_CAMERA
 	irqDisable();
 	Camera.disable();
-	system.functions.Pause_DMA();
+	rho_system.functions.utility.Pause_DMA();
 #endif
   while(1);
 }
@@ -204,12 +219,12 @@ void master_test( void )
 	{
 		bool background_event = !(bool)(i%10);
 		if( background_event )
-			system.functions.Perform_Background_Event();
+			rho_system.functions.perform.Perform_Background_Event();
 	}
-	int xp = (int)Rho.prediction_pair.x.primary.value;
-	int yp = (int)Rho.prediction_pair.y.primary.value;
-	int xs = (int)Rho.prediction_pair.x.secondary.value;
-	int ys = (int)Rho.prediction_pair.y.secondary.value;
+	int xp = (int)rho_system.variables.rho.prediction_pair.x.primary.value;
+	int yp = (int)rho_system.variables.rho.prediction_pair.y.primary.value;
+	int xs = (int)rho_system.variables.rho.prediction_pair.x.secondary.value;
+	int ys = (int)rho_system.variables.rho.prediction_pair.y.secondary.value;
 	print("Printing predictions ");
 	sprintf((char *)hex, "\tP(%d, %d) | S(%d, %d)\r\n", xp, yp, xs, ys);
 	print( hex );
@@ -228,7 +243,7 @@ inline void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			svf.frame = !(flag_t)(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
 			return;
 		case HREF_Pin:
-			svf.row 	 =  (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
+			svf.row 	=  (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
 			return;
 		default:
 			return;
@@ -237,7 +252,7 @@ inline void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void initTimerDMA( void )
 {
-    if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.svb.capture, svb.capture_SIZE) != HAL_OK) Error_Handler();
+    if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.capture, CAPTURE_BUFFER_SIZE) != HAL_OK) Error_Handler();
     __HAL_TIM_ENABLE_DMA(this_timer, TIM2_DMA_CC);
     __HAL_TIM_ENABLE_IT(this_timer, TIM2_IT_CC);
     TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
@@ -265,7 +280,7 @@ void print( const uint8_t * Buf )
 }
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	uart_dma_busy = 0;
+	svf.uart_dma_busy = 0;
 }
 
 /***************************************************************************************/
@@ -273,55 +288,55 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 /***************************************************************************************/
 void zero_memory( void )
 {
-	memset(svb.thresh,  	0, sizeof(index_t)      * svb.thresh_SIZE  );
-	memset(svb.density_x,       0, sizeof(density_t)  	* CAPTURE_HEIGHT      );
-	memset(svb.density_y,       0, sizeof(density_t) 		* CAPTURE_WIDTH      	);
+	memset(svb.thresh,  	0, sizeof(index_t)      * THRESH_BUFFER_SIZE  );
+	memset(svb.density_x, 0, sizeof(density_t)  	* CAPTURE_HEIGHT      );
+	memset(svb.density_y, 0, sizeof(density_t) 		* CAPTURE_WIDTH      	);
 	memset(svb.quadrant,	0, sizeof(density_t) 		* 4                   );
-	QUADRANT_PREVIOUS = 0;
+	svd.quadrant_previous = 0;
 }
 
 void init_memory( void )
 {
-		uart_dma_busy = 0;
+	svf.uart_dma_busy = 0;
 
-		frame_flag = 0;
-		row_flag = 0;
-    zero_memory();
+	svf.frame = 0;
+	svf.row = 0;
+	zero_memory();
 
-    svd.camera_port 		= (address_t)&(GPIOA->IDR);
-		UART_TX_ADDRESS = (address_t)&(USART1->TDR);
+	svd.camera_port 		= (address_t)&(GPIOA->IDR);
+	svd.uart_tx_address = (address_t)&(USART1->TDR);
 #ifdef DYNAMIC_BUFFER
-	svb.capture_END = (address_t)svb.capture+CAPTURE_WIDTH;
+	svd.capture_end = (address_t)svb.capture+CAPTURE_WIDTH;
 #else
-	svb.capture_END = (address_t)svb.capture;
+	svd.capture_end = (address_t)svb.capture;
 #endif
-    svb.capture_MAX = (address_t)svb.capture + svb.capture_SIZE;
-    svb.thresh_MAX = (address_t)svb.thresh + sizeof(index_t)*(svb.thresh_SIZE-CAPTURE_HEIGHT);
-		svb.thresh_END = (address_t)svb.thresh;
-    CENTROID_X = 3;
-    CENTROID_Y = 3;
-    svd.thresh_value = DEFAULT_THRESH;
+	svd.capture_max = (address_t)svb.capture + THRESH_BUFFER_SIZE;
+	svd.thresh_max = (address_t)svb.thresh + sizeof(index_t)*(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT);
+	svd.thresh_end = (address_t)svb.thresh;
+	svd.CENTROID_X = 3;
+	svd.CENTROID_Y = 3;
+	svd.thresh_value = DEFAULT_THRESH;
 
-    /* Initialize Rho Type */
-    Rho.density_map_pair.x.length   = CAPTURE_HEIGHT;
-    Rho.density_map_pair.y.length   = CAPTURE_WIDTH;
-    Rho.density_map_pair.x.max[0]   = 0;
-		Rho.density_map_pair.x.max[1]   = 0;
-		Rho.density_map_pair.y.max[0]   = 0;
-		Rho.density_map_pair.y.max[1]   = 0;
+	/* Initialize Rho Type */
+	rho_system.variables.rho.density_map_pair.x.length   = CAPTURE_HEIGHT;
+	rho_system.variables.rho.density_map_pair.y.length   = CAPTURE_WIDTH;
+	rho_system.variables.rho.density_map_pair.x.max[0]   = 0;
+	rho_system.variables.rho.density_map_pair.x.max[1]   = 0;
+	rho_system.variables.rho.density_map_pair.y.max[0]   = 0;
+	rho_system.variables.rho.density_map_pair.y.max[1]   = 0;
 
-    rho_kalman_t
-				* kpxl = &Rho.density_map_pair.x.kalmans[0],
-				* kpxh = &Rho.density_map_pair.x.kalmans[1],
-        * kpyl = &Rho.density_map_pair.y.kalmans[0],
-				* kpyh = &Rho.density_map_pair.y.kalmans[1];
-    RhoKalman.init(kpxl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-		RhoKalman.init(kpxh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(kpyl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(kpyh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+	rho_kalman_t
+			* kpxl = &rho_system.variables.rho.density_map_pair.x.kalmans[0],
+			* kpxh = &rho_system.variables.rho.density_map_pair.x.kalmans[1],
+			* kpyl = &rho_system.variables.rho.density_map_pair.y.kalmans[0],
+			* kpyh = &rho_system.variables.rho.density_map_pair.y.kalmans[1];
+	RhoKalman.init(kpxl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+	RhoKalman.init(kpxh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+	RhoKalman.init(kpyl, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+	RhoKalman.init(kpyh, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
 
-    Rho.density_map_pair.x.map = svb.density_x;
-    Rho.density_map_pair.y.map = svb.density_y;
+	rho_system.variables.rho.density_map_pair.x.map = svb.density_x;
+	rho_system.variables.rho.density_map_pair.y.map = svb.density_y;
 }
 
 /***************************************************************************************/
@@ -329,7 +344,7 @@ void init_memory( void )
 /***************************************************************************************/
 void spoofFrameProcessor( void )
 {
-	while(uart_dma_busy);
+	while(svf.uart_dma_busy);
 	zero_memory();
 	spoofPixels();
 	frame_start();
@@ -350,13 +365,13 @@ void spoofFrameProcessor( void )
 
 void frameTx( void )
 {
-	while(!frame_flag);
+	while(!svf.frame);
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_DEL, 2, UART_TIMEOUT );
-	while(frame_flag)
+	while(svf.frame)
 	{
-		while(!row_flag);
+		while(!svf.row);
 		HAL_UART_Transmit_DMA( this_uart, (uint8_t *)svb.capture, CAPTURE_WIDTH );
-		while(row_flag && frame_flag);
+		while(svf.row && svf.frame);
 	}
 	tog();
 	HAL_Delay(2);
@@ -368,12 +383,12 @@ void spoofFrameTx( void )
 	spoofPixels();
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_DEL, 2, UART_TIMEOUT );
 	uint32_t x = 0, y;
-	for( y = 0; y < svb.capture_HEIGHT; y++ )
+	for( y = 0; y < CAPTURE_BUFFER_HEIGHT; y++ )
 	{
-		dprint( ((uint8_t *)svb.capture) + x, svb.capture_WIDTH );
-		x += svb.capture_WIDTH;
+		dprint( ((uint8_t *)svb.capture) + x, CAPTURE_BUFFER_WIDTH );
+		x += CAPTURE_BUFFER_WIDTH;
 		tog();
-		while(uart_dma_busy);
+		while(svf.uart_dma_busy);
 	}
 	HAL_Delay(1);
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_END, 2, UART_TIMEOUT );
@@ -384,12 +399,12 @@ void spoofFrameTx( void )
 /***************************************************************************************/
 void spoofPixels( void )
 {
-	svb.capture_t c = svd.thresh_value;
+	capture_t c = svd.thresh_value;
 	index_t p, y, x;
 
-	for( y = 0, p = 0; y < svb.capture_HEIGHT; y++ )
+	for( y = 0, p = 0; y < CAPTURE_BUFFER_HEIGHT; y++ )
 	{
-		for( x = 0; x < svb.capture_WIDTH; x++, p++ )
+		for( x = 0; x < CAPTURE_BUFFER_WIDTH; x++, p++ )
 		{
 			svb.capture[p] 	= c;
 		}
@@ -427,19 +442,19 @@ void spoofDensityMaps( void )
 void dprintBuffers( void )
 {
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_DEL, 2, UART_TIMEOUT );
-	dprint( (uint8_t *)svb.density_y, sizeof(density_t)*(svb.capture_WIDTH + svb.capture_HEIGHT ) );
+	dprint( (uint8_t *)svb.density_y, sizeof(density_t)*(CAPTURE_BUFFER_WIDTH + CAPTURE_BUFFER_HEIGHT ) );
 }
 
 void dprintCapture( void )
 {
 	HAL_UART_Transmit( this_uart, (uint8_t *)&BUFFER_TX_DEL, 2, UART_TIMEOUT );
-	dprint( (uint8_t *)svb.capture, sizeof(density_t)*svb.capture_SIZE );
+	dprint( (uint8_t *)svb.capture, sizeof(density_t)*CAPTURE_BUFFER_SIZE );
 }
 
 void dprint( uint8_t * scrAddr, uint16_t len )
 {
-	while(uart_dma_busy);
-	uart_dma_busy = 1;
+	while(svf.uart_dma_busy);
+	svf.uart_dma_busy = 1;
 	while(HAL_UART_Transmit_DMA( this_uart, scrAddr, len ) != HAL_OK);// Error_Handler();
 }
 
@@ -452,10 +467,10 @@ void printBuffers( uint32_t s )
     printBuffer( svb.thresh, thresh_buffer_size );
 
     print( "Printing Dx\r\n" );
-    drawDensityMap(svb.density_x, svb.capture_HEIGHT);
+    drawDensityMap(svb.density_x, CAPTURE_BUFFER_HEIGHT);
 
     print( "Printing Dy\r\n" );
-    drawDensityMap(svb.density_y, svb.capture_WIDTH);
+    drawDensityMap(svb.density_y, CAPTURE_BUFFER_WIDTH);
 }
 
 void printAddress( const char * s, uint32_t addr )
@@ -480,18 +495,18 @@ void printAddresses( void )
     printAddress("Q prv", (uint32_t)&svd.quadrant_previous);
     printAddress("   Cx", (uint32_t)&svd.CENTROID_X);
     printAddress("   Cy", (uint32_t)&svd.CENTROID_Y);
-    printAddress("   Xm", (uint32_t)&svb.density_x_MAX);
+    printAddress("   Xm", (uint32_t)&svd.density_x_max);
     printAddress("T val", (uint32_t)&svd.thresh_value);
     printAddress("M end", (uint32_t)&svd.rho_mem_end);
 }
 
 void printCapture( void )
 {
-	for(int y = 0; y < svb.capture_HEIGHT; y++ )
+	for(int y = 0; y < CAPTURE_BUFFER_HEIGHT; y++ )
 	{
-		for(int x = 0; x < svb.capture_WIDTH; x++ )
+		for(int x = 0; x < CAPTURE_BUFFER_WIDTH; x++ )
 		{
-			uint32_t p = x + y * svb.capture_WIDTH;
+			uint32_t p = x + y * CAPTURE_BUFFER_WIDTH;
 			sprintf((char *)hex, " 0x%2x", svb.capture[p]);
 			print( hex );
 		}

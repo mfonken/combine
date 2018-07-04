@@ -29,6 +29,8 @@ void init_memory( void );
 void zero_memory( void );
 void initTimerDMA( void );
 
+void performBackgroundEvent( void );
+
 void spoofPixels( void );
 void spoofDensityMaps( void );
 
@@ -50,11 +52,6 @@ static void printc(uint8_t* Buf)
 	uint16_t Len = 0;
 	uint8_t c = 0xff;
 	for( ; c != '\0'; c = Buf[Len++] ) ITM_SendChar(c);
-}
-
-static FLOAT timestamp( void )
-{
-	return (FLOAT)HAL_GetTick()/1000;
 }
 
 extern rho_utility Rho;

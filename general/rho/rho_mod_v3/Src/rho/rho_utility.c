@@ -17,6 +17,7 @@
 #define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define POW2(X) 			<<X
+#define INRU(X,H)    ((X>H)?(H-1):X)
 #define INR(X,H)     (X<0?0:((X>H)?(H-1):X))
 #define MAX(A,B)     ((A>B)?A:B)
 #define XRNG(A,B,C)  (A<(B-C)?-1:(A>(B+C)?1:0)) //Check if exceeds range
@@ -24,8 +25,7 @@
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
 #define UDIFF(A,B)	 	 (B<A?A-B:B-A)
 
-//#ifdef RHO_DEBUG
-/*
+#ifdef RHO_DEBUG
 #define PRINT1(A)			sprintf( out_buffer, A ); \
 print(out_buffer);
 #define PRINT2(A,B) 	sprintf( out_buffer, A, B ); \
@@ -33,18 +33,19 @@ print(out_buffer);
 #define PRINT3(A,B,C) sprintf( out_buffer, A, B, C ); \
 print(out_buffer);
 #else
-*/
+
 #define PRINT1(A)			;
 #define PRINT2(A,B)		;
 #define PRINT3(A,B,C)	;
-//#endif
-//*/
+#endif
 
 #define UART_TIMEOUT 100
 UART_HandleTypeDef * uart;
 
-byte_t packet_buffer[PACKET_SIZE];
 char out_buffer[125];
+
+static packet_offset_lookup_t packet_offset_lookup = PACKET_OFFSETS;
+static packet_value_lookup_t  packet_value_lookup  = PACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
 
 static void print(const char * Buf )
 {
@@ -55,7 +56,7 @@ static void print(const char * Buf )
 const density_redistribution_lookup_t rlookup =
 {{{{{0,1,3,4},{2,5},{6,7},{8}},{{0},{1,2},{3,6},{4,5,7,8}},{{0,1,2,3},{1,3},{2,3},{3}},{4,2,2,1}},{{{0,3},{1,2,4,5},{6},{7,8}},{{0,1},{2},{3,4,6,7},{5,8}},{{0,2},{0,1,2,3},{2},{2,3}},{2,4,1,2}},{{{0,1},{2},{3,4,6,7},{5,8}},{{0,3},{1,2,4,5},{6},{7,8}},{{0,1},{1},{0,1,2,3},{1,3}},{2,1,4,2}},{{{0},{1,2},{3,6},{4,5,7,8}},{{0,1,3,4},{2,5},{6,7},{8}},{{0},{0,1},{0,2},{0,1,2,3}},{1,2,2,4}}}};
 
-void Init(rho_utility * utility, index_t  w, index_t h)
+void Init(rho_utility * utility, UART_HandleTypeDef * uart, index_t  w, index_t h)
 {
 	/* Utility frame */
 	utility->width  = w;
@@ -97,11 +98,9 @@ void Init(rho_utility * utility, index_t  w, index_t h)
 	memset(&utility->prediction_pair.x.probabilities, 0, sizeof(FLOAT)*3);
 	memset(&utility->prediction_pair.y.probabilities, 0, sizeof(FLOAT)*3);
 
-	utility->packet.data 		 				= PACKET_HEADER_ID;
+	utility->packet.header.ID 			= PACKET_HEADER_ID;
 	utility->packet.header.includes = PACKET_INCLUDES;
 	memset(utility->packet.data, 0, sizeof(packet_offset_lookup_t));
-	packet_offset_lookup 						= PACKET_OFFSETS;
-	packet_address_lookup = PACKET_ADDRESS_INITIALIZER(utility->prediction_pair);
 }
 
 void Perform( rho_utility * utility, bool background_event )
@@ -123,7 +122,7 @@ void Perform( rho_utility * utility, bool background_event )
 static index_t calculateCentroid( density_t * map, index_t l, index_t * C, byte_t thresh )
 {
 	centroid_calculation_variables _ = { 0 };
-	for( _.i; _.i < l; _.i++ )
+	for( ; _.i < l; _.i++ )
 	{
 		_.c = map[_.i];
 		if( _.c > thresh )
@@ -143,7 +142,7 @@ void Redistribute_Densities( rho_utility * utility )
 		{ utility->Bx, abs(utility->Cx-utility->Bx), utility->width - utility->Cx  },
 		{ utility->By, abs(utility->Cy-utility->By), utility->height - utility->Cy },
 		{ 0 }, 0
-	}
+	};
 	if( utility->Cx < utility->Bx )
 	{
 		_.xl[0] = utility->Cx;
@@ -279,9 +278,9 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 	_.tdnf = _.blobs[0].den + _.blobs[1].den;
 	_.pfac = _.blobs[ _.sel].den * _.fdnf;
 	_.sfac = _.blobs[!_.sel].den * _.fdnf;
-	_.afac = ( 1. - ( _.tdnf * _.fdnf ) ) * ALTERNATE_TUNING_FACTOR;
+	_.afac = ( 1. - ( _.tdnf * _.fdnf ) ) * (FLOAT)ALTERNATE_TUNING_FACTOR;
 
-	if( _.fcov > FILTERED_COVERAGE_TARGET )
+	if( _.fcov > (FLOAT)FILTERED_COVERAGE_TARGET )
 	{
 		_.fvf_ = 1.0;//ZDIV( 1.0, _.fvar );
 		r->probabilities.primary   = _.pfac * _.fvf_;
@@ -294,7 +293,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 		r->probabilities.primary   = 0.;
 		r->probabilities.secondary = 0.;
 		r->probabilities.alternate = 0.;
-		r->probabilities.absence   = MAX_ABSENCE_PROBABILITY;
+		r->probabilities.absence   = (FLOAT)MAX_ABSENCE_PROBABILITY;
 	}
 #ifdef RHO_DEBUG
 	printf("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.loc[0], _.den[0], _.max[0], _.loc[1], _.den[1], _.max[1]);
@@ -330,7 +329,7 @@ void Update_Prediction( rho_utility * utility )
 		utility->Cx,
 		utility->Cy,
 		0
-	}
+	};
 	if(_.Ax > _.Bx) iswap(&_.Ax, &_.Bx);
 	if(_.Ay > _.By) iswap(&_.Ay, &_.By);
 
@@ -370,17 +369,17 @@ void Update_Prediction( rho_utility * utility )
 	_.Cx = (index_t)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) >> 1;
 	_.Cy = (index_t)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) >> 1;
 
-	_.Cx = INR(_.Cx, utility->width);
-	_.Cy = INR(_.Cy, utility->height);
+	_.Cx = INRU(_.Cx, utility->width);
+	_.Cy = INRU(_.Cy, utility->height);
 
 	utility->Cx = _.Cx;
 	utility->Cy = _.Cy;
 	utility->density_map_pair.x.centroid = _.Cy;
 	utility->density_map_pair.y.centroid = _.Cx;
 
-	utility->prediction_pair.probabilities.primary 	 = sqrt( utility->prediction_pair.x.primary   * utility->prediction_pair.y.primary   );
-	utility->prediction_pair.probabilities.secondary = sqrt( utility->prediction_pair.x.secondary * utility->prediction_pair.y.secondary );
-	utility->prediction_pair.probabilities.alternate = sqrt( utility->prediction_pair.x.alternate * utility->prediction_pair.y.alternate );
+	utility->prediction_pair.probabilities.primary 	 = sqrt( utility->prediction_pair.x.probabilities.primary   * utility->prediction_pair.y.probabilities.primary   );
+	utility->prediction_pair.probabilities.secondary = sqrt( utility->prediction_pair.x.probabilities.secondary * utility->prediction_pair.y.probabilities.secondary );
+	utility->prediction_pair.probabilities.alternate = sqrt( utility->prediction_pair.x.probabilities.alternate * utility->prediction_pair.y.probabilities.alternate );
 
 	BayesianFunctions.sys.update( &utility->sys, &utility->prediction_pair );
 }
@@ -442,11 +441,11 @@ void Generate_Packet( rho_utility * utility )
 	packet_generation_variables _ =
 	{
 		&utility->packet,
-		(address_t)&packet->data,
+		(address_t)&utility->packet.data,
 		(address_t)&packet_offset_lookup,
 		(address_t*)&packet_value_lookup,
 	};
-	packet->timestamp = timestamp();
+	*(timestamp_t *)&_.packet->header.timestamp = timestamp();
 	while( _.i++ < NUM_PACKET_ELEMENTS )
 	{
 		if( _.includes & 1 )

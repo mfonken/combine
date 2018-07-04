@@ -38,13 +38,9 @@
 	extern	CENTROID_X
 	extern	CENTROID_Y
 	extern	DENSITY_X_MAX
-	extern	CAPTURE_BUFFER_END
-	extern 	CAPTURE_BUFFER_MAX
 	extern	THRESH_BUFFER_END
 	extern 	THRESH_BUFFER_MAX
 	extern	THRESH_VALUE
-	extern	RHO_MEM_END
-	extern	CAMERA_PORT
 
 	extern 	proc_flag
     entry

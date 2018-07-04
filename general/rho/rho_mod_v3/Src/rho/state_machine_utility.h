@@ -45,8 +45,9 @@
 
 /* Tau states */
 #define state_dimension_t uint8_t
-#define loop_variables_state_dimension_t loop_variables_##state_dimension_t
-typedef enum : state_dimension_t
+#define loop_variables_state_dimension_t loop_variables_uint8_t //##state_dimension_t
+
+typedef enum
 {
     UNKNOWN_STATE = 0,
     STABLE_NONE,
@@ -62,7 +63,7 @@ typedef enum : state_dimension_t
 } state_t;
 
 static inline state_dimension_t stateToSelection(state_t s) {return ((state_dimension_t)((s+1)/2) - 1);};
-static inline const char *stateString(state_t s)
+static inline const char *stateString(state_dimension_t s)
 {
     static const char *strings[] = { "UN", "S0", "U0", "S1", "U1", "S2", "U2", "SM", "UM" };
     return strings[(state_dimension_t)s];
@@ -116,13 +117,13 @@ struct bayesian_functions
 {
   struct bayesian_map_functions    map;
   struct bayesian_system_functions sys;
-}
+};
 
 extern const struct bayesian_functions BayesianFunctions;
 
 static inline void copymax(FLOAT * a, FLOAT * b) { if(*a>*b)*b=*a;else*a=*b; }
-static inline bool isStable( state_t s ) { return ((state_t)s % 2); }
+static inline bool isStable( state_t s ) { return ((state_dimension_t)s % 2); }
 static inline state_dimension_t stateNumber( state_t s ) { return (state_dimension_t)( ( s - 1 ) / 2 ); }
 
-#define define_loop_variable_template(T, N)struct { T l, i, j; FLOAT u, v;}N;
+#define define_loop_variable_template_struct(T, N)struct { T l, i, j; FLOAT u, v;}N;
 #endif /* state_machine_utility_hpp */

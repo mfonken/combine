@@ -27,7 +27,53 @@ Project File Date:  06/24/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'rho_mod_v3'
-"rho_mod_v1\rho_mod_v3.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+compiling master.c...
+..\Src\master.c(232): warning:  #128-D: loop is not reachable
+  	while(1);
+..\Src\master.c(68): warning:  #177-D: function "set"  was declared but never referenced
+  static void set( GPIO_PinState s )
+..\Src\master.c: 2 warnings, 0 errors
+compiling rho_utility.c...
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(48): warning:  #1296-D: extended constant initialiser used
+  static packet_value_lookup_t  packet_value_lookup  = 
+ACKET_ADDRESS_INITIALIZER(rho_system.variables.rho.prediction_pair);
+..\Src\rho\rho_utility.c(186): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	if( utility->QT < 
+ACKGROUND_COVERAGE_MIN )
+..\Src\rho\rho_utility.c(281): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	_.afac = ( 1. - ( _.tdnf * _.fdnf ) ) * (FLOAT)ALTERNATE_TUNING_FACTOR;
+..\Src\rho\rho_utility.c(396): warning:  #186-D: pointless comparison of unsigned integer with zero
+  	switch( 
+RNG( utility->QbT, 0, BACKGROUND_COVERAGE_TOL_PX ) )
+..\Src\rho\rho_utility.c(461): warning:  #1293-D: assignment in condition
+  		if((_.t=!_.t )) _.llPtr++;
+..\Src\rho\rho_utility.c(50): warning:  #177-D: function "print"  was declared but never referenced
+  static void print(const char * Buf )
+..\Src\rho\rho_utility.c: 12 warnings, 0 errors
+linking...
+rho_mod_v1\rho_mod_v3.axf: Warning: L6305W: Image does not have an entry point. (Not specified or not set due to multiple choices.)
+rho_mod_v1\rho_mod_v3.axf: error: L6047U: The size of this image (33180 bytes) exceeds the maximum allowed for this version of the linker
+Finished: 0 information, 1 warning, 0 error and 1 fatal error messages.
+"rho_mod_v1\rho_mod_v3.axf" - 1 Error(s), 15 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -50,7 +96,8 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.1
-Build Time Elapsed:  00:00:01
+Target not created.
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>

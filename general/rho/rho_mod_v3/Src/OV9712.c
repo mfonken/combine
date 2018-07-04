@@ -1,15 +1,15 @@
 #include "OV9712.h"
 
-#define CAMERA_DIV			2
-#define	CAMERA_WIDTH_F	(1280>>CAMERA_DIV)
-#define CAMERA_HEIGHT_F	(800>>CAMERA_DIV)
+#define CAMERA_DIV				 2
+#define	CAMERA_WIDTH_F		(1280>>CAMERA_DIV)
+#define CAMERA_HEIGHT_F		(800>>CAMERA_DIV)
 #define CAMERA_WIDTH_MSB 	((CAMERA_WIDTH_F >> 3) & 0xff)
 #define CAMERA_WIDTH_LSB	( CAMERA_WIDTH_F & 0x07)
 #define CAMERA_HEIGHT_MSB	((CAMERA_HEIGHT_F >> 2) & 0xff)
 #define CAMERA_HEIGHT_LSB	( CAMERA_HEIGHT_F & 0x03)
-#define REG57_V		(uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
-#define REG58_V		(uint8_t)CAMERA_HEIGHT_MSB
-#define REG59_V		(uint8_t)CAMERA_WIDTH_MSB
+#define REG57_V						(uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
+#define REG58_V						(uint8_t)CAMERA_HEIGHT_MSB
+#define REG59_V						(uint8_t)CAMERA_WIDTH_MSB
 
 #define	CAMERA_WIDTH_R	(((REG57_V >> 3) & 0x07 ) | (REG59_V << 3))
 #define	CAMERA_HEIGHT_R	((REG57_V & 0x03) | (REG58_V << 2))

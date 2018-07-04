@@ -8,6 +8,11 @@
 #include <stdbool.h>
 #include "stm32l4xx_hal.h"
 
+static double timestamp( void )
+{
+	return (double)HAL_GetTick()/1000;
+}
+
     /** Kalman Uncertainties */
     typedef struct
     {

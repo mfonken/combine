@@ -9,6 +9,8 @@
 #ifndef rho_types_h
 #define rho_types_h
 
+#include "stm32l4xx_hal.h"
+#include <stdbool.h>
 #include "rho_kalman.h"
 
 #define USE_SHORTHAND_TYPES
@@ -22,14 +24,84 @@ typedef int16_t   sw;
 typedef int32_t   sl;
 #endif
 
-typedef float FLOAT;
+typedef float 		FLOAT;
 typedef uint8_t		byte_t;
 typedef uint16_t	index_t;
 typedef uint8_t 	capture_t;
-typedef uint32_t	density_t;
+typedef uint16_t	density_t;
 typedef uint32_t	address_t;
 typedef volatile bool flag_t;
 typedef FLOAT     timestamp_t;
+
+/* Camera Config */
+#define CAMERA_WIDTH 	(1280)
+#define CAMERA_HEIGHT	(800)
+
+//#define DYNAMIC_BUFFER
+
+/* Capture Config */
+#define CAPTURE_DIV			2
+#define CAPTURE_WIDTH 	1//(CAMERA_WIDTH>>CAPTURE_DIV)
+#define CAPTURE_HEIGHT	1//(CAMERA_HEIGHT>>CAPTURE_DIV)
+#define FRAME_SIZE 			(CAPTURE_WIDTH*CAPTURE_HEIGHT)
+#define	CAPTURE_BUFFER_WIDTH	(uint32_t)CAPTURE_WIDTH
+#define CAPTURE_BUFFER_HEIGHT (uint32_t)CAPTURE_HEIGHT
+#ifdef DYNAMIC_BUFFER
+#define CAPTURE_BUFFER_SIZE CAPTURE_BUFFER_WIDTH	//*CAPTURE_BUFFER_HEIGHT
+#else
+#define CAPTURE_BUFFER_SIZE (CAPTURE_BUFFER_WIDTH*CAPTURE_BUFFER_HEIGHT)
+#endif
+
+#define COVERAGE_NORMAL_MAX	0.45
+#define THRESH_BUFFER_SIZE 	1//((uint32_t)((CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1.))*COVERAGE_NORMAL_MAX)+2)
+#define DEFAULT_THRESH			0xfa
+
+#define RHO_SQRT_HEIGHT     sqrt((FLOAT)CAPTURE_HEIGHT)
+#define RHO_DIM_INFLUENCE   0.1
+#define RHO_K_TARGET_IND    0.3
+#define RHO_K_TARGET        RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)          //0.3
+#define RHO_VARIANCE_NORMAL (FLOAT)(RHO_SQRT_HEIGHT/5.0)             //5
+#define RHO_VARIANCE_SCALE  (FLOAT)(RHO_SQRT_HEIGHT/3.0)//1.32        //20
+#define RHO_VARIANCE(X)     ( RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) ) )
+
+#define RHO_PUNISH(X)       ((X)<<1)
+
+#define RHO_GAP_MAX 2//10
+
+#define FILTERED_CONVERAGE_TARGET  0.00002//0.01
+
+#define MAX_ABSENCE_PROBABILITY		0.5
+
+#define RHO_PREDICTION_LS   1.0
+#define RHO_PREDICTION_VU   0.5
+#define RHO_PREDICTION_BU   0.01
+#define RHO_PREDICTION_SU   0.001
+
+#define RHO_DEFAULT_LS      5
+#define RHO_DEFAULT_VU      0.001
+#define RHO_DEFAULT_BU      0.5//0.5
+#define RHO_DEFAULT_SU      0.01//0.7
+
+#define RHO_THRESH_LS				10
+#define RHO_THRESH_VU				0.5
+#define RHO_THRESH_BU				0.01
+#define RHO_THRESH_SU				0.05
+
+#define MAX_COVERAGE						1
+#define BACKGROUND_PERCENT_MIN	0.02
+#define BACKGROUND_COVERAGE_MIN	( (uint32_t)( BACKGROUND_PERCENT_MIN * FRAME_SIZE ) )
+#define BACKGORUND_COVERAGE_TOL_PR 0.001
+#define	BACKGROUND_COVERAGE_TOL_PX ( (uint32_t)( BACKGORUND_COVERAGE_TOL_PR * FRAME_SIZE ) )
+
+#define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
+
+#define ALTERNATE_TUNING_FACTOR 	0.5
+#define FILTERED_COVERAGE_TARGET	0.004
+#define FILTERED_COVERAGE_PIXELS	( (uint32_t)( FILTERED_COVERAGE_TARGET*FRAME_SIZE ) )
+
+#define THRESH_STEP	1
+#define THRESH_MIN	100
+#define THRESH_MAX 	255
 
 /* Packet Generation Settings */
 #define YES 1
@@ -137,9 +209,6 @@ typedef struct
     byte_t          data[PACKET_SIZE];
 } packet_t;
 
-static packet_offset_lookup_t packet_offset_lookup = {0};
-static packet_value_lookup_t  packet_value_lookup  = {0};
-
 /* Rho Structures* */
 typedef struct
 {
@@ -155,6 +224,20 @@ typedef struct
 {
     density_map_t x,y;
 } density_map_pair_t;
+
+typedef struct
+{
+    byte_t
+			background[4][4],
+			current[4][4],
+			factor[4][4],
+			length[4];
+} density_redistribution_lookup_config_t;
+
+typedef struct
+{
+    density_redistribution_lookup_config_t config[4];
+} density_redistribution_lookup_t;
 
 typedef struct
 {
@@ -182,284 +265,11 @@ typedef struct
 
 typedef struct
 {
-    int area[9];
-} area_list_t;
-
-typedef struct
-{
-    unsigned char
-        background[4][4],
-        current[4][4],
-        factor[4][4],
-        length[4];
-} density_redistribution_lookup_config_t;
-
-typedef struct
-{
-    density_redistribution_lookup_config_t config[4];
-} density_redistribution_lookup_t;
-
-typedef struct
-{
   density_t
     max,
     den;
   index_t
     loc;
 } blob_t;
-
-typedef struct
-{
-  index_t
-  	xl[3],
-  	yl[3],
-    area[9],
-
-	byte_t a, b, c, d, l, l_, p, q, x, y;
-} redistribution_variables;
-
-typedef struct
-{
-  index_t
-        len,     /* data set/map length */
-        range[3],
-        cyc,
-        cyc_,
-        x1,
-        x2,
-        fpeak,   /* filter peak */
-        fvar,    /* filter variance */
-        fbandl,  /* filter band lower edge value */
-        c1,      /* current map value 1 */
-        c2,      /* current map value 2 */
-        b,       /* current background value */
-        cloc,    /* current location value */
-        gapc,    /* gap counter value */
-        avgc;    /* averaging counter value */
-    blob_t
-        blobs[2];
-
-    density_t
-        cmax,   /* current maximum value */
-        amax,   /* alternate blob maximum */
-
-        cden,   /* current density value */
-        fden,   /* filtered density */
-        tden;   /* Total density */
-
-    bool
-        has,    /* has blob, is tracking */
-        sel;
-
-    FLOAT
-        fcov,   /* Filtered coverage ratio */
-        cavg,   /* cumulative average */
-        mavg,   /* moment average */
-        afac,   /* alternate factor */
-        pfac,   /* prinary factor */
-        sfac,   /* secondary factor */
-        fdnf,   /* filtered density (float) */
-        tdnf,   /* target density (float) */
-        fvf_;   /* filtered variance inverse (float) */
-} rho_selection_variables;
-
-typedef struct
-{
-	index_t
-		Ax,
-		Ay,
-		Bx,
-		By,
-		Cx,
-		Cy;
-  FLOAT
-    x1,
-    y1;
-	byte_t non_diag,
-  int8_t q_check;
-} preduction_update_variables;
-
-typedef struct
-{
-  FLOAT
-    avg,
-    mavg;
-  density_t
-    c;
-  index_t
-    cnt,
-    tot,
-    i;
-} centroid_calculation_variables;
-
-typedef struct
-{
-  packet_t * packet;
-  address_t pdPtr,
-            llPtr,
-					* alPtr;
-	byte_t    includes,
-            i,
-            j,
-            l,
-            t;
-} packet_generation_variables;
-
-typedef struct
-{
-  flag_t
-    irq,
-  	frame,
-  	row,
-  	uart_dma_busy;
-} system_flags_variables;
-
-typedef struct
-{
-  volatile uint16_t
-    v,
-    w,
-    h,
-    f,
-    t,
-    p;
-} system_counter_variables;
-
-typedef struct
-{
-  index_t
-      CENTROID_X,
-      CENTROID_Y;
-  density_t
-      quadrant_total,                       /* Total density */
-      quadrant_previous,                    /* Previous row density */
-      density_x_max;
-  address_t
-      capture_end,
-      capture_max,
-      thresh_end,                    /* Max threshold buffering size */
-      thresh_max,
-      thresh_value,                         /* Shared threshold value */
-      rho_mem_end,
-   		campera_port,
-  		uart_tx_address;
-} system_data_variables;
-
-typedef struct
-{
-  density_t
-      density_y[CAPTURE_WIDTH],          		/* Processed density X array */
-      density_x[CAPTURE_HEIGHT],            /* Processed density Y array */
-      quadrant[4];                   /* Quadrant density array */
-  capture_t
-      capture[CAPTURE_BUFFER_SIZE];  /* Raw capture buffer for DMA */
-  index_t
-      thresh[THRESH_BUFFER_SIZE];    /* Threshold processing buffer */
-} system_buffer_variables;
-
-typedef struct
-{
-    density_map_pair_t  density_map_pair;
-    prediction_pair_t   prediction_pair;
-    bayesian_system_t   sys;
-    rho_kalman_t        thresh_filter;
-    index_t
-            width,
-            height,
-            Cx,
-            Cy,
-            Bx,
-            By;
-    byte_t thresh;
-    density_t
-            Q[4],
-            Qb[4],
-            Qf[4],
-            QT,
-            QbT;
-    packet_t packet;
-    // double  QF, FT;
-} rho_utility;
-
-typedef struct
-{
-  system_flags_variables    flags;
-  system_counter_variables  counters
-  system_data_variables     data;
-  system_buffers_variables  buffers;
-  rho_utility     rho;
-} system_variables;
-
-typedef struct
-{
-  void (*Process_Frame)( void );
-  void (*Perform_Background_Event)( void );
-} system_perform_functions;
-
-typedef struct
-{
-  void (*Init_Pixel_DMA)( void );
-  void (*Pause_DMA)( void );
-  void (*Resume_DMA)( void );
-  void (*Reset_DMA)( void );
-  void (*printd)( void );
-} system_utility_functions;
-
-typedef struct
-{
-  void (*Init_Memory)( void );
-  void (*Zero_Memory)( void );
-} system_memory_functions;
-
-typedef struct
-{
-  system_perform_functions;
-  system_utility_functions;
-  system_memory_functions;
-} system_functions;
-
-typedef struct
-{
-  system_variables variables;
-  system_functions functions;
-} system;
-
-#define DEFAULT_SYSTEM_INITIALIZATION                               \
-{                                                                   \
-  {0}, /* VARIABLES */                                              \
-  { /* FUNCTIONS */                                                 \
-    { /* Perform */                                                 \
-      .Process_Frame            = frameProcessor,                   \
-  		.Perform_Background_Event = performBackgroundEvent            \
-    },                                                              \
-    { /* Utility */                                                 \
-      .Init_Pixel_DMA = initTimerDMA,                               \
-      .Pause_DMA      = pauseDMA,                                   \
-      .Resume_DMA     = resumeDMA,                                  \
-      .Reset_DMA      = resetDMA,                                   \
-      .printd         = dprint                                      \
-    },                                                              \
-    { /* Memory */                                                  \
-      .Init_Memory = init_memory,                                   \
-      .Zero_Memory = zero_memory                                    \
-    }                                                               \
-  }                                                                 \
-}
-
-#define svf system.variables.flags
-#define svc system.variables.counters
-#define svd system.variables.data
-#define svb system.variables.buffers
-
-#define PACKET_ADDRESS_INITIALIZER(r)
-{
- (address_t)&r.x.primary.value,         /* px */
- (address_t)&r.y.primary.value,         /* py */
- (address_t)&r.x.secondary.value,       /* sx */
- (address_t)&r.y.secondary.value,       /* sy */
- (address_t)&r.probabilities.primary,   /* pp */
- (address_t)&r.probabilities.secondary, /* ap */
- (address_t)&r.probabilities.alternate  /* ap */
-}
 
 #endif /* rho_c_types_h */

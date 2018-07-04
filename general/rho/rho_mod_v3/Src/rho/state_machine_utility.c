@@ -8,20 +8,20 @@
 
 #include "state_machine_utility.h"
 
-typedef define_loop_variable_template_struct(state_dimension_t, state_global_t)
+typedef define_loop_variable_template_struct(state_dimension_t, state_global_t);
 state_global_t _;
 
 /* Temporary macros */
 #define numberOfSelectedPeaks 1
 
-inline void reset_loop_variables( state_global_t * _, state_dimension_t l )
-{ _.l = l; _.i = 0; _.j = 0; _.u = 0, _.v = 0.}
+static inline void reset_loop_variables( state_global_t * _, state_dimension_t l )
+{ _->l = l; _->i = 0; _->j = 0; _->u = 0; _->v = 0.; }
 
 static FLOAT doubt( state_dimension_t i, state_t cs )
 {
   FLOAT ret = ((FLOAT)( ( i << 1 ) + 1 )) / NUM_STATES;
   if( isStable(cs) && ( i < stateNumber(cs) ) )
-    ret *= DOUBT_STABILITY;
+    ret *= (FLOAT)DOUBT_STABILITY;
   return ret;
 }
 
@@ -70,14 +70,14 @@ static void resetState( bayesian_map_t * bm, state_dimension_t i )
 static void print( bayesian_map_t * bm, state_t s )
 {
   reset_loop_variables( &_, bm->length );
-  for( _.i = 0; _.i < _.l; _.i++ ) printf("\t\t %s-[%d]", stateString(_.i), _.i);
+  for( _.i = 0; _.i < _.l; _.i++ ) printf("\t\t %s-[%d]", stateString((state_dimension_t)_.i), _.i);
   for( _.i = 0; _.i < _.l; _.i++ )
   {
-    printf("\n%s-[%d]", stateString(i), i);
+    printf("\n%s-[%d]", stateString((state_dimension_t)_.i), _.i);
     for( _.j = 0; _.j < _.l; _.j++ )
     {
       char c = ' ';
-      if(j == (state_dimension_t)s) c = '|';
+      if(_.j == (state_dimension_t)s) c = '|';
       printf("\t%c[%.2f]%c",c, bm->map[_.i][_.j],c);
     }
   }
@@ -114,10 +114,8 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
       DISTANCE_SQ(p->x.probabilities.alternate, p->y.probabilities.alternate)
     },
     out[4] = { 0 },
-        *f =  &_.u,
-        *p =  &_.v,
     *max_v =  &_.u;
-  state_t next = sys->current;
+  state_t next = sys->state;
   bool ch[4] =
     { 0, //ABSENCE_FACTOR
       prob[1] > PROBABILITY_TUNING_THRESHOLD,
@@ -129,15 +127,15 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
 
   for( ; _.i < _.l; _.i++ )
   {
-    _.v = sys->probabilities.map[_.i][(state_dimension_t)sys->state;];
+    _.v = sys->probabilities.map[_.i][(state_dimension_t)sys->state];
     if( _.v > *max_v )
     {
       *max_v = _.v;
-      next = _.i;
+      next = (state_t)_.i;
     }
   }
   /* Only update sys->next state on change */
-  if( next != sys_current ) sys->next = next;
+  if( next != sys->state ) sys->next = next;
 
 #ifdef STATEM_DEBUG
 printf("\n###### Current state is %s. ######\n\n", stateString((state_dimension_t)sys->state));
@@ -148,17 +146,17 @@ printf("Next state is %s(%.2f).\n", stateString((state_dimension_t)sys->next), m
   sys->selection_index = _.l;
   for( _.i = 0; _.i <= _.l; _.i++)
   {
-    *p = prob[_.i] * PROBABILITY_TUNING_FACTOR;
-    *f = (FLOAT)doubt(_.i, sys->state);
-    out[_.i] = (*p) * (*f);
+    _.u = prob[_.i] * (FLOAT)PROBABILITY_TUNING_FACTOR;
+    _.v = (FLOAT)doubt(_.i, sys->state);
+    out[_.i] = _.u * _.v;
 #ifdef STATEM_DEBUG
     printf("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, *p, *f, out[_.i]);
 #endif
   }
 
   /* Independent Alternate Check */
-  if( prob[3] > PROBABILITY_ALTERNATE_THRESH )
-    out[3] = prob[3] * PROBABILITY_TUNING_FACTOR_SQ;
+  if( prob[3] > (FLOAT)PROBABILITY_ALTERNATE_THRESH )
+    out[3] = prob[3] * (FLOAT)PROBABILITY_TUNING_FACTOR_SQ;
 
   BayesianFunctions.sys.updateProbabilities( sys, out );
   BayesianFunctions.map.normalizeState( &sys->probabilities, sys->state );
@@ -170,8 +168,9 @@ printf("Next state is %s(%.2f).\n", stateString((state_dimension_t)sys->next), m
 
 static void updateProbabilities( bayesian_system_t * sys, FLOAT p[4] )
 {
-  state_dimension_t
-    c = (state_dimension_t)sys->state,
+	state_t
+    c = sys->state;
+	state_dimension_t
     x = stateNumber(c);
   int8_t k = -1;
 
