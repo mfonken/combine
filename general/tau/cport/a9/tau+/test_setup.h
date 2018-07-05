@@ -22,7 +22,7 @@
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define TAU_DEBUG
-//#define RHO_DEBUG
+#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define IMUT_DEBUG
 

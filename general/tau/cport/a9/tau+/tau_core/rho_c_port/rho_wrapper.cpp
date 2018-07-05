@@ -32,7 +32,6 @@ Rho::Rho( int width, int height ) : frame(height, width, CV_8UC3, Scalar(0,0,0))
     
     RhoFunctions.Init(&utility, width, height);
     BayesianFunctions.sys.init( &utility.sys );
-    
     backgrounding_event = false;
 }
 
@@ -43,7 +42,7 @@ void Rho::perform( cimage_t * img, PredictionPair * p )
     pthread_mutex_lock(&density_map_pair_mutex);
     pthread_mutex_lock(&c_mutex);
     /* Core Rho Functions */
-    RhoFunctions.Generate_Density_Map_Using_Interrupt_Model( &utility, image, backgrounding_event );
+    Generate_Density_Map_Using_Interrupt_Model( image, backgrounding_event );
     RhoFunctions.Perform( &utility, backgrounding_event );
     backgrounding_event = false; // Generate background always and only once
     /* * * * * * * * * * */
@@ -60,4 +59,30 @@ void Rho::perform( cimage_t * img, PredictionPair * p )
     p->y.probabilities.primary   = utility.prediction_pair.x.probabilities.primary;
     p->y.probabilities.secondary = utility.prediction_pair.x.probabilities.secondary;
     p->y.probabilities.alternate = utility.prediction_pair.x.probabilities.alternate;
+}
+
+/* Interrupt (Simulated Hardware-Driven) Density map generator */
+void Rho::Generate_Density_Map_Using_Interrupt_Model( cimage_t image, bool backgrounding )
+{
+    if( backgrounding )
+    {
+        RhoVariables.ram.Dx      =  utility.density_map_pair.x.background;
+        RhoVariables.ram.Dy      =  utility.density_map_pair.y.background;
+        RhoVariables.ram.CX_ADDR = &utility.By;
+        RhoVariables.ram.CY_ADDR = &utility.Bx;
+        RhoVariables.ram.Q       =  utility.Qb;
+    }
+    
+    PERFORM_RHO_C( image );
+    
+    if( backgrounding )
+    {
+        RhoVariables.ram.Dx      =  utility.density_map_pair.x.map;
+        RhoVariables.ram.Dy      =  utility.density_map_pair.y.map;
+        RhoVariables.ram.CX_ADDR = &utility.Cx;
+        RhoVariables.ram.CY_ADDR = &utility.Cy;
+        RhoVariables.ram.Q       =  utility.Q;
+        //        utility->density_map_pair.x.has_background = true;
+        //        utility->density_map_pair.y.has_background = true;
+    }
 }

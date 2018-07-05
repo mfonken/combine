@@ -35,11 +35,13 @@ extern const rho_interrupts RhoInterrupts;
 
 typedef struct
 {
-    int C_FRAME_MAX,
+    uint32_t
+        C_FRAME_MAX;
+    index_t
+        counter,
         y_delimiter,
         W,
-        H,
-        counter;
+        H;
     
     pthread_t       loop_thread;
     pthread_mutex_t rho_int_mutex;
@@ -47,34 +49,41 @@ typedef struct
 
 typedef struct
 {
-    int x,
+    index_t
+        x,
         p,
-        QS,
-        PTOG,
         Cx,
         Cy,
-       *wr,
-       *rd,
+        *wr,
+        *rd;
+    density_t
         THRESH;
+    density_2d_t
+        QS;    
+    byte_t
+        PTOG;
 } rho_register_variables;
 
 typedef struct
 {
-    int y,
+    density_t
+        *Dx,
+        *Dy,
+        *THRESH_ADDR;
+    density_2d_t
+        *Q,
         QT,
         QN,
         QN_;
-
-    density_t
-        *Dx,
-        *Dy;
-    int *Q,
+    index_t
+        y,
         *CX_ADDR,
         *CY_ADDR,
         *C_FRAME,
-        *C_FRAME_END,
-        *THRESH_ADDR;
-    unsigned char *CAM_PORT;
+        *C_FRAME_END;
+    
+    pixel_base_t
+        *CAM_PORT;
 } rho_sram_variables;
 
 typedef struct

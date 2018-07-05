@@ -23,14 +23,14 @@ typedef int16_t   sw;
 typedef int32_t   sl;
 #endif
 
-typedef float       floating_t;
+typedef float      floating_t;
 typedef uint8_t     byte_t;
 typedef uint16_t    index_t;
-typedef uint8_t     capture_t;
+//typedef uint8_t     capture_t;
 typedef uint16_t    density_t;
 typedef uint32_t    density_2d_t;
 typedef uint32_t    address_t;
-typedef volatile bool flag_t;
+//typedef volatile bool flag_t;
 typedef floating_t  timestamp_t;
 
 

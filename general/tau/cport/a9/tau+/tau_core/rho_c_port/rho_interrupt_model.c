@@ -14,11 +14,11 @@ inline void PERFORM_RHO_C( cimage_t image )
 {
     RhoInterrupts.FRAME_START();
     pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
-    int p = 0;
-    for( int y = 0; y < image.height; y++ )
+    uint32_t p = 0;
+    for( index_t y = 0, x; y < image.height; y++ )
     {
         RhoInterrupts.ROW_INT();
-        for( int x = 0; x < image.width; x++, p++ )
+        for( x = 0; x < image.width; x++, p++ )
         {
             *(RhoVariables.ram.CAM_PORT) = image.pixels[p];
             RhoInterrupts.PCLK_INT();
@@ -45,10 +45,10 @@ void FRAME_START( void )
     RhoVariables.ram.QT         = 0;
     RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.C_FRAME_MAX;
     
-    memset(RhoVariables.ram.C_FRAME, 0, sizeof(int)*RhoVariables.global.C_FRAME_MAX);
-    memset(RhoVariables.ram.Dy, 0, sizeof(int) * RhoVariables.global.W);
-    memset(RhoVariables.ram.Dx, 0, sizeof(int) * RhoVariables.global.H);
-    memset(RhoVariables.ram.Q,  0, sizeof(int) * 4);
+    memset(RhoVariables.ram.C_FRAME, 0, sizeof(*RhoVariables.ram.C_FRAME)*RhoVariables.global.C_FRAME_MAX);
+    memset(RhoVariables.ram.Dy, 0, sizeof(*RhoVariables.ram.Dy) * RhoVariables.global.W);
+    memset(RhoVariables.ram.Dx, 0, sizeof(*RhoVariables.ram.Dx) * RhoVariables.global.H);
+    memset(RhoVariables.ram.Q,  0, sizeof(*RhoVariables.ram.Q) * 4);
     RhoVariables.registers.Cx   = *RhoVariables.ram.CX_ADDR;
     RhoVariables.registers.Cy   = *RhoVariables.ram.CY_ADDR;
     RhoVariables.registers.wr   = RhoVariables.ram.C_FRAME;
@@ -61,8 +61,8 @@ void FRAME_END( void )
     if(pthread_mutex_trylock(&RhoVariables.global.rho_int_mutex))
         pthread_mutex_unlock(&RhoVariables.global.rho_int_mutex);
     RhoVariables.ram.QT = 0;
-    int * Qp = RhoVariables.ram.Q;
-    for( int i = 0; i < 4; i++ )
+    density_2d_t * Qp = RhoVariables.ram.Q;
+    for( uint8_t i = 0; i < 4; i++ )
         RhoVariables.ram.QT += *(Qp++);
 }
 
@@ -83,7 +83,8 @@ void PCLK_INT( void )
 void LOOP_THREAD( void * mutex )
 {
     pthread_mutex_t * m = (pthread_mutex_t *)mutex;
-    int rx = 0, ry = 0;
+    uint32_t rx = 0;
+    index_t ry = 0;
     RhoVariables.global.counter = 0;
     while( RhoVariables.registers.rd != RhoVariables.ram.C_FRAME_END
            && pthread_mutex_trylock(m)

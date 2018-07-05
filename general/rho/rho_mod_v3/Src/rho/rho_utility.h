@@ -35,21 +35,22 @@ typedef struct
 typedef struct
 {
   index_t
-        len,     /* data set/map length */
+        len,     /* data set/map length           */
         range[3],
         cyc,
         cyc_,
         x1,
         x2,
-        fpeak,   /* filter peak */
-        fvar,    /* filter variance */
-        fbandl,  /* filter band lower edge value */
-        c1,      /* current map value 1 */
-        c2,      /* current map value 2 */
-        b,       /* current background value */
-        cloc,    /* current location value */
-        gapc,    /* gap counter value */
-        avgc;    /* averaging counter value */
+        fpeak,   /* filter peak                   */
+        fvar,    /* filter variance               */
+        fbandl,  /* filter band lower edge value  */
+        c1,      /* current map value 1           */
+        c2,      /* current map value 2           */
+        b,       /* current background value      */
+        p,       /* punishment value              */
+        cloc,    /* current location value        */
+        gapc,    /* gap counter value             */
+        avgc;    /* averaging counter value       */
     blob_t
         blobs[2];
 

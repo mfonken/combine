@@ -17,15 +17,17 @@
 #define INR(X,H)     (X<0?0:((X>H)?(H-1):X))
 #define MAX(A,B)     ((A>B)?A:B)
 #define XRNG(A,B,C)  (A<(B-C)?-1:(A>(B+C)?1:0)) //Check if exceeds range
-
 #define ALLOW_NEGATIVE_REDISTRIBUTION
-
-//#define FOR(L)       for( int i = L; i > 0; --i)
-//#define FORA(L,A)    for( int i = L; i > 0; --i, A[i] )
-//#define FORA2(L,A,B) for( int i = L; i > 0; --i, A[i], B[i] )
 #define ZDIV(X,Y)    (!X?0:(!Y?2<<10:(floating_t)X/(floating_t)Y))
-
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
+
+static void cma_M0_M1( floating_t v, floating_t i, floating_t *m0, floating_t *m1, density_2d_t * n )
+{
+    floating_t n_=1/((floating_t)(++(*n)));
+    *m0+=((v-*m0)*n_);
+    *m1+=(((v*i)-*m1)*n_);
+}
+static void iswap( index_t *a, index_t *b ) { index_t t=(*a);*a=*b;*b=t; }
 
 /* Universal Port for interrupt model */
 pixel_base_t test_port = 0;
@@ -62,16 +64,16 @@ const density_redistribution_lookup_t rlookup =
 };
 
 /* Generic centroid and mass calculator */
-static int calculateCentroid( density_t * map, int l, int * C, register density_t thresh )
+static index_t calculateCentroid( density_t * map, index_t l, index_t * C, register density_t thresh )
 {
     floating_t avg = 0, mavg = 0;
     density_2d_t cnt = 0, tot = 0;
-    for( int i = 0; i < l; i++ )
+    for( index_t i = 0; i < l; i++ )
     {
         density_t c = map[i];
         if( c > thresh )
         {
-            cma_M0_M1(c, i, &avg, &mavg, &cnt);
+            cma_M0_M1((floating_t)c, (floating_t)i, &avg, &mavg, &cnt);
             tot += c;
         }
     }
@@ -157,7 +159,7 @@ static void Redistribute_Densities( rho_c_utility * utility )
     }
 }
 
-void Init(rho_c_utility * utility, int w, int h)
+void Init(rho_c_utility * utility, index_t w, index_t h)
 {
     /* Utility frame */
     utility->width  = w;
@@ -202,12 +204,12 @@ void Init(rho_c_utility * utility, int w, int h)
     
     /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
     /* Connect to Interrupt Model variable structure */
-    RhoVariables.ram.Dx      =  utility->density_map_pair.x.map;
-    RhoVariables.ram.Dy      =  utility->density_map_pair.y.map;
-    RhoVariables.ram.Q       =  utility->Q;
-    RhoVariables.ram.CX_ADDR = &utility->Cx;
-    RhoVariables.ram.CY_ADDR = &utility->Cy;
-    RhoVariables.ram.C_FRAME =  utility->cframe;
+    RhoVariables.ram.Dx       =  utility->density_map_pair.x.map;
+    RhoVariables.ram.Dy       =  utility->density_map_pair.y.map;
+    RhoVariables.ram.Q        =  utility->Q;
+    RhoVariables.ram.CX_ADDR  = &utility->Cx;
+    RhoVariables.ram.CY_ADDR  = &utility->Cy;
+    RhoVariables.ram.C_FRAME  =  utility->cframe;
     RhoVariables.ram.THRESH_ADDR = &utility->thresh;
     RhoVariables.ram.CAM_PORT = &test_port;
     
@@ -225,32 +227,6 @@ void Init(rho_c_utility * utility, int w, int h)
     /*****  INTERRUPT MODEL CROSS-CONNECTOR VARIABLES END  *****/
 }
 
-/* Interrupt (Simulated Hardware-Driven) Density map generator */
-void Generate_Density_Map_Using_Interrupt_Model( rho_c_utility * utility, cimage_t image, bool backgrounding )
-{
-    if( backgrounding )
-    {
-        RhoVariables.ram.Dx      =  utility->density_map_pair.x.background;
-        RhoVariables.ram.Dy      =  utility->density_map_pair.y.background;
-        RhoVariables.ram.CX_ADDR = &utility->By;
-        RhoVariables.ram.CY_ADDR = &utility->Bx;
-        RhoVariables.ram.Q       =  utility->Qb;
-    }
-    
-    PERFORM_RHO_C( image );
-    
-    if( backgrounding )
-    {
-        RhoVariables.ram.Dx      =  utility->density_map_pair.x.map;
-        RhoVariables.ram.Dy      =  utility->density_map_pair.y.map;
-        RhoVariables.ram.CX_ADDR = &utility->Cx;
-        RhoVariables.ram.CY_ADDR = &utility->Cy;
-        RhoVariables.ram.Q       =  utility->Q;
-//        utility->density_map_pair.x.has_background = true;
-//        utility->density_map_pair.y.has_background = true;
-    }
-}
-
 /* Calculate and process data in variance band from density filter to generate predictions */
 void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t * r )
 {
@@ -260,8 +236,10 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
     utility->QT = 0;
     
     /* Find max and update kalman */
-    int x1 = _.len, x2 = _.len, cyc, cyc_;
-    int range[3] = { _.len, d->centroid, 0 };
+    byte_t cyc, cyc_;
+    index_t x1 = _.len,
+            x2 = _.len,
+            range[3] = { _.len, d->centroid, 0 };
 #ifdef RHO_DEBUG
 //    printf("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
 #endif
@@ -305,7 +283,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
         _.fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
         d->kalmans[cyc].variance = _.fvar;
         
-        if( _.fvar < _.fpeak && _.fvar > 0)
+        if( _.fpeak > _.fvar && _.fvar > 0)
         {
             _.fbandl = _.fpeak - _.fvar;
 #ifdef RHO_DEBUG
@@ -316,8 +294,11 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
             {
                 /* Punish values above the filter peak */
                 if(_.c1 > _.fpeak)
-                    _.c1 = _.fpeak - RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
-                
+                {
+                    _.p = RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
+                    if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
+                    else _.c1 = 0;
+                }
                 /* Check if CMA value is in band */
                 if(_.c1 > _.fbandl)
                 {
@@ -325,7 +306,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                     _.c2 = _.c1 - _.fbandl;
         
                     /* Process new values into blob */
-                    cma_M0_M1(_.c2, x2, &_.cavg, &_.mavg, &_.avgc);
+                    cma_M0_M1((floating_t)_.c2, (floating_t)x2, &_.cavg, &_.mavg, &_.avgc);
                     if(_.c2 > _.cmax) _.cmax = _.c2;
                     _.has = 1; _.gapc = 0;
                 }
@@ -333,7 +314,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                 /* Process completed blobs */
                 else if(_.has && _.gapc > RHO_GAP_MAX)
                 {
-                    _.cden = (int)_.cavg;
+                    _.cden = (density_2d_t)_.cavg;
                     
                     bool sel_ = !_.sel;
                     if( _.cden > _.blobs[sel_].den )
@@ -343,7 +324,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                             _.sel = sel_;
                             _.amax = _.blobs[_.sel].max;
                         }
-                        _.blobs[_.sel] = (blob_t){ _.cmax, _.cden, (int)ZDIV(_.mavg,_.cavg) };
+                        _.blobs[_.sel] = (blob_t){ _.cmax, _.cden, (density_2d_t)ZDIV(_.mavg,_.cavg) };
                     }
                     
                     utility->QF += _.cavg;
@@ -483,7 +464,7 @@ void Update_Prediction( rho_c_utility * utility )
 /* Use background and state information to update image threshold */
 void Update_Threshold( rho_c_utility * utility )
 {
-    int thresh = utility->thresh;
+    density_t thresh = utility->thresh;
     
     /* Hard-Tune on significant background */
 #ifdef RHO_DEBUG
@@ -539,7 +520,6 @@ const struct rho_functions RhoFunctions =
     .Init = Init,
     .Perform = Perform,
     .Generate_Background = Generate_Background,
-    .Generate_Density_Map_Using_Interrupt_Model = Generate_Density_Map_Using_Interrupt_Model,
     .Redistribute_Densities = Redistribute_Densities,
     .Filter_and_Select_Pairs = Filter_and_Select_Pairs,
     .Filter_and_Select = Filter_and_Select,

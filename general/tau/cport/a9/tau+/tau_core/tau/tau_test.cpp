@@ -53,9 +53,9 @@ void TauDraw::drawDensitiesOnFrame(Mat M)
     
     pthread_mutex_lock(&tau->rho.c_mutex);
     
-    int Qv[] = { tau->rho.utility.Q[0],  tau->rho.utility.Q[1],  tau->rho.utility.Q[2],  tau->rho.utility.Q[3]  },
-        Qb[] = { tau->rho.utility.Qb[0], tau->rho.utility.Qb[1], tau->rho.utility.Qb[2], tau->rho.utility.Qb[3] },
-        Qf[] = { tau->rho.utility.Qf[0], tau->rho.utility.Qf[1], tau->rho.utility.Qf[2], tau->rho.utility.Qf[3] };
+    density_2d_t    Qv[] = { tau->rho.utility.Q[0],  tau->rho.utility.Q[1],  tau->rho.utility.Q[2],  tau->rho.utility.Q[3]  },
+                    Qb[] = { tau->rho.utility.Qb[0], tau->rho.utility.Qb[1], tau->rho.utility.Qb[2], tau->rho.utility.Qb[3] },
+                    Qf[] = { tau->rho.utility.Qf[0], tau->rho.utility.Qf[1], tau->rho.utility.Qf[2], tau->rho.utility.Qf[3] };
     //    qsort(Qv, 4, sizeof(int), compare);
 #define inseta_ 10
 #define insetb_ 50
@@ -94,8 +94,8 @@ void TauDraw::drawDensityGraph(Mat M)
     Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
-    rangex[3] = { w, tau->rho.utility.Cx, 0 },
-    rangey[3] = { h, tau->rho.utility.Cy, 0 },
+    rangex[3] = { w, (int)tau->rho.utility.Cx, 0 },
+    rangey[3] = { h, (int)tau->rho.utility.Cy, 0 },
     Bx = tau->rho.utility.Bx,
     By = tau->rho.utility.By;
     line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
@@ -281,7 +281,7 @@ void TauDraw::drawDensityGraph(Mat M)
 void TauDraw::drawDensityMaps(Mat M)
 {
     Vec3b c(0,0,0);
-    int x = 0, y = 0, rangex[2] = { tau->rho.utility.Cx, w }, rangey[2] = { tau->rho.utility.Cy, h };
+    int x = 0, y = 0, rangex[2] = { (int)tau->rho.utility.Cx, w }, rangey[2] = { (int)tau->rho.utility.Cy, h };
     for( int i = 0; i < 2; i++ )
     {
         int mX = tau->rho.utility.density_map_pair.x.max[1-i], mY = tau->rho.utility.density_map_pair.y.max[1-i];
@@ -291,14 +291,14 @@ void TauDraw::drawDensityMaps(Mat M)
         
         for(; y < rangey[i]; y++ )
         {
-            int v = ( dX[y] * 255 ) /mX;
+            int v = ( dX[y] * 255 ) / mX;
             c = densityColor(v);
             line(M, Point(w,y), Point(W,y), c);
         }
         
         for( ; x < rangex[i]; x++ )
         {
-            int v = ( dY[x] * 255 ) /mY;
+            int v = ( dY[x] * 255 ) / mY;
             c = densityColor(v);
             line(M, Point(x,h), Point(x,H), c);
         }

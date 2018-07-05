@@ -21,7 +21,7 @@ extern "C" {
 
 #include "global_types.h"
 #include "rho_c_types.h"
-    
+#include "state_machine_utility.h"
 #include "rho_interrupt_model.h"
 
 //#define MAX_PEAKS           3
@@ -32,7 +32,7 @@ extern "C" {
 
 #define ALTERNATE_TUNING_FACTOR    0.5
 #define FILTERED_COVERAGE_TARGET   0.004
-#define FILTERED_COVERAGE_PIXELS   ((int)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
+#define FILTERED_COVERAGE_PIXELS   ((index_t)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
     
 #define MAX_ABSENCE_PROBABIILITY   0.5
     
@@ -54,7 +54,7 @@ extern "C" {
 #define MAX_COVERAGE        1
 #define FRAME_SIZE          ( FNL_RESIZE_W * FNL_RESIZE_H )
 #define C_FRAME_SIZE        ((int)(MAX_COVERAGE * FRAME_SIZE))
-#define Y_DEL               0xaaaaaaaa
+#define Y_DEL               0xaaaa
     
 #define BACKGROUND_PERCENT_MIN  0.02
 #define BACKGROUND_COVERAGE_MIN ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
@@ -71,52 +71,39 @@ extern "C" {
 #define RHO_VARIANCE_SCALE  RHO_SQRT_HEIGHT/3.0//1.32        //20
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) );
 
-static void cma( double new_val, double *avg, int num )
-    {
-        *avg+=(new_val-*avg)/(double)(num+1);
-    }
-static void cma_M0_M1( floating_t v, floating_t i, floating_t *m0, floating_t *m1, density_2d_t * n )
-    {
-        floating_t n_=1/((floating_t)(++(*n)));
-        *m0+=((v-*m0)*n_);
-        *m1+=(((v*i)-*m1)*n_);
-    }
-static void iswap( int *a, int *b ) { int t=(*a);*a=*b;*b=t; }
-
-#include "state_machine_utility.h"
-
 typedef struct
 {
     density_map_pair_t  density_map_pair;
     prediction_pair_t   prediction_pair;
     bayesian_system_t   sys;
     rho_kalman_t        thresh_filter;
-    int     width,
-            height,
-            thresh,
-            Cx,
-            Cy,
-            Bx,
-            By,
-            Q[4],
-            Qb[4],
-            Qf[4],
-            QT,
-            QbT,
-            QF;
+    index_t     width,
+                height,
+                Cx,
+                Cy,
+                Bx,
+                By;
+    density_t
+                thresh;
+    density_2d_t
+                Q[4],
+                Qb[4],
+                Qf[4],
+                QT,
+                QbT,
+                QF;
     floating_t  FT;
 
-    int cframe[C_FRAME_SIZE];
+    index_t cframe[C_FRAME_SIZE];
     pthread_mutex_t rho_int_mutex;
 } rho_c_utility;
     
 
 struct rho_functions
 {
-    void (*Init)(                                       rho_c_utility *, int, int);
+    void (*Init)(                                       rho_c_utility *, index_t, index_t);
     void (*Perform)(                                    rho_c_utility *, bool );
     void (*Generate_Background)(                        rho_c_utility * );
-    void (*Generate_Density_Map_Using_Interrupt_Model)( rho_c_utility *, cimage_t, bool );
     void (*Redistribute_Densities)(                     rho_c_utility * );
     void (*Filter_and_Select_Pairs)(                    rho_c_utility * );
     void (*Filter_and_Select)(                          rho_c_utility *, density_map_t *, prediction_t * );
@@ -137,10 +124,11 @@ typedef struct
 {
     index_t
         xl[3],
-        yl[3],
+        yl[3];
+    density_2d_t
         area[9];
     
-    byte_t a, b, c, d, l, l_, p, q, x, y;
+    density_2d_t a, b, c, d, l, l_, p, q, x, y;
 } redistribution_variables;
 
 typedef struct
@@ -155,7 +143,8 @@ typedef struct
         fbandl,
         c1,
         c2,
-        b;
+        b,
+        p;
     density_2d_t
         cmax,
         amax,

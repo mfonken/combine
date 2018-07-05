@@ -39,7 +39,8 @@ public:
     
     Rho( int, int );
     void perform( cimage_t *, PredictionPair * );
-    void perform( cv::Mat,    PredictionPair * );    
+    void perform( cv::Mat,    PredictionPair * );
+    void Generate_Density_Map_Using_Interrupt_Model( cimage_t, bool );
 };
 
 #endif /* rho_wrapper_hpp */

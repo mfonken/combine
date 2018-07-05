@@ -237,7 +237,11 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 			for( _.x2 = _.range[_.cyc]; _.x2 > _.range[_.cyc_]; --_.x2, _.c1 = d->map[_.x2] )
 			{
 				if( _.c1 > _.fpeak ) /* Punish values above the filter peak */
-					_.c1 = _.fpeak - RHO_PUNISH( _.c1 - _.fpeak );
+				{
+					_.p = RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
+          if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
+          else _.c1 = 0;
+				}
 				if( _.c1 > _.fbandl ) /* Check if CMA value is in band */
 				{
 					_.c2 = _.c1 - _.fbandl; /* De-offset valid values */

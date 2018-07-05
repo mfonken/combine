@@ -30,21 +30,22 @@ typedef double kalman_floating_t;
         kalman_floating_t lifespan;
         rho_kalman_uncertainty_c uncertainty;
         /* Data */
-        kalman_floating_t      K[2],
-                    P[2][2],
-                    rate,
-                    bias,
-                    value,
-                    prev,
-                    velocity,
-                    variance,
-                    timestamp;
+        kalman_floating_t
+            K[2],
+            P[2][2],
+            rate,
+            bias,
+            value,
+            prev,
+            velocity,
+            variance,
+            timestamp;
     } rho_kalman_t;
     
     struct rho_kalman {
         void (*init)( rho_kalman_t *, kalman_floating_t, kalman_floating_t, kalman_floating_t, kalman_floating_t, kalman_floating_t );
         void (*update)( rho_kalman_t *, kalman_floating_t, kalman_floating_t );
-        int  (*isExpired)( rho_kalman_t * );
+        bool  (*isExpired)( rho_kalman_t * );
     };
     
 //    kalman_floating_t timestamp(void);

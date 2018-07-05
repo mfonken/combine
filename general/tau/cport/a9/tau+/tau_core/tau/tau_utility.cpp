@@ -10,6 +10,11 @@
 
 using namespace cv;
 
+static void cma( double new_val, double *avg, index_t num )
+{
+    *avg+=(new_val-*avg)/(double)(num+1);
+}
+
 void Tau::init( void )
 {
     rho.utility.thresh = THRESHOLD_MIN;;
