@@ -58,9 +58,8 @@ typedef struct
         *rd;
     density_t
         THRESH;
-    density_2d_t
-        QS;    
     byte_t
+        QS,
         PTOG;
 } rho_register_variables;
 

@@ -38,7 +38,7 @@ public:
     bool                backgrounding_event;
     
     Rho( int, int );
-    void perform( cimage_t *, PredictionPair * );
+    void perform( cimage_t&, GlobalPacket * );
     void perform( cv::Mat,    PredictionPair * );
     void Generate_Density_Map_Using_Interrupt_Model( cimage_t, bool );
 };

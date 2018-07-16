@@ -20,7 +20,7 @@ Vec3b white    (255, 255, 255);
 Vec3b red      (  0,   0, 255);
 Vec3b blue     (255,   0,   0);
 
-TauDraw::TauDraw( Tau * tau, Mat inframe )
+TauDraw::TauDraw( Tau * tau) : frame(Size(tau->width,  tau->height), CV_8UC3, Scalar(0,0,0))//, Mat inframe )
 #ifdef DRAW_RHO_MAPS
 :
 RMX(Size(tau->width,  RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255)),
@@ -31,10 +31,9 @@ RMY(Size(tau->height, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
     this->tau = tau;
     w = tau->width; h = tau->height;
     W = w + SIDEBAR_WIDTH; H = h + SIDEBAR_WIDTH;
-    Mat N(H, W, CV_8UC3, Scalar(0));
-    inframe.copyTo(N(Rect(0,0,w,h)));
-    frame = N;
-    
+//    Mat N(H, W, CV_8UC3, Scalar(0));
+//    inframe.copyTo(N(Rect(0,0,w,h)));
+//    frame = N;
     pthread_mutex_init( &drawer_mutex, NULL );
 }
 
@@ -57,28 +56,23 @@ void TauDraw::drawDensitiesOnFrame(Mat M)
                     Qb[] = { tau->rho.utility.Qb[0], tau->rho.utility.Qb[1], tau->rho.utility.Qb[2], tau->rho.utility.Qb[3] },
                     Qf[] = { tau->rho.utility.Qf[0], tau->rho.utility.Qf[1], tau->rho.utility.Qf[2], tau->rho.utility.Qf[3] };
     //    qsort(Qv, 4, sizeof(int), compare);
-#define inseta_ 10
-#define insetb_ 50
-#define fontsize_ 1.4
-#define fontcolora_ Vec3b(100,100,0)
+
     putText(frame, to_string(Qv[0]), Point(inseta_, insetb_),                       FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
     putText(frame, to_string(Qv[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_),      FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
     putText(frame, to_string(Qv[2]), Point(inseta_, h-inseta_),                     FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
     putText(frame, to_string(Qv[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_),    FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
-    
-#define fontcolorb_ Vec3b(0,100,100)
+
     putText(frame, to_string(Qb[0]), Point(inseta_, insetb_+18),                    FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
     putText(frame, to_string(Qb[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_+18),   FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
     putText(frame, to_string(Qb[2]), Point(inseta_, h-inseta_+18),                  FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
     putText(frame, to_string(Qb[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_+18), FONT_HERSHEY_PLAIN, fontsize_, fontcolorb_, 4);
-    
-#define fontcolorc_ Vec3b(100,0,100)
+
     putText(frame, to_string(Qf[0]), Point(inseta_, insetb_+36),                    FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     putText(frame, to_string(Qf[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_+36),   FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     putText(frame, to_string(Qf[2]), Point(inseta_, h-inseta_+36),                  FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     putText(frame, to_string(Qf[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_+36), FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     
-    putText(frame, "Thresh: " + to_string(tau->utility->thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
+    putText(frame, "Thresh: " + to_string(tau->utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
     putText(frame, "State: " + string(stateString(tau->rho.utility.sys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
 //    putText(frame, "X (" + to_string(tau->rho.utility.Cx) + ", " + to_string(tau->rho.utility.Cy) + ")", Point(tau->rho.utility.Cx, tau->rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
@@ -135,13 +129,15 @@ void TauDraw::drawDensityGraph(Mat M)
         /* Density Maps */
         pthread_mutex_lock(&tau->rho.density_map_pair_mutex);
         int dX[h], dY[w], fX[h], fY[w];
-        for( y1 = rangey[i]; y1 > rangey[j]; --y1 )
+        for( y1 = rangey[i]; y1 > rangey[j];  )
         {
+            --y1;
             dX[y1] = INR(tau->rho.utility.density_map_pair.x.map[y1], h);
             fX[y1] = INR(tau->rho.utility.density_map_pair.x.background[y1], h);
         }
-        for( x1 = rangex[i]; x1 > rangex[j]; --x1 )
+        for( x1 = rangex[i]; x1 > rangex[j];  )
         {
+            --x1;
             dY[x1] = INR(tau->rho.utility.density_map_pair.y.map[x1], w);
             fY[x1] = INR(tau->rho.utility.density_map_pair.y.background[x1], w);
         }
@@ -155,8 +151,9 @@ void TauDraw::drawDensityGraph(Mat M)
         line(RMY, Point(0,nv1d), Point(H,nv1d), yellowish);
         line(RMY, Point(0,nv2d), Point(H,nv2d), yellowish);
 #endif
-        for( y2 = rangey[i]; y2 > rangey[j]; --y2 )
+        for( y2 = rangey[i]; y2 > rangey[j];  )
         {
+            --y2;
             u = INR(OP_ALIGN((fX[y2]/DENSITY_SCALE),w),w);
             v = INR(OP_ALIGN((dX[y2]/DENSITY_SCALE),w),w);
             
@@ -263,8 +260,8 @@ void TauDraw::drawDensityGraph(Mat M)
      */
     
     pthread_mutex_lock(&tau->predictions_mutex);
-    Point2f a(tau->predictions.x.primary.value,   tau->predictions.y.primary.value),
-            b(tau->predictions.x.secondary.value, tau->predictions.y.secondary.value);
+    Point2f a(tau->packet.px, tau->packet.py),
+            b(tau->packet.sx, tau->packet.sy);
     pthread_mutex_unlock(&tau->predictions_mutex);
     
     line(M, Point(a.y, 0), Point(a.y, h), bluish);
@@ -301,6 +298,44 @@ void TauDraw::drawDensityMaps(Mat M)
             int v = ( dY[x] * 255 ) / mY;
             c = densityColor(v);
             line(M, Point(x,h), Point(x,H), c);
+        }
+    }
+}
+
+void TauDraw::drawRhoProbabilities(Mat M)
+{
+    int w = M.cols, h = M.rows, h_ = h-RHO_MAPS_INSET;
+    M = {Scalar(245,245,245)};
+    double prob[8] =
+    {
+        tau->rho.utility.prediction_pair.x.probabilities.primary,
+        tau->rho.utility.prediction_pair.x.probabilities.secondary,
+        tau->rho.utility.prediction_pair.x.probabilities.alternate,
+        tau->rho.utility.prediction_pair.x.probabilities.absence,
+        tau->rho.utility.prediction_pair.y.probabilities.primary,
+        tau->rho.utility.prediction_pair.y.probabilities.secondary,
+        tau->rho.utility.prediction_pair.y.probabilities.alternate,
+        tau->rho.utility.prediction_pair.y.probabilities.absence
+    };
+    
+    line(M, Point(RHO_MAPS_INSET, h_+1), Point(w-RHO_MAPS_INSET, h_+1), Scalar(15,15,15));
+    line(M, Point(w/2, h_+10), Point(w/2, RHO_MAPS_INSET-10), Scalar(15,15,15));
+    
+    int col_space = 10, col_width = (w - ((8*col_space)+2*RHO_MAPS_INSET))/8, col_scale = h-RHO_MAPS_INSET*2;
+    
+    line(M, Point(RHO_MAPS_INSET, h_-col_scale), Point(w-RHO_MAPS_INSET, h_-col_scale), Scalar(115,115,145));
+    
+    int x = RHO_MAPS_INSET, c = 0;
+    for( int i = 0; i < 8; i++)
+    {
+        int y = h_- prob[i]*col_scale;
+        rectangle(M, Point(x,h_), Point(x+col_width, y), densityColor(c), -1);
+        x += col_space + col_width;
+        c += 255/4;
+        if(i == 3)
+        {
+            x += col_space;
+            c = 0;
         }
     }
 }

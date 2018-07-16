@@ -19,7 +19,7 @@
 #include "state_machine_utility.h"
 
 #define MAX_COUNT               10000
-#define BACKGROUNDING_PERIOD    2000
+#define BACKGROUNDING_PERIOD    20
 
 class Tau : public TestInterface
 {
@@ -30,12 +30,11 @@ public:
     virtual void trigger( void );
     virtual std::string serialize( void );
     
-    Tau( std::string, ImageUtility *, int, int );
+    Tau( std::string, ImageUtility&, int, int );
     double perform( cv::Mat );
-    double perform( cimage_t * );
+    double perform( cimage_t & );
     void updateThresh();
     void updatePrediction();
-    void updatePredictionFromPeaks();
     
     int                 count;
     double              avg;
@@ -46,10 +45,11 @@ public:
                         tick,
                         width,
                         height;
-    ImageUtility      * utility;
+    ImageUtility        utility;
     Rho                 rho;
-    PredictionPair      predictions;
-    pthread_mutex_t     predictions_mutex;
+    GlobalPacket        packet;
+    pthread_mutex_t     predictions_mutex,
+                      * utility_mutex;
 };
 
 #endif /* tau_utility_hpp */

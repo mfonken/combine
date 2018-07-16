@@ -37,6 +37,13 @@
 #define RHO_MAPS_HEIGHT 200
 #define RHO_MAPS_INSET 10
 
+#define inseta_ 10
+#define insetb_ 50
+#define fontsize_ 1.4
+#define fontcolora_ Vec3b(100,100,0)
+#define fontcolorb_ Vec3b(0,100,100)
+#define fontcolorc_ Vec3b(100,0,100)
+
 using namespace cv;
 //
 class TauDraw
@@ -48,10 +55,11 @@ public:
     Tau * tau;
     int w, h, W, H;
     
-    TauDraw( Tau * tau, cv::Mat );
+    TauDraw( Tau * tau);//, cv::Mat );
     void drawDensitiesOnFrame(Mat);
     void drawDensityGraph(Mat);
     void drawDensityMaps(Mat);
+    void drawRhoProbabilities(Mat);
     Vec3b densityColor( int );
     int pixelDensity( Vec3b );
     Vec3b hsv2bgr(Vec3b);

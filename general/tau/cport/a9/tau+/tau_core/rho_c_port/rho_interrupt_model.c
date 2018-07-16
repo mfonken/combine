@@ -10,19 +10,24 @@
 #include <stdio.h>
 #include <string.h>
 
+#define BURN_ROWS 0
+#define BURN_COLS 0
+
 inline void PERFORM_RHO_C( cimage_t image )
 {
     RhoInterrupts.FRAME_START();
     pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
-    uint32_t p = 0;
-    for( index_t y = 0, x; y < image.height; y++ )
+    uint32_t p = BURN_ROWS * image.height;
+    for( index_t y = BURN_ROWS, x; y < image.height; y++ )
     {
         RhoInterrupts.ROW_INT();
-        for( x = 0; x < image.width; x++, p++ )
+        p += BURN_COLS;
+        for( x = BURN_COLS; x < image.width; x++, p++ )
         {
             *(RhoVariables.ram.CAM_PORT) = image.pixels[p];
             RhoInterrupts.PCLK_INT();
         }
+        
     }
     RhoInterrupts.FRAME_END();
 }
@@ -63,7 +68,8 @@ void FRAME_END( void )
     RhoVariables.ram.QT = 0;
     density_2d_t * Qp = RhoVariables.ram.Q;
     for( uint8_t i = 0; i < 4; i++ )
-        RhoVariables.ram.QT += *(Qp++);
+        RhoVariables.ram.QT += Qp[i];
+    printf(">>>frame density is %d<<<\n", RhoVariables.ram.QT);
 }
 
 void ROW_INT( void )
@@ -83,8 +89,7 @@ void PCLK_INT( void )
 void LOOP_THREAD( void * mutex )
 {
     pthread_mutex_t * m = (pthread_mutex_t *)mutex;
-    uint32_t rx = 0;
-    index_t ry = 0;
+    index_t rx = 0, ry = 0;
     RhoVariables.global.counter = 0;
     while( RhoVariables.registers.rd != RhoVariables.ram.C_FRAME_END
            && pthread_mutex_trylock(m)
@@ -94,7 +99,8 @@ void LOOP_THREAD( void * mutex )
         if( RhoVariables.registers.rd < RhoVariables.registers.wr )
         {
             rx = *(RhoVariables.registers.rd++);
-            if( rx == RhoVariables.global.y_delimiter || rx == 0 )
+            
+            if( rx == RhoVariables.global.y_delimiter )
             {
                 if( ry < RhoVariables.registers.Cy )
                 {
@@ -116,8 +122,8 @@ void LOOP_THREAD( void * mutex )
                         RhoVariables.registers.QS &= 0xfe;
                 else    RhoVariables.registers.QS |= 0x01;
                 (*(RhoVariables.ram.Dy+rx))++;
+                (*(RhoVariables.ram.Q+RhoVariables.registers.QS))++;
             }
-            (*(RhoVariables.ram.Q+RhoVariables.registers.QS))++;
         }
     }
 }

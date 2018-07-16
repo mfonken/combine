@@ -24,6 +24,8 @@ extern "C" {
 #include "state_machine_utility.h"
 #include "rho_interrupt_model.h"
 
+#define PACKET_HEADER_ID 0xab
+    
 //#define MAX_PEAKS           3
 
 #define RHO_PUNISH_FACTOR   1
@@ -51,6 +53,11 @@ extern "C" {
 #define RHO_THRESH_BU      0.01
 #define RHO_THRESH_SU      0.05
     
+#define RHO_TARGET_LS      5
+#define RHO_TARGET_VU      0.5
+#define RHO_TARGET_BU      0.01
+#define RHO_TARGET_SU      0.05
+    
 #define MAX_COVERAGE        1
 #define FRAME_SIZE          ( FNL_RESIZE_W * FNL_RESIZE_H )
 #define C_FRAME_SIZE        ((int)(MAX_COVERAGE * FRAME_SIZE))
@@ -76,39 +83,44 @@ typedef struct
     density_map_pair_t  density_map_pair;
     prediction_pair_t   prediction_pair;
     bayesian_system_t   sys;
-    rho_kalman_t        thresh_filter;
-    index_t     width,
-                height,
-                Cx,
-                Cy,
-                Bx,
-                By;
-    density_t
-                thresh;
-    density_2d_t
-                Q[4],
-                Qb[4],
-                Qf[4],
-                QT,
-                QbT,
-                QF;
-    floating_t  FT;
+    rho_kalman_t        thresh_filter,
+                        target_filter;
+    index_t             width,
+                        height,
+                        Cx,
+                        Cy,
+                        Bx,
+                        By;
+    density_t           thresh;
+    density_2d_t        Q[4],
+                        Qb[4],
+                        Qf[4],
+                        QbT,
+                        total_coverage,
+                        filtered_coverage,
+                        target_coverage;
+    floating_t          filtered_percentage,
+                        target_coverage_factor,
+                        coverage_factor,
+                        variance_factor;
 
     index_t cframe[C_FRAME_SIZE];
     pthread_mutex_t rho_int_mutex;
+    packet_t packet;
 } rho_c_utility;
     
 
 struct rho_functions
 {
-    void (*Init)(                                       rho_c_utility *, index_t, index_t);
-    void (*Perform)(                                    rho_c_utility *, bool );
-    void (*Generate_Background)(                        rho_c_utility * );
-    void (*Redistribute_Densities)(                     rho_c_utility * );
-    void (*Filter_and_Select_Pairs)(                    rho_c_utility * );
-    void (*Filter_and_Select)(                          rho_c_utility *, density_map_t *, prediction_t * );
-    void (*Update_Prediction)(                          rho_c_utility * );
-    void (*Update_Threshold)(                           rho_c_utility * );
+    void (*Init)(                       rho_c_utility *, index_t, index_t);
+    void (*Perform)(                    rho_c_utility *, bool );
+    void (*Generate_Background)(        rho_c_utility * );
+    void (*Redistribute_Densities)(     rho_c_utility * );
+    void (*Filter_and_Select_Pairs)(    rho_c_utility * );
+    void (*Filter_and_Select)(          rho_c_utility *, density_map_t *, prediction_t * );
+    void (*Update_Prediction)(          rho_c_utility * );
+    void (*Update_Threshold)(           rho_c_utility * );
+    void (*Generate_Packet)(            rho_c_utility * );
 };
     
 typedef struct
@@ -156,11 +168,23 @@ typedef struct
         has,
         sel;
     floating_t
-        cavg,
-        mavg;
+        fcov,   /* Filtered coverage ratio */
+        cavg,   /* cumulative average */
+        mavg,   /* moment average */
+        afac,   /* alternate factor */
+        bfac,   /* absence factor */
+        pfac,   /* primary factor */
+        sfac,   /* secondary factor */
+        cfac,   /* coverage factor */
+        vfac,   /* variance factor */
+        fdn_,   /* filtered density (float) */
+        tdnf,   /* target density (float) */
+        fvf_;   /* filtered variance inverse (float) */
     blob_t
         blobs[2];
 } rho_selection_variables;
+    
+    
 
 typedef struct
 {
@@ -177,6 +201,32 @@ typedef struct
     byte_t non_diag;
     int8_t qcheck;
 } prediction_update_variables;
+    
+    
+typedef struct
+{
+    packet_t * packet;
+    address_t pdPtr,
+        llPtr,
+        * alPtr;
+    byte_t
+        includes,
+        i,
+        j,
+        l,
+        t;
+} packet_generation_variables;
+    
+#define PACKET_ADDRESS_INITIALIZER(r)           \
+{                                               \
+(address_t)&r.y.primary.value,         /* px */ \
+(address_t)&r.x.primary.value,         /* py */ \
+(address_t)&r.y.secondary.value,       /* sx */ \
+(address_t)&r.x.secondary.value,       /* sy */ \
+(address_t)&r.probabilities.primary,   /* pp */ \
+(address_t)&r.probabilities.secondary, /* ap */ \
+(address_t)&r.probabilities.alternate  /* ap */ \
+}
     
 extern const density_redistribution_lookup_t rlookup;
 extern const struct rho_functions RhoFunctions;
