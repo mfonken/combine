@@ -69,7 +69,7 @@ void FRAME_END( void )
     density_2d_t * Qp = RhoVariables.ram.Q;
     for( uint8_t i = 0; i < 4; i++ )
         RhoVariables.ram.QT += Qp[i];
-    printf(">>>frame density is %d<<<\n", RhoVariables.ram.QT);
+    LOG_RHO(">>>frame density is %d<<<\n", RhoVariables.ram.QT);
 }
 
 void ROW_INT( void )
@@ -196,10 +196,8 @@ void PERFORM_RHO_FUNCTION( cimage_t image )
     RhoVariables.ram.Q[3] = Q3;
     RhoVariables.ram.QT = Q0 + Q1 + Q2 + Q3;
     
-#ifdef RHO_DEBUG
-    printf("Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
-    printf("# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
-#endif
+    LOG_RHO("Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
+    LOG_RHO("# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
 }
 
 const rho_interrupts RhoInterrupts =
