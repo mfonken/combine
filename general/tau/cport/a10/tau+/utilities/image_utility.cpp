@@ -26,7 +26,7 @@ image(Size(FNL_RESIZE_W, FNL_RESIZE_H), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
 #endif
-    if(num_frames) printf("Image Utility Initialized.\n");
+    if(num_frames) LOG_IMUT("Image Utility Initialized.\n");
     cimageInit(outimage, width, height);
     pthread_mutex_init(&outframe_mutex, NULL);
     pthread_mutex_init(&outimage_mutex, NULL);
@@ -68,7 +68,7 @@ void ImageUtility::init()
     = false;
 #endif
     
-    printf("Initializing Image Utility: ");
+    LOG_IMUT("Initializing Image Utility: ");
     if(has_file) initFile();
     if(has_camera) initCamera();
     if(has_generator) initGenerator();
@@ -86,7 +86,7 @@ void ImageUtility::initFile()
     subdir = file;
     if(num_frames > 0)
     {
-        printf("With %d %dx%d frames.\n", num_frames, size.width, size.height);
+        LOG_IMUT("With %d %dx%d frames.\n", num_frames, size.width, size.height);
         counter = 1;
         
         file.append( to_string(counter%num_frames+1) );
@@ -94,15 +94,15 @@ void ImageUtility::initFile()
     }
     else
     {
-        printf("With a single %dx%d frame.\n", size.width, size.height);
+        LOG_IMUT("With a single %dx%d frame.\n", size.width, size.height);
         file.append(".bmp");
     }
-    printf("\tOpening file: %s\n", file.c_str());
+    LOG_IMUT("\tOpening file: %s\n", file.c_str());
     
     image = imread(file, IMREAD_COLOR );
     if( image.empty() )                      // Check for invalid input
     {
-        cout <<  "Could not open or find the image" << std::endl ;
+        LOG_IMUT("Could not open or find the image.\n");
         return;
     }
     
@@ -119,10 +119,14 @@ void ImageUtility::initCamera()
     cam.set(CV_CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT);
     cam.set(CV_CAP_PROP_FPS,          CAM_FRAME_RATE);
     
-    if (!cam.isOpened()) cout << "cannot open camera" << endl;
+    if (!cam.isOpened())
+    {
+        LOG_IMUT("Could not open or find camera.\n");
+        return;
+    }
     cam.read(image);
     
-    printf("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
+    LOG_IMUT("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
     
 #ifdef GREYSCALE
     Mat grey;
@@ -214,9 +218,9 @@ Mat ImageUtility::getImage()
 {
     file = subdir + to_string( counter%num_frames+1) + ".png";
     image = imread( file, IMREAD_COLOR );
-    if( image.empty() )
+    if( image.empty() )                      // Check for invalid input
     {
-        cout <<  "Could not open or find the image " << file << std::endl ;
+        LOG_IMUT("Could not open or find the image.\n");
         return frame;
     }
     resize(image,frame,size);

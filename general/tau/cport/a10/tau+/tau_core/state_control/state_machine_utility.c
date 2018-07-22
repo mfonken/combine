@@ -27,7 +27,7 @@ static floating_t DOUBT( state_dimension_t i, state_t cs )
 
 static void initMap( bayesian_map_t * bm )
 {
-    printf("Initializing State Machine.\n");
+    LOG_STATEM("Initializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
     bm->length = NUM_STATES;
     for( ; _.i < _.l; _.i++ )
@@ -68,6 +68,7 @@ static void resetState( bayesian_map_t * bm, state_dimension_t i )
 
 static void print( bayesian_map_t * bm, state_t s )
 {
+#ifdef STATEM_DEBUG
     reset_loop_variables( &_, bm->length );
     for( _.i = 0; _.i < _.l; _.i++ ) printf("\t\t %s-[%d]", stateString((state_dimension_t)_.i), _.i);
     for( _.i = 0; _.i < _.l; _.i++ )
@@ -81,6 +82,7 @@ static void print( bayesian_map_t * bm, state_t s )
         }
     }
     printf("\n");
+#endif
 }
 
 static void init( bayesian_system_t * sys )
@@ -131,12 +133,8 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
     }
     /* Only update sys->next state on change */
     if( next != sys->state ) sys->next = next;
-    
-#ifdef STATEM_DEBUG
-    printf("\n###### Current state is %s. ######\n\n", stateString((state_dimension_t)sys->state));
-    printf("Next state is %s(%.2f).\n", stateString((state_dimension_t)sys->next), _.u);
-#endif
-    
+    LOG_STATEM("\n###### Current state is %s. ######\n\n", stateString((state_dimension_t)sys->state));
+    LOG_STATEM("Next state is %s(%.2f).\n", stateString((state_dimension_t)sys->next), _.u);
     _.l = ch[1] + ch[2] + ch[3];
     sys->selection_index = _.l;
     for( _.i = 0; _.i <= _.l; _.i++)
@@ -144,9 +142,7 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
         _.u = prob[_.i];// * (floating_t)PROBABILITY_TUNING_FACTOR;
         _.v = (floating_t)DOUBT(_.i, sys->state);
         out[_.i] = _.u * _.v;
-#ifdef STATEM_DEBUG
-        printf("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, _.u, _.v, out[_.i]);
-#endif
+        LOG_STATEM("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, _.u, _.v, out[_.i]);
     }
     
     /* Independent Alternate Check */
@@ -156,9 +152,7 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
     BayesianFunctions.sys.updateProbabilities( sys, out );
     BayesianFunctions.map.normalizeState( &sys->probabilities, sys->state );
     BayesianFunctions.sys.updateState( sys );
-#ifdef STATEM_DEBUG
     print( &sys->probabilities, sys->state );
-#endif
 }
 
 static void updateProbabilities( bayesian_system_t * sys, floating_t p[4] )
@@ -188,9 +182,7 @@ static void updateProbabilities( bayesian_system_t * sys, floating_t p[4] )
         else if( x == _.i ) k = c;
         else k = ( c + 1 ) - ( _.j << 1);
         
-#ifdef STATEM_DEBUG
-        printf("Updating %s by %.2f.\n", stateString(k), p[_.i]);
-#endif
+        LOG_STATEM("Updating %s by %.2f.\n", stateString(k), p[_.i]);
         sys->probabilities.map[k][c] += p[_.i];
     }
 }
@@ -199,10 +191,8 @@ static void updateState( bayesian_system_t * sys )
 {
     if(sys->next != UNKNOWN_STATE )
     {
-#ifdef STATEM_DEBUG
-        printf("Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
-        if(sys->next != sys->state) printf("~~~ State is %s ~~~\n", stateString(sys->next));
-#endif
+        LOG_STATEM("Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
+        if(sys->next != sys->state) {LOG_STATEM("~~~ State is %s ~~~\n", stateString(sys->next));}
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;

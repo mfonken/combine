@@ -12,6 +12,7 @@ using namespace cv;
 
 static void printPacket( GlobalPacket * p, int l )
 {
+#ifdef TAU_DEBU
     printf("Packet Size > %lubytes\n", sizeof(GlobalPacket));
     for(int i = 0; i < sizeof(GlobalPacket); )
     {
@@ -28,6 +29,7 @@ static void printPacket( GlobalPacket * p, int l )
     uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
     double pxfr = *(double*)&pxr;
     printf("[%02x][%02x][%02x][%02x] %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
+#endif
 }
 
 Tau::Tau( std::string name, int width, int height, std::string n = "ImageUtility", std::string f = "", int num = 0 ) :
@@ -70,7 +72,7 @@ void Tau::trigger( void )
     pthread_mutex_unlock(&utility.outframe_mutex);
     
     
-    printf("Tau perform: %.3fs\n", p);
+    LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
         cma(p, &avg, ++count);
 }
@@ -87,7 +89,7 @@ double Tau::perform( cimage_t &img )
     if( ++tick >= BACKGROUNDING_PERIOD )
     {
         utility.RequestBackground();
-        printf("Waiting for utility to generate background...\n");
+        LOG_TAU("Waiting for utility to generate background...\n");
         
         while(!utility.background_ready)
             utility.trigger();

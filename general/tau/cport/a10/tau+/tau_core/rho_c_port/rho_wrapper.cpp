@@ -16,14 +16,14 @@ using namespace cv;
 
 Rho::Rho( int width, int height ) : width(width), height(height)
 {
-    printf("Initializing Rho Utility: %dx%d & [KTarg-%.3f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
+    LOG_RHO("Initializing Rho Utility: %dx%d & [KTarg-%.3f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     size_t
         a = sizeof(redistribution_variables),
         b = sizeof(rho_selection_variables),
         c = sizeof(prediction_update_variables),
         d = sizeof(rho_c_utility)-sizeof(density_t)*C_FRAME_SIZE+(2*(FNL_RESIZE_W+FNL_RESIZE_H))*sizeof(density_t),
         e = a + b + c + d;
-    printf("\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);
+    LOG_RHO("\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     
