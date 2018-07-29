@@ -10,8 +10,8 @@
 #define test_setup_h
 
 #define TITLE_STRING            "Tau+ CPort Alpha v0.10"
-#define IMAGE_SOURCE_PATH       "noise/dynamic_clouds"
-#define IMAGE_SOURCE_NUM_FRAMES 1
+#define IMAGE_SOURCE_PATH       "noise/clouds"//"frames/small"
+#define IMAGE_SOURCE_NUM_FRAMES 4//26
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
@@ -22,9 +22,10 @@
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define TAU_DEBUG
-#define RHO_DEBUG   
+//#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define IMUT_DEBUG
+//#define ENV_DEBUG
 
 #ifdef HAS_CAMERA
 #define FISHEYE
@@ -65,7 +66,7 @@
 
 #define THRESH_STEP             1
 #define THRESHOLD_MAX           255-THRESH_STEP
-#define THRESHOLD_MIN           100
+#define THRESHOLD_MIN           5
 
 #define THRESHOLD               230
 #define BRIGHTNESS              155

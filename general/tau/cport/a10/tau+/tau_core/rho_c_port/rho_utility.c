@@ -19,7 +19,7 @@
 #define XTOLU(A,TOL)    (A>TOL?1:0) //Check if exceeds range
 #define XTOL(A,TOL)     (A<-TOL?-1:(A>TOL?1:0)) //Check if exceeds range
 
-#define ALLOW_NEGATIVE_REDISTRIBUTION
+//#define ALLOW_NEGATIVE_REDISTRIBUTION
 #define ZDIV(X,Y)       (!X?0:(!Y?2<<10:(floating_t)X/(floating_t)Y))
 
 #define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
@@ -130,7 +130,7 @@ void Generate_Background( rho_c_utility * utility )
 {
     floating_t xt = calculateCentroid( utility->density_map_pair.x.background, utility->density_map_pair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
     floating_t yt = calculateCentroid( utility->density_map_pair.y.background, utility->density_map_pair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
-    printf("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
+    LOG_RHO("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
     utility->QbT = MAX(xt, yt);
 }
 

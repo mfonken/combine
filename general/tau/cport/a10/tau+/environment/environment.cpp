@@ -12,8 +12,8 @@ Environment::Environment( TestInterface * test, int rate ) : Environment(test, N
 
 Environment::Environment( TestInterface * test, SerialWriter * sercom, int rate )
 {
-    printf("Initializing Test Environment.\n");
-    if (pthread_mutex_init(&lock, NULL) != 0) printf("\n mutex init failed\n");
+    LOG_ENV("Initializing Test Environment.\n");
+    if (pthread_mutex_init(&lock, NULL) != 0) {LOG_ENV("\n mutex init failed\n");}
     if(events.add( &lock, test, sercom, rate ))
         test->init();
     status = INITIALIZED;
@@ -43,14 +43,14 @@ void Environment::start()
 
 void Environment::pause()
 {
-    printf("Pausing environment\n");
+    LOG_ENV("Pausing environment\n");
     pthread_mutex_unlock(&lock);
     status = PAUSED;
 }
 
 void Environment::resume()
 {
-    printf("Resuming environment\n");
+    LOG_ENV("Resuming environment\n");
     pthread_mutex_lock(&lock);
     for( int i = 0; i < events.length(); i++ )
     {
@@ -77,16 +77,16 @@ Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * serc
 void * Event::worker( void * data )
 {
     Event e = *(Event*)data;
-    const char * n = e.test->name.c_str();
+    const char * n = e.test->name;
     if( e.mutex == NULL)
     {
-        printf("ALERT: Event %s has no mutex!\n", n);
+        LOG_ENV("ALERT: Event %s has no mutex!\n", n);
         return NULL;
     }
     
     if( e.rate <= 0)
     {
-        printf("ALERT: Event %s has invalid rate.\n", n);
+        LOG_ENV("ALERT: Event %s has invalid rate.\n", n);
         return NULL;
     }
     int sl = 1000000/e.rate;
@@ -106,7 +106,7 @@ void * Event::worker( void * data )
         while( (curr_time = getTime(time)) < end_time );
     }
     pthread_mutex_unlock(e.mutex);
-    printf("Event %s has triggered %d times\n", n, e.id);
+    LOG_ENV("Event %s has triggered %d times\n", e.test->name, e.id);
     return NULL;
 }
 

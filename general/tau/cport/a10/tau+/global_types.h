@@ -40,9 +40,15 @@
 #endif
 
 #ifdef IMUT_DEBUG
-#define LOG_IMUT(...) LOG("Image Utility: "n__VA_ARGS__)
+#define LOG_IMUT(...) LOG("Image Utility: " __VA_ARGS__)
 #else
 #define LOG_IMUT(...)
+#endif
+
+#ifdef ENV_DEBUG
+#define LOG_ENV(...) LOG("Environment: " __VA_ARGS__)
+#else
+#define LOG_ENV(...)
 #endif
 
 #ifdef __cplusplus

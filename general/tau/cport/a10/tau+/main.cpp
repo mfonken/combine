@@ -9,8 +9,8 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        30
-#define TAU_FPS         30
+#define MAIN_FPS        60
+#define TAU_FPS         60
 #define COMBINE_FPS     0
 
 #define sleep(X) usleep(X*1E6)
@@ -73,9 +73,10 @@ int main( int argc, const char * argv[] )
                 tau.avg = 0;
                 tau.count = 0;
                 env.start();
-                sleep(1);
+                sleep(10);
                 env.pause();
-                printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
+                printf("%d\n", tau.count);
+//                printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
                 break;
         }
     }

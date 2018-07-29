@@ -24,12 +24,12 @@ class Combine : public TestInterface
 {
 public:
     int id;
-    std::string name;
+    const char * name;
     virtual void init( void );
     virtual void trigger( void );
     virtual string serialize( void );
     
-    Combine(std::string, Tau *, int, int);
+    Combine(const char *, Tau *, int, int);
     
 private:
     int         width,

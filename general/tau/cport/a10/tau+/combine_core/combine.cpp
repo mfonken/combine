@@ -8,7 +8,7 @@
 
 #include "combine.hpp"
 
-Combine::Combine(std::string n, Tau * t, int width, int height )
+Combine::Combine(const char * n, Tau * t, int width, int height )
 {
     this->tau = t;
     this->name = n;

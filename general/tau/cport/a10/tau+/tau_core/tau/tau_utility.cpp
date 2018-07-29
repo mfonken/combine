@@ -32,7 +32,7 @@ static void printPacket( GlobalPacket * p, int l )
 #endif
 }
 
-Tau::Tau( std::string name, int width, int height, std::string n = "ImageUtility", std::string f = "", int num = 0 ) :
+Tau::Tau( const char * name, int width, int height, std::string n = "ImageUtility", std::string f = "", int num = 0 ) :
 rho(width, height),
 name(name), width(width), height(height),
 utility(n, f, num, width, height)
@@ -94,7 +94,7 @@ double Tau::perform( cimage_t &img )
         while(!utility.background_ready)
             utility.trigger();
         
-        printf("Background ready.\n");
+        LOG_RHO("Background ready.\n");
         rho.backgrounding_event = true;
         rho.perform( img, &packet );
         utility.background_ready = false;
@@ -107,7 +107,7 @@ double Tau::perform( cimage_t &img )
         updatePrediction();
     }
     gettimeofday( &b, NULL);
-//    printPacket(&packet, 4);
+    printPacket(&packet, 4);
     return timeDiff(a,b);
 }
 

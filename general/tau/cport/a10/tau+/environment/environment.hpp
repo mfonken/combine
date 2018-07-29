@@ -18,7 +18,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <pthread.h>
-
+#include "global_types.h"
 #include "serial_wrapper.hpp"
 
 #define MAX_THREADS 3
@@ -40,7 +40,7 @@ class TestInterface
 {
 public:
     int id;
-    std::string name;
+    const char * name;
     virtual void  init( void ) = 0;
     virtual void  trigger( void ) = 0;
     virtual string serialize( void ) = 0;

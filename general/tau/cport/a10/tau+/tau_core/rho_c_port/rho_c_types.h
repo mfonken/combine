@@ -46,7 +46,7 @@ typedef floating_t  timestamp_t;
 #define THRESH_STEP_MAX 10
 #define THRESH_STEP_BASE 6
 #define THRESH_STEP 1
-#define THRESH_MIN  100
+#define THRESH_MIN  0
 #define THRESH_MAX  255
 
 /* Packet Generation Settings */

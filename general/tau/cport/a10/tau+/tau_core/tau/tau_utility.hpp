@@ -25,12 +25,12 @@ class Tau : public TestInterface
 {
 public:
     int id;
-    std::string name;
+    const char * name;
     virtual void init( void );
     virtual void trigger( void );
     virtual std::string serialize( void );
     
-    Tau( std::string, int, int, std::string, std::string, int );
+    Tau(const char *, int, int, std::string, std::string, int );
     double perform( cv::Mat );
     double perform( cimage_t & );
     void updateThresh();

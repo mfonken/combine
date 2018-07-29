@@ -27,7 +27,7 @@ RMX(Size(tau->width,  RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255)),
 RMY(Size(tau->height, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
 #endif
 {
-    printf("Initializing Tau Drawer.\n");
+    LOG_TAU("Initializing Tau Drawer.\n");
     this->tau = tau;
     w = tau->width; h = tau->height;
     W = w + SIDEBAR_WIDTH; H = h + SIDEBAR_WIDTH;
