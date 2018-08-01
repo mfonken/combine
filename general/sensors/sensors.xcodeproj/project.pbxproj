@@ -11,6 +11,7 @@
 		4935553C210CFC84008FBBCE /* motionsensor.c in Sources */ = {isa = PBXBuildFile; fileRef = 49355538210CFC84008FBBCE /* motionsensor.c */; };
 		4935553D210CFC84008FBBCE /* BNO080.c in Sources */ = {isa = PBXBuildFile; fileRef = 4935553B210CFC84008FBBCE /* BNO080.c */; };
 		49BC136A210AD0130032B952 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 49BC1369210AD0130032B952 /* main.c */; };
+		49D6E922211136F20079D283 /* sh2.c in Sources */ = {isa = PBXBuildFile; fileRef = 49D6E921211136F20079D283 /* sh2.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +38,7 @@
 		49BC1369210AD0130032B952 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		49BC1370210AD04C0032B952 /* sensor_data_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_data_types.h; sourceTree = "<group>"; };
 		49BC138B210AD04D0032B952 /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
+		49D6E921211136F20079D283 /* sh2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sh2.c; sourceTree = "<group>"; };
 		49F1E91D210AD23000A68B37 /* STC3100IQT.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STC3100IQT.h; sourceTree = "<group>"; };
 		49F1E91F210AD23000A68B37 /* batterymonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
 		49F1E926210AD84E00A68B37 /* i2c_template.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = i2c_template.h; sourceTree = "<group>"; };
@@ -66,11 +68,12 @@
 		49355537210CFC84008FBBCE /* motionsensor */ = {
 			isa = PBXGroup;
 			children = (
+				4935553E210D047D008FBBCE /* sh2.h */,
+				49D6E921211136F20079D283 /* sh2.c */,
 				49355539210CFC84008FBBCE /* BNO080.h */,
 				4935553B210CFC84008FBBCE /* BNO080.c */,
 				4935553A210CFC84008FBBCE /* motionsensor.h */,
 				49355538210CFC84008FBBCE /* motionsensor.c */,
-				4935553E210D047D008FBBCE /* sh2.h */,
 			);
 			path = motionsensor;
 			sourceTree = "<group>";
@@ -185,6 +188,7 @@
 				4935553C210CFC84008FBBCE /* motionsensor.c in Sources */,
 				49BC136A210AD0130032B952 /* main.c in Sources */,
 				4935552E210CF027008FBBCE /* sysiocontroller.c in Sources */,
+				49D6E922211136F20079D283 /* sh2.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

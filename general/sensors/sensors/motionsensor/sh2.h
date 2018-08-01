@@ -8,17 +8,19 @@
 #ifndef sh2_h
 #define sh2_h
 
+#define SHTP_REPORT_STATUS_MASK
+
 /* Records start */
 typedef enum
 {
     SH2_CONFIGURATION_RECORD_STATIC_CALIBRATION_AGM                          = 0x7979,
-    SH2_CONFIGURATION_RECORD_NOMINAL CALIBRATION_AGM                         = 0x4D4D,
+    SH2_CONFIGURATION_RECORD_NOMINAL_CALIBRATION_AGM                         = 0x4D4D,
     SH2_CONFIGURATION_RECORD_STATIC_CALIBRATION_SRA                          = 0x8A8A,
     SH2_CONFIGURATION_RECORD_NOMINAL_CALIBRATION_SRA                         = 0x4E4E,
     SH2_CONFIGURATION_RECORD_DYNAMIC_CALIBRATION                             = 0x1F1F,
     SH2_CONFIGURATION_RECORD_MOTIONENGINE_POWER_MANAGEMENT                   = 0xD3E2,
     SH2_CONFIGURATION_RECORD_SYSTEM_ORIENTATION                              = 0x2D3E,
-    SH2_CONFIGURATION_RECORD_PRIMARY_ACCELEROMETER ORIENTATION               = 0x2D41,
+    SH2_CONFIGURATION_RECORD_PRIMARY_ACCELEROMETER_ORIENTATION               = 0x2D41,
     SH2_CONFIGURATION_RECORD_GYROSCOPE_ORIENTATION                           = 0x2D46,
     SH2_CONFIGURATION_RECORD_MAGNETOMETER_ORIENTATION                        = 0x2D4C,
     SH2_CONFIGURATION_RECORD_STABILIZATION_ROTATION_VECTOR                   = 0x3E2D,
@@ -31,15 +33,15 @@ typedef enum
     SH2_CONFIGURATION_RECORD_ENVIRONMENTAL_SENSOR_TEMPERATURE_CALIBRATION    = 0x4D20,
     SH2_CONFIGURATION_RECORD_ENVIRONMENTAL_SENSOR_HUMIDITY_CALIBRATION       = 0x1AC9,
     SH2_CONFIGURATION_RECORD_ENVIRONMENTAL_SENSOR_AMBIENT_LIGHT_CALIBRATION  = 0x39B1,
-    SH2_CONFIGURATION_RECORD_ENVIRONMENTAL_SENSOR_PROxIMITY_CALIBRATION      = 0x4DA2,
+    SH2_CONFIGURATION_RECORD_ENVIRONMENTAL_SENSOR_PROXIMITY_CALIBRATION      = 0x4DA2,
     SH2_CONFIGURATION_RECORD_ALS_CALIBRATION                                 = 0xD401,
-    SH2_CONFIGURATION_RECORD_PROxIMITY_SENSOR_CALIBRATION                    = 0xD402,
+    SH2_CONFIGURATION_RECORD_PROXIMITY_SENSOR_CALIBRATION                    = 0xD402,
     SH2_CONFIGURATION_RECORD_STABILITY_DETECTOR_CONFIGURATION                = 0xED85,
     SH2_CONFIGURATION_RECORD_USER_RECORD                                     = 0x74B4,
     SH2_CONFIGURATION_RECORD_MOTIONENGINE_TIME_SOURCE_SELECTION              = 0xD403,
     SH2_CONFIGURATION_RECORD_GYRO_INTEGRATED_ROTATION_VECTOR_CONFIGURATION   = 0xA1A2
 } SH2_CONFIGURATION_RECORD;
-    
+
 typedef enum
 {
     SH2_METADATA_RECORD_RAW_ACCELEROMETER                                   = 0xE301,
@@ -58,7 +60,7 @@ typedef enum
     SH2_METADATA_RECORD_PRESSURE                                            = 0xE30E,
     SH2_METADATA_RECORD_AMBIENT_LIGHT                                       = 0xE30F,
     SH2_METADATA_RECORD_HUMIDITY                                            = 0xE310,
-    SH2_METADATA_RECORD_PROxIMITY                                           = 0xE311,
+    SH2_METADATA_RECORD_PROXIMITY                                           = 0xE311,
     SH2_METADATA_RECORD_TEMPERATURE                                         = 0xE312,
     SH2_METADATA_RECORD_TAP_DETECTOR                                        = 0xE313,
     SH2_METADATA_RECORD_STEP_DETECTOR                                       = 0xE314,
@@ -97,7 +99,7 @@ typedef enum
 
 typedef struct /* 0xF1 */
 {
-uint8_t
+    uint8_t
     report_id,
     sequence_number,
     command,
@@ -169,11 +171,11 @@ typedef struct /* 0xF7 */
 
 typedef enum
 {
-    SH2_RESET_CAUSE_NOT_APPLICABLE                          = 0x00
-    SH2_RESET_CAUSE_POWER_ON_RESET                          = 0x01
-    SH2_RESET_CAUSE_INTERNAL_SYSTEM_RESET                   = 0x02
-    SH2_RESET_CAUSE_WATCHDOG_TIMEOUT                        = 0x03
-    SH2_RESET_CAUSE_EXTERNAL_RESET                          = 0x04
+    SH2_RESET_CAUSE_NOT_APPLICABLE                          = 0x00,
+    SH2_RESET_CAUSE_POWER_ON_RESET                          = 0x01,
+    SH2_RESET_CAUSE_INTERNAL_SYSTEM_RESET                   = 0x02,
+    SH2_RESET_CAUSE_WATCHDOG_TIMEOUT                        = 0x03,
+    SH2_RESET_CAUSE_EXTERNAL_RESET                          = 0x04,
     SH2_RESET_CAUSE_OTHER                                   = 0x05
 } SH2_RESET_CAUSE;
 typedef struct /* 0xF8 */
@@ -181,13 +183,13 @@ typedef struct /* 0xF8 */
     uint8_t
     report_id,
     reset_cause,
-    sw_version Major,
-    sw_version Minor;
+    sw_version_major,
+    sw_version_minor;
     uint32_t
     sw_part_Number,
     sw_build_Number;
     uint16_t
-    sw_version Patch,
+    sw_version_patch,
     reserved;
 } sh2_product_id_response;
 typedef struct /* 0xF9 */
@@ -224,6 +226,21 @@ typedef enum
 } SH2_TARE_COMMAND_ID;
 /* Commands end */
 
+typedef enum
+{
+    SH2_SENSOR_STATUS_UNRELIABLE = 0x00,
+    SH2_SENSOR_STATUS_ACCURACTY_LOW = 0x01,
+    SH2_SENSOR_STATUS_ACCURACTY_MEDIUM = 0x02,
+    SH2_SENSOR_STATUS_ACCURACTY_HIGH = 0x03,
+} SH2_SENSOR_STATUS;
+
+struct
+{
+ uint16_t
+    accuracy:2,
+    delay:14;                       // 6 most-significant bits of report delay. See blow.
+} sh2_sensor_status;
+
 /* Generic report types start */
 typedef struct
 {
@@ -233,7 +250,7 @@ typedef struct
     uint32_t
     report_interval,
     batch_interval;
-    struct feature_flags
+    struct
     {
         uint8_t
     change_sensitivity_type:1,      // 0 – absolute, 1 – relative
@@ -241,18 +258,13 @@ typedef struct
     wake_up_enable:1,               // 0 – disabled, 1 – enabled
     always_on_enable:1,             // 0 – disabled, 1 - enabled(run sensor while hub is in “sleep” mode)
     reserved:4;
-    };
+    } feature_flags;
     uint16_t
     change_sensitivity_absolute,
     change_sensitivity_relative;
     uint32_t
     sensor_specific_configuration_word;
-    struct status
-    {
-        uint16_t
-    indicate_sensor_status:2,       // 0 – Unreliable, 1 – Accuracy low, 2 – Accuracy medium, 3 – Accuracy high
-    delay:14;                       // 6 most-significant bits of report delay. See blow.
-    };
+    sh2_sensor_status status;
 } sh2_common_fields;
 
 typedef struct
@@ -260,7 +272,7 @@ typedef struct
     uint8_t
     report_id,
     feature_report_id,
-    feature_flags,
+    feature_flags;
     uint16_t
     change_sensitivity;
     uint32_t
@@ -280,8 +292,8 @@ uint8_t
 
 typedef struct
 {
-sh2_report_header_t header;
-uint16_t
+    sh2_report_header_t header;
+    uint16_t
     x,
     y,
     z;
@@ -336,33 +348,32 @@ typedef enum
     SH2_SENSOR_REPORT_GET_FEATURE_RESPONSE                  = 0xFC,
     SH2_SENSOR_REPORT_GET_FEATURE_COMMAND                   = 0xFD,
     SH2_SENSOR_REPORT_GET_FEATURE_REQUEST                   = 0xFE,
-    
 } SH2_SENSOR_REPORT_ID;
 
 typedef sh2_generic_triple_axis_report
-    sh2_accelerometer_input_report,             /* 0x01 */
-    sh2_linear_acceleration_input_report,       /* 0x04 */
-    sh2_gravity_input_report,                   /* 0x06 */
-    sh2_gyroscope_calibrated_input_report,      /* 0x02 */
-    sh2_magnetic_field_calibrated_input_report  /* 0x03 */
+sh2_accelerometer_input_report,             /* 0x01 */
+sh2_linear_acceleration_input_report,       /* 0x04 */
+sh2_gravity_input_report,                   /* 0x06 */
+sh2_gyroscope_calibrated_input_report,      /* 0x02 */
+sh2_magnetic_field_calibrated_input_report;  /* 0x03 */
 
 typedef struct                                  /* 0x14 */
 {
     sh2_report_header_t header;
-uint16_t
+    uint16_t
     x,
     y,
     z,
     reserved;
-uint32_t
+    uint32_t
     timestamp;
 } sh2_raw_accelerometer_input_report,
-    sh2_raw_magnetometer_input_report;          /* 0x16 */
+sh2_raw_magnetometer_input_report;          /* 0x16 */
 
 typedef struct                                  /* 0x15 */
 {
     sh2_report_header_t header;
-uint16_t
+    uint16_t
     x,
     y,
     z,
@@ -373,28 +384,28 @@ uint16_t
 
 typedef struct                                  /* 0x07 */
 {
-sh2_report_header_t header;
-uint16_t
+    sh2_report_header_t header;
+    uint16_t
     x,
     y,
     z,
     x_bias,
     y_bias,
     z_bias;
-} sh2_gyroscope_uncalibrated_input_report;
-
+} sh2_gyroscope_uncalibrated_input_report,
+    sh2_magnetic_field_uncalibrated_input_report;
 typedef struct
 {
-sh2_report_header_t header;
-uint16_t
+    sh2_report_header_t header;
+    uint16_t
     i,
     j,
     k,
     real,
     accuracy;
 } sh2_rotation_vector_input_report,             /* 0x05 */
-    sh2_geomagnetic_rotation_vector_input_report,    /* 0x09 */
-    sh2_arvr_stabilized_rotation_vector_input_report /* 0x28 */
+sh2_geomagnetic_rotation_vector_input_report,    /* 0x09 */
+sh2_arvr_stabilized_rotation_vector_input_report; /* 0x28 */
 
 typedef struct
 {
@@ -405,7 +416,7 @@ typedef struct
     k,
     real;
 } sh2_game_rotation_vector_input_report,        /* 0x08 */
-    sh2_arvr_stabilized_game_rotation_vector_input_report /* 0x29 */
+sh2_arvr_stabilized_game_rotation_vector_input_report; /* 0x29 */
 
 typedef struct
 {
@@ -422,10 +433,10 @@ typedef struct
 
 typedef struct
 {
-sh2_report_header_t header;
-    union sensor_data
+    sh2_report_header_t header;
+    union
     {
-    uint32_t
+        uint32_t
         atmospheric_pressure:32,                /* 0x0A */
         ambient_light:32,                       /* 0x0B */
         humidity:16,                            /* 0x0C */
@@ -433,53 +444,55 @@ sh2_report_header_t header;
         temperature:16,                         /* 0x0E */
         taps_detected:8,                        /* 0x10 */
         detect_latency:8,                       /* 0x18 */
-        motion:16,                              /* 0x12 */
-        struct stability_classifier_data        /* 0x13 */
+        motion:16;                              /* 0x12 */
+        struct                                  /* 0x13 */
         {
-        uint8_t
+            uint8_t
             stability_classification,
             reserved;
-        }:16,
+        } stability_classifier_data;
+        uint32_t
         shake:16,                               /* 0x19 */
         flip:16,                                /* 0x1A */
         pickup:16,                              /* 0x1B */
-        stability:16,                           /* 0x1C */
-        struct sleep_detector_data              /* 0x1F */
+        stability:16;                           /* 0x1C */
+        struct                                  /* 0x1F */
         {
-        uint8_t
+            uint8_t
             sleep_state,
             reserved;
-        }:16,
+        } sleep_detector_data;
+        uint32_t
         tilt:16,                                /* 0x20 */
         pocket:16,                              /* 0x21 */
         circle:16,                              /* 0x22 */
-        heart_rate:16,                          /* 0x23 */
-    };
+        heart_rate:16;                          /* 0x23 */
+    } sensor_data;
 } sh2_pressure_input_report,
-    sh2_ambient_light_input_report,
-    sh2_humidity_input_report,
-    sh2_distance_input_report,
-    sh2_temperature_input_report,
-    sh2_tap_detector_input_report,
-    sh2_step_detector_input_report,
-    sh2_significant_motion_input_report,
-    sh2_stability_classifier_input_report,
-    sh2_shake_detector_input_report,
-    sh2_flip_detector_input_report,
-    sh2_pickup_detector_input_report,
-    sh2_stability_detector_input_report,
-    sh2_sleep_detector_input_report,
-    sh2_tilt_detector_input_report,
-    sh2_pocket_detector_input_report,
-    sh2_circle_detector_input_report,
-    sh2_heart_rate_detector_input_report;
+sh2_ambient_light_input_report,
+sh2_humidity_input_report,
+sh2_proximity_input_report,
+sh2_temperature_input_report,
+sh2_tap_detector_input_report,
+sh2_step_detector_input_report,
+sh2_significant_motion_input_report,
+sh2_stability_classifier_input_report,
+sh2_shake_detector_input_report,
+sh2_flip_detector_input_report,
+sh2_pickup_detector_input_report,
+sh2_stability_detector_input_report,
+sh2_sleep_detector_input_report,
+sh2_tilt_detector_input_report,
+sh2_pocket_detector_input_report,
+sh2_circle_detector_input_report,
+sh2_heart_rate_monitor_input_report;
 
 typedef struct
 {
-sh2_report_header_t header;
-uint32_t
+    sh2_report_header_t header;
+    uint32_t
     detect_latency;
-uint16_t
+    uint16_t
     steps,
     reserved;
 } sh2_step_counter_input_report;                /* 0x11 */
@@ -498,9 +511,9 @@ typedef enum
 } SH2_PERSONAL_ACTIVITY_CLASSIFICATION_STATE;
 typedef struct
 {
-sh2_report_header_t header;
-uint8_t
-    page_number_and_eos;
+    sh2_report_header_t header;
+    uint8_t
+    page_number_and_eos,
     most_likely_state,
     classification[10];
 } sh2_personal_activity_classifier_input_report; /* 0x1E */
@@ -515,17 +528,18 @@ typedef enum
 
 typedef struct
 {
-uint8_t
-    Report ID;
-    union batching_data
+    uint8_t
+    report_id;
+    union
     {
-    uint32_t
+        uint32_t
         base_delta,     // relative to transport-defined reference point. Signed. Units are 100 microsecond ticks.
         rebase_delta;   // relative to Base Timestamp Reference. Signed. Units are 100 microsecond ticks.
-    };
-
+    } batching_data;
+    
 } sh2_base_timestamp_reference_record,          /* 0xFB */
-    sh2_timestamp_rebase_record;                /* 0xFA */
+sh2_timestamp_rebase_record;                /* 0xFA */
 /* Batching end */
 
 #endif /* sh2_h */
+
