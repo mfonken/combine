@@ -19,8 +19,6 @@ typedef struct
     double x, y, z;
 } triple_axis_t;
 
-typedef
-
 typedef struct
 {
     triple_axis_t   accel[3];

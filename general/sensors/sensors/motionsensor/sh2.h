@@ -8,8 +8,6 @@
 #ifndef sh2_h
 #define sh2_h
 
-#define SHTP_REPORT_STATUS_MASK
-
 /* Records start */
 typedef enum
 {
@@ -119,8 +117,8 @@ typedef struct /* 0xF3 */
 {
     uint8_t
     report_id,
-data_length:4,
-status:4;
+    data_length:4,
+    status:4;
     uint16_t
     word_offset;
     uint32_t
@@ -171,6 +169,19 @@ typedef struct /* 0xF7 */
 
 typedef enum
 {
+    SH2_FRS_STATUS_NO_ERROR = 0,
+    SH2_FRS_STATUS_UNRECOGNIZED_FRS_TYPE,
+    SH2_FRS_STATUS_BUSY,
+    SH2_FRS_STATUS_READ_RECORD_COMPLETED,
+    SH2_FRS_STATUS_OFFSET_OUT_OF_RANGE,
+    SH2_FRS_STATUS_RECORD_EMPTY,
+    SH2_FRS_STATUS_READ_BLOCK_COMPLETED,    // if block size requested
+    SH2_FRS_STATUS_READ_COMPLETED,          // if block size requested
+    SH2_FRS_STATUS_DEVICE_ERROR
+} SH2_FRS_STATUS;
+
+typedef enum
+{
     SH2_RESET_CAUSE_NOT_APPLICABLE                          = 0x00,
     SH2_RESET_CAUSE_POWER_ON_RESET                          = 0x01,
     SH2_RESET_CAUSE_INTERNAL_SYSTEM_RESET                   = 0x02,
@@ -186,8 +197,8 @@ typedef struct /* 0xF8 */
     sw_version_major,
     sw_version_minor;
     uint32_t
-    sw_part_Number,
-    sw_build_Number;
+    sw_part_number,
+    sw_build_number;
     uint16_t
     sw_version_patch,
     reserved;
@@ -213,6 +224,7 @@ typedef enum
     SH2_COMMAND_GET_OSCILLATOR_TYPE                         = 0x0A,
     SH2_COMMAND_CLEAR_DCD_AND_RESET                         = 0x0B
 } SH2_COMMAND_ID;
+
 typedef enum
 {
     SH2_COUNTER_COMMAND_GET_COUNTS                          = 0x00,
@@ -234,7 +246,7 @@ typedef enum
     SH2_SENSOR_STATUS_ACCURACTY_HIGH = 0x03,
 } SH2_SENSOR_STATUS;
 
-struct
+typedef struct
 {
  uint16_t
     accuracy:2,
@@ -276,8 +288,8 @@ typedef struct
     uint16_t
     change_sensitivity;
     uint32_t
-    report_Interval,
-    batch_Interval,
+    report_interval,
+    batch_interval,
     sensor_specific_configuration_word;
 } sh2_common_dynamic_feature_report;
 
@@ -346,9 +358,23 @@ typedef enum
     SH2_SENSOR_REPORT_FORCE_SENSOR_FLUSH                    = 0xF0,
     
     SH2_SENSOR_REPORT_GET_FEATURE_RESPONSE                  = 0xFC,
-    SH2_SENSOR_REPORT_GET_FEATURE_COMMAND                   = 0xFD,
+    SH2_SENSOR_REPORT_SET_FEATURE_COMMAND                   = 0xFD,
     SH2_SENSOR_REPORT_GET_FEATURE_REQUEST                   = 0xFE,
 } SH2_SENSOR_REPORT_ID;
+
+typedef struct
+{
+uint8_t
+    report_id,
+    feature_report_id;
+} sh2_get_feature_request;
+
+typedef struct
+{
+uint8_t
+    report_id,
+    sensor_id;
+} sh2_sensor_flush;
 
 typedef sh2_generic_triple_axis_report
 sh2_accelerometer_input_report,             /* 0x01 */
@@ -540,6 +566,8 @@ typedef struct
 } sh2_base_timestamp_reference_record,          /* 0xFB */
 sh2_timestamp_rebase_record;                /* 0xFA */
 /* Batching end */
+
+
 
 #endif /* sh2_h */
 
