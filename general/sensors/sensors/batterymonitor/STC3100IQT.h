@@ -1,6 +1,6 @@
 /* File: STC3100IQT.h
  * Author: Matthew Fonken
- * Source: https://www.mouser.com/datasheet/2/389/stc3100-974293.pdf
+ * Source: https://www.mouser.com/datasheet/2/389/STC3100-974293.pdf
  * Description:
     The STC3100 monitors the critical parameters of a single-cell Li-Ion battery (voltage, temperature and current) and includes hardware functions to implement a gas gauge for battery charge monitoring, based on a programmable 12- to 14-bit A/D converter. With a typical 30 milliOhms external sense resistor, the battery current can be up to 2.5 A and the accumulator system provides a capacity up to +/-7000 mAh with a resolution of 0.2 mAh. The device is programmable through the I2C interface.
  */
@@ -45,7 +45,7 @@
 #define STC_REG_ID6             30  // R Unique part ID, bits 40-47
 #define STC_REG_ID7             31  // R Device ID CRC
 
-typedef long stc_id_t;
+typedef long STC_id_t;
 
 /* RAM Register 32 - 63 */
 #define STC_REG_RAM_LEN         32  // RAM number of registers
@@ -60,7 +60,7 @@ uint8_t
     GG_CAL:1,       // 3    R/W 0   0: no effect 1: used to calibrate the AD converters
     GG_RUN:1,       // 4    R/W 0   0: standby mode. Accumulator and counter registers are frozen, gas gauge and battery monitor functions are in standby. 1: operating mode.
     RESERVED:3;     // 5-7  Unused
-} reg_mode_t;
+} stc_reg_mode_t;
 
 /* REG CTRL - Register 1 */
 typedef struct
@@ -74,57 +74,111 @@ uint8_t
     PORDET:1,       // 4    R   1   Power on reset (POR) detection bit: 0 = no POR event occurred, 1 = POR event occurred
                     //      W   0   Soft reset: 0 = release the soft-reset and clear the POR detection bit, 1 = assert the soft-reset and set the POR detection bit.
     RESERVED:3;     // 5-7  Unused
-} reg_ctrl_t;
+} stc_reg_ctrl_t;
 
 /* STC basic structure */
 typedef struct
 {
-    reg_mode_t mode;
-    reg_ctrl_t ctrl;
+    stc_reg_mode_t mode;
+    stc_reg_ctrl_t ctrl;
 } stc_t;
 
 /* I2C Events */
-static i2c_event_t stcSetModeEvent(void)        { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_ADDR, STC_REG_MODE,             STC_REG_LEN      }; }
-static i2c_event_t stcGetModeEvent(void)        { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_MODE,             STC_REG_LEN      }; }
-static i2c_event_t stcSetControlEvent(void)     { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_ADDR, STC_REG_CTRL,             STC_REG_LEN      }; }
-static i2c_event_t stcGetControlEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CTRL,             STC_REG_LEN      }; }
-static i2c_event_t stcGetIDEvent(void)          { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_ID0,              STC_REG_ID_LEN   }; }
-static i2c_event_t stcGetRAMEvent(void)         { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_RAM_START,        STC_REG_RAM_LEN  }; }
-static i2c_event_t stcGetChargeEvent(void)      { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CHARGE_LOW,       STC_WORD_LEN     }; }
-static i2c_event_t stcGetCounterEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_COUNTER_LOW,      STC_WORD_LEN     }; }
-static i2c_event_t stcGetCurrentEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CURRENT_LOW,      STC_WORD_LEN     }; }
-static i2c_event_t stcGetVoltageEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_VOLTAGE_LOW,      STC_WORD_LEN     }; }
-static i2c_event_t stcGetTemperatureEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN     }; }
+static i2c_event_t STCSetModeEvent(void)        { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_ADDR, STC_REG_MODE,             STC_REG_LEN      }; }
+static i2c_event_t STCGetModeEvent(void)        { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_MODE,             STC_REG_LEN      }; }
+static i2c_event_t STCSetControlEvent(void)     { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_ADDR, STC_REG_CTRL,             STC_REG_LEN      }; }
+static i2c_event_t STCGetControlEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CTRL,             STC_REG_LEN      }; }
+static i2c_event_t STCGetIDEvent(void)          { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_ID0,              STC_REG_ID_LEN   }; }
+static i2c_event_t STCGetRAMEvent(void)         { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_RAM_START,        STC_REG_RAM_LEN  }; }
+static i2c_event_t STCGetChargeEvent(void)      { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CHARGE_LOW,       STC_WORD_LEN     }; }
+static i2c_event_t STCGetCounterEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_COUNTER_LOW,      STC_WORD_LEN     }; }
+static i2c_event_t STCGetCurrentEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_CURRENT_LOW,      STC_WORD_LEN     }; }
+static i2c_event_t STCGetVoltageEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_VOLTAGE_LOW,      STC_WORD_LEN     }; }
+static i2c_event_t STCGetTemperatureEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_ADDR, STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN     }; }
+
+static void STCSetMode( stc_reg_mode_t data )
+{
+    i2c_data[0] = *(uint8_t *)&data;
+    performI2CEvent(STCSetModeEvent(), i2c_data);
+}
+static stc_reg_mode_t STCGetMode(void)
+{
+    performI2CEvent(STCGetModeEvent(), i2c_data);
+    return *(stc_reg_mode_t *)&i2c_data[0];
+}
+static void STCSetControl( stc_reg_ctrl_t data )
+{
+    i2c_data[0] = *(uint8_t *)&data;
+    performI2CEvent(STCSetControlEvent(), i2c_data);
+}
+static stc_reg_ctrl_t STCGetControl(void)
+{
+    performI2CEvent(STCGetControlEvent(), i2c_data);
+    return *(stc_reg_ctrl_t *)&i2c_data;
+}
+static uint8_t STCGetIDE(void)
+{
+    performI2CEvent(STCGetIDEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetRAM(void)
+{
+    performI2CEvent(STCGetRAMEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetCharge(void)
+{
+    performI2CEvent(STCGetChargeEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetCounter(void)
+{
+    performI2CEvent(STCGetCounterEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetCurrent(void)
+{
+    performI2CEvent(STCGetCurrentEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetVoltage(void)
+{
+    performI2CEvent(STCGetVoltageEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
+static uint8_t STCGetTemperature(void)
+{
+    performI2CEvent(STCGetTemperatureEvent(), i2c_data);
+    return (uint8_t)*i2c_data;
+}
 
 typedef struct
 {
 i2c_event_t
-    (*setModeEvent)(void),
-    (*getModeEvent)(void),
-    (*setControlEvent)(void),
-    (*getControlEvent)(void),
-    (*getIDEvent)(void),
-    (*getRAMEvent)(void),
-    (*getChargeEvent)(void),
-    (*getCounterEvent)(void),
-    (*getCurrentEvent)(void),
-    (*getVoltageEvent)(void),
-    (*getTemperatureEvent)(void);
+    (*SetModeEvent)(void),
+    (*GetModeEvent)(void),
+    (*SetControlEvent)(void),
+    (*GetControlEvent)(void),
+    (*GetIDEvent)(void),
+    (*GetRAMEvent)(void),
+    (*GetChargeEvent)(void),
+    (*GetCounterEvent)(void),
+    (*GetCurrentEvent)(void),
+    (*GetVoltageEvent)(void),
+    (*GetTemperatureEvent)(void);
+    void (*SetMode)( stc_reg_mode_t );
+    stc_reg_mode_t (*GetMode)(void);
+    void (*SetControl)( stc_reg_ctrl_t );
+    stc_reg_ctrl_t (*GetControl)(void);
+uint8_t
+    (*GetIDE)(void),
+    (*GetRAM)(void),
+    (*GetCharge)(void),
+    (*GetCounter)(void),
+    (*GetCurrent)(void),
+    (*GetVoltage)(void),
+    (*GetTemperature)(void);
 } stc_functions;
 
-static stc_functions STCFunctions =
-{
-    .setModeEvent        = stcSetModeEvent,
-    .getModeEvent        = stcGetModeEvent,
-    .setControlEvent     = stcSetControlEvent,
-    .getControlEvent     = stcGetControlEvent,
-    .getIDEvent          = stcGetIDEvent,
-    .getRAMEvent         = stcGetRAMEvent,
-    .getChargeEvent      = stcGetChargeEvent,
-    .getCounterEvent     = stcGetCounterEvent,
-    .getCurrentEvent     = stcGetCurrentEvent,
-    .getVoltageEvent     = stcGetVoltageEvent,
-    .getTemperatureEvent = stcGetTemperatureEvent
-};
 
 #endif /* STC3100IQT_h */

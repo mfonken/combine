@@ -12,22 +12,30 @@
 #include <stdio.h>
 #include "STC3100IQT.h"
 
-typedef stc_t battery_monitor_t;
-
-static uint8_t getControl(void)
+static stc_functions BatteryMonitor =
 {
-    performI2CEvent(STCFunctions.getControlEvent(), i2c_data);
-    return (uint8_t)*i2c_data;
-}
-
-typedef struct
-{
-    uint8_t(*getControl)(void);
-} battery_monitor_functions;
-
-static battery_monitor_functions BatteryMonitor =
-{
-    .getControl = getControl
+    .SetMode             = STCSetMode,
+    .GetMode             = STCGetMode,
+    .SetControl          = STCSetControl,
+    .GetControl          = STCGetControl,
+    .GetIDE              = STCGetIDE,
+    .GetRAM              = STCGetRAM,
+    .GetCharge           = STCGetCharge,
+    .GetCounter          = STCGetCounter,
+    .GetCurrent          = STCGetCurrent,
+    .GetVoltage          = STCGetVoltage,
+    .GetTemperature      = STCGetTemperature,
+    .SetModeEvent        = STCSetModeEvent,
+    .GetModeEvent        = STCGetModeEvent,
+    .SetControlEvent     = STCSetControlEvent,
+    .GetControlEvent     = STCGetControlEvent,
+    .GetIDEvent          = STCGetIDEvent,
+    .GetRAMEvent         = STCGetRAMEvent,
+    .GetChargeEvent      = STCGetChargeEvent,
+    .GetCounterEvent     = STCGetCounterEvent,
+    .GetCurrentEvent     = STCGetCurrentEvent,
+    .GetVoltageEvent     = STCGetVoltageEvent,
+    .GetTemperatureEvent = STCGetTemperatureEvent
 };
 
 #endif /* batterymonitor_h */

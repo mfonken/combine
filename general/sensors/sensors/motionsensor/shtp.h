@@ -12,9 +12,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+
 #include "i2c_template.h"
 #include "sh2.h"
-#include <string.h>
+#include "timestamp.h"
 
 #define SHTP_CLIENT_BUFFER_LEN 100
 
@@ -26,10 +28,50 @@
 #define SHTP_REPORT_STATUS_MASK 0x03
 #define SHTP_FRS_STATUS_MASK 0x0f
 
+//void PushBytesToSHTPClientBufferNext(uint8_t *, uint16_t );
+//void PushAxis3ToSHTPClientBufferNext( axis3_t * );
+//uint8_t * GetSHTPClientBufferNext( shtp_client_buffer * );
+//typedef struct
+//{
+//    void (*Push)(uint8_t *, uint16_t );
+//    void (*PushAxis3)( axis3_t * );
+//    uint8_t *(*GetNext)( shtp_client_buffer *  );
+//} shtp_client_buffer_functions;
+//static shtp_client_buffer_functions SHTPClientBufferFunctions =
+//{
+//    .Push = PushBytesToSHTPClientBufferNext,
+//    .PushAxis3 = PushAxis3ToSHTPClientBufferNext,
+//    .GetNext = GetSHTPClientBufferNext
+//};
+//void PushBytesToSHTPClientBufferNext( uint8_t * data, uint16_t len, shtp_client_buffer * buffer )
+//{
+//    memcpy( SHTPClientBufferFunctions.GetNext(buffer), data, len );
+//    buffer->offset += len;
+//    buffer->length += len;
+//}
+//void PushAxis3ToSHTPClientBufferNext( axis3_t * data, shtp_client_buffer * buffer)
+//{
+//    CopyAxis3ToByteArray( data, SHTPClientBufferFunctions.GetNext(buffer) );
+//    buffer->offset += sizeof(axis3_t);
+//    buffer->length += sizeof(axis3_t);
+//}
+//uint8_t * GetSHTPClientBufferNext( shtp_client_buffer * buffer )
+//{
+//    return (((uint8_t *)&buffer->data) + buffer->offset);
+//}
+
 typedef struct
 {
     uint16_t x, y, z;
+    uint32_t timestamp;
 } axis3_t;
+
+typedef struct
+{
+    uint16_t i, j, k, real;
+    uint32_t timestamp;
+} rotation_vector_t;
+
 typedef enum
 {
     I2C = 0x01,
@@ -48,21 +90,6 @@ typedef struct
     uint16_t offset;
     uint8_t data[SHTP_CLIENT_BUFFER_LEN];
 } shtp_client_buffer;
-void PushBytesToSHTPClientBufferNext(uint8_t *, uint16_t, shtp_client_buffer * );
-void PushAxis3ToSHTPClientBufferNext( axis3_t *, shtp_client_buffer * );
-uint8_t * GetSHTPClientBufferNext( shtp_client_buffer * );
-typedef struct
-{
-    void (*Push)(uint8_t *, uint16_t, shtp_client_buffer * );
-    void (*PushAxis3)( axis3_t *, shtp_client_buffer * );
-    uint8_t *(*GetNext)( shtp_client_buffer *  );
-} shtp_client_buffer_functions;
-static shtp_client_buffer_functions SHTPClientBufferFunctions =
-{
-    .Push = PushBytesToSHTPClientBufferNext,
-    .PushAxis3 = PushAxis3ToSHTPClientBufferNext,
-    .GetNext = GetSHTPClientBufferNext
-};
 
 typedef struct
 {
@@ -79,9 +106,27 @@ typedef struct
 
 typedef struct
 {
+    axis3_t
+        axis3, 
+        bias3;
+    rotation_vector_t
+        rotation_vector;
+    uint16_t
+        accuracy,
+        temperature;
+    uint32_t timestamp;
+    SH2_SENSOR_REPORT_ID type;
+} shtp_client_output;
+
+typedef struct
+{
     shtp_client_header header;
     shtp_client_buffer buffer;
     shtp_client_product_id product;
+    shtp_client_output output;
+    uint8_t
+        ID,
+        sequence_number;
 } shtp_client_t;
 
 static shtp_client_t * active_client;
@@ -146,6 +191,7 @@ typedef struct
 
 static shtp_t local;
 
+void SetSHTPActiveClient( shtp_client_t * client);
 void SetSHTPRotationVector( uint32_t );
 
 void SendSHTPPacket(void);
@@ -157,17 +203,17 @@ void SendSHTPConfigurationFRSWriteRequest(void);
 void SendSHTPConfigurationProductIDRequest(void);
 void SendSHTPFeatureCommand( uint8_t, uint32_t, uint32_t );
 
-void ReceiveSHTPHeader( shtp_packet_header_t * );
-void ReceiveSHTPPacket(void);
+bool ReceiveSHTPHeader( shtp_packet_header_t * );
+bool ReceiveSHTPPacket(void);
 void ParseSHTPControlReport(void);
-void ParseSHTCommandResponse(void);
+void ParseSHTPCommandResponse(void);
 SHTP_EXECUTABLE_RESPONSE ParseSHTPExecutableResponse(void);
 void ParseSHTPControlResponse(void);
 void ParseSHTPInputReport(void);
 void ParseSHTPWakeReport(void);
 void ParseSHTPRotation(void);
  
-void ParseSHTPConfigurationReportCommandResponse(sh2_command_response *, shtp_client_buffer *);
+void ParseSHTPConfigurationReportCommandResponse(sh2_command_response *);
 bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
@@ -179,7 +225,6 @@ static i2c_event_t GetSHTPPacketSendI2CEvent(uint8_t len) { return (i2c_event_t)
 
 typedef struct
 {
-    void (*SetRotationVector)( uint32_t );
     void (*SetActiveClient)( shtp_client_t * );
     void (*SendPacket)(void);
     void (*SendExecutableCommand)(SHTP_EXECUTABLE_COMMAND command);
@@ -190,18 +235,18 @@ typedef struct
     void (*SendConfigurationProductIDRequest)(void);
     void (*SendFeatureCommand)( uint8_t, uint32_t, uint32_t );
     
-    void (*ReceiveHeader)( shtp_packet_header_t * );
-    void (*ReceivePacket)(void);
+    bool (*ReceiveHeader)( shtp_packet_header_t * );
+    bool (*ReceivePacket)(void);
     
     void (*ParseControlReport)(void);
-    void (*ParseSHTPCommandResponse)(void);
+    void (*ParseCommandResponse)(void);
     SHTP_EXECUTABLE_RESPONSE (*ParseExecutableResponse)(void);
     void (*ParseControlResponse)(void);
     void (*ParseInputReport)(void);
     void (*ParseWakeReport)(void);
     void (*ParseRotation)(void);
     
-    void (*ParseConfigurationReportCommandResponse)(sh2_command_response *, shtp_client_buffer *);
+    void (*ParseConfigurationReportCommandResponse)(sh2_command_response *);
     bool (*ParseConfigurationFRSReadResponse)(void);
     bool (*ParseConfigurationFRSWriteResponse)(void);
     void (*ParseConfigurationProductIDResponse)(void);
@@ -212,56 +257,76 @@ typedef struct
     i2c_event_t (*GetPacketSendEvent)(uint8_t);
 } shtp_functions;
 
-static shtp_functions SHTPFunctions =
+static const shtp_functions SHTPFunctions =
 {
-    .SetRotationVector = SetSHTPRotationVector,
+    .SetActiveClient = SetSHTPActiveClient,
     .SendPacket = SendSHTPPacket,
+    .SendExecutableCommand = SendSHTPExecutableCommand,
+    .SendConfigurationReportCommandRequest = SendSHTPConfigurationReportCommandRequest,
+    .SendConfigurationFRSReadRequest = SendSHTPConfigurationFRSReadRequest,
+    .SendConfigurationFRSWriteDataRequest = SendSHTPConfigurationFRSWriteDataRequest,
+    .SendConfigurationFRSWriteRequest = SendSHTPConfigurationFRSWriteRequest,
+    .SendConfigurationProductIDRequest = SendSHTPConfigurationProductIDRequest,
     .SendFeatureCommand = SendSHTPFeatureCommand,
+    
     .ReceiveHeader = ReceiveSHTPHeader,
     .ReceivePacket = ReceiveSHTPPacket,
+    
+    .ParseControlReport = ParseSHTPControlReport,
+    .ParseCommandResponse = ParseSHTPCommandResponse,
+    .ParseExecutableResponse = ParseSHTPExecutableResponse,
+    .ParseControlResponse = ParseSHTPControlResponse,
     .ParseInputReport = ParseSHTPInputReport,
+    .ParseWakeReport = ParseSHTPWakeReport,
+    .ParseRotation = ParseSHTPRotation,
+    
+    .ParseConfigurationReportCommandResponse = ParseSHTPConfigurationReportCommandResponse,
+    .ParseConfigurationFRSReadResponse = ParseSHTPConfigurationFRSReadResponse,
+    .ParseConfigurationFRSWriteResponse = ParseSHTPConfigurationFRSWriteResponse,
+    .ParseConfigurationProductIDResponse = ParseSHTPConfigurationProductIDResponse,
+    
     .GetHeaderReceiveEvent = GetSHTPHeaderReceiveI2CEvent,
     .GetPacketReceiveEvent = GetSHTPPacketReceiveI2CEvent,
     .GetHeaderSendEvent = GetSHTPHeaderSendI2CEvent,
     .GetPacketSendEvent = GetSHTPPacketSendI2CEvent
 };
 
-void ParseAccelerometerReport(sh2_accelerometer_input_report *, shtp_client_buffer * );
-void ParseGyroscopeCalibratedReport(sh2_gyroscope_calibrated_input_report *, shtp_client_buffer * );
-void ParseMagneticFieldCalibratedReport(sh2_magnetic_field_calibrated_input_report *, shtp_client_buffer * );
-void ParseLinearAccelerationReport(sh2_linear_acceleration_input_report *, shtp_client_buffer * );
-void ParseRotationVectorReport(sh2_rotation_vector_input_report *, shtp_client_buffer * );
-void ParseGravityReport(sh2_gravity_input_report *, shtp_client_buffer * );
-void ParseGyroscopeUncalibratedReport(sh2_gyroscope_uncalibrated_input_report *, shtp_client_buffer * );
-void ParseGameRotationVectorReport(sh2_game_rotation_vector_input_report *, shtp_client_buffer * );
-void ParseGeomagneticRotationVectorReport(sh2_geomagnetic_rotation_vector_input_report *, shtp_client_buffer * );
-void ParsePressureReport(sh2_pressure_input_report *, shtp_client_buffer * );
-void ParseAmbientLightReport(sh2_ambient_light_input_report *, shtp_client_buffer * );
-void ParseHumidityReport(sh2_humidity_input_report *, shtp_client_buffer * );
-void ParseProximityReport(sh2_proximity_input_report *, shtp_client_buffer * );
-void ParseTemperatureReport(sh2_temperature_input_report *, shtp_client_buffer * );
-void ParseMagneticFieldUncalibratedReport(sh2_magnetic_field_uncalibrated_input_report *, shtp_client_buffer * );
-void ParseTapDetectorReport(sh2_tap_detector_input_report *, shtp_client_buffer * );
-void ParseStepCounterReport(sh2_step_counter_input_report *, shtp_client_buffer * );
-void ParseSignificantMotionReport(sh2_significant_motion_input_report *, shtp_client_buffer * );
-void ParseStabilityClassifierReport(sh2_stability_classifier_input_report *, shtp_client_buffer * );
-void ParseRawAccelerometerReport(sh2_raw_accelerometer_input_report *, shtp_client_buffer * );
-void ParseRawGyroscopeReport(sh2_raw_gyroscope_input_report *, shtp_client_buffer * );
-void ParseRawMagnetometerReport(sh2_raw_magnetometer_input_report *, shtp_client_buffer * );
-void ParseStepDetectorReport(sh2_step_detector_input_report *, shtp_client_buffer * );
-void ParseShakeDetectorReport(sh2_shake_detector_input_report *, shtp_client_buffer * );
-void ParseFlipDetectorReport(sh2_flip_detector_input_report *, shtp_client_buffer * );
-void ParsePickupDetectorReport(sh2_pickup_detector_input_report *, shtp_client_buffer * );
-void ParseStabilityDetectorReport(sh2_stability_detector_input_report *, shtp_client_buffer * );
-void ParsePersonalActivityClassifierReport(sh2_personal_activity_classifier_input_report *, shtp_client_buffer * );
-void ParseSleepDetectorReport(sh2_sleep_detector_input_report *, shtp_client_buffer * );
-void ParseTiltDetectorReport(sh2_tilt_detector_input_report *, shtp_client_buffer * );
-void ParsePocketDetectorReport(sh2_pocket_detector_input_report *, shtp_client_buffer * );
-void ParseCircleDetectorReport(sh2_circle_detector_input_report *, shtp_client_buffer * );
-void ParseHeartRateMonitorReport(sh2_heart_rate_monitor_input_report *, shtp_client_buffer * );
-void ParseStabilizedRotationVectorReport(sh2_arvr_stabilized_rotation_vector_input_report *, shtp_client_buffer * );
-void ParseStabilizedGameRotationVectorReport(sh2_arvr_stabilized_game_rotation_vector_input_report *, shtp_client_buffer * );
-void ParseGyroIntegratedRotationVectorReport(sh2_gyro_integrated_rotation_vector_input_report *, shtp_client_buffer * );
-void ParseFlushCompletedReport(sh2_sensor_flush *, shtp_client_buffer * );
-void ParseGetFeatureResponseReport( sh2_common_dynamic_feature_report *, shtp_client_buffer * );
+void ParseAccelerometerReport(sh2_accelerometer_input_report * );
+void ParseGyroscopeCalibratedReport(sh2_gyroscope_calibrated_input_report * );
+void ParseMagneticFieldCalibratedReport(sh2_magnetic_field_calibrated_input_report * );
+void ParseLinearAccelerationReport(sh2_linear_acceleration_input_report * );
+void ParseRotationVectorReport(sh2_rotation_vector_input_report * );
+void ParseGravityReport(sh2_gravity_input_report * );
+void ParseGyroscopeUncalibratedReport(sh2_gyroscope_uncalibrated_input_report * );
+void ParseGameRotationVectorReport(sh2_game_rotation_vector_input_report * );
+void ParseGeomagneticRotationVectorReport(sh2_geomagnetic_rotation_vector_input_report * );
+void ParsePressureReport(sh2_pressure_input_report * );
+void ParseAmbientLightReport(sh2_ambient_light_input_report * );
+void ParseHumidityReport(sh2_humidity_input_report * );
+void ParseProximityReport(sh2_proximity_input_report * );
+void ParseTemperatureReport(sh2_temperature_input_report * );
+void ParseMagneticFieldUncalibratedReport(sh2_magnetic_field_uncalibrated_input_report * );
+void ParseTapDetectorReport(sh2_tap_detector_input_report * );
+void ParseStepCounterReport(sh2_step_counter_input_report * );
+void ParseSignificantMotionReport(sh2_significant_motion_input_report * );
+void ParseStabilityClassifierReport(sh2_stability_classifier_input_report * );
+void ParseRawAccelerometerReport(sh2_raw_accelerometer_input_report * );
+void ParseRawGyroscopeReport(sh2_raw_gyroscope_input_report * );
+void ParseRawMagnetometerReport(sh2_raw_magnetometer_input_report * );
+void ParseStepDetectorReport(sh2_step_detector_input_report * );
+void ParseShakeDetectorReport(sh2_shake_detector_input_report * );
+void ParseFlipDetectorReport(sh2_flip_detector_input_report * );
+void ParsePickupDetectorReport(sh2_pickup_detector_input_report * );
+void ParseStabilityDetectorReport(sh2_stability_detector_input_report * );
+void ParsePersonalActivityClassifierReport(sh2_personal_activity_classifier_input_report * );
+void ParseSleepDetectorReport(sh2_sleep_detector_input_report * );
+void ParseTiltDetectorReport(sh2_tilt_detector_input_report * );
+void ParsePocketDetectorReport(sh2_pocket_detector_input_report * );
+void ParseCircleDetectorReport(sh2_circle_detector_input_report * );
+void ParseHeartRateMonitorReport(sh2_heart_rate_monitor_input_report * );
+void ParseStabilizedRotationVectorReport(sh2_arvr_stabilized_rotation_vector_input_report * );
+void ParseStabilizedGameRotationVectorReport(sh2_arvr_stabilized_game_rotation_vector_input_report * );
+void ParseGyroIntegratedRotationVectorReport(sh2_gyro_integrated_rotation_vector_input_report * );
+void ParseFlushCompletedReport(sh2_sensor_flush * );
+void ParseGetFeatureResponseReport( sh2_common_dynamic_feature_report * );
 #endif /* shtp_h */

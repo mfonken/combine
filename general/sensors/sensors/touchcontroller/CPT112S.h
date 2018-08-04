@@ -38,15 +38,15 @@ typedef struct
     uint32_t PADDING    :8;
 } cpt_packet_t;
 
-static i2c_event_t cptGetReadEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT, CPT_ADDR, NO_REG, CPT_PACKET_LEN }; }
+static i2c_event_t CPTGetReadEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT, CPT_ADDR, NO_REG, CPT_PACKET_LEN }; }
 
 typedef struct
 {
-    i2c_event_t (*getReadEvent)(void);
+    i2c_event_t (*GetReadEvent)(void);
 } cpt_functions;
 
 static cpt_functions CPTFunctions =
 {
-    .getReadEvent = cptGetReadEvent
+    .GetReadEvent = CPTGetReadEvent
 };
 #endif /* CPT112S_h */

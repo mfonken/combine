@@ -40,6 +40,8 @@
 		49BC138B210AD04D0032B952 /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
 		49D6E923211138370079D283 /* shtp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shtp.h; sourceTree = "<group>"; };
 		49D6E924211138370079D283 /* shtp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = shtp.c; sourceTree = "<group>"; };
+		49D6E9262113E1DA0079D283 /* timestamp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
+		49D6E9272113E7970079D283 /* global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global.h; sourceTree = "<group>"; };
 		49F1E91D210AD23000A68B37 /* STC3100IQT.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STC3100IQT.h; sourceTree = "<group>"; };
 		49F1E91F210AD23000A68B37 /* batterymonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
 		49F1E926210AD84E00A68B37 /* i2c_template.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = i2c_template.h; sourceTree = "<group>"; };
@@ -106,6 +108,8 @@
 				4935552F210CF02B008FBBCE /* sysiocontroller */,
 				49BC1385210AD04D0032B952 /* touchcontroller */,
 				49F1E926210AD84E00A68B37 /* i2c_template.h */,
+				49D6E9262113E1DA0079D283 /* timestamp.h */,
+				49D6E9272113E7970079D283 /* global.h */,
 			);
 			path = sensors;
 			sourceTree = "<group>";
