@@ -13,6 +13,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "BNO080.h"
+#include "global.h"
+
+#define IMU_DEFAULT_COMM_CHANNEL SYSTEM_COMM_SPI
 
 typedef enum
 {
@@ -30,11 +33,11 @@ typedef struct
     uint32_t sensor_specific_metadata;
 } imu_t;
 
-bool Init_IMU( imu_t *, uint8_t, imu_chip_t );
+bool Init_IMU( imu_t *, uint8_t, system_comm_channel, imu_chip_t );
 
 typedef struct
 {
-    bool (*Init)( imu_t *, uint8_t, imu_chip_t );
+    bool (*Init)( imu_t *, uint8_t, system_comm_channel, imu_chip_t );
     bool (*Start)( shtp_client_t *, imu_feature_t, uint32_t, uint32_t );
     bool (*Stop)( shtp_client_t *, imu_feature_t );
     bool (*Refresh)( shtp_client_t * );

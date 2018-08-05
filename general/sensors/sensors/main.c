@@ -17,10 +17,12 @@ int main(int argc, const char * argv[]) {
     stc_reg_ctrl_t data = BatteryMonitor.GetControl();
     
     imu_t imu;
-    IMUFunctions.Init( &imu, SYSTEM_SENSOR_MOTION_PRIMARY, IMU_CHIP_BNO080 );
+    IMUFunctions.Init( &imu, SYSTEM_SENSOR_MOTION_PRIMARY, IMU_DEFAULT_COMM_CHANNEL, IMU_CHIP_BNO080 );
     IMUFunctions.Start( &imu.client, BNO080_ORIENTATION_OUTPUT_GYRO_ROTATION_VECTOR, 50, 0 );
+    IMUFunctions.Refresh( &imu.client );
     
     printf("Battery monitor control register 0x%02x\n", *(uint8_t*)&data);
     printf("Touch controller read 0x%02x\n", TouchController.Read().index);
+    printf("IMU read 0x%04x\n", imu.rotation.i );
     return 0;
 }

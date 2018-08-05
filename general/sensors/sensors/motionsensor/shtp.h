@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "i2c_template.h"
+#include "global.h"
 #include "sh2.h"
 #include "timestamp.h"
 
@@ -126,7 +126,8 @@ typedef struct
     shtp_client_output output;
     uint8_t
         ID,
-        sequence_number;
+        sequence_number,
+        comm_channel;
 } shtp_client_t;
 
 static shtp_client_t * active_client;
@@ -218,10 +219,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static i2c_event_t GetSHTPHeaderReceiveI2CEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT, active_client->header.address, NO_REG, SHTP_HEADER_LENGTH }; }
-static i2c_event_t GetSHTPPacketReceiveI2CEvent(uint8_t len) { return (i2c_event_t){ I2C_READ_REG_EVENT, active_client->header.address, NO_REG, len }; }
-static i2c_event_t GetSHTPHeaderSendI2CEvent(void) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, active_client->header.address, NO_REG, SHTP_HEADER_LENGTH }; }
-static i2c_event_t GetSHTPPacketSendI2CEvent(uint8_t len) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, active_client->header.address, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderReceiveCommEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketReceiveCommEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderSendCommEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketSendCommEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, len }; }
 
 typedef struct
 {
@@ -251,10 +252,10 @@ typedef struct
     bool (*ParseConfigurationFRSWriteResponse)(void);
     void (*ParseConfigurationProductIDResponse)(void);
     
-    i2c_event_t (*GetHeaderReceiveEvent)(void);
-    i2c_event_t (*GetPacketReceiveEvent)(uint8_t);
-    i2c_event_t (*GetHeaderSendEvent)(void);
-    i2c_event_t (*GetPacketSendEvent)(uint8_t);
+    comm_event_t (*GetHeaderReceiveEvent)(void);
+    comm_event_t (*GetPacketReceiveEvent)(uint8_t);
+    comm_event_t (*GetHeaderSendEvent)(void);
+    comm_event_t (*GetPacketSendEvent)(uint8_t);
 } shtp_functions;
 
 static const shtp_functions SHTPFunctions =
@@ -285,10 +286,10 @@ static const shtp_functions SHTPFunctions =
     .ParseConfigurationFRSWriteResponse = ParseSHTPConfigurationFRSWriteResponse,
     .ParseConfigurationProductIDResponse = ParseSHTPConfigurationProductIDResponse,
     
-    .GetHeaderReceiveEvent = GetSHTPHeaderReceiveI2CEvent,
-    .GetPacketReceiveEvent = GetSHTPPacketReceiveI2CEvent,
-    .GetHeaderSendEvent = GetSHTPHeaderSendI2CEvent,
-    .GetPacketSendEvent = GetSHTPPacketSendI2CEvent
+    .GetHeaderReceiveEvent = GetSHTPHeaderReceiveCommEvent,
+    .GetPacketReceiveEvent = GetSHTPPacketReceiveCommEvent,
+    .GetHeaderSendEvent = GetSHTPHeaderSendCommEvent,
+    .GetPacketSendEvent = GetSHTPPacketSendCommEvent
 };
 
 void ParseAccelerometerReport(sh2_accelerometer_input_report * );

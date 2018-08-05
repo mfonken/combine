@@ -34,9 +34,9 @@
 		4935553A210CFC84008FBBCE /* motionsensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = motionsensor.h; sourceTree = "<group>"; };
 		4935553B210CFC84008FBBCE /* BNO080.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BNO080.c; sourceTree = "<group>"; };
 		4935553E210D047D008FBBCE /* sh2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sh2.h; sourceTree = "<group>"; };
+		49480F322117855A00D3F45A /* spi_template.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spi_template.h; sourceTree = "<group>"; };
 		49BC1366210AD0130032B952 /* sensors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sensors; sourceTree = BUILT_PRODUCTS_DIR; };
 		49BC1369210AD0130032B952 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		49BC1370210AD04C0032B952 /* sensor_data_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_data_types.h; sourceTree = "<group>"; };
 		49BC138B210AD04D0032B952 /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
 		49D6E923211138370079D283 /* shtp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shtp.h; sourceTree = "<group>"; };
 		49D6E924211138370079D283 /* shtp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = shtp.c; sourceTree = "<group>"; };
@@ -82,6 +82,18 @@
 			path = motionsensor;
 			sourceTree = "<group>";
 		};
+		49480F3321178BE500D3F45A /* system */ = {
+			isa = PBXGroup;
+			children = (
+				49F1E926210AD84E00A68B37 /* i2c_template.h */,
+				49480F322117855A00D3F45A /* spi_template.h */,
+				49D6E9262113E1DA0079D283 /* timestamp.h */,
+				49D6E9272113E7970079D283 /* global.h */,
+			);
+			name = system;
+			path = System;
+			sourceTree = "<group>";
+		};
 		49BC135D210AD0130032B952 = {
 			isa = PBXGroup;
 			children = (
@@ -102,14 +114,11 @@
 			isa = PBXGroup;
 			children = (
 				49BC1369210AD0130032B952 /* main.c */,
-				49BC1370210AD04C0032B952 /* sensor_data_types.h */,
 				49F1E920210AD23000A68B37 /* batterymonitor */,
 				49355537210CFC84008FBBCE /* motionsensor */,
 				4935552F210CF02B008FBBCE /* sysiocontroller */,
 				49BC1385210AD04D0032B952 /* touchcontroller */,
-				49F1E926210AD84E00A68B37 /* i2c_template.h */,
-				49D6E9262113E1DA0079D283 /* timestamp.h */,
-				49D6E9272113E7970079D283 /* global.h */,
+				49480F3321178BE500D3F45A /* system */,
 			);
 			path = sensors;
 			sourceTree = "<group>";
