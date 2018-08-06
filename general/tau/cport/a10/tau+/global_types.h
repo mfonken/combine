@@ -65,23 +65,26 @@ extern "C" {
     typedef float global_timestamp_t;
     typedef struct
     {
-        unsigned char ID,
-            includes,
-            timestamp[sizeof(global_timestamp_t)];
-    } GlobalPacketHeader;
+    uint8_t
+        ID,
+        includes,
+        timestamp[sizeof(global_timestamp_t)];
+    } global_packet_header;
     
     typedef struct
     {
-        GlobalPacketHeader header;
-        uint32_t padding;
-        double
-            px,
-            py,
-            sx,
-            sy,
-            pp,
-            sp,
-            ap;
+    global_packet_header
+        header;
+    uint32_t
+        padding;
+    double
+        px,
+        py,
+        sx,
+        sy,
+        pp,
+        sp,
+        ap;
     } GlobalPacket;
     
 #ifdef __cplusplus

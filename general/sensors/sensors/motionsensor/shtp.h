@@ -219,10 +219,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveCommEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketReceiveCommEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, len }; }
-static comm_event_t GetSHTPHeaderSendCommEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketSendCommEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, len }; }
 
 typedef struct
 {
@@ -286,10 +286,10 @@ static const shtp_functions SHTPFunctions =
     .ParseConfigurationFRSWriteResponse = ParseSHTPConfigurationFRSWriteResponse,
     .ParseConfigurationProductIDResponse = ParseSHTPConfigurationProductIDResponse,
     
-    .GetHeaderReceiveEvent = GetSHTPHeaderReceiveCommEvent,
-    .GetPacketReceiveEvent = GetSHTPPacketReceiveCommEvent,
-    .GetHeaderSendEvent = GetSHTPHeaderSendCommEvent,
-    .GetPacketSendEvent = GetSHTPPacketSendCommEvent
+    .GetHeaderReceiveEvent = GetSHTPHeaderReceiveEvent,
+    .GetPacketReceiveEvent = GetSHTPPacketReceiveEvent,
+    .GetHeaderSendEvent = GetSHTPHeaderSendEvent,
+    .GetPacketSendEvent = GetSHTPPacketSendEvent
 };
 
 void ParseAccelerometerReport(sh2_accelerometer_input_report * );
