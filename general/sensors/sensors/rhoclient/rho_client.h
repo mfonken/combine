@@ -12,11 +12,11 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "global.h"
+#include "system_types.h"
 
 #define RHO_DEFAULT_COMM_CHANNEL SYSTEM_COMM_UART
 
-typedef double packet_data_type;
+typedef uint16_t packet_data_type;
 typedef float global_timestamp_t;
 typedef struct
 {
@@ -65,7 +65,6 @@ void ReceiveRhoPacket( rho_t * );
 typedef struct
 {
     void (*Receive)( rho_t * );
-    
     comm_event_t (*GetReceiveEvent)(void);
 } rho_functions;
 

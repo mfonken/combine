@@ -1,5 +1,5 @@
 /* File: sh2.h
- * Author: Matthew Fonken
+ * Author: Matthew Fonken - mfonken@marbl.co
  * Source: https://www.hillcrestlabs.com/download/5a57cc8a566d07c5e0000008
  * Description:
  The SH-2 is Hillcrest’s turnkey sensor hub software solution. The SH-2 connects to various motion and environmental sensors, collects data from them, processes that data and provides the results to a host processor.
