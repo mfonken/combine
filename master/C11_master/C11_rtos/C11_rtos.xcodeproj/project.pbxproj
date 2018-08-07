@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4948103B2117974400D3F45A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948103A2117974400D3F45A /* main.c */; };
+		494810692117975A00D3F45A /* sysiocontroller.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810582117975A00D3F45A /* sysiocontroller.c */; };
+		4948106B2117975A00D3F45A /* motionsensor.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948105C2117975A00D3F45A /* motionsensor.c */; };
+		4948106C2117975A00D3F45A /* shtp.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810612117975A00D3F45A /* shtp.c */; };
+		4948106D2117975A00D3F45A /* BNO080.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810622117975A00D3F45A /* BNO080.c */; };
+		494810802117977B00D3F45A /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810712117977B00D3F45A /* kalman.c */; };
+		494810822117977B00D3F45A /* kinetic.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810762117977B00D3F45A /* kinetic.c */; };
+		494810832117977B00D3F45A /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107A2117977B00D3F45A /* vector.c */; };
+		494810842117977B00D3F45A /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107D2117977B00D3F45A /* point.c */; };
+		494810852117977B00D3F45A /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107F2117977B00D3F45A /* quaternion.c */; };
+		49485D8D2117CC3300D3F45A /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 49485D8C2117CC3300D3F45A /* rho_client.c */; };
+		49C54B2B211914C20072B458 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49C54B2A211914C20072B458 /* systemmanager.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		494810352117974400D3F45A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		494810372117974400D3F45A /* C11_rtos */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = C11_rtos; sourceTree = BUILT_PRODUCTS_DIR; };
+		4948103A2117974400D3F45A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		494810432117975A00D3F45A /* touchcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchcontroller.h; sourceTree = "<group>"; };
+		494810442117975A00D3F45A /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
+		494810532117975A00D3F45A /* i2c_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2c_template.h; sourceTree = "<group>"; };
+		494810542117975A00D3F45A /* global.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global.h; sourceTree = "<group>"; };
+		494810552117975A00D3F45A /* spi_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi_template.h; sourceTree = "<group>"; };
+		494810562117975A00D3F45A /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
+		494810582117975A00D3F45A /* sysiocontroller.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysiocontroller.c; sourceTree = "<group>"; };
+		494810592117975A00D3F45A /* sysiocontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysiocontroller.h; sourceTree = "<group>"; };
+		4948105C2117975A00D3F45A /* motionsensor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = motionsensor.c; sourceTree = "<group>"; };
+		4948105D2117975A00D3F45A /* shtp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shtp.h; sourceTree = "<group>"; };
+		4948105E2117975A00D3F45A /* sh2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sh2.h; sourceTree = "<group>"; };
+		4948105F2117975A00D3F45A /* BNO080.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BNO080.h; sourceTree = "<group>"; };
+		494810602117975A00D3F45A /* motionsensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = motionsensor.h; sourceTree = "<group>"; };
+		494810612117975A00D3F45A /* shtp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = shtp.c; sourceTree = "<group>"; };
+		494810622117975A00D3F45A /* BNO080.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BNO080.c; sourceTree = "<group>"; };
+		494810642117975A00D3F45A /* STC3100IQT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STC3100IQT.h; sourceTree = "<group>"; };
+		494810652117975A00D3F45A /* batterymonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
+		494810702117977B00D3F45A /* kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kalman.h; sourceTree = "<group>"; };
+		494810712117977B00D3F45A /* kalman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kalman.c; sourceTree = "<group>"; };
+		494810722117977B00D3F45A /* kinetic_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kinetic_master.h; sourceTree = "<group>"; };
+		494810762117977B00D3F45A /* kinetic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kinetic.c; sourceTree = "<group>"; };
+		494810772117977B00D3F45A /* kinetic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kinetic.h; sourceTree = "<group>"; };
+		494810792117977B00D3F45A /* point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point.h; sourceTree = "<group>"; };
+		4948107A2117977B00D3F45A /* vector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vector.c; sourceTree = "<group>"; };
+		4948107B2117977B00D3F45A /* quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternion.h; sourceTree = "<group>"; };
+		4948107C2117977B00D3F45A /* qmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qmath.h; sourceTree = "<group>"; };
+		4948107D2117977B00D3F45A /* point.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = point.c; sourceTree = "<group>"; };
+		4948107E2117977B00D3F45A /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		4948107F2117977B00D3F45A /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
+		49485D8B2117CC3300D3F45A /* rho_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
+		49485D8C2117CC3300D3F45A /* rho_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
+		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
+		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
+		49C54B2C211915460072B458 /* system_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = system_types.h; sourceTree = "<group>"; };
+		49C54B2D211915AD0072B458 /* C11_component_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_component_list.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		494810342117974400D3F45A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4948102E2117974300D3F45A = {
+			isa = PBXGroup;
+			children = (
+				494810392117974400D3F45A /* C11_rtos */,
+				494810382117974400D3F45A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		494810382117974400D3F45A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				494810372117974400D3F45A /* C11_rtos */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		494810392117974400D3F45A /* C11_rtos */ = {
+			isa = PBXGroup;
+			children = (
+				4948103A2117974400D3F45A /* main.c */,
+				4948106E2117977B00D3F45A /* kinetic */,
+				494810412117975A00D3F45A /* sensors */,
+			);
+			path = C11_rtos;
+			sourceTree = "<group>";
+		};
+		494810412117975A00D3F45A /* sensors */ = {
+			isa = PBXGroup;
+			children = (
+				49485D8A2117CC3300D3F45A /* rhoclient */,
+				494810422117975A00D3F45A /* touchcontroller */,
+				494810522117975A00D3F45A /* system */,
+				494810572117975A00D3F45A /* sysiocontroller */,
+				4948105B2117975A00D3F45A /* motionsensor */,
+				494810632117975A00D3F45A /* batterymonitor */,
+			);
+			name = sensors;
+			path = ../../../../general/sensors/sensors;
+			sourceTree = "<group>";
+		};
+		494810422117975A00D3F45A /* touchcontroller */ = {
+			isa = PBXGroup;
+			children = (
+				494810442117975A00D3F45A /* CPT112S.h */,
+				494810432117975A00D3F45A /* touchcontroller.h */,
+			);
+			path = touchcontroller;
+			sourceTree = "<group>";
+		};
+		494810522117975A00D3F45A /* system */ = {
+			isa = PBXGroup;
+			children = (
+				494810542117975A00D3F45A /* global.h */,
+				494810532117975A00D3F45A /* i2c_template.h */,
+				494810552117975A00D3F45A /* spi_template.h */,
+				494810562117975A00D3F45A /* timestamp.h */,
+				49C54B29211914C20072B458 /* systemmanager.h */,
+				49C54B2A211914C20072B458 /* systemmanager.c */,
+				49C54B2C211915460072B458 /* system_types.h */,
+				49C54B2D211915AD0072B458 /* C11_component_list.h */,
+			);
+			path = system;
+			sourceTree = "<group>";
+		};
+		494810572117975A00D3F45A /* sysiocontroller */ = {
+			isa = PBXGroup;
+			children = (
+				494810592117975A00D3F45A /* sysiocontroller.h */,
+				494810582117975A00D3F45A /* sysiocontroller.c */,
+			);
+			path = sysiocontroller;
+			sourceTree = "<group>";
+		};
+		4948105B2117975A00D3F45A /* motionsensor */ = {
+			isa = PBXGroup;
+			children = (
+				4948105E2117975A00D3F45A /* sh2.h */,
+				4948105D2117975A00D3F45A /* shtp.h */,
+				494810612117975A00D3F45A /* shtp.c */,
+				4948105F2117975A00D3F45A /* BNO080.h */,
+				494810622117975A00D3F45A /* BNO080.c */,
+				494810602117975A00D3F45A /* motionsensor.h */,
+				4948105C2117975A00D3F45A /* motionsensor.c */,
+			);
+			path = motionsensor;
+			sourceTree = "<group>";
+		};
+		494810632117975A00D3F45A /* batterymonitor */ = {
+			isa = PBXGroup;
+			children = (
+				494810642117975A00D3F45A /* STC3100IQT.h */,
+				494810652117975A00D3F45A /* batterymonitor.h */,
+			);
+			path = batterymonitor;
+			sourceTree = "<group>";
+		};
+		4948106E2117977B00D3F45A /* kinetic */ = {
+			isa = PBXGroup;
+			children = (
+				494810722117977B00D3F45A /* kinetic_master.h */,
+				494810772117977B00D3F45A /* kinetic.h */,
+				494810762117977B00D3F45A /* kinetic.c */,
+				4948106F2117977B00D3F45A /* filters */,
+				494810782117977B00D3F45A /* qmath */,
+			);
+			name = kinetic;
+			path = "../../../../general/tau/cport/a10/tau+/combine_core/kinetic";
+			sourceTree = "<group>";
+		};
+		4948106F2117977B00D3F45A /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				494810702117977B00D3F45A /* kalman.h */,
+				494810712117977B00D3F45A /* kalman.c */,
+			);
+			path = filters;
+			sourceTree = "<group>";
+		};
+		494810782117977B00D3F45A /* qmath */ = {
+			isa = PBXGroup;
+			children = (
+				4948107C2117977B00D3F45A /* qmath.h */,
+				494810792117977B00D3F45A /* point.h */,
+				4948107D2117977B00D3F45A /* point.c */,
+				4948107E2117977B00D3F45A /* vector.h */,
+				4948107A2117977B00D3F45A /* vector.c */,
+				4948107B2117977B00D3F45A /* quaternion.h */,
+				4948107F2117977B00D3F45A /* quaternion.c */,
+			);
+			path = qmath;
+			sourceTree = "<group>";
+		};
+		49485D8A2117CC3300D3F45A /* rhoclient */ = {
+			isa = PBXGroup;
+			children = (
+				49485D8B2117CC3300D3F45A /* rho_client.h */,
+				49485D8C2117CC3300D3F45A /* rho_client.c */,
+			);
+			path = rhoclient;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		494810362117974400D3F45A /* C11_rtos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4948103E2117974400D3F45A /* Build configuration list for PBXNativeTarget "C11_rtos" */;
+			buildPhases = (
+				494810332117974400D3F45A /* Sources */,
+				494810342117974400D3F45A /* Frameworks */,
+				494810352117974400D3F45A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = C11_rtos;
+			productName = C11_rtos;
+			productReference = 494810372117974400D3F45A /* C11_rtos */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4948102F2117974300D3F45A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Marbl;
+				TargetAttributes = {
+					494810362117974400D3F45A = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 494810322117974300D3F45A /* Build configuration list for PBXProject "C11_rtos" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4948102E2117974300D3F45A;
+			productRefGroup = 494810382117974400D3F45A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				494810362117974400D3F45A /* C11_rtos */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		494810332117974400D3F45A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				49C54B2B211914C20072B458 /* systemmanager.c in Sources */,
+				49485D8D2117CC3300D3F45A /* rho_client.c in Sources */,
+				4948106C2117975A00D3F45A /* shtp.c in Sources */,
+				4948103B2117974400D3F45A /* main.c in Sources */,
+				4948106D2117975A00D3F45A /* BNO080.c in Sources */,
+				494810822117977B00D3F45A /* kinetic.c in Sources */,
+				494810842117977B00D3F45A /* point.c in Sources */,
+				494810692117975A00D3F45A /* sysiocontroller.c in Sources */,
+				494810802117977B00D3F45A /* kalman.c in Sources */,
+				494810832117977B00D3F45A /* vector.c in Sources */,
+				4948106B2117975A00D3F45A /* motionsensor.c in Sources */,
+				494810852117977B00D3F45A /* quaternion.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4948103C2117974400D3F45A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4948103D2117974400D3F45A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4948103F2117974400D3F45A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		494810402117974400D3F45A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		494810322117974300D3F45A /* Build configuration list for PBXProject "C11_rtos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4948103C2117974400D3F45A /* Debug */,
+				4948103D2117974400D3F45A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4948103E2117974400D3F45A /* Build configuration list for PBXNativeTarget "C11_rtos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4948103F2117974400D3F45A /* Debug */,
+				494810402117974400D3F45A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4948102F2117974300D3F45A /* Project object */;
+}

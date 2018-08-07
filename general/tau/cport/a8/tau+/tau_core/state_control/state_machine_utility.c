@@ -156,7 +156,8 @@ static void update( bayesian_system_t * sys, PredictionPairC * p )
     bool ch[4] = { 0,
                    prob[1] > PROBABILITY_TUNING_THRESHOLD,
                    prob[2] > PROBABILITY_TUNING_THRESHOLD,
-                   prob[3] > PROBABILITY_TUNING_THRESHOLD };
+                   prob[3] > PROBABILITY_TUNING_THRESHOLD
+                 };
     num_selections += ch[1] + ch[2] + ch[3];
 //    ch[0] = ( num_selections > 0 );
 //    for(int i = 0; i < num_selections; i++) prob[i] *= (double)ch[i];

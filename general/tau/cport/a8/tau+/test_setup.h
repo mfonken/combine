@@ -9,7 +9,7 @@
 #ifndef test_setup_h
 #define test_setup_h
 
-#define TITLE_STRING            "Tau+ CPort Alpha v0.7"
+#define TITLE_STRING            "Tau+ CPort Alpha v0.8"
 #define IMAGE_SOURCE_PATH       "noise/dynamic_clouds"
 #define IMAGE_SOURCE_NUM_FRAMES 1
 
@@ -21,7 +21,7 @@
 /* DEBUGGING */
 //#define MAIN_DEBUG
 //#define TAU_DEBUG
-#define RHO_DEBUG
+//#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define IMUT_DEBUG
 

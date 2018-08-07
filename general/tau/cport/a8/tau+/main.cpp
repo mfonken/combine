@@ -49,7 +49,7 @@ int main( int argc, const char * argv[] )
         pthread_mutex_lock(&utility.outframe_mutex);
         drawer.drawDensitiesOnFrame(utility.outframe);
         pthread_mutex_lock(&drawer.drawer_mutex);
-        imshow("Outframe",  drawer.frame);
+        imshow(TITLE_STRING,  drawer.frame);
         pthread_mutex_unlock(&drawer.drawer_mutex);
         pthread_mutex_unlock(&utility.outframe_mutex);
         
