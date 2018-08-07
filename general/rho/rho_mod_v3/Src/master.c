@@ -32,7 +32,6 @@ const uint16_t BUFFER_TX_DEL = (0xabcd),
 /******************************************************************/
 
 /***************************** Memory *****************************/
-
 system_t rho_system = DEFAULT_SYSTEM_INITIALIZATION;
 
 capture_t * CAPTURE_BUFFER 	= svb.capture;
@@ -54,6 +53,7 @@ uint16_t thresh_buffer_size = THRESH_BUFFER_SIZE;
 /******************************************************************/
 
 /*************** Static, Inline, & Extern Functions ***************/
+/*
 extern inline void rho_init(void);
 extern inline void frame_start(void);
 extern inline void frame_end(void);
@@ -61,6 +61,7 @@ extern inline void row_int(void);
 extern inline bool pixel_proc(void);
 extern inline void rho_proc( uint32_t t );
 extern inline void asm_test(void);
+*/
 
 //static FLOAT now( void ) { return (FLOAT)HAL_GetTick()/1000; }
 static void tog( void )
@@ -347,7 +348,7 @@ void spoofFrameProcessor( void )
 	while(svf.uart_dma_busy);
 	zero_memory();
 	spoofPixels();
-	frame_start();
+	//frame_start();
 
 	uint16_t x = 0, y = 0, p = 0, t = 0;
 	for( ; y < CAPTURE_HEIGHT; y++ )
@@ -360,7 +361,7 @@ void spoofFrameProcessor( void )
 		}
 	}
 	thresh_buffer_size = t - CAPTURE_HEIGHT + 1;
-	rho_proc( thresh_buffer_size << 1 );
+	//rho_proc( thresh_buffer_size << 1 );
 }
 
 void frameTx( void )

@@ -1,0 +1,839 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.24.2.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Matthew Fonken, Marbl Limited, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.24.1
+Toolchain Path:  C:\Keil_v5\ARM\ARMCLANG\Bin
+C Compiler:      ArmClang.exe V6.7
+Assembler:       Armasm.exe V6.7
+Linker/Locator:  ArmLink.exe V6.7
+Library Manager: ArmAr.exe V6.7
+Hex Converter:   FromElf.exe V6.7
+CPU DLL:         SARMCM3.DLL V5.24.1
+Dialog DLL:      DCM.DLL V1.16.0.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
+Dialog DLL:      TCM.DLL V1.32.0.0
+ 
+<h2>Project:</h2>
+C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v3\MDK-ARM\rho_mod_v3.uvprojx
+Project File Date:  07/03/2018
+
+<h2>Output:</h2>
+*** Using Compiler 'V6.7', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
+Build target 'rho_mod_v3'
+assembling startup_stm32l432xx.s...
+startup_stm32l432xx.s: warning: startup_stm32l432xx.s: 'assembler' input unused [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-I .\RTE\_rho_mod_v3' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-I C:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-mfloat-abi=hard' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-D __UVISION_VERSION=524' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-D _RTE_' [-Wunused-command-line-argument]
+startup_stm32l432xx.s: warning: argument unused during compilation: '-D STM32L432xx' [-Wunused-command-line-argument]
+startup_stm32l432xx.s(1): warning: A1313W: Missing END directive at end of file
+creating preprocessor file for system_stm32l4xx.c...
+creating preprocessor file for main.c...
+..//Src/system_stm32l4xx.c(108): warning: In file included from...
+../Drivers/CMSIS/Device/ST/STM32L4xx/Include\stm32l4xx.h(238): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling system_stm32l4xx.c...
+creating preprocessor file for stm32l4xx_hal_msp.c...
+../Src/main.c(41): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling main.c...
+creating preprocessor file for stm32l4xx_it.c...
+../Src/stm32l4xx_hal_msp.c(40): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_hal_msp.c...
+../Src/stm32l4xx_it.c(34): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_it.c...
+creating preprocessor file for master.c...
+creating preprocessor file for OV9712.c...
+../Src/master.c(1): warning: In file included from...
+../Src/master.h(4): warning: In file included from...
+../Src/OV9712.h(5): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Src/master.c(229): warning: passing 'char [22]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+        print("Printing predictions ");
+              ^~~~~~~~~~~~~~~~~~~~~~~
+../Src/master.h(47): note: passing argument to parameter 'Buf' here
+void print( const uint8_t* Buf);
+                           ^
+../Src/master.c(467): warning: passing 'char [25]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+    print( "Printing Thresh Buffer\r\n" );
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(470): warning: passing 'char [14]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+    print( "Printing Dx\r\n" );
+           ^~~~~~~~~~~~~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(473): warning: passing 'char [14]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+    print( "Printing Dy\r\n" );
+           ^~~~~~~~~~~~~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(514): warning: passing 'char [3]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+                print( "\r\n" );
+                       ^~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(529): warning: passing 'char [3]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+    print("\r\n");
+          ^~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(540): warning: passing 'char [2]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+        for( ; curr > 0; curr--) print( " " );
+                                        ^~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(541): warning: passing 'char [4]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+        print( "|\r\n" );
+               ^~~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+../Src/master.c(551): warning: passing 'char [22]' to parameter of type 'const uint8_t *' (aka 'const unsigned char *') converts between pointers to integer types with different sign [-Wpointer-sign]
+        print("Printing predictions ");
+              ^~~~~~~~~~~~~~~~~~~~~~~
+../Src/master.c(278): note: passing argument to parameter 'Buf' here
+void print( const uint8_t * Buf )
+                            ^
+9 warnings and 2 errors generated.
+compiling master.c...
+creating preprocessor file for gpio.c...
+../Src/OV9712.c(1): warning: In file included from...
+../Src/OV9712.h(5): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling OV9712.c...
+creating preprocessor file for i2c.c...
+../Src/gpio.c(41): warning: In file included from...
+../Inc\gpio.h(48): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling gpio.c...
+creating preprocessor file for tim.c...
+../Src/i2c.c(41): warning: In file included from...
+../Inc\i2c.h(47): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling i2c.c...
+creating preprocessor file for dma.c...
+../Src/tim.c(41): warning: In file included from...
+../Inc\tim.h(47): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling tim.c...
+creating preprocessor file for usart.c...
+../Src/dma.c(40): warning: In file included from...
+../Inc\dma.h(48): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling dma.c...
+creating preprocessor file for rho_kalman.c...
+../Src/usart.c(41): warning: In file included from...
+../Inc\usart.h(47): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling usart.c...
+creating preprocessor file for rho_utility.c...
+../Src/rho/rho_kalman.c(1): warning: In file included from...
+../Src/rho/rho_kalman.h(9): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling rho_kalman.c...
+creating preprocessor file for state_machine_utility.c...
+../Src/rho/rho_utility.c(9): warning: In file included from...
+../Src/rho/rho_utility.h(16): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling rho_utility.c...
+creating preprocessor file for stm32l4xx_hal_cortex.c...
+../Src/Rho/state_machine_utility.c(9): warning: In file included from...
+../Src/Rho/state_machine_utility.h(15): warning: In file included from...
+../Src/Rho/rho_types.h(12): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling state_machine_utility.c...
+creating preprocessor file for stm32l4xx_hal_uart.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.c(121): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.c(428): error: unknown type name '__weak'
+__weak void HAL_SYSTICK_Callback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_cortex.c(428): error: expected identifier or '('
+__weak void HAL_SYSTICK_Callback(void)
+       ^
+4 errors generated.
+compiling stm32l4xx_hal_cortex.c...
+creating preprocessor file for stm32l4xx_hal_dma.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(102): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(569): error: unknown type name '__weak'
+__weak void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(569): error: expected identifier or '('
+__weak void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(584): error: unknown type name '__weak'
+__weak void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(584): error: expected identifier or '('
+__weak void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1937): error: unknown type name '__weak'
+__weak void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1937): error: expected identifier or '('
+__weak void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1952): error: unknown type name '__weak'
+__weak void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1952): error: expected identifier or '('
+__weak void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1967): error: unknown type name '__weak'
+__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1967): error: expected identifier or '('
+__weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1982): error: unknown type name '__weak'
+__weak void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1982): error: expected identifier or '('
+__weak void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1997): error: unknown type name '__weak'
+__weak void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(1997): error: expected identifier or '('
+__weak void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(2012): error: unknown type name '__weak'
+__weak void HAL_UART_AbortCpltCallback (UART_HandleTypeDef *huart)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(2012): error: expected identifier or '('
+__weak void HAL_UART_AbortCpltCallback (UART_HandleTypeDef *huart)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c(2027): error: unknown type name '__weak'
+__weak void HAL_UART_AbortTransmitCpltCallback (UART_HandleTypeDef *huart)
+^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+compiling stm32l4xx_hal_uart.c...
+creating preprocessor file for stm32l4xx_hal_i2c_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_dma.c(106): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_hal_dma.c...
+creating preprocessor file for stm32l4xx_hal_pwr_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.c(66): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_hal_i2c_ex.c...
+creating preprocessor file for stm32l4xx_hal_tim.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.c(42): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.c(1363): error: unknown type name '__weak'
+__weak void HAL_PWREx_PVM3Callback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.c(1363): error: expected identifier or '('
+__weak void HAL_PWREx_PVM3Callback(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.c(1374): error: unknown type name '__weak'
+__weak void HAL_PWREx_PVM4Callback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr_ex.c(1374): error: expected identifier or '('
+__weak void HAL_PWREx_PVM4Callback(void)
+       ^
+6 errors generated.
+compiling stm32l4xx_hal_pwr_ex.c...
+creating preprocessor file for stm32l4xx_hal.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(127): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(267): error: unknown type name '__weak'
+__weak void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(267): error: expected identifier or '('
+__weak void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(282): error: unknown type name '__weak'
+__weak void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(282): error: expected identifier or '('
+__weak void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(549): error: unknown type name '__weak'
+__weak void HAL_TIM_OC_MspInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(549): error: expected identifier or '('
+__weak void HAL_TIM_OC_MspInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(564): error: unknown type name '__weak'
+__weak void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(564): error: expected identifier or '('
+__weak void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1072): error: unknown type name '__weak'
+__weak void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1072): error: expected identifier or '('
+__weak void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1087): error: unknown type name '__weak'
+__weak void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1087): error: expected identifier or '('
+__weak void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1590): error: unknown type name '__weak'
+__weak void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1590): error: expected identifier or '('
+__weak void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1605): error: unknown type name '__weak'
+__weak void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(1605): error: expected identifier or '('
+__weak void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c(2077): error: unknown type name '__weak'
+__weak void HAL_TIM_OnePulse_MspInit(TIM_HandleTypeDef *htim)
+^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+compiling stm32l4xx_hal_tim.c...
+creating preprocessor file for stm32l4xx_hal_pwr.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(52): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(223): error: unknown type name '__weak'
+__weak void HAL_MspInit(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(223): error: expected identifier or '('
+__weak void HAL_MspInit(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(234): error: unknown type name '__weak'
+__weak void HAL_MspDeInit(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(234): error: expected identifier or '('
+__weak void HAL_MspDeInit(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(257): error: unknown type name '__weak'
+__weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c(257): error: expected ';' after top level declarator
+__weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+                        ^
+                        ;
+8 errors generated.
+compiling stm32l4xx_hal.c...
+creating preprocessor file for stm32l4xx_hal_uart_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr.c(42): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr.c(650): error: unknown type name '__weak'
+__weak void HAL_PWR_PVDCallback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pwr.c(650): error: expected identifier or '('
+__weak void HAL_PWR_PVDCallback(void)
+       ^
+4 errors generated.
+compiling stm32l4xx_hal_pwr.c...
+creating preprocessor file for stm32l4xx_hal_tim_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c(65): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c(271): error: unknown type name '__weak'
+ __weak void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart)
+ ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c(271): error: expected identifier or '('
+ __weak void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart)
+        ^
+4 errors generated.
+compiling stm32l4xx_hal_uart_ex.c...
+creating preprocessor file for stm32l4xx_hal_flash.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(97): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(261): error: unknown type name '__weak'
+__weak void HAL_TIMEx_HallSensor_MspInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(261): error: expected identifier or '('
+__weak void HAL_TIMEx_HallSensor_MspInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(276): error: unknown type name '__weak'
+__weak void HAL_TIMEx_HallSensor_MspDeInit(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(276): error: expected identifier or '('
+__weak void HAL_TIMEx_HallSensor_MspDeInit(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(2133): error: unknown type name '__weak'
+__weak void HAL_TIMEx_CommutationCallback(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(2133): error: expected identifier or '('
+__weak void HAL_TIMEx_CommutationCallback(TIM_HandleTypeDef *htim)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(2148): error: unknown type name '__weak'
+__weak void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef *htim)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c(2148): error: expected identifier or '('
+__weak void HAL_TIMEx_BreakCallback(TIM_HandleTypeDef *htim)
+       ^
+10 errors generated.
+compiling stm32l4xx_hal_tim_ex.c...
+creating preprocessor file for stm32l4xx_hal_flash_ramfunc.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c(106): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c(454): error: unknown type name '__weak'
+__weak void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c(454): error: expected identifier or '('
+__weak void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c(472): error: unknown type name '__weak'
+__weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c(472): error: expected identifier or '('
+__weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
+       ^
+6 errors generated.
+compiling stm32l4xx_hal_flash.c...
+creating preprocessor file for stm32l4xx_hal_dma_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ramfunc.c(66): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ramfunc.c(111): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC HAL_FLASHEx_EnableRunPowerDown(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ramfunc.c(125): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC HAL_FLASHEx_DisableRunPowerDown(void)
+^
+4 errors generated.
+compiling stm32l4xx_hal_flash_ramfunc.c...
+creating preprocessor file for stm32l4xx_hal_i2c.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_dma_ex.c(60): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_hal_dma_ex.c...
+creating preprocessor file for stm32l4xx_hal_rcc_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(242): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(527): error: unknown type name '__weak'
+__weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(527): error: expected identifier or '('
+__weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(543): error: unknown type name '__weak'
+__weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(543): error: expected identifier or '('
+__weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3034): error: unknown type name '__weak'
+__weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3034): error: expected identifier or '('
+__weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3050): error: unknown type name '__weak'
+__weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3050): error: expected identifier or '('
+__weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3065): error: unknown type name '__weak'
+__weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3065): error: expected identifier or '('
+__weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3081): error: unknown type name '__weak'
+__weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3081): error: expected identifier or '('
+__weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3099): error: unknown type name '__weak'
+__weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3099): error: expected identifier or '('
+__weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3117): error: unknown type name '__weak'
+__weak void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3117): error: expected identifier or '('
+__weak void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.c(3133): error: unknown type name '__weak'
+__weak void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
+^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+compiling stm32l4xx_hal_i2c.c...
+creating preprocessor file for stm32l4xx_hal_gpio.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(43): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2453): error: unknown type name '__weak'
+__weak void HAL_RCCEx_LSECSS_Callback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2453): error: expected identifier or '('
+__weak void HAL_RCCEx_LSECSS_Callback(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2876): error: unknown type name '__weak'
+__weak void HAL_RCCEx_CRS_SyncOkCallback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2876): error: expected identifier or '('
+__weak void HAL_RCCEx_CRS_SyncOkCallback(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2887): error: unknown type name '__weak'
+__weak void HAL_RCCEx_CRS_SyncWarnCallback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2887): error: expected identifier or '('
+__weak void HAL_RCCEx_CRS_SyncWarnCallback(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2898): error: unknown type name '__weak'
+__weak void HAL_RCCEx_CRS_ExpectedSyncCallback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2898): error: expected identifier or '('
+__weak void HAL_RCCEx_CRS_ExpectedSyncCallback(void)
+       ^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2914): error: unknown type name '__weak'
+__weak void HAL_RCCEx_CRS_ErrorCallback(uint32_t Error)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c(2914): error: expected identifier or '('
+__weak void HAL_RCCEx_CRS_ErrorCallback(uint32_t Error)
+       ^
+12 errors generated.
+compiling stm32l4xx_hal_rcc_ex.c...
+creating preprocessor file for stm32l4xx_hal_rcc.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c(122): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c(540): error: unknown type name '__weak'
+__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c(540): error: expected identifier or '('
+__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+       ^
+4 errors generated.
+compiling stm32l4xx_hal_gpio.c...
+creating preprocessor file for stm32l4xx_hal_flash_ex.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.c(69): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.c(1552): error: unknown type name '__weak'
+__weak void HAL_RCC_CSSCallback(void)
+^
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc.c(1552): error: expected identifier or '('
+__weak void HAL_RCC_CSSCallback(void)
+       ^
+4 errors generated.
+compiling stm32l4xx_hal_rcc.c...
+../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ex.c(79): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h(46): warning: In file included from...
+../Inc\stm32l4xx_hal_conf.h(284): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h(770): warning: In file included from...
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(99): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_EnableRunPowerDown(void);
+^
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h(100): error: unknown type name '__RAM_FUNC'
+__RAM_FUNC  HAL_FLASHEx_DisableRunPowerDown(void);
+^
+2 errors generated.
+compiling stm32l4xx_hal_flash_ex.c...
+".\rho_mod_v3\rho_mod_v3.axf" - 159 Error(s), 18 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.3.0.pack
+                ARM.CMSIS.5.3.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.1.1
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32L4xx_DFP.2.0.0.pack
+                Keil.STM32L4xx_DFP.2.0.0
+                STMicroelectronics STM32L4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_rho_mod_v3
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32L4xx_DFP\2.0.0\Drivers\CMSIS\Device\ST\STM32L4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.1.1
+Target not created.
+Build Time Elapsed:  00:00:06
+</pre>
+</body>
+</html>

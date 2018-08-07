@@ -1,47 +1,39 @@
-rho_mod_v1\master.o: ..\Src\master.c
-rho_mod_v1\master.o: ..\Src\master.h
-rho_mod_v1\master.o: ..\Src\OV9712.h
-rho_mod_v1\master.o: ..\Src\OV9712_regs.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h
-rho_mod_v1\master.o: ../Inc/stm32l4xx_hal_conf.h
-rho_mod_v1\master.o: ../Inc/main.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l432xx.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Include/core_cm4.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Include/core_cmInstr.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Include/core_cmFunc.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Include/core_cmSimd.h
-rho_mod_v1\master.o: ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/system_stm32l4xx.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h
-rho_mod_v1\master.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
-rho_mod_v1\master.o: ../Inc/stm32l4xx_it.h
-rho_mod_v1\master.o: ..\Src\Rho\rho_utility.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
-rho_mod_v1\master.o: ..\Src\Rho\rho_types.h
-rho_mod_v1\master.o: ..\Src\Rho\rho_kalman.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
-rho_mod_v1\master.o: ..\Src\Rho\state_machine_utility.h
-rho_mod_v1\master.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+./rho_mod_v3/master.o: ../Src/master.c ../Src/master.h ../Src/OV9712.h \
+  ../Src/OV9712_regs.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdint.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal.h \
+  ../Inc\stm32l4xx_hal_conf.h ../Inc/main.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_rcc.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h \
+  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include\stm32l4xx.h \
+  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l432xx.h \
+  ../Drivers/CMSIS/Include\core_cm4.h \
+  ../Drivers/CMSIS/Include/core_cmInstr.h \
+  ../Drivers/CMSIS/Include/cmsis_armcc_V6.h \
+  ../Drivers/CMSIS/Include/core_cmFunc.h \
+  ../Drivers/CMSIS/Include/core_cmSimd.h \
+  ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/system_stm32l4xx.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_gpio.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_dma.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_dma_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_cortex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_flash.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_flash_ramfunc.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_i2c.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_pwr.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_tim.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc\stm32l4xx_hal_uart.h \
+  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
+  ../Inc\stm32l4xx_it.h ../Src/Rho\rho_utility.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\math.h ../Src/Rho/rho_types.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
+  ../Src/Rho/rho_kalman.h ../Src/Rho/state_machine_utility.h \
+  ../Src/printers.h C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h
