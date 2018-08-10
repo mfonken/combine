@@ -21,6 +21,7 @@ void PerformRoutineSubactivities( system_subactivity_t *, uint8_t );
 void PerformSubactivity( system_subactivity_t );
 void PerformSystemRoutine( const system_activity_routine_t * );
 
+void RegisterSystemStateProfile( system_state_t, system_state_profile_t );
 void RegisterSystemState( system_state_t );
 void RegisterSystemAction( system_action_t );
 void RegisterSystemActivity( system_activity_t );

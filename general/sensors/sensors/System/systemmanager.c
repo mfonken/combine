@@ -57,7 +57,10 @@ void PerformSystemRoutine( const system_activity_routine_t * list )
 {
     PerformRoutine( (system_activity_routine_t *)list );
 }
-
+void RegisterSystemStateProfile( system_state_t state, system_state_profile_t state_profile )
+{
+	System.state_profile[state] = state_profile;
+}
 void RegisterSystemState( system_state_t state )
 {
     System.state = state;

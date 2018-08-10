@@ -8,7 +8,7 @@
 
 #include "profilemanager.h"
 
-void InitProfile( sys_profile_t * profile )
+void InitProfile( system_profile_t * profile )
 {
     PerformSystemRoutine( &profile->routines->startup );
     
@@ -16,9 +16,10 @@ void InitProfile( sys_profile_t * profile )
     {
         
     }
+
 }
 
-void InitProfileEntry( sys_profile_entry_t * entry )
+void InitProfileEntry( system_profile_entry_t * entry )
 {
     if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
     {

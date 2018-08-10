@@ -43,15 +43,16 @@ typedef SYSTEM_ACTION system_action_t;
 
 typedef enum
 {
-    SYSTEM_ACTIVITY_IDLE = 0,
-    SYSTEM_ACTIVITY_STARTUP,
-    SYSTEM_ACTIVITY_PROBE_HOST,
-    SYSTEM_ACTIVITY_PROBE_RHO,
-    SYSTEM_ACTIVITY_PROFILE_INIT,
-    SYSTEM_ACTIVITY_TAU_INIT,
-    SYSTEM_ACTIVITY_TAU_STANDARD,
-    SYSTEM_ACTIVITY_TAU_AUGMENTED,
-    SYSTEM_ACTIVITY_TAU_MINIMAL,
+	SYSTEM_ACTIVITY_IDLE = 0,
+	SYSTEM_ACTIVITY_STARTUP,
+	SYSTEM_ACTIVITY_PROBE_HOST,
+	SYSTEM_ACTIVITY_PROBE_RHO,
+	SYSTEM_ACTIVITY_PROFILE_INIT,
+	SYSTEM_ACTIVITY_TAU_INIT,
+	SYSTEM_ACTIVITY_TAU_STANDARD,
+	SYSTEM_ACTIVITY_TAU_AUGMENTED,
+	SYSTEM_ACTIVITY_TAU_MINIMAL,
+	SYSTEM_ACTIVITY_QUEUE_TOUCH_INTERRUPT,
     SYSTEM_ACTIVITY_PROBE_BATTERY_MONITOR,
     SYSTEM_ACTIVITY_PROBE_TIP,
     SYSTEM_ACTIVITY_UPDATE_HAPTIC,
@@ -122,30 +123,22 @@ typedef enum
 } SYSTEM_CONSUMPTION;
 typedef SYSTEM_CONSUMPTION system_consumption_t;
 
-typedef struct
-{
-    system_state_t          state;
-    system_action_t         action;
-    system_activity_t       activity;
-    system_subactivity_t    subactivity;
-    system_error_t          error;
-    system_consumption_t    consumption_level;
-} system_master_t;
 
 typedef struct
 {
     system_activity_t activity;
     uint8_t length;
-    system_subactivity_t subactivities[];
+    system_subactivity_t * subactivities;
 } system_activity_routine_t;
 
 typedef enum
 {
-    SYSTEM_FAMILY_0 = 0, /* Always on */
+    SYSTEM_FAMILY_0 = 1, /* Always on */
     SYSTEM_FAMILY_A,
     SYSTEM_FAMILY_B,
     SYSTEM_FAMILY_C,
-    SYSTEM_FAMILY_D
+    SYSTEM_FAMILY_D,
+	NUM_SYSTEM_FAMILIES
 } SYSTEM_FAMILY;
 
 typedef enum
@@ -246,7 +239,7 @@ typedef enum
     COMPONENT_STATE_INTERRUPT = 0x0a
 } COMPONENT_STATE;
 
-typedef uint8_t sys_family_t;
+typedef uint8_t system_family_t;
 typedef struct
 {
 component_id
@@ -262,7 +255,7 @@ uint8_t
     tied;
 void *
     instance;
-} sys_component_t;
+} system_component_t;
 
 typedef struct
 {
@@ -280,20 +273,7 @@ system_activity_routine_t
     probe_tip,
     update_haptic,
     sleep;
-} sys_routines_t;
-
-typedef struct
-{
-    
-} sys_sensor_profile_t;
-typedef struct
-{
-    
-} sys_driver_profile_t;
-typedef struct
-{
-    
-} sys_behaviour_profile_t;
+} system_routine_t;
 
 typedef enum
 {
@@ -303,14 +283,14 @@ typedef enum
     SYSTEM_PROFILE_ENTRY_STATE_ENABLED,
     SYSTEM_PROFILE_ENTRY_STATE_ACTIVE,
 } SYSTEM_PROFILE_ENTRY_STATE;
-typedef SYSTEM_PROFILE_ENTRY_STATE sys_profile_entry_state;
+typedef SYSTEM_PROFILE_ENTRY_STATE system_profile_entry_state;
 typedef enum
 {
     SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT,
     SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT,
     SYSTEM_PROFILE_ENTRY_DIRECTION_INOUT
 } SYSTEM_PROFILE_ENTRY_DIRECTION;
-typedef SYSTEM_PROFILE_ENTRY_DIRECTION sys_profile_entry_direction;
+typedef SYSTEM_PROFILE_ENTRY_DIRECTION system_profile_entry_direction;
 
 typedef enum
 {
@@ -318,42 +298,82 @@ typedef enum
     SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT,
     SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULE
 } SYSTEM_PROFILE_ENTRY_TYPE;
-typedef SYSTEM_PROFILE_ENTRY_TYPE sys_profile_entry_type;
+typedef SYSTEM_PROFILE_ENTRY_TYPE system_profile_entry_type;
 
 typedef struct
 {
-sys_profile_entry_state
+system_profile_entry_state
     state:3;
-sys_profile_entry_direction
+system_profile_entry_direction
     direction:2;
-sys_profile_entry_type
+system_profile_entry_type
     type:3;
-} sys_profile_header;
+} system_profile_header;
 
 typedef struct
 {
-sys_profile_header
+system_profile_header
     header;
     union
     {
-    uint32_t
-        schedule,
-        interrupt;
+		uint32_t
+			schedule;
+		component_id
+			component_ID,
+			tbd[3];
     } data;
-system_activity_routine_t *
-    routine;
-} sys_profile_entry_t;
+system_activity_t
+	routine_id;
+} system_profile_entry_t;
 
 typedef struct
 {
 uint8_t
     num_entries;
-sys_profile_entry_t *
+system_profile_entry_t *
     entries;
-sys_routines_t *
+system_routine_t *
     routines;
-sys_component_t *
+system_component_t *
     components;
-} sys_profile_t;
+} system_profile_t;
+
+typedef struct
+{
+	uint8_t
+		task_id,
+		num_interrupts,
+		num_sheduled;
+	system_profile_entry_t *
+		interrupt;
+	system_profile_entry_t *
+		scheduled;
+} system_task_shelf_t;
+
+typedef enum
+{
+	SYSTEM_TASK_SHELF_ENTRY_SENSOR_TOUCH_PRIMARY,
+} SYSTEM_TASK_SHELF_ENTRY;
+typedef SYSTEM_TASK_SHELF_ENTRY system_task_shelf_entry_t;
+
+typedef struct
+{
+	uint8_t *
+		families;
+	system_task_shelf_entry_t *
+		tasks;
+} system_state_profile_t;
+
+typedef struct
+{
+	system_state_t          state;
+	system_action_t         action;
+	system_activity_t       activity;
+	system_subactivity_t    subactivity;
+	system_error_t          error;
+	system_consumption_t    consumption_level;
+	system_task_shelf_t		shelf;
+	system_state_profile_t	state_profile[NUM_SYSTEM_STATES];
+} system_master_t;
 
 #endif /* systemtypes_h */

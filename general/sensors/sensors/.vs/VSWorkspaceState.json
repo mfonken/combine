@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\batterymonitor",
+    "\\motionsensor",
+    "\\rhoclient",
+    "\\sysiocontroller",
+    "\\System",
+    "\\touchcontroller"
+  ],
+  "SelectedNode": "\\System\\profilemanager.c",
+  "PreviewInSolutionExplorer": false
+}

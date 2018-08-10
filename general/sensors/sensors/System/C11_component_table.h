@@ -97,7 +97,7 @@
 #define XC9265_STATE        COMPONENT_STATE_OFF
 #define XC9265_COMPONENT  { XC9265_ID, XC9265_FAMILY, XC9265_COMM, XC9265_CHANN, XC9265_ADDR, XC9265_PORT, XC9265_PIN, XC9265_STATE }
 
-static sys_component_t C11_V1_ComponentList[] =
+static system_component_t C11_V1_ComponentList[] =
 {
     BNO080_COMPONENT,
     RHOMOD_COMPONENT,
