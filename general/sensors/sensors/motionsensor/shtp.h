@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "system_types.h"
+#include "systemtypes.h"
 #include "sh2.h"
 #include "timestamp.h"
 

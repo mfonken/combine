@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "system_types.h"
+#include "systemtypes.h"
 
 #define SYSIOCTL_NUM_CS_FAMILY 8
 #define SYSIOCTL_NUM_FAMILIES sizeof(sys_family_t)*8

@@ -12,7 +12,12 @@
 /***********************************************************************************************//**
  *  \brief  Initialize Kinetic Sensors
  **************************************************************************************************/
-static int init( kinetic_t * k, int W, int H, double F, double L )
+static int KineticDefaultInit( void )
+{
+    return KineticFunctions.Init( &Kinetic, CAMERA_WIDTH, CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
+}
+
+static int KineticInit( kinetic_t * k, int W, int H, double F, double L )
 {
     k->W = W;
     k->H = H;
@@ -24,7 +29,7 @@ static int init( kinetic_t * k, int W, int H, double F, double L )
     return 1;
 }
 
-static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
+static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 {
     /* Step 1: Update Pitch (Restricted) */
     double v = k->filters.rotation[0].value;
@@ -55,19 +60,19 @@ static void updateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
     k->values.rotation[2] = k->filters.rotation[2].value;
 }
 
-static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
+static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
 {
     /* Step 1: Calculate Minor Angles */
-    Kinetic.minorAngles( k, A, B );
+    KineticFunctions.MinorAngles( k, A, B );
     
     /* Step 2: Calculate Quaternion Rotations */
-    Kinetic.quaternions( k );
+    KineticFunctions.Quaternions( k );
     
     /* Step 3: Calculate Major Angles */
-    Kinetic.majorAngles( k );
+    KineticFunctions.MajorAngles( k );
     
     /* Step 4: Calculate r vector */
-    Kinetic.r( k );
+    KineticFunctions.R( k );
     
     /* Step 5A: Update position values for tests */
     k->values.position[1] = -k->r.i;
@@ -78,14 +83,14 @@ static void updatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * 
     Kalman.update( &k->filters.position[0],  k->r.j, 0, VELOCITY );
     Kalman.update( &k->filters.position[2],  k->r.k, 0, VELOCITY );
     
-//    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gam*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+//    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;
     
     /* Step 5B: Calculate Non-gravitational Data */
 //    Kinetic.nongrav( k, n );
 }
 
-static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
+static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 {
     KPoint.copy(A, &k->A);
     KPoint.copy(B, &k->B);
@@ -107,7 +112,7 @@ static void minorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
     k->sigmaR = Vector.ang3( &Av, &Bv );
 }
 
-static void quaternions( kinetic_t * k )
+static void KineticQuaternions( kinetic_t * k )
 {
     k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
     k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
@@ -139,18 +144,18 @@ static void quaternions( kinetic_t * k )
 //    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
 }
 
-static void majorAngles( kinetic_t * k )
+static void KineticMajorAngles( kinetic_t * k )
 {
-    Kinetic.chi( k );
-    Kinetic.mu(  k );
-    Kinetic.gam( k );
+    KineticFunctions.Chi( k );
+    KineticFunctions.Mu(  k );
+    KineticFunctions.Gamma( k );
 }
 
 /* Calculation of chi - Secondary angle of inner triangle
  * a - focal length
  * b - length of vec d'
  */
-static int chi( kinetic_t * k )
+static int KineticChi( kinetic_t * k )
 {
     double m, n;
     if( ( fabs( k->sigmaA ) != M_PI_2 ) && ( k->d__l > 0 ) )
@@ -168,7 +173,7 @@ static int chi( kinetic_t * k )
  * a - quaternion x factor
  * b - quaternion z factor
  */
-static int mu( kinetic_t * k )
+static int KineticMu( kinetic_t * k )
 {
     double m, n, a = k->qc_.x, b = k->qc_.z;
     m = ( a * a ) + ( b * b );
@@ -183,23 +188,23 @@ static int mu( kinetic_t * k )
     return 0;
 }
 
-/* Calculation of gamma */
-static void gam( kinetic_t * k )
+/* Calculation of gammama */
+static void KineticGamma( kinetic_t * k )
 {
-    //OP2B: k->gam = k->chi - k->mu;
-    k->gam = k->chi + k->mu;
+    //OP2B: k->gamma = k->chi - k->mu;
+    k->gamma = k->chi + k->mu;
 }
 
 /* Calculation of r vec length
  * a - sin sigmaR
  * b - d vec real length
  */
-static int r_l( kinetic_t * k )
+static int KineticR_l( kinetic_t * k )
 {
     double m;
     if( fabs(k->sigmaR) < 1 )
     {
-        m = sin( k->gam ) / sin( k->sigmaR );
+        m = sin( k->gamma ) / sin( k->sigmaR );
         k->r_l = m * k->d_l;
         return 1;
     }
@@ -208,15 +213,15 @@ static int r_l( kinetic_t * k )
 }
 
 /* Calculation of r vec */
-static void r( kinetic_t * k )
+static void KineticR( kinetic_t * k )
 {
-    Kinetic.r_l(k);
+    KineticFunctions.R_l(k);
     vec3_t r_u = { 0, k->r_l, 0 };
     Quaternion.rotVec( &r_u, &k->qa, &k->r );
 }
 
 /* Calculation and filtering of nongraviation data */
-static void nongrav( kinetic_t * k, vec3_t * n )
+static void KineticNongrav( kinetic_t * k, vec3_t * n )
 {
     Quaternion.rotVec( n, &k->qd, &k->n );
     
@@ -229,20 +234,21 @@ static void nongrav( kinetic_t * k, vec3_t * n )
     k->values.position[2] = k->filters.position[2].value;
 }
 
-const kinetic Kinetic =
+const kinetic_functions KineticFunctions =
 {
-    .init = init,
-    .updateRotation = updateRotation,
-    .updatePosition = updatePosition,
-    .minorAngles = minorAngles,
-    .quaternions = quaternions,
-    .majorAngles = majorAngles,
-    .chi = chi,
-    .mu = mu,
-    .gam = gam,
-    .r_l = r_l,
-    .r = r,
-    .nongrav = nongrav
+    .DefaultInit = KineticDefaultInit,
+    .Init = KineticInit,
+    .UpdateRotation = KineticUpdateRotation,
+    .UpdatePosition = KineticUpdatePosition,
+    .MinorAngles = KineticMinorAngles,
+    .Quaternions = KineticQuaternions,
+    .MajorAngles = KineticMajorAngles,
+    .Chi = KineticChi,
+    .Mu = KineticMu,
+    .Gamma = KineticGamma,
+    .R_l = KineticR_l,
+    .R = KineticR,
+    .Nongrav = KineticNongrav
 };
 
 /***************************************************************************************************

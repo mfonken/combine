@@ -9,7 +9,7 @@
 #ifndef C11_component_table_h
 #define C11_component_table_h
 
-#include "system_types.h"
+#include "systemtypes.h"
 
 /* Port spoof */
 #define PORT0 0
@@ -90,16 +90,16 @@
 
 /* XC9265 - 1.5v Voltage Regulator */
 #define XC9265_ID         { SYSTEM_COMPONENT_DRIVER, SYSTEM_DRIVER_REGULATOR_1V5 }
-#define XC9265_FAMILY       SYSTEM_FAMILY_B
-#define XC9265_COMM         SYSTEM_COMM_I2C
-#define XC9265_CHANN        SYSTEM_COMM_CHANNEL_PRIMARY
+#define XC9265_FAMILY       SYSTEM_FAMILY_A
+#define XC9265_COMM         SYSTEM_COMM_NONE
+#define XC9265_CHANN        SYSTEM_COMM_CHANNEL_NONE
 #define XC9265_ADDR         0x00
 #define XC9265_PORT         PORTF
 #define XC9265_PIN          0
 #define XC9265_STATE        COMPONENT_STATE_OFF
 #define XC9265_COMPONENT  { XC9265_ID, XC9265_FAMILY, XC9265_COMM, XC9265_CHANN, XC9265_ADDR, XC9265_PORT, XC9265_PIN, XC9265_STATE }
 
-static sys_component_t C11_V1_ComponentList[C11_V1_NUM_COMPONENTS] =
+static sys_component_t _C11_V1_component_list_[C11_V1_NUM_COMPONENTS] =
 {
     BNO080_COMPONENT,
     RHOMOD_COMPONENT,

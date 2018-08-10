@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "system_types.h"
+#include "systemtypes.h"
 
 #define RHO_DEFAULT_COMM_CHANNEL SYSTEM_COMM_UART
 

@@ -10,6 +10,8 @@
 
 #include "C11_component_list.h"
 
+#include "systemmanager.h"
+
 #include "batterymonitor.h"
 #include "touchcontroller.h"
 #include "motionsensor.h"
@@ -19,7 +21,7 @@
 
 int main(int argc, const char * argv[])
 {
-    SysIOCtlFunctions.Init( C11_V1_ComponentList, C11_V1_NUM_COMPONENTS );
+    PerformSystemList( &_C11_V1_startup_list );
     
     imu_t imu;
     IMUFunctions.Init( &imu, SYSTEM_SENSOR_MOTION_PRIMARY, IMU_DEFAULT_COMM_CHANNEL, IMU_CHIP_BNO080 );

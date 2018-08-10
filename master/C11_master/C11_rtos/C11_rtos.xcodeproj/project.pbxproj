@@ -19,6 +19,7 @@
 		494810852117977B00D3F45A /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107F2117977B00D3F45A /* quaternion.c */; };
 		49485D8D2117CC3300D3F45A /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 49485D8C2117CC3300D3F45A /* rho_client.c */; };
 		49C54B2B211914C20072B458 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49C54B2A211914C20072B458 /* systemmanager.c */; };
+		49F0AA2D211D2515005E1D9E /* profilemanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49F0AA2C211D2515005E1D9E /* profilemanager.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,10 +68,15 @@
 		4948107F2117977B00D3F45A /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		49485D8B2117CC3300D3F45A /* rho_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49485D8C2117CC3300D3F45A /* rho_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
+		498E8F68211A7027008F3660 /* C11_system_routines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_system_routines.h; sourceTree = "<group>"; };
+		498E8F69211A77F6008F3660 /* systembridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
 		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
 		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
-		49C54B2C211915460072B458 /* system_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = system_types.h; sourceTree = "<group>"; };
+		49C54B2C211915460072B458 /* systemtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
 		49C54B2D211915AD0072B458 /* C11_component_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_component_list.h; sourceTree = "<group>"; };
+		49F0AA2A211D19CC005E1D9E /* C11_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_profile.h; sourceTree = "<group>"; };
+		49F0AA2B211D2515005E1D9E /* profilemanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = profilemanager.h; path = ../System/profilemanager.h; sourceTree = "<group>"; };
+		49F0AA2C211D2515005E1D9E /* profilemanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = profilemanager.c; path = ../System/profilemanager.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +109,9 @@
 		494810392117974400D3F45A /* C11_rtos */ = {
 			isa = PBXGroup;
 			children = (
+				49C54B2D211915AD0072B458 /* C11_component_list.h */,
+				498E8F68211A7027008F3660 /* C11_system_routines.h */,
+				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				4948103A2117974400D3F45A /* main.c */,
 				4948106E2117977B00D3F45A /* kinetic */,
 				494810412117975A00D3F45A /* sensors */,
@@ -142,8 +151,10 @@
 				494810562117975A00D3F45A /* timestamp.h */,
 				49C54B29211914C20072B458 /* systemmanager.h */,
 				49C54B2A211914C20072B458 /* systemmanager.c */,
-				49C54B2C211915460072B458 /* system_types.h */,
-				49C54B2D211915AD0072B458 /* C11_component_list.h */,
+				49F0AA2B211D2515005E1D9E /* profilemanager.h */,
+				49F0AA2C211D2515005E1D9E /* profilemanager.c */,
+				498E8F69211A77F6008F3660 /* systembridge.h */,
+				49C54B2C211915460072B458 /* systemtypes.h */,
 			);
 			path = system;
 			sourceTree = "<group>";
@@ -294,6 +305,7 @@
 				494810832117977B00D3F45A /* vector.c in Sources */,
 				4948106B2117975A00D3F45A /* motionsensor.c in Sources */,
 				494810852117977B00D3F45A /* quaternion.c in Sources */,
+				49F0AA2D211D2515005E1D9E /* profilemanager.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
