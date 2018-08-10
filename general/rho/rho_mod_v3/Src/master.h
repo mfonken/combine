@@ -47,13 +47,4 @@ void UART_Clear( void );
 void print( const uint8_t* Buf);
 void printPredictionPair( prediction_pair_t * pr );
 
-static void printc(uint8_t* Buf)
-{
-	uint16_t Len = 0;
-	uint8_t c = 0xff;
-	for( ; c != '\0'; c = Buf[Len++] ) ITM_SendChar(c);
-}
-
-extern rho_utility Rho;
-
 #endif

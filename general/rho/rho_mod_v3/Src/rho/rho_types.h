@@ -13,18 +13,7 @@
 #include <stdbool.h>
 #include "rho_kalman.h"
 
-#define USE_SHORTHAND_TYPES
-
-#ifdef USE_SHORTHAND_TYPES
-typedef uint8_t   uh;
-typedef uint16_t  uw;
-typedef uint32_t  ul;
-typedef int8_t    sh;
-typedef int16_t   sw;
-typedef int32_t   sl;
-#endif
-
-typedef float 		FLOAT;
+typedef double 		FLOAT;
 typedef uint8_t		byte_t;
 typedef uint16_t	index_t;
 typedef uint8_t 	capture_t;
@@ -37,10 +26,10 @@ typedef FLOAT     timestamp_t;
 #define CAMERA_WIDTH 	(1280)
 #define CAMERA_HEIGHT	(800)
 
-//#define DYNAMIC_BUFFER
+#define DYNAMIC_BUFFER
 
 /* Capture Config */
-#define CAPTURE_DIV			2
+#define CAPTURE_DIV			4
 #define CAPTURE_WIDTH 	(CAMERA_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT	(CAMERA_HEIGHT>>CAPTURE_DIV)
 #define FRAME_SIZE 			(CAPTURE_WIDTH*CAPTURE_HEIGHT)

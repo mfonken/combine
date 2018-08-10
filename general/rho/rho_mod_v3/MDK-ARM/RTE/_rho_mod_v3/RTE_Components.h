@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'rho_mod_v1' 
+ * Project: 'rho_mod_v3' 
  * Target:  'rho_mod_v3' 
  */
 

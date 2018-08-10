@@ -1,6 +1,12 @@
+<<<<<<< HEAD
+Configuration	rho_mod_v3
+STM32CubeMX 	4.25.0
+Date	07/03/2018
+=======
 Configuration	rho_mod_v1
 STM32CubeMX 	4.25.0
 Date	04/15/2018
+>>>>>>> master
 MCU	STM32L432KBUx
 
 
@@ -12,18 +18,31 @@ RCC	Crystal/Ceramic Resonator	RCC_OSC32_IN	PC14-OSC32_IN (PC14)
 RCC	Crystal/Ceramic Resonator	RCC_OSC32_OUT	PC15-OSC32_OUT (PC15)
 RCC	Clock-out	RCC_MCO	PA8
 SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+<<<<<<< HEAD
+TIM2	Combined Reset Trigger Mode	TIM2_VS_ControllerModeCombinedResetTrigger	VP_TIM2_VS_ControllerModeCombinedResetTrigger
+TIM2	TI2FP2	TIM2_CH2	PB3 (JTDO-TRACESWO)
+TIM2	Input Capture direct mode	TIM2_CH2	PB3 (JTDO-TRACESWO)
+USART1	Asynchronous	USART1_RX	PB7
+USART1	Asynchronous	USART1_TX	PB6
+=======
 TIM2	External Clock Mode 1	TIM2_VS_ControllerModeClock	VP_TIM2_VS_ControllerModeClock
 TIM2	TI2FP2	TIM2_CH2	PB3 (JTDO-TRACESWO)
 USART1	Asynchronous	USART1_RX	PB7
 USART1	Asynchronous	USART1_TX	PB6
 USB	Device (FS)	USB_DM	PA11
 USB	Device (FS)	USB_DP	PA12
+>>>>>>> master
 
 
 
 Pin Nb	PINs	FUNCTIONs	LABELs
+<<<<<<< HEAD
+2	PC14-OSC32_IN (PC14)	RCC_OSC32_IN	
+3	PC15-OSC32_OUT (PC15)	RCC_OSC32_OUT	
+=======
 2	PC14-OSC32_IN (PC14)	RCC_OSC32_IN
 3	PC15-OSC32_OUT (PC15)	RCC_OSC32_OUT
+>>>>>>> master
 6	PA0	GPIO_Input	CPI0
 7	PA1	GPIO_Input	CPI1
 8	PA2	GPIO_Input	CPI2
@@ -35,29 +54,49 @@ Pin Nb	PINs	FUNCTIONs	LABELs
 14	PB0	GPIO_EXTI0	VSYNC
 15	PB1	GPIO_EXTI1	HREF
 18	PA8	RCC_MCO	MCLK
+<<<<<<< HEAD
+19	PA9	I2C1_SCL	
+20	PA10	I2C1_SDA	
+=======
 19	PA9	I2C1_SCL
 20	PA10	I2C1_SDA
 21	PA11	USB_DM
 22	PA12	USB_DP
+>>>>>>> master
 25	PA15 (JTDI)	GPIO_Output	CAM_EN
 26	PB3 (JTDO-TRACESWO)	TIM2_CH2	PCLK
 27	PB4 (NJTRST)	GPIO_Output	LED
 28	PB5	GPIO_Output	CAM_#CS
+<<<<<<< HEAD
+29	PB6	USART1_TX	UTX
+30	PB7	USART1_RX	URX
+=======
 29	PB6	USART1_TX
 30	PB7	USART1_RX
+>>>>>>> master
 
 
 
 SOFTWARE PROJECT
 
+<<<<<<< HEAD
+Project Settings : 
+Project Name : rho_mod_v3
+Project Folder : C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v3
+=======
 Project Settings :
 Project Name : rho_mod_v1
 Project Folder : C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho_mod\rho_mod_v1
+>>>>>>> master
 Toolchain / IDE : MDK-ARM V5
 Firmware Package Name and Version : STM32Cube FW_L4 V1.11.0
 
 
+<<<<<<< HEAD
+Code Generation Settings : 
+=======
 Code Generation Settings :
+>>>>>>> master
 STM32Cube Firmware Library Package : Copy all used libraries into the project folder
 Generate peripheral initialization as a pair of '.c/.h' files per peripheral : No
 Backup previously generated files when re-generating : No
@@ -65,5 +104,16 @@ Delete previously generated files when not re-generated : Yes
 Set all free pins as analog (to optimize the power consumption) : No
 
 
+<<<<<<< HEAD
+Toolchains Settings : 
+Compiler Optimizations : Balanced Size/Speed
+
+
+
+
+
+
+=======
 Toolchains Settings :
 Compiler Optimizations : Balanced Size/Speed
+>>>>>>> master

@@ -238,8 +238,6 @@ typedef struct
   system_functions functions;
 } system_t;
 
-extern system_t rho_system;
-
 #define DEFAULT_SYSTEM_INITIALIZATION                               \
 {                                                                   \
   {0}, /* VARIABLES */                                              \
@@ -287,7 +285,7 @@ extern system_t rho_system;
 static void cma( FLOAT new_val, FLOAT *avg, index_t num ) { *avg+=(new_val-*avg)/(FLOAT)(num+1); }
 static void cma_M0_M1( FLOAT v, FLOAT i, FLOAT *m0, FLOAT *m1, index_t * n )
 {FLOAT n_=1/(++(*n));*m0+=(v-*m0)*n_;*m1+=((v*i)-*m1)*n_;}
-static inline void iswap(uw*a,uw*b){uw t=*a;*a=*b;*b=t;}
+static inline void iswap(uint16_t*a,uint16_t*b){uint16_t t=*a;*a=*b;*b=t;}
 
 struct rho_functions
 {
@@ -302,7 +300,7 @@ struct rho_functions
   void (*Generate_Packet)( rho_utility * );
 };
 
-//extern rho_c_utility utility;
+extern system_t rho_system;
 extern const struct rho_functions RhoFunctions;
 extern const density_redistribution_lookup_t rlookup;
 
