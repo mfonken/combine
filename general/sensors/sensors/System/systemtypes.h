@@ -46,19 +46,27 @@ typedef enum
 	SYSTEM_ACTIVITY_IDLE = 0,
 	SYSTEM_ACTIVITY_STARTUP,
 	SYSTEM_ACTIVITY_PROBE_HOST,
+    SYSTEM_ACTIVITY_TRANSMIT_HOST_PACKET,
+    SYSTEM_ACTIVITY_RECEIVE_HOST_PACKET,
+    SYSTEM_ACTIVITY_TRANSMIT_SUB_PACKET,
+    SYSTEM_ACTIVITY_RECEIVE_SUB_PACKET,
 	SYSTEM_ACTIVITY_PROBE_RHO,
+    SYSTEM_ACTIVITY_RECEIVE_RHO_PACKET,
 	SYSTEM_ACTIVITY_PROFILE_INIT,
 	SYSTEM_ACTIVITY_TAU_INIT,
 	SYSTEM_ACTIVITY_TAU_STANDARD,
 	SYSTEM_ACTIVITY_TAU_AUGMENTED,
 	SYSTEM_ACTIVITY_TAU_MINIMAL,
+    SYSTEM_ACTIVITY_QUEUE_MOTION_WAKE,
+    SYSTEM_ACTIVITY_QUEUE_MOTION_INTERRUPT,
 	SYSTEM_ACTIVITY_QUEUE_TOUCH_INTERRUPT,
     SYSTEM_ACTIVITY_PROBE_BATTERY_MONITOR,
     SYSTEM_ACTIVITY_PROBE_TIP,
     SYSTEM_ACTIVITY_UPDATE_HAPTIC,
     SYSTEM_ACTIVITY_SLEEP,
     
-    SYSTEM_ACTIVITY_WAIT_FOR_ACTION
+    SYSTEM_ACTIVITY_WAIT_FOR_ACTION,
+    NUM_SYSTEM_ACTIVITIES,
 } SYSTEM_ACTIVITY;
 typedef SYSTEM_ACTIVITY system_activity_t;
 
@@ -98,9 +106,18 @@ typedef enum
     
     SYSTEM_SUBACTIVITY_HAPTIC_SEND_PACKET,
     
-    SYSTEM_SUBACTIVITY_HANDLE_INTERRUPT,
+    SYSTEM_SUBACTIVITY_WAIT_FOR_WAKE,
+    
+    NUM_SYSTEM_SUBACTIVITIES
 } SYSTEM_SUBACTIVITY;
 typedef SYSTEM_SUBACTIVITY system_subactivity_t;
+
+typedef struct
+{
+    void (*function);
+    uint8_t data;
+} system_subactivity_map_entry_t;
+typedef system_subactivity_map_entry_t* system_subactivity_map_t;
 
 typedef enum
 {
@@ -179,24 +196,6 @@ type:8;
     channel;
 } comm_event_t;
 
-static void performCommEvent( comm_event_t event, uint8_t * data )
-{
-    switch( event.channel )
-    {
-        case SYSTEM_COMM_I2C:
-            performI2CEvent(*(i2c_event_t *)&event, data );
-            break;
-        case SYSTEM_COMM_SPI:
-            performSPIEvent(*(spi_event_t *)&event, data );
-            break;
-        case SYSTEM_COMM_UART:
-            //performUARTEvent(*(uart_event_t *)&event, data );
-            break;
-        default:
-            break;
-    }
-}
-
 typedef enum
 {
     SYSTEM_SENSOR_MOTION_PRIMARY = 0x50,
@@ -213,6 +212,8 @@ typedef enum
 
 typedef enum
 {
+    SYSTEM_DRIVER_BLE_RADIO = 0x30,
+    SYSTEM_DRIVER_SUB_RADIO = 0x40,
     SYSTEM_DRIVER_HAPTIC_PRIMARY = 0x50,
     SYSTEM_DRIVER_HAPTIC_SECONDARY = 0x51,
     SYSTEM_DRIVER_REGULATOR_1V5 = 0x61
@@ -259,21 +260,8 @@ void *
 
 typedef struct
 {
-system_activity_routine_t
-    idle,
-    startup,
-    probe_host,
-    probe_rho,
-    profile_init,
-    tau_init,
-    tau_standard,
-    tau_augmented,
-    tau_minimal,
-    probe_battery_monitor,
-    probe_tip,
-    update_haptic,
-    sleep;
-} system_routine_t;
+    system_activity_routine_t ID[NUM_SYSTEM_ACTIVITIES];
+} system_routine_map_t;
 
 typedef enum
 {
@@ -296,7 +284,7 @@ typedef enum
 {
     SYSTEM_PROFILE_ENTRY_TYPE_NONE = 0,
     SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT,
-    SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULE
+    SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED
 } SYSTEM_PROFILE_ENTRY_TYPE;
 typedef SYSTEM_PROFILE_ENTRY_TYPE system_profile_entry_type;
 
@@ -328,18 +316,6 @@ system_activity_t
 
 typedef struct
 {
-uint8_t
-    num_entries;
-system_profile_entry_t *
-    entries;
-system_routine_t *
-    routines;
-system_component_t *
-    components;
-} system_profile_t;
-
-typedef struct
-{
 	uint8_t
 		task_id,
 		num_interrupts,
@@ -348,32 +324,41 @@ typedef struct
 		interrupt;
 	system_profile_entry_t *
 		scheduled;
-} system_task_shelf_t;
+} system_task_shelf_entry_t;
+typedef system_task_shelf_entry_t* system_task_shelf_t;
 
 typedef enum
 {
-	SYSTEM_TASK_SHELF_ENTRY_SENSOR_TOUCH_PRIMARY,
-} SYSTEM_TASK_SHELF_ENTRY;
-typedef SYSTEM_TASK_SHELF_ENTRY system_task_shelf_entry_t;
+	SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS = 0,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_DRIVER_HAPTIC_PRIMARY_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS
+} SYSTEM_TASK_SHELF_ENTRY_ID;
+typedef SYSTEM_TASK_SHELF_ENTRY_ID system_task_shelf_entry_id_t;
 
 typedef struct
 {
 	uint8_t *
 		families;
-	system_task_shelf_entry_t *
-		tasks;
+	system_task_shelf_entry_id_t *
+		entries;
 } system_state_profile_t;
 
 typedef struct
 {
-	system_state_t          state;
-	system_action_t         action;
-	system_activity_t       activity;
-	system_subactivity_t    subactivity;
-	system_error_t          error;
-	system_consumption_t    consumption_level;
-	system_task_shelf_t		shelf;
-	system_state_profile_t	state_profile[NUM_SYSTEM_STATES];
-} system_master_t;
+system_task_shelf_t
+    shelf;
+system_state_profile_t
+    state_profiles[NUM_SYSTEM_STATES];
+system_routine_map_t
+    routines;
+system_component_t *
+    components;
+} system_profile_t;
 
 #endif /* systemtypes_h */

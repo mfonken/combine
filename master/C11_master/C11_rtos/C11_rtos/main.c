@@ -8,8 +8,6 @@
 
 #include <stdio.h>
 
-#include "C11_component_list.h"
-
 #include "systemmanager.h"
 
 #include "batterymonitor.h"
@@ -21,11 +19,11 @@
 
 int main(int argc, const char * argv[])
 {
-    PerformSystemList( &_C11_V1_startup_list );
+//    PerformSystemList( &_C11_V1_startup_list );
     
     imu_t imu;
     IMUFunctions.Init( &imu, SYSTEM_SENSOR_MOTION_PRIMARY, IMU_DEFAULT_COMM_CHANNEL, IMU_CHIP_BNO080 );
-    SysIOCtlFunctions.Tie( (component_id)BNO080_ID, (void *)&imu );
+//    SysIOCtlFunctions.Tie( (component_id)BNO080_ID, (void *)&imu );
     
 //    imu_t * temp = SysIOCtl.tables.component[SYSTEM_FAMILY_A][0].instance;
     

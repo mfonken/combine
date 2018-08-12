@@ -68,12 +68,10 @@
 		4948107F2117977B00D3F45A /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		49485D8B2117CC3300D3F45A /* rho_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49485D8C2117CC3300D3F45A /* rho_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
-		498E8F68211A7027008F3660 /* C11_system_routines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_system_routines.h; sourceTree = "<group>"; };
 		498E8F69211A77F6008F3660 /* systembridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
 		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
 		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
 		49C54B2C211915460072B458 /* systemtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
-		49C54B2D211915AD0072B458 /* C11_component_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_component_list.h; sourceTree = "<group>"; };
 		49F0AA2A211D19CC005E1D9E /* C11_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_profile.h; sourceTree = "<group>"; };
 		49F0AA2B211D2515005E1D9E /* profilemanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = profilemanager.h; path = ../System/profilemanager.h; sourceTree = "<group>"; };
 		49F0AA2C211D2515005E1D9E /* profilemanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = profilemanager.c; path = ../System/profilemanager.c; sourceTree = "<group>"; };
@@ -109,8 +107,6 @@
 		494810392117974400D3F45A /* C11_rtos */ = {
 			isa = PBXGroup;
 			children = (
-				49C54B2D211915AD0072B458 /* C11_component_list.h */,
-				498E8F68211A7027008F3660 /* C11_system_routines.h */,
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				4948103A2117974400D3F45A /* main.c */,
 				4948106E2117977B00D3F45A /* kinetic */,
@@ -153,8 +149,8 @@
 				49C54B2A211914C20072B458 /* systemmanager.c */,
 				49F0AA2B211D2515005E1D9E /* profilemanager.h */,
 				49F0AA2C211D2515005E1D9E /* profilemanager.c */,
-				498E8F69211A77F6008F3660 /* systembridge.h */,
 				49C54B2C211915460072B458 /* systemtypes.h */,
+				498E8F69211A77F6008F3660 /* systembridge.h */,
 			);
 			path = system;
 			sourceTree = "<group>";

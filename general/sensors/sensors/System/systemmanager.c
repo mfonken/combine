@@ -10,70 +10,63 @@
 
 void InitSystemManager( )
 {
-    InitProfile( &Profile );
 }
 
-void PerformRoutine( system_activity_routine_t * list )
+void PerformSystemManagerRoutine( system_activity_routine_t * list )
 {
     RegisterSystemActivity(list->activity);
     
     uint8_t len = list->length;
-    PerformRoutineSubactivities( list->subactivities, len );
+    SystemFunctions.Perform.Subactivities( list->subactivities, len );
 }
 
-void PerformRoutineSubactivities( system_subactivity_t * subactivities, uint8_t len )
+void PerformSystemManagerRoutineSubactivities( system_subactivity_t * subactivities, uint8_t len )
 {
     for( uint8_t i = 0; i < len; i++ )
     {
         system_subactivity_t subactivity = subactivities[i];
-        PerformSubactivity( subactivity );
+        SystemFunctions.Perform.Subactivity( subactivity );
     }
 }
 
-void PerformSubactivity( system_subactivity_t subactivity )
+void PerformSystemManagerSubactivity( system_subactivity_t subactivity )
 {
-    RegisterSystemSubactivity(subactivity);
-    
-    switch( subactivity )
-    {
-        case SYSTEM_SUBACTIVITY_INIT_COMMUNICATION:
-            break;
-        case SYSTEM_SUBACTIVITY_INIT_COMPONENTS:
-            Bridge.init.components();
-            break;
-        case SYSTEM_SUBACTIVITY_INIT_TAU_CLIENT:
-            break;
-        case SYSTEM_SUBACTIVITY_INIT_KINETIC:
-            Bridge.init.kinetic();
-            break;
-        case SYSTEM_SUBACTIVITY_INIT_CONFIRM:
-            break;
-        default:
-            break;
-    }
+    system_subactivity_map_entry_t entry = System.subactivity_map[subactivity];
+    if( entry.data == NULL ) entry.function();
+    else entry.function(entry.data);
 }
 
-void PerformSystemRoutine( const system_activity_routine_t * list )
+void PerformSystemManagerSystemRoutine( const system_activity_routine_t * list )
 {
-    PerformRoutine( (system_activity_routine_t *)list );
+    SystemFunctions.Perform.Routine( (system_activity_routine_t *)list );
 }
-void RegisterSystemStateProfile( system_state_t state, system_state_profile_t state_profile )
+
+void RegisterSystemManangerSubactivityMap( system_subactivity_map_t * map)
 {
-	System.state_profile[state] = state_profile;
+    System.subactivity_map = map;
 }
-void RegisterSystemState( system_state_t state )
+void RegisterSystemManagerProfile( system_profile_t * profile )
 {
+    System.profile = profile;
+}
+void RegisterSystemManagerSystemStateProfile( system_state_t state, system_state_profile_t state_profile )
+{
+    System.state_profile[state] = state_profile;
+}
+void RegisterSystemManagerSystemState( system_state_t state )
+{
+    SystemFunctions.Enstate.StateProfile( &System.state_profile[state] );
     System.state = state;
 }
-void RegisterSystemAction( system_action_t action )
+void RegisterSystemManagerAction( system_action_t action )
 {
     System.action = action;
 }
-void RegisterSystemActivity( system_activity_t activity )
+void RegisterSystemManagerActivity( system_activity_t activity )
 {
     System.activity = activity;
 }
-void RegisterSystemSubactivity( system_subactivity_t subactivity )
+void RegisterSystemManagerSubactivity( system_subactivity_t subactivity )
 {
     System.subactivity = subactivity;
 }
@@ -81,8 +74,54 @@ void RegisterSystemError( system_error_t error )
 {
     System.error = error;
 }
-void RegisterSystemConsumption( system_consumption_t consumption )
+void RegisterSystemManagerConsumption( system_consumption_t consumption )
 {
     System.consumption_level = consumption;
+}
+
+system_task_shelf_entry_t GetTaskShelfEntryById( system_task_shelf_entry_id_t entry_id )
+{
+    uint8_t num_entries = sizeof(System.shelf) / sizeof(System.shelf[0]);
+    for( uint8_t i = 0; i < num_entries; i++ )
+        if( System.shelf[i].task_id == entry_id ) return System.shelf[i];
+    return System.profile->shelf[0];
+}
+void EnstateSystemManagerTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
+{
+    system_task_shelf_entry_t entry = GetTaskShelfEntryById( entry_id );
+    for( uint8_t i = 0; i < entry.num_interrupts; i++ )
+        entry.interrupt[i].header.state = SYSTEM_PROFILE_ENTRY_STATE_ENABLED;
+    for( uint8_t i = 0; i < entry.num_sheduled; i++ )
+        entry.scheduled[i].header.state = SYSTEM_PROFILE_ENTRY_STATE_ENABLED;
+}
+void EnstateSystemManagerSystemStateProfile( system_state_profile_t * state_profile )
+{
+    /* Enable families */
+    uint8_t num_families = sizeof(state_profile->families) / sizeof( state_profile->families[0] );
+    for( uint8_t i = 0; i < num_families; i++ );
+//        SYSIOCTLFunctions.EnableFamily( &state_profile->families[i] );
+    
+    /* Enable Tasks */
+    uint8_t num_entries = sizeof(state_profile->entries) / sizeof( state_profile->entries[0] );
+    for( uint8_t i = 0; i < num_entries; i++ )
+        SystemFunctions.Enstate.TaskShelfEntry( state_profile->entries[i] );
+}
+
+void PerformSystemManagerCommEvent( comm_event_t event, uint8_t * data )
+{
+    switch( event.channel )
+    {
+        case SYSTEM_COMM_I2C:
+            performI2CEvent(*(i2c_event_t *)&event, data );
+            break;
+        case SYSTEM_COMM_SPI:
+            performSPIEvent(*(spi_event_t *)&event, data );
+            break;
+        case SYSTEM_COMM_UART:
+            //performUARTEvent(*(uart_event_t *)&event, data );
+            break;
+        default:
+            break;
+    }
 }
 

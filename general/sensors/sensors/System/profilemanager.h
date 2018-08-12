@@ -11,9 +11,33 @@
 
 #include <stdio.h>
 
-#include "systemtypes.h"
+#include "systemmanager.h"
 
-void InitProfile( sys_profile_t * );
-void InitProfileEntry( sys_profile_entry_t * );
+void InitProfile( system_profile_t * );
+void InitProfileEntry( system_profile_entry_t * );
+
+void FetchProfile( );
+void PerformProfile( );
+void UpdateProfile( );
+void StoreProfile( );
+
+typedef struct
+{
+    void (*Init)(void);
+    void (*Fetch)(void);
+    void (*Perform)(void);
+    void (*Update)(void);
+    void (*Store)(void);
+} profile_functions;
+
+static profile_functions ProfileFunctions =
+{
+    .Init = InitProfile,
+    .InitEntry = InitProfileEntry,
+    .Fetch = FetchProfile,
+    .Perform = PerformProfile,
+    .Update = UpdateProfile,
+    .Store = StoreProfile
+};
 
 #endif /* profilemanager_h */

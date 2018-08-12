@@ -10,13 +10,16 @@
 
 void InitProfile( system_profile_t * profile )
 {
-    PerformSystemRoutine( &profile->routines->startup );
+//    SystemFunctions
+//    PerformSystemRoutine( &profile->routines[SYSTEM_ACTIVITY_STARTUP]  );
     
-    for( uint8_t i = 0; i < profile->num_entries; i++ )
+    for( uint8_t i = 0; i < NUM_SYSTEM_STATES; i++ )
     {
-        
+//        RegisterSystemStateProfile( i, &profile->state_profiles[i] );
     }
-
+    /* - Register task shelf
+     * -
+     */
 }
 
 void InitProfileEntry( system_profile_entry_t * entry )
@@ -36,7 +39,7 @@ void InitProfileEntry( system_profile_entry_t * entry )
                     break;
             }
                 break;
-            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULE:
+            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
                 switch( entry->header.direction )
             {
                 case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
