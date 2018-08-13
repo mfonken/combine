@@ -7,19 +7,14 @@
 //
 
 #include "profilemanager.h"
+#include "systemmanager.h"
 
 void InitProfile( system_profile_t * profile )
 {
-//    SystemFunctions
-//    PerformSystemRoutine( &profile->routines[SYSTEM_ACTIVITY_STARTUP]  );
-    
+    SystemFunctions.Registers.TaskShelf( &profile->shelf );
     for( uint8_t i = 0; i < NUM_SYSTEM_STATES; i++ )
-    {
-//        RegisterSystemStateProfile( i, &profile->state_profiles[i] );
-    }
-    /* - Register task shelf
-     * -
-     */
+        SystemFunctions.Registers.StateProfile( i, profile->state_profiles[i] );
+    SystemFunctions.Perform.Routine( &profile->routines[SYSTEM_ACTIVITY_STARTUP] );
 }
 
 void InitProfileEntry( system_profile_entry_t * entry )
@@ -54,4 +49,21 @@ void InitProfileEntry( system_profile_entry_t * entry )
                 break;
         }
     }
+}
+
+void FetchProfile(void)
+{
+    
+}
+void PerformProfile(void)
+{
+    
+}
+void UpdateProfile(void)
+{
+    
+}
+void StoreProfile(void)
+{
+    
 }

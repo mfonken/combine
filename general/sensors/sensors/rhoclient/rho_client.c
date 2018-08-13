@@ -10,5 +10,5 @@
 
 void ReceiveRhoPacket( rho_t * rho )
 {
-    performCommEvent(RhoFunctions.GetReceiveEvent(), (uint8_t*)&rho->packet);
+    PerformCommEvent(RhoFunctions.GetReceiveEvent(), (uint8_t*)&rho->packet);
 }

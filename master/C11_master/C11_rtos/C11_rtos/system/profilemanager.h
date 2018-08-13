@@ -10,20 +10,20 @@
 #define profilemanager_h
 
 #include <stdio.h>
-
-#include "systemmanager.h"
+#include "systemtypes.h"
 
 void InitProfile( system_profile_t * );
 void InitProfileEntry( system_profile_entry_t * );
 
-void FetchProfile( );
-void PerformProfile( );
-void UpdateProfile( );
-void StoreProfile( );
+void FetchProfile(void);
+void PerformProfile(void);
+void UpdateProfile(void);
+void StoreProfile(void);
 
 typedef struct
 {
-    void (*Init)(void);
+    void (*Init)( system_profile_t * );
+    void (*InitEntry)( system_profile_entry_t * );
     void (*Fetch)(void);
     void (*Perform)(void);
     void (*Update)(void);

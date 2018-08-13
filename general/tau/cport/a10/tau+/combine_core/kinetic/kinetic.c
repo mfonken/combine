@@ -12,12 +12,12 @@
 /***********************************************************************************************//**
  *  \brief  Initialize Kinetic Sensors
  **************************************************************************************************/
-static int KineticDefaultInit( void )
+void KineticDefaultInit( void )
 {
-    return KineticFunctions.Init( &Kinetic, CAMERA_WIDTH, CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
+    KineticFunctions.Init( &Kinetic, CAMERA_WIDTH, CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
 }
 
-static int KineticInit( kinetic_t * k, int W, int H, double F, double L )
+void KineticInit( kinetic_t * k, int W, int H, double F, double L )
 {
     k->W = W;
     k->H = H;
@@ -26,7 +26,6 @@ static int KineticInit( kinetic_t * k, int W, int H, double F, double L )
     Camera_Rotation_Init(k);
     Reference_Rotation_Init(k);
     Filters_Init(k);
-    return 1;
 }
 
 static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
@@ -234,7 +233,7 @@ static void KineticNongrav( kinetic_t * k, vec3_t * n )
     k->values.position[2] = k->filters.position[2].value;
 }
 
-const kinetic_functions KineticFunctions =
+kinetic_functions KineticFunctions =
 {
     .DefaultInit = KineticDefaultInit,
     .Init = KineticInit,

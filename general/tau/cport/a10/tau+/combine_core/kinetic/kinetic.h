@@ -132,8 +132,8 @@ typedef struct _serial_kinetic_t
 
 typedef struct
 {
-    int  (*DefaultInit)(void);
-    int  (*Init)( kinetic_t *, int, int, double, double);
+    void  (*DefaultInit)(void);
+    void  (*Init)( kinetic_t *, int, int, double, double);
     void (*UpdateRotation)( kinetic_t *, ang3_t * , ang3_t *);
     void (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t * , kpoint_t * );
     
@@ -148,7 +148,7 @@ typedef struct
     void (*Nongrav)( kinetic_t *, vec3_t * );
 } kinetic_functions;
 
-extern const kinetic_functions KineticFunctions;
+extern kinetic_functions KineticFunctions;
 
 void Filters_Init( kinetic_t *);
 void Camera_Rotation_Init( kinetic_t *);

@@ -18,6 +18,7 @@
 		494810842117977B00D3F45A /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107D2117977B00D3F45A /* point.c */; };
 		494810852117977B00D3F45A /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107F2117977B00D3F45A /* quaternion.c */; };
 		49485D8D2117CC3300D3F45A /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 49485D8C2117CC3300D3F45A /* rho_client.c */; };
+		49A17FAE211FF6C000F920CE /* systembehavior.c in Sources */ = {isa = PBXBuildFile; fileRef = 49A17FAD211FF6C000F920CE /* systembehavior.c */; };
 		49C54B2B211914C20072B458 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49C54B2A211914C20072B458 /* systemmanager.c */; };
 		49F0AA2D211D2515005E1D9E /* profilemanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49F0AA2C211D2515005E1D9E /* profilemanager.c */; };
 /* End PBXBuildFile section */
@@ -40,7 +41,6 @@
 		494810432117975A00D3F45A /* touchcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchcontroller.h; sourceTree = "<group>"; };
 		494810442117975A00D3F45A /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
 		494810532117975A00D3F45A /* i2c_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2c_template.h; sourceTree = "<group>"; };
-		494810542117975A00D3F45A /* global.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global.h; sourceTree = "<group>"; };
 		494810552117975A00D3F45A /* spi_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi_template.h; sourceTree = "<group>"; };
 		494810562117975A00D3F45A /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
 		494810582117975A00D3F45A /* sysiocontroller.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysiocontroller.c; sourceTree = "<group>"; };
@@ -69,6 +69,8 @@
 		49485D8B2117CC3300D3F45A /* rho_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49485D8C2117CC3300D3F45A /* rho_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
 		498E8F69211A77F6008F3660 /* systembridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
+		49A17FAC211FF6C000F920CE /* systembehavior.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembehavior.h; sourceTree = "<group>"; };
+		49A17FAD211FF6C000F920CE /* systembehavior.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = systembehavior.c; sourceTree = "<group>"; };
 		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
 		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
 		49C54B2C211915460072B458 /* systemtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				4948103A2117974400D3F45A /* main.c */,
 				4948106E2117977B00D3F45A /* kinetic */,
+				494810522117975A00D3F45A /* system */,
 				494810412117975A00D3F45A /* sensors */,
 			);
 			path = C11_rtos;
@@ -120,10 +123,9 @@
 			children = (
 				49485D8A2117CC3300D3F45A /* rhoclient */,
 				494810422117975A00D3F45A /* touchcontroller */,
-				494810522117975A00D3F45A /* system */,
-				494810572117975A00D3F45A /* sysiocontroller */,
 				4948105B2117975A00D3F45A /* motionsensor */,
 				494810632117975A00D3F45A /* batterymonitor */,
+				494810572117975A00D3F45A /* sysiocontroller */,
 			);
 			name = sensors;
 			path = ../../../../general/sensors/sensors;
@@ -141,12 +143,10 @@
 		494810522117975A00D3F45A /* system */ = {
 			isa = PBXGroup;
 			children = (
-				494810542117975A00D3F45A /* global.h */,
-				494810532117975A00D3F45A /* i2c_template.h */,
-				494810552117975A00D3F45A /* spi_template.h */,
-				494810562117975A00D3F45A /* timestamp.h */,
 				49C54B29211914C20072B458 /* systemmanager.h */,
 				49C54B2A211914C20072B458 /* systemmanager.c */,
+				49A17FAC211FF6C000F920CE /* systembehavior.h */,
+				49A17FAD211FF6C000F920CE /* systembehavior.c */,
 				49F0AA2B211D2515005E1D9E /* profilemanager.h */,
 				49F0AA2C211D2515005E1D9E /* profilemanager.c */,
 				49C54B2C211915460072B458 /* systemtypes.h */,
@@ -158,6 +158,9 @@
 		494810572117975A00D3F45A /* sysiocontroller */ = {
 			isa = PBXGroup;
 			children = (
+				494810562117975A00D3F45A /* timestamp.h */,
+				494810532117975A00D3F45A /* i2c_template.h */,
+				494810552117975A00D3F45A /* spi_template.h */,
 				494810592117975A00D3F45A /* sysiocontroller.h */,
 				494810582117975A00D3F45A /* sysiocontroller.c */,
 			);
@@ -293,6 +296,7 @@
 				49485D8D2117CC3300D3F45A /* rho_client.c in Sources */,
 				4948106C2117975A00D3F45A /* shtp.c in Sources */,
 				4948103B2117974400D3F45A /* main.c in Sources */,
+				49A17FAE211FF6C000F920CE /* systembehavior.c in Sources */,
 				4948106D2117975A00D3F45A /* BNO080.c in Sources */,
 				494810822117977B00D3F45A /* kinetic.c in Sources */,
 				494810842117977B00D3F45A /* point.c in Sources */,

@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include "systemtypes.h"
+#include "global.h"
 
 #define RHO_DEFAULT_COMM_CHANNEL SYSTEM_COMM_UART
 
@@ -68,7 +69,7 @@ typedef struct
     comm_event_t (*GetReceiveEvent)(void);
 } rho_functions;
 
-static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ RHO_DEFAULT_COMM_CHANNEL, SYSTEM_COMM_READ_REG, NO_REG, sizeof(rho_packet) }; }
+static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ SYSTEM_COMM_READ_REG, NO_REG, sizeof(rho_packet), RHO_DEFAULT_COMM_CHANNEL }; }
 
 static rho_functions RhoFunctions =
 {

@@ -20,10 +20,10 @@ typedef struct
     system_subactivity_t    subactivity;
     system_error_t          error;
     system_consumption_t    consumption_level;
-    system_task_shelf_t     shelf;
-    system_state_profile_t *state_profile;
+    system_task_shelf_t    *shelf;
+    system_state_profile_t  state_profile[NUM_SYSTEM_STATES];
     system_profile_t       *profile;
-    system_subactivity_map_t *subactivity_map;
+    system_subactivity_map_t subactivity_map;
 } system_master_t;
 static system_master_t System;
 
@@ -33,7 +33,8 @@ void PerformSystemManagerRoutine( system_activity_routine_t * );
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t *, uint8_t );
 void PerformSystemManagerSubactivity( system_subactivity_t );
 
-void RegisterSystemManangerSubactivityMap( system_subactivity_map_t * );
+void RegisterSystemManangerTaskShelf( system_task_shelf_t * );
+void RegisterSystemManangerSubactivityMap( system_subactivity_map_t );
 void RegisterSystemManagerProfile( system_profile_t * );
 void RegisterSystemManagerStateProfile( system_state_t, system_state_profile_t );
 void RegisterSystemManagerState( system_state_t );
@@ -51,12 +52,13 @@ void EnstateSystemManagerStateProfile( system_state_profile_t * );
 typedef struct
 {
     void (*Routine)( system_activity_routine_t * );
-    void (*Subactivities)( system_state_t, system_state_profile_t );
+    void (*Subactivities)( system_subactivity_t *, uint8_t );
     void (*Subactivity)( system_subactivity_t );
 } system_perform_functions;
 typedef struct
 {
-    void (*SubactivityMap)( system_subactivity_map_t * );
+    void (*TaskShelf)( system_task_shelf_t * );
+    void (*SubactivityMap)( system_subactivity_map_t );
     void (*Profile)( system_profile_t * );
     void (*StateProfile)( system_state_t, system_state_profile_t );
     void (*State)( system_state_t );
@@ -69,7 +71,7 @@ typedef struct
 typedef struct
 {
     void (*TaskShelfEntry)( system_task_shelf_entry_id_t );
-    void (*StateProfile)( system_subactivity_t );
+    void (*StateProfile)( system_state_profile_t * );
 } system_enstate_functions;
 
 typedef struct
@@ -86,7 +88,8 @@ static system_functions SystemFunctions =
     .Perform.Routine = PerformSystemManagerRoutine,
     .Perform.Subactivities = PerformSystemManagerRoutineSubactivities,
     .Perform.Subactivity = PerformSystemManagerSubactivity,
-    .Register.SubactivityMap = RegisterSystemManangerSubactivityMap,
+    .Registers.TaskShelf = RegisterSystemManangerTaskShelf,
+    .Registers.SubactivityMap = RegisterSystemManangerSubactivityMap,
     .Registers.Profile = RegisterSystemManagerProfile,
     .Registers.StateProfile = RegisterSystemManagerStateProfile,
     .Registers.State = RegisterSystemManagerState,
