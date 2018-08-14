@@ -19,6 +19,8 @@
 		494810852117977B00D3F45A /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948107F2117977B00D3F45A /* quaternion.c */; };
 		49485D8D2117CC3300D3F45A /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 49485D8C2117CC3300D3F45A /* rho_client.c */; };
 		49A17FAE211FF6C000F920CE /* systembehavior.c in Sources */ = {isa = PBXBuildFile; fileRef = 49A17FAD211FF6C000F920CE /* systembehavior.c */; };
+		49BD147021225B15002FDB6A /* communicationmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49BD146F21225B15002FDB6A /* communicationmanager.c */; };
+		49BD147321225BA6002FDB6A /* taumanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49BD147221225BA6002FDB6A /* taumanager.c */; };
 		49C54B2B211914C20072B458 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49C54B2A211914C20072B458 /* systemmanager.c */; };
 		49F0AA2D211D2515005E1D9E /* profilemanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49F0AA2C211D2515005E1D9E /* profilemanager.c */; };
 /* End PBXBuildFile section */
@@ -71,6 +73,10 @@
 		498E8F69211A77F6008F3660 /* systembridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
 		49A17FAC211FF6C000F920CE /* systembehavior.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systembehavior.h; sourceTree = "<group>"; };
 		49A17FAD211FF6C000F920CE /* systembehavior.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = systembehavior.c; sourceTree = "<group>"; };
+		49BD146E21225B15002FDB6A /* communicationmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = communicationmanager.h; sourceTree = "<group>"; };
+		49BD146F21225B15002FDB6A /* communicationmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = communicationmanager.c; sourceTree = "<group>"; };
+		49BD147121225BA6002FDB6A /* taumanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = taumanager.h; sourceTree = "<group>"; };
+		49BD147221225BA6002FDB6A /* taumanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = taumanager.c; sourceTree = "<group>"; };
 		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
 		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
 		49C54B2C211915460072B458 /* systemtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
@@ -149,6 +155,10 @@
 				49A17FAD211FF6C000F920CE /* systembehavior.c */,
 				49F0AA2B211D2515005E1D9E /* profilemanager.h */,
 				49F0AA2C211D2515005E1D9E /* profilemanager.c */,
+				49BD146E21225B15002FDB6A /* communicationmanager.h */,
+				49BD146F21225B15002FDB6A /* communicationmanager.c */,
+				49BD147121225BA6002FDB6A /* taumanager.h */,
+				49BD147221225BA6002FDB6A /* taumanager.c */,
 				49C54B2C211915460072B458 /* systemtypes.h */,
 				498E8F69211A77F6008F3660 /* systembridge.h */,
 			);
@@ -294,6 +304,8 @@
 			files = (
 				49C54B2B211914C20072B458 /* systemmanager.c in Sources */,
 				49485D8D2117CC3300D3F45A /* rho_client.c in Sources */,
+				49BD147321225BA6002FDB6A /* taumanager.c in Sources */,
+				49BD147021225B15002FDB6A /* communicationmanager.c in Sources */,
 				4948106C2117975A00D3F45A /* shtp.c in Sources */,
 				4948103B2117974400D3F45A /* main.c in Sources */,
 				49A17FAE211FF6C000F920CE /* systembehavior.c in Sources */,

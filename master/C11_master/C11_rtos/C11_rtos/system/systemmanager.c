@@ -11,13 +11,11 @@
 void InitSystemManager( )
 {
 }
-
 void PerformSystemManagerRoutine( system_activity_routine_t * list )
 {
     SystemFunctions.Registers.Activity(list->activity);
     SystemFunctions.Perform.Subactivities( list->subactivities, list->length );
 }
-
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t * subactivities, uint8_t len )
 {
     for( uint8_t i = 0; i < len; i++ )
@@ -26,7 +24,6 @@ void PerformSystemManagerRoutineSubactivities( system_subactivity_t * subactivit
         SystemFunctions.Perform.Subactivity( subactivity );
     }
 }
-
 void PerformSystemManagerSubactivity( system_subactivity_t subactivity )
 {
     system_subactivity_map_entry_t entry = System.subactivity_map.entries[subactivity];
@@ -34,7 +31,6 @@ void PerformSystemManagerSubactivity( system_subactivity_t subactivity )
     else if( entry.data.pointer != NULL ) entry.function.pointer(entry.data.pointer);
     else entry.function.byte(entry.data.byte);
 }
-
 void PerformSystemManagerSystemRoutine( const system_activity_routine_t * list )
 {
     SystemFunctions.Perform.Routine( (system_activity_routine_t *)list );

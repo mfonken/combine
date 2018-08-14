@@ -15,6 +15,8 @@
 #include "profilemanager.h"
 #include "sysiocontroller.h"
 #include "kinetic_master.h"
+#include "communicationmanager.h"
+#include "taumanager.h"
 
 static void InitBridge( system_profile_t * profile )
 {
@@ -22,9 +24,9 @@ static void InitBridge( system_profile_t * profile )
     SystemFunctions.Registers.SubactivityMap(
      (system_subactivity_map_t) { {
         { .function.blank = BehaviorFunctions.Perform.SelfCheck, .data.byte = NO_DATA }, /* SELF_CHECK = 0 */
-        { .function.blank = NullFunction, .data.byte = NO_DATA }, /* INIT_COMMUNICATION */
+        { .function.blank = CommFunctions.Init, .data.byte = NO_DATA }, /* INIT_COMMUNICATION */
         { .function.pointer = (void(*)(void *))SysIOCtlFunctions.Init, .data.pointer = Profile.components }, /* INIT_COMPONENTS */
-        { .function.blank = NullFunction, .data.byte = NO_DATA }, /* INIT_TAU_CLIENT */
+        { .function.blank = TauFunctions.Init, .data.byte = NO_DATA }, /* INIT_TAU_CLIENT */
         { .function.blank = KineticFunctions.DefaultInit, .data.byte = NO_DATA }, /* INIT_KINETIC */
         { .function.blank = BehaviorFunctions.Perform.ConfirmInit, .data.byte = NO_DATA }, /* INIT_CONFIRM */
         { .function.byte = (void(*)(uint8_t))BehaviorFunctions.Perform.Probe.Send, SYSTEM_PROBE_ID_HOST }, /* SEND_HOST_PROBE */
