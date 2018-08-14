@@ -8,6 +8,11 @@
 
 #include "systembehavior.h"
 
+void SystemBehaviorTask( )
+{
+    
+}
+
 void PerformBehaviorSelfCheck(void)
 {
 }
