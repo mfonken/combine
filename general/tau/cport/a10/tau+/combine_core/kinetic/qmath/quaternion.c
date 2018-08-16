@@ -109,12 +109,21 @@ void combine(quaternion_t * a, quaternion_t * b, quaternion_t * c )
     c->z = D + (  E - F - G + H ) / 2;
 }
 
+void copy( quaternion_t * a, quaternion_t * b )
+{
+    b->w = a->w;
+    b->x = a->x;
+    b->y = a->y;
+    b->z = a->z;
+}
+
 const struct quaternion Quaternion = {
     .fromEuler = fromEuler,
     .toEuler = toEuler,
     .toMatrix = toMatrix,
     .rotVec = rotVec,
-    .combine = combine
+    .combine = combine,
+    .copy = copy
 };
 
 void radToDeg( ang3_t * a )

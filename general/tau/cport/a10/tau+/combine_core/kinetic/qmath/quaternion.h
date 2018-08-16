@@ -50,6 +50,7 @@ extern "C" {
         void (*toMatrix)(  quaternion_t * q, mat3x3_t     * m );
         void (*rotVec)(    vec3_t       * v, quaternion_t * q, vec3_t       * r );
         void (*combine)(   quaternion_t * a, quaternion_t * b, quaternion_t * c );
+        void (*copy)(      quaternion_t * a, quaternion_t * b );
     };
               
     extern const struct quaternion Quaternion;

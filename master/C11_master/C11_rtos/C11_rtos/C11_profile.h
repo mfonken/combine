@@ -303,7 +303,7 @@ static system_profile_t Profile =
                 SYSTEM_SUBACTIVITY_INIT_COMMUNICATION,
                 SYSTEM_SUBACTIVITY_INIT_COMPONENTS,
                 SYSTEM_SUBACTIVITY_INIT_TAU_CLIENT,
-                SYSTEM_SUBACTIVITY_INIT_KINETIC,
+//                SYSTEM_SUBACTIVITY_INIT_KINETIC,
                 SYSTEM_SUBACTIVITY_INIT_CONFIRM
             }
         },
@@ -334,7 +334,7 @@ static system_profile_t Profile =
             SYSTEM_ACTIVITY_TAU_STANDARD,
             3, {
                 SYSTEM_SUBACTIVITY_TAU_RECEIVE_RHO_PACKET,
-                SYSTEM_SUBACTIVITY_TAU_PERFORM_KINETIC,
+                SYSTEM_SUBACTIVITY_TAU_PERFORM,
                 SYSTEM_SUBACTIVITY_TAU_GENERATE_PACKET
             }
         },
@@ -342,7 +342,7 @@ static system_profile_t Profile =
             SYSTEM_ACTIVITY_TAU_AUGMENTED,
             3, {
                 SYSTEM_SUBACTIVITY_TAU_RECEIVE_RHO_PACKET,
-                SYSTEM_SUBACTIVITY_TAU_PERFORM_KINETIC,
+                SYSTEM_SUBACTIVITY_TAU_PERFORM,
                 SYSTEM_SUBACTIVITY_TAU_GENERATE_PACKET
             }
         },
@@ -350,7 +350,7 @@ static system_profile_t Profile =
             SYSTEM_ACTIVITY_TAU_MINIMAL,
             3, {
                 SYSTEM_SUBACTIVITY_TAU_RECEIVE_RHO_PACKET,
-                SYSTEM_SUBACTIVITY_TAU_PERFORM_KINETIC,
+                SYSTEM_SUBACTIVITY_TAU_PERFORM,
                 SYSTEM_SUBACTIVITY_TAU_GENERATE_PACKET
             }
         },

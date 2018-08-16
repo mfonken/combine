@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "BNO080.h"
-#include "global.h"
 
 #define IMU_DEFAULT_COMM_CHANNEL SYSTEM_COMM_SPI
 

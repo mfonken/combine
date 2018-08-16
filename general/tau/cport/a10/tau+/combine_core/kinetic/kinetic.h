@@ -108,7 +108,8 @@ typedef struct _kinetic_t
     d_l,
     d__l,
     r_l;
-    ang3_t  e;
+    ang3_t  raw,
+            e;
     vec3_t  r,
     n;
     quaternion_t
@@ -132,13 +133,12 @@ typedef struct _serial_kinetic_t
 
 typedef struct
 {
-    void  (*DefaultInit)(void);
+    void  (*DefaultInit)(kinetic_t * );
     void  (*Init)( kinetic_t *, int, int, double, double);
-    void (*UpdateRotation)( kinetic_t *, ang3_t * , ang3_t *);
-    void (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t * , kpoint_t * );
+    void (*UpdatePosition)( kinetic_t *, vec3_t *, quaternion_t *, kpoint_t * , kpoint_t * );
     
     void (*MinorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );
-    void (*Quaternions)( kinetic_t * );
+    void (*Quaternions)( kinetic_t *, quaternion_t * );
     void (*MajorAngles)( kinetic_t * );
     int  (*Chi)( kinetic_t * );
     int  (*Mu)( kinetic_t * );
@@ -154,6 +154,5 @@ void Filters_Init( kinetic_t *);
 void Camera_Rotation_Init( kinetic_t *);
 void Reference_Rotation_Init( kinetic_t *);
 
-static kinetic_t Kinetic;
 #endif /* kinetic_h */
 

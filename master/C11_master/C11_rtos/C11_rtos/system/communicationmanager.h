@@ -24,7 +24,7 @@ typedef struct
     void (*Receive)(comm_packet_t *);
 } comm_functions;
 
-void CommuncationManagerInit(void);
+void CommunicationManagerInit(void);
 void CommunicationManagerTransmit(comm_packet_t *);
 void CommunicationManagerReceive(comm_packet_t *);
 

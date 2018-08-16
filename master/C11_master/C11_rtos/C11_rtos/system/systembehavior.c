@@ -30,17 +30,22 @@ void PerformBehaviorProbeReceive( system_probe_id_t id )
 }
 void PerformBehaviorSchedulerSchedule( system_scheduler_id_t id )
 {
+    //Schedule BehaviorScheduledTasks[id]
 }
 void PerformBehaviorSchedulerDeschedule( system_scheduler_id_t id )
 {
+    //Deschedule BehaviorScheduledTasks[id]
 }
 void PerformBehaviorInterrupterSend( system_interrupter_id_t id )
 {
+    //Enable BehaviorInterruptTasks[id]
 }
 void PerformBehaviorInterrupterReceive( system_interrupter_id_t id )
 {
+    //Handle BehaviorInterruptTasks[id]
 }
 void PerformBehaviorInterrupterPerform( system_interrupter_id_t id )
 {
+    //Disable BehaviorInterruptTasks[id]
 }
 

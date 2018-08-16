@@ -8,15 +8,15 @@
 
 #include "communicationmanager.h"
 
-void CommuncationManagerInit(void)
+void CommunicationManagerInit(void)
 {
     
 }
-void CommunicationManagerTransmit(comm_packet_t *)
+void CommunicationManagerTransmit(comm_packet_t * packet )
 {
     
 }
-void CommunicationManagerReceive(comm_packet_t *)
+void CommunicationManagerReceive( comm_packet_t * packet )
 {
     
 }

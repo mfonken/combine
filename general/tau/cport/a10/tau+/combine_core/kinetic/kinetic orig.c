@@ -28,13 +28,44 @@ void KineticInit( kinetic_t * k, int W, int H, double F, double L )
     Filters_Init(k);
 }
 
-static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, quaternion_t * O, kpoint_t * A, kpoint_t * B )
+static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
+{
+    /* Step 1: Update Pitch (Restricted) */
+    double v = k->filters.rotation[0].value;
+    if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
+        ( e->x >  M_PI_2 && v < -M_PI_2 ) )
+    {
+        k->filters.rotation[0].value = e->x;
+        k->values.rotation[0] = e->x;
+    }
+    else
+    {
+        Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
+        k->values.rotation[0] = k->filters.rotation[0].value;
+    }
+    
+    if ( k->values.rotation[0] > M_PI_2 )
+    {
+        /* Invert rate, so it fits the restricted accelerometer reading */
+        g->x = -g->x;
+    }
+    
+    /* Step 2: Update Roll */
+    Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
+    k->values.rotation[1] = k->filters.rotation[1].value;
+
+    /* Step 3: Update Yaw */
+    Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
+    k->values.rotation[2] = k->filters.rotation[2].value;
+}
+
+static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
     
     /* Step 2: Calculate Quaternion Rotations */
-    KineticFunctions.Quaternions( k, O );
+    KineticFunctions.Quaternions( k );
     
     /* Step 3: Calculate Major Angles */
     KineticFunctions.MajorAngles( k );
@@ -80,10 +111,17 @@ static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
     k->sigmaR = Vector.ang3( &Av, &Bv );
 }
 
-static void KineticQuaternions( kinetic_t * k, quaternion_t * O )
+static void KineticQuaternions( kinetic_t * k )
 {
+    k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
+    k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
+    k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
+    
     /* Get proper device angles from kinetic */
-    Quaternion.copy( O, &k->qd );
+    k->e.x = k->values.rotation[0];
+    k->e.y = k->values.rotation[1];
+    k->e.z = k->values.rotation[2];
+    Quaternion.fromEuler( &k->e, &k->qd );
     
     /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizonatl and vertical angle offset */
     double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
@@ -199,6 +237,7 @@ kinetic_functions KineticFunctions =
 {
     .DefaultInit = KineticDefaultInit,
     .Init = KineticInit,
+    .UpdateRotation = KineticUpdateRotation,
     .UpdatePosition = KineticUpdatePosition,
     .MinorAngles = KineticMinorAngles,
     .Quaternions = KineticQuaternions,

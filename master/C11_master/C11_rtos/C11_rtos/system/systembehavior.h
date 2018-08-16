@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "systemtypes.h"
+#include "taumanager.h"
 
 void PerformBehaviorSelfCheck(void);
 void PerformBehaviorConfirmInit(void);
@@ -51,6 +52,22 @@ static behavior_functions BehaviorFunctions =
     .Perform.Interrupter.Send = PerformBehaviorInterrupterSend,
     .Perform.Interrupter.Receive = PerformBehaviorInterrupterReceive,
     .Perform.Interrupter.Perform = PerformBehaviorInterrupterPerform
+};
+
+static generic_function_t BehaviorScheduledTasks[] =
+{
+    NullFunction, /* SYSTEM_SCHEDULER_ID_NONE = 0 */
+    NullFunction, /* SYSTEM_SCHEDULER_ID_TAU_DATA_TRANFER */
+    TauManagerTick, /* SYSTEM_SCHEDULER_ID_TAU_PERFORM */
+    NullFunction /* SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE */
+};
+
+static generic_function_t BehaviorInterruptTasks[] =
+{
+    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PERFORM */
+    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_RHO_RECEIVE */
+    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE */
+    NullFunction /* SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE */
 };
 
 #endif /* systembehavior_h */
