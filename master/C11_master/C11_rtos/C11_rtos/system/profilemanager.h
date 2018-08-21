@@ -11,9 +11,9 @@
 
 #include <stdio.h>
 #include "systemtypes.h"
+#include "systemmanager.h"
 
 void InitProfile( system_profile_t * );
-void InitProfileEntry( system_profile_entry_t * );
 
 void FetchProfile(void);
 void PerformProfile(void);
@@ -23,7 +23,6 @@ void StoreProfile(void);
 typedef struct
 {
     void (*Init)( system_profile_t * );
-    void (*InitEntry)( system_profile_entry_t * );
     void (*Fetch)(void);
     void (*Perform)(void);
     void (*Update)(void);
@@ -33,7 +32,6 @@ typedef struct
 static profile_functions ProfileFunctions =
 {
     .Init = InitProfile,
-    .InitEntry = InitProfileEntry,
     .Fetch = FetchProfile,
     .Perform = PerformProfile,
     .Update = UpdateProfile,

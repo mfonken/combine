@@ -7,12 +7,12 @@
 //
 
 #include <stdio.h>
-#include "C11_profile.h"
 #include "systembridge.h"
 
 int main(int argc, const char * argv[])
 {
-    InitBridge( &Profile );
+    InitializeMeta();
+    
     
     return 0;
 }

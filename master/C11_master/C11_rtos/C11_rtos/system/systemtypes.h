@@ -18,6 +18,19 @@
 #define UNLOCK 0
 #define LOCK 1
 
+#define MAX_ROUTINES 45
+#define MAX_SUBACTIVITIES_PER_ACTIVITY 20
+#define SYSTEM_COMM_ADDR_NONE 0xff
+#define MAX_TASKS 10
+#define MAX_INTERRUPTS MAX_TASKS/2
+#define MAX_SCHEDULED MAX_TASKS/2
+#define MAX_TASK_SHELF_ENTRIES 20
+#define MAX_STATE_PROFILE_ENTRIES 10
+
+/************************************************************************************/
+/***                               Enums Start                                    ***/
+/************************************************************************************/
+
 typedef enum
 {
     SYSTEM_STATE_STARTUP = 0,
@@ -30,7 +43,6 @@ typedef enum
     SYSTEM_STATE_UNKNOWN,
     NUM_SYSTEM_STATES
 } SYSTEM_STATE;
-typedef SYSTEM_STATE system_state_t;
 
 typedef enum
 {
@@ -38,17 +50,16 @@ typedef enum
     SYSTEM_ACTION_CHANGE_STATE,
     SYSTEM_ACTION_CONNECT_TO_HOST,
     SYSTEM_ACTION_RECONNECT_TO_HOST,
-    SYSTEM_ACTION_PERFORM_TAU,
+    SYSTEM_ACTION_TRIGGER_TAU,
     SYSTEM_ACTION_GO_TO_SLEEP,
     
     SYSTEM_ACTION_REPORT_DATA,
     SYSTEM_ACTION_REPORT_ERROR
 } SYSTEM_ACTION;
-typedef SYSTEM_ACTION system_action_t;
 
 typedef enum
 {
-    SYSTEM_ACTIVITY_IDLE = 0,
+    SYSTEM_ACTIVITY_NONE = 0,
     SYSTEM_ACTIVITY_STARTUP,
     SYSTEM_ACTIVITY_PROBE_HOST,
     SYSTEM_ACTIVITY_TRANSMIT_HOST_PACKET,
@@ -71,13 +82,13 @@ typedef enum
     SYSTEM_ACTIVITY_SLEEP,
     
     SYSTEM_ACTIVITY_WAIT_FOR_ACTION,
-    NUM_SYSTEM_ACTIVITIES,
+    NUM_SYSTEM_ACTIVITIES
 } SYSTEM_ACTIVITY;
-typedef SYSTEM_ACTIVITY system_activity_t;
 
 typedef enum
 {
-    SYSTEM_SUBACTIVITY_SELF_CHECK = 0,
+    SYSTEM_SUBACTIVITY_NONE = 0,
+    SYSTEM_SUBACTIVITY_SELF_CHECK,
     
     SYSTEM_SUBACTIVITY_INIT_COMMUNICATION,
     SYSTEM_SUBACTIVITY_INIT_COMPONENTS,
@@ -114,11 +125,165 @@ typedef enum
     SYSTEM_SUBACTIVITY_HAPTIC_SEND_PACKET,
     
     SYSTEM_SUBACTIVITY_WAIT_FOR_WAKE,
-    
+
     NUM_SYSTEM_SUBACTIVITIES
 } SYSTEM_SUBACTIVITY;
-typedef SYSTEM_SUBACTIVITY system_subactivity_t;
+typedef enum
+{
+    SYSTEM_ERROR_NONE = 0,
+    SYSTEM_ERROR_STARTUP,
+    SYSTEM_ERROR_HARDWARE_NOT_FOUND,
+    SYSTEM_ERROR_HOST_NOT_FOUND
+} SYSTEM_ERROR;
+typedef enum
+{
+    SYSTEM_CONSUMPTION_NONE = 0,
+    SYSTEM_CONSUMPTION_MICRO,
+    SYSTEM_CONSUMPTION_LOW,
+    SYSTEM_CONSUMPTION_NORMAL,
+    SYSTEM_CONSUMPTION_HIGH,
+    SYSTEM_CONSUMPTION_SURGE
+} SYSTEM_CONSUMPTION;
+typedef enum
+{
+    SYSTEM_FAMILY_0 = 1, /* Always on */
+    SYSTEM_FAMILY_A,
+    SYSTEM_FAMILY_B,
+    SYSTEM_FAMILY_C,
+    SYSTEM_FAMILY_D,
+    NUM_SYSTEM_FAMILIES
+} SYSTEM_FAMILY;
+typedef enum
+{
+    SYSTEM_COMM_NONE = 0,
+    SYSTEM_COMM_I2C,
+    SYSTEM_COMM_SPI,
+    SYSTEM_COMM_UART
+} SYSTEM_COMM;
+typedef enum
+{
+    SYSTEM_COMM_CHANNEL_NONE = 0,
+    SYSTEM_COMM_CHANNEL_PRIMARY,
+    SYSTEM_COMM_CHANNEL_SECONDARY
+} SYSTEM_COMM_CHANNEL;
+typedef enum
+{
+    SYSTEM_COMM_READ_REG = 1,
+    SYSTEM_COMM_WRITE_REG
+} SYSTEM_COMM_TYPE;
+typedef enum
+{
+    SYSTEM_SENSOR_MOTION_PRIMARY = 0x50,
+    SYSTEM_SENSOR_MOTION_SECONDARY = 0x51,
+    SYSTEM_SENSOR_RHO_MODULE_PRIMARY = 0x60,
+    SYSTEM_SENSOR_RHO_MODULE_SECONDARY = 0x61,
+    SYSTEM_SENSOR_TOUCH_PRIMARY = 0x70,
+    SYSTEM_SENSOR_TOUCH_SECONDARY = 0x71,
+    SYSTEM_SENSOR_TIP_PRIMARY = 0x80,
+    SYSTEM_SENSOR_TIP_SECONDARY = 0x81,
+    SYSTEM_SENSOR_TIP_ALTERNATE = 0x82,
+    SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY = 0x90
+} SYSTEM_SENSOR;
+typedef enum
+{
+    SYSTEM_DRIVER_BLE_RADIO = 0x30,
+    SYSTEM_DRIVER_SUB_RADIO = 0x40,
+    SYSTEM_DRIVER_HAPTIC_PRIMARY = 0x50,
+    SYSTEM_DRIVER_HAPTIC_SECONDARY = 0x51,
+    SYSTEM_DRIVER_REGULATOR_1V5 = 0x61
+} SYSTEM_DRIVER;
 
+typedef enum
+{
+    SYSTEM_COMPONENT_NONE = 0x00,
+    SYSTEM_COMPONENT_SENSOR = 0x02,
+    SYSTEM_COMPONENT_DRIVER = 0x03
+} SYSTEM_COMPONENT;
+
+typedef enum
+{
+    COMPONENT_STATE_OFF = 0x00,
+    COMPONENT_STATE_ON = 0x01,
+    COMPONENT_STATE_Z = 0x02,
+    COMPONENT_STATE_INTERRUPT = 0x0a
+} COMPONENT_STATE;
+typedef enum
+{
+    SYSTEM_PROFILE_ENTRY_STATE_NONE = 0,
+    SYSTEM_PROFILE_ENTRY_STATE_IDLE, // Uninitialized
+    SYSTEM_PROFILE_ENTRY_STATE_DISABLED,
+    SYSTEM_PROFILE_ENTRY_STATE_ENABLED,
+    SYSTEM_PROFILE_ENTRY_STATE_ACTIVE,
+} SYSTEM_PROFILE_ENTRY_STATE;
+typedef enum
+{
+    SYSTEM_PROFILE_ENTRY_DIRECTION_NONE = 0,
+    SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT,
+    SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT,
+    SYSTEM_PROFILE_ENTRY_DIRECTION_INOUT
+} SYSTEM_PROFILE_ENTRY_DIRECTION;
+typedef enum
+{
+    SYSTEM_PROFILE_ENTRY_TYPE_NONE = 0,
+    SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT,
+    SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED
+} SYSTEM_PROFILE_ENTRY_TYPE;
+typedef enum
+{
+    SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS = 0,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_DRIVER_HAPTIC_PRIMARY_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS,
+    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS
+} SYSTEM_TASK_SHELF_ENTRY_ID;
+typedef enum
+{
+    SYSTEM_PROBE_ID_NONE = 0,
+    SYSTEM_PROBE_ID_HOST,
+    SYSTEM_PROBE_ID_RHO,
+    SYSTEM_PROBE_ID_TIP,
+    SYSTEM_PROBE_ID_BATTERY_MONITOR,
+} SYSTEM_PROBE_ID;
+typedef enum
+{
+    SYSTEM_SCHEDULER_ID_NONE = 0,
+    SYSTEM_SCHEDULER_ID_TAU_DATA_TRANFER,
+    SYSTEM_SCHEDULER_ID_TAU_PERFORM,
+    SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE,
+} SYSTEM_SCHEDULER_ID;
+typedef enum
+{
+    SYSTEM_INTERRUPTER_ID_NONE = 0,
+    SYSTEM_INTERRUPTER_ID_TAU_RHO_RECEIVE,
+    SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE,
+    SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE,
+} SYSTEM_INTERRUPTER_ID;
+/************************************************************************************/
+
+/************************************************************************************/
+/***                               Types Start                                    ***/
+/************************************************************************************/
+typedef SYSTEM_STATE system_state_t;
+typedef SYSTEM_ACTION system_action_t;
+typedef SYSTEM_ACTIVITY system_activity_t;
+typedef SYSTEM_SUBACTIVITY system_subactivity_t;
+typedef SYSTEM_ERROR system_error_t;
+typedef SYSTEM_CONSUMPTION system_consumption_t;
+typedef SYSTEM_COMM system_comm_channel;
+typedef SYSTEM_COMM_TYPE system_comm_type;
+typedef SYSTEM_PROFILE_ENTRY_STATE system_profile_entry_state;
+typedef SYSTEM_PROFILE_ENTRY_DIRECTION system_profile_entry_direction;
+typedef SYSTEM_PROFILE_ENTRY_TYPE system_profile_entry_type;
+typedef SYSTEM_PROBE_ID system_probe_id_t;
+typedef SYSTEM_SCHEDULER_ID system_scheduler_id_t;
+typedef SYSTEM_INTERRUPTER_ID system_interrupter_id_t;
+typedef SYSTEM_TASK_SHELF_ENTRY_ID system_task_shelf_entry_id_t;
+
+typedef void (*generic_function_t)(void);
 typedef struct
 {
     union
@@ -138,70 +303,13 @@ typedef struct
     system_subactivity_map_entry_t entries[NUM_SYSTEM_SUBACTIVITIES];
 } system_subactivity_map_t;
 
-typedef enum
-{
-    SYSTEM_ERROR_NONE = 0,
-    SYSTEM_ERROR_STARTUP,
-    SYSTEM_ERROR_HARDWARE_NOT_FOUND,
-    SYSTEM_ERROR_RHO_CLIENT_NOT_FOUND,
-    SYSTEM_ERROR_
-} SYSTEM_ERROR;
-typedef SYSTEM_ERROR system_error_t;
-
-typedef enum
-{
-    SYSTEM_CONSUMPTION_NONE = 0,
-    SYSTEM_CONSUMPTION_MICRO,
-    SYSTEM_CONSUMPTION_LOW,
-    SYSTEM_CONSUMPTION_NORMAL,
-    SYSTEM_CONSUMPTION_HIGH,
-    SYSTEM_CONSUMPTION_SURGE
-} SYSTEM_CONSUMPTION;
-typedef SYSTEM_CONSUMPTION system_consumption_t;
-
-#define MAX_SUBACTIVITIES_PER_ACTIVITY 20
 typedef struct
 {
     system_activity_t activity;
     uint8_t length;
     system_subactivity_t subactivities[MAX_SUBACTIVITIES_PER_ACTIVITY];
 } system_activity_routine_t;
-
-typedef enum
-{
-    SYSTEM_FAMILY_0 = 1, /* Always on */
-    SYSTEM_FAMILY_A,
-    SYSTEM_FAMILY_B,
-    SYSTEM_FAMILY_C,
-    SYSTEM_FAMILY_D,
-    NUM_SYSTEM_FAMILIES
-} SYSTEM_FAMILY;
-
-typedef enum
-{
-    SYSTEM_COMM_NONE = 0,
-    SYSTEM_COMM_I2C,
-    SYSTEM_COMM_SPI,
-    SYSTEM_COMM_UART
-} SYSTEM_COMM;
-
-typedef enum
-{
-    SYSTEM_COMM_CHANNEL_NONE = 0,
-    SYSTEM_COMM_CHANNEL_PRIMARY,
-    SYSTEM_COMM_CHANNEL_SECONDARY
-} SYSTEM_COMM_CHANNEL;
-
-typedef enum
-{
-    SYSTEM_COMM_READ_REG = 1,
-    SYSTEM_COMM_WRITE_REG
-} SYSTEM_COMM_TYPE;
-
-typedef SYSTEM_COMM system_comm_channel;
-typedef SYSTEM_COMM_TYPE system_comm_type;
-
-#define SYSTEM_COMM_ADDR_NONE 0xff
+typedef system_activity_routine_t system_routine_map_t[MAX_ROUTINES];
 
 typedef struct
 {
@@ -215,36 +323,6 @@ system_comm_channel
     channel;
 } comm_event_t;
 
-typedef enum
-{
-    SYSTEM_SENSOR_MOTION_PRIMARY = 0x50,
-    SYSTEM_SENSOR_MOTION_SECONDARY = 0x51,
-    SYSTEM_SENSOR_RHO_MODULE_PRIMARY = 0x60,
-    SYSTEM_SENSOR_RHO_MODULE_SECONDARY = 0x61,
-    SYSTEM_SENSOR_TOUCH_PRIMARY = 0x70,
-    SYSTEM_SENSOR_TOUCH_SECONDARY = 0x71,
-    SYSTEM_SENSOR_TIP_PRIMARY = 0x80,
-    SYSTEM_SENSOR_TIP_SECONDARY = 0x81,
-    SYSTEM_SENSOR_TIP_ALTERNATE = 0x82,
-    SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY = 0x90
-} SYSTEM_SENSOR;
-
-typedef enum
-{
-    SYSTEM_DRIVER_BLE_RADIO = 0x30,
-    SYSTEM_DRIVER_SUB_RADIO = 0x40,
-    SYSTEM_DRIVER_HAPTIC_PRIMARY = 0x50,
-    SYSTEM_DRIVER_HAPTIC_SECONDARY = 0x51,
-    SYSTEM_DRIVER_REGULATOR_1V5 = 0x61
-} SYSTEM_DRIVER;
-
-typedef enum
-{
-    SYSTEM_COMPONENT_NONE = 0x00,
-    SYSTEM_COMPONENT_SENSOR = 0x02,
-    SYSTEM_COMPONENT_DRIVER = 0x03
-} SYSTEM_COMPONENT;
-
 typedef struct
 {
     uint8_t
@@ -252,20 +330,12 @@ typedef struct
     micro;
 } component_id;
 
-typedef enum
-{
-    COMPONENT_STATE_OFF = 0x00,
-    COMPONENT_STATE_ON = 0x01,
-    COMPONENT_STATE_Z = 0x02,
-    COMPONENT_STATE_INTERRUPT = 0x0a
-} COMPONENT_STATE;
-
 typedef uint8_t system_family_t;
 typedef struct
 {
-    component_id
+component_id
     ID;
-    uint8_t
+uint8_t
     family,
     comm,
     chann,
@@ -274,37 +344,9 @@ typedef struct
     pin,
     state,
     tied;
-    void *
+void *
     instance;
 } system_component_t;
-#define MAX_ROUTINES 45
-typedef system_activity_routine_t system_routine_map_t[MAX_ROUTINES];
-
-typedef enum
-{
-    SYSTEM_PROFILE_ENTRY_STATE_NONE = 0,
-    SYSTEM_PROFILE_ENTRY_STATE_IDLE, // Uninitialized
-    SYSTEM_PROFILE_ENTRY_STATE_DISABLED,
-    SYSTEM_PROFILE_ENTRY_STATE_ENABLED,
-    SYSTEM_PROFILE_ENTRY_STATE_ACTIVE,
-} SYSTEM_PROFILE_ENTRY_STATE;
-typedef SYSTEM_PROFILE_ENTRY_STATE system_profile_entry_state;
-typedef enum
-{
-    SYSTEM_PROFILE_ENTRY_DIRECTION_NONE = 0,
-    SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT,
-    SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT,
-    SYSTEM_PROFILE_ENTRY_DIRECTION_INOUT
-} SYSTEM_PROFILE_ENTRY_DIRECTION;
-typedef SYSTEM_PROFILE_ENTRY_DIRECTION system_profile_entry_direction;
-
-typedef enum
-{
-    SYSTEM_PROFILE_ENTRY_TYPE_NONE = 0,
-    SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT,
-    SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED
-} SYSTEM_PROFILE_ENTRY_TYPE;
-typedef SYSTEM_PROFILE_ENTRY_TYPE system_profile_entry_type;
 
 typedef struct
 {
@@ -325,7 +367,7 @@ system_profile_header
         uint32_t
         schedule;
         uint8_t
-        tbd[4];
+        info[4];
     } data;
 component_id
     component;
@@ -333,10 +375,6 @@ system_activity_t
     routine_id;
 } system_profile_entry_t;
 
-#define MAX_TASKS 10
-#define MAX_INTERRUPTS MAX_TASKS/2
-#define MAX_SCHEDULED MAX_TASKS/2
-#define MAX_TASK_SHELF_ENTRIES 20
 typedef struct
 {
 uint8_t
@@ -351,21 +389,6 @@ system_profile_entry_t
 } system_task_shelf_entry_t;
 typedef system_task_shelf_entry_t system_task_shelf_t[MAX_TASK_SHELF_ENTRIES];
 
-typedef enum
-{
-    SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS = 0,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_DRIVER_HAPTIC_PRIMARY_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS
-} SYSTEM_TASK_SHELF_ENTRY_ID;
-typedef SYSTEM_TASK_SHELF_ENTRY_ID system_task_shelf_entry_id_t;
-
-#define MAX_STATE_PROFILE_ENTRIES 10
 typedef struct
 {
 uint8_t
@@ -373,48 +396,20 @@ uint8_t
 system_task_shelf_entry_id_t
     entries[MAX_STATE_PROFILE_ENTRIES];
 } system_state_profile_t;
-
+typedef system_state_profile_t system_state_profile_list_t[NUM_SYSTEM_STATES];
 
 #define MAX_COMPONENTS 20
 typedef struct
 {
 system_task_shelf_t
     shelf;
-system_state_profile_t
-    state_profiles[NUM_SYSTEM_STATES];
+system_state_profile_list_t
+    state_profiles;
 system_routine_map_t
     routines;
 system_component_t
     components[MAX_COMPONENTS];
 } system_profile_t;
-
-typedef enum
-{
-    SYSTEM_PROBE_ID_NONE = 0,
-    SYSTEM_PROBE_ID_HOST,
-    SYSTEM_PROBE_ID_RHO,
-    SYSTEM_PROBE_ID_TIP,
-    SYSTEM_PROBE_ID_BATTERY_MONITOR,
-} SYSTEM_PROBE_ID;
-typedef SYSTEM_PROBE_ID system_probe_id_t;
-
-typedef enum
-{
-    SYSTEM_SCHEDULER_ID_NONE = 0,
-    SYSTEM_SCHEDULER_ID_TAU_DATA_TRANFER,
-    SYSTEM_SCHEDULER_ID_TAU_PERFORM,
-    SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE,
-} SYSTEM_SCHEDULER_ID;
-typedef SYSTEM_SCHEDULER_ID system_scheduler_id_t;
-
-typedef enum
-{
-    SYSTEM_INTERRUPTER_ID_NONE = 0,
-    SYSTEM_INTERRUPTER_ID_TAU_RHO_RECEIVE,
-    SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE,
-    SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE,
-} SYSTEM_INTERRUPTER_ID;
-typedef SYSTEM_INTERRUPTER_ID system_interrupter_id_t;
 
 typedef struct
 {
@@ -444,6 +439,24 @@ typedef struct
     void (*Perform)(system_interrupter_id_t);
 } system_interrupter_functions;
 
+typedef struct
+{
+    system_state_t          state;
+    system_action_t         action;
+    system_activity_t       activity;
+    system_subactivity_t    subactivity;
+    system_error_t          error;
+    system_consumption_t    consumption_level;
+    system_task_shelf_t    *shelf;
+    system_state_profile_list_t *state_profiles;
+    system_profile_t       *profile;
+    system_subactivity_map_t subactivity_map;
+} system_master_t;
+/************************************************************************************/
+
+/************************************************************************************/
+/***                             Functions Start                                  ***/
+/************************************************************************************/
 static void PerformCommEvent( comm_event_t event, uint8_t * data )
 {
     switch( event.channel )
@@ -463,7 +476,6 @@ static void PerformCommEvent( comm_event_t event, uint8_t * data )
 }
 
 static void NullFunction(void) {}
-
-typedef void (*generic_function_t)(void);
+/************************************************************************************/
 
 #endif /* systemtypes_h */

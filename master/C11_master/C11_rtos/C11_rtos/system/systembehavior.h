@@ -12,7 +12,9 @@
 #include <stdio.h>
 
 #include "systemtypes.h"
+
 #include "taumanager.h"
+
 
 void PerformBehaviorSelfCheck(void);
 void PerformBehaviorConfirmInit(void);
@@ -24,6 +26,8 @@ void PerformBehaviorSchedulerDeschedule( system_scheduler_id_t );
 void PerformBehaviorInterrupterSend( system_interrupter_id_t );
 void PerformBehaviorInterrupterReceive( system_interrupter_id_t );
 void PerformBehaviorInterrupterPerform( system_interrupter_id_t );
+
+void InitProfileEntry( system_profile_entry_t * );
 
 typedef struct
 {
@@ -37,11 +41,13 @@ typedef struct
 
 typedef struct
 {
+    void (*InitEntry)( system_profile_entry_t * );
     behavior_perform_functions Perform;
 } behavior_functions;
 
 static behavior_functions BehaviorFunctions =
 {
+    .InitEntry = InitProfileEntry,
     .Perform.SelfCheck = PerformBehaviorSelfCheck,
     .Perform.ConfirmInit = PerformBehaviorConfirmInit,
     .Perform.WaitForWake = PerformBehaviorWaitForWake,

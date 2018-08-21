@@ -11,32 +11,31 @@
 
 #include <stdio.h>
 #include "systemtypes.h"
+#include "profilemanager.h"
+#include "communicationmanager.h"
+#include "systembehavior.h"
+#include "sysiocontroller.h"
 
-typedef struct
-{
-    system_state_t          state;
-    system_action_t         action;
-    system_activity_t       activity;
-    system_subactivity_t    subactivity;
-    system_error_t          error;
-    system_consumption_t    consumption_level;
-    system_task_shelf_t    *shelf;
-    system_state_profile_t  state_profile[NUM_SYSTEM_STATES];
-    system_profile_t       *profile;
-    system_subactivity_map_t subactivity_map;
-} system_master_t;
+#define DEFAULT_SYSTEM_STATE SYSTEM_STATE_IDLE
+#define DEFAULT_SYSTEM_ACTION SYSTEM_ACTION_NONE
+#define DEFAULT_SYSTEM_ACTIVITY SYSTEM_ACTIVITY_NONE
+#define DEFAULT_SYSTEM_SUBACTIVITY SYSTEM_SUBACTIVITY_NONE
+#define DEFAULT_SYSTEM_ERROR SYSTEM_ERROR_NONE
+#define DEFAULT_SYSTEM_CONSUMPTION SYSTEM_CONSUMPTION_NONE
+#define DEFAULT_SYSTEM_ACTIVITY SYSTEM_ACTIVITY_NONE
+
 static system_master_t System;
 
-void InitSystemManager(void);
+void InitSystemManager(system_profile_t *);
 
-void PerformSystemManagerRoutine( system_activity_routine_t * );
+void PerformSystemManagerRoutine( system_activity_t );
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t *, uint8_t );
 void PerformSystemManagerSubactivity( system_subactivity_t );
 
 void RegisterSystemManangerTaskShelf( system_task_shelf_t * );
 void RegisterSystemManangerSubactivityMap( system_subactivity_map_t );
 void RegisterSystemManagerProfile( system_profile_t * );
-void RegisterSystemManagerStateProfile( system_state_t, system_state_profile_t );
+void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
 void RegisterSystemManagerState( system_state_t );
 void RegisterSystemManagerAction( system_action_t );
 void RegisterSystemManagerActivity( system_activity_t );
@@ -51,7 +50,7 @@ void EnstateSystemManagerStateProfile( system_state_profile_t * );
 
 typedef struct
 {
-    void (*Routine)( system_activity_routine_t * );
+    void (*Routine)( system_activity_t );
     void (*Subactivities)( system_subactivity_t *, uint8_t );
     void (*Subactivity)( system_subactivity_t );
 } system_perform_functions;
@@ -60,7 +59,7 @@ typedef struct
     void (*TaskShelf)( system_task_shelf_t * );
     void (*SubactivityMap)( system_subactivity_map_t );
     void (*Profile)( system_profile_t * );
-    void (*StateProfile)( system_state_t, system_state_profile_t );
+    void (*StateProfileList)( system_state_profile_list_t * );
     void (*State)( system_state_t );
     void (*Action)( system_action_t );
     void (*Activity)( system_activity_t );
@@ -76,7 +75,7 @@ typedef struct
 
 typedef struct
 {
-    void (*Init)(void);
+    void (*Init)(system_profile_t *);
     system_perform_functions Perform;
     system_register_functions Registers;
     system_enstate_functions Enstate;
@@ -91,7 +90,7 @@ static system_functions SystemFunctions =
     .Registers.TaskShelf = RegisterSystemManangerTaskShelf,
     .Registers.SubactivityMap = RegisterSystemManangerSubactivityMap,
     .Registers.Profile = RegisterSystemManagerProfile,
-    .Registers.StateProfile = RegisterSystemManagerStateProfile,
+    .Registers.StateProfileList = RegisterSystemManagerStateProfileList,
     .Registers.State = RegisterSystemManagerState,
     .Registers.Action = RegisterSystemManagerAction,
     .Registers.Activity = RegisterSystemManagerActivity,
