@@ -46,9 +46,9 @@ void TauManagerInit(void)
 void TauManagerDoNothing(void)
 {
 }
-void TauManagerStart(void)
+void TauManagerStart( tau_state_t state )
 {
-    RegisterTauManagerState( TAU_STATE_IDLE );
+    RegisterTauManagerState( state );
 }
 void TauManagerPause(void)
 {

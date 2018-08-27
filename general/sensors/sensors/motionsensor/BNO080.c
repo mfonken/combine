@@ -36,6 +36,13 @@ bool BNO080Refresh( shtp_client_t * client )
     return false;
 }
 
+bool BNO080Read( shtp_client_t * client )
+{
+    SHTPFunctions.SetActiveClient( client );
+//    SHTPFunctions.
+    return false;
+}
+
 bool BNO080AttemptGet( uint32_t timeout )
 {
     uint32_t timestart = timestamp();

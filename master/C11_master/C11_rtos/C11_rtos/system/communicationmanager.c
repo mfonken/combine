@@ -16,7 +16,7 @@ void CommunicationManagerTransmit(comm_packet_t * packet )
 {
     
 }
-void CommunicationManagerReceive( comm_packet_t * packet )
+void CommunicationManagerReceive( void )
 {
     
 }

@@ -9,11 +9,18 @@
 #include <stdio.h>
 #include "motionsensor.h"
 
-bool Init_IMU( imu_t * imu, uint8_t ID, system_comm_channel channel, imu_chip_t chip )
+bool Init_IMU( imu_t * imu, component_id component_ID, uint8_t shtp_ID, comm_channel channel, imu_chip_t chip )
 {
-    imu->client.ID = ID;
+    imu->ID = component_ID;
+    imu->client.ID = shtp_ID;
     imu->client.comm_channel = channel;
     imu->chip = chip;
     imu->sensor_specific_metadata = 0;
+    return true;
+}
+
+bool Start_IMU_RotVec( imu_t * imu )
+{
+    IMUFunctions.Start( &imu->client, SH2_SENSOR_REPORT_ROTATION_VECTOR, imu->interval, 0 );
     return true;
 }

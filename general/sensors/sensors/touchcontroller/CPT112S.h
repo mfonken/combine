@@ -24,8 +24,8 @@ typedef enum
 
 typedef struct
 {
-    uint32_t counter    :4;
-    cpt_event_t type    :4;
+    uint32_t counter:4;
+    cpt_event_t type:4;
     union
     {
         struct
@@ -35,7 +35,7 @@ typedef struct
         };
         uint16_t slider;
     };
-    uint32_t PADDING    :8;
+    uint32_t PADDING:8;
 } cpt_packet_t;
 
 static i2c_event_t CPTGetReadEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT, NO_REG, CPT_PACKET_LEN, CPT_ADDR }; }

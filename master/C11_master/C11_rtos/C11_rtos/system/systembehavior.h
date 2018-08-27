@@ -13,15 +13,13 @@
 
 #include "systemtypes.h"
 
-#include "taumanager.h"
-
 
 void PerformBehaviorSelfCheck(void);
 void PerformBehaviorConfirmInit(void);
 void PerformBehaviorWaitForWake(void);
 void PerformBehaviorProbeSend( system_probe_id_t );
 void PerformBehaviorProbeReceive( system_probe_id_t );
-void PerformBehaviorSchedulerSchedule( system_scheduler_id_t );
+void PerformBehaviorSchedulerSchedule( system_scheduler_id_t, uint32_t );
 void PerformBehaviorSchedulerDeschedule( system_scheduler_id_t );
 void PerformBehaviorInterrupterSend( system_interrupter_id_t );
 void PerformBehaviorInterrupterReceive( system_interrupter_id_t );

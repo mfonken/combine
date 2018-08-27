@@ -12,7 +12,5 @@
 int main(int argc, const char * argv[])
 {
     InitializeMeta();
-    
-    
     return 0;
 }

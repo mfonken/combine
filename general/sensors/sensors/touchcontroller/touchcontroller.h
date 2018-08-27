@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include "CPT112S.h"
 
+#define TOUCH_SLIDER_NULL 0xff
+
 typedef cpt_packet_t touch_packet_t;
 typedef cpt_event_t touch_event_t;
 

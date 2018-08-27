@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4941CC93212E7D3300A95CCE /* systemhandlers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4941CC92212E7D3300A95CCE /* systemhandlers.c */; };
 		4948103B2117974400D3F45A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948103A2117974400D3F45A /* main.c */; };
 		494810692117975A00D3F45A /* sysiocontroller.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810582117975A00D3F45A /* sysiocontroller.c */; };
 		4948106B2117975A00D3F45A /* motionsensor.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948105C2117975A00D3F45A /* motionsensor.c */; };
@@ -38,6 +39,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4941CC91212E7D3300A95CCE /* systemhandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemhandlers.h; sourceTree = "<group>"; };
+		4941CC92212E7D3300A95CCE /* systemhandlers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = systemhandlers.c; sourceTree = "<group>"; };
+		4941CC9421325AB700A95CCE /* globaltypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = globaltypes.h; sourceTree = "<group>"; };
 		494810372117974400D3F45A /* C11_rtos */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = C11_rtos; sourceTree = BUILT_PRODUCTS_DIR; };
 		4948103A2117974400D3F45A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		494810432117975A00D3F45A /* touchcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchcontroller.h; sourceTree = "<group>"; };
@@ -153,12 +157,15 @@
 				49C54B2A211914C20072B458 /* systemmanager.c */,
 				49A17FAC211FF6C000F920CE /* systembehavior.h */,
 				49A17FAD211FF6C000F920CE /* systembehavior.c */,
+				4941CC91212E7D3300A95CCE /* systemhandlers.h */,
+				4941CC92212E7D3300A95CCE /* systemhandlers.c */,
 				49F0AA2B211D2515005E1D9E /* profilemanager.h */,
 				49F0AA2C211D2515005E1D9E /* profilemanager.c */,
 				49BD146E21225B15002FDB6A /* communicationmanager.h */,
 				49BD146F21225B15002FDB6A /* communicationmanager.c */,
 				49BD147121225BA6002FDB6A /* taumanager.h */,
 				49BD147221225BA6002FDB6A /* taumanager.c */,
+				4941CC9421325AB700A95CCE /* globaltypes.h */,
 				49C54B2C211915460072B458 /* systemtypes.h */,
 				498E8F69211A77F6008F3660 /* systembridge.h */,
 			);
@@ -307,6 +314,7 @@
 				49A55F052128CCC70087AF74 /* point.c in Sources */,
 				49485D8D2117CC3300D3F45A /* rho_client.c in Sources */,
 				49A55F062128CCC70087AF74 /* quaternion.c in Sources */,
+				4941CC93212E7D3300A95CCE /* systemhandlers.c in Sources */,
 				49BD147321225BA6002FDB6A /* taumanager.c in Sources */,
 				49A55F022128CCC70087AF74 /* kinetic.c in Sources */,
 				49BD147021225B15002FDB6A /* communicationmanager.c in Sources */,

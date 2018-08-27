@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "systemtypes.h"
 #include "profilemanager.h"
-#include "communicationmanager.h"
 #include "systembehavior.h"
 #include "sysiocontroller.h"
 
@@ -28,7 +27,7 @@ static system_master_t System;
 
 void InitSystemManager(system_profile_t *);
 
-void PerformSystemManagerRoutine( system_activity_t );
+void PerformSystemManagerRoutine( system_activity_routine_t * );
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t *, uint8_t );
 void PerformSystemManagerSubactivity( system_subactivity_t );
 
@@ -37,20 +36,21 @@ void RegisterSystemManangerSubactivityMap( system_subactivity_map_t );
 void RegisterSystemManagerProfile( system_profile_t * );
 void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
 void RegisterSystemManagerState( system_state_t );
-void RegisterSystemManagerAction( system_action_t );
+//void RegisterSystemManagerAction( system_action_t );
 void RegisterSystemManagerActivity( system_activity_t );
 void RegisterSystemManagerSubactivity( system_subactivity_t );
 void RegisterSystemManagerError( system_error_t );
 void RegisterSystemManagerConsumption( system_consumption_t );
 
-system_task_shelf_entry_t GetTaskShelfEntryById( system_task_shelf_entry_id_t );
+system_subactivity_map_entry_t * GetSubactivityMapEntryById( system_subactivity_t );
+system_task_shelf_entry_t * GetTaskShelfEntryById( system_task_shelf_entry_id_t );
 
 void EnstateSystemManagerTaskShelfEntry( system_task_shelf_entry_id_t );
 void EnstateSystemManagerStateProfile( system_state_profile_t * );
 
 typedef struct
 {
-    void (*Routine)( system_activity_t );
+    void (*Routine)( system_activity_routine_t * );
     void (*Subactivities)( system_subactivity_t *, uint8_t );
     void (*Subactivity)( system_subactivity_t );
 } system_perform_functions;
@@ -61,7 +61,7 @@ typedef struct
     void (*Profile)( system_profile_t * );
     void (*StateProfileList)( system_state_profile_list_t * );
     void (*State)( system_state_t );
-    void (*Action)( system_action_t );
+//    void (*Action)( system_action_t );
     void (*Activity)( system_activity_t );
     void (*Subactivity)( system_subactivity_t );
     void (*Error)( system_error_t );
@@ -92,7 +92,7 @@ static system_functions SystemFunctions =
     .Registers.Profile = RegisterSystemManagerProfile,
     .Registers.StateProfileList = RegisterSystemManagerStateProfileList,
     .Registers.State = RegisterSystemManagerState,
-    .Registers.Action = RegisterSystemManagerAction,
+//    .Registers.Action = RegisterSystemManagerAction,
     .Registers.Activity = RegisterSystemManagerActivity,
     .Registers.Subactivity = RegisterSystemManagerSubactivity,
     .Registers.Error = RegisterSystemManagerError,

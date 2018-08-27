@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "systemtypes.h"
+#include "communicationmanager.h"
 #include "sh2.h"
 #include "timestamp.h"
 
@@ -219,10 +219,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_READ_REG, NO_REG, len }; }
-static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, SYSTEM_COMM_WRITE_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->comm_channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, COMM_READ_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->comm_channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, COMM_WRITE_REG, NO_REG, len }; }
 
 typedef struct
 {

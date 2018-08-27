@@ -10,7 +10,6 @@
 #define BNO080_h
 
 #include "shtp.h"
-#include "i2c_template.h"
 
 #define BNO080_DEFAULT_ADDRESS 0x4B
 #define BNO080_UART_RVC_HEADER 0xAAAA
@@ -88,12 +87,14 @@ typedef uint8_t bno080_feature_t;
 bool BNO080EnableFeature( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );
 bool BNO080DisableFeature( shtp_client_t *, bno080_feature_t );
 bool BNO080Refresh( shtp_client_t * );
+bool BNO080Read( shtp_client_t * );
 bool BNO080AttemptGet( uint32_t );
 
 typedef struct
 {
     bool (*EnableFeature)( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );
     bool (*Refresh)( shtp_client_t * );
+    bool (*Read)( shtp_client_t * );
     bool (*AttemptGet)( uint32_t );
 } bno080_functions;
 
@@ -101,6 +102,7 @@ static const bno080_functions BNO080Functions =
 {
     .EnableFeature = BNO080EnableFeature,
     .Refresh = BNO080Refresh,
+    .Read = BNO080Read,
     .AttemptGet = BNO080AttemptGet
 };
 

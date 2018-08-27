@@ -12,9 +12,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "systemtypes.h"
+#include "communicationmanager.h"
 
-#define RHO_DEFAULT_COMM_CHANNEL SYSTEM_COMM_UART
+#define RHO_DEFAULT_COMM_CHANNEL COMM_UART
 
 typedef uint16_t packet_data_type;
 typedef float global_timestamp_t;
@@ -25,6 +25,11 @@ uint8_t
     includes,
     timestamp[sizeof(global_timestamp_t)];
 } global_packet_header;
+
+typedef struct
+{
+    ///
+} rho_setting_t;
 
 typedef struct
 {
@@ -50,30 +55,44 @@ rho_point
     secondary;
 rho_probabilites
     probabilites;
-} rho_packet;
+} rho_packet_t;
 
 typedef struct
 {
 uint8_t
     ID;
-rho_packet
+rho_packet_t
     packet;
+rho_setting_t
+    settings;
 } rho_t;
 
+void SendRhoSetting( rho_setting_t * );
 void ReceiveRhoPacket( rho_t * );
 
 typedef struct
 {
+    void (*Send)( rho_setting_t * );
     void (*Receive)( rho_t * );
+    comm_event_t (*GetSendEvent)(void);
     comm_event_t (*GetReceiveEvent)(void);
 } rho_functions;
 
-static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ SYSTEM_COMM_READ_REG, NO_REG, sizeof(rho_packet), RHO_DEFAULT_COMM_CHANNEL }; }
+static comm_event_t RhoGetSendEvent(void) { return (comm_event_t){ COMM_WRITE_REG, NO_REG, sizeof(rho_setting_t), RHO_DEFAULT_COMM_CHANNEL }; }
+static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ COMM_READ_REG, NO_REG, sizeof(rho_packet_t), RHO_DEFAULT_COMM_CHANNEL }; }
 
 static rho_functions RhoFunctions =
 {
+    .Send = SendRhoSetting,
     .Receive = ReceiveRhoPacket,
+    .GetSendEvent = RhoGetSendEvent,
     .GetReceiveEvent = RhoGetReceiveEvent
 };
+
+static void RhoPointToKPoint( rho_point * r, kpoint_t * k )
+{
+    k->x = r->a;
+    k->y = r->b;
+}
 
 #endif /* rho_client_h */

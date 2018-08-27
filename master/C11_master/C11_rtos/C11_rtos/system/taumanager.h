@@ -10,8 +10,7 @@
 #define taumanager_h
 
 #include <stdio.h>
-#include "systemtypes.h"
-#include "kinetic_master.h"
+#include "globaltypes.h"
 
 #define TAU_MAX_ACTIONS_PER_STATE 3
 
@@ -44,7 +43,7 @@ void TauManagerTick(void);
 
 void TauManagerInit(void);
 void TauManagerDoNothing(void);
-void TauManagerStart(void);
+void TauManagerStart(tau_state_t);
 void TauManagerPause(void);
 void TauManagerStop(void);
 void TauManagerPerformKinetic(void);
@@ -64,7 +63,7 @@ typedef struct
 {
     void (*RegisterState)(tau_state_t);
     void (*Tick)(void);
-    void (*Start)(void);
+    void (*Start)(tau_state_t);
     void (*Pause)(void);
     void (*Stop)(void);
     tau_perform_functions Perform;
@@ -185,25 +184,6 @@ uint32_t
     timestamp;
 } tau_header_t;
 
-typedef struct
-{
-quaternion_t
-    data;
-double
-    confidence;
-uint32_t
-    timestamp;
-} tau_orientation_data_t;
-
-typedef struct
-{
-kpoint_t
-    data[3];
-double
-    confidence[3];
-uint32_t
-    timestamp;
-} tau_rho_data_t;
 
 typedef struct
 {
@@ -217,9 +197,9 @@ typedef struct
 {
 tau_header_t
     header;
-tau_orientation_data_t
+orientation_data_t
     orientation;
-tau_rho_data_t
+rho_data_t
     rho;
 kinetic_t
     kinetic;

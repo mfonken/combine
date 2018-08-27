@@ -27,10 +27,10 @@ void PerformBehaviorProbeSend( system_probe_id_t id )
 void PerformBehaviorProbeReceive( system_probe_id_t id )
 {
 }
-void PerformBehaviorSchedulerSchedule( system_scheduler_id_t id )
+void PerformBehaviorSchedulerSchedule( system_scheduler_id_t id, uint32_t data )
 {
-    //Schedule BehaviorScheduledTasks[id]
 }
+
 void PerformBehaviorSchedulerDeschedule( system_scheduler_id_t id )
 {
     //Deschedule BehaviorScheduledTasks[id]
