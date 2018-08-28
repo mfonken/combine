@@ -8,6 +8,11 @@
 
 #include "rho_client.h"
 
+void InitRho( rho_setting_t * setting )
+{
+    SendRhoSetting( setting );
+}
+
 void SendRhoSetting( rho_setting_t * setting )
 {
     PerformCommEvent( RhoFunctions.GetSendEvent(), (uint8_t*)setting );

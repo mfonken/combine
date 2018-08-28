@@ -12,11 +12,12 @@ void InitSystemManager( system_profile_t * profile )
 {
     SystemFunctions.Registers.Profile( profile );
     SystemFunctions.Registers.State(SYSTEM_STATE_STARTUP);
-//    SystemFunctions.Registers.Action(DEFAULT_SYSTEM_ACTION);
     SystemFunctions.Registers.Activity(DEFAULT_SYSTEM_ACTIVITY);
     SystemFunctions.Registers.Subactivity(DEFAULT_SYSTEM_SUBACTIVITY);
     SystemFunctions.Registers.Error(DEFAULT_SYSTEM_ERROR);
     SystemFunctions.Registers.Consumption(SYSTEM_CONSUMPTION_NONE);
+    
+    EnstateSystemManagerTaskShelfEntry(SYSTEM_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS);
 }
 
 void PerformSystemManagerRoutine( system_activity_routine_t * routine )
@@ -46,9 +47,9 @@ void RegisterSystemManangerTaskShelf( system_task_shelf_t * shelf)
     {
         system_task_shelf_entry_t * entry = &(*shelf)[i];
         for( uint8_t j = 0; j < entry->num_interrupts; j++ )
-            BehaviorFunctions.InitEntry( &System.profile->shelf[i].interrupts[j]);
+            SystemFunctions.Registers.ProfileEntry( &System.profile->shelf[i].interrupts[j]);
         for( uint8_t j = 0; j < entry->num_scheduled; j++ )
-            BehaviorFunctions.InitEntry( &System.profile->shelf[i].scheduled[j]);
+            SystemFunctions.Registers.ProfileEntry( &System.profile->shelf[i].scheduled[j]);
     }
 }
 void RegisterSystemManangerSubactivityMap( system_subactivity_map_t map)
@@ -59,6 +60,40 @@ void RegisterSystemManagerProfile( system_profile_t * profile )
 {
     System.profile = profile;
     ProfileFunctions.Init( profile );
+}
+
+void RegisterSystemManagerProfileEntry( system_profile_entry_t * entry )
+{
+    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
+    {
+        switch( entry->header.type )
+        {
+            case SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT:
+                switch( entry->header.direction )
+            {
+                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+                    break;
+                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+                    break;
+                default:
+                    break;
+            }
+                break;
+            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
+                switch( entry->header.direction )
+            {
+                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+                    break;
+                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+                    break;
+                default:
+                    break;
+            }
+                break;
+            default:
+                break;
+        }
+    }
 }
 void RegisterSystemManagerStateProfileList( system_state_profile_list_t * state_profiles )
 {

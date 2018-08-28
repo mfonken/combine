@@ -13,7 +13,6 @@
 
 #include "systemtypes.h"
 
-
 void PerformBehaviorSelfCheck(void);
 void PerformBehaviorConfirmInit(void);
 void PerformBehaviorWaitForWake(void);
@@ -45,7 +44,6 @@ typedef struct
 
 static behavior_functions BehaviorFunctions =
 {
-    .InitEntry = InitProfileEntry,
     .Perform.SelfCheck = PerformBehaviorSelfCheck,
     .Perform.ConfirmInit = PerformBehaviorConfirmInit,
     .Perform.WaitForWake = PerformBehaviorWaitForWake,

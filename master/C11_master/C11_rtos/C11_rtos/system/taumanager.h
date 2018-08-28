@@ -209,6 +209,13 @@ tau_locks
     locks;
 } tau_t;
 
+typedef struct
+{
+uint32_t
+    orientation_interval,
+    rho_interval;
+} tau_settings_t;
+
 static tau_data_element_t TauManagerGetElementFromKalman( kalman_t * kalman )
 {
     /* Assume total doubt */

@@ -241,6 +241,7 @@ typedef enum
 typedef enum
 {
     SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS = 0,
+    SYSTEM_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS,
     SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
     SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
     SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
@@ -296,11 +297,13 @@ typedef struct
     {
         void (*blank)(void);
         void (*byte)(uint8_t);
+        void (*word)(uint32_t);
         void (*pointer)(void *);
     } function;
     union
     {
         uint8_t byte;
+        uint32_t word;
         void * pointer;
     } data;
 } system_subactivity_map_entry_t;
@@ -371,6 +374,8 @@ system_activity_routine_t
     routine;
 uint8_t
     families[NUM_SYSTEM_FAMILIES];
+uint8_t
+    num_entries;
 system_task_shelf_entry_id_t
     entries[MAX_STATE_PROFILE_ENTRIES];
 } system_state_profile_t;
@@ -383,8 +388,6 @@ system_task_shelf_t
     shelf;
 system_state_profile_list_t
     state_profiles;
-//system_routine_map_t
-//    routines;
 component_t
     components[MAX_COMPONENTS];
 } system_profile_t;
@@ -425,6 +428,17 @@ rho_data_t
     rho;
 touch_data_t
     touch;
+comm_packet_t
+    packet_in,
+    packet_out,
+    sub_packet_in,
+    sub_packet_out;
+battery_monitor_basic_t
+    battery;
+uint8_t
+    battery_monitor_mode;
+tau_settings_t
+    tau_settings;
 } system_buffers_t;
 
 typedef struct
@@ -441,7 +455,6 @@ typedef struct
 {
     system_profile_t       *profile;
     system_state_t          state;
-//    system_action_t         action;
     system_activity_t       activity;
     system_subactivity_t    subactivity;
     system_error_t          error;

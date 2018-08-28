@@ -98,7 +98,8 @@ void HostOutputHandler( void )
 /* BLE In */
 void HostInputHandler( void )
 {
-    
+    // State change?
+    CommFunctions.Receive();
 }
 
 /* Sub Out */

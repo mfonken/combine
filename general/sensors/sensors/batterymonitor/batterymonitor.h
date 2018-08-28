@@ -12,30 +12,29 @@
 #include <stdio.h>
 #include "STC3100IQT.h"
 
-static stc_functions BatteryMonitor =
+typedef struct
 {
-    .SetMode             = STCSetMode,
-    .GetMode             = STCGetMode,
-    .SetControl          = STCSetControl,
-    .GetControl          = STCGetControl,
-    .GetIDE              = STCGetIDE,
-    .GetRAM              = STCGetRAM,
-    .GetCharge           = STCGetCharge,
-    .GetCounter          = STCGetCounter,
-    .GetCurrent          = STCGetCurrent,
-    .GetVoltage          = STCGetVoltage,
-    .GetTemperature      = STCGetTemperature,
-    .SetModeEvent        = STCSetModeEvent,
-    .GetModeEvent        = STCGetModeEvent,
-    .SetControlEvent     = STCSetControlEvent,
-    .GetControlEvent     = STCGetControlEvent,
-    .GetIDEvent          = STCGetIDEvent,
-    .GetRAMEvent         = STCGetRAMEvent,
-    .GetChargeEvent      = STCGetChargeEvent,
-    .GetCounterEvent     = STCGetCounterEvent,
-    .GetCurrentEvent     = STCGetCurrentEvent,
-    .GetVoltageEvent     = STCGetVoltageEvent,
-    .GetTemperatureEvent = STCGetTemperatureEvent
+uint32_t
+    charge,
+    counter,
+    current,
+    voltage;
+} battery_monitor_basic_t;
+
+void GetBatteryMonitorBasic( battery_monitor_basic_t * );
+void SetBatteryMonitorMode( uint8_t );
+
+typedef struct
+{
+    void(*GetBasic)( battery_monitor_basic_t *);
+    void (*Set)( uint8_t );
+} battery_monitor_functions;
+
+static battery_monitor_functions BatteryMonitor =
+{
+    .GetBasic = GetBatteryMonitorBasic,
+    .Set = SetBatteryMonitorMode
 };
+
 
 #endif /* batterymonitor_h */

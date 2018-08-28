@@ -18,7 +18,9 @@ typedef enum
     COMM_NONE = 0,
     COMM_I2C,
     COMM_SPI,
-    COMM_UART
+    COMM_UART,
+    COMM_BLE,
+    COMM_SUB
 } COMM;
 typedef enum
 {
@@ -78,7 +80,13 @@ static void PerformCommEvent( comm_event_t event, uint8_t * data )
             performSPIEvent(*(spi_event_t *)&event, data );
             break;
         case COMM_UART:
-            //            performUARTEvent(*(uart_event_t *)&event, data );
+//            performUARTEvent(*(uart_event_t *)&event, data );
+            break;
+        case COMM_BLE:
+//            performBLEEvent(*(ble_event_t *)&event, data );
+            break;
+        case COMM_SUB:
+//            performSUBEvent(*(sub_event_t *)&event, data );
             break;
         default:
             break;

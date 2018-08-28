@@ -67,11 +67,13 @@ rho_setting_t
     settings;
 } rho_t;
 
+void InitRho( rho_setting_t * );
 void SendRhoSetting( rho_setting_t * );
 void ReceiveRhoPacket( rho_t * );
 
 typedef struct
 {
+    void (*Init)( rho_setting_t * );
     void (*Send)( rho_setting_t * );
     void (*Receive)( rho_t * );
     comm_event_t (*GetSendEvent)(void);
@@ -83,6 +85,7 @@ static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ COMM_READ_
 
 static rho_functions RhoFunctions =
 {
+    .Init = InitRho,
     .Send = SendRhoSetting,
     .Receive = ReceiveRhoPacket,
     .GetSendEvent = RhoGetSendEvent,

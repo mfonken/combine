@@ -35,7 +35,7 @@ typedef struct
 } imu_t;
 
 bool Init_IMU( imu_t *, component_id, uint8_t, comm_channel, imu_chip_t );
-bool Start_IMU_RotVec( imu_t * );
+bool Set_IMU_RotVec( imu_t * );
 
 static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
 {
@@ -62,7 +62,7 @@ static const imu_functions IMUFunctions =
     .Stop = BNO080DisableFeature,
     .Read = BNO080Read,
     .Refresh = BNO080Refresh,
-    .RotVec = Start_IMU_RotVec
+    .RotVec = Set_IMU_RotVec
 };
 
 #endif /* motionsensor_h */

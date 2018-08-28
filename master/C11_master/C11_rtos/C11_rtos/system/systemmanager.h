@@ -34,9 +34,9 @@ void PerformSystemManagerSubactivity( system_subactivity_t );
 void RegisterSystemManangerTaskShelf( system_task_shelf_t * );
 void RegisterSystemManangerSubactivityMap( system_subactivity_map_t );
 void RegisterSystemManagerProfile( system_profile_t * );
+void RegisterSystemManagerProfileEntry( system_profile_entry_t * );
 void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
 void RegisterSystemManagerState( system_state_t );
-//void RegisterSystemManagerAction( system_action_t );
 void RegisterSystemManagerActivity( system_activity_t );
 void RegisterSystemManagerSubactivity( system_subactivity_t );
 void RegisterSystemManagerError( system_error_t );
@@ -59,9 +59,9 @@ typedef struct
     void (*TaskShelf)( system_task_shelf_t * );
     void (*SubactivityMap)( system_subactivity_map_t );
     void (*Profile)( system_profile_t * );
+    void (*ProfileEntry)( system_profile_entry_t * );
     void (*StateProfileList)( system_state_profile_list_t * );
     void (*State)( system_state_t );
-//    void (*Action)( system_action_t );
     void (*Activity)( system_activity_t );
     void (*Subactivity)( system_subactivity_t );
     void (*Error)( system_error_t );
@@ -90,9 +90,9 @@ static system_functions SystemFunctions =
     .Registers.TaskShelf = RegisterSystemManangerTaskShelf,
     .Registers.SubactivityMap = RegisterSystemManangerSubactivityMap,
     .Registers.Profile = RegisterSystemManagerProfile,
+    .Registers.ProfileEntry = RegisterSystemManagerProfileEntry,
     .Registers.StateProfileList = RegisterSystemManagerStateProfileList,
     .Registers.State = RegisterSystemManagerState,
-//    .Registers.Action = RegisterSystemManagerAction,
     .Registers.Activity = RegisterSystemManagerActivity,
     .Registers.Subactivity = RegisterSystemManagerSubactivity,
     .Registers.Error = RegisterSystemManagerError,

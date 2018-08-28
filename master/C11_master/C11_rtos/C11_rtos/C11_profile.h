@@ -19,6 +19,10 @@
 #define PORTD 0
 #define PORTF 0
 
+#define COMPONENT_FAMILIES_IDLE SYSTEM_FAMILY_0
+#define COMPONENT_FAMILIES_ALL  SYSTEM_FAMILY_0, SYSTEM_FAMILY_A, SYSTEM_FAMILY_B, SYSTEM_FAMILY_C
+#define COMPONENT_FAMILIES_ERROR  SYSTEM_FAMILY_0, SYSTEM_FAMILY_B, SYSTEM_FAMILY_C
+
 /* BNO080 - Primary Motion Sensor */
 #define BNO080_ID           SYSTEM_COMPONENT_MOTION_PRIMARY
 #define BNO080_FAMILY       SYSTEM_FAMILY_B
@@ -96,13 +100,6 @@
 #define XC9265_STATE        COMPONENT_STATE_OFF
 #define XC9265_COMPONENT  { XC9265_ID, XC9265_FAMILY, XC9265_COMM, XC9265_CHANN, XC9265_ADDR, XC9265_PORT, XC9265_PIN, XC9265_STATE }
 
-#define SYSTEM_NO_TASK { \
-.ID.interrupter = SYSTEM_SCHEDULER_ID_NONE, \
-.header = { SYSTEM_PROFILE_ENTRY_STATE_NONE, SYSTEM_PROFILE_ENTRY_DIRECTION_NONE, SYSTEM_PROFILE_ENTRY_TYPE_NONE }, \
-.data.info = { 0 }, \
-.component = SYSTEM_COMPONENT_NONE, \
-.handler_id = SYSTEM_SUBACTIVITY_NONE }
-
 #define SYSTEM_SENSOR_MOTION_PRIMARY_INTERRUPT_ENTRY { \
 .ID.interrupter = SYSTEM_SCHEDULER_ID_MOTION_INTERRUPT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
@@ -146,7 +143,7 @@
 .handler_id = SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC }
 
 #define COMMUNICATION_HOST_SCHEDULED_TRANSMIT_PACKET_ENTRY { \
-.ID.scheduler = SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT, \
+.ID.interrupter = SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
 .data.schedule = 0, \
 .component = SYSTEM_DRIVER_BLE_RADIO, \
@@ -169,42 +166,49 @@
 #define SYSTEM_TASK_SHELF_ENTRY_NULL { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS, \
 .num_interrupts = 0, \
-.interrupts = { SYSTEM_NO_TASK }, \
+.interrupts = { }, \
 .num_scheduled = 0, \
-.scheduled = { SYSTEM_NO_TASK } }
+.scheduled = { } }
+
+#define SYSTEM_TASK_SHELF_ENTRY_GLOBAL_TASKS { \
+.task_id = SYSTEM_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS, \
+.num_interrupts = 1, \
+.interrupts = { COMMUNICATION_HOST_RECEIVE_PACKET_INTERRUPT_ENTRY }, \
+.num_scheduled = 1, \
+.scheduled = { SYSTEM_SENSOR_BATTERY_MONITOR_SCHEDULED_PROBE_ENTRY } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_SENSOR_MOTION_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS, \
 .num_interrupts = 1, \
 .interrupts = { SYSTEM_SENSOR_MOTION_PRIMARY_INTERRUPT_ENTRY }, \
 .num_scheduled = 0, \
-.scheduled = { SYSTEM_NO_TASK } }
+.scheduled = { } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_SENSOR_TOUCH_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS, \
 .num_interrupts = 1, \
 .interrupts = { SYSTEM_SENSOR_TOUCH_PRIMARY_INTERRUPT_ENTRY }, \
 .num_scheduled = 0, \
-.scheduled = { SYSTEM_NO_TASK } }
+.scheduled = { } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_SENSOR_TIP_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS, \
 .num_interrupts = 0, \
-.interrupts = { SYSTEM_NO_TASK }, \
+.interrupts = { }, \
 .num_scheduled = 1, \
 .scheduled = { SYSTEM_SENSOR_TIP_SCHEDULED_PROBE_ENTRY } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_SENSOR_BATTERY_MONITOR_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS, \
 .num_interrupts = 0, \
-.interrupts = { SYSTEM_NO_TASK }, \
+.interrupts = { }, \
 .num_scheduled = 1, \
 .scheduled = { SYSTEM_SENSOR_BATTERY_MONITOR_SCHEDULED_PROBE_ENTRY } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_SENSOR_RHO_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS, \
 .num_interrupts = 0, \
-.interrupts = { SYSTEM_NO_TASK }, \
+.interrupts = { }, \
 .num_scheduled = 1, \
 .scheduled = { SYSTEM_SENSOR_RHO_RECEIVE_INTERRUPT_ENTRY } }
 
@@ -213,7 +217,7 @@
 .num_interrupts = 1, \
 .interrupts = { SYSTEM_DRIVER_HAPTIC_PRIMARY_TRIGGER_ENTRY }, \
 .num_scheduled = 0, \
-.scheduled = { SYSTEM_NO_TASK } }
+.scheduled = { } }
 
 #define SYSTEM_TASK_SHELF_ENTRY_COMMUNICATION_HOST_RADIO_TASKS { \
 .task_id = SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS, \
@@ -227,12 +231,13 @@
 .num_interrupts = 1, \
 .interrupts = { COMMUNICATION_SUB_TRANSMIT_PACKET_INTERRUPT_ENTRY }, \
 .num_scheduled = 0, \
-.scheduled = { SYSTEM_NO_TASK } }
+.scheduled = { } }
 
 static system_profile_t Profile =
 {
     { /* Task Shelf */
         SYSTEM_TASK_SHELF_ENTRY_NULL,
+        SYSTEM_TASK_SHELF_ENTRY_GLOBAL_TASKS,
         SYSTEM_TASK_SHELF_ENTRY_SENSOR_MOTION_TASKS,
         SYSTEM_TASK_SHELF_ENTRY_SENSOR_TOUCH_TASKS,
         SYSTEM_TASK_SHELF_ENTRY_SENSOR_TIP_TASKS,
@@ -242,7 +247,6 @@ static system_profile_t Profile =
         SYSTEM_TASK_SHELF_ENTRY_COMMUNICATION_HOST_RADIO_TASKS,
         SYSTEM_TASK_SHELF_ENTRY_COMMUNICATION_SUB_RADIO_TASKS
     },
-    
     { /* State Profiles */
         { /* SYSTEM_STATE_STARTUP */
             {
@@ -256,18 +260,20 @@ static system_profile_t Profile =
                 },
                 SYSTEM_STATE_ACTIVE
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
-                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS,
+            { COMPONENT_FAMILIES_ALL }, /* Families */
+            3, { /* Tasks */
+                SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
+                SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
+                SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
             }
         },
         { /* SYSTEM_STATE_IDLE */
             {
                 SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_IDLE
+                0, { }, SYSTEM_STATE_IDLE
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -276,8 +282,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_WAITING
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -286,8 +292,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_ACTIVE
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_ALL }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -296,8 +302,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_ASLEEP
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -306,8 +312,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_ERROR
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_ERROR }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -316,8 +322,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_RECOVERY
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_ERROR }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
@@ -326,8 +332,8 @@ static system_profile_t Profile =
                 SYSTEM_ACTIVITY_NONE,
                 0, {}, SYSTEM_STATE_UNKNOWN
             },
-            { SYSTEM_FAMILY_A }, /* Families */
-            { /* Tasks */
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         }

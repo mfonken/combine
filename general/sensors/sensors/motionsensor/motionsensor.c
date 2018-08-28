@@ -19,7 +19,7 @@ bool Init_IMU( imu_t * imu, component_id component_ID, uint8_t shtp_ID, comm_cha
     return true;
 }
 
-bool Start_IMU_RotVec( imu_t * imu )
+bool Set_IMU_RotVec( imu_t * imu )
 {
     IMUFunctions.Start( &imu->client, SH2_SENSOR_REPORT_ROTATION_VECTOR, imu->interval, 0 );
     return true;
