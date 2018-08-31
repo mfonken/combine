@@ -23,13 +23,15 @@
 #define DEFAULT_SYSTEM_CONSUMPTION SYSTEM_CONSUMPTION_NONE
 #define DEFAULT_SYSTEM_ACTIVITY SYSTEM_ACTIVITY_NONE
 
-static system_master_t System;
+extern system_master_t System;
 
 void InitSystemManager(system_profile_t *);
 
 void PerformSystemManagerRoutine( system_activity_routine_t * );
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t *, uint8_t );
 void PerformSystemManagerSubactivity( system_subactivity_t );
+void PerformSystemManagerEnableProfileEntryState( system_profile_entry_t * );
+void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * );
 
 void RegisterSystemManangerTaskShelf( system_task_shelf_t * );
 void RegisterSystemManangerSubactivityMap( system_subactivity_map_t );
@@ -53,6 +55,8 @@ typedef struct
     void (*Routine)( system_activity_routine_t * );
     void (*Subactivities)( system_subactivity_t *, uint8_t );
     void (*Subactivity)( system_subactivity_t );
+    void (*EnableProfileEntry)( system_profile_entry_t * );
+    void (*DisableProfileEntry)( system_profile_entry_t * );
 } system_perform_functions;
 typedef struct
 {
@@ -75,10 +79,17 @@ typedef struct
 
 typedef struct
 {
+    system_subactivity_map_entry_t * (*SubactivityMapEntry)( system_subactivity_t );
+    system_task_shelf_entry_t * (*TaskShelfEntry)( system_task_shelf_entry_id_t );
+} system_get_functions;
+
+typedef struct
+{
     void (*Init)(system_profile_t *);
     system_perform_functions Perform;
     system_register_functions Registers;
     system_enstate_functions Enstate;
+    system_get_functions Get;
 } system_functions;
 
 static system_functions SystemFunctions =
@@ -87,6 +98,8 @@ static system_functions SystemFunctions =
     .Perform.Routine = PerformSystemManagerRoutine,
     .Perform.Subactivities = PerformSystemManagerRoutineSubactivities,
     .Perform.Subactivity = PerformSystemManagerSubactivity,
+    .Perform.EnableProfileEntry = PerformSystemManagerEnableProfileEntryState,
+    .Perform.DisableProfileEntry = PerformSystemManagerEnableProfileEntryState,
     .Registers.TaskShelf = RegisterSystemManangerTaskShelf,
     .Registers.SubactivityMap = RegisterSystemManangerSubactivityMap,
     .Registers.Profile = RegisterSystemManagerProfile,
@@ -98,6 +111,8 @@ static system_functions SystemFunctions =
     .Registers.Error = RegisterSystemManagerError,
     .Registers.Consumption = RegisterSystemManagerConsumption,
     .Enstate.TaskShelfEntry = EnstateSystemManagerTaskShelfEntry,
-    .Enstate.StateProfile = EnstateSystemManagerStateProfile
+    .Enstate.StateProfile = EnstateSystemManagerStateProfile,
+    .Get.SubactivityMapEntry = GetSubactivityMapEntryById,
+    .Get.TaskShelfEntry = GetTaskShelfEntryById
 };
 #endif /* systemmanager_h */

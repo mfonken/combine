@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		491BF78121376CEA007D404D /* drv2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 491BF78021376CEA007D404D /* drv2605.c */; };
 		4941CC93212E7D3300A95CCE /* systemhandlers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4941CC92212E7D3300A95CCE /* systemhandlers.c */; };
 		4948103B2117974400D3F45A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 4948103A2117974400D3F45A /* main.c */; };
 		494810692117975A00D3F45A /* sysiocontroller.c in Sources */ = {isa = PBXBuildFile; fileRef = 494810582117975A00D3F45A /* sysiocontroller.c */; };
@@ -40,6 +41,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		491BF43B21365F95007D404D /* hapticcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
+		491BF43D21366021007D404D /* drv2605.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = drv2605.h; sourceTree = "<group>"; };
+		491BF78021376CEA007D404D /* drv2605.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = drv2605.c; sourceTree = "<group>"; };
 		4941CC91212E7D3300A95CCE /* systemhandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemhandlers.h; sourceTree = "<group>"; };
 		4941CC92212E7D3300A95CCE /* systemhandlers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = systemhandlers.c; sourceTree = "<group>"; };
 		4941CC9421325AB700A95CCE /* globaltypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = globaltypes.h; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 		49C54B29211914C20072B458 /* systemmanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemmanager.h; path = ../System/systemmanager.h; sourceTree = "<group>"; };
 		49C54B2A211914C20072B458 /* systemmanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = systemmanager.c; path = ../System/systemmanager.c; sourceTree = "<group>"; };
 		49C54B2C211915460072B458 /* systemtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
+		49EBED4A213649AB00F2DB8F /* systemdebug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = systemdebug.h; sourceTree = "<group>"; };
 		49F0AA2A211D19CC005E1D9E /* C11_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_profile.h; sourceTree = "<group>"; };
 		49F0AA2B211D2515005E1D9E /* profilemanager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = profilemanager.h; path = ../System/profilemanager.h; sourceTree = "<group>"; };
 		49F0AA2C211D2515005E1D9E /* profilemanager.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = profilemanager.c; path = ../System/profilemanager.c; sourceTree = "<group>"; };
@@ -102,6 +107,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		491BF43A21365F4B007D404D /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				491BF43D21366021007D404D /* drv2605.h */,
+				491BF78021376CEA007D404D /* drv2605.c */,
+				491BF43B21365F95007D404D /* hapticcontroller.h */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
 		4948102E2117974300D3F45A = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +138,7 @@
 			children = (
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				4948103A2117974400D3F45A /* main.c */,
+				491BF43A21365F4B007D404D /* drivers */,
 				49A55EED2128CCC70087AF74 /* kinetic */,
 				494810412117975A00D3F45A /* sensors */,
 				494810522117975A00D3F45A /* system */,
@@ -170,6 +186,7 @@
 				4941CC9421325AB700A95CCE /* globaltypes.h */,
 				49C54B2C211915460072B458 /* systemtypes.h */,
 				498E8F69211A77F6008F3660 /* systembridge.h */,
+				49EBED4A213649AB00F2DB8F /* systemdebug.h */,
 			);
 			path = system;
 			sourceTree = "<group>";
@@ -319,6 +336,7 @@
 				49A55F062128CCC70087AF74 /* quaternion.c in Sources */,
 				4941CC93212E7D3300A95CCE /* systemhandlers.c in Sources */,
 				49BD147321225BA6002FDB6A /* taumanager.c in Sources */,
+				491BF78121376CEA007D404D /* drv2605.c in Sources */,
 				49A55F022128CCC70087AF74 /* kinetic.c in Sources */,
 				49BD147021225B15002FDB6A /* communicationmanager.c in Sources */,
 				4948106C2117975A00D3F45A /* shtp.c in Sources */,
@@ -444,6 +462,10 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				ENABLE_NS_ASSERTIONS = YES;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -453,6 +475,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RAUFW7M7KN;
+				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

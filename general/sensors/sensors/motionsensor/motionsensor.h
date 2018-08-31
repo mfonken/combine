@@ -53,6 +53,7 @@ typedef struct
     bool (*Read)( shtp_client_t * );
     bool (*Refresh)( shtp_client_t * );
     bool (*RotVec)( imu_t * );
+    void (*GenerateClient)( shtp_client_t *, uint8_t );
 } imu_functions;
 
 static const imu_functions IMUFunctions =
@@ -62,7 +63,8 @@ static const imu_functions IMUFunctions =
     .Stop = BNO080DisableFeature,
     .Read = BNO080Read,
     .Refresh = BNO080Refresh,
-    .RotVec = Set_IMU_RotVec
+    .RotVec = Set_IMU_RotVec,
+    .GenerateClient = BNO080GenerateSH2Client
 };
 
 #endif /* motionsensor_h */

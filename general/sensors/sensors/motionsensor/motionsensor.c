@@ -13,7 +13,6 @@ bool Init_IMU( imu_t * imu, component_id component_ID, uint8_t shtp_ID, comm_cha
 {
     imu->ID = component_ID;
     imu->client.ID = shtp_ID;
-    imu->client.comm_channel = channel;
     imu->chip = chip;
     imu->sensor_specific_metadata = 0;
     return true;

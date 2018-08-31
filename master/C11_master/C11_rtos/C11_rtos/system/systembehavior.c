@@ -50,34 +50,4 @@ void PerformBehaviorInterrupterPerform( system_interrupter_id_t id )
 
 void InitProfileEntry( system_profile_entry_t * entry )
 {
-    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
-    {
-        switch( entry->header.type )
-        {
-            case SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT:
-                switch( entry->header.direction )
-            {
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-                    break;
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                    break;
-                default:
-                    break;
-            }
-                break;
-            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
-                switch( entry->header.direction )
-            {
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-                    break;
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                    break;
-                default:
-                    break;
-            }
-                break;
-            default:
-                break;
-        }
-    }
 }

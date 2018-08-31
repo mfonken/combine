@@ -20,15 +20,17 @@ typedef uint16_t packet_data_type;
 typedef float global_timestamp_t;
 typedef struct
 {
+generic_id_t
+    ID;
 uint8_t
-    ID,
     includes,
     timestamp[sizeof(global_timestamp_t)];
 } global_packet_header;
 
 typedef struct
 {
-    ///
+generic_id_t
+    ID;
 } rho_setting_t;
 
 typedef struct

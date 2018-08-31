@@ -22,6 +22,7 @@
 typedef void (*generic_function_t)(void);
 
 typedef uint16_t event_id;
+typedef uint8_t generic_id_t;
 
 typedef struct
 {
@@ -29,11 +30,12 @@ uint8_t
     macro,
     micro;
 } component_id;
+
 typedef struct
 {
-    component_id
+component_id
     ID;
-    uint8_t
+uint8_t
     family,
     comm,
     chann,
@@ -42,7 +44,7 @@ typedef struct
     pin,
     state,
     tied;
-    void *
+void *
     instance;
 } component_t;
 

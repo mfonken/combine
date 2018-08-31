@@ -28,38 +28,6 @@
 #define SHTP_REPORT_STATUS_MASK 0x03
 #define SHTP_FRS_STATUS_MASK 0x0f
 
-//void PushBytesToSHTPClientBufferNext(uint8_t *, uint16_t );
-//void PushAxis3ToSHTPClientBufferNext( axis3_t * );
-//uint8_t * GetSHTPClientBufferNext( shtp_client_buffer * );
-//typedef struct
-//{
-//    void (*Push)(uint8_t *, uint16_t );
-//    void (*PushAxis3)( axis3_t * );
-//    uint8_t *(*GetNext)( shtp_client_buffer *  );
-//} shtp_client_buffer_functions;
-//static shtp_client_buffer_functions SHTPClientBufferFunctions =
-//{
-//    .Push = PushBytesToSHTPClientBufferNext,
-//    .PushAxis3 = PushAxis3ToSHTPClientBufferNext,
-//    .GetNext = GetSHTPClientBufferNext
-//};
-//void PushBytesToSHTPClientBufferNext( uint8_t * data, uint16_t len, shtp_client_buffer * buffer )
-//{
-//    memcpy( SHTPClientBufferFunctions.GetNext(buffer), data, len );
-//    buffer->offset += len;
-//    buffer->length += len;
-//}
-//void PushAxis3ToSHTPClientBufferNext( axis3_t * data, shtp_client_buffer * buffer)
-//{
-//    CopyAxis3ToByteArray( data, SHTPClientBufferFunctions.GetNext(buffer) );
-//    buffer->offset += sizeof(axis3_t);
-//    buffer->length += sizeof(axis3_t);
-//}
-//uint8_t * GetSHTPClientBufferNext( shtp_client_buffer * buffer )
-//{
-//    return (((uint8_t *)&buffer->data) + buffer->offset);
-//}
-
 typedef struct
 {
     uint16_t x, y, z;
@@ -80,8 +48,10 @@ typedef enum
 
 typedef struct
 {
-    comm_channel channel;
-    uint8_t address;
+comm_channel
+    channel;
+uint8_t
+    address;
 } shtp_client_header;
 
 typedef struct
@@ -126,9 +96,23 @@ typedef struct
     shtp_client_output output;
     uint8_t
         ID,
-        sequence_number,
-        comm_channel;
+        sequence_number;
 } shtp_client_t;
+
+static void SHTP_GenerateSH2Client( shtp_client_t * client,
+                                    uint8_t ID, uint8_t sequence_number,
+                                    shtp_client_header * header,
+                                    shtp_client_buffer * buffer,
+                                    shtp_client_product_id * product,
+                                    shtp_client_output * output )
+{
+    client->ID = ID;
+    client->sequence_number = sequence_number;
+    memcpy( (void *)&client->header, header, sizeof(shtp_client_header) );
+    memcpy( (void *)&client->buffer, buffer, sizeof(shtp_client_buffer) );
+    memcpy( (void *)&client->product, product, sizeof(shtp_client_product_id) );
+    memcpy( (void *)&client->output, output, sizeof(shtp_client_output) );
+}
 
 static shtp_client_t * active_client;
 
@@ -219,10 +203,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->comm_channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, COMM_READ_REG, NO_REG, len }; }
-static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->comm_channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->comm_channel, COMM_WRITE_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, len }; }
 
 typedef struct
 {
@@ -256,6 +240,13 @@ typedef struct
     comm_event_t (*GetPacketReceiveEvent)(uint8_t);
     comm_event_t (*GetHeaderSendEvent)(void);
     comm_event_t (*GetPacketSendEvent)(uint8_t);
+    
+    void (*GenerateClient)( shtp_client_t *,
+                            uint8_t, uint8_t,
+                            shtp_client_header *,
+                            shtp_client_buffer *,
+                            shtp_client_product_id *,
+                            shtp_client_output * );
 } shtp_functions;
 
 static const shtp_functions SHTPFunctions =
@@ -289,7 +280,9 @@ static const shtp_functions SHTPFunctions =
     .GetHeaderReceiveEvent = GetSHTPHeaderReceiveEvent,
     .GetPacketReceiveEvent = GetSHTPPacketReceiveEvent,
     .GetHeaderSendEvent = GetSHTPHeaderSendEvent,
-    .GetPacketSendEvent = GetSHTPPacketSendEvent
+    .GetPacketSendEvent = GetSHTPPacketSendEvent,
+    
+    .GenerateClient = SHTP_GenerateSH2Client
 };
 
 void ParseAccelerometerReport(sh2_accelerometer_input_report * );

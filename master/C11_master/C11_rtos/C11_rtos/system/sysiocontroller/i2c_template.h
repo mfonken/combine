@@ -10,6 +10,7 @@
 #define i2c_template_h
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define NO_REG 0xff
 #define I2C_DATA_LEN 32
@@ -74,6 +75,11 @@ static uint8_t performI2CEvent( i2c_event_t e, uint8_t * data )
             break;
     }
     return len;
+}
+
+static uint8_t performI2CEventByte( i2c_event_t e, uint8_t byte )
+{
+    return performI2CEvent( e, &byte );
 }
 
 #endif /* i2c_template_h */

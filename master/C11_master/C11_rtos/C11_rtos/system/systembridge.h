@@ -12,12 +12,27 @@
 #include "C11_profile.h"
 #include "systemhandlers.h"
 
+typedef struct
+{
+    uint8_t a,b,c;
+} test_t;
+
+static test_t testA, testB;
+
+static void Test( test_t * test )
+{
+//    printf(">%p\n", test );
+}
+
 static void InitializeMeta(void)
 {
+    printf("Bridge System pointer is %p\n", &System);
+    Test(&testA);
     SystemFunctions.Registers.SubactivityMap(
      (system_subactivity_map_t)
      {
          {
+             { SYSTEM_SUBACTIVITY_TEST, .function.pointer = (void(*)(void *))Test, .data.pointer = &testA },
              { SYSTEM_SUBACTIVITY_SELF_CHECK, .function.blank = (void(*)(void))BehaviorFunctions.Perform.SelfCheck, NO_DATA },
              
              { SYSTEM_SUBACTIVITY_HANDLE_MOTION_EVENT, .function.blank = (void(*)(void))HandlerFunctions.Input.Motion, NO_DATA },
@@ -41,7 +56,7 @@ static void InitializeMeta(void)
              
              /* Initialization */
              { SYSTEM_SUBACTIVITY_INIT_COMMUNICATION, .function.blank = (void(*)(void))CommFunctions.Init, .data.byte = NO_DATA },
-             { SYSTEM_SUBACTIVITY_INIT_COMPONENTS, .function.pointer = (void(*)(void *))SysIOCtlFunctions.Init, .data.pointer = Profile.components },
+             { SYSTEM_SUBACTIVITY_INIT_COMPONENTS, .function.pointer = (void(*)(void *))SysIOCtlFunctions.Init, .data.pointer = &System },
              { SYSTEM_SUBACTIVITY_INIT_TAU_CLIENT, .function.blank = (void(*)(void))TauFunctions.Perform.Init, .data.byte = NO_DATA },
              { SYSTEM_SUBACTIVITY_INIT_RHO_CLIENT, .function.pointer = (void(*)(void *))RhoFunctions.Init, .data.pointer = &System.objects.Rho.settings },
              { SYSTEM_SUBACTIVITY_INIT_CONFIRM, .function.blank   = (void(*)(void))BehaviorFunctions.Perform.ConfirmInit, .data.byte = NO_DATA },
@@ -65,7 +80,7 @@ static void InitializeMeta(void)
              { SYSTEM_SUBACTIVITY_POLL_BATTERY_MONITOR, .function.pointer = (void(*)(void *))BatteryMonitor.GetBasic, .data.pointer = &System.buffers.battery },
 //             { SYSTEM_SUBACTIVITY_POLL_TIP, .function.pointer = (void(*)(void *))BatteryMonitor.GetBasic, .data.pointer = &System.buffers.tip_data },
              
-//             { SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC, .function.pointer = (void(*)(void *))Haptic.Update, .data.pointer = &System.buffers.haptic },
+             { SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC, .function.byte = (void(*)(uint8_t))HapticFunctions.Trigger, .data.byte = System.buffers.haptic },
              
              { SYSTEM_SUBACTIVITY_TRANSMIT_HOST_PACKET, .function.pointer = (void(*)(void *))CommFunctions.Transmit, .data.pointer = &System.buffers.packet_out },
              { SYSTEM_SUBACTIVITY_RECEIVE_HOST_PACKET, .function.pointer = (void(*)(void *))CommFunctions.Transmit, .data.pointer = &System.buffers.packet_in },
@@ -87,10 +102,6 @@ static void InitializeMeta(void)
 }
 
 #endif /* systembridge_h */
-
-
-//
-
 
 
 
