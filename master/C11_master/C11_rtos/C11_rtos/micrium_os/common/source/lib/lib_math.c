@@ -53,8 +53,8 @@
 *********************************************************************************************************
 */
 
-#include  <common/include/lib_math.h>
-#include  <cpu/include/cpu.h>
+#include  "lib_math.h"
+#include  "cpu.h"
 
 
 /*

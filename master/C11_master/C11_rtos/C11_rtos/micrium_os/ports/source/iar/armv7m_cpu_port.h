@@ -60,12 +60,12 @@
 *********************************************************************************************************
 */
 
-#include  <intrinsics.h>
+//#include  <intrinsics.h>
 
-#include  <cpu/include/cpu_def.h>
+#include  "cpu_def.h"
 
-#include  <common/include/rtos_path.h>
-#include  <cpu_cfg.h>                                           /* See Note #3.                                         */
+#include  "rtos_path.h"
+#include  "cpu_cfg.h"                                         /* See Note #3.                                         */
 
 #ifdef __cplusplus
 extern  "C" {

@@ -55,8 +55,8 @@
 *********************************************************************************************************
 */
 
-#include  <common/include/rtos_opt_def.h>
-#include  <common/include/rtos_path.h>
+#include  "rtos_opt_def.h"
+#include  "rtos_path.h"
 
 #ifndef CPU_PORT_PATH
     #if ((RTOS_CPU_PORT_NAME == RTOS_CPU_SEL_ARM_V7_M) || \
@@ -75,7 +75,7 @@
         #if   (RTOS_TOOLCHAIN_NAME == RTOS_TOOLCHAIN_ARMCC)
             #include  <ports/source/armcc/armv6m_cpu_port.h>
         #elif (RTOS_TOOLCHAIN_NAME == RTOS_TOOLCHAIN_GNU)
-            #include  <ports/source/gnu/armv6m_cpu_port.h>
+//            #include  <ports/source/gnu/armv6m_cpu_port.h>
         #elif (RTOS_TOOLCHAIN_NAME == RTOS_TOOLCHAIN_IAR)
             #include  <ports/source/iar/armv6m_cpu_port.h>
         #else

@@ -83,14 +83,14 @@
 
 #include  "cpu_def.h"
 
-#include  <common/include/rtos_path.h>
-#include  <cpu_cfg.h>
+#include  "rtos_path.h"
+#include  "cpu_cfg.h"
 
 #include  "cpu_port_sel.h"
 
-#include  <common/include/rtos_err.h>
+#include  "rtos_err.h"
 
-#include  <common/include/lib_def.h>
+#include  "lib_def.h"
 
 #include  "cpu_int.h"
 

@@ -10,16 +10,18 @@
 
 void SYSIOCTL_Init( system_master_t * system )
 {
-    printf("SysIOCTL System pointer is %p\n", system);
     printd("Initializing SYSIOCTL\n");
     memset( &SysIOCtl, 0, sizeof(SysIOCtl) );
     SysIOCtl.system = system;
     for( uint8_t i = 0; i < system->profile->component_list.num_entries; i++ )
     {
         component_t * component = &system->profile->component_list.entries[i];
-        SYSIOCTL_Init_Component( component );
-        SYSIOCTL_Push_Component( component );
+        SysIOCtlFunctions.EnableFamily( component->family );
+        SysIOCtlFunctions.InitComponent( component );
+        SysIOCtlFunctions.Push( component );
+        SysIOCtlFunctions.DisableFamily( component->family );
     }
+    SysIOCtlFunctions.EnableFamily( SYSTEM_FAMILY_0 );
 }
 
 component_t * SYSIOCTL_Get_Component( component_id id )
@@ -50,7 +52,7 @@ shtp_client_output * output )
  */
 void SYSIOCTL_Init_Component( component_t * component )
 {
-    printd("Initializing %s 0x%02x\n", component_type_strings[component->ID.macro], component->ID.micro);
+    printd("Initializing component: %s 0x%02x\n", component_type_strings[component->ID.macro], component->ID.micro);
     generic_id_t ID = PROTOCOL_ID_NULL;
     if( component->ID.macro == SYSTEM_COMPONENT_TYPE_SENSOR )
     {
@@ -88,7 +90,7 @@ void SYSIOCTL_Init_Component( component_t * component )
 
 void SYSIOCTL_Push_Component( component_t * component )
 {
-    printd("Pushing 0x%02x\n", component->ID.micro);
+    printd("Pushing component: 0x%02x\n", component->ID.micro);
     SysIOCtl.tables.component[component->family][SysIOCtl.tables.index[component->family]++] = *component;
     if( SysIOCtl.tables.index[component->family] >= SYSIOCTL_MAX_COMPONENTS_PER_FAMILY )
     {
@@ -100,24 +102,29 @@ void SYSIOCTL_Push_Component( component_t * component )
 
 void SYSIOCTL_Enable_Family( system_family_t family )
 {
-    printd("Enabling %s\n", family_strings[family]);
-    for( uint8_t i = 0; i < SysIOCtl.tables.index[family]; i++)
-    {
+    if( family == SYSTEM_FAMILY_NONE ) return;
+    if( family == SYSTEM_FAMILY_0 ) return;
+    uint8_t i = 0;
+    printd("Enabling family: %s\n", family_strings[family]);
+    for( ; i < SysIOCtl.tables.index[family]; i++)
         SYSIOCTL_Enable_Component( &SysIOCtl.tables.component[family][i] );
-    }
+    if( !i )
+        printd("No components in family: %s\n", family_strings[family]);
 }
 void SYSIOCTL_Disable_Family( system_family_t family )
 {
+    if( family == SYSTEM_FAMILY_NONE ) return;
     if( family == SYSTEM_FAMILY_0 )
     {
         printd("Rejecting disable of FAMILY_0\n");
         return;
     }
+    uint8_t i = 0;
     printd("Disabling %s\n", family_strings[family]);
-    for( uint8_t i = 0; i < SysIOCtl.tables.index[family]; i++)
-    {
+    for( ; i < SysIOCtl.tables.index[family]; i++)
         SYSIOCTL_Disable_Component( &SysIOCtl.tables.component[family][i] );
-    }
+    if( !i )
+        printd("No components in family: %s\n", family_strings[family]);
 }
 
 void GPIO_Set( uint8_t port, uint8_t pin, uint8_t status )
@@ -127,13 +134,13 @@ void GPIO_Set( uint8_t port, uint8_t pin, uint8_t status )
 
 void SYSIOCTL_Enable_Component( component_t * component )
 {
-    printd("Enabling 0x%02x\n", component->ID.micro);
+    printd("Enabling component: 0x%02x\n", component->ID.micro);
     GPIO_Set( component->pin, component->port, 1 );
 }
 
 void SYSIOCTL_Disable_Component( component_t * component )
 {
-    printd("Disabling 0x%02x\n", component->ID.micro);
+    printd("Disabling component: 0x%02x\n", component->ID.micro);
     GPIO_Set( component->pin, component->port, 0 );
 }
 

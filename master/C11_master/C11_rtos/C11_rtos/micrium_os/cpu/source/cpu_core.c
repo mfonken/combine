@@ -55,7 +55,7 @@
 *********************************************************************************************************
 */
 
-#include  <cpu/include/cpu.h>
+#include  "cpu.h"
 
 #include  <common/source/rtos/rtos_utils_priv.h>
 

@@ -20,7 +20,7 @@
 #define PORTF 0
 
 #define COMPONENT_FAMILIES_IDLE SYSTEM_FAMILY_0
-#define COMPONENT_FAMILIES_ALL  SYSTEM_FAMILY_0, SYSTEM_FAMILY_A, SYSTEM_FAMILY_B, SYSTEM_FAMILY_C
+#define COMPONENT_FAMILIES_ALL  SYSTEM_FAMILY_0, SYSTEM_FAMILY_A, SYSTEM_FAMILY_B, SYSTEM_FAMILY_C, SYSTEM_FAMILY_D
 #define COMPONENT_FAMILIES_ERROR  SYSTEM_FAMILY_0, SYSTEM_FAMILY_B, SYSTEM_FAMILY_C
 
 /* BNO080 - Primary Motion Sensor */
@@ -101,63 +101,63 @@
 #define XC9265_COMPONENT  { XC9265_ID, XC9265_FAMILY, XC9265_COMM, XC9265_CHANN, XC9265_ADDR, XC9265_PORT, XC9265_PIN, XC9265_STATE }
 
 #define SYSTEM_SENSOR_MOTION_PRIMARY_INTERRUPT_ENTRY { \
-.ID.interrupter = SYSTEM_SCHEDULER_ID_MOTION_INTERRUPT, \
+.ID = SYSTEM_SCHEDULER_ID_MOTION_INTERRUPT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
 .data.info = { 0 }, \
 .component_ID = SYSTEM_SENSOR_MOTION_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_HANDLE_MOTION_EVENT }
 
 #define SYSTEM_SENSOR_TOUCH_PRIMARY_INTERRUPT_ENTRY { \
-.ID.interrupter = SYSTEM_SCHEDULER_ID_TOUCH_INTERRUPT, \
+.ID = SYSTEM_SCHEDULER_ID_TOUCH_INTERRUPT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
 .data.info = { 0 }, \
 .component_ID = SYSTEM_SENSOR_TOUCH_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_HANDLE_TOUCH_EVENT }
 
 #define SYSTEM_SENSOR_TIP_SCHEDULED_PROBE_ENTRY { \
-.ID.scheduler = SYSTEM_SCHEDULER_ID_TIP_POLL, \
+.ID = SYSTEM_SCHEDULER_ID_TIP_POLL, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
 .data.schedule = 0, \
 .component_ID = SYSTEM_SENSOR_TIP_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_POLL_TIP }
 
 #define SYSTEM_SENSOR_BATTERY_MONITOR_SCHEDULED_PROBE_ENTRY { \
-.ID.scheduler = SYSTEM_SCHEDULER_ID_BATTERY_MONITOR_POLL, \
+.ID = SYSTEM_SCHEDULER_ID_BATTERY_MONITOR_POLL, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
 .data.schedule = 0, \
 .component_ID = SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_POLL_BATTERY_MONITOR }
 
 #define SYSTEM_SENSOR_RHO_RECEIVE_INTERRUPT_ENTRY { \
-.ID.interrupter = SYSTEM_SCHEDULER_ID_RHO_INTERRUPT, \
+.ID = SYSTEM_SCHEDULER_ID_RHO_INTERRUPT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
 .data.info = { 0 }, \
 .component_ID = SYSTEM_SENSOR_RHO_MODULE_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_HANDLE_RHO_EVENT }
 
 #define SYSTEM_DRIVER_HAPTIC_PRIMARY_TRIGGER_ENTRY { \
-.ID.interrupter = SYSTEM_INTERRUPTER_ID_HAPTIC_TRIGGER, \
+.ID = SYSTEM_INTERRUPTER_ID_HAPTIC_TRIGGER, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
 .data.info = { 0 }, \
 .component_ID = SYSTEM_DRIVER_HAPTIC_PRIMARY, \
 .handler_id = SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC }
 
 #define COMMUNICATION_HOST_SCHEDULED_TRANSMIT_PACKET_ENTRY { \
-.ID.interrupter = SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT, \
+.ID = SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
 .data.schedule = 0, \
 .component_ID = SYSTEM_DRIVER_BLE_RADIO, \
 .handler_id = SYSTEM_SUBACTIVITY_TRANSMIT_HOST_PACKET }
 
 #define COMMUNICATION_HOST_RECEIVE_PACKET_INTERRUPT_ENTRY { \
-.ID.interrupter = SYSTEM_INTERRUPTER_ID_TAU_PACKET_RECEIVE, \
+.ID = SYSTEM_INTERRUPTER_ID_TAU_PACKET_RECEIVE, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
 .data.schedule = 0, \
 .component_ID = SYSTEM_DRIVER_BLE_RADIO, \
 .handler_id = SYSTEM_SUBACTIVITY_RECEIVE_HOST_PACKET }
 
 #define COMMUNICATION_SUB_TRANSMIT_PACKET_INTERRUPT_ENTRY { \
-.ID.interrupter = SYSTEM_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT, \
+.ID = SYSTEM_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
 .data.info = { 0 }, \
 .component_ID = SYSTEM_DRIVER_SUB_RADIO, \
@@ -248,17 +248,52 @@ static system_profile_t Profile =
         SYSTEM_TASK_SHELF_ENTRY_COMMUNICATION_SUB_RADIO_TASKS
     },
     { /* State Profiles */
-        { /* SYSTEM_STATE_STARTUP */
+        {
+            SYSTEM_STATE_STARTUP,
             {
                 SYSTEM_ACTIVITY_STARTUP,
-                6, {
-                    SYSTEM_SUBACTIVITY_TEST,
+                5, {
                     SYSTEM_SUBACTIVITY_SELF_CHECK,
                     SYSTEM_SUBACTIVITY_INIT_COMMUNICATION,
                     SYSTEM_SUBACTIVITY_INIT_COMPONENTS,
                     SYSTEM_SUBACTIVITY_INIT_TAU_CLIENT,
                     SYSTEM_SUBACTIVITY_INIT_CONFIRM
                 },
+                SYSTEM_STATE_IDLE//SYSTEM_STATE_ACTIVE
+            },
+            { COMPONENT_FAMILIES_ALL }, /* Families */
+            0, { /* Tasks */
+            }
+        },
+        {
+            SYSTEM_STATE_IDLE,
+            {
+                SYSTEM_ACTIVITY_NONE,
+                0, { },
+                SYSTEM_STATE_IDLE
+            },
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
+                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
+            }
+        },
+        {
+            SYSTEM_STATE_WAITING,
+            {
+                SYSTEM_ACTIVITY_NONE,
+                0, {},
+                SYSTEM_STATE_WAITING
+            },
+            { COMPONENT_FAMILIES_IDLE }, /* Families */
+            1, { /* Tasks */
+                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
+            }
+        },
+        {
+            SYSTEM_STATE_ACTIVE,
+            {
+                SYSTEM_ACTIVITY_NONE,
+                0, {},
                 SYSTEM_STATE_ACTIVE
             },
             { COMPONENT_FAMILIES_ALL }, /* Families */
@@ -268,70 +303,48 @@ static system_profile_t Profile =
                 SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
             }
         },
-        { /* SYSTEM_STATE_IDLE */
+        {
+            SYSTEM_STATE_ASLEEP,
             {
                 SYSTEM_ACTIVITY_NONE,
-                0, { }, SYSTEM_STATE_IDLE
+                0, {},
+                SYSTEM_STATE_ASLEEP
             },
             { COMPONENT_FAMILIES_IDLE }, /* Families */
             1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
-        { /* SYSTEM_STATE_WAITING */
+        {
+            SYSTEM_STATE_ERROR,
             {
                 SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_WAITING
-            },
-            { COMPONENT_FAMILIES_IDLE }, /* Families */
-            1, { /* Tasks */
-                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
-            }
-        },
-        { /* SYSTEM_STATE_ACTIVE */
-            {
-                SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_ACTIVE
-            },
-            { COMPONENT_FAMILIES_ALL }, /* Families */
-            1, { /* Tasks */
-                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
-            }
-        },
-        { /* SYSTEM_STATE_ASLEEP */
-            {
-                SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_ASLEEP
-            },
-            { COMPONENT_FAMILIES_IDLE }, /* Families */
-            1, { /* Tasks */
-                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
-            }
-        },
-        { /* SYSTEM_STATE_ERROR */
-            {
-                SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_ERROR
+                0, {},
+                SYSTEM_STATE_ERROR
             },
             { COMPONENT_FAMILIES_ERROR }, /* Families */
             1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
-        { /* SYSTEM_STATE_RECOVERY */
+        {
+            SYSTEM_STATE_RECOVERY,
             {
                 SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_RECOVERY
+                0, {},
+                SYSTEM_STATE_RECOVERY
             },
             { COMPONENT_FAMILIES_ERROR }, /* Families */
             1, { /* Tasks */
                 SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
-        { /* SYSTEM_STATE_UNKNOWN */
+        {
+            SYSTEM_STATE_UNKNOWN,
             {
                 SYSTEM_ACTIVITY_NONE,
-                0, {}, SYSTEM_STATE_UNKNOWN
+                0, {},
+                SYSTEM_STATE_UNKNOWN
             },
             { COMPONENT_FAMILIES_IDLE }, /* Families */
             1, { /* Tasks */

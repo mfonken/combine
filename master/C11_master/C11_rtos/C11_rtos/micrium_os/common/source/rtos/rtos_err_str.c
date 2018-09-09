@@ -43,10 +43,10 @@
 *********************************************************************************************************
 */
 
-#include  <common/include/rtos_path.h>
+#include  "rtos_path.h"
 #include  <rtos_err_cfg.h>
 
-#include  <common/include/lib_def.h>
+#include  "lib_def.h"
 
 
 #if (RTOS_ERR_CFG_STR_EN == DEF_ENABLED)                        /* Do not compile if error strings are turned off.      */

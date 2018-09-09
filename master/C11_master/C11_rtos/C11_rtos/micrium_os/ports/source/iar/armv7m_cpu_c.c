@@ -50,8 +50,8 @@
 
 #define    MICRIUM_SOURCE
 #include  "armv7m_cpu_port.h"
-#include  <cpu/include/cpu.h>
-#include  <common/include/lib_utils.h>
+#include  "cpu.h"
+#include  "lib_utils.h"
 
 
 #ifdef __cplusplus

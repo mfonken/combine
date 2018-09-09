@@ -55,9 +55,9 @@
 *********************************************************************************************************
 */
 
-#include  <rtos_description.h>
+#include  "rtos_description.h"
 #if (RTOS_CPU_SEL == RTOS_CPU_SEL_SILABS_GECKO_AUTO)
-#include "em_device.h"
+//#include "em_device.h"
 #endif
 
 
