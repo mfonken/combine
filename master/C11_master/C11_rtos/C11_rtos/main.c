@@ -6,12 +6,10 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include <stdio.h>
-
-#include "systembridge.h"
+#include "combinemaster.h"
 
 int main(int argc, const char * argv[])
 {
-    InitializeMeta();
+    Bridge.Start();
     return 0;
 }

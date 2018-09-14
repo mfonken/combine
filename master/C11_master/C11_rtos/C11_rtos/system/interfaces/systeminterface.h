@@ -9,9 +9,7 @@
 #ifndef systeminterface_h
 #define systeminterface_h
 
-#include <stdio.h>
 #include "profilemanager.h"
-//#include "systembehavior.h"
 #include "sysiocontroller.h"
 
 void CreateSystemInterfaceOSTask( os_task_data_t * );

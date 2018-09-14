@@ -134,14 +134,18 @@ void GPIO_Set( uint8_t port, uint8_t pin, uint8_t status )
 
 void SYSIOCTL_Enable_Component( component_t * component )
 {
+    if( component->state == COMPONENT_STATE_ON ) return;
     printd("Enabling component: 0x%02x\n", component->ID.micro);
     GPIO_Set( component->pin, component->port, 1 );
+    component->state = COMPONENT_STATE_ON;
 }
 
 void SYSIOCTL_Disable_Component( component_t * component )
 {
+    if( component->state == COMPONENT_STATE_OFF ) return;
     printd("Disabling component: 0x%02x\n", component->ID.micro);
     GPIO_Set( component->pin, component->port, 0 );
+    component->state = COMPONENT_STATE_OFF;
 }
 
 generic_id_t SYSTIOCTL_Generate_ID( protocol_id_base_t base )

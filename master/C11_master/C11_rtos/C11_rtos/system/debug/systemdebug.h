@@ -205,6 +205,7 @@ static const char * task_shelf_entry_id_strings[] =
 static const char * task_id_strings[] =
 {
     "ACTION_ID_NONE",
+    "COMBINE_GLOBAL",
     
     "PROBE_ID_HOST",
     "PROBE_ID_RHO",

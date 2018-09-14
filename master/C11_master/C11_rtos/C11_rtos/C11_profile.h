@@ -9,8 +9,6 @@
 #ifndef C11_profile_h
 #define C11_profile_h
 
-#include "systemtypes.h"
-
 /* Port spoof */
 #define PORT0 0
 #define PORTA 0
@@ -233,7 +231,7 @@
 .num_scheduled = 0, \
 .scheduled = { } }
 
-static system_profile_t Profile =
+PROFILE_TEMPLATE =
 {
     { /* Task Shelf */
         SYSTEM_TASK_SHELF_ENTRY_NULL,

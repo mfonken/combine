@@ -37,11 +37,11 @@ void PerformCommunicationManagerEvent( comm_event_t event, uint8_t * data )
     }
 }
 
-void PerformCommunicationManagerTransmit(comm_packet_t * packet )
+void PerformCommunicationManagerTransmit( comm_packet_t * packet )
 {
     
 }
-void PerformCommunicationManagerReceive( void )
+void PerformCommunicationManagerReceive( comm_packet_t * packet )
 {
     
 }

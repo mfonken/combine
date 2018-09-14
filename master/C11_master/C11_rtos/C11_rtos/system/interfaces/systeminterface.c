@@ -16,19 +16,21 @@ void CreateSystemInterfaceOSTask( os_task_data_t * task_data )
 {
     if( task_data->ID == SYSTEM_ACTION_ID_NONE ) return;
     printd("Creating OS Task: %s\n", task_id_strings[task_data->ID]);
-    //    OSTaskCreate(&BluetoothTaskTCB,
-    //                 "Bluetooth Task",
-    //                 BluetoothTask,
-    //                 0u,
-    //                 stack_priority,
-    //                 &BluetoothTaskStk[0u],
-    //                 BLUETOOTH_STACK_SIZE / 10u,
-    //                 BLUETOOTH_STACK_SIZE,
-    //                 0u,
-    //                 0u,
-    //                 0u,
-    //                 (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-    //                 &os_err);
+    //    OSTaskCreate(&task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 &task_data->[0u],
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 task_data->,
+    //                 &task_data->);
+    
+    task_data->p_task(task_data->p_arg);
 }
 
 void ResumeSystemInterfaceOSTask( os_task_data_t * task_data )

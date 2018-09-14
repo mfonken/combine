@@ -9,7 +9,6 @@
 #ifndef systemhandlers_h
 #define systemhandlers_h
 
-#include <stdio.h>
 #include "systemmanager.h"
 
 #define MAX_HANDLER_QUEUE 10

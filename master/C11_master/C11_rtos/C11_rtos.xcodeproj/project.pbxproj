@@ -98,6 +98,7 @@
 		49A55EFD2128CCC70087AF74 /* point.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = point.c; sourceTree = "<group>"; };
 		49A55EFE2128CCC70087AF74 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
 		49A55EFF2128CCC70087AF74 /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
+		49DF233B214A08E7003AB634 /* combinemaster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = combinemaster.h; sourceTree = "<group>"; };
 		49F0AA2A211D19CC005E1D9E /* C11_profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = C11_profile.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -166,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
+				49DF233B214A08E7003AB634 /* combinemaster.h */,
 				4948103A2117974400D3F45A /* main.c */,
 				496658F6213F6D6B0042050A /* algorithms */,
 				496658F5213F6D530042050A /* peripherals */,

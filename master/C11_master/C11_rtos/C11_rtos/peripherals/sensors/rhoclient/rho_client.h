@@ -9,10 +9,8 @@
 #ifndef rho_client_h
 #define rho_client_h
 
-#include <stdio.h>
-#include <stdint.h>
-
 #include "peripheralbridge.h"
+#include "point.h"
 
 #define RHO_DEFAULT_COMM_CHANNEL COMM_UART
 

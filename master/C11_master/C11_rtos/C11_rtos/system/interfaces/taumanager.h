@@ -9,8 +9,8 @@
 #ifndef taumanager_h
 #define taumanager_h
 
-#include <stdio.h>
 #include "globaltypes.h"
+#include "kinetic_master.h"
 
 #define TAU_MAX_ACTIONS_PER_STATE 3
 
@@ -214,7 +214,7 @@ typedef struct
 uint32_t
     orientation_interval,
     rho_interval;
-} tau_settings_t;
+} tau_config_t;
 
 static tau_data_element_t TauManagerGetElementFromKalman( kalman_t * kalman )
 {

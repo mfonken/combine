@@ -9,7 +9,6 @@
 #ifndef systemmanager_h
 #define systemmanager_h
 
-#include <stdio.h>
 #include "systeminterface.h"
 
 #define DEFAULT_SYSTEM_STATE SYSTEM_STATE_IDLE
@@ -30,17 +29,17 @@ void PerformSystemManagerSubactivity( system_subactivity_t );
 void PerformSystemManagerEnableProfileEntryState( system_profile_entry_t * );
 void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * );
 
-void RegisterSystemManangerOSTaskList( os_task_list_t * );
-void RegisterSystemManangerTaskShelf( system_task_shelf_t * );
-void RegisterSystemManangerSubactivityMap( system_subactivity_map_t * );
-void RegisterSystemManagerProfile( system_profile_t * );
-void RegisterSystemManagerProfileEntry( system_profile_entry_t * );
-void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
-void RegisterSystemManagerState( system_state_t );
-void RegisterSystemManagerActivity( system_activity_t );
-void RegisterSystemManagerSubactivity( system_subactivity_t );
-void RegisterSystemManagerError( system_error_t );
-void RegisterSystemManagerConsumption( system_consumption_t );
+void RegisterystemManangerOSTaskList( os_task_list_t * );
+void RegisterystemManangerTaskShelf( system_task_shelf_t * );
+void RegisterystemManangerSubactivityMap( system_subactivity_map_t * );
+void RegisterystemManagerProfile( system_profile_t * );
+void RegisterystemManagerProfileEntry( system_profile_entry_t * );
+void RegisterystemManagerStateProfileList( system_state_profile_list_t * );
+void RegisterystemManagerState( system_state_t );
+void RegisterystemManagerActivity( system_activity_t );
+void RegisterystemManagerSubactivity( system_subactivity_t );
+void RegisterystemManagerError( system_error_t );
+void RegisterystemManagerConsumption( system_consumption_t );
 
 system_subactivity_map_entry_t * GetSystemManagerSubactivityMapEntryById( system_subactivity_t );
 system_task_shelf_entry_t * GetSystemManagerTaskShelfEntryById( system_task_shelf_entry_id_t );
@@ -88,7 +87,7 @@ typedef struct
 {
     void (*Init)(system_profile_t *);
     system_perform_functions Perform;
-    system_register_functions Registers;
+    system_register_functions Register;
     system_enstate_functions Enstate;
     system_get_functions Get;
 } system_functions;
@@ -101,17 +100,17 @@ static system_functions SystemFunctions =
     .Perform.Subactivity = PerformSystemManagerSubactivity,
     .Perform.EnableProfileEntry = PerformSystemManagerEnableProfileEntryState,
     .Perform.DisableProfileEntry = PerformSystemManagerEnableProfileEntryState,
-    .Registers.OSTaskList = RegisterSystemManangerOSTaskList,
-    .Registers.TaskShelf = RegisterSystemManangerTaskShelf,
-    .Registers.SubactivityMap = RegisterSystemManangerSubactivityMap,
-    .Registers.Profile = RegisterSystemManagerProfile,
-    .Registers.ProfileEntry = RegisterSystemManagerProfileEntry,
-    .Registers.StateProfileList = RegisterSystemManagerStateProfileList,
-    .Registers.State = RegisterSystemManagerState,
-    .Registers.Activity = RegisterSystemManagerActivity,
-    .Registers.Subactivity = RegisterSystemManagerSubactivity,
-    .Registers.Error = RegisterSystemManagerError,
-    .Registers.Consumption = RegisterSystemManagerConsumption,
+    .Register.OSTaskList = RegisterystemManangerOSTaskList,
+    .Register.TaskShelf = RegisterystemManangerTaskShelf,
+    .Register.SubactivityMap = RegisterystemManangerSubactivityMap,
+    .Register.Profile = RegisterystemManagerProfile,
+    .Register.ProfileEntry = RegisterystemManagerProfileEntry,
+    .Register.StateProfileList = RegisterystemManagerStateProfileList,
+    .Register.State = RegisterystemManagerState,
+    .Register.Activity = RegisterystemManagerActivity,
+    .Register.Subactivity = RegisterystemManagerSubactivity,
+    .Register.Error = RegisterystemManagerError,
+    .Register.Consumption = RegisterystemManagerConsumption,
     .Enstate.TaskShelfEntry = EnstateSystemManagerTaskShelfEntry,
     .Enstate.StateProfile = EnstateSystemManagerStateProfile,
     .Get.SubactivityMapEntry = GetSystemManagerSubactivityMapEntryById,

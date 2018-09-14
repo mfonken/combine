@@ -9,8 +9,8 @@
 #ifndef communicationmanager_h
 #define communicationmanager_h
 
-#include <stdio.h>
-#include "globaltypes.h"
+#include "i2c_template.h"
+#include "spi_template.h"
 
 #define COMM_ADDR_NONE 0xff
 typedef enum
@@ -54,13 +54,13 @@ typedef struct
 void CommunicationManagerInit(void);
 void PerformCommunicationManagerEvent( comm_event_t event, uint8_t * data );
 void PerformCommunicationManagerTransmit(comm_packet_t *);
-void PerformCommunicationManagerReceive(void);
+void PerformCommunicationManagerReceive(comm_packet_t *);
 
 typedef struct
 {
     void (*Event)( comm_event_t, uint8_t * );
     void (*Transmit)(comm_packet_t *);
-    void (*Receive)(void);
+    void (*Receive)(comm_packet_t *);
 } comm_perform_functions;
 
 typedef struct

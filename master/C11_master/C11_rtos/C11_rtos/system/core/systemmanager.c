@@ -13,17 +13,19 @@ system_master_t System = { DEFAULT_SYSTEM_STATE };
 void InitSystemManager( system_profile_t * profile )
 {
     printf("Initializing System Manager\n");
-    SystemFunctions.Registers.Profile( profile );
-    SystemFunctions.Registers.Error(DEFAULT_SYSTEM_ERROR);
-    SystemFunctions.Registers.Consumption(SYSTEM_CONSUMPTION_NONE);
+    SystemFunctions.Register.Profile( profile );
+    
+    SystemFunctions.Register.State(SYSTEM_STATE_STARTUP);
     SystemFunctions.Enstate.TaskShelfEntry(SYSTEM_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS);
-    SystemFunctions.Registers.State(SYSTEM_STATE_STARTUP);
+    
+    SystemFunctions.Register.Error(DEFAULT_SYSTEM_ERROR);
+    SystemFunctions.Register.Consumption(SYSTEM_CONSUMPTION_NONE);
 }
 void PerformSystemManagerRoutine( system_activity_routine_t * routine )
 {
-    SystemFunctions.Registers.Activity(routine->activity);
+    SystemFunctions.Register.Activity(routine->activity);
     SystemFunctions.Perform.Subactivities( routine->subactivities, routine->length );
-    SystemFunctions.Registers.State( routine->exit_state );
+    SystemFunctions.Register.State( routine->exit_state );
 }
 void PerformSystemManagerRoutineSubactivities( system_subactivity_t * subactivities, uint8_t len )
 {
@@ -36,10 +38,10 @@ void PerformSystemManagerRoutineSubactivities( system_subactivity_t * subactivit
 void PerformSystemManagerSubactivity( system_subactivity_t subactivity )
 {
     printd("Performing subactivity: %s\n", subactivity_strings[subactivity]);
-    
     system_subactivity_map_entry_t * entry = SystemFunctions.Get.SubactivityMapEntry(subactivity);
     if( entry == NULL ) return;
-    if( entry->data.pointer != NULL ) entry->function.pointer(entry->data.pointer);
+    
+    if( entry->data.pointer != NULL && IS_VALID_PTR(entry->data.pointer)) entry->function.pointer(entry->data.pointer);
     else if( entry->data.byte != NO_DATA ) entry->function.blank();
     else entry->function.byte(entry->data.byte);
 }
@@ -60,62 +62,62 @@ void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * entr
     os_task_data_t * task_data = SystemFunctions.Get.TaskData( entry->ID );
     InterfaceFunctions.OS.Suspend(task_data);
 }
-void RegisterSystemManangerOSTaskList( os_task_list_t * task_list )
+void RegisterystemManangerOSTaskList( os_task_list_t * task_list )
 {
     System.os_tasks = task_list;
     for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
-        InterfaceFunctions.OS.Create( &((*task_list)[i]) );
+        InterfaceFunctions.OS.Create( &((*System.os_tasks)[i]) );
 }
-void RegisterSystemManangerTaskShelf( system_task_shelf_t * shelf )
+void RegisterystemManangerTaskShelf( system_task_shelf_t * shelf )
 {
     for(uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++)
     {
         system_task_shelf_entry_t * entry = &(*shelf)[i];
         for( uint8_t j = 0; j < entry->num_interrupts; j++ )
-            SystemFunctions.Registers.ProfileEntry( &System.profile->shelf[i].interrupts[j]);
+            SystemFunctions.Register.ProfileEntry( &System.profile->shelf[i].interrupts[j]);
         for( uint8_t j = 0; j < entry->num_scheduled; j++ )
-            SystemFunctions.Registers.ProfileEntry( &System.profile->shelf[i].scheduled[j]);
+            SystemFunctions.Register.ProfileEntry( &System.profile->shelf[i].scheduled[j]);
     }
 }
-void RegisterSystemManangerSubactivityMap( system_subactivity_map_t * map)
+void RegisterystemManangerSubactivityMap( system_subactivity_map_t * map)
 {
     System.subactivity_map = map;
 }
-void RegisterSystemManagerProfile( system_profile_t * profile )
+void RegisterystemManagerProfile( system_profile_t * profile )
 {
     System.profile = profile;
-//    ProfileFunctions.Init( profile )
-    SystemFunctions.Registers.TaskShelf( &profile->shelf );
-    SystemFunctions.Registers.StateProfileList( &profile->state_profiles );
+    SystemFunctions.Register.TaskShelf( &profile->shelf );
+    SystemFunctions.Register.StateProfileList( &profile->state_profiles );
 }
-void RegisterSystemManagerProfileEntry( system_profile_entry_t * entry )
+void RegisterystemManagerProfileEntry( system_profile_entry_t * entry )
 {
+    system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
     if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
     {
         switch( entry->header.type )
         {
             case SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT:
                 switch( entry->header.direction )
-            {
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-                    
-                    break;
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                    break;
-                default:
-                    break;
-            }
+                {
+                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+//                        handler->function
+                        break;
+                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
                 switch( entry->header.direction )
-            {
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-                    break;
-                case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                    break;
-                default:
-                    break;
-            }
+                {
+                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+                        break;
+                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
@@ -127,33 +129,36 @@ void RegisterSystemManagerProfileEntry( system_profile_entry_t * entry )
 
     ///TODO: Implement interval delay and hardware interrupt functionality!!!
 }
-void RegisterSystemManagerStateProfileList( system_state_profile_list_t * state_profiles )
+void RegisterystemManagerStateProfileList( system_state_profile_list_t * state_profiles )
 {
 //    System.profile->state_profiles = state_profiles;
 }
-void RegisterSystemManagerState( system_state_t state )
+void RegisterystemManagerState( system_state_t state )
 {
-    printd("Registering state: %s\n", state_strings[state]);
     if( System.state == state ) return;
+    
+    printf("\n+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+\n\n");
+    printd("Registering state: %s\n", state_strings[state]);
+    
     System.state = state;
     SystemFunctions.Enstate.StateProfile( &System.profile->state_profiles[state] );
 }
-void RegisterSystemManagerActivity( system_activity_t activity )
+void RegisterystemManagerActivity( system_activity_t activity )
 {
     printd("Registering activity: %s\n", activity_strings[activity]);
     System.activity = activity;
 }
-void RegisterSystemManagerSubactivity( system_subactivity_t subactivity )
+void RegisterystemManagerSubactivity( system_subactivity_t subactivity )
 {
     printd("Registering subactivity: %s\n", subactivity_strings[subactivity]);
     System.subactivity = subactivity;
 }
-void RegisterSystemManagerError( system_error_t error )
+void RegisterystemManagerError( system_error_t error )
 {
     printd("Registering error: %s\n", error_strings[error]);
-    System.error = error;
+    System.error.type = error;
 }
-void RegisterSystemManagerConsumption( system_consumption_t consumption )
+void RegisterystemManagerConsumption( system_consumption_t consumption )
 {
     System.consumption_level = consumption;
 }
@@ -162,6 +167,7 @@ system_subactivity_map_entry_t * GetSystemManagerSubactivityMapEntryById( system
     for( uint8_t i = 0; i < NUM_SYSTEM_SUBACTIVITIES; i++ )
     {
         system_subactivity_map_entry_t * entry = &((*System.subactivity_map)[i]);
+        system_subactivity_t id = (system_subactivity_t)entry->ID;
         if( entry == NULL ) continue;
         if( entry->ID == entry_id ) return entry;
     }
@@ -181,7 +187,7 @@ os_task_data_t * GetSystemManagerTaskDataById( system_task_id_t task_id )
 {
     for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
     {
-        os_task_data_t * task_data = &(*(System.os_tasks)[i]);
+        os_task_data_t * task_data = &((*System.os_tasks)[i]);
         if( task_data == NULL ) continue;
         if( task_data->ID == task_id ) return task_data;
     }
@@ -189,6 +195,7 @@ os_task_data_t * GetSystemManagerTaskDataById( system_task_id_t task_id )
 }
 void EnstateSystemManagerTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
 {
+    if( entry_id == SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS ) return;
     printd("Enstating task shelf entry: %s\n", task_shelf_entry_id_strings[entry_id]);
     system_task_shelf_entry_t * entry = SystemFunctions.Get.TaskShelfEntry( entry_id );
     if( entry == NULL ) return;

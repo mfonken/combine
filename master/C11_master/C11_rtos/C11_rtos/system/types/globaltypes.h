@@ -9,10 +9,13 @@
 #ifndef globaltypes_h
 #define globaltypes_h
 
-#include "i2c_template.h"
-#include "spi_template.h"
+/* Standard includes */
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 
-#include "kinetic_master.h"
+#define IS_VALID_PTR(X) ((long)X>=0x0000000100000000)
 
 #define NO_DATA 0xff
 
@@ -23,6 +26,14 @@ typedef void (*generic_function_t)(void);
 
 typedef uint16_t event_id;
 typedef uint8_t generic_id_t;
+
+typedef enum
+{
+    COMPONENT_STATE_OFF = 0x00,
+    COMPONENT_STATE_ON = 0x01,
+    COMPONENT_STATE_Z = 0x02,
+    COMPONENT_STATE_INTERRUPT = 0x0a
+} COMPONENT_STATE;
 
 typedef struct
 {
@@ -42,31 +53,12 @@ uint8_t
     addr,
     port,
     pin,
-    state,
     tied;
+COMPONENT_STATE
+    state;
 void *
     instance;
 } component_t;
-
-typedef struct
-{
-    quaternion_t
-    data;
-    double
-    confidence;
-    uint32_t
-    timestamp;
-} orientation_data_t;
-
-typedef struct
-{
-    kpoint_t
-    data[3];
-    double
-    confidence[3];
-    uint32_t
-    timestamp;
-} rho_data_t;
 
 typedef struct
 {

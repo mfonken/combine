@@ -9,7 +9,6 @@
 #ifndef touch_controller_h
 #define touch_controller_h
 
-#include <stdio.h>
 #include "CPT112S.h"
 
 #define TOUCH_SLIDER_NULL 0xff

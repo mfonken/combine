@@ -9,9 +9,8 @@
 #ifndef system_types_h
 #define system_types_h
 
-#include <stdint.h>
+#include "globaltypes.h"
 #include "systemdebug.h"
-
 #include "taumanager.h"
 #include "communicationmanager.h"
 #include "motionsensor.h"
@@ -19,6 +18,8 @@
 #include "batterymonitor.h"
 #include "touchcontroller.h"
 #include "hapticcontroller.h"
+
+#define GENERIC_PROFILE profile
 
 #define MAX_ROUTINES 45
 #define MAX_SUBACTIVITIES_PER_ACTIVITY 20
@@ -184,13 +185,6 @@ typedef enum
 
 typedef enum
 {
-    COMPONENT_STATE_OFF = 0x00,
-    COMPONENT_STATE_ON = 0x01,
-    COMPONENT_STATE_Z = 0x02,
-    COMPONENT_STATE_INTERRUPT = 0x0a
-} COMPONENT_STATE;
-typedef enum
-{
     SYSTEM_PROFILE_ENTRY_STATE_NONE = 0,
     SYSTEM_PROFILE_ENTRY_STATE_IDLE, // Uninitialized
     SYSTEM_PROFILE_ENTRY_STATE_DISABLED,
@@ -226,19 +220,18 @@ typedef enum
 typedef enum
 {
     SYSTEM_ACTION_ID_NONE = 0,
+    SYSTEM_COMBINE_GLOBAL,
     
     SYSTEM_PROBE_ID_HOST,
     SYSTEM_PROBE_ID_RHO,
     SYSTEM_PROBE_ID_TIP,
     SYSTEM_PROBE_ID_BATTERY_MONITOR,
     
-//    SYSTEM_SCHEDULER_ID_NONE,
     SYSTEM_SCHEDULER_ID_TAU_PERFORM,
     SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE,
     SYSTEM_SCHEDULER_ID_TIP_POLL,
     SYSTEM_SCHEDULER_ID_BATTERY_MONITOR_POLL,
 
-//    SYSTEM_INTERRUPTER_ID_NONE,
     SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT,
     SYSTEM_INTERRUPTER_ID_TAU_PACKET_RECEIVE,
     SYSTEM_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT,
@@ -246,7 +239,7 @@ typedef enum
     SYSTEM_SCHEDULER_ID_MOTION_INTERRUPT,
     SYSTEM_SCHEDULER_ID_RHO_INTERRUPT,
     SYSTEM_SCHEDULER_ID_TOUCH_INTERRUPT,
-    
+
     NUM_SYSTEM_TASKS
 } SYSTEM_TASK_ID, system_task_id_t;
 
@@ -255,23 +248,30 @@ typedef enum
 /************************************************************************************/
 /***                               Types Start                                    ***/
 /************************************************************************************/
+
+typedef  void           (*OS_TASK_PTR)(void *p_arg);
+typedef  void * OS_TCB;
+typedef           const char CPU_CHAR;
+typedef   unsigned char OS_PRIO, OS_ERR;
+typedef  unsigned int   CPU_STK, CPU_STK_SIZE, OS_TICK;
+typedef unsigned short  OS_MSG_QTY, OS_OPT;
+
 typedef struct
 {
-system_task_id_t
-    ID;
-//    OS_TCB        *p_tcb; /* Operating System: Task Control Block */
-//    CPU_CHAR      *p_name; /* Name */
-//    OS_TASK_PTR    p_task; /* Pointer to task */
-//    void          *p_arg; /* Argument */
-//    OS_PRIO        prio; /* Priority */
-//    CPU_STK       *p_stk_base; /* Stack base address */
-//    CPU_STK_SIZE   stk_limit; /* Stack limit */
-//    CPU_STK_SIZE   stk_size; /* Stack size */
-//    OS_MSG_QTY     q_size; /* Max messages that can be received through queue */
-//    OS_TICK        time_quanta; /* Clock ticks for time quanta during round robin */
-//    void          *p_ext; /* Task control block extension for extended data during context switch */
-//    OS_OPT         opt; /* Task specific options */
-//    OS_ERR        *p_err; /* Pointer to error receiver */
+system_task_id_t   ID;
+    OS_TCB        *p_tcb; /* Operating System: Task Control Block */
+    CPU_CHAR      *p_name; /* Name */
+    OS_TASK_PTR    p_task; /* Pointer to task */
+    void          *p_arg; /* Argument */
+    OS_PRIO        prio; /* Priority */
+    CPU_STK       *p_stk_base; /* Stack base address */
+    CPU_STK_SIZE   stk_limit; /* Stack limit */
+    CPU_STK_SIZE   stk_size; /* Stack size */
+    OS_MSG_QTY     q_size; /* Max messages that can be received through queue */
+    OS_TICK        time_quanta; /* Clock ticks for time quanta during round robin */
+    void          *p_ext; /* Task control block extension for extended data during context switch */
+    OS_OPT         opt; /* Task specific options */
+    OS_ERR        *p_err; /* Pointer to error receiver */
 } os_task_data_t;
 typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
 
@@ -330,7 +330,6 @@ component_id
     component_ID;
 system_subactivity_t
     handler_id;
-    
 os_task_data_t
     *os_task_data;
 } system_profile_entry_t;
@@ -383,6 +382,8 @@ component_list_t
     component_list;
 } system_profile_t;
 
+#define PROFILE_TEMPLATE static system_profile_t GENERIC_PROFILE
+
 typedef struct
 {
     void (*Send)(system_task_id_t);
@@ -413,6 +414,15 @@ typedef struct
 
 typedef struct
 {
+tau_config_t
+    tau;
+uint8_t
+    battery_monitor_mode,
+    haptic;
+} system_config_t;
+
+typedef struct
+{
 orientation_data_t
     orientation;
 rho_data_t
@@ -426,18 +436,21 @@ comm_packet_t
     sub_packet_out;
 battery_monitor_basic_t
     battery;
-uint8_t
-    battery_monitor_mode,
-    haptic;
-tau_settings_t
-    tau_settings;
+system_config_t
+    config;
 } system_buffers_t;
 
+typedef OS_ERR RTOS_ERR;
 typedef struct
 {
-//RTOS_ERR
-//    tau;
-} system_errors_t;
+system_error_t
+    type;
+RTOS_ERR
+    system,
+    sensors,
+    runtime,
+    recovery;
+} system_error_buffer_t;
 
 typedef struct
 {
@@ -454,13 +467,12 @@ typedef struct
     system_state_t          state;
     system_activity_t       activity;
     system_subactivity_t    subactivity;
-    system_error_t          error;
+    system_error_buffer_t   error;
     system_consumption_t    consumption_level;
     system_subactivity_map_t *subactivity_map;
     system_buffers_t        buffers;
     system_objects_t        objects;
     system_profile_t       *profile;
-    system_errors_t         errors;
     os_task_list_t         *os_tasks;
 } system_master_t;
 /************************************************************************************/

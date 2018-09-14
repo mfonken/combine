@@ -9,10 +9,8 @@
 #ifndef motionsensor_h
 #define motionsensor_h
 
-#include <stdint.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "BNO080.h"
+#include "quaternion.h"
 
 #define IMU_DEFAULT_COMM_CHANNEL SYSTEM_COMM_SPI
 

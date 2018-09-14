@@ -15,10 +15,10 @@
 
 static void InitializeMeta(void)
 {
-    SystemFunctions.Registers.SubactivityMap(
+    SystemFunctions.Register.SubactivityMap(
     &(system_subactivity_map_t)
     {
-        //         { SYSTEM_SUBACTIVITY_SELF_CHECK, .function.blank = (void(*)(void))BehaviorFunctions.Perform.SelfCheck, NO_DATA },
+        { SYSTEM_SUBACTIVITY_SELF_CHECK, .function.blank = (void(*)(void))NullFunction, NO_DATA },
 
         { SYSTEM_SUBACTIVITY_HANDLE_MOTION_EVENT, .function.blank = (void(*)(void))HandlerFunctions.Input.Motion, NO_DATA },
         { SYSTEM_SUBACTIVITY_HANDLE_RHO_EVENT, .function.blank = (void(*)(void))HandlerFunctions.Input.Rho, NO_DATA },
@@ -46,7 +46,7 @@ static void InitializeMeta(void)
         { SYSTEM_SUBACTIVITY_INIT_RHO_CLIENT, .function.pointer = (void(*)(void *))RhoFunctions.Init, .data.pointer = &System.objects.Rho.settings },
         //         { SYSTEM_SUBACTIVITY_INIT_CONFIRM, .function.blank   = (void(*)(void))BehaviorFunctions.Perform.ConfirmInit, .data.byte = NO_DATA },
 
-        { SYSTEM_SUBACTIVITY_BATTERY_MONITOR_ACTIVE, .function.byte = (void(*)(uint8_t))BatteryMonitor.Set, .data.byte = System.buffers.battery_monitor_mode },
+        { SYSTEM_SUBACTIVITY_BATTERY_MONITOR_ACTIVE, .function.byte = (void(*)(uint8_t))BatteryMonitor.Set, .data.byte = System.buffers.config.battery_monitor_mode },
 
         /* Profile */
         //    SYSTEM_SUBACTIVITY_PROFILE_FETCH,
@@ -65,7 +65,7 @@ static void InitializeMeta(void)
         { SYSTEM_SUBACTIVITY_POLL_BATTERY_MONITOR, .function.pointer = (void(*)(void *))BatteryMonitor.GetBasic, .data.pointer = &System.buffers.battery },
         //             { SYSTEM_SUBACTIVITY_POLL_TIP, .function.pointer = (void(*)(void *))BatteryMonitor.GetBasic, .data.pointer = &System.buffers.tip_data },
 
-        { SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC, .function.byte = (void(*)(uint8_t))HapticFunctions.Trigger, .data.byte = System.buffers.haptic },
+        { SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC, .function.byte = (void(*)(uint8_t))HapticFunctions.Trigger, .data.byte = System.buffers.config.haptic },
 
         { SYSTEM_SUBACTIVITY_TRANSMIT_HOST_PACKET, .function.pointer = (void(*)(void *))CommFunctions.Perform.Transmit, .data.pointer = &System.buffers.packet_out },
         { SYSTEM_SUBACTIVITY_RECEIVE_HOST_PACKET, .function.pointer = (void(*)(void *))CommFunctions.Perform.Receive, .data.pointer = &System.buffers.packet_in },
@@ -82,29 +82,30 @@ static void InitializeMeta(void)
         { SYSTEM_SUBACTIVITY_TAU_STANDARD_MOTION_STOP, .function.byte = (void(*)(uint8_t))IMUFunctions.RotVec, .data.pointer = &System.objects.IMU },
         { SYSTEM_SUBACTIVITY_TAU_STOP, .function.byte = (void(*)(uint8_t))TauFunctions.Stop, .data.byte = TAU_STATE_IDLE }
     });
-    SystemFunctions.Registers.OSTaskList(
+    SystemFunctions.Register.OSTaskList(
     &(os_task_list_t)
     {
-        SCHEDULER_TAU_PERFORM_OS_TASK(TauFunctions.Tick),
+        SCHEDULER_TAU_PERFORM_OS_TASK((OS_TASK_PTR)TauFunctions.Tick, 0u, &System.error.runtime),
 //        SCHEDULER_TAU_PACKET_QUEUE_OS_TASK(nullptr),
 //        SCHEDULER_TIP_POLL_OS_TASK(nullptr),
-        SCHEDULER_BATTERY_MONITOR_POLL_OS_TASK(BatteryMonitor.GetBasic),
-        INTERRUPTER_TAU_PACKET_TRANSMIT_OS_TASK(CommFunctions.Perform.Transmit),
-        INTERRUPTER_TAU_PACKET_RECEIVE_OS_TASK(CommFunctions.Perform.Receive),
-        INTERRUPTER_SUB_RADIO_PACKET_TRANSMIT_OS_TASK(CommFunctions.Perform.Transmit),
-        INTERRUPTER_HAPTIC_TRIGGER_OS_TASK(HapticFunctions.Trigger),
-        SCHEDULER_MOTION_INTERRUPT_OS_TASK(IMUFunctions.Read),
-        SCHEDULER_RHO_INTERRUPT_OS_TASK(RhoFunctions.Receive),
-        SCHEDULER_TOUCH_INTERRUPT_OS_TASK(CommFunctions.Perform.Transmit)
+        SCHEDULER_BATTERY_MONITOR_POLL_OS_TASK((OS_TASK_PTR)BatteryMonitor.GetBasic, &System.buffers.battery, &System.error.sensors),
+        INTERRUPTER_TAU_PACKET_TRANSMIT_OS_TASK((OS_TASK_PTR)CommFunctions.Perform.Transmit, &System.buffers.packet_out, &System.error.system),
+        INTERRUPTER_TAU_PACKET_RECEIVE_OS_TASK((OS_TASK_PTR)CommFunctions.Perform.Receive, &System.buffers.packet_in, &System.error.system),
+        INTERRUPTER_SUB_RADIO_PACKET_TRANSMIT_OS_TASK((OS_TASK_PTR)CommFunctions.Perform.Transmit, &System.buffers.sub_packet_out, &System.error.system),
+        INTERRUPTER_HAPTIC_TRIGGER_OS_TASK((OS_TASK_PTR)HapticFunctions.Trigger, &System.buffers.config.haptic, &System.error.sensors),
+        SCHEDULER_MOTION_INTERRUPT_OS_TASK((OS_TASK_PTR)IMUFunctions.Read, &System.objects.IMU.client, &System.error.sensors),
+        SCHEDULER_RHO_INTERRUPT_OS_TASK((OS_TASK_PTR)RhoFunctions.Receive, &System.objects.Rho, &System.error.sensors),
+//        SCHEDULER_TOUCH_INTERRUPT_OS_TASK((OS_TASK_PTR)CommFunctions.Perform.Transmit, &System.buffers.packet_out, &System.error.system)
     });
-    SystemFunctions.Init( &Profile );
+    
+    SystemFunctions.Init( &GENERIC_PROFILE );
 }
 
-void InitializeHardware(void)
+void StartCombine(void)
 {
+    InitializeMeta();
 }
-
-void InitializeSystem(void)
+void Start(void)
 {
     //    RTOS_ERR  err;
     //
@@ -121,8 +122,7 @@ void InitializeSystem(void)
     //    /*   Check error code.                                  */
     //    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
     //
-
-    InterfaceFunctions.OS.Create( &(os_task_data_t)COMBINE_API_OS_TASK(NULL) );
+    InterfaceFunctions.OS.Create( &(os_task_data_t)COMBINE_API_OS_TASK((OS_TASK_PTR)StartCombine, 0u, &System.error.system) );
     //
     //    /*   Check error code.                                  */
     //    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
@@ -133,6 +133,16 @@ void InitializeSystem(void)
     //
     //    return (1);
 }
+
+typedef struct
+{
+    void (*Start)(void);
+} bridge_functions;
+
+static bridge_functions Bridge =
+{
+    .Start = Start,
+};
 
 #endif /* systembridge_h */
 

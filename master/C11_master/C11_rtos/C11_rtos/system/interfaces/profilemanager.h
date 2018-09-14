@@ -9,7 +9,6 @@
 #ifndef profilemanager_h
 #define profilemanager_h
 
-#include <stdio.h>
 #include "systemtypes.h"
 
 void InitProfile( system_profile_t * );
