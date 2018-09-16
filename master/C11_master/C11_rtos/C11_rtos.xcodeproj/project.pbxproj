@@ -327,12 +327,12 @@
 		49A55EF82128CCC70087AF74 /* qmath */ = {
 			isa = PBXGroup;
 			children = (
-				49A55EF92128CCC70087AF74 /* point.h */,
-				49A55EFA2128CCC70087AF74 /* vector.c */,
-				49A55EFB2128CCC70087AF74 /* quaternion.h */,
 				49A55EFC2128CCC70087AF74 /* qmath.h */,
+				49A55EF92128CCC70087AF74 /* point.h */,
 				49A55EFD2128CCC70087AF74 /* point.c */,
 				49A55EFE2128CCC70087AF74 /* vector.h */,
+				49A55EFA2128CCC70087AF74 /* vector.c */,
+				49A55EFB2128CCC70087AF74 /* quaternion.h */,
 				49A55EFF2128CCC70087AF74 /* quaternion.c */,
 			);
 			path = qmath;

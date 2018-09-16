@@ -34,20 +34,20 @@ string Combine::serialize()
 
 void Combine::init()
 {
-    printf("Initializing IMU Utility.\n");
-    IMU.init( &bno );
-    
-    printf("Initializing Kinetic Utility.\n");
-    Kinetic.init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
+//    printf("Initializing IMU Utility.\n");
+//    IMU.init( &bno );
+//    
+//    printf("Initializing Kinetic Utility.\n");
+//    Kinetic.init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
 }
 
 void Combine::trigger()
 {
-    IMU.update.orientation( &bno );
-    ang3_t e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD },
-           g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
-    Kinetic.updateRotation( &kin, &e, &g );
-    
-    vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
-    Kinetic.updatePosition( &kin, &R, &tau->B, &tau->A );
+//    IMU.update.orientation( &bno );
+//    ang3_t e = { bno.pitch * DEG_TO_RAD, bno.roll * DEG_TO_RAD, bno.yaw * DEG_TO_RAD },
+//           g = { bno.gyro[0], bno.gyro[1], bno.gyro[2] };
+//    Kinetic.updateRotation( &kin, &e, &g );
+//
+//    vec3_t R = { bno.accel_raw[0], bno.accel_raw[1], bno.accel_raw[2] };
+//    Kinetic.updatePosition( &kin, &R, &tau->B, &tau->A );
 }
