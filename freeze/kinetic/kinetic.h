@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include <sys/time.h>
 
 /* Math headers */
 #include "qmath.h"
@@ -65,14 +64,6 @@
 #define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
 
 #define     D_FIXED                 5.0e-2
-
-typedef struct timeval timeval;
-static double seconds_since( double time )
-{
-    timeval now;
-    gettimeofday( &now, NULL );
-    return (now.tv_sec + now.tv_usec/1000000.0) - time;
-}
 
 /** Kinetic Type */
 typedef struct _kinetic_values_t
@@ -128,7 +119,7 @@ typedef struct _serial_kinetic_t
 {
     ang3_t  orientation;
     vec3_t  position;
-    timeval timestamp;
+    struct timeval timestamp;
 } serial_kinetic_t;
 
 typedef struct

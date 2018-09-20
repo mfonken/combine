@@ -225,19 +225,19 @@ void Init(rho_c_utility * utility, index_t w, index_t h)
     
     /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
     /* Connect to Interrupt Model variable structure */
-    RhoVariables.ram.Dx       =  utility->density_map_pair.x.map;
-    RhoVariables.ram.Dy       =  utility->density_map_pair.y.map;
-    RhoVariables.ram.Q        =  utility->Q;
-    RhoVariables.ram.CX_ADDR  = &utility->Cx;
-    RhoVariables.ram.CY_ADDR  = &utility->Cy;
-    RhoVariables.ram.C_FRAME  =  utility->cframe;
-    RhoVariables.ram.THRESH_ADDR = &utility->thresh;
-    RhoVariables.ram.CAM_PORT = &test_port;
+    RhoVariables.ram.Dx             =  utility->density_map_pair.x.map;
+    RhoVariables.ram.Dy             =  utility->density_map_pair.y.map;
+    RhoVariables.ram.Q              =  utility->Q;
+    RhoVariables.ram.CX_ADDR        = &utility->Cx;
+    RhoVariables.ram.CY_ADDR        = &utility->Cy;
+    RhoVariables.ram.C_FRAME        =  utility->cframe;
+    RhoVariables.ram.THRESH_ADDR    = &utility->thresh;
+    RhoVariables.ram.CAM_PORT       = &test_port;
     
     RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
     RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W    =  utility->width;
-    RhoVariables.global.H    =  utility->height;
+    RhoVariables.global.W           =  utility->width;
+    RhoVariables.global.H           =  utility->height;
     
     /* Interrupt model mutex initializer */
     pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
@@ -306,7 +306,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
         
 //        LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
         
-        if( _.fpeak > _.fvar && _.fvar > 0)
+        if( _.fvar > 0 && _.fpeak > _.fvar )
         {
             _.fbandl = _.fpeak - _.fvar;
             LOG_RHO("Peak>%d | var>%d | bandl>%d\n", _.fpeak, _.fvar, _.fbandl);
@@ -314,14 +314,14 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
             for( x2 = range[cyc]; x2 > range[cyc_]; --x2, _.c1 = d->map[x2] )
             {
                 /* Punish values above the filter peak */
-                if(_.c1 > _.fpeak)
+                if( _.c1 > _.fpeak )
                 {
                     _.p = RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
                     if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
                     else _.c1 = 0;
                 }
                 /* Check if CMA value is in band */
-                if(_.c1 > _.fbandl)
+                if( _.c1 > _.fbandl )
                 {
                     /* De-offset valid values */
                     _.c2 = _.c1 - _.fbandl;
@@ -333,7 +333,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                 }
                 
                 /* Process completed blobs */
-                else if(_.has && _.gapc > RHO_GAP_MAX)
+                else if( _.has && _.gapc > RHO_GAP_MAX )
                 {
                     _.cden = (density_2d_t)_.cavg;
                     if( _.cden > _.blobs[!_.sel].den )
@@ -345,10 +345,9 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                         }
                         _.blobs[_.sel] = (blob_t){ _.cmax, _.cden, (index_t)ZDIV(_.mavg,_.cavg) };
                     }
-                    
                     _.fden += _.cden;
-                    _.mavg = 0.; _.cavg = 0.;
-                    _.has = 0; _.avgc = 0.; _.gapc = 0;
+                    _.mavg = 0.; _.cavg = 0.; _.avgc = 0.;
+                    _.has = 0; _.gapc = 0;
                 }
                 
                 /* Count gaps for all invalid values */
@@ -381,10 +380,10 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
     _.cfac = 1. - BOUND(ZDIV( _.fcov, utility->target_coverage_factor ), 0, 2); // coverage factor
     _.vfac = ZDIV(_.fvar, _.fpeak); // variance factor
     
-    r->probabilities.primary   = _.pfac * n;
-    r->probabilities.secondary = _.sfac * n;
-    r->probabilities.alternate = _.afac * n;
-    r->probabilities.absence   = _.bfac * n;
+    r->probabilities.primary        = _.pfac * n;
+    r->probabilities.secondary      = _.sfac * n;
+    r->probabilities.alternate      = _.afac * n;
+    r->probabilities.absence        = _.bfac * n;
     
     utility->filtered_coverage      = _.fden;
     utility->total_coverage         = _.tden;
@@ -529,8 +528,9 @@ void Generate_Packet( rho_c_utility * utility )
         (address_t)&utility->packet.data,
         (address_t)&packet_offset_lookup,
         (address_t*)&packet_value_lookup,
+        0
     };
-    *(timestamp_t *)&_.packet->header.timestamp = timestamp();
+    _.packet->header.timestamp = timestamp();
     while( _.i++ < NUM_PACKET_ELEMENTS )
     {
         if( _.packet->header.includes & 0x01 )

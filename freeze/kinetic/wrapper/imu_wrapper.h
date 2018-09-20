@@ -16,7 +16,7 @@ extern "C" {
 #include <stdio.h>
 #include <math.h>
     
-#include "sercom.h"
+//#include "sercom.h"
     
 #define DEFAULT_INTERFACE SERCOM
     

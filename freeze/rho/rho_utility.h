@@ -155,12 +155,13 @@ typedef struct
         gapc;
     density_t
         fpeak,
-        fvar,
         fbandl,
         c1,
         c2,
         b,
         p;
+    variance_t
+        fvar;
     density_2d_t
         cmax,
         amax,

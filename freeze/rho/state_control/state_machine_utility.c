@@ -52,7 +52,7 @@ static void normalizeState( bayesian_map_t * bm, state_dimension_t i )
     for( _.j = 0; _.j < _.l; _.j++ ) *total += bm->map[_.j][i];
     if(*total)
     {
-        _.v = 1/(*total);
+        _.v = ZDIV( 1., (*total) );
         for( _.j = 0; _.j < _.l; _.j++ ) bm->map[_.j][i] *= _.v;
     }
     else bm->map[_.i][i] = 1.0;
@@ -62,8 +62,7 @@ static void resetState( bayesian_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     for( _.j = 0; _.j < _.l; _.j++ ) bm->map[_.j][i] = 0.0;
-    bm->map[_.i][i] = 1.0;
-    BayesianFunctions.map.normalizeState( bm, i );
+    bm->map[i][i] = 1.0;
 }
 
 static void print( bayesian_map_t * bm, state_t s )
@@ -139,7 +138,7 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
     sys->selection_index = _.l;
     for( _.i = 0; _.i <= _.l; _.i++)
     {
-        _.u = prob[_.i];// * (floating_t)PROBABILITY_TUNING_FACTOR;
+        _.u = prob[_.i];
         _.v = (floating_t)DOUBT(_.i, sys->state);
         out[_.i] = _.u * _.v;
         LOG_STATEM("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, _.u, _.v, out[_.i]);

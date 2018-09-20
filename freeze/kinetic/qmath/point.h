@@ -26,7 +26,7 @@ extern "C" {
     typedef struct kpoint kpoint;
     struct kpoint
     {
-        void   (*init)( kpoint_t *, double, double, double, double );
+        void (*init)( kpoint_t *, double, double, double, double );
         double (*dist)( kpoint_t * );
         double (*disq)( kpoint_t * );
         double (*angl)( kpoint_t * );

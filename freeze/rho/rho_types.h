@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "rho_kalman.h"
 
-#define USE_SHORTHAND_TYPES
+//#define USE_SHORTHAND_TYPES
 
 #ifdef USE_SHORTHAND_TYPES
 typedef uint8_t   uh;
@@ -27,6 +27,7 @@ typedef double      floating_t;
 typedef uint8_t     byte_t;
 typedef uint16_t    index_t;
 typedef uint16_t    density_t;
+typedef int16_t     variance_t;
 typedef uint32_t    density_2d_t;
 typedef void *      address_t;
 typedef floating_t  timestamp_t;
@@ -35,7 +36,6 @@ typedef floating_t  timestamp_t;
 #define index_t_max         ((sizeof(index_t)*8)-1)
 #define density_t_max       ((sizeof(density_t)*8)-1)
 #define density_2d_t_max    ((sizeof(density_2d_t)*8)-1)
-
 
 #define FILTERED_CONVERAGE_TARGET       0.00002//0.01
 
@@ -125,19 +125,21 @@ typedef struct
 
 typedef struct
 {
-    byte_t  a:PACKET_OFFSET_WIDTH,
-            b:PACKET_OFFSET_WIDTH;
+byte_t
+    a:PACKET_OFFSET_WIDTH,
+    b:PACKET_OFFSET_WIDTH;
 }packing_template_t;
 
 typedef struct
 {
-    address_t px;
-    address_t py;
-    address_t sx;
-    address_t sy;
-    address_t pp;
-    address_t sp;
-    address_t ap;
+address_t
+    px,
+    py,
+    sx,
+    sy,
+    pp,
+    sp,
+    ap;
 } packet_value_lookup_t;
 
 #define NUM_PACKET_ELEMENTS ((byte_t)( sizeof(packet_offset_lookup_t) * ( 8 / PACKET_OFFSET_WIDTH ) ))
@@ -145,8 +147,9 @@ typedef struct
 typedef struct
 {
     byte_t  ID,
-            includes,
-            timestamp[sizeof(timestamp_t)];
+    includes;
+    timestamp_t
+    timestamp;
     uint8_t padding[6];
 } packet_header_t;
 

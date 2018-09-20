@@ -12,4 +12,24 @@
 #include "kinetic.h"
 #include "point.h"
 
+typedef struct
+{
+    quaternion_t
+    data;
+    double
+    confidence;
+    uint32_t
+    timestamp;
+} orientation_data_t;
+
+typedef struct
+{
+    kpoint_t
+    data[3];
+    double
+    confidence[3];
+    uint32_t
+    timestamp;
+} rho_data_t;
+
 #endif /* kinetic_master_h */

@@ -36,6 +36,9 @@ extern "C" {
 #define DISTANCE_SQ(X,Y)                ( SQUARE(X) + SQUARE(Y) )
 #define INRANGE(X,Y,T)                  ( abs( X - Y ) < T )
     
+#define ZDIV_LNUM 1 << 10
+#define ZDIV(X,Y) Y==0?ZDIV_LNUM:X/Y
+    
     /***************************************************************************************/
     
     /** Goals **
