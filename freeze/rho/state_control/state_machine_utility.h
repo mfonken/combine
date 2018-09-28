@@ -9,15 +9,13 @@
 #ifndef state_machine_utility_h
 #define state_machine_utility_h
 
+#include <stdint.h>
+#include "rho_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include "rho_types.h"
-    
     /***************************************************************************************/
     /*                          DEFINITIONS & MACROS                                       */
     /***************************************************************************************/

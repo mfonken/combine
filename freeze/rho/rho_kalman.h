@@ -1,17 +1,15 @@
 #ifndef rho_kalman_h
 #define rho_kalman_h
 
+#include <stdlib.h>
+#include <stdbool.h>
+#include <sys/time.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /* Standard headers */
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <sys/time.h>
-#include "global_types.h"
-#include <math.h>
+/* Standard headers */
     
 typedef double kfl_t;
 

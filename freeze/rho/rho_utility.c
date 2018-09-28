@@ -7,11 +7,7 @@
 //
 
 #include "rho_utility.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#include <unistd.h>
+#include "rho_master.h"
 
 #define MAX(A,B)        ((A>B)?A:B)
 #define XRNGU(A,MAX)    (A>MAX?1:0) //Check if exceeds range
@@ -20,7 +16,6 @@
 #define XTOL(A,TOL)     (A<-TOL?-1:(A>TOL?1:0)) //Check if exceeds range
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
-#define ZDIV(X,Y)       (!X?0:(!Y?2<<10:(floating_t)X/(floating_t)Y))
 
 #define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
@@ -36,8 +31,10 @@ static void cma_M0_M1( floating_t v, floating_t i, floating_t *m0, floating_t *m
 }
 static void iswap( index_t *a, index_t *b ) { index_t t=(*a);*a=*b;*b=t; }
 
+#ifdef USE_INTERRUPT_MODEL
 /* Universal Port for interrupt model */
 pixel_base_t test_port = 0;
+#endif
 
 /* Quadrant density redistribution lookup table */
 const density_redistribution_lookup_t rlookup =
@@ -71,7 +68,7 @@ const density_redistribution_lookup_t rlookup =
 };
 
 /* Generic centroid and mass calculator */
-static floating_t calculateCentroid( density_t * map, index_t l, index_t * C, register density_t thresh )
+static floating_t CalculateCentroid( density_t * map, index_t l, index_t * C, register density_t thresh )
 {
     floating_t avg = 0, mavg = 0, cnt = 0, tot = 0;
     for( index_t i = 0; i < l; i++ )
@@ -87,101 +84,13 @@ static floating_t calculateCentroid( density_t * map, index_t l, index_t * C, re
     return tot;
 }
 
-static void printPacket( packet_t * p, int l )
-{
-    printf("Packet Size - %lubytes\n", sizeof(packet_t));
-    for(int i = 0; i < sizeof(packet_t); )
-    {
-        printf("(%02d)", i);
-        for( int j = 0; j < l && i < sizeof(packet_t); j++, i++ )
-            printf(" 0x%02x", *(byte_t*)(&((byte_t*)&p->header)[i]));
-        printf("\n");
-    }
-    uint32_t px = *(uint32_t*)p->data;
-    floating_t pxf = *(floating_t*)p->data;
-    uint8_t * ptr = (uint8_t*)&px;
-    
-    uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
-    floating_t pxfr = *(floating_t*)&pxr;
-    printf("{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
-}
 
-void Perform( rho_c_utility * utility, bool background_event )
-{
-    if(background_event)
-        RhoFunctions.Generate_Background( utility );
-    else
-    {
-//        printf("Rho: Redistributing densities.\n");
-        RhoFunctions.Redistribute_Densities( utility );
-//        printf("Rho: Filtering and selecting pairs.\n");
-        RhoFunctions.Filter_and_Select_Pairs( utility );
-//        printf("Rho: Updating predictions.\n");
-        RhoFunctions.Update_Prediction( utility );
-//        printf("Rho: Updating threshold.\n");
-        RhoFunctions.Update_Threshold( utility );
-//        printf("Rho: Generating packets.\n");
-        RhoFunctions.Generate_Packet( utility );
-    }
-}
-
-/* Interrupt (Simulated Hardware-Driven) Density map generator */
-void Generate_Background( rho_c_utility * utility )
-{
-    floating_t xt = calculateCentroid( utility->density_map_pair.x.background, utility->density_map_pair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
-    floating_t yt = calculateCentroid( utility->density_map_pair.y.background, utility->density_map_pair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
-    LOG_RHO("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
-    utility->QbT = MAX(xt, yt);
-}
-
-static void Redistribute_Densities( rho_c_utility * utility )
-{
-    redistribution_variables _ =
-    {
-        { utility->Bx, abs(utility->Cx-utility->Bx), utility->width - utility->Cx  },
-        { utility->By, abs(utility->Cy-utility->By), utility->height - utility->Cy },
-        { 0 }, 0
-    };
-    if( utility->Cx < utility->Bx )
-    {
-        _.xl[0] = utility->Cx;
-        _.xl[2] = utility->width - utility->Bx;
-        _.c |= 0x01;
-    }
-    if( utility->Cy < utility->By )
-    {
-        _.yl[0] = utility->Cy;
-        _.yl[2] = utility->width - utility->By;
-        _.c |= 0x02;
-    }
-    while( _.y < 3 )
-        for( _.x = 0; _.x < 3; )
-            _.area[_.p++] = _.xl[_.x++]* _.yl[_.y++];
-    for( ; _.q < 4; _.q++ )
-    {
-        _.l  = rlookup.config[_.c].length[    _.q];
-        _.l_ = rlookup.config[_.c].length[3 - _.q];
-        for( _.x = 0, _.b = 0; _.x < _.l; _.x++ )
-        {
-            _.a = _.area[rlookup.config[_.c].current[_.q][_.x]];
-            for( _.y = 0; _.y < _.l_; _.y++ )
-                _.b += _.area[rlookup.config[_.c].background[rlookup.config[_.c].factor[_.q][_.x]][_.y]];
-            _.d += ZDIV( _.a, _.b ) * utility->Qb[_.q];
-        }
-#ifndef ALLOW_NEGATIVE_REDISTRIBUTION
-        if( _.d > utility->Q[_.q] ) utility->Qf[_.q] = 0;
-        else
-#endif
-            utility->Qf[_.q] = utility->Q[_.q] - _.d;
-    }
-}
-
-void Init(rho_c_utility * utility, index_t w, index_t h)
+void Init( rho_utility * utility )
 {
     /* Utility frame */
-    utility->width  = w;
-    utility->height = h;
-
+    index_t w = utility->width;
+    index_t h = utility->height;
+    
     /* Threshold Filter */
     RhoKalman.init(&utility->thresh_filter, 0, RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
     
@@ -223,6 +132,7 @@ void Init(rho_c_utility * utility, index_t w, index_t h)
     memset(&utility->prediction_pair.x.probabilities, 0, sizeof(floating_t)*4);
     memset(&utility->prediction_pair.y.probabilities, 0, sizeof(floating_t)*4);
     
+#ifdef USE_INTERRUPT_MODEL
     /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
     /* Connect to Interrupt Model variable structure */
     RhoVariables.ram.Dx             =  utility->density_map_pair.x.map;
@@ -236,19 +146,39 @@ void Init(rho_c_utility * utility, index_t w, index_t h)
     
     RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
     RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W           =  utility->width;
-    RhoVariables.global.H           =  utility->height;
+    RhoVariables.global.W           = utility->width;
+    RhoVariables.global.H           = utility->height;
     
     /* Interrupt model mutex initializer */
     pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
+#endif
     
     utility->packet.header.ID       = PACKET_HEADER_ID;
     utility->packet.header.includes = PACKET_INCLUDES;
     memset(utility->packet.data, 0, sizeof(packet_offset_lookup_t));
 }
 
+void Perform( rho_utility * utility, bool background_event )
+{
+    if(background_event)
+        RhoFunctions.Generate_Background( utility );
+    else
+    {
+        //        printf("Rho: Redistributing densities.\n");
+        RhoFunctions.Redistribute_Densities( utility );
+        //        printf("Rho: Filtering and selecting pairs.\n");
+        RhoFunctions.Filter_and_Select_Pairs( utility );
+        //        printf("Rho: Updating predictions.\n");
+        RhoFunctions.Update_Prediction( utility );
+        //        printf("Rho: Updating threshold.\n");
+        RhoFunctions.Update_Threshold( utility );
+        //        printf("Rho: Generating packets.\n");
+        RhoFunctions.Generate_Packet( utility );
+    }
+}
+
 /* Calculate and process data in variance band from density filter to generate predictions */
-void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t * r )
+void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t * r )
 {
     memset(&r->probabilities, 0, sizeof(floating_t)*4);
     memset(&r->probabilities, 0, sizeof(floating_t)*4);
@@ -261,9 +191,9 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
     /* Find max and update kalman */
     byte_t cyc, cyc_;
     index_t x1 = _.len,
-            x2 = _.len,
-            range[3] = { _.len, d->centroid, 0 };
-//    LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
+    x2 = _.len,
+    range[3] = { _.len, d->centroid, 0 };
+    //    LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
     
     for( cyc = 1, cyc_ = 2; cyc_ > 0; cyc--, cyc_-- )
     {
@@ -304,7 +234,7 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
         _.fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
         d->kalmans[cyc].variance = _.fvar;
         
-//        LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
+        LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
         
         if( _.fvar > 0 && _.fpeak > _.fvar )
         {
@@ -320,12 +250,13 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
                     if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
                     else _.c1 = 0;
                 }
+                
                 /* Check if CMA value is in band */
                 if( _.c1 > _.fbandl )
                 {
                     /* De-offset valid values */
                     _.c2 = _.c1 - _.fbandl;
-        
+                    
                     /* Process new values into blob */
                     cma_M0_M1((floating_t)_.c2, (floating_t)x2, &_.cavg, &_.mavg, &_.avgc);
                     if(_.c2 > _.cmax) _.cmax = _.c2;
@@ -356,8 +287,8 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
             }
         }
     }
-
-//    if( !_.blobs[0].loc || !_.blobs[1].loc ) return;
+    
+    //    if( !_.blobs[0].loc || !_.blobs[1].loc ) return;
     
     /* Update prediction with best peaks */
     r->primary_new   = _.blobs[ _.sel].loc;
@@ -398,7 +329,57 @@ void Filter_and_Select( rho_c_utility * utility, density_map_t * d, prediction_t
     LOG_RHO("Normalized total probability: %.3f\n", r->probabilities.primary + r->probabilities.secondary + r->probabilities.alternate + r->probabilities.absence );
 }
 
-void Filter_and_Select_Pairs( rho_c_utility * utility )
+void Generate_Background( rho_utility * utility )
+{
+    floating_t xt = CalculateCentroid( utility->density_map_pair.x.background, utility->density_map_pair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+    floating_t yt = CalculateCentroid( utility->density_map_pair.y.background, utility->density_map_pair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
+    LOG_RHO("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
+    utility->QbT = MAX(xt, yt);
+}
+
+static void Redistribute_Densities( rho_utility * utility )
+{
+    redistribution_variables _ =
+    {
+        { utility->Bx, abs(utility->Cx-utility->Bx), utility->width - utility->Cx  },
+        { utility->By, abs(utility->Cy-utility->By), utility->height - utility->Cy },
+        { 0 }, 0
+    };
+    if( utility->Cx < utility->Bx )
+    {
+        _.xl[0] = utility->Cx;
+        _.xl[2] = utility->width - utility->Bx;
+        _.c |= 0x01;
+    }
+    if( utility->Cy < utility->By )
+    {
+        _.yl[0] = utility->Cy;
+        _.yl[2] = utility->width - utility->By;
+        _.c |= 0x02;
+    }
+    while( _.y < 3 )
+        for( _.x = 0; _.x < 3; )
+            _.area[_.p++] = _.xl[_.x++]* _.yl[_.y++];
+    for( ; _.q < 4; _.q++ )
+    {
+        _.l  = rlookup.config[_.c].length[    _.q];
+        _.l_ = rlookup.config[_.c].length[3 - _.q];
+        for( _.x = 0, _.b = 0; _.x < _.l; _.x++ )
+        {
+            _.a = _.area[rlookup.config[_.c].current[_.q][_.x]];
+            for( _.y = 0; _.y < _.l_; _.y++ )
+                _.b += _.area[rlookup.config[_.c].background[rlookup.config[_.c].factor[_.q][_.x]][_.y]];
+            _.d += ZDIV( _.a, _.b ) * utility->Qb[_.q];
+        }
+#ifndef ALLOW_NEGATIVE_REDISTRIBUTION
+        if( _.d > utility->Q[_.q] ) utility->Qf[_.q] = 0;
+        else
+#endif
+            utility->Qf[_.q] = utility->Q[_.q] - _.d;
+    }
+}
+
+void Filter_and_Select_Pairs( rho_utility * utility )
 {
     LOG_RHO("X Map:\n");
     Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
@@ -407,7 +388,7 @@ void Filter_and_Select_Pairs( rho_c_utility * utility )
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
-void Update_Prediction( rho_c_utility * utility )
+void Update_Prediction( rho_utility * utility )
 {
     prediction_update_variables _ =
     {
@@ -468,7 +449,7 @@ void Update_Prediction( rho_c_utility * utility )
 }
 
 /* Use background and state information to update image threshold */
-void Update_Threshold( rho_c_utility * utility )
+void Update_Threshold( rho_utility * utility )
 {
     /* Hard-Tune on significant background */
     floating_t  hard_tune_factor = 0.;
@@ -510,16 +491,16 @@ void Update_Threshold( rho_c_utility * utility )
     }
     
     utility->target_coverage_factor -= 0.01*(utility->target_coverage_factor - (floating_t)FILTERED_COVERAGE_TARGET);
-    floating_t proposed_thresh = utility->thresh + hard_tune_factor + soft_tune_factor;
+    floating_t proposed_thresh = *utility->thresh + hard_tune_factor + soft_tune_factor;
     RhoKalman.update( &utility->thresh_filter, proposed_thresh, 0);
-    utility->thresh = BOUND(utility->thresh_filter.value, THRESH_MIN, THRESH_MAX);
+    *utility->thresh = BOUND(utility->thresh_filter.value, THRESH_MIN, THRESH_MAX);
     
     LOG_RHO("*** THRESH IS %d ***\n", utility->thresh);
     LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->coverage_factor, utility->variance_factor);
     LOG_RHO("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 
-void Generate_Packet( rho_c_utility * utility )
+void Generate_Packet( rho_utility * utility )
 {
     packet_value_lookup_t  packet_value_lookup  = PACKET_ADDRESS_INITIALIZER(utility->prediction_pair);
     packet_generation_variables _ =

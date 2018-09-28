@@ -7,6 +7,7 @@
 //
 
 #include "state_machine_utility.h"
+#include "rho_master.h"
 
 typedef define_loop_variable_template_struct(state_dimension_t, state_global_t);
 state_global_t _;

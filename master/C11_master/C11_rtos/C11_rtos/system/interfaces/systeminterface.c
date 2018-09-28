@@ -8,8 +8,9 @@
 
 #include "systeminterface.h"
 
-void StartSystemInterfaceOS( )
+void StartSystemInterfaceOS()
 {
+    
 }
 
 void CreateSystemInterfaceOSTask( os_task_data_t * task_data )
