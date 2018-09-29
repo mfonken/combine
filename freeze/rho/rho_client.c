@@ -8,38 +8,38 @@
 
 #include "rho_client.h"
 
-static inline void PixelThreshLoop( address_t pt_index,
-                                      const register byte_t * pixel,
-                                      byte_t * thresh_address,
-                                      register index_t * thresh_buffer )
+static inline void PixelThreshLoop( const register byte_t * capture_address,// capture buffer index
+                                    address_t pthresh_index,                // pointer to thresh buffer index
+                                    byte_t * thresh_address,                // address of thresh buffer
+                                    register index_t * thresh_buffer )
 {
-    register index_t t_index = *(index_t *)pt_index;
-    register index_t x_index = RhoSystem.Variables.Utility.height;
+    register index_t thresh_index = *(index_t *)pthresh_index;
+    register index_t capture_index = RhoSystem.Variables.Utility.Height;
     register byte_t thresh_value = *thresh_address;
-    while( ( x_index > 0 ) && !RhoSystem.Variables.Flag.Row )
-        if( *pixel > thresh_value )
-            thresh_buffer[--t_index] = --x_index;
-    *(index_t *)pt_index = t_index;
+    while( ( --capture_index > 0 ) && !RhoSystem.Variables.Flags.Row )
+        if( capture_address[capture_index] > thresh_value )
+            thresh_buffer[--thresh_index] = capture_index;
+    *(index_t *)pthresh_index = thresh_index;
 }
 
 static inline index_t CaptureFrame()
 {
-    while(!RhoSystem.Variables.Flag.Row);
+    while(!RhoSystem.Variables.Flags.Row);
     
     index_t
-        y_counter = (index_t)RhoSystem.Variables.Utility.height,
-        t_counter = (index_t)((uint32_t)RhoSystem.Variables.Address.ThreshMax - (uint32_t)RhoSystem.Variables.Buffer.Thresh);
+        y_counter = (index_t)RhoSystem.Variables.Utility.Height,
+        t_counter = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
     while( ( y_counter > 0 ) && ( t_counter > 0 ) )
     {
-        RhoSystem.Variables.Buffer.Thresh[--t_counter] = Y_DEL;
-        while(RhoSystem.Variables.Flag.Row);
+        RhoSystem.Variables.Buffers.Thresh[--t_counter] = Y_DEL;
+        while(RhoSystem.Variables.Flags.Row);
 
-        PixelThreshLoop( &t_counter,
-                         RhoSystem.Variables.Address.CameraPort,
-                         RhoSystem.Variables.Utility.thresh,
-                         RhoSystem.Variables.Buffer.Thresh );
+        PixelThreshLoop( RhoSystem.Variables.Buffers.Capture,
+                        &t_counter,
+                         RhoSystem.Variables.Utility.Thresh,
+                         RhoSystem.Variables.Buffers.Thresh );
         
-        while(!RhoSystem.Variables.Flag.Row);
+        while(!RhoSystem.Variables.Flags.Row);
         --y_counter;
     }
     return y_counter;
@@ -51,23 +51,23 @@ static inline section_process_t ProcessFrameSection( register index_t t_counter,
     register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
     while( t_counter < t_len )
     {
-        t_value = RhoSystem.Variables.Buffer.Thresh[t_counter++];
+        t_value = RhoSystem.Variables.Buffers.Thresh[t_counter++];
         if(t_value == Y_DEL)
         {
             Q_total = Q_left + Q_right;
-            RhoSystem.Variables.Utility.density_map_pair.x.map[y_counter] = Q_total - Q_prev;
+            RhoSystem.Variables.Utility.DensityMapPair.x.map[y_counter] = Q_total - Q_prev;
             Q_prev = Q_total;
             if( ++y_counter > y_len ) break;
         }
         else if( t_value < RhoSystem.Variables.Utility.Cx )
         {
             Q_left++;
-            RhoSystem.Variables.Utility.density_map_pair.y.map[t_value]++;
+            RhoSystem.Variables.Utility.DensityMapPair.y.map[t_value]++;
         }
         else
         {
             Q_right++;
-            RhoSystem.Variables.Utility.density_map_pair.y.map[t_value]++;
+            RhoSystem.Variables.Utility.DensityMapPair.y.map[t_value]++;
         }
     }
     return (section_process_t){ t_counter, y_counter, Q_left, Q_right };
@@ -76,42 +76,51 @@ static inline section_process_t ProcessFrameSection( register index_t t_counter,
 static inline void ProcessFrame( index_t t_len )
 {
     section_process_t top = ProcessFrameSection(          0, t_len,        0, RhoSystem.Variables.Utility.Cy     );
-    section_process_t btm = ProcessFrameSection( top.pixels, t_len, top.rows, RhoSystem.Variables.Utility.height );
+    section_process_t btm = ProcessFrameSection( top.pixels, t_len, top.rows, RhoSystem.Variables.Utility.Height );
     
-    RhoSystem.Variables.Utility.Q[0] = top.left;
-    RhoSystem.Variables.Utility.Q[1] = top.right;
-    RhoSystem.Variables.Utility.Q[2] = btm.left;
-    RhoSystem.Variables.Utility.Q[3] = btm.right;
+    RhoSystem.Variables.Buffers.Quadrant[0] = top.left;
+    RhoSystem.Variables.Buffers.Quadrant[1] = top.right;
+    RhoSystem.Variables.Buffers.Quadrant[2] = btm.left;
+    RhoSystem.Variables.Buffers.Quadrant[3] = btm.right;
 }
 
 static inline void ActivateBackgrounding( void )
 {
-    RhoSystem.Variables.Buffer.DensityX = RhoSystem.Variables.Utility.density_map_pair.x.background;
-    RhoSystem.Variables.Buffer.DensityY = RhoSystem.Variables.Utility.density_map_pair.y.background;
-    RhoSystem.Variables.Buffer.Quadrant = RhoSystem.Variables.Utility.Qb;
+    RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
+    RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.background;
+    RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
 }
 
 static inline void DeactivateBackgrounding( void )
 {
-    RhoSystem.Variables.Buffer.DensityX = RhoSystem.Variables.Utility.density_map_pair.x.map;
-    RhoSystem.Variables.Buffer.DensityY = RhoSystem.Variables.Utility.density_map_pair.y.map;
-    RhoSystem.Variables.Buffer.Quadrant = RhoSystem.Variables.Utility.Q;
+    RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
+    RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.map;
+    RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Q;
 }
 
 void ProcessRhoSystemFrameCapture( void )
 {
-    RhoSystem.Variables.Flag.Backgrounding ? ActivateBackgrounding() : DeactivateBackgrounding();
+    RhoSystem.Variables.Flags.Backgrounding = ++RhoSystem.Variables.Utility.BackgroundCounter >= RhoSystem.Variables.Utility.BackgroundPeriod;
+    
+    if( RhoSystem.Variables.Flags.Backgrounding )
+    {
+        ActivateBackgrounding();
+        RhoSystem.Variables.Utility.BackgroundCounter = 0;
+    }
+    else DeactivateBackgrounding();
+    
     RhoSystem.Functions.Memory.Zero();
-    while(!RhoSystem.Variables.Flag.Frame);
+    while(!RhoSystem.Variables.Flags.Frame);
     
     ProcessFrame( CaptureFrame() );
 
-    RhoSystem.Variables.Buffer.DensityX[CAPTURE_BUFFER_HEIGHT-1] = FRAME_ROW_END;
+    RhoSystem.Variables.Buffers.DensityX[CAPTURE_BUFFER_HEIGHT-1] = FRAME_ROW_END;
 }
 
 inline void PerformRhoSystemProcess( void )
 {
-    RhoFunctions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flag.Backgrounding);
+    RhoSystem.Functions.Perform.FrameCapture();
+    RhoFunctions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags.Backgrounding);
 }
 
 /***************************************************************************************/
@@ -119,18 +128,17 @@ inline void PerformRhoSystemProcess( void )
 /***************************************************************************************/
 void InitRhoSystem( void )
 {
-    RhoSystem.Variables.Buffer.DensityX = RhoSystem.Variables.Utility.density_map_pair.x.map;
-    RhoSystem.Variables.Buffer.DensityY = RhoSystem.Variables.Utility.density_map_pair.y.map;
-    RhoSystem.Variables.Buffer.Quadrant = RhoSystem.Variables.Utility.Q;
+    SetActiveClientFlags( &RhoSystem.Variables.Flags );
+    DeactivateBackgrounding();
     
 #ifdef DYNAMIC_BUFFER
-    RhoSystem.Variables.Address.CaptureEnd  = (address_t)RhoSystem.Variables.Buffer.Capture + CAPTURE_WIDTH;
+    RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture + CAPTURE_WIDTH;
 #else
     RhoSystem.Variables.Address.CaptureEnd  = (address_t)RhoSystem.Variables.Buffer.Capture;
 #endif
-    RhoSystem.Variables.Address.CaptureMax  = (address_t)RhoSystem.Variables.Buffer.Capture + THRESH_BUFFER_SIZE;
-    RhoSystem.Variables.Address.ThreshMax   = (address_t)RhoSystem.Variables.Buffer.Thresh + sizeof(index_t)*(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT);
-    RhoSystem.Variables.Address.ThreshEnd   = (address_t)RhoSystem.Variables.Buffer.Thresh;
+    RhoSystem.Variables.Addresses.CaptureMax  = (address_t)RhoSystem.Variables.Buffers.Capture + THRESH_BUFFER_SIZE;
+    RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh + sizeof(index_t)*(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT);
+    RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
 
     RhoSystem.Functions.Memory.Zero();
     RhoFunctions.Init( &RhoSystem.Variables.Utility );
@@ -138,7 +146,7 @@ void InitRhoSystem( void )
 
 void ZeroRhoSystemMemory( void )
 {
-    memset( RhoSystem.Variables.Buffer.Thresh,   0, sizeof(index_t)   * THRESH_BUFFER_SIZE );
-    memset( RhoSystem.Variables.Buffer.Quadrant, 0, sizeof(density_t) * 4                  );
+    memset( RhoSystem.Variables.Buffers.Thresh,   0, sizeof(index_t)   * THRESH_BUFFER_SIZE );
+    memset( RhoSystem.Variables.Buffers.Quadrant, 0, sizeof(density_t) * 4                  );
 }
 

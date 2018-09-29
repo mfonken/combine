@@ -22,33 +22,32 @@ extern "C" {
 
 typedef struct
 {
-    index_t             width,
-                        height,
+    index_t             Width,
+                        Height,
                         Cx,
                         Cy,
                         Bx,
                         By;
-    density_map_pair_t  density_map_pair;
-    prediction_pair_t   prediction_pair;
-    bayesian_system_t   sys;
-    rho_kalman_t        thresh_filter,
-                        target_filter;
-    byte_t *            thresh;
+    byte_t              BackgroundCounter,
+                        BackgroundPeriod;
+    density_map_pair_t  DensityMapPair;
+    prediction_pair_t   PredictionPair;
+    bayesian_system_t   BayeSys;
+    rho_kalman_t        ThreshFilter,
+                        TargetFilter;
+    byte_t *            Thresh;
     density_2d_t        Q[4],
                         Qb[4],
                         Qf[4],
                         QbT,
-                        total_coverage,
-                        filtered_coverage,
-                        target_coverage;
-    floating_t          filtered_percentage,
-                        target_coverage_factor,
-                        coverage_factor,
-                        variance_factor;
-
-    index_t cframe[C_FRAME_SIZE];
-    pthread_mutex_t rho_int_mutex;
-    packet_t packet;
+                        TotalCoverage,
+                        FilteredCoverage,
+                        TargetCoverage;
+    floating_t          FilteredPercentage,
+                        TargetCoverageFactor,
+                        CoverageFactor,
+                        VarianceFactor;
+    packet_t            Packet;
 } rho_utility;
     
 
@@ -170,27 +169,7 @@ typedef struct
 }
     
 extern const density_redistribution_lookup_t rlookup;
-extern const struct rho_functions RhoFunctions;
-
-static void printPacket( packet_t * p, int l )
-{
-    printf("Packet Size - %lubytes\n", sizeof(packet_t));
-    for(int i = 0; i < sizeof(packet_t); )
-    {
-        printf("(%02d)", i);
-        for( int j = 0; j < l && i < sizeof(packet_t); j++, i++ )
-            printf(" 0x%02x", *(byte_t*)(&((byte_t*)&p->header)[i]));
-        printf("\n");
-    }
-    uint32_t px = *(uint32_t*)p->data;
-    floating_t pxf = *(floating_t*)p->data;
-    uint8_t * ptr = (uint8_t*)&px;
-    
-    uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
-    floating_t pxfr = *(floating_t*)&pxr;
-    printf("{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
-}
-    
+extern const struct rho_functions RhoFunctions;    
     
 #ifdef __cplusplus
 }

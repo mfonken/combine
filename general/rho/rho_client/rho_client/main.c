@@ -12,7 +12,8 @@
 int main(int argc, const char * argv[])
 {
     RhoSystem.Functions.Perform.Init();
-    RhoSystem.Functions.Perform.FrameCapture();
+    
+
     RhoSystem.Functions.Perform.RhoProcess();
     return 0;
 }

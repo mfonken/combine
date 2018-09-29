@@ -15,17 +15,6 @@
 
 typedef struct
 {
-flag_t
-    Active,
-    IRQ,
-    Frame,
-    Row,
-    Backgrounding,
-    UARTBusy;
-} rho_system_flags_variables;
-
-typedef struct
-{
 address_t
     CameraPort,
     UartTx,
@@ -58,9 +47,9 @@ typedef struct
 typedef struct
 {
     rho_utility                     Utility;
-    rho_system_address_variables    Address;
-    rho_system_flags_variables      Flag;
-    rho_system_buffer_variables     Buffer;
+    rho_system_address_variables    Addresses;
+    rho_system_flags_variables      Flags;
+    rho_system_buffer_variables     Buffers;
 } rho_system_variables;
 
 typedef struct
@@ -109,43 +98,42 @@ static system_t RhoSystem =
             CAPTURE_WIDTH,
             CAPTURE_HEIGHT
         },
-        { /* Address */
+        { /* Addresses */
             (address_t)CAMERA_PORT,
             (address_t)UART_TX_PORT,
             (address_t)CAPTURE_WIDTH
         },
-        { 0 },/* Flag */
-        { /* Buffer */
+        { 0 },/* Flags */
+        { /* Buffers */
             
         }
     },
     { /* FUNCTIONS */
         { /* Perform */
-            .Init                   = InitRhoSystem,
-            .FrameCapture           = ProcessRhoSystemFrameCapture,
-            .RhoProcess             = PerformRhoSystemProcess
+            .Init               = InitRhoSystem,
+            .FrameCapture       = ProcessRhoSystemFrameCapture,
+            .RhoProcess         = PerformRhoSystemProcess
         },
         { /* Utility */
-            .InitPCLKDMA    = STMInitPCLKDMA,
-            .PauseDMA       = STMPauseDMA,
-            .ResumeDMA      = STMResumeDMA,
-            .ResetDMA       = STMResetDMA,
+            .InitPCLKDMA        = STMInitPCLKDMA,
+            .PauseDMA           = STMPauseDMA,
+            .ResumeDMA          = STMResumeDMA,
+            .ResetDMA           = STMResetDMA,
         },
         { /* Memory */
-            .Init = InitRhoSystem,
-            .Zero = ZeroRhoSystemMemory
+            .Init               = InitRhoSystem,
+            .Zero               = ZeroRhoSystemMemory
         }
     }
 };
 
-static inline void   activityEnable( void ) { RhoSystem.Variables.Flag.Active = 1; }
-static inline void   activityDisable(void ) { RhoSystem.Variables.Flag.Active = 0; }
-static inline void   irqEnable(      void ) { RhoSystem.Variables.Flag.IRQ = 1; }
-static inline void   irqDisable(     void ) { RhoSystem.Variables.Flag.IRQ = 0; }
-static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flag.Row = 1; }
-static inline void   rowFlagReset(   void ) { RhoSystem.Variables.Flag.Row = 0; }
-static inline flag_t rowFlagGet(     void ) { return RhoSystem.Variables.Flag.Row; }
-static inline void   frameFlagSet(   void ) { RhoSystem.Variables.Flag.Frame = 1; }
-static inline void   frameFlagReset( void ) { RhoSystem.Variables.Flag.Frame = 0; }
+static inline void   activityEnable( void ) { RhoSystem.Variables.Flags.Active  = 1; }
+static inline void   activityDisable(void ) { RhoSystem.Variables.Flags.Active  = 0; }
+static inline void   irqEnable(      void ) { RhoSystem.Variables.Flags.IRQ     = 1; }
+static inline void   irqDisable(     void ) { RhoSystem.Variables.Flags.IRQ     = 0; }
+static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flags.Row     = 1; }
+static inline void   rowFlagReset(   void ) { RhoSystem.Variables.Flags.Row     = 0; }
+static inline void   frameFlagSet(   void ) { RhoSystem.Variables.Flags.Frame   = 1; }
+static inline void   frameFlagReset( void ) { RhoSystem.Variables.Flags.Frame   = 0; }
 
 #endif /* rho_client_h */

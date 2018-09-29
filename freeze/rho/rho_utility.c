@@ -31,6 +31,25 @@ static void cma_M0_M1( floating_t v, floating_t i, floating_t *m0, floating_t *m
 }
 static void iswap( index_t *a, index_t *b ) { index_t t=(*a);*a=*b;*b=t; }
 
+static void printPacket( packet_t * p, int l )
+{
+    printf("Packet Size - %lubytes\n", sizeof(packet_t));
+    for(int i = 0; i < sizeof(packet_t); )
+    {
+        printf("(%02d)", i);
+        for( int j = 0; j < l && i < sizeof(packet_t); j++, i++ )
+            printf(" 0x%02x", *(byte_t*)(&((byte_t*)&p->header)[i]));
+        printf("\n");
+    }
+    uint32_t px = *(uint32_t*)p->data;
+    floating_t pxf = *(floating_t*)p->data;
+    uint8_t * ptr = (uint8_t*)&px;
+    
+    uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
+    floating_t pxfr = *(floating_t*)&pxr;
+    printf("{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
+}
+
 #ifdef USE_INTERRUPT_MODEL
 /* Universal Port for interrupt model */
 pixel_base_t test_port = 0;
@@ -88,74 +107,56 @@ static floating_t CalculateCentroid( density_t * map, index_t l, index_t * C, re
 void Init( rho_utility * utility )
 {
     /* Utility frame */
-    index_t w = utility->width;
-    index_t h = utility->height;
+    index_t w = utility->Width;
+    index_t h = utility->Height;
     
     /* Threshold Filter */
-    RhoKalman.init(&utility->thresh_filter, 0, RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
+    RhoKalman.init(&utility->ThreshFilter, 0, RHO_THRESH_LS, RHO_THRESH_VU, RHO_THRESH_BU, RHO_THRESH_SU );
     
     /* Coverage Filter */
-    utility->target_coverage_factor  = (floating_t)FILTERED_COVERAGE_TARGET;
-    RhoKalman.init(&utility->target_filter, utility->target_coverage_factor, RHO_TARGET_LS, RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU );
+    utility->TargetCoverageFactor  = (floating_t)FILTERED_COVERAGE_TARGET;
+    RhoKalman.init(&utility->TargetFilter, utility->TargetCoverageFactor, RHO_TARGET_LS, RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU );
     
     /* Density Filters */
-    utility->density_map_pair.x.map = (density_t*)malloc(sizeof(density_t)*h);
-    utility->density_map_pair.x.length = h;
-    utility->density_map_pair.x.max[0] = 0;
-    utility->density_map_pair.x.max[1] = 0;
-    RhoKalman.init(&utility->density_map_pair.x.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
-    RhoKalman.init(&utility->density_map_pair.x.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
+    utility->DensityMapPair.x.map = (density_t*)malloc(sizeof(density_t)*h);
+    utility->DensityMapPair.x.length = h;
+    utility->DensityMapPair.x.max[0] = 0;
+    utility->DensityMapPair.x.max[1] = 0;
+    RhoKalman.init(&utility->DensityMapPair.x.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
+    RhoKalman.init(&utility->DensityMapPair.x.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     
-    utility->density_map_pair.y.map = (density_t*)malloc(sizeof(density_t)*w);
-    utility->density_map_pair.y.length = w;
-    utility->density_map_pair.y.max[0] = 0;
-    utility->density_map_pair.y.max[1] = 0;
-    RhoKalman.init(&utility->density_map_pair.y.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
-    RhoKalman.init(&utility->density_map_pair.y.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
+    utility->DensityMapPair.y.map = (density_t*)malloc(sizeof(density_t)*w);
+    utility->DensityMapPair.y.length = w;
+    utility->DensityMapPair.y.max[0] = 0;
+    utility->DensityMapPair.y.max[1] = 0;
+    RhoKalman.init(&utility->DensityMapPair.y.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
+    RhoKalman.init(&utility->DensityMapPair.y.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     
-    utility->density_map_pair.x.background = (density_t*)malloc(sizeof(density_t)*h);
-    utility->density_map_pair.y.background = (density_t*)malloc(sizeof(density_t)*w);
-    utility->density_map_pair.x.filtered   = (density_t*)malloc(sizeof(density_t)*h);
-    utility->density_map_pair.y.filtered   = (density_t*)malloc(sizeof(density_t)*w);
+    utility->DensityMapPair.x.background = (density_t*)malloc(sizeof(density_t)*h);
+    utility->DensityMapPair.y.background = (density_t*)malloc(sizeof(density_t)*w);
+    utility->DensityMapPair.x.filtered   = (density_t*)malloc(sizeof(density_t)*h);
+    utility->DensityMapPair.y.filtered   = (density_t*)malloc(sizeof(density_t)*w);
     
     /* Prediction Filters */
-    RhoKalman.init(&utility->prediction_pair.x.primary,   0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(&utility->prediction_pair.x.secondary, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(&utility->prediction_pair.y.primary,   0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    RhoKalman.init(&utility->prediction_pair.y.secondary, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-    utility->prediction_pair.x.primary_new   = w/2;
-    utility->prediction_pair.x.secondary_new = w/2;
-    utility->prediction_pair.y.primary_new   = h/2;
-    utility->prediction_pair.y.secondary_new = h/2;
+    RhoKalman.init(&utility->PredictionPair.x.primary,   0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(&utility->PredictionPair.x.secondary, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(&utility->PredictionPair.y.primary,   0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    RhoKalman.init(&utility->PredictionPair.y.secondary, 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+    utility->PredictionPair.x.primary_new   = w/2;
+    utility->PredictionPair.x.secondary_new = w/2;
+    utility->PredictionPair.y.primary_new   = h/2;
+    utility->PredictionPair.y.secondary_new = h/2;
     
     /* Prediction probabilities */
-    memset(&utility->prediction_pair.x.probabilities, 0, sizeof(floating_t)*4);
-    memset(&utility->prediction_pair.y.probabilities, 0, sizeof(floating_t)*4);
+    memset(&utility->PredictionPair.x.probabilities, 0, sizeof(floating_t)*4);
+    memset(&utility->PredictionPair.y.probabilities, 0, sizeof(floating_t)*4);
     
-#ifdef USE_INTERRUPT_MODEL
-    /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
-    /* Connect to Interrupt Model variable structure */
-    RhoVariables.ram.Dx             =  utility->density_map_pair.x.map;
-    RhoVariables.ram.Dy             =  utility->density_map_pair.y.map;
-    RhoVariables.ram.Q              =  utility->Q;
-    RhoVariables.ram.CX_ADDR        = &utility->Cx;
-    RhoVariables.ram.CY_ADDR        = &utility->Cy;
-    RhoVariables.ram.C_FRAME        =  utility->cframe;
-    RhoVariables.ram.THRESH_ADDR    = &utility->thresh;
-    RhoVariables.ram.CAM_PORT       = &test_port;
+    utility->Packet.header.ID       = PACKET_HEADER_ID;
+    utility->Packet.header.includes = PACKET_INCLUDES;
+    memset(utility->Packet.data, 0, sizeof(packet_offset_lookup_t));
     
-    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
-    RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W           = utility->width;
-    RhoVariables.global.H           = utility->height;
-    
-    /* Interrupt model mutex initializer */
-    pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
-#endif
-    
-    utility->packet.header.ID       = PACKET_HEADER_ID;
-    utility->packet.header.includes = PACKET_INCLUDES;
-    memset(utility->packet.data, 0, sizeof(packet_offset_lookup_t));
+    utility->BackgroundCounter = 0;
+    utility->BackgroundPeriod = BACKGROUND_PERIOD;
 }
 
 void Perform( rho_utility * utility, bool background_event )
@@ -185,8 +186,8 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     
     rho_selection_variables _ = {d->length, 0};
     
-    utility->filtered_coverage = 0;
-    utility->total_coverage = 0;
+    utility->FilteredCoverage = 0;
+    utility->TotalCoverage = 0;
     
     /* Find max and update kalman */
     byte_t cyc, cyc_;
@@ -308,7 +309,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     n = ZDIV( 1., n );
     
     _.fcov = BOUND(ZDIV(_.fden, _.tden), 0, 2); // filtered coverage
-    _.cfac = 1. - BOUND(ZDIV( _.fcov, utility->target_coverage_factor ), 0, 2); // coverage factor
+    _.cfac = 1. - BOUND(ZDIV( _.fcov, utility->TargetCoverageFactor ), 0, 2); // coverage factor
     _.vfac = ZDIV(_.fvar, _.fpeak); // variance factor
     
     r->probabilities.primary        = _.pfac * n;
@@ -316,11 +317,11 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     r->probabilities.alternate      = _.afac * n;
     r->probabilities.absence        = _.bfac * n;
     
-    utility->filtered_coverage      = _.fden;
-    utility->total_coverage         = _.tden;
-    utility->filtered_percentage    = _.fcov;
-    utility->coverage_factor        = _.cfac;
-    utility->variance_factor        = _.vfac;
+    utility->FilteredCoverage      = _.fden;
+    utility->TotalCoverage         = _.tden;
+    utility->FilteredPercentage    = _.fcov;
+    utility->CoverageFactor        = _.cfac;
+    utility->VarianceFactor        = _.vfac;
     
     LOG_RHO("%.3f[cf] %.3f[vf] %.3f%%[fc] %.3f%%[tc] | %.3f[tf]\n", _.cfac, _.vfac, _.fcov*100, utility->target_coverage_factor*100, _.fdn_*_.tdnf );
     LOG_RHO("Rho: pri-%.3f sec-%.3f alt-%.3f abs-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate, r->probabilities.absence);
@@ -331,8 +332,8 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
 
 void Generate_Background( rho_utility * utility )
 {
-    floating_t xt = CalculateCentroid( utility->density_map_pair.x.background, utility->density_map_pair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
-    floating_t yt = CalculateCentroid( utility->density_map_pair.y.background, utility->density_map_pair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
+    floating_t xt = CalculateCentroid( utility->DensityMapPair.x.background, utility->DensityMapPair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+    floating_t yt = CalculateCentroid( utility->DensityMapPair.y.background, utility->DensityMapPair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
     LOG_RHO("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
     utility->QbT = MAX(xt, yt);
 }
@@ -341,20 +342,20 @@ static void Redistribute_Densities( rho_utility * utility )
 {
     redistribution_variables _ =
     {
-        { utility->Bx, abs(utility->Cx-utility->Bx), utility->width - utility->Cx  },
-        { utility->By, abs(utility->Cy-utility->By), utility->height - utility->Cy },
+        { utility->Bx, abs(utility->Cx-utility->Bx), utility->Width - utility->Cx  },
+        { utility->By, abs(utility->Cy-utility->By), utility->Height - utility->Cy },
         { 0 }, 0
     };
     if( utility->Cx < utility->Bx )
     {
         _.xl[0] = utility->Cx;
-        _.xl[2] = utility->width - utility->Bx;
+        _.xl[2] = utility->Width - utility->Bx;
         _.c |= 0x01;
     }
     if( utility->Cy < utility->By )
     {
         _.yl[0] = utility->Cy;
-        _.yl[2] = utility->width - utility->By;
+        _.yl[2] = utility->Width - utility->By;
         _.c |= 0x02;
     }
     while( _.y < 3 )
@@ -382,9 +383,9 @@ static void Redistribute_Densities( rho_utility * utility )
 void Filter_and_Select_Pairs( rho_utility * utility )
 {
     LOG_RHO("X Map:\n");
-    Filter_and_Select( utility, &utility->density_map_pair.x, &utility->prediction_pair.x );
+    Filter_and_Select( utility, &utility->DensityMapPair.x, &utility->PredictionPair.x );
     LOG_RHO("Y Map:\n");
-    Filter_and_Select( utility, &utility->density_map_pair.y, &utility->prediction_pair.y );
+    Filter_and_Select( utility, &utility->DensityMapPair.y, &utility->PredictionPair.y );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
@@ -392,10 +393,10 @@ void Update_Prediction( rho_utility * utility )
 {
     prediction_update_variables _ =
     {
-        utility->prediction_pair.y.primary_new,
-        utility->prediction_pair.x.primary_new,
-        utility->prediction_pair.y.secondary_new,
-        utility->prediction_pair.x.secondary_new,
+        utility->PredictionPair.y.primary_new,
+        utility->PredictionPair.x.primary_new,
+        utility->PredictionPair.y.secondary_new,
+        utility->PredictionPair.x.secondary_new,
         utility->Cx,
         utility->Cy,
         0
@@ -405,14 +406,14 @@ void Update_Prediction( rho_utility * utility )
     
     if( ( _.Ax < _.Cx ) ^ ( _.Bx > _.Cx ) ) /* X ambiguous */
     {
-        _.x1 = utility->prediction_pair.x.primary.value + utility->prediction_pair.x.primary.velocity;
+        _.x1 = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
         if( fabs( _.x1 - _.Ax ) > fabs( _.x1 - _.Bx ) ) iswap( &_.Ax, &_.Bx );
         _.non_diag = true;
         LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
     }
     if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* Y ambiguous */
     {
-        _.y1 = utility->prediction_pair.y.primary.value + utility->prediction_pair.y.primary.velocity;
+        _.y1 = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
         if( fabs( _.y1 - _.Ay ) > fabs( _.y1 -_. By ) ) iswap( &_.Ay, &_.By );
         _.non_diag = true;
         LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
@@ -424,28 +425,28 @@ void Update_Prediction( rho_utility * utility )
         LOG_RHO("Quadrant Check %d\n", _.qcheck);
     }
     
-    if( _.Ax ) RhoKalman.update( &utility->prediction_pair.x.primary,   _.Ax, 0 );
-    if( _.Bx ) RhoKalman.update( &utility->prediction_pair.x.secondary, _.Bx, 0 );
-    if( _.Ay ) RhoKalman.update( &utility->prediction_pair.y.primary,   _.Ay, 0 );
-    if( _.By ) RhoKalman.update( &utility->prediction_pair.y.secondary, _.By, 0 );
+    if( _.Ax ) RhoKalman.update( &utility->PredictionPair.x.primary,   _.Ax, 0 );
+    if( _.Bx ) RhoKalman.update( &utility->PredictionPair.x.secondary, _.Bx, 0 );
+    if( _.Ay ) RhoKalman.update( &utility->PredictionPair.y.primary,   _.Ay, 0 );
+    if( _.By ) RhoKalman.update( &utility->PredictionPair.y.secondary, _.By, 0 );
     
-    _.Cx = (index_t)((utility->prediction_pair.x.primary.value + utility->prediction_pair.x.secondary.value)) >> 1;
-    _.Cy = (index_t)((utility->prediction_pair.y.primary.value + utility->prediction_pair.y.secondary.value)) >> 1;
+    _.Cx = (index_t)((utility->PredictionPair.x.primary.value + utility->PredictionPair.x.secondary.value)) >> 1;
+    _.Cy = (index_t)((utility->PredictionPair.y.primary.value + utility->PredictionPair.y.secondary.value)) >> 1;
     
-    _.Cx = BOUNDU(_.Cx, utility->width );
-    _.Cy = BOUNDU(_.Cy, utility->height);
+    _.Cx = BOUNDU(_.Cx, utility->Width );
+    _.Cy = BOUNDU(_.Cy, utility->Height);
     
     utility->Cx = _.Cx;
     utility->Cy = _.Cy;
     LOG_RHO("Cx>%d | Cy>%d\n", _.Cx, _.Cy);
-    utility->density_map_pair.x.centroid = _.Cy;
-    utility->density_map_pair.y.centroid = _.Cx;
+    utility->DensityMapPair.x.centroid = _.Cy;
+    utility->DensityMapPair.y.centroid = _.Cx;
     
-    utility->prediction_pair.probabilities.primary   = sqrt( utility->prediction_pair.x.probabilities.primary   * utility->prediction_pair.y.probabilities.primary   );
-    utility->prediction_pair.probabilities.secondary = sqrt( utility->prediction_pair.x.probabilities.secondary * utility->prediction_pair.y.probabilities.secondary );
-    utility->prediction_pair.probabilities.alternate = sqrt( utility->prediction_pair.x.probabilities.alternate * utility->prediction_pair.y.probabilities.alternate );
+    utility->PredictionPair.probabilities.primary   = sqrt( utility->PredictionPair.x.probabilities.primary   * utility->PredictionPair.y.probabilities.primary   );
+    utility->PredictionPair.probabilities.secondary = sqrt( utility->PredictionPair.x.probabilities.secondary * utility->PredictionPair.y.probabilities.secondary );
+    utility->PredictionPair.probabilities.alternate = sqrt( utility->PredictionPair.x.probabilities.alternate * utility->PredictionPair.y.probabilities.alternate );
     
-    BayesianFunctions.sys.update( &utility->sys, &utility->prediction_pair );
+    BayesianFunctions.sys.update( &utility->BayeSys, &utility->PredictionPair );
 }
 
 /* Use background and state information to update image threshold */
@@ -457,43 +458,43 @@ void Update_Threshold( rho_utility * utility )
     {
         floating_t background_coverage_factor = 1 - ZDIV( BACKGROUND_COVERAGE_MIN, utility->QbT );
         hard_tune_factor = THRESH_STEP_MAX*pow( BOUND(background_coverage_factor, -1, 1), 3);
-        hard_tune_factor *= HARD_TUNING_PRESIDENCE*utility->coverage_factor;
+        hard_tune_factor *= HARD_TUNING_PRESIDENCE*utility->CoverageFactor;
     }
 
     /* Soft-Tune on State */
     floating_t soft_tune_factor = SOFT_TUNING_PRESIDENCE*THRESH_STEP_BASE;
-    switch(utility->sys.state)
+    switch(utility->BayeSys.state)
     {
         case UNSTABLE_NONE:
             soft_tune_factor *= 2;
         case UNSTABLE_SINGLE:
-            soft_tune_factor *= utility->variance_factor;
+            soft_tune_factor *= utility->VarianceFactor;
             break;
         case STABLE_NONE:
             soft_tune_factor *= 2;
          case STABLE_SINGLE:
-            soft_tune_factor *= utility->coverage_factor;
+            soft_tune_factor *= utility->CoverageFactor;
             break;
         case STABLE_DOUBLE:
-            RhoKalman.update( &utility->target_filter, utility->filtered_percentage, 0. );
-            utility->target_coverage_factor = utility->target_filter.value;
+            RhoKalman.update( &utility->TargetFilter, utility->FilteredPercentage, 0. );
+            utility->TargetCoverageFactor = utility->TargetFilter.value;
             LOG_RHO("*** COVERAGE TARGET IS %.3f ***\n", utility->target_coverage_factor);
             soft_tune_factor = 0.;
             break;
         case UNSTABLE_MANY:
-            soft_tune_factor *= -utility->variance_factor;
+            soft_tune_factor *= -utility->VarianceFactor;
             break;
         case STABLE_MANY:
-            soft_tune_factor *= -utility->coverage_factor;
+            soft_tune_factor *= -utility->CoverageFactor;
             break;
         default:
             break;
     }
     
-    utility->target_coverage_factor -= 0.01*(utility->target_coverage_factor - (floating_t)FILTERED_COVERAGE_TARGET);
-    floating_t proposed_thresh = *utility->thresh + hard_tune_factor + soft_tune_factor;
-    RhoKalman.update( &utility->thresh_filter, proposed_thresh, 0);
-    *utility->thresh = BOUND(utility->thresh_filter.value, THRESH_MIN, THRESH_MAX);
+    utility->TargetCoverageFactor -= 0.01*(utility->TargetCoverageFactor - (floating_t)FILTERED_COVERAGE_TARGET);
+    floating_t proposed_thresh = *utility->Thresh + hard_tune_factor + soft_tune_factor;
+    RhoKalman.update( &utility->ThreshFilter, proposed_thresh, 0);
+    *utility->Thresh = BOUND(utility->ThreshFilter.value, THRESH_MIN, THRESH_MAX);
     
     LOG_RHO("*** THRESH IS %d ***\n", utility->thresh);
     LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->coverage_factor, utility->variance_factor);
@@ -502,11 +503,11 @@ void Update_Threshold( rho_utility * utility )
 
 void Generate_Packet( rho_utility * utility )
 {
-    packet_value_lookup_t  packet_value_lookup  = PACKET_ADDRESS_INITIALIZER(utility->prediction_pair);
+    packet_value_lookup_t  packet_value_lookup  = PACKET_ADDRESS_INITIALIZER(utility->PredictionPair);
     packet_generation_variables _ =
     {
-        &utility->packet,
-        (address_t)&utility->packet.data,
+        &utility->Packet,
+        (address_t)&utility->Packet.data,
         (address_t)&packet_offset_lookup,
         (address_t*)&packet_value_lookup,
         0
@@ -526,6 +527,7 @@ void Generate_Packet( rho_utility * utility )
         _.includes >>= 1;
         if((_.t=!_.t )) _.llPtr++;
     }
+    printPacket 
 }
 
 /* Rho global functions */

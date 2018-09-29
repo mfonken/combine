@@ -13,4 +13,6 @@
 #define CAMERA_WIDTH        1280
 #define CAMERA_HEIGHT       800
 
+#define BACKGROUND_PERIOD   10 // Frames
+
 #endif /* global_config_h */
