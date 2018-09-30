@@ -43,6 +43,9 @@ typedef volatile bool   flag_t;
 
 #define RHO_PUNISH_FACTOR   1
 
+#define PIXEL_COUNT_TRUST_FACTOR   0.2
+#define PIXEL_COUNT_DROP_FACTOR    0.75
+
 #define ALTERNATE_TUNING_FACTOR    0.5
 #define FILTERED_COVERAGE_TARGET   0.004
 #define FILTERED_COVERAGE_PIXELS   ((index_t)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
@@ -224,14 +227,18 @@ address_t
 } packet_value_lookup_t;
 
 #define NUM_PACKET_ELEMENTS ((byte_t)( sizeof(packet_offset_lookup_t) * ( 8 / PACKET_OFFSET_WIDTH ) ))
+#define BEACON_PACKET_ID 0x11
+#define BEACON_DEFAULT_PERIOD 20 // cycles
 
 typedef struct
 {
-    byte_t  ID,
+byte_t
+    ID,
     includes;
-    timestamp_t
+timestamp_t
     timestamp;
-    uint8_t padding[6];
+uint8_t
+    padding[6];
 } packet_header_t;
 
 typedef struct

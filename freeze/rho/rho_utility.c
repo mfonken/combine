@@ -527,7 +527,7 @@ void Generate_Packet( rho_utility * utility )
         _.includes >>= 1;
         if((_.t=!_.t )) _.llPtr++;
     }
-    printPacket 
+    printPacket( &utility->Packet, 3    );
 }
 
 /* Rho global functions */

@@ -65,4 +65,14 @@ static inline void STMResetDMA( void )
     
 }
 
+static inline uint8_t STMUartTxDMA( uint8_t * buffer, uint16_t length )
+{
+    return 1;
+}
+
+static inline uint16_t STMUartRxDMA( uint8_t * buffer )
+{
+    return 1;
+}
+
 #endif /* stm32_interface_h */

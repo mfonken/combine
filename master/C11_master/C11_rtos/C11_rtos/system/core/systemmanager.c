@@ -100,7 +100,7 @@ void RegisterystemManagerProfileEntry( system_profile_entry_t * entry )
                 switch( entry->header.direction )
                 {
                     case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-//                        handler->function
+//                        handler->blank();
                         break;
                     case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
                         break;
@@ -167,7 +167,6 @@ system_subactivity_map_entry_t * GetSystemManagerSubactivityMapEntryById( system
     for( uint8_t i = 0; i < NUM_SYSTEM_SUBACTIVITIES; i++ )
     {
         system_subactivity_map_entry_t * entry = &((*System.subactivity_map)[i]);
-        system_subactivity_t id = (system_subactivity_t)entry->ID;
         if( entry == NULL ) continue;
         if( entry->ID == entry_id ) return entry;
     }

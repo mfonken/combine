@@ -27,6 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		34C638C6216045EF007CC1E1 /* rho_host_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_host_interface.h; sourceTree = "<group>"; };
 		49330C232153655D0010438F /* rho_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49330C242153655D0010438F /* rho_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
 		49479A5021535FE80029AE62 /* rho_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rho_client; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,6 +84,7 @@
 		49479A5A2153603C0029AE62 /* rho */ = {
 			isa = PBXGroup;
 			children = (
+				34C638C6216045EF007CC1E1 /* rho_host_interface.h */,
 				49EB93862156B8BA00CADCAE /* stm32_interface.h */,
 				49479A6C215360BC0029AE62 /* rho_master.h */,
 				49479A602153603C0029AE62 /* rho_types.h */,

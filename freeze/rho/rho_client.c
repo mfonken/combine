@@ -14,35 +14,32 @@ static inline void PixelThreshLoop( const register byte_t * capture_address,// c
                                     register index_t * thresh_buffer )
 {
     register index_t thresh_index = *(index_t *)pthresh_index;
-    register index_t capture_index = RhoSystem.Variables.Utility.Height;
+    register index_t capture_index = 0;
     register byte_t thresh_value = *thresh_address;
-    while( ( --capture_index > 0 ) && !RhoSystem.Variables.Flags.Row )
+    while( ( capture_index++ < RhoSystem.Variables.Utility.Width ) && !RhoSystem.Variables.Flags.Row )
         if( capture_address[capture_index] > thresh_value )
-            thresh_buffer[--thresh_index] = capture_index;
+            thresh_buffer[thresh_index++] = capture_index;
     *(index_t *)pthresh_index = thresh_index;
 }
 
 static inline index_t CaptureFrame()
 {
-    while(!RhoSystem.Variables.Flags.Row);
-    
+    while(RhoSystem.Variables.Flags.Row);
     index_t
         y_counter = (index_t)RhoSystem.Variables.Utility.Height,
-        t_counter = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
-    while( ( y_counter > 0 ) && ( t_counter > 0 ) )
+        t_counter = 0,
+        t_max = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
+    while( ( --y_counter > 0 ) && ( t_counter < t_max ) )
     {
-        RhoSystem.Variables.Buffers.Thresh[--t_counter] = Y_DEL;
+        RhoSystem.Variables.Buffers.Thresh[t_counter++] = Y_DEL;
         while(RhoSystem.Variables.Flags.Row);
-
         PixelThreshLoop( RhoSystem.Variables.Buffers.Capture,
                         &t_counter,
                          RhoSystem.Variables.Utility.Thresh,
                          RhoSystem.Variables.Buffers.Thresh );
-        
         while(!RhoSystem.Variables.Flags.Row);
-        --y_counter;
     }
-    return y_counter;
+    return t_counter;
 }
 
 static inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t t_len, register index_t y_counter, register index_t y_len )
@@ -73,19 +70,9 @@ static inline section_process_t ProcessFrameSection( register index_t t_counter,
     return (section_process_t){ t_counter, y_counter, Q_left, Q_right };
 }
 
-static inline void ProcessFrame( index_t t_len )
-{
-    section_process_t top = ProcessFrameSection(          0, t_len,        0, RhoSystem.Variables.Utility.Cy     );
-    section_process_t btm = ProcessFrameSection( top.pixels, t_len, top.rows, RhoSystem.Variables.Utility.Height );
-    
-    RhoSystem.Variables.Buffers.Quadrant[0] = top.left;
-    RhoSystem.Variables.Buffers.Quadrant[1] = top.right;
-    RhoSystem.Variables.Buffers.Quadrant[2] = btm.left;
-    RhoSystem.Variables.Buffers.Quadrant[3] = btm.right;
-}
-
 static inline void ActivateBackgrounding( void )
 {
+    RhoSystem.Variables.Flags.Backgrounding = true;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.background;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
@@ -93,34 +80,57 @@ static inline void ActivateBackgrounding( void )
 
 static inline void DeactivateBackgrounding( void )
 {
+    RhoSystem.Variables.Flags.Backgrounding = false;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.map;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Q;
 }
 
-void ProcessRhoSystemFrameCapture( void )
+static inline void ProcessFrame( index_t t_len )
 {
-    RhoSystem.Variables.Flags.Backgrounding = ++RhoSystem.Variables.Utility.BackgroundCounter >= RhoSystem.Variables.Utility.BackgroundPeriod;
-    
-    if( RhoSystem.Variables.Flags.Backgrounding )
-    {
+    if( HasPixelCountDrop( RhoSystem.Variables.Buffers.PixelCount, t_len ) )
         ActivateBackgrounding();
-        RhoSystem.Variables.Utility.BackgroundCounter = 0;
-    }
     else DeactivateBackgrounding();
     
+    section_process_t top = ProcessFrameSection(          0, t_len,        0, RhoSystem.Variables.Utility.Cy     );
+    section_process_t btm = ProcessFrameSection( top.pixels, t_len, top.rows, RhoSystem.Variables.Utility.Height );
+    
+    RhoSystem.Variables.Buffers.Quadrant[0] = top.left;
+    RhoSystem.Variables.Buffers.Quadrant[1] = top.right;
+    RhoSystem.Variables.Buffers.Quadrant[2] = btm.left;
+    RhoSystem.Variables.Buffers.Quadrant[3] = btm.right;
+    
+    RhoSystem.Variables.Buffers.DensityX[CAPTURE_BUFFER_HEIGHT-1] = FRAME_ROW_END;
+}
+
+void ProcessRhoSystemFrameCapture( void )
+{
     RhoSystem.Functions.Memory.Zero();
     while(!RhoSystem.Variables.Flags.Frame);
     
     ProcessFrame( CaptureFrame() );
-
-    RhoSystem.Variables.Buffers.DensityX[CAPTURE_BUFFER_HEIGHT-1] = FRAME_ROW_END;
 }
 
 inline void PerformRhoSystemProcess( void )
 {
     RhoSystem.Functions.Perform.FrameCapture();
     RhoFunctions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags.Backgrounding);
+    
+    if( TransmitPacket( &RhoSystem.Variables.Utility.Packet ) )
+        return;
+}
+
+void ActivateRhoSystem(void)
+{
+    RhoSystem.Variables.Flags.Active = true;
+    TransmitPacket( RhoSystem.Variables.Buffers.BeaconPacket );
+}
+
+void DeactivateRhoSystem(void)
+{
+    RhoSystem.Variables.Flags.Active = false;
+    // TODO: zero period
+    TransmitPacket( RhoSystem.Variables.Buffers.BeaconPacket );
 }
 
 /***************************************************************************************/
@@ -140,6 +150,10 @@ void InitRhoSystem( void )
     RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh + sizeof(index_t)*(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT);
     RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
 
+    RhoSystem.Variables.Buffers.BeaconPacket = malloc( sizeof( packet_t ) );
+    RhoSystem.Variables.Buffers.BeaconPacket->header.ID = BEACON_PACKET_ID;
+    RhoSystem.Variables.Buffers.BeaconPacket->header.includes = BEACON_DEFAULT_PERIOD;
+    
     RhoSystem.Functions.Memory.Zero();
     RhoFunctions.Init( &RhoSystem.Variables.Utility );
 }

@@ -11,7 +11,6 @@
 void SystemBehaviorTask( )
 {
 }
-
 void PerformBehaviorSelfCheck(void)
 {
 }
@@ -30,7 +29,6 @@ void PerformBehaviorProbeReceive( system_task_id_t id )
 void PerformBehaviorSchedulerSchedule( system_task_id_t id, uint32_t data )
 {
 }
-
 void PerformBehaviorSchedulerDeschedule( system_task_id_t id )
 {
     //Deschedule BehaviorScheduledTasks[id]
@@ -47,7 +45,6 @@ void PerformBehaviorInterrupterPerform( system_task_id_t id )
 {
     //Disable BehaviorInterruptTasks[id]
 }
-
 void InitProfileEntry( system_profile_entry_t * entry )
 {
 }

@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "rho_utility.h"
+#include "rho_host_interface.h"
 #include "stm32_interface.h"
 
 typedef struct
@@ -36,6 +37,10 @@ capture_t
     Capture[CAPTURE_BUFFER_SIZE];       /* Raw capture buffer for DMA */
 index_t
     Thresh[THRESH_BUFFER_SIZE];         /* Threshold processing buffer */
+index_t
+    *PixelCount;
+packet_t
+    *BeaconPacket;
 } rho_system_buffer_variables;
 
 typedef struct
@@ -126,6 +131,18 @@ static system_t RhoSystem =
         }
     }
 };
+
+static inline void FilterPixelCount( index_t * PixelCount, index_t NewCount )
+{
+    *PixelCount = (index_t)( (floating_t)*PixelCount * ( 1. - PIXEL_COUNT_TRUST_FACTOR ) ) + ( (floating_t)NewCount * PIXEL_COUNT_TRUST_FACTOR );
+}
+
+static inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
+{
+    index_t OldCount = *PixelCount;
+    FilterPixelCount( PixelCount, NewCount );
+    return ( *PixelCount < ( (floating_t)OldCount * PIXEL_COUNT_DROP_FACTOR ) );
+}
 
 static inline void   activityEnable( void ) { RhoSystem.Variables.Flags.Active  = 1; }
 static inline void   activityDisable(void ) { RhoSystem.Variables.Flags.Active  = 0; }
