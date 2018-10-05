@@ -181,6 +181,45 @@ void Perform( rho_utility * utility, bool background_event )
 /* Calculate and process data in variance band from density filter to generate predictions */
 void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t * r )
 {
+    index_t
+    len = 0,
+    cloc = 0,
+    gapc = 0;
+    density_t
+    fpeak = 0,
+    fbandl = 0,
+    c1 = 0,
+    c2 = 0,
+    b = 0,
+    p = 0;
+    variance_t
+    fvar = 0;
+    density_2d_t
+    cmax = 0,
+    amax = 0,
+    cden = 0,
+    tden = 0,
+    fden = 0;
+    bool
+    has = 0,
+    sel = 0;
+    floating_t
+    avgc = 0,
+    fcov = 0,   /* Filtered coverage ratio */
+    cavg = 0,   /* cumulative average */
+    mavg = 0,   /* moment average */
+    afac = 0,   /* alternate factor */
+    bfac = 0,   /* absence factor */
+    pfac = 0,   /* primary factor */
+    sfac = 0,   /* secondary factor */
+    cfac = 0,   /* coverage factor */
+    vfac = 0,   /* variance factor */
+    fdn_ = 0,   /* filtered density (float) */
+    tdnf = 0,   /* target density (float) */
+    fvf_ = 0;   /* filtered variance inverse (float) */
+    blob_t
+    blobs[2] = {0};
+    
     memset(&r->probabilities, 0, sizeof(floating_t)*4);
     memset(&r->probabilities, 0, sizeof(floating_t)*4);
     
@@ -191,142 +230,142 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     
     /* Find max and update kalman */
     byte_t cyc, cyc_;
-    index_t x1 = _.len,
-    x2 = _.len,
-    range[3] = { _.len, d->centroid, 0 };
+    index_t x1 = len,
+    x2 = len,
+    range[3] = { len, d->centroid, 0 };
     //    LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
     
     for( cyc = 1, cyc_ = 2; cyc_ > 0; cyc--, cyc_-- )
     {
-        _.cmax = 0;
+        cmax = 0;
         if( d->has_background )
         {
-            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, _.c1 = d->map[x1], _.b = d->background[x1] )
+            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, c1 = d->map[x1], b = d->background[x1] )
             {
-                _.c1 = abs( (int)_.c1 - (int)_.b );
-//                if( _.c1 < (d->length>>2) )
+                c1 = abs( (int)c1 - (int)b );
+                if( c1 < (d->length>>2) )
                 {
-                    _.tden += _.c1;
-                    if( _.c1 > _.cmax ) _.cmax = _.c1;
-                    d->filtered[x1] = _.c1;
+                    tden += c1;
+                    if( c1 > cmax ) cmax = c1;
+                    d->filtered[x1] = c1;
                 }
-//                else
-//                    d->filtered[x1] = 0;
+                else
+                    d->filtered[x1] = 0;
             }
         }
         else
         {
-            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, _.c1 = d->map[x1] )
+            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, c1 = d->map[x1] )
             {
-//                if( _.c1 < (d->length>>2) )
+                if( c1 < (d->length>>2) )
                 {
-                    _.tden += _.c1;
-                    if( _.c1 > _.cmax ) _.cmax = _.c1;
-                    d->map[x1] = _.c1;
+                    tden += c1;
+                    if( c1 > cmax ) cmax = c1;
+                    d->map[x1] = c1;
                 }
-//                else
-//                    d->map[x1] = 0;
+                else
+                    d->map[x1] = 0;
             }
         }
         
-        RhoKalman.update(&d->kalmans[cyc], _.cmax, 0. );
-        d->max[cyc] = _.cmax;
-        _.fpeak = d->kalmans[cyc].value;
-        _.fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
-        d->kalmans[cyc].variance = _.fvar;
+        RhoKalman.update(&d->kalmans[cyc], cmax, 0. );
+        d->max[cyc] = cmax;
+        fpeak = d->kalmans[cyc].value;
+        fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
+        d->kalmans[cyc].variance = fvar;
         
-        LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
+        LOG_RHO("Map(%d): max>%d\n", cyc, cmax);
         
-        if( _.fvar > 0 && _.fpeak > _.fvar )
+        if( fvar > 0 && fpeak > fvar )
         {
-            _.fbandl = _.fpeak - _.fvar;
-            LOG_RHO("Peak>%d | var>%d | bandl>%d\n", _.fpeak, _.fvar, _.fbandl);
+            fbandl = fpeak - fvar;
+            LOG_RHO("Peak>%d | var>%d | bandl>%d\n", fpeak, fvar, fbandl);
             /* Find blob centroids and sort out the top 2 */
-            for( x2 = range[cyc]; x2 > range[cyc_]; --x2, _.c1 = d->map[x2] )
+            for( x2 = range[cyc]; x2 > range[cyc_]; --x2, c1 = d->map[x2] )
             {
                 /* Punish values above the filter peak */
-                if( _.c1 > _.fpeak )
+                if( c1 > fpeak )
                 {
-                    _.p = RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
-                    if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
-                    else _.c1 = 0;
+                    p = RHO_PUNISH_FACTOR*(c1 - fpeak);
+                    if( fpeak > p ) c1 = fpeak - p;
+                    else c1 = 0;
                 }
                 
                 /* Check if CMA value is in band */
-                if( _.c1 > _.fbandl )
+                if( c1 > fbandl )
                 {
                     /* De-offset valid values */
-                    _.c2 = _.c1 - _.fbandl;
+                    c2 = c1 - fbandl;
                     
                     /* Process new values into blob */
-                    cma_M0_M1((floating_t)_.c2, (floating_t)x2, &_.cavg, &_.mavg, &_.avgc);
-                    if(_.c2 > _.cmax) _.cmax = _.c2;
-                    _.has = 1; _.gapc = 0;
+                    cma_M0_M1((floating_t)c2, (floating_t)x2, &cavg, &mavg, &avgc);
+                    if(c2 > cmax) cmax = c2;
+                    has = 1; gapc = 0;
                 }
                 
                 /* Process completed blobs */
-                else if( _.has && _.gapc > RHO_GAP_MAX )
+                else if( has && gapc > RHO_GAP_MAX )
                 {
-                    _.cden = (density_2d_t)_.cavg;
-                    if( _.cden > _.blobs[!_.sel].den )
+                    cden = (density_2d_t)cavg;
+                    if( cden > blobs[!sel].den )
                     {
-                        if( ( _.cden > _.blobs[_.sel].den ) || ( !_.blobs[!_.sel].den ) )
+                        if( ( cden > blobs[sel].den ) || ( !blobs[!sel].den ) )
                         {
-                            _.sel = !_.sel;
-                            _.amax = _.blobs[_.sel].max;
+                            sel = !sel;
+                            amax = blobs[sel].max;
                         }
-                        _.blobs[_.sel] = (blob_t){ _.cmax, _.cden, (index_t)ZDIV(_.mavg,_.cavg) };
+                        blobs[sel] = (blob_t){ cmax, cden, (index_t)ZDIV(mavg,cavg) };
                     }
-                    _.fden += _.cden;
-                    _.mavg = 0.; _.cavg = 0.; _.avgc = 0.;
-                    _.has = 0; _.gapc = 0;
+                    fden += cden;
+                    mavg = 0.; cavg = 0.; avgc = 0.;
+                    has = 0; gapc = 0;
                 }
                 
                 /* Count gaps for all invalid values */
-                else if( _.has )
-                    _.gapc++;
+                else if( has )
+                    gapc++;
             }
         }
     }
     
-    //    if( !_.blobs[0].loc || !_.blobs[1].loc ) return;
+    //    if( !blobs[0].loc || !blobs[1].loc ) return;
     
     /* Update prediction with best peaks */
-    r->primary_new   = _.blobs[ _.sel].loc;
-    r->secondary_new = _.blobs[!_.sel].loc;
+    r->primary_new   = blobs[ sel].loc;
+    r->secondary_new = blobs[!sel].loc;
     
     /* Generate prediction probabilities */
-    _.fdn_ = ZDIV(     1, _.fden);              // filtered density inverse
+    fdn_ = ZDIV(     1, fden);              // filtered density inverse
     
-    _.pfac = _.blobs[ _.sel].den * _.fdn_;
-    _.sfac = _.blobs[!_.sel].den * _.fdn_;
+    pfac = blobs[ sel].den * fdn_;
+    sfac = blobs[!sel].den * fdn_;
     
-    floating_t n =  _.pfac + _.sfac;
-    _.afac = pow( 1 - n, 1);
-    n += _.afac;
-    _.bfac = pow( 1 - n, 1);
-    n += _.bfac;
+    floating_t n =  pfac + sfac;
+    afac = pow( 1 - n, 1);
+    n += afac;
+    bfac = pow( 1 - n, 1);
+    n += bfac;
     n = ZDIV( 1., n );
     
-    _.fcov = BOUND(ZDIV(_.fden, _.tden), 0, 2); // filtered coverage
-    _.cfac = 1. - BOUND(ZDIV( _.fcov, utility->TargetCoverageFactor ), 0, 2); // coverage factor
-    _.vfac = ZDIV(_.fvar, _.fpeak); // variance factor
+    fcov = BOUND(ZDIV(fden, tden), 0, 2); // filtered coverage
+    cfac = 1. - BOUND(ZDIV( fcov, utility->TargetCoverageFactor ), 0, 2); // coverage factor
+    vfac = ZDIV(fvar, fpeak); // variance factor
     
-    r->probabilities.primary        = _.pfac * n;
-    r->probabilities.secondary      = _.sfac * n;
-    r->probabilities.alternate      = _.afac * n;
-    r->probabilities.absence        = _.bfac * n;
+    r->probabilities.primary        = pfac * n;
+    r->probabilities.secondary      = sfac * n;
+    r->probabilities.alternate      = afac * n;
+    r->probabilities.absence        = bfac * n;
     
-    utility->FilteredCoverage      = _.fden;
-    utility->TotalCoverage         = _.tden;
-    utility->FilteredPercentage    = _.fcov;
-    utility->CoverageFactor        = _.cfac;
-    utility->VarianceFactor        = _.vfac;
+    utility->FilteredCoverage      = fden;
+    utility->TotalCoverage         = tden;
+    utility->FilteredPercentage    = fcov;
+    utility->CoverageFactor        = cfac;
+    utility->VarianceFactor        = vfac;
     
-    LOG_RHO("%.3f[cf] %.3f[vf] %.3f%%[fc] %.3f%%[tc] | %.3f[tf]\n", _.cfac, _.vfac, _.fcov*100, utility->target_coverage_factor*100, _.fdn_*_.tdnf );
+    LOG_RHO("%.3f[cf] %.3f[vf] %.3f%%[fc] %.3f%%[tc] | %.3f[tf]\n", cfac, vfac, fcov*100, utility->target_coverage_factor*100, fdn_*tdnf );
     LOG_RHO("Rho: pri-%.3f sec-%.3f alt-%.3f abs-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate, r->probabilities.absence);
-    LOG_RHO("* %.3f%% ( %d / %d )\n", _.fcov*100, _.fden, _.tden);
-    LOG_RHO("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.blobs[0].loc, _.blobs[0].den, _.blobs[0].max, _.blobs[1].loc, _.blobs[1].den, _.blobs[1].max);
+    LOG_RHO("* %.3f%% ( %d / %d )\n", fcov*100, fden, tden);
+    LOG_RHO("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", blobs[0].loc, blobs[0].den, blobs[0].max, blobs[1].loc, blobs[1].den, blobs[1].max);
     LOG_RHO("Normalized total probability: %.3f\n", r->probabilities.primary + r->probabilities.secondary + r->probabilities.alternate + r->probabilities.absence );
 }
 

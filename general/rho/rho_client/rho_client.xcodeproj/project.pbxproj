@@ -90,11 +90,11 @@
 				49479A602153603C0029AE62 /* rho_types.h */,
 				49479A622153603C0029AE62 /* rho_kalman.h */,
 				49479A662153603C0029AE62 /* rho_kalman.c */,
-				49479A5B2153603C0029AE62 /* state_control */,
 				49479A632153603C0029AE62 /* rho_utility.h */,
 				49479A5E2153603C0029AE62 /* rho_utility.c */,
 				49330C232153655D0010438F /* rho_client.h */,
 				49330C242153655D0010438F /* rho_client.c */,
+				49479A5B2153603C0029AE62 /* state_control */,
 			);
 			name = rho;
 			path = ../../../../freeze/rho;
