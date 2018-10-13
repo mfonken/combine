@@ -191,9 +191,7 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     
     /* Find max and update kalman */
     byte_t cyc, cyc_;
-    index_t x1 = _.len,
-    x2 = _.len,
-    range[3] = { _.len, d->centroid, 0 };
+    index_t x, range[3] = { _.len, d->centroid, 0 };
     //    LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
     
     for( cyc = 1, cyc_ = 2; cyc_ > 0; cyc--, cyc_-- )
@@ -201,37 +199,38 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
         _.cmax = 0;
         if( d->has_background )
         {
-            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, _.c1 = d->map[x1], _.b = d->background[x1] )
+            for( x = range[cyc]; x > range[cyc_]; --x, _.c1 = d->map[x], _.b = d->background[x] )
             {
                 _.c1 = abs( (int)_.c1 - (int)_.b );
 //                if( _.c1 < (d->length>>2) )
                 {
                     _.tden += _.c1;
                     if( _.c1 > _.cmax ) _.cmax = _.c1;
-                    d->filtered[x1] = _.c1;
+                    d->filtered[x] = _.c1;
                 }
 //                else
-//                    d->filtered[x1] = 0;
+//                    d->filtered[x] = 0;
             }
         }
         else
         {
-            for( x1 = range[cyc]; x1 > range[cyc_]; --x1, _.c1 = d->map[x1] )
+            for( x = range[cyc]; x > range[cyc_]; --x, _.c1 = d->map[x] )
             {
 //                if( _.c1 < (d->length>>2) )
                 {
                     _.tden += _.c1;
                     if( _.c1 > _.cmax ) _.cmax = _.c1;
-                    d->map[x1] = _.c1;
+                    d->map[x] = _.c1;
                 }
 //                else
-//                    d->map[x1] = 0;
+//                    d->map[x] = 0;
             }
         }
         
         RhoKalman.update(&d->kalmans[cyc], _.cmax, 0. );
         d->max[cyc] = _.cmax;
         _.fpeak = d->kalmans[cyc].value;
+        _.fpeak_2 = _.fpeak << 1;
         _.fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
         d->kalmans[cyc].variance = _.fvar;
         
@@ -242,15 +241,10 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
             _.fbandl = _.fpeak - _.fvar;
             LOG_RHO("Peak>%d | var>%d | bandl>%d\n", _.fpeak, _.fvar, _.fbandl);
             /* Find blob centroids and sort out the top 2 */
-            for( x2 = range[cyc]; x2 > range[cyc_]; --x2, _.c1 = d->map[x2] )
+            for( x = range[cyc]; x > range[cyc_]; _.c1 = d->map[--x] )
             {
                 /* Punish values above the filter peak */
-                if( _.c1 > _.fpeak )
-                {
-                    _.p = RHO_PUNISH_FACTOR*(_.c1 - _.fpeak);
-                    if( _.fpeak > _.p ) _.c1 = _.fpeak - _.p;
-                    else _.c1 = 0;
-                }
+                if( _.c1 > _.fpeak_2 ) _.c1 = _.fpeak_2 - _.c1;
                 
                 /* Check if CMA value is in band */
                 if( _.c1 > _.fbandl )
@@ -259,32 +253,37 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
                     _.c2 = _.c1 - _.fbandl;
                     
                     /* Process new values into blob */
-                    cma_M0_M1((floating_t)_.c2, (floating_t)x2, &_.cavg, &_.mavg, &_.avgc);
+                    cma_M0_M1((floating_t)_.c2, (floating_t)x, &_.cavg, &_.mavg, &_.avgc);
+                    
+                    /* Update max */
                     if(_.c2 > _.cmax) _.cmax = _.c2;
+                    
+                    /* Reset flag and counter */
                     _.has = 1; _.gapc = 0;
                 }
                 
-                /* Process completed blobs */
-                else if( _.has && _.gapc > RHO_GAP_MAX )
+                /* Process completed blobs and increment count */
+                else if( ++_.gapc > RHO_GAP_MAX && _.has )
                 {
+                    /* Get latest blob centroid */
                     _.cden = (density_2d_t)_.cavg;
+                    _.fden += _.cden;
+                    
+                    /* Check if new blob is dense enough to be saved */
                     if( _.cden > _.blobs[!_.sel].den )
                     {
-                        if( ( _.cden > _.blobs[_.sel].den ) || ( !_.blobs[!_.sel].den ) )
-                        {
+                        /* Create new blob at secondary */
+                        _.blobs[!_.sel] = (blob_t){ _.cmax, _.cden, (index_t)ZDIV(_.mavg,_.cavg) };
+                        
+                        /* Swap selection if new blob is largest found */
+                        if( _.cden > _.blobs[_.sel].den )
                             _.sel = !_.sel;
-                            _.amax = _.blobs[_.sel].max;
-                        }
-                        _.blobs[_.sel] = (blob_t){ _.cmax, _.cden, (index_t)ZDIV(_.mavg,_.cavg) };
                     }
-                    _.fden += _.cden;
+                    
+                    /* Reset variables */
                     _.mavg = 0.; _.cavg = 0.; _.avgc = 0.;
                     _.has = 0; _.gapc = 0;
                 }
-                
-                /* Count gaps for all invalid values */
-                else if( _.has )
-                    _.gapc++;
             }
         }
     }
@@ -406,15 +405,15 @@ void Update_Prediction( rho_utility * utility )
     
     if( ( _.Ax < _.Cx ) ^ ( _.Bx > _.Cx ) ) /* X ambiguous */
     {
-        _.x1 = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
-        if( fabs( _.x1 - _.Ax ) > fabs( _.x1 - _.Bx ) ) iswap( &_.Ax, &_.Bx );
+        _.x = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
+        if( fabs( _.x - _.Ax ) > fabs( _.x - _.Bx ) ) iswap( &_.Ax, &_.Bx );
         _.non_diag = true;
         LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
     }
     if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* Y ambiguous */
     {
-        _.y1 = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
-        if( fabs( _.y1 - _.Ay ) > fabs( _.y1 -_. By ) ) iswap( &_.Ay, &_.By );
+        _.y = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
+        if( fabs( _.y - _.Ay ) > fabs( _.y -_. By ) ) iswap( &_.Ay, &_.By );
         _.non_diag = true;
         LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
     }

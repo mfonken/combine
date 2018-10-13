@@ -37,7 +37,34 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3435C936215FF5A100A1636A /* kinetic */ = {isa = PBXFileReference; lastKnownFileType = folder; name = kinetic; path = ../../../../freeze/kinetic; sourceTree = "<group>"; };
+		34C638F72169543F007CC1E1 /* kalman.h */ = {isa = PBXFileReference; path = kalman.h; sourceTree = "<group>"; };
+		34C638F82169543F007CC1E1 /* kalman.c */ = {isa = PBXFileReference; path = kalman.c; sourceTree = "<group>"; };
+		34C638FA2169543F007CC1E1 /* kinetic_master.h */ = {isa = PBXFileReference; path = kinetic_master.h; sourceTree = "<group>"; };
+		34C638FB2169543F007CC1E1 /* imu_wrapper.h */ = {isa = PBXFileReference; path = imu_wrapper.h; sourceTree = "<group>"; };
+		34C638FC2169543F007CC1E1 /* imu_wrapper.c */ = {isa = PBXFileReference; path = imu_wrapper.c; sourceTree = "<group>"; };
+		34C638FE2169543F007CC1E1 /* kinetic.c */ = {isa = PBXFileReference; path = kinetic.c; sourceTree = "<group>"; };
+		34C638FF2169543F007CC1E1 /* kinetic.h */ = {isa = PBXFileReference; path = kinetic.h; sourceTree = "<group>"; };
+		34C639002169543F007CC1E1 /* point.h */ = {isa = PBXFileReference; path = point.h; sourceTree = "<group>"; };
+		34C639012169543F007CC1E1 /* vector.c */ = {isa = PBXFileReference; path = vector.c; sourceTree = "<group>"; };
+		34C639022169543F007CC1E1 /* quaternion.h */ = {isa = PBXFileReference; path = quaternion.h; sourceTree = "<group>"; };
+		34C639032169543F007CC1E1 /* qmath.h */ = {isa = PBXFileReference; path = qmath.h; sourceTree = "<group>"; };
+		34C639042169543F007CC1E1 /* point.c */ = {isa = PBXFileReference; path = point.c; sourceTree = "<group>"; };
+		34C639052169543F007CC1E1 /* vector.h */ = {isa = PBXFileReference; path = vector.h; sourceTree = "<group>"; };
+		34C639062169543F007CC1E1 /* quaternion.c */ = {isa = PBXFileReference; path = quaternion.c; sourceTree = "<group>"; };
+		34C6390921695440007CC1E1 /* kalman.h */ = {isa = PBXFileReference; path = kalman.h; sourceTree = "<group>"; };
+		34C6390A21695440007CC1E1 /* kalman.c */ = {isa = PBXFileReference; path = kalman.c; sourceTree = "<group>"; };
+		34C6390C21695440007CC1E1 /* kinetic_master.h */ = {isa = PBXFileReference; path = kinetic_master.h; sourceTree = "<group>"; };
+		34C6390D21695440007CC1E1 /* imu_wrapper.h */ = {isa = PBXFileReference; path = imu_wrapper.h; sourceTree = "<group>"; };
+		34C6390E21695440007CC1E1 /* imu_wrapper.c */ = {isa = PBXFileReference; path = imu_wrapper.c; sourceTree = "<group>"; };
+		34C6391021695440007CC1E1 /* kinetic.c */ = {isa = PBXFileReference; path = kinetic.c; sourceTree = "<group>"; };
+		34C6391121695440007CC1E1 /* kinetic.h */ = {isa = PBXFileReference; path = kinetic.h; sourceTree = "<group>"; };
+		34C6391221695440007CC1E1 /* point.h */ = {isa = PBXFileReference; path = point.h; sourceTree = "<group>"; };
+		34C6391321695440007CC1E1 /* vector.c */ = {isa = PBXFileReference; path = vector.c; sourceTree = "<group>"; };
+		34C6391421695440007CC1E1 /* quaternion.h */ = {isa = PBXFileReference; path = quaternion.h; sourceTree = "<group>"; };
+		34C6391521695440007CC1E1 /* qmath.h */ = {isa = PBXFileReference; path = qmath.h; sourceTree = "<group>"; };
+		34C6391621695440007CC1E1 /* point.c */ = {isa = PBXFileReference; path = point.c; sourceTree = "<group>"; };
+		34C6391721695440007CC1E1 /* vector.h */ = {isa = PBXFileReference; path = vector.h; sourceTree = "<group>"; };
+		34C6391821695440007CC1E1 /* quaternion.c */ = {isa = PBXFileReference; path = quaternion.c; sourceTree = "<group>"; };
 		491BF43B21365F95007D404D /* hapticcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
 		491BF43D21366021007D404D /* drv2605.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = drv2605.h; sourceTree = "<group>"; };
 		491BF78021376CEA007D404D /* drv2605.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = drv2605.c; sourceTree = "<group>"; };
@@ -97,6 +124,98 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		34C638F92169543F007CC1E1 /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				34C638F72169543F007CC1E1 /* kalman.h */,
+				34C638F82169543F007CC1E1 /* kalman.c */,
+			);
+			path = filters;
+			sourceTree = "<group>";
+		};
+		34C638FD2169543F007CC1E1 /* wrapper */ = {
+			isa = PBXGroup;
+			children = (
+				34C638FB2169543F007CC1E1 /* imu_wrapper.h */,
+				34C638FC2169543F007CC1E1 /* imu_wrapper.c */,
+			);
+			path = wrapper;
+			sourceTree = "<group>";
+		};
+		34C639072169543F007CC1E1 /* qmath */ = {
+			isa = PBXGroup;
+			children = (
+				34C639002169543F007CC1E1 /* point.h */,
+				34C639012169543F007CC1E1 /* vector.c */,
+				34C639022169543F007CC1E1 /* quaternion.h */,
+				34C639032169543F007CC1E1 /* qmath.h */,
+				34C639042169543F007CC1E1 /* point.c */,
+				34C639052169543F007CC1E1 /* vector.h */,
+				34C639062169543F007CC1E1 /* quaternion.c */,
+			);
+			path = qmath;
+			sourceTree = "<group>";
+		};
+		34C639082169543F007CC1E1 /* kinetic */ = {
+			isa = PBXGroup;
+			children = (
+				34C638F92169543F007CC1E1 /* filters */,
+				34C638FA2169543F007CC1E1 /* kinetic_master.h */,
+				34C638FD2169543F007CC1E1 /* wrapper */,
+				34C638FE2169543F007CC1E1 /* kinetic.c */,
+				34C638FF2169543F007CC1E1 /* kinetic.h */,
+				34C639072169543F007CC1E1 /* qmath */,
+			);
+			name = kinetic;
+			path = /Users/matthew/Desktop/marbl/Techincal/combine/master/C11_master/C11_rtos/C11_rtos/kinetic;
+			sourceTree = "<absolute>";
+		};
+		34C6390B21695440007CC1E1 /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				34C6390921695440007CC1E1 /* kalman.h */,
+				34C6390A21695440007CC1E1 /* kalman.c */,
+			);
+			path = filters;
+			sourceTree = "<group>";
+		};
+		34C6390F21695440007CC1E1 /* wrapper */ = {
+			isa = PBXGroup;
+			children = (
+				34C6390D21695440007CC1E1 /* imu_wrapper.h */,
+				34C6390E21695440007CC1E1 /* imu_wrapper.c */,
+			);
+			path = wrapper;
+			sourceTree = "<group>";
+		};
+		34C6391921695440007CC1E1 /* qmath */ = {
+			isa = PBXGroup;
+			children = (
+				34C6391221695440007CC1E1 /* point.h */,
+				34C6391321695440007CC1E1 /* vector.c */,
+				34C6391421695440007CC1E1 /* quaternion.h */,
+				34C6391521695440007CC1E1 /* qmath.h */,
+				34C6391621695440007CC1E1 /* point.c */,
+				34C6391721695440007CC1E1 /* vector.h */,
+				34C6391821695440007CC1E1 /* quaternion.c */,
+			);
+			path = qmath;
+			sourceTree = "<group>";
+		};
+		34C6391A21695440007CC1E1 /* kinetic */ = {
+			isa = PBXGroup;
+			children = (
+				34C6390B21695440007CC1E1 /* filters */,
+				34C6390C21695440007CC1E1 /* kinetic_master.h */,
+				34C6390F21695440007CC1E1 /* wrapper */,
+				34C6391021695440007CC1E1 /* kinetic.c */,
+				34C6391121695440007CC1E1 /* kinetic.h */,
+				34C6391921695440007CC1E1 /* qmath */,
+			);
+			name = kinetic;
+			path = /Users/matthew/Desktop/marbl/Techincal/combine/master/C11_master/C11_rtos/C11_rtos/kinetic;
+			sourceTree = "<absolute>";
+		};
 		491BF43A21365F4B007D404D /* drivers */ = {
 			isa = PBXGroup;
 			children = (
@@ -153,7 +272,8 @@
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				49DF233B214A08E7003AB634 /* combinemaster.h */,
 				4948103A2117974400D3F45A /* main.c */,
-				3435C936215FF5A100A1636A /* kinetic */,
+				34C639082169543F007CC1E1 /* kinetic */,
+				34C6391A21695440007CC1E1 /* kinetic */,
 				496658F5213F6D530042050A /* peripherals */,
 				496658CF213F6D3E0042050A /* system */,
 			);

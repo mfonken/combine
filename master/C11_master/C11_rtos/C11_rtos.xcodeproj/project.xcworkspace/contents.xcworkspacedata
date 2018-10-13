@@ -1,9 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
-   <FileRef
-      location = "group:../../../../freeze/kinetic">
-   </FileRef>
+   <Group
+      location = "group:/Users/matthew/Desktop/marbl/Techincal/combine/master/C11_master/C11_rtos/C11_rtos/kinetic"
+      name = "kinetic">
+      <Group
+         location = "group:filters"
+         name = "filters">
+         <FileRef
+            location = "group:kalman.h">
+         </FileRef>
+         <FileRef
+            location = "group:kalman.c">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:kinetic_master.h">
+      </FileRef>
+      <Group
+         location = "group:wrapper"
+         name = "wrapper">
+         <FileRef
+            location = "group:imu_wrapper.h">
+         </FileRef>
+         <FileRef
+            location = "group:imu_wrapper.c">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:kinetic.c">
+      </FileRef>
+      <FileRef
+         location = "group:kinetic.h">
+      </FileRef>
+      <Group
+         location = "group:qmath"
+         name = "qmath">
+         <FileRef
+            location = "group:point.h">
+         </FileRef>
+         <FileRef
+            location = "group:vector.c">
+         </FileRef>
+         <FileRef
+            location = "group:quaternion.h">
+         </FileRef>
+         <FileRef
+            location = "group:qmath.h">
+         </FileRef>
+         <FileRef
+            location = "group:point.c">
+         </FileRef>
+         <FileRef
+            location = "group:vector.h">
+         </FileRef>
+         <FileRef
+            location = "group:quaternion.c">
+         </FileRef>
+      </Group>
+   </Group>
    <FileRef
       location = "self:">
    </FileRef>

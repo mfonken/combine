@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include "rho_utility.h"
-#include "rho_host_interface.h"
+#include "rho_platform_interface.h"
 #include "stm32_interface.h"
 
 typedef struct

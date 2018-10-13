@@ -92,6 +92,7 @@ typedef struct
         gapc;
     density_t
         fpeak,
+        fpeak_2,
         fbandl,
         c1,
         c2,
@@ -101,7 +102,7 @@ typedef struct
         fvar;
     density_2d_t
         cmax,
-        amax,
+//        amax,
         cden,
         tden,
         fden;
@@ -136,8 +137,8 @@ typedef struct
         Cx,
         Cy;
     floating_t
-        x1,
-        y1;
+        x,
+        y;
     byte_t non_diag;
     int8_t qcheck;
 } prediction_update_variables;

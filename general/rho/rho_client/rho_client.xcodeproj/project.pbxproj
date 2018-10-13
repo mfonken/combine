@@ -27,7 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		34C638C6216045EF007CC1E1 /* rho_host_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_host_interface.h; sourceTree = "<group>"; };
+		3413CA9A2171A0C600B40BC8 /* stm32_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stm32_interface.h; path = platform/stm32_interface.h; sourceTree = "<group>"; };
 		49330C232153655D0010438F /* rho_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49330C242153655D0010438F /* rho_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
 		49479A5021535FE80029AE62 /* rho_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rho_client; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,7 +41,6 @@
 		49479A662153603C0029AE62 /* rho_kalman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_kalman.c; sourceTree = "<group>"; };
 		49479A6C215360BC0029AE62 /* rho_master.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_master.h; sourceTree = "<group>"; };
 		49479A6D2153621E0029AE62 /* global_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_config.h; sourceTree = "<group>"; };
-		49EB93862156B8BA00CADCAE /* stm32_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = stm32_interface.h; path = ../../../freeze/rho/stm32_interface.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,17 +83,16 @@
 		49479A5A2153603C0029AE62 /* rho */ = {
 			isa = PBXGroup;
 			children = (
-				34C638C6216045EF007CC1E1 /* rho_host_interface.h */,
-				49EB93862156B8BA00CADCAE /* stm32_interface.h */,
+				3413CA9A2171A0C600B40BC8 /* stm32_interface.h */,
 				49479A6C215360BC0029AE62 /* rho_master.h */,
 				49479A602153603C0029AE62 /* rho_types.h */,
 				49479A622153603C0029AE62 /* rho_kalman.h */,
 				49479A662153603C0029AE62 /* rho_kalman.c */,
+				49479A5B2153603C0029AE62 /* state_control */,
 				49479A632153603C0029AE62 /* rho_utility.h */,
 				49479A5E2153603C0029AE62 /* rho_utility.c */,
 				49330C232153655D0010438F /* rho_client.h */,
 				49330C242153655D0010438F /* rho_client.c */,
-				49479A5B2153603C0029AE62 /* state_control */,
 			);
 			name = rho;
 			path = ../../../../freeze/rho;

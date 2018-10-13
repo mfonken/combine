@@ -172,7 +172,6 @@ static void updateProbabilities( bayesian_system_t * sys, floating_t p[4] )
 #endif
     for( _.i = 0; _.i < 4; _.i++ )
     {
-        k = -1;
         _.j = x - _.i;
         if(!isStable(c))
         {
