@@ -11,7 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <sys/time.h>
 
-    /** Kalman Uncertainties */
+    /* Kalman Uncertainties */
     typedef struct
     {
         double value;
@@ -48,8 +48,6 @@ extern "C" {
         void (*update)( kalman_t *, double, double, update_type_c );
         int  (*isExpired)( kalman_t * );
     };
-    
-//    double timestamp(void);
     
     extern const struct kalman Kalman;
     

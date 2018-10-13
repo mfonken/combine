@@ -14,12 +14,12 @@
 
 static inline bool TransmitPacket( packet_t * packet )
 {
-    return (bool)STMUartTxDMA( packet, sizeof(packet_t));
+    return (bool)STMUartTxDMA( (byte_t *)packet, sizeof(packet_t));
 }
 
 static inline uint16_t ReceivePacket( packet_t * packet )
 {
-    return STMUartRxDMA( packet );
+    return STMUartRxDMA( (byte_t *)packet );
 }
 
 #endif /* rho_host_interface_h */
