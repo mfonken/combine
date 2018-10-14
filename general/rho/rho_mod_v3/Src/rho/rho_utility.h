@@ -163,7 +163,7 @@ typedef struct
 typedef struct
 {
   density_t
-      density_y[CAPTURE_WIDTH],          		/* Processed density X array */
+      density_y[CAPTURE_WIDTH],          	/* Processed density X array */
       density_x[CAPTURE_HEIGHT],            /* Processed density Y array */
       quadrant[4];                   /* Quadrant density array */
   capture_t

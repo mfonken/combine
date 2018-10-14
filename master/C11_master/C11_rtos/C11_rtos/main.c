@@ -6,13 +6,10 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include <stdio.h>
-#include "C11_profile.h"
-#include "systembridge.h"
+#include "combinemaster.h"
 
 int main(int argc, const char * argv[])
 {
-    InitBridge( &Profile );
-    
+    Bridge.Start();
     return 0;
 }

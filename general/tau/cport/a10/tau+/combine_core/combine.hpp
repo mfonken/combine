@@ -35,7 +35,6 @@ private:
     int         width,
                 height;
     Tau       * tau;
-    imu_t       bno;
     kinetic_t   kin;
 };
 
