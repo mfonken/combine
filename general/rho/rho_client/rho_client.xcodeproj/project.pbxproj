@@ -27,7 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3413CA9A2171A0C600B40BC8 /* stm32_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stm32_interface.h; path = platform/stm32_interface.h; sourceTree = "<group>"; };
+		34FF28C22172E8F5006A1676 /* stm32_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32_interface.h; sourceTree = "<group>"; };
 		49330C232153655D0010438F /* rho_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49330C242153655D0010438F /* rho_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
 		49479A5021535FE80029AE62 /* rho_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rho_client; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -54,6 +54,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		34FF28C12172E8F5006A1676 /* platforms */ = {
+			isa = PBXGroup;
+			children = (
+				34FF28C22172E8F5006A1676 /* stm32_interface.h */,
+			);
+			path = platforms;
+			sourceTree = "<group>";
+		};
+		34FF28C62172EA60006A1676 /* types */ = {
+			isa = PBXGroup;
+			children = (
+				49479A602153603C0029AE62 /* rho_types.h */,
+				49479A622153603C0029AE62 /* rho_kalman.h */,
+				49479A662153603C0029AE62 /* rho_kalman.c */,
+			);
+			path = types;
+			sourceTree = "<group>";
+		};
+		34FF28C72172EA89006A1676 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				49479A632153603C0029AE62 /* rho_utility.h */,
+				49479A5E2153603C0029AE62 /* rho_utility.c */,
+				49330C232153655D0010438F /* rho_client.h */,
+				49330C242153655D0010438F /* rho_client.c */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
 		49479A4721535FE80029AE62 = {
 			isa = PBXGroup;
 			children = (
@@ -74,8 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				49479A6D2153621E0029AE62 /* global_config.h */,
-				49479A5A2153603C0029AE62 /* rho */,
 				49479A5321535FE80029AE62 /* main.c */,
+				49479A5A2153603C0029AE62 /* rho */,
 			);
 			path = rho_client;
 			sourceTree = "<group>";
@@ -83,16 +112,11 @@
 		49479A5A2153603C0029AE62 /* rho */ = {
 			isa = PBXGroup;
 			children = (
-				3413CA9A2171A0C600B40BC8 /* stm32_interface.h */,
 				49479A6C215360BC0029AE62 /* rho_master.h */,
-				49479A602153603C0029AE62 /* rho_types.h */,
-				49479A622153603C0029AE62 /* rho_kalman.h */,
-				49479A662153603C0029AE62 /* rho_kalman.c */,
+				34FF28C72172EA89006A1676 /* core */,
+				34FF28C12172E8F5006A1676 /* platforms */,
 				49479A5B2153603C0029AE62 /* state_control */,
-				49479A632153603C0029AE62 /* rho_utility.h */,
-				49479A5E2153603C0029AE62 /* rho_utility.c */,
-				49330C232153655D0010438F /* rho_client.h */,
-				49330C242153655D0010438F /* rho_client.c */,
+				34FF28C62172EA60006A1676 /* types */,
 			);
 			name = rho;
 			path = ../../../../freeze/rho;

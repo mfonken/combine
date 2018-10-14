@@ -11,43 +11,60 @@
 
 #include <stdio.h>
 #include "rho_utility.h"
-#include "rho_platform_interface.h"
 #include "stm32_interface.h"
 
+/************************************************************************
+ *                      Global Function Prototypes                      *
+ ***********************************************************************/
+void PixelThreshLoop( const register byte_t *, address_t, byte_t *, register index_t * );
+index_t CaptureFrame( void );
+section_process_t ProcessFrameSection( register index_t, register index_t, register index_t, register index_t );
+void ActivateBackgrounding( void );
+void DeactivateBackgrounding( void );
+void FilterPixelCount( index_t *, index_t );
+bool HasPixelCountDrop( index_t *, index_t );
+void ProcessFrame( index_t );
+void ProcessRhoSystemFrameCapture( void );
+void PerformRhoSystemProcess( void );
+void ActivateRhoSystem( void );
+void DeactivateRhoSystem( void );
+void InitRhoSystem( void );
+void ZeroRhoSystemMemory( void );
+
+/************************************************************************
+ *                      Global Buffers                                  *
+ ***********************************************************************/
+static capture_t _capture_buffer_internal[CAPTURE_BUFFER_SIZE];
+static index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
+
+/************************************************************************
+ *                      Rho Core Variables                              *
+ ***********************************************************************/
 typedef struct
 {
 address_t
-    CameraPort,
-    UartTx,
-    CaptureEnd,
-    CaptureMax,
-    ThreshEnd,                    /* Max threshold buffering size */
-    ThreshMax,
-    RhoMemEnd;
+    CameraPort,                     /* Parallel port register to camera */
+    CaptureEnd,                     /* Effective end address for capture buffer */
+    CaptureMax,                     /* Actual end address for capture buffer */
+    ThreshEnd,                      /* Actual end of thresh buffer */
+    ThreshMax,                      /* Shared address of threshold value */
+    PixelCount;                     /* Shared address of pixel count value */
 } rho_system_address_variables;
 
 typedef struct
 {
-density_t
-    *DensityY,                          /* Processed density X array */
-    *DensityX;                          /* Processed density Y array */
-density_2d_t
-    *Quadrant;                          /* Quadrant density array */
 capture_t
-    Capture[CAPTURE_BUFFER_SIZE];       /* Raw capture buffer for DMA */
+    *Capture;                       /* Raw capture buffer for DMA */
 index_t
-    Thresh[THRESH_BUFFER_SIZE];         /* Threshold processing buffer */
-index_t
-    *PixelCount;
+    *Thresh;                        /* Threshold processing buffer */
+density_t
+    *DensityY,                      /* Processed density X array */
+    *DensityX;                      /* Processed density Y array */
+density_2d_t
+    *Quadrant;                      /* Quadrant density array */
 packet_t
-    *BeaconPacket;
+    *BeaconPacket;                  /* Data packet for beacon comm */
 } rho_system_buffer_variables;
-
-typedef struct
-{
-    index_t pixels, rows;
-    density_2d_t left, right;
-} section_process_t;
 
 typedef struct
 {
@@ -57,6 +74,9 @@ typedef struct
     rho_system_buffer_variables     Buffers;
 } rho_system_variables;
 
+/************************************************************************
+ *                      Rho Core Functions                              *
+ ***********************************************************************/
 typedef struct
 {
     void (*Init)( void );
@@ -85,18 +105,16 @@ typedef struct
     rho_system_memory_functions     Memory;
 } rho_system_functions;
 
+/************************************************************************
+ *                      Rho Core System Definition                      *
+ ***********************************************************************/
 typedef struct
 {
     rho_system_variables Variables;
     rho_system_functions Functions;
-} system_t;
+} rho_system_t;
 
-void ProcessRhoSystemFrameCapture( void );
-void PerformRhoSystemProcess( void );
-void InitRhoSystem( void );
-void ZeroRhoSystemMemory( void );
-
-static system_t RhoSystem =
+static rho_system_t RhoSystem =
 {
     { /* VARIABLES */
         { /* Utility */
@@ -110,7 +128,8 @@ static system_t RhoSystem =
         },
         { 0 },/* Flags */
         { /* Buffers */
-            
+            _capture_buffer_internal,
+            _thresh_buffer_internal
         }
     },
     { /* FUNCTIONS */
@@ -131,18 +150,6 @@ static system_t RhoSystem =
         }
     }
 };
-
-static inline void FilterPixelCount( index_t * PixelCount, index_t NewCount )
-{
-    *PixelCount = (index_t)( (floating_t)*PixelCount * ( 1. - PIXEL_COUNT_TRUST_FACTOR ) ) + ( (floating_t)NewCount * PIXEL_COUNT_TRUST_FACTOR );
-}
-
-static inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
-{
-    index_t OldCount = *PixelCount;
-    FilterPixelCount( PixelCount, NewCount );
-    return ( *PixelCount < ( (floating_t)OldCount * PIXEL_COUNT_DROP_FACTOR ) );
-}
 
 static inline void   activityEnable( void ) { RhoSystem.Variables.Flags.Active  = 1; }
 static inline void   activityDisable(void ) { RhoSystem.Variables.Flags.Active  = 0; }

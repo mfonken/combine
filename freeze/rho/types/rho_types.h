@@ -302,4 +302,10 @@ typedef struct
     prediction_probabilities probabilities;
 } prediction_pair_t;
 
+typedef struct
+{
+    index_t pixels, rows;           /* Process location variables */
+    density_2d_t left, right;       /* Direction density values */
+} section_process_t;
+
 #endif /* rho_c_types_h */

@@ -8,7 +8,7 @@
 
 #include "rho_client.h"
 
-static inline void PixelThreshLoop( const register byte_t * capture_address,// capture buffer index
+inline void PixelThreshLoop( const register byte_t * capture_address,// capture buffer index
                                     address_t pthresh_index,                // pointer to thresh buffer index
                                     byte_t * thresh_address,                // address of thresh buffer
                                     register index_t * thresh_buffer )
@@ -22,7 +22,7 @@ static inline void PixelThreshLoop( const register byte_t * capture_address,// c
     *(index_t *)pthresh_index = thresh_index;
 }
 
-static inline index_t CaptureFrame()
+inline index_t CaptureFrame()
 {
     while(RhoSystem.Variables.Flags.Row);
     index_t
@@ -42,7 +42,7 @@ static inline index_t CaptureFrame()
     return t_counter;
 }
 
-static inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t t_len, register index_t y_counter, register index_t y_len )
+inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t t_len, register index_t y_counter, register index_t y_len )
 {
     register index_t t_value = 0;
     register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
@@ -70,7 +70,7 @@ static inline section_process_t ProcessFrameSection( register index_t t_counter,
     return (section_process_t){ t_counter, y_counter, Q_left, Q_right };
 }
 
-static inline void ActivateBackgrounding( void )
+inline void ActivateBackgrounding( void )
 {
     RhoSystem.Variables.Flags.Backgrounding = true;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
@@ -78,7 +78,7 @@ static inline void ActivateBackgrounding( void )
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
 }
 
-static inline void DeactivateBackgrounding( void )
+inline void DeactivateBackgrounding( void )
 {
     RhoSystem.Variables.Flags.Backgrounding = false;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
@@ -86,19 +86,31 @@ static inline void DeactivateBackgrounding( void )
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Q;
 }
 
-static inline void ProcessFrame( index_t t_len )
+inline void FilterPixelCount( index_t * PixelCount, index_t NewCount )
 {
-    if( HasPixelCountDrop( RhoSystem.Variables.Buffers.PixelCount, t_len ) )
+    *PixelCount = (index_t)( (floating_t)(*PixelCount) * ( 1. - PIXEL_COUNT_TRUST_FACTOR ) ) + ( (floating_t)NewCount * PIXEL_COUNT_TRUST_FACTOR );
+}
+
+inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
+{
+    index_t OldCount = *PixelCount;
+    FilterPixelCount( PixelCount, NewCount );
+    return ( *PixelCount < ( (floating_t)OldCount * PIXEL_COUNT_DROP_FACTOR ) );
+}
+
+inline void ProcessFrame( index_t t_len )
+{
+    if( HasPixelCountDrop( RhoSystem.Variables.Addresses.PixelCount, t_len ) )
         ActivateBackgrounding();
     else DeactivateBackgrounding();
     
-    section_process_t top = ProcessFrameSection(          0, t_len,        0, RhoSystem.Variables.Utility.Cy     );
-    section_process_t btm = ProcessFrameSection( top.pixels, t_len, top.rows, RhoSystem.Variables.Utility.Height );
+    section_process_t ProcessedTopSectionData = ProcessFrameSection(          0, t_len,        0, RhoSystem.Variables.Utility.Cy     );
+    section_process_t ProcessedBottomSectionData = ProcessFrameSection( ProcessedTopSectionData.pixels, t_len, ProcessedTopSectionData.rows, RhoSystem.Variables.Utility.Height );
     
-    RhoSystem.Variables.Buffers.Quadrant[0] = top.left;
-    RhoSystem.Variables.Buffers.Quadrant[1] = top.right;
-    RhoSystem.Variables.Buffers.Quadrant[2] = btm.left;
-    RhoSystem.Variables.Buffers.Quadrant[3] = btm.right;
+    RhoSystem.Variables.Buffers.Quadrant[0] = ProcessedTopSectionData.left;
+    RhoSystem.Variables.Buffers.Quadrant[1] = ProcessedTopSectionData.right;
+    RhoSystem.Variables.Buffers.Quadrant[2] = ProcessedBottomSectionData.left;
+    RhoSystem.Variables.Buffers.Quadrant[3] = ProcessedBottomSectionData.right;
     
     RhoSystem.Variables.Buffers.DensityX[CAPTURE_BUFFER_HEIGHT-1] = FRAME_ROW_END;
 }

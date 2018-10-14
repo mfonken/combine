@@ -10,10 +10,6 @@
 #include "rho_master.h"
 
 #define MAX(A,B)        ((A>B)?A:B)
-#define XRNGU(A,MAX)    (A>MAX?1:0) //Check if exceeds range
-#define XRNG(A,MIN,MAX) (A<MIN?-1:(A>MAX?1:0)) //Check if exceeds range
-#define XTOLU(A,TOL)    (A>TOL?1:0) //Check if exceeds range
-#define XTOL(A,TOL)     (A<-TOL?-1:(A>TOL?1:0)) //Check if exceeds range
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
@@ -307,8 +303,8 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
     n += _.bfac;
     n = ZDIV( 1., n );
     
-    _.fcov = BOUND(ZDIV(_.fden, _.tden), 0, 2); // filtered coverage
-    _.cfac = 1. - BOUND(ZDIV( _.fcov, utility->TargetCoverageFactor ), 0, 2); // coverage factor
+    _.fcov = BOUNDU(ZDIV(_.fden, _.tden), 2); // filtered coverage
+    _.cfac = 1. - BOUNDU(ZDIV( _.fcov, utility->TargetCoverageFactor ), 2); // coverage factor
     _.vfac = ZDIV(_.fvar, _.fpeak); // variance factor
     
     r->probabilities.primary        = _.pfac * n;
