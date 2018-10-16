@@ -11,12 +11,11 @@
 
 #include <stdio.h>
 #include "rho_utility.h"
-#include "stm32_interface.h"
 
 /************************************************************************
  *                      Global Function Prototypes                      *
  ***********************************************************************/
-void PixelThreshLoop( const register byte_t *, address_t, byte_t *, register index_t * );
+void PixelThreshLoop( const register byte_t *, index_t *, byte_t *, register index_t * );
 index_t CaptureFrame( void );
 section_process_t ProcessFrameSection( register index_t, register index_t, register index_t, register index_t );
 void ActivateBackgrounding( void );
@@ -28,8 +27,10 @@ void ProcessRhoSystemFrameCapture( void );
 void PerformRhoSystemProcess( void );
 void ActivateRhoSystem( void );
 void DeactivateRhoSystem( void );
-void InitRhoSystem( void );
+void InitRhoSystem( address_t, address_t );
 void ZeroRhoSystemMemory( void );
+void ConnectRhoSystemPlatformInterface( platform_interface_functions * );
+void TransmitRhoSystemPacket( void );
 
 /************************************************************************
  *                      Global Buffers                                  *
@@ -43,12 +44,13 @@ static index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
 typedef struct
 {
 address_t
-    CameraPort,                     /* Parallel port register to camera */
-    CaptureEnd,                     /* Effective end address for capture buffer */
-    CaptureMax,                     /* Actual end address for capture buffer */
-    ThreshEnd,                      /* Actual end of thresh buffer */
-    ThreshMax,                      /* Shared address of threshold value */
-    PixelCount;                     /* Shared address of pixel count value */
+  CameraPort,                     /* Parallel port register to camera */
+  CaptureEnd,                     /* Effective end address for capture buffer */
+  CaptureMax,                     /* Actual end address for capture buffer */
+  ThreshEnd,                      /* Actual end of thresh buffer */
+  ThreshMax,                      /* Shared address of threshold value */
+  PixelCount,                     /* Shared address of pixel count value */
+  UartTxPort;                   
 } rho_system_address_variables;
 
 typedef struct
@@ -79,29 +81,22 @@ typedef struct
  ***********************************************************************/
 typedef struct
 {
-    void (*Init)( void );
+    void (*Init)( address_t, address_t );
     void (*FrameCapture)( void );
     void (*RhoProcess)( void );
+    void (*ConnectToInterface)( platform_interface_functions * );
+    void (*TransmitPacket)( void );
 } rho_perform_functions;
 
 typedef struct
 {
-    void (*InitPCLKDMA)( void );
-    void (*PauseDMA)( void );
-    void (*ResumeDMA)( void );
-    void (*ResetDMA)( void );
-} rho_system_utility_functions;
-
-typedef struct
-{
-    void (*Init)( void );
     void (*Zero)( void );
 } rho_system_memory_functions;
 
 typedef struct
 {
     rho_perform_functions           Perform;
-    rho_system_utility_functions    Utility;
+    platform_interface_functions    Platform;
     rho_system_memory_functions     Memory;
 } rho_system_functions;
 
@@ -121,11 +116,7 @@ static rho_system_t RhoSystem =
             CAPTURE_WIDTH,
             CAPTURE_HEIGHT
         },
-        { /* Addresses */
-            (address_t)CAMERA_PORT,
-            (address_t)UART_TX_PORT,
-            (address_t)CAPTURE_WIDTH
-        },
+        { 0 },/* Addresses */
         { 0 },/* Flags */
         { /* Buffers */
             _capture_buffer_internal,
@@ -136,16 +127,12 @@ static rho_system_t RhoSystem =
         { /* Perform */
             .Init               = InitRhoSystem,
             .FrameCapture       = ProcessRhoSystemFrameCapture,
-            .RhoProcess         = PerformRhoSystemProcess
+            .RhoProcess         = PerformRhoSystemProcess,
+            .ConnectToInterface = ConnectRhoSystemPlatformInterface,
+            .TransmitPacket     = TransmitRhoSystemPacket
         },
-        { /* Utility */
-            .InitPCLKDMA        = STMInitPCLKDMA,
-            .PauseDMA           = STMPauseDMA,
-            .ResumeDMA          = STMResumeDMA,
-            .ResetDMA           = STMResetDMA,
-        },
+        { 0 }, /* Utility */        
         { /* Memory */
-            .Init               = InitRhoSystem,
             .Zero               = ZeroRhoSystemMemory
         }
     }

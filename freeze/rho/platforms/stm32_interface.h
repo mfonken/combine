@@ -9,10 +9,11 @@
 #ifndef stm32_interface_h
 #define stm32_interface_h
 
-#define CAMERA_PORT     0//&(GPIOA->IDR)
-#define UART_TX_PORT    0//&(USART1->TDR)
+#define CAMERA_PORT     &(GPIOA->IDR)
+#define UART_TX_PORT    &(USART1->TDR)
 
 #define STMInterruptHandler HAL_GPIO_EXTI_Callback
+#define STMUartCompleted HAL_UART_TxCpltCallback
 
 typedef struct
 {
@@ -50,39 +51,49 @@ static inline void STMInterruptHandler( uint16_t GPIO_Pin )
 
 static inline void STMInitPCLKDMA( void )
 {
-    
+  if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.capture, CAPTURE_BUFFER_SIZE) != HAL_OK) 
+      Error_Handler();
+  __HAL_TIM_ENABLE_DMA(this_timer, TIM2_DMA_CC);
+  __HAL_TIM_ENABLE_IT(this_timer, TIM2_IT_CC);
+  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
 static inline void STMPauseDMA( void )
 {
-    
+  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
 }
 static inline void STMResumeDMA( void )
 {
-    
+  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
 static inline void STMResetDMA( void )
 {
-    
+  this_timer->hdma[TIM2_DMA_ID]->Instance->CMAR = (uint32_t)svb.capture;
 }
 
 static inline uint8_t STMUartTxDMA( uint8_t * buffer, uint16_t length )
 {
-    return 1;
+  uint8_t ascii_clear = 0x0c;
+  HAL_UART_Transmit( this_uart, &ascii_clear, 1, UART_TIMEOUT );
 }
 
 static inline uint16_t STMUartRxDMA( uint8_t * buffer )
 {
-    return 1;
+  ///TODO: Actual implement lol
+  return 1;
+}
+static inline void STMUartCompleted( UART_HandleTypeDef *huart )
+{
+  ActiveFlags.UARTBusy = 0;
 }
 
 static inline bool TransmitPacket( packet_t * packet )
 {
-    return (bool)STMUartTxDMA( (byte_t *)packet, sizeof(packet_t));
+  return (bool)STMUartTxDMA( (byte_t *)packet, sizeof(packet_t));
 }
 
 static inline uint16_t ReceivePacket( packet_t * packet )
 {
-    return STMUartRxDMA( (byte_t *)packet );
+  return STMUartRxDMA( (byte_t *)packet );
 }
 
 #endif /* stm32_interface_h */

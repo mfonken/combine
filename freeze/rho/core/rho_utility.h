@@ -148,8 +148,8 @@ typedef struct
 {
     packet_t * packet;
     address_t pdPtr,
-        llPtr,
-        * alPtr;
+              llPtr,
+            * alPtr;
     byte_t
         includes,
         i,

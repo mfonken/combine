@@ -8,10 +8,10 @@
 
 #include "rho_client.h"
 
-inline void PixelThreshLoop( const register byte_t * capture_address,// capture buffer index
-                                    address_t pthresh_index,                // pointer to thresh buffer index
-                                    byte_t * thresh_address,                // address of thresh buffer
-                                    register index_t * thresh_buffer )
+inline void PixelThreshLoop( const register byte_t * capture_address, // capture buffer index
+                              index_t * pthresh_index,                // pointer to thresh buffer index
+                              byte_t * thresh_address,                // address of thresh buffer
+                              register index_t * thresh_buffer )
 {
     register index_t thresh_index = *(index_t *)pthresh_index;
     register index_t capture_index = 0;
@@ -88,7 +88,7 @@ inline void DeactivateBackgrounding( void )
 
 inline void FilterPixelCount( index_t * PixelCount, index_t NewCount )
 {
-    *PixelCount = (index_t)( (floating_t)(*PixelCount) * ( 1. - PIXEL_COUNT_TRUST_FACTOR ) ) + ( (floating_t)NewCount * PIXEL_COUNT_TRUST_FACTOR );
+    *PixelCount = (index_t)( ( (floating_t)(*PixelCount) * ( 1. - PIXEL_COUNT_TRUST_FACTOR ) ) + ( (floating_t)NewCount * PIXEL_COUNT_TRUST_FACTOR ) );
 }
 
 inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
@@ -100,7 +100,7 @@ inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
 
 inline void ProcessFrame( index_t t_len )
 {
-    if( HasPixelCountDrop( RhoSystem.Variables.Addresses.PixelCount, t_len ) )
+    if( HasPixelCountDrop( (index_t *)RhoSystem.Variables.Addresses.PixelCount, t_len ) )
         ActivateBackgrounding();
     else DeactivateBackgrounding();
     
@@ -128,38 +128,45 @@ inline void PerformRhoSystemProcess( void )
     RhoSystem.Functions.Perform.FrameCapture();
     RhoFunctions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags.Backgrounding);
     
-    if( TransmitPacket( &RhoSystem.Variables.Utility.Packet ) )
-        return;
+    RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 void ActivateRhoSystem(void)
 {
     RhoSystem.Variables.Flags.Active = true;
-    TransmitPacket( RhoSystem.Variables.Buffers.BeaconPacket );
+    RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 void DeactivateRhoSystem(void)
 {
     RhoSystem.Variables.Flags.Active = false;
     // TODO: zero period
-    TransmitPacket( RhoSystem.Variables.Buffers.BeaconPacket );
+    RhoSystem.Functions.Perform.TransmitPacket();
+}
+
+void TransmitRhoSystemPacket( void )
+{
+  RhoSystem.Functions.Platform.Usart.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
 }
 
 /***************************************************************************************/
 /*                                  Initializers                                       */
 /***************************************************************************************/
-void InitRhoSystem( void )
+void InitRhoSystem( address_t CameraPort, address_t UartTxPort )
 {
-    SetActiveClientFlags( &RhoSystem.Variables.Flags );
+    RhoSystem.Functions.Platform.Flags.Activate( &RhoSystem.Variables.Flags );
     DeactivateBackgrounding();
     
+    RhoSystem.Variables.Addresses.CameraPort = CameraPort;
+    RhoSystem.Variables.Addresses.UartTxPort = UartTxPort;
+    
 #ifdef DYNAMIC_BUFFER
-    RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture + CAPTURE_WIDTH;
+    RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture[CAPTURE_WIDTH];
 #else
     RhoSystem.Variables.Address.CaptureEnd  = (address_t)RhoSystem.Variables.Buffer.Capture;
 #endif
-    RhoSystem.Variables.Addresses.CaptureMax  = (address_t)RhoSystem.Variables.Buffers.Capture + THRESH_BUFFER_SIZE;
-    RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh + sizeof(index_t)*(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT);
+    RhoSystem.Variables.Addresses.CaptureMax  = (address_t)RhoSystem.Variables.Buffers.Capture[THRESH_BUFFER_SIZE];
+    RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh[THRESH_BUFFER_MAX];
     RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
 
     RhoSystem.Variables.Buffers.BeaconPacket = malloc( sizeof( packet_t ) );
@@ -168,6 +175,20 @@ void InitRhoSystem( void )
     
     RhoSystem.Functions.Memory.Zero();
     RhoFunctions.Init( &RhoSystem.Variables.Utility );
+}
+
+void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformInterface )
+{
+  RhoSystem.Functions.Platform.DMA.Init = PlatformInterface->DMA.Init;
+  RhoSystem.Functions.Platform.DMA.Pause = PlatformInterface->DMA.Pause;
+  RhoSystem.Functions.Platform.DMA.Resume = PlatformInterface->DMA.Resume;
+  RhoSystem.Functions.Platform.DMA.Reset = PlatformInterface->DMA.Reset;
+  
+  RhoSystem.Functions.Platform.Usart.Transmit = PlatformInterface->Usart.Transmit;
+  
+  RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
+  
+  RhoSystem.Functions.Platform.Time.Now = PlatformInterface->Time.Now;
 }
 
 void ZeroRhoSystemMemory( void )

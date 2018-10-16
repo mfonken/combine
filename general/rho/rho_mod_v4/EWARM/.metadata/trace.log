@@ -1,0 +1,14 @@
+# !SESSION 2018-10-14 18:46:10.874
+# version: 1.1
+# verbose: true
+# The following option strings are specified for this debug session:
+# 	null
+| main | 2018-10-14 18:46:10.874 | com.iar.ide.common | /debug | com.iar.ide.common.logging.Logger | traceFile | 194 | Using CMSIS pack repositories: http://links.iar.com/cmsis/pack |
+| Worker-1 | 2018-10-14 18:51:09.426 | com.iar.ide.common | /debug | com.iar.ide.common.logging.Logger | traceFile | 194 | Performing pack conversion... |
+| Worker-1 | 2018-10-14 18:51:13.700 | com.iar.ide.common | /debug | com.iar.ide.common.logging.Logger | traceFile | 194 | Pack has been converted. |
+# !SESSION 2018-10-14 18:59:20.072
+# version: 1.1
+# verbose: true
+# The following option strings are specified for this debug session:
+# 	null
+| Worker-2 | 2018-10-14 18:59:20.072 | com.iar.ide.common | /debug | com.iar.ide.common.logging.Logger | traceFile | 194 | Using CMSIS pack repositories: http://links.iar.com/cmsis/pack |

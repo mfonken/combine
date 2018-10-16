@@ -4,9 +4,10 @@
 
 static kfl_t timestamp(void)
 {
-    struct timeval stamp;
-    gettimeofday(&stamp, NULL);
-    return stamp.tv_sec + stamp.tv_usec/1000000.0;
+//    struct timeval stamp;
+//    gettimeofday(&stamp, NULL);
+//    return stamp.tv_sec + stamp.tv_usec/1000000.0;
+    return 1; ///TODO: Implement local time
 }
 
 static void init( rho_kalman_t * k, kfl_t v, kfl_t ls, kfl_t vu, kfl_t bu, kfl_t su )

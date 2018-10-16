@@ -17,7 +17,7 @@
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
 
 static packet_offset_lookup_t packet_offset_lookup = PACKET_OFFSETS;
-static floating_t timestamp(void){struct timeval stamp; gettimeofday(&stamp, NULL); return stamp.tv_sec + stamp.tv_usec/1000000.0;}
+//static floating_t timestamp(void){struct timeval stamp; gettimeofday(&stamp, NULL); return stamp.tv_sec + stamp.tv_usec/1000000.0;}
 
 static void cma_M0_M1( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
@@ -225,9 +225,9 @@ void Filter_and_Select( rho_utility * utility, density_map_t * d, prediction_t *
         
         RhoKalman.update(&d->kalmans[cyc], _.cmax, 0. );
         d->max[cyc] = _.cmax;
-        _.fpeak = d->kalmans[cyc].value;
+        _.fpeak = (index_t)d->kalmans[cyc].value;
         _.fpeak_2 = _.fpeak << 1;
-        _.fvar = RHO_VARIANCE( d->kalmans[cyc].K[0] );
+        _.fvar = (index_t)RHO_VARIANCE( d->kalmans[cyc].K[0] );
         d->kalmans[cyc].variance = _.fvar;
         
         LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
@@ -489,7 +489,7 @@ void Update_Threshold( rho_utility * utility )
     utility->TargetCoverageFactor -= 0.01*(utility->TargetCoverageFactor - (floating_t)FILTERED_COVERAGE_TARGET);
     floating_t proposed_thresh = *utility->Thresh + hard_tune_factor + soft_tune_factor;
     RhoKalman.update( &utility->ThreshFilter, proposed_thresh, 0);
-    *utility->Thresh = BOUND(utility->ThreshFilter.value, THRESH_MIN, THRESH_MAX);
+    *utility->Thresh = (byte_t)BOUND(utility->ThreshFilter.value, THRESH_MIN, THRESH_MAX);
     
     LOG_RHO("*** THRESH IS %d ***\n", utility->thresh);
     LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->coverage_factor, utility->variance_factor);
@@ -507,7 +507,7 @@ void Generate_Packet( rho_utility * utility )
         (address_t*)&packet_value_lookup,
         0
     };
-    _.packet->header.timestamp = timestamp();
+    _.packet->header.timestamp = RhoSystem.Functions.Platform.Time.Now();
     while( _.i++ < NUM_PACKET_ELEMENTS )
     {
         if( _.packet->header.includes & 0x01 )
@@ -516,11 +516,11 @@ void Generate_Packet( rho_utility * utility )
             else          _.l = (*(packing_template_t*)_.llPtr).b;
             for( _.j = 0; _.j < _.l; _.j++)
                 ((byte_t*)_.pdPtr)[_.j] = *(((byte_t*)*_.alPtr)+_.j);
-            _.pdPtr += _.l;
+             _.pdPtr += _.l;
         }
         _.alPtr++;
         _.includes >>= 1;
-        if((_.t=!_.t )) _.llPtr++;
+        if((_.t=!_.t )) ++_.llPtr;
     }
     printPacket( &utility->Packet, 3    );
 }
