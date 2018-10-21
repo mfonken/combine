@@ -31,7 +31,7 @@ typedef uint16_t        index_t;
 typedef uint16_t        density_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
-//typedef uint32_t        register_t;
+typedef uint32_t        register_t;
 typedef register_t *    address_t;
 typedef floating_t      timestamp_t;
 typedef uint8_t         capture_t;

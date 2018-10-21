@@ -24,14 +24,17 @@ inline index_t CaptureFrame()
         y_counter = (index_t)RhoSystem.Variables.Utility.Height,
         t_counter = 0,
         t_max = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
+    byte_t *
+        capture_address = RhoSystem.Variables.Buffers.Capture;
+    index_t *
+        thresh_address = RhoSystem.Variables.Buffers.Thresh;
     while( ( --y_counter > 0 ) && ( t_counter < t_max ) )
     {
         RhoSystem.Variables.Buffers.Thresh[t_counter++] = Y_DEL;
         while(RhoSystem.Variables.Flags.Row);
-        PixelThreshLoop( RhoSystem.Variables.Buffers.Capture,
-                        &t_counter,
-                         RhoSystem.Variables.Utility.Thresh,
-                         RhoSystem.Variables.Buffers.Thresh );
+        PixelThreshLoop( capture_address,
+                         thresh_address,
+                         RhoSystem.Variables.Utility.Thresh );
         while(!RhoSystem.Variables.Flags.Row);
     }
     return t_counter;
