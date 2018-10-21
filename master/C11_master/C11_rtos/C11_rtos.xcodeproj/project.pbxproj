@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34FF28DA21798CE3006A1676 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28CB21798CE3006A1676 /* kalman.c */; };
+		34FF28DB21798CE3006A1676 /* imu_wrapper.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28CF21798CE3006A1676 /* imu_wrapper.c */; };
+		34FF28DC21798CE3006A1676 /* kinetic.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28D021798CE3006A1676 /* kinetic.c */; };
+		34FF28DD21798CE3006A1676 /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28D421798CE3006A1676 /* vector.c */; };
+		34FF28DE21798CE3006A1676 /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28D721798CE3006A1676 /* point.c */; };
+		34FF28DF21798CE3006A1676 /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 34FF28D921798CE3006A1676 /* quaternion.c */; };
 		491BF78121376CEA007D404D /* drv2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 491BF78021376CEA007D404D /* drv2605.c */; };
 		49469F1D2145B03E00DE3662 /* taumanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 49469F162145B03E00DE3662 /* taumanager.c */; };
 		49469F1E2145B03E00DE3662 /* systeminterface.c in Sources */ = {isa = PBXBuildFile; fileRef = 49469F172145B03E00DE3662 /* systeminterface.c */; };
@@ -37,34 +43,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		34C638F72169543F007CC1E1 /* kalman.h */ = {isa = PBXFileReference; path = kalman.h; sourceTree = "<group>"; };
-		34C638F82169543F007CC1E1 /* kalman.c */ = {isa = PBXFileReference; path = kalman.c; sourceTree = "<group>"; };
-		34C638FA2169543F007CC1E1 /* kinetic_master.h */ = {isa = PBXFileReference; path = kinetic_master.h; sourceTree = "<group>"; };
-		34C638FB2169543F007CC1E1 /* imu_wrapper.h */ = {isa = PBXFileReference; path = imu_wrapper.h; sourceTree = "<group>"; };
-		34C638FC2169543F007CC1E1 /* imu_wrapper.c */ = {isa = PBXFileReference; path = imu_wrapper.c; sourceTree = "<group>"; };
-		34C638FE2169543F007CC1E1 /* kinetic.c */ = {isa = PBXFileReference; path = kinetic.c; sourceTree = "<group>"; };
-		34C638FF2169543F007CC1E1 /* kinetic.h */ = {isa = PBXFileReference; path = kinetic.h; sourceTree = "<group>"; };
-		34C639002169543F007CC1E1 /* point.h */ = {isa = PBXFileReference; path = point.h; sourceTree = "<group>"; };
-		34C639012169543F007CC1E1 /* vector.c */ = {isa = PBXFileReference; path = vector.c; sourceTree = "<group>"; };
-		34C639022169543F007CC1E1 /* quaternion.h */ = {isa = PBXFileReference; path = quaternion.h; sourceTree = "<group>"; };
-		34C639032169543F007CC1E1 /* qmath.h */ = {isa = PBXFileReference; path = qmath.h; sourceTree = "<group>"; };
-		34C639042169543F007CC1E1 /* point.c */ = {isa = PBXFileReference; path = point.c; sourceTree = "<group>"; };
-		34C639052169543F007CC1E1 /* vector.h */ = {isa = PBXFileReference; path = vector.h; sourceTree = "<group>"; };
-		34C639062169543F007CC1E1 /* quaternion.c */ = {isa = PBXFileReference; path = quaternion.c; sourceTree = "<group>"; };
-		34C6390921695440007CC1E1 /* kalman.h */ = {isa = PBXFileReference; path = kalman.h; sourceTree = "<group>"; };
-		34C6390A21695440007CC1E1 /* kalman.c */ = {isa = PBXFileReference; path = kalman.c; sourceTree = "<group>"; };
-		34C6390C21695440007CC1E1 /* kinetic_master.h */ = {isa = PBXFileReference; path = kinetic_master.h; sourceTree = "<group>"; };
-		34C6390D21695440007CC1E1 /* imu_wrapper.h */ = {isa = PBXFileReference; path = imu_wrapper.h; sourceTree = "<group>"; };
-		34C6390E21695440007CC1E1 /* imu_wrapper.c */ = {isa = PBXFileReference; path = imu_wrapper.c; sourceTree = "<group>"; };
-		34C6391021695440007CC1E1 /* kinetic.c */ = {isa = PBXFileReference; path = kinetic.c; sourceTree = "<group>"; };
-		34C6391121695440007CC1E1 /* kinetic.h */ = {isa = PBXFileReference; path = kinetic.h; sourceTree = "<group>"; };
-		34C6391221695440007CC1E1 /* point.h */ = {isa = PBXFileReference; path = point.h; sourceTree = "<group>"; };
-		34C6391321695440007CC1E1 /* vector.c */ = {isa = PBXFileReference; path = vector.c; sourceTree = "<group>"; };
-		34C6391421695440007CC1E1 /* quaternion.h */ = {isa = PBXFileReference; path = quaternion.h; sourceTree = "<group>"; };
-		34C6391521695440007CC1E1 /* qmath.h */ = {isa = PBXFileReference; path = qmath.h; sourceTree = "<group>"; };
-		34C6391621695440007CC1E1 /* point.c */ = {isa = PBXFileReference; path = point.c; sourceTree = "<group>"; };
-		34C6391721695440007CC1E1 /* vector.h */ = {isa = PBXFileReference; path = vector.h; sourceTree = "<group>"; };
-		34C6391821695440007CC1E1 /* quaternion.c */ = {isa = PBXFileReference; path = quaternion.c; sourceTree = "<group>"; };
+		34FF28CA21798CE3006A1676 /* kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kalman.h; sourceTree = "<group>"; };
+		34FF28CB21798CE3006A1676 /* kalman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kalman.c; sourceTree = "<group>"; };
+		34FF28CC21798CE3006A1676 /* kinetic_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kinetic_master.h; sourceTree = "<group>"; };
+		34FF28CE21798CE3006A1676 /* imu_wrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imu_wrapper.h; sourceTree = "<group>"; };
+		34FF28CF21798CE3006A1676 /* imu_wrapper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imu_wrapper.c; sourceTree = "<group>"; };
+		34FF28D021798CE3006A1676 /* kinetic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kinetic.c; sourceTree = "<group>"; };
+		34FF28D121798CE3006A1676 /* kinetic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kinetic.h; sourceTree = "<group>"; };
+		34FF28D321798CE3006A1676 /* point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point.h; sourceTree = "<group>"; };
+		34FF28D421798CE3006A1676 /* vector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vector.c; sourceTree = "<group>"; };
+		34FF28D521798CE3006A1676 /* quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quaternion.h; sourceTree = "<group>"; };
+		34FF28D621798CE3006A1676 /* qmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qmath.h; sourceTree = "<group>"; };
+		34FF28D721798CE3006A1676 /* point.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = point.c; sourceTree = "<group>"; };
+		34FF28D821798CE3006A1676 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		34FF28D921798CE3006A1676 /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		491BF43B21365F95007D404D /* hapticcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
 		491BF43D21366021007D404D /* drv2605.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = drv2605.h; sourceTree = "<group>"; };
 		491BF78021376CEA007D404D /* drv2605.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = drv2605.c; sourceTree = "<group>"; };
@@ -124,97 +116,51 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		34C638F92169543F007CC1E1 /* filters */ = {
+		34FF28C821798CE3006A1676 /* kinetic */ = {
 			isa = PBXGroup;
 			children = (
-				34C638F72169543F007CC1E1 /* kalman.h */,
-				34C638F82169543F007CC1E1 /* kalman.c */,
+				34FF28C921798CE3006A1676 /* filters */,
+				34FF28CC21798CE3006A1676 /* kinetic_master.h */,
+				34FF28CD21798CE3006A1676 /* wrapper */,
+				34FF28D021798CE3006A1676 /* kinetic.c */,
+				34FF28D121798CE3006A1676 /* kinetic.h */,
+				34FF28D221798CE3006A1676 /* qmath */,
+			);
+			name = kinetic;
+			path = ../../../../freeze/kinetic;
+			sourceTree = "<group>";
+		};
+		34FF28C921798CE3006A1676 /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				34FF28CA21798CE3006A1676 /* kalman.h */,
+				34FF28CB21798CE3006A1676 /* kalman.c */,
 			);
 			path = filters;
 			sourceTree = "<group>";
 		};
-		34C638FD2169543F007CC1E1 /* wrapper */ = {
+		34FF28CD21798CE3006A1676 /* wrapper */ = {
 			isa = PBXGroup;
 			children = (
-				34C638FB2169543F007CC1E1 /* imu_wrapper.h */,
-				34C638FC2169543F007CC1E1 /* imu_wrapper.c */,
+				34FF28CE21798CE3006A1676 /* imu_wrapper.h */,
+				34FF28CF21798CE3006A1676 /* imu_wrapper.c */,
 			);
 			path = wrapper;
 			sourceTree = "<group>";
 		};
-		34C639072169543F007CC1E1 /* qmath */ = {
+		34FF28D221798CE3006A1676 /* qmath */ = {
 			isa = PBXGroup;
 			children = (
-				34C639002169543F007CC1E1 /* point.h */,
-				34C639012169543F007CC1E1 /* vector.c */,
-				34C639022169543F007CC1E1 /* quaternion.h */,
-				34C639032169543F007CC1E1 /* qmath.h */,
-				34C639042169543F007CC1E1 /* point.c */,
-				34C639052169543F007CC1E1 /* vector.h */,
-				34C639062169543F007CC1E1 /* quaternion.c */,
+				34FF28D321798CE3006A1676 /* point.h */,
+				34FF28D421798CE3006A1676 /* vector.c */,
+				34FF28D521798CE3006A1676 /* quaternion.h */,
+				34FF28D621798CE3006A1676 /* qmath.h */,
+				34FF28D721798CE3006A1676 /* point.c */,
+				34FF28D821798CE3006A1676 /* vector.h */,
+				34FF28D921798CE3006A1676 /* quaternion.c */,
 			);
 			path = qmath;
 			sourceTree = "<group>";
-		};
-		34C639082169543F007CC1E1 /* kinetic */ = {
-			isa = PBXGroup;
-			children = (
-				34C638F92169543F007CC1E1 /* filters */,
-				34C638FA2169543F007CC1E1 /* kinetic_master.h */,
-				34C638FD2169543F007CC1E1 /* wrapper */,
-				34C638FE2169543F007CC1E1 /* kinetic.c */,
-				34C638FF2169543F007CC1E1 /* kinetic.h */,
-				34C639072169543F007CC1E1 /* qmath */,
-			);
-			name = kinetic;
-			path = /Users/matthew/Desktop/marbl/Techincal/combine/master/C11_master/C11_rtos/C11_rtos/kinetic;
-			sourceTree = "<absolute>";
-		};
-		34C6390B21695440007CC1E1 /* filters */ = {
-			isa = PBXGroup;
-			children = (
-				34C6390921695440007CC1E1 /* kalman.h */,
-				34C6390A21695440007CC1E1 /* kalman.c */,
-			);
-			path = filters;
-			sourceTree = "<group>";
-		};
-		34C6390F21695440007CC1E1 /* wrapper */ = {
-			isa = PBXGroup;
-			children = (
-				34C6390D21695440007CC1E1 /* imu_wrapper.h */,
-				34C6390E21695440007CC1E1 /* imu_wrapper.c */,
-			);
-			path = wrapper;
-			sourceTree = "<group>";
-		};
-		34C6391921695440007CC1E1 /* qmath */ = {
-			isa = PBXGroup;
-			children = (
-				34C6391221695440007CC1E1 /* point.h */,
-				34C6391321695440007CC1E1 /* vector.c */,
-				34C6391421695440007CC1E1 /* quaternion.h */,
-				34C6391521695440007CC1E1 /* qmath.h */,
-				34C6391621695440007CC1E1 /* point.c */,
-				34C6391721695440007CC1E1 /* vector.h */,
-				34C6391821695440007CC1E1 /* quaternion.c */,
-			);
-			path = qmath;
-			sourceTree = "<group>";
-		};
-		34C6391A21695440007CC1E1 /* kinetic */ = {
-			isa = PBXGroup;
-			children = (
-				34C6390B21695440007CC1E1 /* filters */,
-				34C6390C21695440007CC1E1 /* kinetic_master.h */,
-				34C6390F21695440007CC1E1 /* wrapper */,
-				34C6391021695440007CC1E1 /* kinetic.c */,
-				34C6391121695440007CC1E1 /* kinetic.h */,
-				34C6391921695440007CC1E1 /* qmath */,
-			);
-			name = kinetic;
-			path = /Users/matthew/Desktop/marbl/Techincal/combine/master/C11_master/C11_rtos/C11_rtos/kinetic;
-			sourceTree = "<absolute>";
 		};
 		491BF43A21365F4B007D404D /* drivers */ = {
 			isa = PBXGroup;
@@ -272,8 +218,7 @@
 				49F0AA2A211D19CC005E1D9E /* C11_profile.h */,
 				49DF233B214A08E7003AB634 /* combinemaster.h */,
 				4948103A2117974400D3F45A /* main.c */,
-				34C639082169543F007CC1E1 /* kinetic */,
-				34C6391A21695440007CC1E1 /* kinetic */,
+				34FF28C821798CE3006A1676 /* kinetic */,
 				496658F5213F6D530042050A /* peripherals */,
 				496658CF213F6D3E0042050A /* system */,
 			);
@@ -461,14 +406,20 @@
 				496658F0213F6D3E0042050A /* sysiocontroller.c in Sources */,
 				496658ED213F6D3E0042050A /* systembehavior.c in Sources */,
 				491BF78121376CEA007D404D /* drv2605.c in Sources */,
+				34FF28DB21798CE3006A1676 /* imu_wrapper.c in Sources */,
 				49469F1E2145B03E00DE3662 /* systeminterface.c in Sources */,
 				49469F1F2145B03E00DE3662 /* profilemanager.c in Sources */,
 				4948106C2117975A00D3F45A /* shtp.c in Sources */,
+				34FF28DD21798CE3006A1676 /* vector.c in Sources */,
+				34FF28DE21798CE3006A1676 /* point.c in Sources */,
 				4948103B2117974400D3F45A /* main.c in Sources */,
 				49469F202145B03E00DE3662 /* communicationmanager.c in Sources */,
 				4948106D2117975A00D3F45A /* BNO080.c in Sources */,
+				34FF28DF21798CE3006A1676 /* quaternion.c in Sources */,
 				49469F1D2145B03E00DE3662 /* taumanager.c in Sources */,
+				34FF28DC21798CE3006A1676 /* kinetic.c in Sources */,
 				495AB6DE2135034D00C42F16 /* batterymonitor.c in Sources */,
+				34FF28DA21798CE3006A1676 /* kalman.c in Sources */,
 				496658EE213F6D3E0042050A /* systemhandlers.c in Sources */,
 				4948106B2117975A00D3F45A /* motionsensor.c in Sources */,
 			);

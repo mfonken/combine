@@ -8,18 +8,13 @@
 
 #include "rho_client.h"
 
-inline void PixelThreshLoop( const register byte_t * capture_address, // capture buffer index
-                              index_t * pthresh_index,                // pointer to thresh buffer index
-                              byte_t * thresh_address,                // address of thresh buffer
-                              register index_t * thresh_buffer )
+inline void PixelThreshLoop( register byte_t * capture_address,   // capture buffer index
+                             register index_t * thresh_address,    // address of thresh buffer
+                             const register byte_t thresh_value )
 {
-    register index_t thresh_index = *(index_t *)pthresh_index;
-    register index_t capture_index = 0;
-    register byte_t thresh_value = *thresh_address;
-    while( ( capture_index++ < RhoSystem.Variables.Utility.Width ) && !RhoSystem.Variables.Flags.Row )
-        if( capture_address[capture_index] > thresh_value )
-            thresh_buffer[thresh_index++] = capture_index;
-    *(index_t *)pthresh_index = thresh_index;
+    while( ( *capture_address < RhoSystem.Variables.Utility.Width ) && !RhoSystem.Variables.Flags.Row )
+        if( *(capture_address++) > thresh_value )
+            *(thresh_address++) = (index_t)( capture_address -  RhoSystem.Variables.Buffers.Capture );
 }
 
 inline index_t CaptureFrame()

@@ -15,7 +15,7 @@
 /************************************************************************
  *                      Global Function Prototypes                      *
  ***********************************************************************/
-void PixelThreshLoop( const register byte_t *, index_t *, byte_t *, register index_t * );
+void PixelThreshLoop( register byte_t *, register index_t *, const byte_t );
 index_t CaptureFrame( void );
 section_process_t ProcessFrameSection( register index_t, register index_t, register index_t, register index_t );
 void ActivateBackgrounding( void );
