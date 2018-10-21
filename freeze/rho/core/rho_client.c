@@ -8,13 +8,62 @@
 
 #include "rho_client.h"
 
+#define __ASSEMBLY_RHO__
+
 inline void PixelThreshLoop( register byte_t * capture_address,   // capture buffer index
                              register index_t * thresh_address,    // address of thresh buffer
-                             const register byte_t thresh_value )
+                             const register byte_t thresh_value,
+                             const register byte_t sub_sample )
 {
-    while( ( *capture_address < RhoSystem.Variables.Utility.Width ) && !RhoSystem.Variables.Flags.Row )
-        if( *(capture_address++) > thresh_value )
-            *(thresh_address++) = (index_t)( capture_address -  RhoSystem.Variables.Buffers.Capture );
+  register register_t width = RhoSystem.Variables.Utility.Width;
+  register register_t capture_value = *capture_address;
+  register address_t capture_base = (address_t)RhoSystem.Variables.Buffers.Capture;
+  register register_t capture_offset = 0;
+#ifndef __ASSEMBLY_RHO__
+  while( ( ( capture_value = *(capture_address+=sub_sample)) < w ) && !RhoSystem.Variables.Flags.Row )
+      if( capture_value > thresh_value )
+          *(thresh_address++) = (index_t)( capture_address -  RhoSystem.Variables.Buffers.Capture );
+#else
+ 
+
+  __asm volatile 
+  (
+   "Capture_Iterate: \n"
+   "add %0, %0, %1 \n"
+   "cmp %0, %2 \n"
+   "bgt End_Iterate \n"
+   "ldr %3, [%0] \n" 
+   "cmp %3, %4 \n"
+   "blt Capture_Iterate \n"
+   "sub %5, %0, %6 \n"
+   "strh %5, [%7] \n"
+   "add %7, %7, #2 \n"
+   "b   Capture_Iterate \n"
+   "End_Iterate: \n"
+   :: 
+   "r"(thresh_value),
+   "r"(sub_sample),
+   "r"(width),
+   "r"(capture_value),
+   "r"(thresh_value),
+   "r"(capture_offset),
+   "r"(capture_base),
+   "r"(thresh_address)
+//    add capture_address, capture_address, sub_sample"
+//    cmp capture_address, width
+//    bgt End_Iterate
+// 
+//    ldr capture_value, [capture_address]
+//    cmp capture_value, thresh_value
+//    blt Capture_Iterate
+//
+//    sub capture_offset, capture_address, capture_base
+//    strh capture_offset, [thresh_address]
+//    add thresh_address, thresh_address, 1
+//    b   Capture_Iterate
+  );
+
+#endif
 }
 
 inline index_t CaptureFrame()
@@ -24,17 +73,16 @@ inline index_t CaptureFrame()
         y_counter = (index_t)RhoSystem.Variables.Utility.Height,
         t_counter = 0,
         t_max = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
-    byte_t *
-        capture_address = RhoSystem.Variables.Buffers.Capture;
-    index_t *
-        thresh_address = RhoSystem.Variables.Buffers.Thresh;
+    byte_t 
+      thresh_value = *RhoSystem.Variables.Utility.Thresh,
+      *capture_address = RhoSystem.Variables.Buffers.Capture;
+    index_t 
+      *thresh_address = RhoSystem.Variables.Buffers.Thresh;
     while( ( --y_counter > 0 ) && ( t_counter < t_max ) )
     {
         RhoSystem.Variables.Buffers.Thresh[t_counter++] = Y_DEL;
         while(RhoSystem.Variables.Flags.Row);
-        PixelThreshLoop( capture_address,
-                         thresh_address,
-                         RhoSystem.Variables.Utility.Thresh );
+        PixelThreshLoop( capture_address, thresh_address, thresh_value, 1 );
         while(!RhoSystem.Variables.Flags.Row);
     }
     return t_counter;

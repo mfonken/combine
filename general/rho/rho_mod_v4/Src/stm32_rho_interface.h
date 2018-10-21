@@ -34,7 +34,32 @@ typedef struct
 static platform_utilities Utilities;
 static rho_system_flags_variables * ActiveFlags;
 
-static void InitRhoInterface( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart )
+static void InitRhoInterface( TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart );
+static void ActivateClientFlags( rho_system_flags_variables * Flags ); 
+inline void STMInterruptHandler( uint16_t GPIO_Pin );
+static inline void STMInitDMA( void );
+static inline void STMPauseDMA( void );
+static inline void STMResumeDMA( void );
+static inline void STMResetDMA( void );
+static inline uint8_t STMUartTxDMA( uint8_t * buffer, uint16_t length );
+static inline uint16_t STMUartRxDMA( uint8_t * buffer );
+static inline void STMUartCompleted( USART_HandleTypeDef *huart );
+static inline uint8_t TransmitPacket( packet_t * packet );
+static inline uint16_t ReceivePacket( packet_t * packet );
+
+static platform_interface_functions PlatformInterface = 
+{
+  .DMA.Init = STMInitDMA,
+  .DMA.Pause = STMPauseDMA,
+  .DMA.Resume = STMResumeDMA,
+  .DMA.Reset = STMResetDMA,
+  
+  .Usart.Transmit = STMUartTxDMA,
+  
+  .Flags.Activate = ActivateClientFlags
+};
+
+static void InitRhoInterface(TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart )
 {
   Utilities.Timer = timer;
   Utilities.Usart = usart;
