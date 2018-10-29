@@ -14,7 +14,7 @@
 #define CAMERA_PORT     (GPIOA->IDR)
 #define UART_TX_PORT    (USART1->TDR)
 
-#define UART_TIMEOUT	100
+#define USART_TIMEOUT	100
 
 /* DMA Config */
 #define TIM2_DMA_ID 	TIM_DMA_ID_CC2
@@ -56,7 +56,9 @@ static platform_interface_functions PlatformInterface =
   
   .Usart.Transmit = STMUartTxDMA,
   
-  .Flags.Activate = ActivateClientFlags
+  .Flags.Activate = ActivateClientFlags,
+    
+  .Time.Now = Now
 };
 
 static void InitRhoInterface(TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart )
@@ -75,17 +77,17 @@ static void ActivateClientFlags( rho_system_flags_variables * Flags )
 static inline void STMInterruptHandler( uint16_t GPIO_Pin )
 {
     if(!ActiveFlags->IRQ) return;
-//    switch(GPIO_Pin)
-//    {
-//        case VSYNC_Pin:
-//            ActiveFlags->Frame = !(flag_t)(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
-//            return;
-//        case HREF_Pin:
-//            ActiveFlags->Row     =  (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
-//            return;
-//        default:
-//            return;
-//    }
+    switch(GPIO_Pin)
+    {
+        case VSYNC_Pin:
+            ActiveFlags->Frame = !(flag_t)(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
+            return;
+        case HREF_Pin:
+            ActiveFlags->Row   =  (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
+            return;
+        default:
+            return;
+    }
 }
 
 static inline void STMInitDMA( void )
@@ -115,7 +117,7 @@ static inline void STMResetDMA( void )
 static inline uint8_t STMUartTxDMA( uint8_t * buffer, uint16_t length )
 {
   uint8_t ascii_clear = 0x0c;
-  return (uint8_t)HAL_USART_Transmit( Utilities.Usart, &ascii_clear, 1, UART_TIMEOUT );
+  return (uint8_t)HAL_USART_Transmit( Utilities.Usart, &ascii_clear, 1, USART_TIMEOUT );
 }
 
 static inline uint16_t STMUartRxDMA( uint8_t * buffer )

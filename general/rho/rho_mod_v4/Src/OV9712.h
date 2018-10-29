@@ -1,10 +1,8 @@
 #ifndef OV9712_h
 #define OV9712_h
 
+#include "global_lib.h"
 #include "OV9712_regs.h"
-#include "stm32l4xx_hal.h"
-
-#define INIT_DELAY_CYCLES	1000
 
 typedef struct 
 {

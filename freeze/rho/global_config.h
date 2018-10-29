@@ -14,8 +14,6 @@
 #define CAMERA_HEIGHT       800
 
 #define BACKGROUND_PERIOD   10 // Frames
-
-
 #define RHO_PUNISH_FACTOR   1
 
 #define PIXEL_COUNT_TRUST_FACTOR   0.2

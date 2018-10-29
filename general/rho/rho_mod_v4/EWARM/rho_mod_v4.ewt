@@ -1246,12 +1246,18 @@
                     </file>
                 </group>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\freeze\rho\global_config.h</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\..\..\freeze\rho\rho_master.h</name>
                 </file>
             </group>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\freeze\rho\global_config.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\freeze\rho\global_lib.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\freeze\rho\global_lib.h</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\Src\main.c</name>
             </file>

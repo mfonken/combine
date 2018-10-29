@@ -85,8 +85,6 @@
 #define CAM_EN_GPIO_Port GPIOA
 #define PCLK_Pin GPIO_PIN_3
 #define PCLK_GPIO_Port GPIOB
-#define CAM__CS_Pin GPIO_PIN_4
-#define CAM__CS_GPIO_Port GPIOB
 #define UCK_Pin GPIO_PIN_5
 #define UCK_GPIO_Port GPIOB
 #define UTX_Pin GPIO_PIN_6

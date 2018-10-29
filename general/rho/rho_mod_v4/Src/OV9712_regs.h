@@ -1,24 +1,24 @@
 /*******************************************************************************
- * File Name: ov9712.h
- * Author: Matthew Fonken
- ******************************************************************************/
+* File Name: ov9712.h
+* Author: Matthew Fonken
+******************************************************************************/
 
 #ifndef _OV9712_H    /* Guard against multiple inclusion */
 #define _OV9712_H
-   
+
 #include <stdint.h>	 
-		
+
 #define OV9712_ADDR  0x60
-   
+
 //<editor-fold defaultstate="collapsed" desc="OV9712 Registers">  
 #define GAIN		 	0x00
 #define BLUE		 	0x01
-#define RED     	0x02
+#define RED     	        0x02
 #define REG03		 	0x03
 #define REG04		 	0x04
 #define GREEN		 	0x05
-#define BRL       0x06
-#define GL        0x07
+#define BRL                     0x06
+#define GL                      0x07
 #define REG08		 	0x08
 #define COM2		 	0x09
 #define PIDH		 	0x0a
@@ -27,18 +27,18 @@
 #define COM4		 	0x0d
 #define COM5		 	0x0e
 #define COM6		 	0x0f
-#define AEC       0x10
-#define CLK       0x11
+#define AEC                     0x10
+#define CLK                     0x11
 #define COM7		 	0x12
 #define COM8		 	0x13
 #define COM9		 	0x14
 #define COM10		 	0x15
 #define AECH		 	0x16
-#define HSTART		0x17
-#define AHSIZE		0x18
-#define VSTART		0x19
-#define AVSIZE		0x1a
-#define PSHIFT		0x1b
+#define HSTART		        0x17
+#define AHSIZE		        0x18
+#define VSTART		        0x19
+#define AVSIZE		        0x1a
+#define PSHIFT		        0x1b
 #define MIDH		 	0x1c
 #define MIDL		 	0x1d
 #define COM11		 	0x1e
@@ -47,9 +47,9 @@
 #define COM13		 	0x21
 #define COM14		 	0x22
 #define COM15		 	0x23
-#define WPT       0x24
-#define BPT       0x25
-#define VPT       0x26
+#define WPT                     0x24
+#define BPT                     0x25
+#define VPT                     0x26
 #define COM16		 	0x27
 #define COM17		 	0x28
 #define COM18		 	0x29
@@ -72,8 +72,8 @@
 #define REG43		 	0x43
 #define ROFFS		 	0x44
 #define BOFFS		 	0x45
-#define GROFFS		0x46
-#define GBOFFS		0x47
+#define GROFFS		        0x46
+#define GBOFFS		        0x47
 #define HOFFS		 	0x48
 #define REG49		 	0x49
 #define REG4A		 	0x4a
@@ -96,12 +96,12 @@
 #define REG77		 	0x77
 #define REG78		 	0x78
 #define REG79		 	0x79
-#define DSP_CTRL_0 	 0x96
-#define DSP_CTRL_1 	 0x97
-#define DSP_CTRL_2 	 0x98
-#define DSP_CTRL_3 	 0x99
-#define DSP_CTRL_4 	 0x9a
-#define DSP_CTRL_5 	 0x9b
+#define DSP_CTRL_0 	        0x96
+#define DSP_CTRL_1 	        0x97
+#define DSP_CTRL_2 	        0x98
+#define DSP_CTRL_3 	        0x99
+#define DSP_CTRL_4 	        0x9a
+#define DSP_CTRL_5 	        0x9b
 #define DSP_CTRL_6	 0x9c
 #define DSP_CTRL_7	 0x9d
 #define LENC_CTRL_0	 0x9e
@@ -175,13 +175,13 @@
 // *****************************************************************************
 typedef struct _cam_register_t
 {
-    uint8_t id;
-    uint8_t value;
+  uint8_t id;
+  uint8_t value;
 } cam_register_t;
-     
+
 
 #endif
 
 /* *****************************************************************************
- End of File
- */
+End of File
+*/

@@ -248,7 +248,7 @@ typedef struct
 
 typedef struct 
 {
-  floating_t (*Now)( void );
+  uint32_t (*Now)( void );
 } platform_time_interace_functions;
 
 typedef struct
