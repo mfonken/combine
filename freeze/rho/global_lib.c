@@ -17,3 +17,4 @@ inline uint32_t Now(void)
 {
   return HAL_GetTick();
 }
+

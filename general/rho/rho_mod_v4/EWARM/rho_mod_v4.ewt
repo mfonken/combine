@@ -1282,6 +1282,12 @@
             <file>
                 <name>$PROJ_DIR$\..\Src\stm32l4xx_it.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\freeze\rho\system.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\freeze\rho\system.h</name>
+            </file>
         </group>
     </group>
     <group>

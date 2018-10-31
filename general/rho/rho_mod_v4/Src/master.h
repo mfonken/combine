@@ -5,6 +5,7 @@
 master_init( &hi2c1, &htim2, &husart1 );
 */
 
+#include "system.h"
 #include "OV9712.h"
 //#include "stm32l4xx_hal.h"
 #include "stm32l4xx_it.h"
@@ -14,7 +15,5 @@ master_init( &hi2c1, &htim2, &husart1 );
 
 void master_init( I2C_HandleTypeDef *, TIM_HandleTypeDef *, USART_HandleTypeDef * );
 void master_run( void );
-
-
 
 #endif

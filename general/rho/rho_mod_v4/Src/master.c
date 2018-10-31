@@ -3,6 +3,10 @@
 /***************************************************************************************/
 /*                                      Core                                           */
 /***************************************************************************************/
+void master_main(I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart)
+{
+}
+
 void master_init( I2C_HandleTypeDef * i2c, TIM_HandleTypeDef * timer, USART_HandleTypeDef * usart )
 {
   Camera.init(i2c);
