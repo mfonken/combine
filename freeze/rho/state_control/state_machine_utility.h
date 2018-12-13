@@ -103,28 +103,53 @@ extern "C" {
     
     struct bayesian_map_functions
     {
-        void (*initMap)(            bayesian_map_t * );
-        void (*normalizeMap)(       bayesian_map_t * );
-        void (*normalizeState)(     bayesian_map_t *, state_dimension_t );
-        void (*resetState)(         bayesian_map_t *, state_dimension_t );
-        void (*print)(              bayesian_map_t *, state_t s );
+        void (*InitMap)(            bayesian_map_t * );
+        void (*NormalizeMap)(       bayesian_map_t * );
+        void (*NormalizeState)(     bayesian_map_t *, state_dimension_t );
+        void (*ResetState)(         bayesian_map_t *, state_dimension_t );
+        void (*Print)(              bayesian_map_t *, state_t s );
     };
     
     struct bayesian_system_functions
     {
-        void (*init)(                bayesian_system_t * );
-        void (*updateProbabilities)( bayesian_system_t *, floating_t[4] );
-        void (*updateState)(         bayesian_system_t * );
-        void (*update)(              bayesian_system_t *, prediction_pair_t * );
+        void (*Init)(                bayesian_system_t * );
+        void (*UpdateProbabilities)( bayesian_system_t *, floating_t[4] );
+        void (*UpdateState)(         bayesian_system_t * );
+        void (*Update)(              bayesian_system_t *, prediction_pair_t * );
     };
     
     struct bayesian_functions
     {
-        struct bayesian_map_functions    map;
-        struct bayesian_system_functions sys;
+        struct bayesian_map_functions    Map;
+        struct bayesian_system_functions Sys;
     };
     
-    extern const struct bayesian_functions BayesianFunctions;
+    void InitBayesianMap(               bayesian_map_t *                            );
+    void NormalizeBayesianMap(          bayesian_map_t *                            );
+    void NormalizeBayesianState(        bayesian_map_t *,       state_dimension_t   );
+    void ResetBayesianState(            bayesian_map_t *,       state_dimension_t   );
+    void PrintBayesianMap(              bayesian_map_t *,       state_t             );
+    void InitBayesianSystem(            bayesian_system_t *                         );
+    void UpdateBayesianSystem(          bayesian_system_t *,    prediction_pair_t * );
+    void UpdateBayesianProbabilities(   bayesian_system_t *,    floating_t[4]       );
+    void UpdateBayesianState(           bayesian_system_t *                         );
+    
+    static const struct bayesian_functions BayesianFunctions =
+    {
+        { /* Map functions */
+            .InitMap                = InitBayesianMap,
+            .NormalizeMap           = NormalizeBayesianMap,
+            .NormalizeState         = NormalizeBayesianState,
+            .ResetState             = ResetBayesianState,
+            .Print                  = PrintBayesianMap
+        },
+        { /* System functions */
+            .Init                   = InitBayesianSystem,
+            .Update                 = UpdateBayesianSystem,
+            .UpdateProbabilities    = UpdateBayesianProbabilities,
+            .UpdateState            = UpdateBayesianState
+        }
+    };
     
     static inline void copymax(floating_t * a, floating_t * b) { if(*a>*b)*b=*a;else*a=*b; }
     static inline bool isStable( state_t s ) { return ((state_dimension_t)s % 2); }

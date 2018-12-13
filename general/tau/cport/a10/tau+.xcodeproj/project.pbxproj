@@ -482,8 +482,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				DEVELOPMENT_TEAM = RAUFW7M7KN;
 				GENERATE_PROFILING_CODE = YES;
-				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv3/**";
-				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv3/**";
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/3.4.3/**";
+				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv/3.4.3/**";
 				OTHER_LDFLAGS = (
 					"-I/usr/local/Cellar/opencv/3.3.0_3/include/opencv",
 					"-I/usr/local/Cellar/opencv/3.3.0_3/include",
@@ -541,8 +541,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				DEVELOPMENT_TEAM = RAUFW7M7KN;
 				GENERATE_PROFILING_CODE = YES;
-				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv3/**";
-				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv3/**";
+				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/3.4.3/**";
+				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv/3.4.3/**";
 				OTHER_LDFLAGS = (
 					"-I/usr/local/Cellar/opencv/3.3.0_3/include/opencv",
 					"-I/usr/local/Cellar/opencv/3.3.0_3/include",

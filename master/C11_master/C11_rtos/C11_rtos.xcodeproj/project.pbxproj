@@ -119,11 +119,11 @@
 		34FF28C821798CE3006A1676 /* kinetic */ = {
 			isa = PBXGroup;
 			children = (
-				34FF28C921798CE3006A1676 /* filters */,
 				34FF28CC21798CE3006A1676 /* kinetic_master.h */,
-				34FF28CD21798CE3006A1676 /* wrapper */,
-				34FF28D021798CE3006A1676 /* kinetic.c */,
 				34FF28D121798CE3006A1676 /* kinetic.h */,
+				34FF28D021798CE3006A1676 /* kinetic.c */,
+				34FF28C921798CE3006A1676 /* filters */,
+				34FF28CD21798CE3006A1676 /* wrapper */,
 				34FF28D221798CE3006A1676 /* qmath */,
 			);
 			name = kinetic;

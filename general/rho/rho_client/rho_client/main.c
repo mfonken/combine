@@ -7,11 +7,12 @@
 //
 
 #include <stdio.h>
+#include "stm32_interface.h"
 #include "rho_client.h"
 
 int main(int argc, const char * argv[])
 {
-    RhoSystem.Functions.Perform.Init();
+    RhoSystem.Functions.Perform.Init(CAMERA_PORT, UART_TX_PORT);
     
 
     RhoSystem.Functions.Perform.RhoProcess();

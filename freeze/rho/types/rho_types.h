@@ -13,34 +13,8 @@
 #include <stdbool.h>
 #include "global_config.h"
 #include "rho_kalman.h"
-
-//#define USE_SHORTHAND_TYPES
-
-#ifdef USE_SHORTHAND_TYPES
-typedef uint8_t   uh;
-typedef uint16_t  uw;
-typedef uint32_t  ul;
-typedef int8_t    sh;
-typedef int16_t   sw;
-typedef int32_t   sl;
-#endif
-
-typedef double          floating_t;
-typedef uint8_t         byte_t;
-typedef uint16_t        index_t;
-typedef uint16_t        density_t;
-typedef int16_t         variance_t;
-typedef uint32_t        density_2d_t;
-typedef uint32_t        register_t;
-typedef register_t *    address_t;
-typedef floating_t      timestamp_t;
-typedef uint8_t         capture_t;
-typedef volatile bool   flag_t;
-
-#define byte_t_max          ( (sizeof(byte_t)       << 3 ) - 1 )
-#define index_t_max         ( (sizeof(index_t)      << 3 ) - 1 )
-#define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
-#define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
+#include "rho_pid.h"
+#include "rho_global.h"
 
 /* Packet Generation Settings */
 #define YES 1
@@ -95,14 +69,14 @@ typedef volatile bool   flag_t;
 + INCLUDE_PACKET_AP_DATA * PACKET_AP_DATA_SIZE \
 )
 #define PACKET_OFFSETS  {                    \
-PACKET_PX_DATA_SIZE, \
-PACKET_PY_DATA_SIZE, \
-PACKET_SX_DATA_SIZE, \
-PACKET_SY_DATA_SIZE, \
-PACKET_PP_DATA_SIZE, \
-PACKET_SP_DATA_SIZE, \
-PACKET_AP_DATA_SIZE, \
-}
+                        PACKET_PX_DATA_SIZE, \
+                        PACKET_PY_DATA_SIZE, \
+                        PACKET_SX_DATA_SIZE, \
+                        PACKET_SY_DATA_SIZE, \
+                        PACKET_PP_DATA_SIZE, \
+                        PACKET_SP_DATA_SIZE, \
+                        PACKET_AP_DATA_SIZE, \
+                        }
 #define LOG2_MAX_PACKET_TYPE_SIZE 4
 #define PACKET_OFFSET_WIDTH LOG2_MAX_PACKET_TYPE_SIZE
 typedef struct

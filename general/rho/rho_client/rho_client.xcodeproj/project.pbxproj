@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		340A51F22186C45D00FBE342 /* rho_pid.c in Sources */ = {isa = PBXBuildFile; fileRef = 340A51F12186C45D00FBE342 /* rho_pid.c */; };
 		49330C252153655D0010438F /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 49330C242153655D0010438F /* rho_client.c */; };
 		49479A5421535FE80029AE62 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 49479A5321535FE80029AE62 /* main.c */; };
 		49479A672153603D0029AE62 /* state_machine_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = 49479A5D2153603C0029AE62 /* state_machine_utility.c */; };
@@ -27,6 +28,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		340A51F12186C45D00FBE342 /* rho_pid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_pid.c; sourceTree = "<group>"; };
+		347FFE25217C526800E47A82 /* rho_pid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_pid.h; sourceTree = "<group>"; };
+		347FFE26217ED51B00E47A82 /* rho_global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_global.h; sourceTree = "<group>"; };
 		34FF28C22172E8F5006A1676 /* stm32_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32_interface.h; sourceTree = "<group>"; };
 		49330C232153655D0010438F /* rho_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49330C242153655D0010438F /* rho_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
@@ -65,7 +69,10 @@
 		34FF28C62172EA60006A1676 /* types */ = {
 			isa = PBXGroup;
 			children = (
+				347FFE26217ED51B00E47A82 /* rho_global.h */,
 				49479A602153603C0029AE62 /* rho_types.h */,
+				347FFE25217C526800E47A82 /* rho_pid.h */,
+				340A51F12186C45D00FBE342 /* rho_pid.c */,
 				49479A622153603C0029AE62 /* rho_kalman.h */,
 				49479A662153603C0029AE62 /* rho_kalman.c */,
 			);
@@ -191,6 +198,7 @@
 				49479A672153603D0029AE62 /* state_machine_utility.c in Sources */,
 				49479A682153603D0029AE62 /* rho_utility.c in Sources */,
 				49330C252153655D0010438F /* rho_client.c in Sources */,
+				340A51F22186C45D00FBE342 /* rho_pid.c in Sources */,
 				49479A6B2153603D0029AE62 /* rho_kalman.c in Sources */,
 				49479A5421535FE80029AE62 /* main.c in Sources */,
 			);

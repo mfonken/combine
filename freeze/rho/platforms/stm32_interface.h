@@ -9,25 +9,33 @@
 #ifndef stm32_interface_h
 #define stm32_interface_h
 
+#include "rho_global.h"
+
+#ifdef __STM32__
 #define CAMERA_PORT     &(GPIOA->IDR)
 #define UART_TX_PORT    &(USART1->TDR)
+#else
+#define CAMERA_PORT     0
+#define UART_TX_PORT    0
+#endif
 
 #define STMInterruptHandler HAL_GPIO_EXTI_Callback
 #define STMUartCompleted HAL_UART_TxCpltCallback
 
-typedef struct
-{
-    flag_t
-    Active,
-    IRQ,
-    Frame,
-    Row,
-    Backgrounding,
-    UARTBusy;
-} rho_system_flags_variables;
+//typedef struct
+//{
+//flag_t
+//    Active,
+//    IRQ,
+//    Frame,
+//    Row,
+//    Backgrounding,
+//    UARTBusy;
+//} rho_system_flags_variables;
 
-static rho_system_flags_variables * ActiveFlags;
+//static rho_system_flags_variables * ActiveFlags;
 
+#ifdef __STM32__
 static void SetActiveClientFlags( rho_system_flags_variables * Flags )
 {
     ActiveFlags = Flags;
@@ -95,5 +103,6 @@ static inline uint16_t ReceivePacket( packet_t * packet )
 {
   return STMUartRxDMA( (byte_t *)packet );
 }
+#endif
 
 #endif /* stm32_interface_h */

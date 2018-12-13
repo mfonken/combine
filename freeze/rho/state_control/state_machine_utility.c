@@ -26,7 +26,7 @@ static floating_t DOUBT( state_dimension_t i, state_t cs )
     return ret;
 }
 
-static void initMap( bayesian_map_t * bm )
+void InitBayesianMap( bayesian_map_t * bm )
 {
     LOG_STATEM("Initializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
@@ -39,14 +39,14 @@ static void initMap( bayesian_map_t * bm )
     }
 }
 
-static void normalizeMap( bayesian_map_t * bm )
+void NormalizeBayesianMap( bayesian_map_t * bm )
 {
     reset_loop_variables( &_, bm->length );
     for(  _.i = 0; _.i < _.l; _.i++ )
-        BayesianFunctions.map.normalizeState( bm, _.i );
+        BayesianFunctions.Map.NormalizeState( bm, _.i );
 }
 
-static void normalizeState( bayesian_map_t * bm, state_dimension_t i )
+void NormalizeBayesianState( bayesian_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     floating_t * total = &_.v;
@@ -59,14 +59,14 @@ static void normalizeState( bayesian_map_t * bm, state_dimension_t i )
     else bm->map[_.i][i] = 1.0;
 }
 
-static void resetState( bayesian_map_t * bm, state_dimension_t i )
+void ResetBayesianState( bayesian_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     for( _.j = 0; _.j < _.l; _.j++ ) bm->map[_.j][i] = 0.0;
     bm->map[i][i] = 1.0;
 }
 
-static void print( bayesian_map_t * bm, state_t s )
+void PrintBayesianMap( bayesian_map_t * bm, state_t s )
 {
 #ifdef STATEM_DEBUG
     reset_loop_variables( &_, bm->length );
@@ -85,7 +85,7 @@ static void print( bayesian_map_t * bm, state_t s )
 #endif
 }
 
-static void init( bayesian_system_t * sys )
+void InitBayesianSystem( bayesian_system_t * sys )
 {
     sys->state                = STABLE_NONE;
     sys->prev                 = UNKNOWN_STATE;
@@ -96,10 +96,10 @@ static void init( bayesian_system_t * sys )
     sys->stability.alternate  = 0.;
     sys->stability.overall    = 0.;
     
-    BayesianFunctions.map.initMap( &sys->probabilities );
+    BayesianFunctions.Map.InitMap( &sys->probabilities );
 }
 
-static void update( bayesian_system_t * sys, prediction_pair_t * p )
+void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
 {
     reset_loop_variables( &_, NUM_STATES );
     state_t next = sys->state;
@@ -149,13 +149,13 @@ static void update( bayesian_system_t * sys, prediction_pair_t * p )
     if( prob[3] > (floating_t)PROBABILITY_ALTERNATE_THRESH )
         out[3] = prob[3] * (floating_t)PROBABILITY_TUNING_FACTOR_SQ;
     
-    BayesianFunctions.sys.updateProbabilities( sys, out );
-    BayesianFunctions.map.normalizeState( &sys->probabilities, sys->state );
-    BayesianFunctions.sys.updateState( sys );
-    print( &sys->probabilities, sys->state );
+    BayesianFunctions.Sys.UpdateProbabilities( sys, out );
+    BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
+    BayesianFunctions.Sys.UpdateState( sys );
+    PrintBayesianMap( &sys->probabilities, sys->state );
 }
 
-static void updateProbabilities( bayesian_system_t * sys, floating_t p[4] )
+void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
 {
     state_t           c = sys->state;
     state_dimension_t x = stateNumber(c);
@@ -186,7 +186,7 @@ static void updateProbabilities( bayesian_system_t * sys, floating_t p[4] )
     }
 }
 
-static void updateState( bayesian_system_t * sys )
+void UpdateBayesianState( bayesian_system_t * sys )
 {
     if(sys->next != UNKNOWN_STATE )
     {
@@ -195,24 +195,6 @@ static void updateState( bayesian_system_t * sys )
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;
-        BayesianFunctions.map.resetState( &sys->probabilities, sys->prev );
+        BayesianFunctions.Map.ResetState( &sys->probabilities, sys->prev );
     }
 }
-
-const struct bayesian_functions BayesianFunctions =
-{
-    { /* Map functions */
-        .initMap = initMap,
-        .normalizeMap = normalizeMap,
-        .normalizeState = normalizeState,
-        .resetState = resetState,
-        .print = print
-    },
-    { /* System functions */
-        .init = init,
-        .update = update,
-        .updateProbabilities = updateProbabilities,
-        .updateState = updateState
-    }
-};
-
