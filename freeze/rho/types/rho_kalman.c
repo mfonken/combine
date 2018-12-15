@@ -75,3 +75,13 @@ bool IsRhoKalmanExpired( rho_kalman_t * k )
 {
     return ((timestamp() - k->timestamp) > k->lifespan);
 }
+
+inline kfl_t ScoreRhoKalman( rho_kalman_t * k )
+{
+    return k->K[0];
+}
+
+void PunishRhoKalman( rho_kalman_t * k )
+{
+    k->K[0] *= KALMAN_PUNISH_FACTOR;
+}

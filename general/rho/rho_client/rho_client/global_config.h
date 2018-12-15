@@ -111,4 +111,6 @@
 #define MIN_BLOB_DENSITY    10
 #define MIN_BLOB_SCORE      5
 
+#define MAX_TRACKING_FILTERS 4
+
 #endif /* global_config_h */

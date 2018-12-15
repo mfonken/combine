@@ -52,21 +52,6 @@ extern "C" {
 #define state_dimension_t uint8_t
 #define loop_variables_state_dimension_t loop_variables_uint8_t //##state_dimension_t
     
-    typedef enum
-    {
-        UNKNOWN_STATE = 0,
-        STABLE_NONE,
-        UNSTABLE_NONE,
-        STABLE_SINGLE,
-        UNSTABLE_SINGLE,
-        STABLE_DOUBLE,
-        UNSTABLE_DOUBLE,
-        STABLE_MANY,
-        UNSTABLE_MANY,
-        
-        NUM_STATES
-    } state_t;
-    
     static inline state_dimension_t stateToSelection(state_t s) {return ((state_dimension_t)((s+1)/2) - 1);};
     static inline const char *stateString(state_dimension_t s)
     {

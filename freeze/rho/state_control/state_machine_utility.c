@@ -103,24 +103,14 @@ void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
 {
     reset_loop_variables( &_, NUM_STATES );
     state_t next = sys->state;
-    
-    /* Update self-diagnostics based on state */
-    floating_t prob[4] =
+
+    bool ch[NUM_STATE_GROUPS] = { 0 };
+    for(uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
     {
-        DISTANCE_SQ(p->x.probabilities.absence,   p->y.probabilities.absence),
-        DISTANCE_SQ(p->x.probabilities.primary,   p->y.probabilities.primary),
-        DISTANCE_SQ(p->x.probabilities.secondary, p->y.probabilities.secondary),
-        DISTANCE_SQ(p->x.probabilities.alternate, p->y.probabilities.alternate)
-    },
-    out[4] = { 0 };
-    bool ch[4] =
-    {
-        true, /* Assume absence */
-        prob[1] > PROBABILITY_TUNING_THRESHOLD,
-        prob[2] > PROBABILITY_TUNING_THRESHOLD,
-        prob[3] > PROBABILITY_TUNING_THRESHOLD
-    };
+        ch[i] = p->Probabilities.P[i] > PROBABILITY_TUNING_THRESHOLD;
+    }
     
+    floating_t out[NUM_STATE_GROUPS] = { 0. };
     /* Find most probable next state */
     for( ; _.i < _.l; _.i++ )
     {
@@ -139,15 +129,11 @@ void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
     sys->selection_index = _.l;
     for( _.i = 0; _.i <= _.l; _.i++)
     {
-        _.u = prob[_.i];
+        _.u = p->Probabilities.P[_.i];
         _.v = (floating_t)DOUBT(_.i, sys->state);
         out[_.i] = _.u * _.v;
         LOG_STATEM("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, _.u, _.v, out[_.i]);
     }
-    
-    /* Independent Alternate Check */
-    if( prob[3] > (floating_t)PROBABILITY_ALTERNATE_THRESH )
-        out[3] = prob[3] * (floating_t)PROBABILITY_TUNING_FACTOR_SQ;
     
     BayesianFunctions.Sys.UpdateProbabilities( sys, out );
     BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );

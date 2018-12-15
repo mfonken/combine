@@ -141,6 +141,19 @@ typedef struct
     byte_t          data[PACKET_SIZE];
 } packet_t;
 
+typedef struct
+{
+    density_t
+    max,
+    den;
+    index_t
+    loc,
+    wth,
+    srt;
+    floating_t
+    scr;
+} blob_t;
+
 /* Rho Structures* */
 typedef struct
 {
@@ -173,27 +186,45 @@ typedef struct
     density_redistribution_lookup_config_t config[4];
 } density_redistribution_lookup_t;
 
+typedef enum
+{
+    UNKNOWN_STATE = 0,
+    STABLE_NONE,
+    UNSTABLE_NONE,
+    STABLE_SINGLE,
+    UNSTABLE_SINGLE,
+    STABLE_DOUBLE,
+    UNSTABLE_DOUBLE,
+    STABLE_MANY,
+    UNSTABLE_MANY,
+    
+    NUM_STATES
+} state_t;
+
+#define NUM_STATE_GROUPS (NUM_STATES/2)
+
 typedef struct
 {
-    floating_t  primary,
-                secondary,
-                alternate,
-                absence;
+    floating_t  P[NUM_STATE_GROUPS];
 } prediction_probabilities;
 
 typedef struct
 {
-    rho_kalman_t    primary,
-                    secondary;
-    floating_t      primary_new,
-                    secondary_new;
-    prediction_probabilities probabilities;
+    rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
+    uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
+    blob_t          Blobs[MAX_BLOBS];
+    uint8_t         BlobsOrder[MAX_BLOBS],
+                    NumBlobs;
+    floating_t      NuBlobs;
+    density_t       PreviousPeak,
+                    PreviousDensity;
+    prediction_probabilities Probabilities;
 } prediction_t;
 
 typedef struct
 {
     prediction_t    x,y;
-    prediction_probabilities probabilities;
+    prediction_probabilities Probabilities;
 } prediction_pair_t;
 
 typedef struct

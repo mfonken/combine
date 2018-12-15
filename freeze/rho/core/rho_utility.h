@@ -19,8 +19,6 @@
 #include "global_config.h"
 #include "state_machine_utility.h"
 
-#define MAX_TRACKING_FILTERS 4
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,19 +32,13 @@ extern "C" {
         Bx,
         By;
         byte_t              BackgroundCounter,
-                            BackgroundPeriod,
-                            NumBlobs;
-        density_t           PreviousPeak,
-                            PreviousDensity;
+                            BackgroundPeriod;
         density_map_pair_t  DensityMapPair;
         prediction_pair_t   PredictionPair;
         bayesian_system_t   BayeSys;
         rho_pid_t           ThreshFilter;
-        rho_kalman_t        TargetFilter,
-                            TrackingFilters[MAX_TRACKING_FILTERS];
-        uint8_t             TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-        blob_t              Blobs[MAX_BLOBS];
-        uint8_t             BlobsOrder[MAX_BLOBS];
+        rho_kalman_t        TargetFilter;
+        
         byte_t *            Thresh;
         density_2d_t        Q[4],
         Qb[4],
@@ -68,7 +60,8 @@ extern "C" {
     void RedistributeRhoUtilityDensities(  rho_utility * );
     void FilterAndSelectRhoUtilityPairs(   rho_utility * );
     void FilterAndSelectRhoUtility(        rho_utility *, density_map_t *, prediction_t * );
-    void UpdateRhoUtilityPrediction(       rho_utility * );
+    void UpdateRhoUtilityPrediction(       rho_utility *, prediction_t * );
+    void UpdateRhoUtilityPredictions(      rho_utility * );
     void UpdateRhoUtilityThreshold(        rho_utility * );
     void GenerateRhoUtilityPacket(         rho_utility * );
     
@@ -80,23 +73,11 @@ extern "C" {
         void (*RedistributeDensities)(  rho_utility * );
         void (*FilterAndSelectPairs)(   rho_utility * );
         void (*FilterAndSelect)(        rho_utility *, density_map_t *, prediction_t * );
-        void (*UpdatePrediction)(       rho_utility * );
+        void (*UpdatePrediction)(       rho_utility *, prediction_t * );
+        void (*UpdatePredictions)(      rho_utility * );
         void (*UpdateThreshold)(        rho_utility * );
         void (*GeneratePacket)(         rho_utility * );
     };
-    
-    typedef struct
-    {
-        density_t
-        max,
-        den;
-        index_t
-        loc,
-        wth,
-        srt;
-        floating_t
-        scr;
-    } blob_t;
     
     typedef struct
     {
@@ -152,7 +133,9 @@ extern "C" {
         fdn_,   /* filtered density (float) */
         tdnf,   /* target density (float) */
         fvf_,   /* filtered variance inverse (float) */
-        chaos;
+        chaos,
+        denp,
+        pkp;
     } rho_selection_variables;
     
     typedef struct
@@ -187,13 +170,13 @@ extern "C" {
     
 #define PACKET_ADDRESS_INITIALIZER(r)           \
     {                                               \
-        (address_t)&r.y.primary.value,         /* px */ \
-        (address_t)&r.x.primary.value,         /* py */ \
-        (address_t)&r.y.secondary.value,       /* sx */ \
-        (address_t)&r.x.secondary.value,       /* sy */ \
-        (address_t)&r.probabilities.primary,   /* pp */ \
-        (address_t)&r.probabilities.secondary, /* ap */ \
-        (address_t)&r.probabilities.alternate  /* ap */ \
+        (address_t)&r.y.TrackingFilters[0].value,         /* px */ \
+        (address_t)&r.x.TrackingFilters[0].value,         /* py */ \
+        (address_t)&r.y.TrackingFilters[1].value,       /* sx */ \
+        (address_t)&r.x.TrackingFilters[1].value,       /* sy */ \
+        (address_t)&r.Probabilities.P[1],   /* pp */ \
+        (address_t)&r.Probabilities.P[2], /* ap */ \
+        (address_t)&r.Probabilities.P[3]  /* ap */ \
     }
     
     extern const density_redistribution_lookup_t rlookup;
@@ -207,6 +190,7 @@ extern "C" {
         .FilterAndSelectPairs = FilterAndSelectRhoUtilityPairs,
         .FilterAndSelect = FilterAndSelectRhoUtility,
         .UpdatePrediction = UpdateRhoUtilityPrediction,
+        .UpdatePredictions = UpdateRhoUtilityPredictions,
         .UpdateThreshold = UpdateRhoUtilityThreshold,
         .GeneratePacket = GenerateRhoUtilityPacket
     };
