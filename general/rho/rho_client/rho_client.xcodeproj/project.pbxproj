@@ -31,6 +31,7 @@
 		340A51F12186C45D00FBE342 /* rho_pid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_pid.c; sourceTree = "<group>"; };
 		347FFE25217C526800E47A82 /* rho_pid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_pid.h; sourceTree = "<group>"; };
 		347FFE26217ED51B00E47A82 /* rho_global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_global.h; sourceTree = "<group>"; };
+		34C5BC4C21C224790007D543 /* rho_structure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_structure.h; sourceTree = "<group>"; };
 		34FF28C22172E8F5006A1676 /* stm32_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32_interface.h; sourceTree = "<group>"; };
 		49330C232153655D0010438F /* rho_client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		49330C242153655D0010438F /* rho_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
@@ -82,6 +83,7 @@
 		34FF28C72172EA89006A1676 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				34C5BC4C21C224790007D543 /* rho_structure.h */,
 				49479A632153603C0029AE62 /* rho_utility.h */,
 				49479A5E2153603C0029AE62 /* rho_utility.c */,
 				49330C232153655D0010438F /* rho_client.h */,

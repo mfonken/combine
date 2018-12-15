@@ -107,4 +107,8 @@
 #define THRESH_MIN          0
 #define THRESH_MAX          255
 
+#define MAX_BLOBS           10
+#define MIN_BLOB_DENSITY    10
+#define MIN_BLOB_SCORE      5
+
 #endif /* global_config_h */

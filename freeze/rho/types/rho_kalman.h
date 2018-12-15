@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+#define KALMAN_SCORE(N) (N.K[0])
+    
 /* Standard headers */    
 typedef double kfl_t;
 

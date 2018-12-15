@@ -26,6 +26,7 @@ typedef double          floating_t;
 typedef uint8_t         byte_t;
 typedef uint16_t        index_t;
 typedef uint16_t        density_t;
+typedef int16_t         sdensity_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
 //typedef uint32_t        register_t;

@@ -14,8 +14,12 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "rho_structure.h"
+
 #include "global_config.h"
 #include "state_machine_utility.h"
+
+#define MAX_TRACKING_FILTERS 4
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,12 +34,19 @@ extern "C" {
         Bx,
         By;
         byte_t              BackgroundCounter,
-        BackgroundPeriod;
+                            BackgroundPeriod,
+                            NumBlobs;
+        density_t           PreviousPeak,
+                            PreviousDensity;
         density_map_pair_t  DensityMapPair;
         prediction_pair_t   PredictionPair;
         bayesian_system_t   BayeSys;
         rho_pid_t           ThreshFilter;
-        rho_kalman_t        TargetFilter;
+        rho_kalman_t        TargetFilter,
+                            TrackingFilters[MAX_TRACKING_FILTERS];
+        uint8_t             TrackingFiltersOrder[MAX_TRACKING_FILTERS];
+        blob_t              Blobs[MAX_BLOBS];
+        uint8_t             BlobsOrder[MAX_BLOBS];
         byte_t *            Thresh;
         density_2d_t        Q[4],
         Qb[4],
@@ -80,7 +91,11 @@ extern "C" {
         max,
         den;
         index_t
-        loc;
+        loc,
+        wth,
+        srt;
+        floating_t
+        scr;
     } blob_t;
     
     typedef struct
@@ -99,7 +114,10 @@ extern "C" {
         index_t
         len,
         cloc,
-        gapc;
+        gapc,
+        width,
+        blbi,            /* Blob index */
+        blbf;            /* Blob fill */
         density_t
         fpeak,
         fpeak_2,
@@ -118,7 +136,8 @@ extern "C" {
         fden;
         bool
         has,
-        sel;
+        sel,
+        resc; /* Rescore */
         floating_t
         avgc,
         fcov,   /* Filtered coverage ratio */
@@ -132,9 +151,8 @@ extern "C" {
         vfac,   /* variance factor */
         fdn_,   /* filtered density (float) */
         tdnf,   /* target density (float) */
-        fvf_;   /* filtered variance inverse (float) */
-        blob_t
-        blobs[2];
+        fvf_,   /* filtered variance inverse (float) */
+        chaos;
     } rho_selection_variables;
     
     typedef struct
@@ -152,7 +170,6 @@ extern "C" {
         byte_t non_diag;
         int8_t qcheck;
     } prediction_update_variables;
-    
     
     typedef struct
     {
