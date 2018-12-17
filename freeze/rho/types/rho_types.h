@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "global_config.h"
+#include "rho_config.h"
 #include "rho_kalman.h"
 #include "rho_pid.h"
 #include "rho_global.h"

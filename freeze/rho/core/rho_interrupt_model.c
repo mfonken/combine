@@ -7,16 +7,18 @@
 //
 
 #include "rho_interrupt_model.h"
-#include <stdio.h>
-#include <string.h>
+
 
 #define BURN_ROWS 0
 #define BURN_COLS 0
 
-void PERFORM_RHO_C( cimage_t image )
+rho_variables RhoVariables = { 0 };
+
+void RIM_PERFORM_RHO_C( cimage_t image )
 {
+    if(!RhoVariables.connected) return;
     RhoInterrupts.FRAME_START();
-    pthread_create(&RhoVariables.global.loop_thread, NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
+    //        pthread_create((pthread_t)&RhoVariables.global.loop_thread, (const pthread_attr_t *)NULL, (void *)RhoInterrupts.LOOP_THREAD, (void *)&RhoVariables.global.rho_int_mutex);
     uint32_t p = BURN_ROWS * image.height;
     for( index_t y = BURN_ROWS, x; y < image.height; y++ )
     {
@@ -31,12 +33,12 @@ void PERFORM_RHO_C( cimage_t image )
     RhoInterrupts.FRAME_END();
 }
 
-void FRAME_INIT( void )
+void RIM_FRAME_INIT( void )
 {
-
+    
 }
 
-void FRAME_START( void )
+void RIM_FRAME_START( void )
 {
     RhoVariables.registers.x    = 0;
     RhoVariables.registers.p    = 0;
@@ -61,7 +63,7 @@ void FRAME_START( void )
     RhoVariables.registers.THRESH = *RhoVariables.ram.THRESH_ADDR;
 }
 
-void FRAME_END( void )
+void RIM_FRAME_END( void )
 {
     if(pthread_mutex_trylock(&RhoVariables.global.rho_int_mutex))
         pthread_mutex_unlock(&RhoVariables.global.rho_int_mutex);
@@ -72,27 +74,27 @@ void FRAME_END( void )
     LOG_RHO(">>>frame density is %d<<<\n", RhoVariables.ram.QT);
 }
 
-void ROW_INT( void )
+void RIM_ROW_INT( void )
 {
     *(RhoVariables.registers.wr++) = RhoVariables.global.y_delimiter;
-//    RhoVariables.registers.PTOG = !RhoVariables.registers.PTOG;
+    //    RhoVariables.registers.PTOG = !RhoVariables.registers.PTOG;
     RhoVariables.registers.x = 0;
 }
 
-void PCLK_INT( void )
+void RIM_PCLK_INT( void )
 {
     if( *RhoVariables.ram.CAM_PORT > RhoVariables.registers.THRESH )
         *(RhoVariables.registers.wr++) = RhoVariables.registers.x;
     RhoVariables.registers.x++;
 }
 
-void LOOP_THREAD( void * mutex )
+void RIM_LOOP_THREAD( void * mutex )
 {
     pthread_mutex_t * m = (pthread_mutex_t *)mutex;
     index_t rx = 0, ry = 0;
     RhoVariables.global.counter = 0;
     while( RhoVariables.registers.rd != RhoVariables.ram.C_FRAME_END
-           && pthread_mutex_trylock(m)
+          && pthread_mutex_trylock(m)
           )
     {
         RhoVariables.global.counter++;
@@ -119,7 +121,7 @@ void LOOP_THREAD( void * mutex )
             else
             {
                 if( rx < RhoVariables.registers.Cx )
-                        RhoVariables.registers.QS &= 0xfe;
+                    RhoVariables.registers.QS &= 0xfe;
                 else    RhoVariables.registers.QS |= 0x01;
                 (*(RhoVariables.ram.Dy+rx))++;
                 (*(RhoVariables.ram.Q+RhoVariables.registers.QS))++;
@@ -131,17 +133,18 @@ void LOOP_THREAD( void * mutex )
 #define RPC(X) if(X&0xf0)
 #define RPCB(X,Y,N) {RPC(X){Q##Y++;N[x]++;}}
 
-void PERFORM_RHO_FUNCTION( cimage_t image )
+void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
 {
+    if(!RhoVariables.connected) return;
     index_t w = image.width, h = image.height;
-//    int * mapx = density_map_pair.x.map, * mapy = density_map_pair.y.map;
-//    density_map_pair.y.length = w;
-//    density_map_pair.x.length = h;
+    //    int * mapx = density_map_pair.x.map, * mapy = density_map_pair.y.map;
+    //    density_map_pair.y.length = w;
+    //    density_map_pair.x.length = h;
     
     index_t y, x;
-    int p;
-
-    FRAME_START();
+    uint32_t p;
+    
+    RhoInterrupts.FRAME_START();
     
     RhoVariables.ram.QT = p = 0;
     density_2d_t Q0 = 0, Q1 = 0, Q2 = 0, Q3 = 0, QN = 0, QN_ = 0;
@@ -189,7 +192,7 @@ void PERFORM_RHO_FUNCTION( cimage_t image )
         RhoVariables.ram.Dx[y] = QN - QN_;
         QN_ = QN;
     }
-
+    
     RhoVariables.ram.Q[0] = Q0;
     RhoVariables.ram.Q[1] = Q1;
     RhoVariables.ram.Q[2] = Q2;
@@ -199,5 +202,3 @@ void PERFORM_RHO_FUNCTION( cimage_t image )
     LOG_RHO("Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
     LOG_RHO("# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
 }
-
-rho_variables RhoVariables;

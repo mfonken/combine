@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "test_setup.h"
+
 /* Math headers */
 #include "qmath.h"
 
@@ -48,8 +50,8 @@
 //#define     CAMERA_ALPHA_W          120     // degrees
 //#define     CAMERA_ALPHA_H          75      // degrees
 
-#define     CAMERA_WIDTH            960//1280    // pixels
-#define     CAMERA_HEIGHT           540//800     // pixels
+#define     KINETIC_CAMERA_WIDTH    1//CAMERA_WIDTH//1280    // pixels
+#define     KINETIC_CAMERA_HEIGHT   1//CAMERA_HEIGHT//800     // pixels
 #define     CAMERA_HALF_WIDTH       FNL_RESIZE_W/2
 #define     CAMERA_HALF_HEIGHT      FNL_RESIZE_H/2
 

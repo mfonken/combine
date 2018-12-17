@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-using namespace cv;
+//using namespace cv;
 
 Rho::Rho( int width, int height ) : width(width), height(height)
 {
@@ -21,14 +21,14 @@ Rho::Rho( int width, int height ) : width(width), height(height)
         a = sizeof(redistribution_variables),
         b = sizeof(rho_selection_variables),
         c = sizeof(prediction_update_variables),
-        d = sizeof(rho_c_utility)-sizeof(density_t)*C_FRAME_SIZE+(2*(FNL_RESIZE_W+FNL_RESIZE_H))*sizeof(density_t),
+        d = sizeof(rho_utility)-sizeof(density_t)*C_FRAME_SIZE+(2*(RHO_WIDTH+RHO_HEIGHT))*sizeof(density_t),
         e = a + b + c + d;
     LOG_RHO("\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     
-    RhoFunctions.Init(&utility, width, height);
-    BayesianFunctions.sys.init( &utility.sys );
+    RhoFunctions.Init(&utility);
+    BayesianFunctions.Sys.Init( &utility.BayeSys );
     backgrounding_event = false;
     
     RhoInterrupts.FRAME_INIT();
@@ -45,7 +45,7 @@ void Rho::perform( cimage_t & img, GlobalPacket * p )
     /* * * * * * * * * * */
     
     pthread_mutex_unlock(&density_map_pair_mutex);
-    memcpy((byte_t *)p, (byte_t*)&utility.packet, sizeof(packet_t));
+    memcpy((byte_t *)p, (byte_t*)&utility.Packet, sizeof(packet_t));
     backgrounding_event = false; // Generate background always and only once
     pthread_mutex_unlock(&c_mutex);
 }
@@ -55,24 +55,24 @@ void Rho::Generate_Density_Map_Using_Interrupt_Model( cimage_t image, bool backg
 {
     if( backgrounding )
     {
-        RhoVariables.ram.Dx      =  utility.density_map_pair.x.background;
-        RhoVariables.ram.Dy      =  utility.density_map_pair.y.background;
+        RhoVariables.ram.Dx      =  utility.DensityMapPair.x.background;
+        RhoVariables.ram.Dy      =  utility.DensityMapPair.y.background;
         RhoVariables.ram.CX_ADDR = &utility.By;
         RhoVariables.ram.CY_ADDR = &utility.Bx;
         RhoVariables.ram.Q       =  utility.Qb;
     }
     
-//    PERFORM_RHO_C( image );
-    PERFORM_RHO_FUNCTION( image );
+//    RIM_PERFORM_RHO_C( image );
+    RIM_PERFORM_RHO_FUNCTION( image );
     
     if( backgrounding )
     {
-        RhoVariables.ram.Dx      =  utility.density_map_pair.x.map;
-        RhoVariables.ram.Dy      =  utility.density_map_pair.y.map;
+        RhoVariables.ram.Dx      =  utility.DensityMapPair.x.map;
+        RhoVariables.ram.Dy      =  utility.DensityMapPair.y.map;
         RhoVariables.ram.CX_ADDR = &utility.Cx;
         RhoVariables.ram.CY_ADDR = &utility.Cy;
         RhoVariables.ram.Q       =  utility.Q;
-        utility.density_map_pair.x.has_background = true;
-        utility.density_map_pair.y.has_background = true;
+        utility.DensityMapPair.x.has_background = true;
+        utility.DensityMapPair.y.has_background = true;
     }
 }

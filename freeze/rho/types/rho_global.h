@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 //#define USE_SHORTHAND_TYPES
 #ifdef USE_SHORTHAND_TYPES
@@ -46,12 +47,12 @@ typedef volatile bool   flag_t;
 #define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
 
-static double timestamp(void)
-{
-    //    struct timeval stamp;
-    //    gettimeofday(&stamp, NULL);
-    //    return stamp.tv_sec + stamp.tv_usec/1000000.0;
-    return 1; ///TODO: Implement local time
-}
+//static double timestamp(void)
+//{
+//    //    struct timeval stamp;
+//    //    gettimeofday(&stamp, NULL);
+//    //    return stamp.tv_sec + stamp.tv_usec/1000000.0;
+//    return 1; ///TODO: Implement local time
+//}
 
 #endif /* rho_global_h */

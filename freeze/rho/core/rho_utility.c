@@ -7,7 +7,9 @@
 //
 
 #include "rho_utility.h"
-#include "rho_master.h"
+
+/* Universal Port for interrupt model */
+pixel_base_t test_port = 0;
 
 static packet_offset_lookup_t packet_offset_lookup = PACKET_OFFSETS;
 //static floating_t timestamp(void){struct timeval stamp; gettimeofday(&stamp, NULL); return stamp.tv_sec + stamp.tv_usec/1000000.0;}
@@ -102,6 +104,8 @@ static floating_t CalculateCentroid( density_t * map, index_t l, index_t * C, re
 
 void InitRhoUtility( rho_utility * utility )
 {
+    memset(utility, 0, sizeof(utility));
+    
     /* Utility frame */
     index_t w = utility->Width;
     index_t h = utility->Height;
@@ -165,6 +169,32 @@ void InitRhoUtility( rho_utility * utility )
     
     utility->BackgroundCounter = 0;
     utility->BackgroundPeriod = BACKGROUND_PERIOD;
+       
+    /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
+    /* Connect to Interrupt Model variable structure */
+    RhoVariables.ram.Dx      =  utility->DensityMapPair.x.map;
+    RhoVariables.ram.Dy      =  utility->DensityMapPair.y.map;
+    RhoVariables.ram.Q       =  utility->Q;
+    RhoVariables.ram.CX_ADDR = &utility->Cx;
+    RhoVariables.ram.CY_ADDR = &utility->Cy;
+    RhoVariables.ram.C_FRAME =  utility->cframe;
+    RhoVariables.ram.THRESH_ADDR = (density_t *)&utility->Thresh;
+    RhoVariables.ram.CAM_PORT = &test_port;
+    
+    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
+    RhoVariables.global.y_delimiter = Y_DEL;
+    RhoVariables.global.W    =  utility->Width;
+    RhoVariables.global.H    =  utility->Height;
+    
+    /* Frame Initializer routine */
+    RhoInterrupts.FRAME_INIT();
+    
+    /* Interrupt model mutex initializer */
+    pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
+    pthread_mutex_lock(&RhoVariables.global.rho_int_mutex);
+    
+    RhoVariables.connected = true;
+    /*****  INTERRUPT MODEL CROSS-CONNECTOR VARIABLES END  *****/
 }
 
 void PerformRhoUtility( rho_utility * utility, bool background_event )
@@ -367,6 +397,7 @@ void GenerateRhoUtilityBackground( rho_utility * utility )
 
 void RedistributeRhoUtilityDensities( rho_utility * utility )
 {
+    LOG_RHO("Rho: Redistributing densities.\n");
     redistribution_variables _ =
     {
         { utility->Bx, abs(utility->Cx-utility->Bx), utility->Width - utility->Cx  },
@@ -504,31 +535,30 @@ void UpdateRhoUtilityPredictions( rho_utility * utility )
         utility->Cy,
         0
     };
-    if(_.Ax > _.Bx) iswap(&_.Ax, &_.Bx);
-    if(_.Ay > _.By) iswap(&_.Ay, &_.By);
+//    if(_.Ax > _.Bx) iswap(&_.Ax, &_.Bx);
+//    if(_.Ay > _.By) iswap(&_.Ay, &_.By);
     
-//    if( ( _.Ax < _.Cx ) ^ ( _.Bx > _.Cx ) ) /* ! X ambiguous */
-//    {
+    if( ( _.Ax < _.Cx ) ^ ( _.Bx > _.Cx ) ) /* ! X ambiguous */
+    {
 //        _.x = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
 //        if( fabs( _.x - _.Ax ) > fabs( _.x - _.Bx ) ) iswap( &_.Ax, &_.Bx );
-//        _.non_diag = true;
-//        LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
-//    }
-//    if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* ! Y ambiguous */
-//    {
+        _.non_diag = true;
+        LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
+    }
+    if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* ! Y ambiguous */
+    {
 //        _.y = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
 //        if( fabs( _.y - _.Ay ) > fabs( _.y -_. By ) ) iswap( &_.Ay, &_.By );
-//        _.non_diag = true;
-//        LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
-//    }
-//    if ( !_.non_diag )
-//    {
-        //        printf("Rho: Redistributing densities.\n");
+        _.non_diag = true;
+        LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
+    }
+    if ( !_.non_diag )
+    {
         RhoFunctions.RedistributeDensities( utility );
         _.qcheck = (  utility->Qf[0] > utility->Qf[1] ) + ( utility->Qf[2] < utility->Qf[3] ) - 1;
         if( ( _.Ax > _.Bx ) ^ ( ( _.qcheck > 0 ) ^ ( _.Ay < _.By ) ) ) iswap(&_.Ax, &_.Bx);
         LOG_RHO("Quadrant Check %d\n", _.qcheck);
-//    }
+    }
     
     _.Cx = (index_t)(_.Ax + _.Bx) >> 1;
     _.Cy = (index_t)(_.Ay + _.By) >> 1;
@@ -599,9 +629,9 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     }
     
     utility->TargetCoverageFactor -= 0.01*(utility->TargetCoverageFactor - (floating_t)FILTERED_COVERAGE_TARGET);
-    floating_t proposed_thresh = *utility->Thresh + hard_tune_factor + soft_tune_factor;
-    RhoPID.Update( &utility->ThreshFilter, proposed_thresh, *utility->Thresh);
-    *utility->Thresh = (byte_t)BOUND(utility->ThreshFilter.Value, THRESH_MIN, THRESH_MAX);
+    floating_t proposed_thresh = utility->Thresh + hard_tune_factor + soft_tune_factor;
+    RhoPID.Update( &utility->ThreshFilter, proposed_thresh, utility->Thresh);
+    utility->Thresh = (byte_t)BOUND(utility->ThreshFilter.Value, THRESH_MIN, THRESH_MAX);
     
     LOG_RHO("*** THRESH IS %d ***\n", utility->thresh);
     LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->coverage_factor, utility->variance_factor);
@@ -619,7 +649,7 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
         (address_t*)&packet_value_lookup,
         0
     };
-    _.packet->header.timestamp = RhoSystem.Functions.Platform.Time.Now();
+    _.packet->header.timestamp = timestamp();
     while( _.i++ < NUM_PACKET_ELEMENTS )
     {
         if( _.packet->header.includes & 0x01 )
@@ -634,7 +664,7 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
         _.includes >>= 1;
         if((_.t=!_.t )) ++_.llPtr;
     }
-    printPacket( &utility->Packet, 3    );
+//    printPacket( &utility->Packet, 3    );
 }
 
 // OLD PROBABILITY FUNCTIONS

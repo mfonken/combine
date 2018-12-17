@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "rho_global.h"
+#include "timestamp.h"
 //#include <sys/time.h>
 
 #define KALMAN_PUNISH_FACTOR  0.5
@@ -41,7 +42,7 @@ extern "C" {
         uncertainty;
     } rho_kalman_t;
     
-    kfl_t timestamp(void);
+//    kfl_t timestamp(void);
     void InitRhoKalman( rho_kalman_t * k, kfl_t v, kfl_t ls, kfl_t vu, kfl_t bu, kfl_t su );
     void PredictRhoKalman( rho_kalman_t * k, kfl_t rate_new );
     void UpdateRhoKalman( rho_kalman_t * k, kfl_t value_new );

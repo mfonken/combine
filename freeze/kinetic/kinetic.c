@@ -14,7 +14,7 @@
  **************************************************************************************************/
 void KineticDefaultInit( kinetic_t * k )
 {
-    KineticFunctions.Init( k, CAMERA_WIDTH, CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
+    KineticFunctions.Init( k, KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
 }
 
 void KineticInit( kinetic_t * k, int W, int H, double F, double L )

@@ -14,10 +14,19 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "timestamp.h"
+
 #include "rho_structure.h"
 
-#include "global_config.h"
+#include "rho_config.h"
 #include "state_machine_utility.h"
+
+#ifdef __PCR__
+#include "rho_interrupt_model.h"
+#else
+#include "rho_client.h"
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +48,7 @@ extern "C" {
         rho_pid_t           ThreshFilter;
         rho_kalman_t        TargetFilter;
         
-        byte_t *            Thresh;
+        byte_t              Thresh;
         density_2d_t        Q[4],
         Qb[4],
         Qf[4],
@@ -52,6 +61,7 @@ extern "C" {
         CoverageFactor,
         VarianceFactor;
         packet_t            Packet;
+        index_t cframe[C_FRAME_SIZE];
     } rho_utility;
     
     void InitRhoUtility(                   rho_utility * );

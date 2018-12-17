@@ -14,7 +14,6 @@
 		49954A2A202C3583003748EC /* image_utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A1B202C3581003748EC /* image_utility.cpp */; };
 		49954A2D202C3583003748EC /* gaussian.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A1F202C3582003748EC /* gaussian.cpp */; };
 		49954A2F202C3583003748EC /* kalman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A25202C3582003748EC /* kalman.cpp */; };
-		49954A3E202D252D003748EC /* state_machine_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = 49954A3C202D252D003748EC /* state_machine_utility.c */; };
 		49954A69202D63BB003748EC /* environment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A5E202D63BB003748EC /* environment.cpp */; };
 		49954A71202D63CC003748EC /* serial_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A6C202D63CC003748EC /* serial_wrapper.cpp */; };
 		49954A72202D63CC003748EC /* file_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49954A6F202D63CC003748EC /* file_writer.cpp */; };
@@ -27,10 +26,6 @@
 		49CA033E214F05B600921D2F /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA0334214F05B600921D2F /* vector.c */; };
 		49CA0340214F05B600921D2F /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA0338214F05B600921D2F /* point.c */; };
 		49CA0341214F05B600921D2F /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA033A214F05B600921D2F /* quaternion.c */; };
-		49CA034D214F06ED00921D2F /* rho_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA0344214F06ED00921D2F /* rho_utility.c */; };
-		49CA034F214F06ED00921D2F /* rho_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49CA0347214F06ED00921D2F /* rho_wrapper.cpp */; };
-		49CA0350214F06ED00921D2F /* rho_interrupt_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA034B214F06ED00921D2F /* rho_interrupt_model.c */; };
-		49CA0351214F06ED00921D2F /* rho_kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 49CA034C214F06ED00921D2F /* rho_kalman.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,8 +57,6 @@
 		49954A25202C3582003748EC /* kalman.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = kalman.cpp; sourceTree = "<group>"; };
 		49954A26202C3582003748EC /* gaussian.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gaussian.hpp; sourceTree = "<group>"; };
 		49954A38202D20CE003748EC /* tau_master.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tau_master.h; sourceTree = "<group>"; };
-		49954A3C202D252D003748EC /* state_machine_utility.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = state_machine_utility.c; sourceTree = "<group>"; };
-		49954A3D202D252D003748EC /* state_machine_utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = state_machine_utility.h; sourceTree = "<group>"; };
 		49954A5E202D63BB003748EC /* environment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = environment.cpp; sourceTree = "<group>"; };
 		49954A5F202D63BB003748EC /* environment_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = environment_master.h; sourceTree = "<group>"; };
 		49954A60202D63BB003748EC /* environment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = environment.hpp; sourceTree = "<group>"; };
@@ -93,15 +86,6 @@
 		49CA0338214F05B600921D2F /* point.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = point.c; sourceTree = "<group>"; };
 		49CA0339214F05B600921D2F /* vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
 		49CA033A214F05B600921D2F /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
-		49CA0343214F06ED00921D2F /* rho_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_types.h; sourceTree = "<group>"; };
-		49CA0344214F06ED00921D2F /* rho_utility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_utility.c; sourceTree = "<group>"; };
-		49CA0345214F06ED00921D2F /* rho_interrupt_model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_interrupt_model.h; sourceTree = "<group>"; };
-		49CA0347214F06ED00921D2F /* rho_wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rho_wrapper.cpp; sourceTree = "<group>"; };
-		49CA0348214F06ED00921D2F /* rho_kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_kalman.h; sourceTree = "<group>"; };
-		49CA0349214F06ED00921D2F /* rho_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_utility.h; sourceTree = "<group>"; };
-		49CA034A214F06ED00921D2F /* rho_wrapper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rho_wrapper.hpp; sourceTree = "<group>"; };
-		49CA034B214F06ED00921D2F /* rho_interrupt_model.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_interrupt_model.c; sourceTree = "<group>"; };
-		49CA034C214F06ED00921D2F /* rho_kalman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_kalman.c; sourceTree = "<group>"; };
 		49E45D3F1FB2C7E600E81316 /* test_setup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_setup.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -116,15 +100,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4931A408206DC15C001A377B /* state_control */ = {
-			isa = PBXGroup;
-			children = (
-				49954A3D202D252D003748EC /* state_machine_utility.h */,
-				49954A3C202D252D003748EC /* state_machine_utility.c */,
-			);
-			path = state_control;
-			sourceTree = "<group>";
-		};
 		4931A40A206DC19D001A377B /* tau */ = {
 			isa = PBXGroup;
 			children = (
@@ -194,7 +169,6 @@
 		49954A34202C3647003748EC /* tau_core */ = {
 			isa = PBXGroup;
 			children = (
-				49CA0342214F06ED00921D2F /* rho */,
 				4931A40A206DC19D001A377B /* tau */,
 			);
 			path = tau_core;
@@ -267,24 +241,6 @@
 			path = qmath;
 			sourceTree = "<group>";
 		};
-		49CA0342214F06ED00921D2F /* rho */ = {
-			isa = PBXGroup;
-			children = (
-				49CA0343214F06ED00921D2F /* rho_types.h */,
-				49CA0345214F06ED00921D2F /* rho_interrupt_model.h */,
-				49CA034B214F06ED00921D2F /* rho_interrupt_model.c */,
-				49CA034A214F06ED00921D2F /* rho_wrapper.hpp */,
-				49CA0347214F06ED00921D2F /* rho_wrapper.cpp */,
-				49CA0348214F06ED00921D2F /* rho_kalman.h */,
-				49CA034C214F06ED00921D2F /* rho_kalman.c */,
-				49CA0349214F06ED00921D2F /* rho_utility.h */,
-				49CA0344214F06ED00921D2F /* rho_utility.c */,
-				4931A408206DC15C001A377B /* state_control */,
-			);
-			name = rho;
-			path = ../../../../../../freeze/rho;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -321,7 +277,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 497681901F4DF21200324190 /* Build configuration list for PBXProject "tau+" */;
+			buildConfigurationList = 497681901F4DF21200324190 /* Build configuration list for PBXProject "tau+ 2" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -343,20 +299,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49CA034F214F06ED00921D2F /* rho_wrapper.cpp in Sources */,
 				49954A2A202C3583003748EC /* image_utility.cpp in Sources */,
 				497681AE1F4DF29800324190 /* main.cpp in Sources */,
-				49CA0350214F06ED00921D2F /* rho_interrupt_model.c in Sources */,
 				49954A2D202C3583003748EC /* gaussian.cpp in Sources */,
 				4931A412206DC19D001A377B /* tau_utility.cpp in Sources */,
-				49954A3E202D252D003748EC /* state_machine_utility.c in Sources */,
 				49954A69202D63BB003748EC /* environment.cpp in Sources */,
 				49954A71202D63CC003748EC /* serial_wrapper.cpp in Sources */,
-				49CA034D214F06ED00921D2F /* rho_utility.c in Sources */,
 				4931A411206DC19D001A377B /* tau_structures.cpp in Sources */,
 				49954A73202D63CC003748EC /* sercom.c in Sources */,
 				49CA033B214F05B600921D2F /* kalman.c in Sources */,
-				49CA0351214F06ED00921D2F /* rho_kalman.c in Sources */,
 				49954A76202D68A8003748EC /* unfisheye.cpp in Sources */,
 				49CA0341214F05B600921D2F /* quaternion.c in Sources */,
 				4931A413206DC19D001A377B /* tau_test.cpp in Sources */,
@@ -597,7 +548,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		497681901F4DF21200324190 /* Build configuration list for PBXProject "tau+" */ = {
+		497681901F4DF21200324190 /* Build configuration list for PBXProject "tau+ 2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4976819A1F4DF21200324190 /* Debug */,

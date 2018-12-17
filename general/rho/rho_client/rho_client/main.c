@@ -13,8 +13,6 @@
 int main(int argc, const char * argv[])
 {
     RhoSystem.Functions.Perform.Init(CAMERA_PORT, UART_TX_PORT);
-    
-
     RhoSystem.Functions.Perform.RhoProcess();
     return 0;
 }

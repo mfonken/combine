@@ -9,9 +9,27 @@
 #ifndef global_config_h
 #define global_config_h
 
+#define __PCR__
+
+#ifndef LOG
+#define LOG(...) printf(__VA_ARGS__)
+#endif
+
+#ifdef RHO_DEBUG
+#define LOG_RHO(...) LOG("<Rho> " __VA_ARGS__)
+#else
+#define LOG_RHO(...)
+#endif
+
+#ifdef STATEM_DEBUG
+#define LOG_STATEM(...) LOG("<State> " __VA_ARGS__)
+#else
+#define LOG_STATEM(...)
+#endif
+
 /* Camera Config */
-#define CAMERA_WIDTH        1280
-#define CAMERA_HEIGHT       800
+#define RHO_WIDTH        1280
+#define RHO_HEIGHT       800
 
 #define BACKGROUND_PERIOD   10 // Frames
 #define RHO_PUNISH_FACTOR   1
@@ -53,8 +71,8 @@
 
 /* Capture Config */
 #define CAPTURE_DIV             4
-#define CAPTURE_WIDTH           (CAMERA_WIDTH>>CAPTURE_DIV)
-#define CAPTURE_HEIGHT          (CAMERA_HEIGHT>>CAPTURE_DIV)
+#define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
+#define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
@@ -106,5 +124,11 @@
 #define THRESH_STEP         1
 #define THRESH_MIN          0
 #define THRESH_MAX          255
+
+#define MAX_BLOBS           10
+#define MIN_BLOB_DENSITY    10
+#define MIN_BLOB_SCORE      5
+
+#define MAX_TRACKING_FILTERS 4
 
 #endif /* global_config_h */
