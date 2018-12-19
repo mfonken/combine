@@ -11,6 +11,8 @@
 
 #define __PCR__
 
+#define RHO_DEBUG
+
 #ifndef LOG
 #define LOG(...) printf(__VA_ARGS__)
 #endif

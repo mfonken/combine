@@ -68,9 +68,9 @@ public:
     
     static ImageUtility& Instance();
     
-    void initFile();
-    void initCamera();
-    void initGenerator();
+    void InitFile();
+    void InitCamera();
+    void InitGenerator();
     
     VideoCapture cam;
     Mat outframe, preoutframe, frame, image;
@@ -85,12 +85,11 @@ public:
     
     void RequestBackground();
     
-    Mat getNextImage();
-    Mat getImage();
+    Mat& GetNextImage();
+    Mat& GetImage();
     int loop(char c);
-    Mat getNextFrame();
+    Mat& GetNextFrame();
     bool isLive();
-    void getBeacons();
     void drawOutframe();
     Mat generateImage();
     

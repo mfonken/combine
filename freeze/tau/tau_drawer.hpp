@@ -45,9 +45,9 @@ public:
     
     TauDrawer( const char * name, int width, int height, std::string f = "", int num = 0 );
     Mat& GetDensitiesFrame(void);
-    void drawDensityGraph(Mat);
-    void drawDensityMaps(Mat);
-    void drawRhoProbabilities(Mat);
+    void DrawDensityGraph(Mat);
+    void DrawDensityMaps(Mat);
+    void DrawRhoProbabilities(Mat);
     Vec3b densityColor( int );
     int pixelDensity( Vec3b );
     Vec3b hsv2bgr(Vec3b);

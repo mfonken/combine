@@ -137,9 +137,6 @@ void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
 {
     if(!RhoVariables.connected) return;
     index_t w = image.width, h = image.height;
-    //    int * mapx = density_map_pair.x.map, * mapy = density_map_pair.y.map;
-    //    density_map_pair.y.length = w;
-    //    density_map_pair.x.length = h;
     
     index_t y, x;
     uint32_t p;

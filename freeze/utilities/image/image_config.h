@@ -40,7 +40,7 @@
 #define IU_FRAME_RATE   60
 
 #define IU_THRESHOLD    100
-#define IU_BRIGHTNESS   100
+#define IU_BRIGHTNESS   255
 
 // ?
 #define     D_FIXED                 5.0e-2

@@ -17,14 +17,13 @@ class Rho
 public:
     int                 width,
                         height;
-    rho_utility       utility;
+    rho_utility         utility;
     pthread_mutex_t     c_mutex;
     pthread_mutex_t     density_map_pair_mutex;
     bool                backgrounding_event;
     
     Rho( int, int );
-    void perform( cimage_t&, GlobalPacket * );
-//    void perform( cv::Mat,   PredictionPair * );
+    void Perform( cimage_t&, GlobalPacket * );
     void Generate_Density_Map_Using_Interrupt_Model( cimage_t, bool );
 };
 

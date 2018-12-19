@@ -32,7 +32,8 @@ static void printPacket( GlobalPacket * p, int l )
 #endif
 }
 
-Tau::Tau( const char * name, int width, int height, std::string f, int num, std::string n ) :
+Tau::Tau( const char * name, int width, int height, std::string f, int num, std::string n )
+:
 rho(width, height),
 name(name), width(width), height(height),
 utility(n, f, num, width, height)
@@ -66,13 +67,10 @@ void Tau::trigger( void )
 {
     double p = 0.;
 
-    pthread_mutex_lock(&utility.outimage_mutex);
     pthread_mutex_lock(&utility.outframe_mutex);
     utility.trigger();
     p = perform( utility.outimage );
-    pthread_mutex_unlock(&utility.outimage_mutex);
     pthread_mutex_unlock(&utility.outframe_mutex);
-    
     
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
@@ -98,13 +96,13 @@ double Tau::perform( cimage_t &img )
         
         LOG_RHO("Background ready.\n");
         rho.backgrounding_event = true;
-        rho.perform( img, &packet );
+        rho.Perform( img, &packet );
         utility.background_ready = false;
         tick = 0;
     }
     else
     {
-        rho.perform( img, &packet );
+        rho.Perform( img, &packet );
         updateThresh();
         updatePrediction();
     }

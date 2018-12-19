@@ -37,30 +37,16 @@ RMY(Size(TauDrawerheight, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
     pthread_mutex_init( &drawer_mutex, NULL );
 }
 
-int compare (const void * a, const void * b)
-{
-    return ( *(int*)a - *(int*)b );
-}
-
 Mat& TauDrawer::GetDensitiesFrame(void)
 {
-//    pthread_mutex_lock(&utility.outimage_mutex);
-//    pthread_mutex_lock(&utility.outframe_mutex);
-//    pthread_mutex_lock(&rho.c_mutex);
-    
-//    image = utility.outframe;
-    
     pthread_mutex_lock(&drawer_mutex);
     utility.outframe.copyTo(frame(Rect(0,0,w,h)));
-    drawDensityGraph(frame);
-    drawDensityMaps(frame);
-    
-//    pthread_mutex_lock(&rho.c_mutex);
+    DrawDensityGraph(frame);
+    DrawDensityMaps(frame);
     
     density_2d_t    Qv[] = { rho.utility.Q[0],  rho.utility.Q[1],  rho.utility.Q[2],  rho.utility.Q[3]  },
                     Qb[] = { rho.utility.Qb[0], rho.utility.Qb[1], rho.utility.Qb[2], rho.utility.Qb[3] },
                     Qf[] = { rho.utility.Qf[0], rho.utility.Qf[1], rho.utility.Qf[2], rho.utility.Qf[3] };
-    //    qsort(Qv, 4, sizeof(int), compare);
 
     putText(frame, to_string(Qv[0]), Point(inseta_, insetb_),                       FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
     putText(frame, to_string(Qv[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_),      FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
@@ -80,20 +66,16 @@ Mat& TauDrawer::GetDensitiesFrame(void)
     putText(frame, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
     putText(frame, "State: " + string(stateString(rho.utility.BayeSys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
-//    putText(frame, "X (" + to_string(rho.utility.Cx) + ", " + to_string(rho.utility.Cy) + ")", Point(rho.utility.Cx, rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
-//    pthread_mutex_unlock(&rho.c_mutex);
-    pthread_mutex_unlock(&drawer_mutex);
+    putText(frame, "X (" + to_string(rho.utility.Cx) + ", " + to_string(rho.utility.Cy) + ")", Point(rho.utility.Cx, rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
     
     rectangle(frame, Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Scalar(0,0,0));
     
-    pthread_mutex_unlock(&rho.c_mutex);
-    pthread_mutex_unlock(&utility.outframe_mutex);
-    pthread_mutex_unlock(&utility.outimage_mutex);
+    pthread_mutex_unlock(&drawer_mutex);
     
-    return utility.outframe;
+    return frame;
 }
 
-void TauDrawer::drawDensityGraph(Mat M)
+void TauDrawer::DrawDensityGraph(Mat M)
 {
     int u, v, w = width, h = height;
     Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
@@ -286,7 +268,7 @@ void TauDrawer::drawDensityGraph(Mat M)
     //    putText(M, "B", Point(B.x, B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
 }
 
-void TauDrawer::drawDensityMaps(Mat M)
+void TauDrawer::DrawDensityMaps(Mat M)
 {
     Vec3b c(0,0,0);
     int x = 0, y = 0, rangex[2] = { (int)rho.utility.Cx, w }, rangey[2] = { (int)rho.utility.Cy, h };
@@ -313,7 +295,7 @@ void TauDrawer::drawDensityMaps(Mat M)
     }
 }
 
-void TauDrawer::drawRhoProbabilities(Mat M)
+void TauDrawer::DrawRhoProbabilities(Mat M)
 {
     int w = M.cols, h = M.rows, h_ = h-RHO_MAPS_INSET;
     M = {Scalar(245,245,245)};

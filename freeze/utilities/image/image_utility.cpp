@@ -69,17 +69,15 @@ void ImageUtility::init()
 #endif
     
     LOG_IU("Initializing Image Utility: ");
-    if(has_file) initFile();
-    if(has_camera) initCamera();
-    if(has_generator) initGenerator();
+    if(has_file) InitFile();
+    if(has_camera) InitCamera();
+    if(has_generator) InitGenerator();
 }
 
 ImageUtility::~ImageUtility() {}
 
-void ImageUtility::initFile()
+void ImageUtility::InitFile()
 {
-    Mat temp(size.height, size.width, CV_8UC3, Scalar(0,0,0));
-    frame = temp;
     counter = 0;
     file = IMAGE_ROOT;
     
@@ -107,13 +105,10 @@ void ImageUtility::initFile()
         LOG_IU("Could not open or find the image.\n");
         return;
     }
-    
-    resize(image,frame,size);
-    preoutframe = frame;
     live = true;
 }
 
-void ImageUtility::initCamera()
+void ImageUtility::InitCamera()
 {
     counter = 0;
     
@@ -137,12 +132,9 @@ void ImageUtility::initCamera()
 #endif
     
     live = true;
-    
-    resize(image,frame,size);
-    preoutframe = frame;
 }
 
-void ImageUtility::initGenerator()
+void ImageUtility::InitGenerator()
 {
 }
 
@@ -156,9 +148,9 @@ void ImageUtility::trigger()
     preoutframe = {0};
     ++counter;
     if(has_file)
-        preoutframe = getNextImage();
+        preoutframe = GetNextImage();
     else if(has_camera)
-        preoutframe = getNextFrame();
+        preoutframe = GetNextFrame();
 
     if( background_request )
     {
@@ -168,13 +160,15 @@ void ImageUtility::trigger()
     }
     else if(has_generator)
         preoutframe = generateImage();
+    
 #ifdef THRESH_IMAGE
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
 #else
     preoutframe.copyTo(outframe);
 #endif
     
-//    cimageFromMat(outframe, outimage);
+    cimageFromMat(outframe, outimage);
+//    outframe = { 0 };
 //    cimageToMat(outimage, outframe);
 }
 
@@ -200,58 +194,53 @@ int ImageUtility::loop(char c)
         default:
             return 0;
     }
-    if( has_file ) preoutframe = getImage();
-    if( has_camera ) preoutframe = getNextFrame();
+    if( has_file ) preoutframe = GetImage();
+    if( has_camera ) preoutframe = GetNextFrame();
     return 1;
 }
 
-Mat ImageUtility::getNextImage()
+Mat& ImageUtility::GetNextImage()
 {
-    if(!live) return(frame);
+    if(!live) return(image);
     
     if(counter > 0)
     {
         counter %= path_num_ticks;
     }
-    return getImage();
+    return GetImage();
 }
 
-Mat ImageUtility::getImage()
+Mat& ImageUtility::GetImage()
 {
     file = subdir + to_string( counter%num_frames+1) + ".png";
     image = imread( file, IMREAD_COLOR );
     if( image.empty() )                      // Check for invalid input
     {
         LOG_IU("Could not open or find the image.\n");
-        return frame;
+        return image;
     }
-    resize(image,frame,size);
-    return frame;
+    resize(image,image,size);
+    return image;
 }
 
-Mat ImageUtility::getNextFrame()
+Mat& ImageUtility::GetNextFrame()
 {
     cam >> image;
-    resize(image, frame, size, 1, 1);
+    resize(image, image, size, 1, 1);
     
 #ifdef REDSCALE
     Mat bgr[3];
-    split(frame,bgr);
-    frame = bgr[2];
+    split(image,bgr);
+    image = bgr[2];
 #endif
     
 #ifdef GREYSCALE
     Mat grey;
-    cv::cvtColor(frame, grey, cv::COLOR_BGR2GRAY);
-    frame = grey;
+    cv::cvtColor(image, grey, cv::COLOR_BGR2GRAY);
+    image = grey;
 #endif
 
-    return frame;
-}
-
-void ImageUtility::getBeacons()
-{
-    Mat out = getNextFrame();
+    return image;
 }
 
 void ImageUtility::drawOutframe()
@@ -345,8 +334,8 @@ Mat ImageUtility::generateImage()
         path_left = path_center_x - size.width/4,
         path_right = path_center_x + size.width/4,
         path_top = path_center_y - size.height/4,
-        path_bottom = path_center_y + size.height/4,
-        radius_offset = abs(0.5 - phase)*2;
+        path_bottom = path_center_y + size.height/4;
+//        radius_offset = abs(0.5 - phase)*2;
     circle(frame, Point(p_x, p_y), TARGET_RADIUS/**(0.5+radius_offset)*/, TARGET_COLOR, -1);
     circle(frame, Point(s_x, s_y), TARGET_RADIUS/**(1.5-radius_offset)*/, TARGET_COLOR, -1);
 //    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(1.0+radius_offset), TARGET_COLOR, -1);

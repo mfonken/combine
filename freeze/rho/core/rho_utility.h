@@ -64,7 +64,7 @@ extern "C" {
         index_t cframe[C_FRAME_SIZE];
     } rho_utility;
     
-    void InitRhoUtility(                   rho_utility * );
+    void InitRhoUtility(                   rho_utility *, index_t, index_t );
     void PerformRhoUtility(                rho_utility *, bool );
     void GenerateRhoUtilityBackground(     rho_utility * );
     void RedistributeRhoUtilityDensities(  rho_utility * );
@@ -77,7 +77,7 @@ extern "C" {
     
     struct rho_functions
     {
-        void (*Init)(                   rho_utility * );
+        void (*Init)(                   rho_utility *, index_t, index_t );
         void (*Perform)(                rho_utility *, bool );
         void (*GenerateBackground)(     rho_utility * );
         void (*RedistributeDensities)(  rho_utility * );

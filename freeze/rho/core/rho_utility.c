@@ -102,13 +102,13 @@ static floating_t CalculateCentroid( density_t * map, index_t l, index_t * C, re
     return tot;
 }
 
-void InitRhoUtility( rho_utility * utility )
+void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
 {
-    memset(utility, 0, sizeof(utility));
+    memset(utility, 0, sizeof(rho_utility));
     
     /* Utility frame */
-    index_t w = utility->Width;
-    index_t h = utility->Height;
+    utility->Width = width;
+    utility->Height = height;
     
     /* Threshold Filter */
     RhoPID.Init(&utility->ThreshFilter, &(rho_pid_gain_t)DEFAULT_PID_GAIN );
@@ -118,24 +118,24 @@ void InitRhoUtility( rho_utility * utility )
     RhoKalman.Init(&utility->TargetFilter, utility->TargetCoverageFactor, RHO_TARGET_LS, RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU );
     
     /* Density Filters */
-    utility->DensityMapPair.x.map = (density_t*)malloc(sizeof(density_t)*h);
-    utility->DensityMapPair.x.length = h;
+    utility->DensityMapPair.x.map = (density_t*)malloc(sizeof(density_t)*height);
+    utility->DensityMapPair.x.length = height;
     utility->DensityMapPair.x.max[0] = 0;
     utility->DensityMapPair.x.max[1] = 0;
     RhoKalman.Init(&utility->DensityMapPair.x.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     RhoKalman.Init(&utility->DensityMapPair.x.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     
-    utility->DensityMapPair.y.map = (density_t*)malloc(sizeof(density_t)*w);
-    utility->DensityMapPair.y.length = w;
+    utility->DensityMapPair.y.map = (density_t*)malloc(sizeof(density_t)*width);
+    utility->DensityMapPair.y.length = width;
     utility->DensityMapPair.y.max[0] = 0;
     utility->DensityMapPair.y.max[1] = 0;
     RhoKalman.Init(&utility->DensityMapPair.y.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     RhoKalman.Init(&utility->DensityMapPair.y.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     
-    utility->DensityMapPair.x.background = (density_t*)malloc(sizeof(density_t)*h);
-    utility->DensityMapPair.y.background = (density_t*)malloc(sizeof(density_t)*w);
-    utility->DensityMapPair.x.filtered   = (density_t*)malloc(sizeof(density_t)*h);
-    utility->DensityMapPair.y.filtered   = (density_t*)malloc(sizeof(density_t)*w);
+    utility->DensityMapPair.x.background = (density_t*)malloc(sizeof(density_t)*height);
+    utility->DensityMapPair.y.background = (density_t*)malloc(sizeof(density_t)*width);
+    utility->DensityMapPair.x.filtered   = (density_t*)malloc(sizeof(density_t)*height);
+    utility->DensityMapPair.y.filtered   = (density_t*)malloc(sizeof(density_t)*width);
     
     /* Prediction Filters */
     for(uint8_t i = 0; i < MAX_TRACKING_FILTERS; i++)
@@ -225,7 +225,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
     utility->FilteredCoverage = 0;
     utility->TotalCoverage = 0;
     
-    /* Find max and update kalman */
+    r->NuBlobs = 0;
     
     index_t range[3] = { _.len, d->centroid, 0 };
     LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
@@ -233,7 +233,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
     DUAL_FILTER_CYCLE(cyc)
     {
         { /* Update Peak Filter - START */
-            RhoKalman.Step(&d->kalmans[cyc], r->PreviousPeak, 0. );
+            RhoKalman.Step(&d->kalmans[cyc], r->PreviousPeak[cyc], 0. );
             d->max[cyc] = _.cmax;
             _.fpeak = (index_t)d->kalmans[cyc].value;
             _.fpeak_2 = _.fpeak << 1;
@@ -304,8 +304,8 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                     } /* Detect blobs - END */
                     
                     { /* Calculate Chaos - START */
-                        _.pkp = (floating_t)r->PreviousPeak / (floating_t)_.cmax; // density percent
-                        _.denp = (floating_t)r->PreviousDensity / (floating_t)_.fden; // peak percent
+                        _.pkp = (floating_t)r->PreviousPeak[cyc] / (floating_t)_.cmax; // density percent
+                        _.denp = (floating_t)r->PreviousDensity[cyc] / (floating_t)_.fden; // peak percent
                         _.chaos = (density_t)( fabs( 1 - _.denp ) );
                         /* Assume no recalculations are needed */
                         recalculate = false;
@@ -382,8 +382,9 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
             } /* Analyze band - END */
         }
         r->NumBlobs = _.blbf;
-        r->PreviousPeak = _.cmax;
-        r->NuBlobs = _.denp * _.pkp * (floating_t)_.blbf;
+        r->PreviousPeak[cyc] = _.cmax;
+        r->NuBlobs += _.denp * _.pkp * (floating_t)_.blbf;
+        d->max[cyc] = _.cmax;
     }
 }
 
@@ -615,7 +616,7 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
 //            RhoPID
             RhoKalman.Step( &utility->TargetFilter, utility->FilteredPercentage, 0. );
             utility->TargetCoverageFactor = utility->TargetFilter.value;
-            LOG_RHO("*** COVERAGE TARGET IS %.3f ***\n", utility->target_coverage_factor);
+            LOG_RHO("*** COVERAGE TARGET IS %.3f ***\n", utility->TargetCoverageFactor);
             soft_tune_factor = 0.;
             break;
         case UNSTABLE_MANY:
@@ -633,8 +634,8 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     RhoPID.Update( &utility->ThreshFilter, proposed_thresh, utility->Thresh);
     utility->Thresh = (byte_t)BOUND(utility->ThreshFilter.Value, THRESH_MIN, THRESH_MAX);
     
-    LOG_RHO("*** THRESH IS %d ***\n", utility->thresh);
-    LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->coverage_factor, utility->variance_factor);
+    LOG_RHO("*** THRESH IS %d ***\n", utility->Thresh);
+    LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->CoverageFactor, utility->VarianceFactor);
     LOG_RHO("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 

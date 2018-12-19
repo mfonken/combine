@@ -27,14 +27,14 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     
-    RhoFunctions.Init(&utility);
+    RhoFunctions.Init(&utility, width, height);
     BayesianFunctions.Sys.Init( &utility.BayeSys );
     backgrounding_event = false;
     
     RhoInterrupts.FRAME_INIT();
 }
 
-void Rho::perform( cimage_t & img, GlobalPacket * p )
+void Rho::Perform( cimage_t & img, GlobalPacket * p )
 {
     pthread_mutex_lock(&c_mutex);
     pthread_mutex_lock(&density_map_pair_mutex);
