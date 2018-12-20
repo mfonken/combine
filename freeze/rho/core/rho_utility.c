@@ -27,7 +27,7 @@ static inline void CalculateBlobScore( blob_t *b, density_t total_density, byte_
 floating_t
     delta_d = ( (floating_t)b->den / (floating_t)total_density) - 0.5,
     delta_p = (floating_t)peak / (floating_t)b->max;
-    b->scr = ( delta_d * delta_d ) + ( delta_p * delta_p );
+    b->scr = _BLOB_SCORE_FACTOR*( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
 }
 
 static void printPacket( packet_t * p, int l )
@@ -104,6 +104,8 @@ static floating_t CalculateCentroid( density_t * map, index_t l, index_t * C, re
 
 void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
 {
+    size_t size;
+    
     memset(utility, 0, sizeof(rho_utility));
     
     /* Utility frame */
@@ -118,24 +120,31 @@ void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
     RhoKalman.Init(&utility->TargetFilter, utility->TargetCoverageFactor, RHO_TARGET_LS, RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU );
     
     /* Density Filters */
-    utility->DensityMapPair.x.map = (density_t*)malloc(sizeof(density_t)*height);
+    size = sizeof(density_t)*height;
+    utility->DensityMapPair.x.map = (density_t*)malloc(size);
+    utility->DensityMapPair.x.background = (density_t*)malloc(size);
+    utility->DensityMapPair.x.filtered = (density_t*)malloc(size);
+    memset(utility->DensityMapPair.x.map, 0, size);
+    memset(utility->DensityMapPair.x.background, 0, size);
+    memset(utility->DensityMapPair.x.filtered, 0, size);
     utility->DensityMapPair.x.length = height;
     utility->DensityMapPair.x.max[0] = 0;
     utility->DensityMapPair.x.max[1] = 0;
     RhoKalman.Init(&utility->DensityMapPair.x.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     RhoKalman.Init(&utility->DensityMapPair.x.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     
-    utility->DensityMapPair.y.map = (density_t*)malloc(sizeof(density_t)*width);
+    size = sizeof(density_t)*width;
+    utility->DensityMapPair.y.map = (density_t*)malloc(size);
+    utility->DensityMapPair.y.background = (density_t*)malloc(size);
+    utility->DensityMapPair.y.filtered = (density_t*)malloc(size);
+    memset(utility->DensityMapPair.y.map, 0, size);
+    memset(utility->DensityMapPair.y.background, 0, size);
+    memset(utility->DensityMapPair.y.filtered, 0, size);
     utility->DensityMapPair.y.length = width;
     utility->DensityMapPair.y.max[0] = 0;
     utility->DensityMapPair.y.max[1] = 0;
     RhoKalman.Init(&utility->DensityMapPair.y.kalmans[0], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
     RhoKalman.Init(&utility->DensityMapPair.y.kalmans[1], 0, RHO_DEFAULT_LS, RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU);
-    
-    utility->DensityMapPair.x.background = (density_t*)malloc(sizeof(density_t)*height);
-    utility->DensityMapPair.y.background = (density_t*)malloc(sizeof(density_t)*width);
-    utility->DensityMapPair.x.filtered   = (density_t*)malloc(sizeof(density_t)*height);
-    utility->DensityMapPair.y.filtered   = (density_t*)malloc(sizeof(density_t)*width);
     
     /* Prediction Filters */
     for(uint8_t i = 0; i < MAX_TRACKING_FILTERS; i++)
@@ -228,141 +237,164 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
     r->NuBlobs = 0;
     
     index_t range[3] = { _.len, d->centroid, 0 };
-    LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
+    //LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
+    
+    for(uint8_t i = 0; i < MAX_BLOBS; i++)
+    {
+        memset(&r->Blobs[i], 0, sizeof(blob_t));
+        r->BlobsOrder[i] = MAX_BLOBS;
+    }
     
     DUAL_FILTER_CYCLE(cyc)
     {
         { /* Update Peak Filter - START */
             RhoKalman.Step(&d->kalmans[cyc], r->PreviousPeak[cyc], 0. );
-            d->max[cyc] = _.cmax;
+            d->max[cyc] = r->PreviousPeak[cyc];
             _.fpeak = (index_t)d->kalmans[cyc].value;
             _.fpeak_2 = _.fpeak << 1;
             _.fvar = (index_t)RHO_VARIANCE( d->kalmans[cyc].K[0] );
             d->kalmans[cyc].variance = _.fvar;
         } /* Update Peak Filter - END */
         
-        LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
+        //LOG_RHO("Variance %d\n", _.fvar);
         
         { /* Analyze band - START */
-            if( _.fvar > 0 && _.fpeak > _.fvar )
+            if( _.fvar > 0 && (_.fpeak == 0 || _.fpeak > _.fvar ))
             {
-                _.fbandl = _.fpeak - _.fvar;
+                if(_.fpeak > _.fvar)
+                    _.fbandl = _.fpeak - _.fvar;
+                else
+                    _.fbandl = 0;
                 index_t start = range[cyc], end = range[cyc_];
                 
                 bool recalculate = false;
                 do
                 {
                     { /* Detect blobs - START */
-                        /* Find blob centroids and sort out the top two */
                         BOUNDED_CYCLE_DUAL(start, end, x, _.c1, d->map, _.b, d->background)
                         {
                             _.c1 = abs( (int)_.c1 - (int)_.b );
-                            if( _.c1 > _.cmax )  _.cmax = _.c1;
-                            
+                            if( _.c1 > _.cmax )
+                                _.cmax = _.c1;
+
                             /* Punish values above the filter peak */
                             if( _.c1 > _.fpeak_2 ) _.c1 = _.fpeak_2 - _.c1;
-                            
+
                             /* Check if CMA value is in band */
                             if( _.c1 > _.fbandl )
                             {
                                 /* De-offset valid values */
                                 _.c2 = _.c1 - _.fbandl;
-                                
+
                                 /* Process new values into blob */
                                 cma_M0_M1((floating_t)_.c2, (floating_t)x, &_.cavg, &_.mavg, &_.avgc);
-                                
+
                                 /* Update max */
                                 if(_.c2 > _.cmax) _.cmax = _.c2;
-                                
+
                                 _.width++;
-                                
+
                                 /* Reset flag and counter */
                                 _.has = 1; _.gapc = 0;
                             }
-                            
+
                             /* Process completed blobs and increment count */
-                            else if( !(_.width = 0) && ++_.gapc > RHO_GAP_MAX && _.has )
+                            else if( ++_.gapc > RHO_GAP_MAX && _.has )
                             {
                                 /* Get latest blob centroid */
                                 _.cden = (density_2d_t)_.cavg;
                                 _.fden += _.cden;
-                                
+
                                 /* Check if new blob is dense enough to be saved */
-                                if( r->Blobs[_.blbi].den > MIN_BLOB_DENSITY)
+                                if( _.cden > MIN_BLOB_DENSITY)
                                 {
                                     /* Create new blob at secondary */
                                     index_t loc = (index_t)ZDIV(_.mavg,_.cavg);
-                                    r->Blobs[_.blbf++] = (blob_t){ d->map[loc], _.cden, loc, _.width };
-                                    if(_.resc) r->BlobsOrder[_.blbi] = 0;
+                                    r->Blobs[_.blbf] = (blob_t){ d->map[loc], _.cden, loc, _.width };
+                                    r->BlobsOrder[_.blbf] = _.blbf;
+                                    _.blbf++;
                                 }
-                                
+
                                 /* Reset variables */
                                 _.mavg = 0.; _.cavg = 0.; _.avgc = 0.;
                                 _.has = 0; _.gapc = 0;
+                            }
+                            
+                            else if (!_.has)
+                            {
+                                _.width = 0;
                             }
                         }
                     } /* Detect blobs - END */
                     
                     { /* Calculate Chaos - START */
                         _.pkp = (floating_t)r->PreviousPeak[cyc] / (floating_t)_.cmax; // density percent
-                        _.denp = (floating_t)r->PreviousDensity[cyc] / (floating_t)_.fden; // peak percent
-                        _.chaos = (density_t)( fabs( 1 - _.denp ) );
+                        _.chaos = (floating_t)r->PreviousDensity[cyc] / (floating_t)_.fden; // peak percent
+//                        _.chaos = _.denp;
                         /* Assume no recalculations are needed */
                         recalculate = false;
                     } /* Calculate Chaos - END */
+                    
+                    LOG_RHO("Chaos: %f\n", _.chaos);
+                    
                     { /* Score blobs - START */
                         /* Return on empty frames */
-                        if(_.fden == 0) return;
-                        
-                        /* Cycle blobs */
-                        for(uint8_t i = 0; i < _.blbf; i++)
+                        if(_.fden > 0 )
                         {
-                            /* Get blob at index from order array and check validity */
-                            uint8_t j = r->BlobsOrder[i];
-                            if(j == MAX_BLOBS) continue;
-                            blob_t curr = r->Blobs[j];
-                            
-                            /* Score current blob */
-                            CalculateBlobScore(&curr, _.fden, _.cmax);
-                            
-                            /* Recalculate blobs with chaos */
-                            if(curr.scr > _.chaos)
+                            /* Cycle blobs */
+                            for(uint8_t i = 0; i < _.blbf; i++)
                             {
-                                /* Recalculate around chaotic blob */
-                                recalculate = true;
-                                
-                                /* Remove this index */
-                                r->BlobsOrder[i] = MAX_BLOBS;
-                                
-                                /* Get centroid peak */
-                                sdensity_t cpeak = (sdensity_t)d->map[curr.loc];
-                                
-                                /* Raise lower band half of blob centroid to band center when below */
-                                if( cpeak < _.fpeak)
-                                    _.fbandl += abs( (sdensity_t)_.fpeak - cpeak) >> 1;
-                                /* Otherwise raise to centroid peak */
-                                else
-                                    _.fbandl = cpeak;
-                                
-                                /* Recalculate cycle width */
-                                index_t w_2 = curr.wth >> 1;
-                                if(curr.loc > w_2)
-                                    start = curr.loc - w_2;
-                                else start = 0;
-                                if(curr.loc + w_2 < range[cyc_])
-                                    end = curr.loc + w_2;
-                                else end = range[cyc_];
+                                /* Get blob at index from order array and check validity */
+                                uint8_t j = r->BlobsOrder[i];
+                                if(j >= MAX_BLOBS)
+                                    continue;
+                                blob_t * curr = &r->Blobs[j];
+
+                                /* Score current blob */
+                                CalculateBlobScore(curr, _.fden, _.cmax);
+
+                                /* Recalculate blobs with chaos */
+                                if(curr->scr > _.chaos)
+                                {
+                                    /* Recalculate around chaotic blob */
+                                    recalculate = true;
+
+                                    /* Remove this index */
+                                    r->BlobsOrder[i] = MAX_BLOBS+1;
+
+                                    /* Get centroid peak */
+                                    sdensity_t cpeak = (sdensity_t)d->map[curr->loc];
+                                    _.fpeak_2 = cpeak << 1;
+                                    /* Raise lower band half of blob centroid to band center when below */
+                                    if( cpeak < _.fpeak)
+                                    {
+                                        _.fbandl += abs( (sdensity_t)_.fpeak - cpeak) >> 1;
+                                    }
+                                    /* Otherwise raise to centroid peak */
+                                    else
+                                        _.fbandl = cpeak;
+
+                                    /* Recalculate cycle width */
+                                    index_t w_2 = curr->wth >> 1;
+                                    if(curr->loc - w_2 > range[cyc_])
+                                        end = curr->loc - w_2;
+                                    else end = range[cyc_];
+                                    if(curr->loc + w_2 < range[cyc])
+                                        start = curr->loc + w_2;
+                                    else start = range[cyc];
+                                    break;
+                                }
                             }
                         }
                     } /* Score blobs - END */
                 } while( recalculate );
                 { /* Sort blobs - START */
                     uint8_t num_poor = 0;
-                    for(uint8_t i = 0, j = 0; i < _.blbf; i++)
+                    for(uint8_t i = 0, j = i; i < _.blbf; i++)
                     {
-                        for(j = 0; j < _.blbf && r->Blobs[j].srt; j++);
-                        floating_t min = r->Blobs[i].scr;
-                        for(uint8_t k = 0; k < _.blbf; k++)
+                        for(;j < _.blbf && r->Blobs[j].srt;j++);
+                        floating_t min = r->Blobs[j].scr;
+                        for( uint8_t k = j+1; k < _.blbf; k++ )
                         {
                             blob_t *curr = &r->Blobs[k];
                             if( curr->scr < min && !curr->srt )
@@ -372,17 +404,22 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                                 j = k;
                             }
                         }
-                        if(r->Blobs[j].scr > MIN_BLOB_SCORE)
+                        if( min == r->Blobs[j].scr )
+                            r->Blobs[j].srt = 1;
+                        if( r->Blobs[j].scr > MIN_BLOB_SCORE )
                             r->BlobsOrder[i-num_poor] = j;
                         else num_poor++;
                     }
                     /* Remove all unused blobs order indeces */
-                    for(uint8_t i = _.blbf-num_poor; i < MAX_BLOBS; i++) r->BlobsOrder[i] = -1;
+                    for(uint8_t i = _.blbf-num_poor; i < MAX_BLOBS; i++) r->BlobsOrder[i] = MAX_BLOBS;
                 } /* Sort blobs - END */
             } /* Analyze band - END */
         }
+        
+         //LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
         r->NumBlobs = _.blbf;
         r->PreviousPeak[cyc] = _.cmax;
+        r->PreviousDensity[cyc] = _.fden;
         r->NuBlobs += _.denp * _.pkp * (floating_t)_.blbf;
         d->max[cyc] = _.cmax;
     }
@@ -392,13 +429,12 @@ void GenerateRhoUtilityBackground( rho_utility * utility )
 {
     floating_t xt = CalculateCentroid( utility->DensityMapPair.x.background, utility->DensityMapPair.x.length, &utility->Bx, BACKGROUND_CENTROID_CALC_THRESH );
     floating_t yt = CalculateCentroid( utility->DensityMapPair.y.background, utility->DensityMapPair.y.length, &utility->By, BACKGROUND_CENTROID_CALC_THRESH );
-    LOG_RHO("^^^Total X density is %.2f & Total Y density is %.2f^^^\n", xt, yt);
     utility->QbT = MAX(xt, yt);
 }
 
 void RedistributeRhoUtilityDensities( rho_utility * utility )
 {
-    LOG_RHO("Rho: Redistributing densities.\n");
+    //LOG_RHO("Rho: Redistributing densities.\n");
     redistribution_variables _ =
     {
         { utility->Bx, abs(utility->Cx-utility->Bx), utility->Width - utility->Cx  },
@@ -441,9 +477,9 @@ void RedistributeRhoUtilityDensities( rho_utility * utility )
 
 void FilterAndSelectRhoUtilityPairs( rho_utility * utility )
 {
-    LOG_RHO("X Map:\n");
+    //LOG_RHO("X Map:\n");
     RhoFunctions.FilterAndSelect( utility, &utility->DensityMapPair.x, &utility->PredictionPair.x );
-    LOG_RHO("Y Map:\n");
+    //LOG_RHO("Y Map:\n");
     RhoFunctions.FilterAndSelect( utility, &utility->DensityMapPair.y, &utility->PredictionPair.y );
 }
 
@@ -544,21 +580,21 @@ void UpdateRhoUtilityPredictions( rho_utility * utility )
 //        _.x = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
 //        if( fabs( _.x - _.Ax ) > fabs( _.x - _.Bx ) ) iswap( &_.Ax, &_.Bx );
         _.non_diag = true;
-        LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
+        //LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
     }
     if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* ! Y ambiguous */
     {
 //        _.y = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
 //        if( fabs( _.y - _.Ay ) > fabs( _.y -_. By ) ) iswap( &_.Ay, &_.By );
         _.non_diag = true;
-        LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
+        //LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
     }
     if ( !_.non_diag )
     {
         RhoFunctions.RedistributeDensities( utility );
         _.qcheck = (  utility->Qf[0] > utility->Qf[1] ) + ( utility->Qf[2] < utility->Qf[3] ) - 1;
         if( ( _.Ax > _.Bx ) ^ ( ( _.qcheck > 0 ) ^ ( _.Ay < _.By ) ) ) iswap(&_.Ax, &_.Bx);
-        LOG_RHO("Quadrant Check %d\n", _.qcheck);
+        //LOG_RHO("Quadrant Check %d\n", _.qcheck);
     }
     
     _.Cx = (index_t)(_.Ax + _.Bx) >> 1;
@@ -569,7 +605,7 @@ void UpdateRhoUtilityPredictions( rho_utility * utility )
     
     utility->Cx = _.Cx;
     utility->Cy = _.Cy;
-    LOG_RHO("Cx>%d | Cy>%d\n", _.Cx, _.Cy);
+    //LOG_RHO("Cx>%d | Cy>%d\n", _.Cx, _.Cy);
     utility->DensityMapPair.x.centroid = _.Cy;
     utility->DensityMapPair.y.centroid = _.Cx;
 
@@ -616,7 +652,7 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
 //            RhoPID
             RhoKalman.Step( &utility->TargetFilter, utility->FilteredPercentage, 0. );
             utility->TargetCoverageFactor = utility->TargetFilter.value;
-            LOG_RHO("*** COVERAGE TARGET IS %.3f ***\n", utility->TargetCoverageFactor);
+            //LOG_RHO("*** COVERAGE TARGET IS %.3f ***\n", utility->TargetCoverageFactor);
             soft_tune_factor = 0.;
             break;
         case UNSTABLE_MANY:
@@ -634,9 +670,9 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     RhoPID.Update( &utility->ThreshFilter, proposed_thresh, utility->Thresh);
     utility->Thresh = (byte_t)BOUND(utility->ThreshFilter.Value, THRESH_MIN, THRESH_MAX);
     
-    LOG_RHO("*** THRESH IS %d ***\n", utility->Thresh);
-    LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->CoverageFactor, utility->VarianceFactor);
-    LOG_RHO("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
+    //LOG_RHO("*** THRESH IS %d ***\n", utility->Thresh);
+    //LOG_RHO("Hard factor is %.3f & soft factor is %.3f [c%.3f|v%.3f]\n", hard_tune_factor, soft_tune_factor, utility->CoverageFactor, utility->VarianceFactor);
+    //LOG_RHO("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 
 void GenerateRhoUtilityPacket( rho_utility * utility )
@@ -704,11 +740,11 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
 //utility->CoverageFactor        = _.cfac;
 //utility->VarianceFactor        = _.vfac;
 //
-//LOG_RHO("%.3f[cf] %.3f[vf] %.3f%%[fc] %.3f%%[tc] | %.3f[tf]\n", _.cfac, _.vfac, _.fcov*100, utility->target_coverage_factor*100, _.fdn_*_.tdnf );
-//LOG_RHO("Rho: pri-%.3f sec-%.3f alt-%.3f abs-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate, r->probabilities.absence);
-//LOG_RHO("* %.3f%% ( %d / %d )\n", _.fcov*100, _.fden, _.tden);
-//LOG_RHO("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.blobs[0].loc, _.blobs[0].den, _.blobs[0].max, _.blobs[1].loc, _.blobs[1].den, _.blobs[1].max);
-//LOG_RHO("Normalized total probability: %.3f\n", r->probabilities.primary + r->probabilities.secondary + r->probabilities.alternate + r->probabilities.absence );
+////LOG_RHO("%.3f[cf] %.3f[vf] %.3f%%[fc] %.3f%%[tc] | %.3f[tf]\n", _.cfac, _.vfac, _.fcov*100, utility->target_coverage_factor*100, _.fdn_*_.tdnf );
+////LOG_RHO("Rho: pri-%.3f sec-%.3f alt-%.3f abs-%.3f\n", r->probabilities.primary, r->probabilities.secondary, r->probabilities.alternate, r->probabilities.absence);
+////LOG_RHO("* %.3f%% ( %d / %d )\n", _.fcov*100, _.fden, _.tden);
+////LOG_RHO("Blobs: [0](%d,%d,%d) | [1](%d,%d,%d)\n", _.blobs[0].loc, _.blobs[0].den, _.blobs[0].max, _.blobs[1].loc, _.blobs[1].den, _.blobs[1].max);
+////LOG_RHO("Normalized total probability: %.3f\n", r->probabilities.primary + r->probabilities.secondary + r->probabilities.alternate + r->probabilities.absence );
 
 // OLD PREDICTION/KALMAN MATCH LOGIC
 //prediction_update_variables _ =
@@ -729,14 +765,14 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
 //    _.x = utility->PredictionPair.x.primary.value + utility->PredictionPair.x.primary.velocity;
 //    if( fabs( _.x - _.Ax ) > fabs( _.x - _.Bx ) ) iswap( &_.Ax, &_.Bx );
 //        _.non_diag = true;
-//        LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
+//        //LOG_RHO("X Ambiguous (%d < %d > %d)\n", _.Ax, _.Cx, _.Bx);
 //        }
 //if( ( _.Ay < _.Cy ) ^ ( _.By > _.Cy ) ) /* ! Y ambiguous */
 //{
 //    _.y = utility->PredictionPair.y.primary.value + utility->PredictionPair.y.primary.velocity;
 //    if( fabs( _.y - _.Ay ) > fabs( _.y -_. By ) ) iswap( &_.Ay, &_.By );
 //        _.non_diag = true;
-//        LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
+//        //LOG_RHO("Y Ambiguous (%d < %d > %d)\n", _.Ay, _.Cy, _.By);
 //        }
 //if ( !_.non_diag )
 //{
@@ -744,7 +780,7 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
 //    RhoFunctions.RedistributeDensities( utility );
 //    _.qcheck = (  utility->Qf[0] > utility->Qf[1] ) + ( utility->Qf[2] < utility->Qf[3] ) - 1;
 //    if( ( _.Ax > _.Bx ) ^ ( ( _.qcheck > 0 ) ^ ( _.Ay < _.By ) ) ) iswap(&_.Ax, &_.Bx);
-//        LOG_RHO("Quadrant Check %d\n", _.qcheck);
+//        //LOG_RHO("Quadrant Check %d\n", _.qcheck);
 //        }
 //
 //if( _.Ax ) RhoKalman.Step( &utility->PredictionPair.x.primary,   _.Ax, 0. );
@@ -760,7 +796,7 @@ void GenerateRhoUtilityPacket( rho_utility * utility )
 //
 //utility->Cx = _.Cx;
 //utility->Cy = _.Cy;
-//LOG_RHO("Cx>%d | Cy>%d\n", _.Cx, _.Cy);
+////LOG_RHO("Cx>%d | Cy>%d\n", _.Cx, _.Cy);
 //utility->DensityMapPair.x.centroid = _.Cy;
 //utility->DensityMapPair.y.centroid = _.Cx;
 //
