@@ -27,7 +27,7 @@ static inline void CalculateBlobScore( blob_t *b, density_t total_density, byte_
 floating_t
     delta_d = ( (floating_t)b->den / (floating_t)total_density) - 0.5,
     delta_p = (floating_t)peak / (floating_t)b->max;
-    b->scr = _BLOB_SCORE_FACTOR*( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
+    b->scr = BLOB_SCORE_FACTOR*( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
 }
 
 static void printPacket( packet_t * p, int l )
@@ -150,7 +150,7 @@ void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
     for(uint8_t i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
         RhoKalman.Init(&utility->PredictionPair.x.TrackingFilters[i], 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
-        RhoKalman.Init(&utility->PredictionPair.x.TrackingFilters[i], 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
+        RhoKalman.Init(&utility->PredictionPair.y.TrackingFilters[i], 0., RHO_PREDICTION_LS, RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU);
         utility->PredictionPair.x.TrackingFiltersOrder[i] = i;
         utility->PredictionPair.y.TrackingFiltersOrder[i] = i;
     }
@@ -259,15 +259,14 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
         //LOG_RHO("Variance %d\n", _.fvar);
         
         { /* Analyze band - START */
-            if( _.fvar > 0 && (_.fpeak == 0 || _.fpeak > _.fvar ))
+//            if( _.fvar > 0 && (_.fpeak == 0 || _.fpeak > _.fvar ))
             {
                 if(_.fpeak > _.fvar)
                     _.fbandl = _.fpeak - _.fvar;
                 else
                     _.fbandl = 0;
                 index_t start = range[cyc], end = range[cyc_];
-                
-                bool recalculate = false;
+
                 do
                 {
                     { /* Detect blobs - START */
@@ -332,10 +331,10 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                         _.chaos = (floating_t)r->PreviousDensity[cyc] / (floating_t)_.fden; // peak percent
 //                        _.chaos = _.denp;
                         /* Assume no recalculations are needed */
-                        recalculate = false;
+                        _.rcal = false;
                     } /* Calculate Chaos - END */
                     
-                    LOG_RHO("Chaos: %f\n", _.chaos);
+                    LOG_RHO("Chaos: %.3f(%d/%d)\n", _.chaos, r->PreviousDensity[cyc], _.fden);
                     
                     { /* Score blobs - START */
                         /* Return on empty frames */
@@ -357,7 +356,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                                 if(curr->scr > _.chaos)
                                 {
                                     /* Recalculate around chaotic blob */
-                                    recalculate = true;
+                                    _.rcal = true;
 
                                     /* Remove this index */
                                     r->BlobsOrder[i] = MAX_BLOBS+1;
@@ -387,7 +386,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                             }
                         }
                     } /* Score blobs - END */
-                } while( recalculate );
+                } while( _.rcal && ++_.rcal_c < MAX_RHO_RECALCULATION_LEVEL );
                 { /* Sort blobs - START */
                     uint8_t num_poor = 0;
                     for(uint8_t i = 0, j = i; i < _.blbf; i++)
@@ -420,7 +419,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
         r->NumBlobs = _.blbf;
         r->PreviousPeak[cyc] = _.cmax;
         r->PreviousDensity[cyc] = _.fden;
-        r->NuBlobs += _.denp * _.pkp * (floating_t)_.blbf;
+        r->NuBlobs += _.chaos * _.pkp * (floating_t)_.blbf;
         d->max[cyc] = _.cmax;
     }
 }
@@ -491,7 +490,7 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
     for( valid_tracks = 0; valid_tracks < MAX_TRACKING_FILTERS; valid_tracks++ )
     {
         uint8_t index = r->TrackingFiltersOrder[valid_tracks];
-        rho_kalman_t *curr = &r->TrackingFilters[index];
+        rho_kalman_t *curr = &(r->TrackingFilters[index]);
         if(RhoKalman.IsExpired(curr)) break;
         RhoKalman.Predict(curr, 0.);
     }
@@ -537,7 +536,6 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
         i = k;
         for( uint8_t l = 0; l < valid_tracks; l++ )
         {
-            if(k == l) continue;
             curr = RhoKalman.Score(&r->TrackingFilters[l]);
             if( curr > max )
             {
@@ -545,6 +543,7 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
                 i = l;
             }
         }
+        r->TrackingFilters[i].flag = 1;
         r->TrackingFiltersOrder[k] = i;
     }
     for( ; k < r->NumBlobs && k < MAX_TRACKING_FILTERS; k++ )
@@ -642,6 +641,12 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
             soft_tune_factor *= 2;
         case UNSTABLE_SINGLE:
             soft_tune_factor *= utility->VarianceFactor;
+            
+            utility->DensityMapPair.x.kalmans[0].value = utility->PredictionPair.x.PreviousPeak[0];
+            utility->DensityMapPair.x.kalmans[1].value = utility->PredictionPair.x.PreviousPeak[1];
+            utility->DensityMapPair.y.kalmans[0].value = utility->PredictionPair.y.PreviousPeak[0];
+            utility->DensityMapPair.y.kalmans[1].value = utility->PredictionPair.y.PreviousPeak[1];
+            
             break;
         case STABLE_NONE:
             soft_tune_factor *= 2;

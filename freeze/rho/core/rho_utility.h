@@ -116,7 +116,8 @@ extern "C" {
         c1,
         c2,
         b,
-        p;
+        p,
+        rcal_c; /* Recalculation counter */
         variance_t
         fvar;
         density_2d_t
@@ -128,7 +129,8 @@ extern "C" {
         bool
         has,
         sel,
-        resc; /* Rescore */
+        resc, /* Rescore */
+        rcal; /* Recalculate */
         floating_t
         avgc,
         fcov,   /* Filtered coverage ratio */

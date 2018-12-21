@@ -16,6 +16,7 @@ void InitRhoKalman( rho_kalman_t * k, kfl_t v, kfl_t ls, kfl_t vu, kfl_t bu, kfl
     k->prev        = 0;
     k->velocity    = 0;
     k->variance    = 0;
+    k->flag        = 0;
     
     k->lifespan    = ls;
     k->uncertainty.value   = vu;
@@ -63,21 +64,27 @@ void UpdateRhoKalman( rho_kalman_t * k, kfl_t value_new )
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
     k->timestamp  = timestamp();
+    
+    k->flag = 0;
 };
 
 void StepRhoKalman( rho_kalman_t * k, kfl_t value_new, kfl_t rate_new )
 {
+    k->value = value_new;
+    k->K[0] = 0.1;
+    return;
     PredictRhoKalman(k, rate_new);
     UpdateRhoKalman(k, value_new);
 }
 
 bool IsRhoKalmanExpired( rho_kalman_t * k )
 {
-    return ((timestamp() - k->timestamp) > k->lifespan);
+    return false;//((timestamp() - k->timestamp) > k->lifespan);
 }
 
 inline kfl_t ScoreRhoKalman( rho_kalman_t * k )
 {
+    if(k->flag) return 0;
     return k->K[0];
 }
 

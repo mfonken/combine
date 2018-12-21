@@ -40,6 +40,8 @@ extern "C" {
         timestamp;
         rho_kalman_uncertainty_c
         uncertainty;
+        bool
+        flag;
     } rho_kalman_t;
     
 //    kfl_t timestamp(void);
