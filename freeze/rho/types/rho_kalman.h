@@ -7,27 +7,27 @@
 #include "timestamp.h"
 //#include <sys/time.h>
 
-#define KALMAN_PUNISH_FACTOR  0.5
+#define KALMAN_PUNISH_FACTOR  0.2
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
     /* Standard headers */
-    typedef double kfl_t;
+//    typedef double floating_t;
     
     /** Kalman Uncertainties */
     typedef struct
     {
-        kfl_t value;
-        kfl_t bias;
-        kfl_t sensor;
+        floating_t value;
+        floating_t bias;
+        floating_t sensor;
     } rho_kalman_uncertainty_c;
     
     /** Kalman structure */
     typedef struct
     {
-        kfl_t
+        floating_t
         K[2],
         P[2][2],
         rate,
@@ -42,24 +42,27 @@ extern "C" {
         uncertainty;
         bool
         flag;
+        index_t
+        min_value,
+        max_value;
     } rho_kalman_t;
     
-//    kfl_t timestamp(void);
-    void InitRhoKalman( rho_kalman_t * k, kfl_t v, kfl_t ls, kfl_t vu, kfl_t bu, kfl_t su );
-    void PredictRhoKalman( rho_kalman_t * k, kfl_t rate_new );
-    void UpdateRhoKalman( rho_kalman_t * k, kfl_t value_new );
-    void StepRhoKalman( rho_kalman_t * k, kfl_t value_new, kfl_t rate_new );
+//    floating_t timestamp(void);
+    void InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv );
+    void PredictRhoKalman( rho_kalman_t * k, floating_t rate_new );
+    void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new );
+    floating_t StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rate_new );
     bool IsRhoKalmanExpired( rho_kalman_t * k );
-    kfl_t ScoreRhoKalman( rho_kalman_t * k );
+    floating_t ScoreRhoKalman( rho_kalman_t * k );
     void PunishRhoKalman( rho_kalman_t * k );
     
     struct rho_kalman {
-        void (*Init)( rho_kalman_t *, kfl_t, kfl_t, kfl_t, kfl_t, kfl_t );
-        void (*Step)( rho_kalman_t * k, kfl_t, kfl_t );
-        void (*Predict)( rho_kalman_t * k, kfl_t );
-        void (*Update)( rho_kalman_t *, kfl_t );
+        void (*Init)( rho_kalman_t *, floating_t, floating_t, floating_t, floating_t, floating_t, index_t, index_t );
+        floating_t (*Step)( rho_kalman_t * k, floating_t, floating_t );
+        void (*Predict)( rho_kalman_t * k, floating_t );
+        void (*Update)( rho_kalman_t *, floating_t );
         bool (*IsExpired)( rho_kalman_t * );
-        kfl_t (*Score)( rho_kalman_t * );
+        floating_t (*Score)( rho_kalman_t * );
         void (*Punish)( rho_kalman_t * );
     };
     

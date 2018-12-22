@@ -102,14 +102,7 @@ void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
 {
     reset_loop_variables( &_, NUM_STATES );
     state_t next = sys->state;
-
-    bool ch[NUM_STATE_GROUPS] = { 0 };
-    for(uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
-    {
-        ch[i] = p->Probabilities.P[i] > PROBABILITY_TUNING_THRESHOLD;
-    }
-    
-    floating_t out[NUM_STATE_GROUPS] = { 0. };
+  
     /* Find most probable next state */
     for( ; _.i < _.l; _.i++ )
     {
@@ -122,19 +115,8 @@ void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
     }
     /* Only update sys->next state on change */
     if( next != sys->state ) sys->next = next;
-    LOG_STATEM("\n###### Current state is %s. ######\n\n", stateString((state_dimension_t)sys->state));
-    LOG_STATEM("Next state is %s(%.2f).\n", stateString((state_dimension_t)sys->next), _.u);
-    _.l = ch[1] + ch[2] + ch[3];
-    sys->selection_index = _.l;
-    for( _.i = 0; _.i <= _.l; _.i++)
-    {
-        _.u = p->Probabilities.P[_.i];
-        _.v = (floating_t)DOUBT(_.i, sys->state);
-        out[_.i] = _.u * _.v;
-        LOG_STATEM("Punishing prob[%d]-%.3f by a factor of %.3f for a result of %.3f\n", _.i, _.u, _.v, out[_.i]);
-    }
     
-    BayesianFunctions.Sys.UpdateProbabilities( sys, out );
+    BayesianFunctions.Sys.UpdateProbabilities( sys, p->Probabilities.P );
     BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
     BayesianFunctions.Sys.UpdateState( sys );
     PrintBayesianMap( &sys->probabilities, sys->state );
@@ -147,7 +129,7 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
     int8_t            k = -1;
     
 #ifdef STATEM_DEBUG
-    for( _.i = 0; _.i < 4; _.i++)
+    for( _.i = 0; _.i < NUM_STATE_GROUPS; _.i++)
         if( p[_.i] > 10 )
             printf("!\n");
     printf("Probabilies are [0]%.2f [1]%.2f [2]%.2f [3]%.2f.\n", p[0], p[1], p[2], p[3]);
@@ -155,7 +137,7 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
     if(!isStable(c)) printf("not ");
         printf("stable.\n");
 #endif
-    for( _.i = 0; _.i < 4; _.i++ )
+    for( _.i = 0; _.i < NUM_STATE_GROUPS; _.i++ )
     {
         _.j = x - _.i;
         if(!isStable(c))

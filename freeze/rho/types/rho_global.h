@@ -42,6 +42,8 @@ typedef volatile bool   flag_t;
 #define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
 
 #define MAX(A,B)        ((A>B)?A:B)
+
+#define SWAP(A,B)      ({typeof(A) temp = A; A = B; B = temp;})
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
