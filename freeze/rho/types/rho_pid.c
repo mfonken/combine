@@ -27,7 +27,7 @@ void RhoPIDInit( rho_pid_t * PID, rho_pid_gain_t * K )
     }
 }
 
-void RhoPIDUpdate( rho_pid_t * PID, pidfl_t actual, pidfl_t target )
+void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
 {
     PID->Error = actual - target;
     

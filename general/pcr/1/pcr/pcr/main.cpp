@@ -49,8 +49,8 @@ int main( int argc, const char * argv[] )
                 env.start();
                 sleep(10);
                 env.pause();
-                printf("%d\n", tau.count);
-//                printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
+//                printf("%d\n", tau.count);
+                printf("Tau averaged %fms for %d iterations\n", tau.avg*1000, tau.count);
                 break;
         }
     }

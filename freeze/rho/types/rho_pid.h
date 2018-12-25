@@ -11,8 +11,9 @@
 
 #include <string.h>
 #include "rho_global.h"
+#include "timestamp.h"
 
-typedef double pidfl_t;
+//typedef double floating_t;
 
 #define DEFAULT_PROPORTIONAL_FACTOR 0.6
 #define DEFAULT_INTEGRAL_FACTOR     2
@@ -21,13 +22,14 @@ typedef double pidfl_t;
 
 typedef struct
 {
-    pidfl_t Kp, Ki, Kd, Ku, Pu;
+    floating_t Kp, Ki, Kd, Ku, Pu;
 } rho_pid_gain_t;
 
 typedef struct
 {
-    rho_pid_gain_t Gain;
-pidfl_t
+rho_pid_gain_t
+    Gain;
+floating_t
     Pv,
     Iv,
     Dv,
@@ -46,11 +48,11 @@ pidfl_t
 typedef struct
 {
     void (*Init)( rho_pid_t *, rho_pid_gain_t * );
-    void (*Update)( rho_pid_t *, pidfl_t, pidfl_t );
+    void (*Update)( rho_pid_t *, floating_t, floating_t );
 } rho_pid_functions;
 
 void RhoPIDInit( rho_pid_t *, rho_pid_gain_t * );
-void RhoPIDUpdate( rho_pid_t *, pidfl_t, pidfl_t );
+void RhoPIDUpdate( rho_pid_t *, floating_t, floating_t );
 
 extern const rho_pid_functions RhoPID;
 

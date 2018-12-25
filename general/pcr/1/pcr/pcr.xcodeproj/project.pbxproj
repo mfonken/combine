@@ -249,8 +249,8 @@
 			children = (
 				34D3118E21C61FA2000C1D0C /* rho_global.h */,
 				34D3118D21C61FA2000C1D0C /* rho_types.h */,
-				34D3118C21C61FA2000C1D0C /* rho_pid.c */,
 				34D3119021C61FA2000C1D0C /* rho_pid.h */,
+				34D3118C21C61FA2000C1D0C /* rho_pid.c */,
 				34D3118F21C61FA2000C1D0C /* rho_kalman.h */,
 				34D3119121C61FA2000C1D0C /* rho_kalman.c */,
 			);

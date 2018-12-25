@@ -4,6 +4,21 @@
 
 void InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv )
 {
+    k->lifespan    = ls;
+    k->uncertainty.value   = vu;
+    k->uncertainty.bias    = bu;
+    k->uncertainty.sensor  = su;
+    
+    k->origin    = timestamp();
+    
+    k->min_value = minv;
+    k->max_value = maxv;
+    
+    ResetRhoKalman(k, v);
+}
+
+void ResetRhoKalman( rho_kalman_t * k, floating_t v )
+{
     k->K[0]        = 0;
     k->K[1]        = 0;
     k->P[0][0]     = 0;
@@ -17,14 +32,8 @@ void InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu
     k->velocity    = 0;
     k->variance    = 0;
     k->flag        = 0;
-    
-    k->lifespan    = ls;
-    k->uncertainty.value   = vu;
-    k->uncertainty.bias    = bu;
-    k->uncertainty.sensor  = su;
-    
-    k->min_value = minv;
-    k->max_value = maxv;
+    k->score       = 0;
+    k->origin      = timestamp();
 }
 
 void PredictRhoKalman( rho_kalman_t * k, floating_t rate_new )
@@ -51,6 +60,8 @@ void PredictRhoKalman( rho_kalman_t * k, floating_t rate_new )
     k->P[0][1]   -= dt_P_1_1;
     k->P[1][0]   -= dt_P_1_1;
     k->P[1][1]   += k->uncertainty.bias * delta_time;
+    
+    LOG_KALMAN("Prediction - Value:%.2f Rate:%.2f Velocity:%.2f\n", k->value, k->rate, k->velocity);
 }
 
 void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new )
@@ -68,12 +79,14 @@ void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new )
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
     k->timestamp  = timestamp();
+    k->flag = false;
     
-    k->flag = 0;
+    LOG_KALMAN("Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
 };
 
 floating_t StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rate_new )
 {
+    LOG_KALMAN("Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);
     PredictRhoKalman(k, rate_new);
     UpdateRhoKalman(k, value_new);
     return k->value;
@@ -86,11 +99,16 @@ bool IsRhoKalmanExpired( rho_kalman_t * k )
 
 inline floating_t ScoreRhoKalman( rho_kalman_t * k )
 {
-    if(k->flag) return 0;
-    return k->K[0];
+    floating_t score = k->K[0];//, age = ( timestamp() - k->origin );
+    if(k->flag) score = 0.;
+//    else if( age < KALMAN_MATURATION ) score = 1.;
+    k->score = score;
+    return score;
 }
 
 void PunishRhoKalman( rho_kalman_t * k )
 {
     k->K[0] *= KALMAN_PUNISH_FACTOR;
+    if( ScoreRhoKalman(k) < MIN_KALMAN_GAIN )
+        ResetRhoKalman(k, 0);//k->value);
 }

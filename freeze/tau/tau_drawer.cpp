@@ -81,8 +81,8 @@ void TauDrawer::DrawDensityGraph(Mat M)
     Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
-    rangex[3] = { w, (int)rho.utility.Cx, 0 },
-    rangey[3] = { h, (int)rho.utility.Cy, 0 },
+    rangex[3] = { w, (int)rho.utility.Cy, 0 },
+    rangey[3] = { h, (int)rho.utility.Cx, 0 },
     Bx = rho.utility.Bx,
     By = rho.utility.By;
     line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
@@ -153,9 +153,6 @@ void TauDrawer::DrawDensityGraph(Mat M)
             if(v>ndm)
             {
                 M.at<Vec3b>(y2,v) = white;
-//                pA[pT] = Point(v,y2);
-//                if(!first)
-//                    line(M, pA[0], pA[1], white);
             }
             else
             {
@@ -165,34 +162,12 @@ void TauDrawer::DrawDensityGraph(Mat M)
                 M.at<Vec3b>(y2,under)   = bluish;
                 M.at<Vec3b>(y2,over)   = redish;
                 M.at<Vec3b>(y2, u) = greenish;
-                
-//                pB[pT] = Point(under,y2);
-//                pC[pT] = Point(over,y2);
-//                pD[pT] = Point(u,y2);
-//                if(!first)
-//                {
-//                    line(M, pB[0], pB[1], bluish);
-//                    line(M, pC[0], pC[1], redish);
-//                    line(M, pD[0], pD[1], greenish);
-//                }
             }
             pT = !pT;
             first = 0;
 #ifdef DRAW_RHO_MAPS
             u = INR(OP_ALIGN((fX[y2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
-
             line(RMY, Point(y2,RHO_MAPS_HEIGHT), Point(y2,u), greenish);
-            
-//            v = INR(OP_ALIGN((dX[y2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
-//
-//            if(v>nd)  line(RMY, Point(y2,RHO_MAPS_HEIGHT), Point(y2,v), redish);
-//            else
-//            {
-//                int under = nd + abs(nd-v);
-//                int over = nd - abs(nd-v);
-//                line(RMY, Point(y2,RHO_MAPS_HEIGHT), Point(y2,under), redish);
-//                line(RMY, Point(y2,under), Point(y2,over), greyish);
-//            }
 #endif
         }
         
@@ -226,46 +201,54 @@ void TauDrawer::DrawDensityGraph(Mat M)
 #ifdef DRAW_RHO_MAPS
             u = INR(OP_ALIGN((fY[x2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
             line(RMX, Point(x2,RHO_MAPS_HEIGHT), Point(x2,u), greenish);
-            
-//            v = INR(OP_ALIGN((dY[x2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
-//
-//            RMX.at<Vec3b>(v,x2) = blackish;
-//            RMX.at<Vec3b>(u,x2) = orangish;
-//            line(RMX, Point(x2,RHO_MAPS_HEIGHT), Point(x2,v), greyish);
-//
-//            if(v>md)  line(RMX, Point(x2,RHO_MAPS_HEIGHT), Point(x2,v), redish);
-//            else
-//            {
-//                int under = nd + abs(md-v);
-//                int over = nd - abs(md-v);
-//
-//                line(RMX, Point(x2,RHO_MAPS_HEIGHT), Point(x2,under), redish);
-//                line(RMX, Point(x2,under), Point(x2,over), bluish);
-//            }
 #endif
         }
     }
-    
-    /*
-     int nbX = rho.utility.peak_list_pair.x.length, nbY = rho.utility.peak_list_pair.y.length;
-     for( int i = 0; i < nbY; i++ ) line(M, Point(rho.utility.peak_list_pair.y.map[i],0), Point(rho.utility.peak_list_pair.y.map[i],h), greenish);
-     for( int i = 0; i < nbX; i++ ) line(M, Point(0,rho.utility.peak_list_pair.x.map[i]), Point(W,rho.utility.peak_list_pair.x.map[i]), greenish);
-     */
     
     pthread_mutex_lock(&predictions_mutex);
     Point2f a(packet.px, packet.py),
     b(packet.sx, packet.sy);
     pthread_mutex_unlock(&predictions_mutex);
     
-    line(M, Point(a.y, 0), Point(a.y, h), bluish);
-    line(M, Point(b.y, 0), Point(b.y, h), bluish);
-    line(M, Point(0, a.x), Point(w, a.x), bluish);
-    line(M, Point(0, b.x), Point(w, b.x), bluish);
+//    line(M, Point(a.y, 0), Point(a.y, h), bluish);
+//    line(M, Point(b.y, 0), Point(b.y, h), bluish);
+//    line(M, Point(0, a.x), Point(w, a.x), bluish);
+//    line(M, Point(0, b.x), Point(w, b.x), bluish);
     
     line(M, Point(0,Bx),Point(w,Bx), greenish);
     line(M, Point(By,0),Point(By,h), greenish);
     //    putText(M, "A", Point(A.x, A.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,150), 3);
     //    putText(M, "B", Point(B.x, B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
+    
+    
+    // Draw blobs
+//    printf("\t\t\t\t%d|%d\n", rho.utility.PredictionPair.x.NumBlobs, rho.utility.PredictionPair.y.NumBlobs);
+    for( int i = 0; i < rho.utility.PredictionPair.y.NumBlobs; i++ )
+    {
+        int o = rho.utility.PredictionPair.y.BlobsOrder[i];
+        int v = rho.utility.PredictionPair.y.Blobs[o].loc;
+        line(M, Point(v,0),Point(v,h), bluish);
+    }
+    for( int i = 0; i < rho.utility.PredictionPair.x.NumBlobs; i++ )
+    {
+        int o = rho.utility.PredictionPair.x.BlobsOrder[i];
+        int v = rho.utility.PredictionPair.x.Blobs[o].loc;
+        line(M, Point(0,v),Point(w,v), bluish);
+    }
+    
+    // Draw tracking predictions
+    for( int i = 0; i < 2; i++ )
+    {
+        int o = rho.utility.PredictionPair.y.TrackingFiltersOrder[i];
+        int v = rho.utility.PredictionPair.y.TrackingFilters[o].value;
+        line(M, Point(v,0),Point(v,h), greyish);
+    }
+    for( int i = 0; i < 2; i++ )
+    {
+        int o = rho.utility.PredictionPair.x.TrackingFiltersOrder[i];
+        int v = rho.utility.PredictionPair.x.TrackingFilters[o].value;
+        line(M, Point(0,v),Point(w,v), greyish);
+    }
 }
 
 void TauDrawer::DrawDensityMaps(Mat M)

@@ -11,25 +11,6 @@
 
 #define __PCR__
 
-//#define RHO_DEBUG
-//#define STATEM_DEBUG
-
-#ifndef LOG
-#define LOG(...) printf(__VA_ARGS__)
-#endif
-
-#ifdef RHO_DEBUG
-#define LOG_RHO(...) LOG("<Rho> " __VA_ARGS__)
-#else
-#define LOG_RHO(...)
-#endif
-
-#ifdef STATEM_DEBUG
-#define LOG_STATEM(...) LOG("<State> " __VA_ARGS__)
-#else
-#define LOG_STATEM(...)
-#endif
-
 /* Camera Config */
 #define RHO_WIDTH        1280
 #define RHO_HEIGHT       800
@@ -50,25 +31,25 @@
 #define HARD_TUNING_PRESIDENCE  TUNING_PRESIDENCE
 #define SOFT_TUNING_PRESIDENCE  (1 - TUNING_PRESIDENCE)
 
-#define RHO_PREDICTION_LS   1.0
+#define RHO_PREDICTION_LS   1.
 #define RHO_PREDICTION_VU   0.05
 #define RHO_PREDICTION_BU   0.001
-#define RHO_PREDICTION_SU   0.01
+#define RHO_PREDICTION_SU   0.1
 
-#define RHO_DEFAULT_LS      5
+#define RHO_DEFAULT_LS      5.
 #define RHO_DEFAULT_VU      0.001
-#define RHO_DEFAULT_BU      0.0001
-#define RHO_DEFAULT_SU      0.7
+#define RHO_DEFAULT_BU      0.001
+#define RHO_DEFAULT_SU      0.01
 
-#define RHO_THRESH_LS       10
+#define RHO_THRESH_LS       10.
 #define RHO_THRESH_VU       0.5
 #define RHO_THRESH_BU       0.01
 #define RHO_THRESH_SU       0.05
 
-#define RHO_TARGET_LS       5
-#define RHO_TARGET_VU       0.5
+#define RHO_TARGET_LS       5.
+#define RHO_TARGET_VU       0.001
 #define RHO_TARGET_BU       0.01
-#define RHO_TARGET_SU       0.05
+#define RHO_TARGET_SU       0.9
 
 #define DYNAMIC_BUFFER
 
@@ -106,7 +87,7 @@
 #define RHO_K_TARGET_IND    0.3
 #define RHO_K_TARGET        0.4//RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)
 #define RHO_VARIANCE_NORMAL 5.//RHO_SQRT_HEIGHT/5.0
-#define RHO_VARIANCE_SCALE  10.//RHO_SQRT_HEIGHT/3.0//1.32
+#define RHO_VARIANCE_SCALE  8.//RHO_SQRT_HEIGHT/3.0//1.32
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
 #define RHO_PUNISH(X)       ((X)<<1)
@@ -125,7 +106,7 @@
 #define THRESH_STEP_MAX     10
 #define THRESH_STEP_BASE    6
 #define THRESH_STEP         1
-#define THRESH_MIN          0
+#define THRESH_MIN          1
 #define THRESH_MAX          255
 
 #define MIN_VARIANCE        3
@@ -133,12 +114,12 @@
 
 #define MAX_BLOBS           10
 #define MIN_BLOB_DENSITY    5
-#define MAX_BLOB_SCORE      1.5
-#define BLOB_SCORE_FACTOR  0.5
+#define MAX_BLOB_SCORE      4
+#define BLOB_SCORE_FACTOR   0.5
 
-#define MAX_RHO_RECALCULATION_LEVEL 2
+#define MAX_RHO_RECALCULATION_LEVEL 0
 
 #define MAX_TRACKING_FILTERS 4
-#define MIN_TRACKING_KALMAN_SCORE 0.01
+#define MIN_TRACKING_KALMAN_SCORE 0.02
 
 #endif /* global_config_h */

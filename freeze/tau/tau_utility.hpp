@@ -20,7 +20,7 @@
 #include "image_utility.hpp"
 #include "rho_wrapper.hpp"
 
-#define MAX_COUNT               10000
+#define MAX_COUNT               1000
 #define BACKGROUNDING_PERIOD    1500
 
 class Tau : public TestInterface

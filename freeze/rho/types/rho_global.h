@@ -49,6 +49,34 @@ typedef volatile bool   flag_t;
 #define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
 #define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
 
+#define FBOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
+
+//#define RHO_DEBUG
+//#define STATEM_DEBUG
+//#define KALMAN_DEBUG
+
+#ifndef LOG
+#define LOG(...) printf(__VA_ARGS__)
+#endif
+
+#ifdef RHO_DEBUG
+#define LOG_RHO(...) LOG("<Rho> " __VA_ARGS__)
+#else
+#define LOG_RHO(...)
+#endif
+
+#ifdef STATEM_DEBUG
+#define LOG_STATEM(...) LOG("<State> " __VA_ARGS__)
+#else
+#define LOG_STATEM(...)
+#endif
+
+#ifdef KALMAN_DEBUG
+#define LOG_KALMAN(...) LOG("<Kalman> " __VA_ARGS__)
+#else
+#define LOG_KALMAN(...)
+#endif
+
 //static double timestamp(void)
 //{
 //    //    struct timeval stamp;

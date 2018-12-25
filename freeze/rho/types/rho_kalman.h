@@ -8,6 +8,8 @@
 //#include <sys/time.h>
 
 #define KALMAN_PUNISH_FACTOR  0.2
+#define MIN_KALMAN_GAIN       0.001
+#define KALMAN_MATURATION     3 // Seconds
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +39,9 @@ extern "C" {
         velocity,
         variance,
         lifespan,
-        timestamp;
+        timestamp,
+        origin,
+        score;
         rho_kalman_uncertainty_c
         uncertainty;
         bool
@@ -48,27 +52,30 @@ extern "C" {
     } rho_kalman_t;
     
 //    floating_t timestamp(void);
-    void InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv );
-    void PredictRhoKalman( rho_kalman_t * k, floating_t rate_new );
-    void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new );
-    floating_t StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rate_new );
-    bool IsRhoKalmanExpired( rho_kalman_t * k );
+    void        InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv );
+    void       ResetRhoKalman( rho_kalman_t * k, floating_t v );
+    void     PredictRhoKalman( rho_kalman_t * k, floating_t rate_new );
+    void      UpdateRhoKalman( rho_kalman_t * k, floating_t value_new );
+    floating_t  StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rate_new );
+    bool   IsRhoKalmanExpired( rho_kalman_t * k );
     floating_t ScoreRhoKalman( rho_kalman_t * k );
-    void PunishRhoKalman( rho_kalman_t * k );
+    void      PunishRhoKalman( rho_kalman_t * k );
     
     struct rho_kalman {
-        void (*Init)( rho_kalman_t *, floating_t, floating_t, floating_t, floating_t, floating_t, index_t, index_t );
-        floating_t (*Step)( rho_kalman_t * k, floating_t, floating_t );
-        void (*Predict)( rho_kalman_t * k, floating_t );
-        void (*Update)( rho_kalman_t *, floating_t );
-        bool (*IsExpired)( rho_kalman_t * );
+        void (*       Init)( rho_kalman_t *, floating_t, floating_t, floating_t, floating_t, floating_t, index_t, index_t );
+        void (*      Reset)( rho_kalman_t *, floating_t );
+        void (*    Predict)( rho_kalman_t *, floating_t );
+        void (*     Update)( rho_kalman_t *, floating_t );
+        floating_t (* Step)( rho_kalman_t *, floating_t, floating_t );
+        bool (*  IsExpired)( rho_kalman_t * );
         floating_t (*Score)( rho_kalman_t * );
-        void (*Punish)( rho_kalman_t * );
+        void (*     Punish)( rho_kalman_t * );
     };
     
     static const struct rho_kalman RhoKalman =
     {
         .Init = InitRhoKalman,
+        .Reset = ResetRhoKalman,
         .Predict = PredictRhoKalman,
         .Update = UpdateRhoKalman,
         .Step = StepRhoKalman,

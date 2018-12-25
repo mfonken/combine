@@ -215,7 +215,9 @@ typedef struct
     blob_t          Blobs[MAX_BLOBS];
     uint8_t         BlobsOrder[MAX_BLOBS],
                     NumBlobs;
-    floating_t      NuBlobs;
+    floating_t      NuBlobs,
+                    Primary,
+                    Secondary;
     density_t       PreviousPeak[2],
                     PreviousDensity[2];
     prediction_probabilities Probabilities;

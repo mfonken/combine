@@ -35,7 +35,7 @@ extern "C" {
 #define INRANGE(X,Y,T)                  ( abs( X - Y ) < T )
     
 #define ZDIV_LNUM 1 << 10
-#define ZDIV(X,Y) Y==0?ZDIV_LNUM:X/Y
+#define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
     
     /***************************************************************************************/
     
