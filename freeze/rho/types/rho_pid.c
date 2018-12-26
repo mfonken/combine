@@ -8,23 +8,25 @@
 
 #include "rho_pid.h"
 
-void RhoPIDInit( rho_pid_t * PID, rho_pid_gain_t * K )
+void RhoPIDInit( rho_pid_t * PID, rho_pid_gain_t K )
 {
     /* Zero Entire PID */
     memset( PID, 0, sizeof(rho_pid_t) );
     
-    if( !K->Kp && !K->Ki && !K->Kd && !K->Pu )
+    if( !K.Kp && !K.Ki && !K.Kd )
     {
-        PID->Gain.Kp = DEFAULT_PROPORTIONAL_FACTOR * K->Ku;
-        PID->Gain.Ki = DEFAULT_INTEGRAL_FACTOR * ( PID->Gain.Kp / K->Pu );
-        PID->Gain.Kd = DEFAULT_DERIVATIVE_FACTOR * ( PID->Gain.Kd * K->Pu );
+        K.Pu = 1.;
+        PID->Gain.Kp = DEFAULT_PROPORTIONAL_FACTOR * K.Ku;
+        PID->Gain.Ki = DEFAULT_INTEGRAL_FACTOR * ( PID->Gain.Kp / K.Pu );
+        PID->Gain.Kd = DEFAULT_DERIVATIVE_FACTOR * ( PID->Gain.Kd * K.Pu );
     }
     else
     {
-        PID->Gain.Kp = K->Kp;
-        PID->Gain.Ki = K->Ki;
-        PID->Gain.Kd = K->Kd;
+        PID->Gain.Kp = K.Kp;
+        PID->Gain.Ki = K.Ki;
+        PID->Gain.Kd = K.Kd;
     }
+    PID->Timestamp = timestamp();
 }
 
 void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
@@ -38,17 +40,25 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
     PID->Iv = PID->Gain.Ki * PID->TotalError;
     
     PID->DeltaError = PID->PrevError - PID->Error;
-    PID->Dv = ( PID->Gain.Kd * PID->DeltaError ) / PID->Dt;
+    PID->Dv = ZDIV( ( PID->Gain.Kd * PID->DeltaError ), PID->Dt);
     
     PID->Value = PID->Pv + PID->Iv + PID->Dv + PID->Bias;
     
-    PID->Value = BOUND(PID->Value, PID->MinValue, PID->MaxValue);
+    if( PID->MaxValue > 0 )
+        PID->Value = BOUND(PID->Value, PID->MinValue, PID->MaxValue);
     
     PID->PrevError = PID->Error;
+}
+
+void RhoPIDPrint( rho_pid_t * PID )
+{
+    printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
+           PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
 }
 
 const rho_pid_functions RhoPID =
 {
     .Init = RhoPIDInit,
-    .Update = RhoPIDUpdate
+    .Update = RhoPIDUpdate,
+    .Print = RhoPIDPrint
 };

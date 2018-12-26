@@ -22,7 +22,7 @@
 #define PIXEL_COUNT_DROP_FACTOR    0.75
 
 #define ALTERNATE_TUNING_FACTOR    0.5
-#define FILTERED_COVERAGE_TARGET   0.004
+#define FILTERED_COVERAGE_TARGET   0.007
 #define FILTERED_COVERAGE_PIXELS   ((index_t)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
 
 #define MAX_ABSENCE_PROBABIILITY   0.5
@@ -48,7 +48,7 @@
 
 #define RHO_TARGET_LS       5.
 #define RHO_TARGET_VU       0.001
-#define RHO_TARGET_BU       0.01
+#define RHO_TARGET_BU       0.05
 #define RHO_TARGET_SU       0.9
 
 #define DYNAMIC_BUFFER
@@ -121,5 +121,7 @@
 
 #define MAX_TRACKING_FILTERS 4
 #define MIN_TRACKING_KALMAN_SCORE 0.02
+
+#define PID_SCALE   10
 
 #endif /* global_config_h */

@@ -13,47 +13,66 @@
 #include "rho_global.h"
 #include "timestamp.h"
 
-//typedef double floating_t;
+//#define STRICT_PROPORTIONAL_FACTOR 0.98
+//#define STRICT_INTEGRAL_FACTOR     0.02
+//#define STRICT_DERIVATIVE_FACTOR   0.001
 
-#define DEFAULT_PROPORTIONAL_FACTOR 0.6
-#define DEFAULT_INTEGRAL_FACTOR     2
-#define DEFAULT_DERIVATIVE_FACTOR   0.125
-#define DEFAULT_PID_GAIN { DEFAULT_PROPORTIONAL_FACTOR, DEFAULT_INTEGRAL_FACTOR, DEFAULT_DERIVATIVE_FACTOR }
+#define DEFAULT_PROPORTIONAL_FACTOR 0.98
+#define DEFAULT_INTEGRAL_FACTOR     0.02
+#define DEFAULT_DERIVATIVE_FACTOR   0.001
+#define DEFAULT_PID_GAIN (rho_pid_gain_t){ DEFAULT_PROPORTIONAL_FACTOR, DEFAULT_INTEGRAL_FACTOR, DEFAULT_DERIVATIVE_FACTOR }
 
-typedef struct
-{
-    floating_t Kp, Ki, Kd, Ku, Pu;
-} rho_pid_gain_t;
+#define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
+#define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
+#define ZDIV_LNUM 1 << 10
+#define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
 
-typedef struct
-{
-rho_pid_gain_t
-    Gain;
-floating_t
-    Pv,
-    Iv,
-    Dv,
-    Value,
-    Bias,
-    Dt,
-    Timestamp,
-    PrevError,
-    Error,
-    DeltaError,
-    TotalError,
-    MinValue,
-    MaxValue;
-} rho_pid_t;
-
-typedef struct
-{
-    void (*Init)( rho_pid_t *, rho_pid_gain_t * );
-    void (*Update)( rho_pid_t *, floating_t, floating_t );
-} rho_pid_functions;
-
-void RhoPIDInit( rho_pid_t *, rho_pid_gain_t * );
-void RhoPIDUpdate( rho_pid_t *, floating_t, floating_t );
-
-extern const rho_pid_functions RhoPID;
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+    typedef double floating_t;
+    
+    typedef struct
+    {
+        floating_t Kp, Ki, Kd, Ku, Pu;
+    } rho_pid_gain_t;
+    
+    typedef struct
+    {
+        rho_pid_gain_t
+        Gain;
+        floating_t
+        Pv,
+        Iv,
+        Dv,
+        Value,
+        Bias,
+        Dt,
+        Timestamp,
+        PrevError,
+        Error,
+        DeltaError,
+        TotalError,
+        MinValue,
+        MaxValue;
+    } rho_pid_t;
+    
+    typedef struct
+    {
+        void (*Init)( rho_pid_t *, rho_pid_gain_t );
+        void (*Update)( rho_pid_t *, floating_t, floating_t );
+        void (*Print)( rho_pid_t * );
+    } rho_pid_functions;
+    
+    void RhoPIDInit( rho_pid_t *, rho_pid_gain_t );
+    void RhoPIDUpdate( rho_pid_t *, floating_t, floating_t );
+    void RhoPIDPrint( rho_pid_t * );
+    
+    extern const rho_pid_functions RhoPID;
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* rho_pid_h */

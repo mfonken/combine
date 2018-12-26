@@ -113,7 +113,7 @@ void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
     utility->Height = height;
     
     /* Threshold Filter */
-    RhoPID.Init(&utility->ThreshFilter, &(rho_pid_gain_t)DEFAULT_PID_GAIN );
+    RhoPID.Init(&utility->ThreshFilter, DEFAULT_PID_GAIN );
     
     /* Coverage Filter */
     utility->TargetCoverageFactor  = (floating_t)FILTERED_COVERAGE_TARGET;
@@ -701,12 +701,12 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     RhoPID.Update( &utility->ThreshFilter, utility->FilteredPercentage, utility->TargetFilter.value);
     
     /* Filtered-Tune on target difference */
-    floating_t filtered_tune_factor = utility->ThreshFilter.Error;
-    floating_t proposed_tune_factor = 1. - ( filtered_tune_factor + background_tune_factor + state_tune_factor );
-    utility->Thresh = (byte_t)BOUND(utility->Thresh * proposed_tune_factor, THRESH_MIN, THRESH_MAX);
+//    floating_t filtered_tune_factor = utility->ThreshFilter.Error;
+    floating_t proposed_tune_factor = BOUND( ( 1. + ( background_tune_factor + state_tune_factor ) ) * ( PID_SCALE * -utility->ThreshFilter.Value ), -THRESH_STEP_MAX, THRESH_STEP_MAX);
+    utility->Thresh = (byte_t)BOUND(utility->Thresh + proposed_tune_factor, THRESH_MIN, THRESH_MAX);
 
-    printf("*** THRESH IS %d(%.2f) ***\n", utility->Thresh, proposed_tune_factor);
-    printf("btf:%.3f | stf%.3f | e%.6f \n", background_tune_factor, state_tune_factor, filtered_tune_factor);
+    printf("*** THRESH IS %d(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
+    printf("btf:%.3f | stf%.3f | e%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
     printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", utility->ThreshFilter.Value, utility->ThreshFilter.Error, utility->TargetFilter.value, utility->TargetCoverageFactor);
 //    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }

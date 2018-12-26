@@ -13,17 +13,17 @@ using namespace cv;
 using namespace std;
 
 #define MAIN_FPS        60
-#define TAU_FPS         5
+#define TAU_FPS         15
 #define COMBINE_FPS     0
 
 #define TITLE_STRING                    "PCR Alpha v0.01"
-#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "frames/small"
-#define FRAME_IMAGE_SOURCE_NUM_FRAMES   26
+#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "noise/dynamic_clouds"
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES   1
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
 //#define HAS_IMU
-//#define HAS_FILE
+#define HAS_FILE
 #define HAS_GENERATOR
 
 #define FRAME_WIDTH                     700
