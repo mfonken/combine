@@ -143,14 +143,14 @@ typedef struct
 
 typedef struct
 {
-    density_t
+density_t
     max,
     den;
-    index_t
+index_t
     loc,
     wth,
     srt;
-    floating_t
+floating_t
     scr;
 } blob_t;
 

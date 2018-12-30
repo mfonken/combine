@@ -15,7 +15,10 @@ int main( int argc, const char * argv[] )
         , FRAME_IMAGE_IMAGE_SOURCE_PATH, FRAME_IMAGE_SOURCE_NUM_FRAMES
 #endif
         );
-    Environment env(&tau, TAU_FPS);
+   
+    FileWriter writer("Rho writer");
+//    SerialWriter comm(SFILE, FILENAME);
+    Environment env(&tau, /*&comm,*/ TAU_FPS);
     
     env.pause();
     sleep(0.1);
@@ -25,6 +28,9 @@ int main( int argc, const char * argv[] )
     {
         pthread_mutex_lock(&tau.utility.outframe_mutex);
         imshow(TITLE_STRING, tau.GetDensitiesFrame());
+        imshow("Rho Frame", tau.DrawRhoFrame());
+        imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
+        imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         pthread_mutex_unlock(&tau.utility.outframe_mutex);
         
         char c = waitKey(KEY_DELAY);

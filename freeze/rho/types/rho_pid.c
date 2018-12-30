@@ -48,6 +48,9 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
         PID->Value = BOUND(PID->Value, PID->MinValue, PID->MaxValue);
     
     PID->PrevError = PID->Error;
+    
+    
+    PID->TotalError *= 0.9;
 }
 
 void RhoPIDPrint( rho_pid_t * PID )

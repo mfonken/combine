@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/time.h>
+#include <string>
+#include <sstream>
 
 //#include "rho_kalman.h"
 #include "kalman.hpp"
@@ -36,6 +38,21 @@
 
 static inline double timeDiff( struct timeval a, struct timeval b )
 { return ((b.tv_sec  - a.tv_sec) + (b.tv_usec - a.tv_usec)/1000000.0) + 0.0005; }
+
+template <typename T>
+static std::string to_stringn(const T a_value, const int n = 6)
+{
+    std::ostringstream out;
+    out.precision(n);
+    out << std::fixed << a_value;
+    return out.str();
+}
+
+typedef enum
+{
+    X_DIMENSION = 0,
+    Y_DIMENSION
+} dimension_t;
 
 typedef enum
 {

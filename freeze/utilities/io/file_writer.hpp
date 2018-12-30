@@ -19,8 +19,7 @@ class FileWriter
 {
     const char *file_name;
 public:
-    FileWriter();
-    FileWriter( const char *);
+    FileWriter( const char * name = NULL);
     
     void init( const char * );
     void trigger( std::string data );

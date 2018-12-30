@@ -39,11 +39,17 @@ class TauDrawer : public Tau
 public:
     pthread_mutex_t drawer_mutex;
     
-    cv::Mat image, frame, RMX, RMY, probabilities;
-//    Tau * tau;
-    int w, h, W, H;
+    cv::Mat image, frame, RMX, RMY, probabilities,
+    rho_frame, rho_detection_x, rho_detection_y;
+    int w, h, W, H, frame_i, x_detection_i, y_detection_i, pid_data_x, x_match_data_x, y_match_data_x, x_peak_data_x, y_peak_data_x;
+    floating_t *pid_data,
+    *x_peak_data_l, *x_peak_data_u, *x_peak_data_uv, *x_peak_data_lv, *x_peak_data_ut, *x_peak_data_lt,
+    *y_peak_data_l, *y_peak_data_u, *y_peak_data_uv, *y_peak_data_lv, *y_peak_data_ut, *y_peak_data_lt;
+    int *x_match_data, *y_match_data;
+    
     
     TauDrawer( const char * name, int width, int height, std::string f = "", int num = 0 );
+    virtual ~TauDrawer();
     Mat& GetDensitiesFrame(void);
     void DrawDensityGraph(Mat);
     void DrawDensityMaps(Mat);
@@ -51,7 +57,11 @@ public:
     Vec3b densityColor( int );
     int pixelDensity( Vec3b );
     Vec3b hsv2bgr(Vec3b);
+    Mat& DrawRhoFrame();
+    Mat& DrawRhoDetection(int dimension);
     void drawKalmans();
 };
+
+
 
 #endif /* tau_test_hpp */

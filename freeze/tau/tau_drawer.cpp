@@ -7,7 +7,7 @@
 //
 
 #include "tau_drawer.hpp"
-#include <string.h>
+#include <string>
 
 #define RANGE(X,M) (X<0?0:(X>M?M-1:X))
 
@@ -16,16 +16,20 @@ using namespace std;
 
 Vec3b ap       (150, 255, 150);
 Vec3b bp       (150, 150, 255);
-Vec3b white    (255, 255, 255);
+//Vec3b white    (255, 255, 255);
 Vec3b red      (  0,   0, 255);
 Vec3b blue     (255,   0,   0);
 
+Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
+
 TauDrawer::TauDrawer( const char * name, int width, int height, std::string f, int num )
-: Tau(name, width, height, f, num), frame(Size(width,  height), CV_8UC3, Scalar(0,0,0)), probabilities(Size(800, 200), CV_8UC3, Scalar(245,245,245))
+: Tau(name, width, height, f, num), frame(Size(width,  height), CV_8UC3, Scalar(0,0,0)), probabilities(Size(800, 200), CV_8UC3, Scalar(245,245,245)),
+rho_frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+rho_detection_x(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+rho_detection_y(Size(width, height), CV_8UC3, Scalar(0,0,0))
 #ifdef DRAW_RHO_MAPS
-:
-RMX(Size(TauDrawerwidth,  RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255)),
-RMY(Size(TauDrawerheight, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
+,RMX(Size(TauDrawerwidth,  RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
+,RMY(Size(TauDrawerheight, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
 #endif
 {
     LOG_TAU("Initializing Tau Drawer.\n");
@@ -34,7 +38,119 @@ RMY(Size(TauDrawerheight, RHO_MAPS_HEIGHT), CV_8UC3, Scalar(255,255,255))
     Mat N(H, W, CV_8UC3, Scalar(0));
     utility.outframe.copyTo(N(Rect(0,0,w,h)));
     frame = N;
+    pid_data_x = 0; x_match_data_x = 0; y_match_data_x = 0; x_peak_data_x = 0; y_peak_data_x = 0; frame_i = 0; x_detection_i = 0; y_detection_i = 0;
+    pid_data = new floating_t[width];
+    x_match_data = new int[width];
+    y_match_data = new int[width];
+    x_peak_data_l = new floating_t[width];
+    x_peak_data_u = new floating_t[width];
+    x_peak_data_lv = new floating_t[width];
+    x_peak_data_uv = new floating_t[width];
+    x_peak_data_lt = new floating_t[width];
+    x_peak_data_ut = new floating_t[width];
+    
+    y_peak_data_l = new floating_t[width];
+    y_peak_data_u = new floating_t[width];
+    y_peak_data_lv = new floating_t[width];
+    y_peak_data_uv = new floating_t[width];
+    y_peak_data_lt = new floating_t[width];
+    y_peak_data_ut = new floating_t[width];
+    
+    ofstream file(FILENAME);
+    file << "#,cvg%," << "flt%";
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << ",X" << to_string(i);
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << ",Y" << to_string(i);
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << ",C" << to_string(i);
+    file << ",UN,S0,U0,S1,U1,S2,U2,SM,UM," << "tc%,pidv" << endl;
+    file.close();
+    
+    file.open(X_DIM_FILENAME);
+    // Header
+    file << "#";
+    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    {
+        string blob_id = "B" + to_string(i);
+        file << "," << "Den(" << blob_id << ")";
+        file << "," << "Wth(" << blob_id << ")";
+        file << "," << "Loc(" << blob_id << ")";
+        file << "," << "Max(" << blob_id << ")";
+        file << "," << "Scr(" << blob_id << ")";
+        file << "," << "Flt(" << blob_id << ")";
+    }
+    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        string filter_id = "F" + to_string(i);
+        file << "," << "Bias(" << filter_id << ")";
+        file << "," << "K0(" << filter_id << ")";
+        file << "," << "K1(" << filter_id << ")";
+        file << "," << "Val(" << filter_id << ")";
+        file << "," << "Vel(" << filter_id << ")";
+        file << "," << "Scr(" << filter_id << ")";
+    }
+    file << ",Centroid,Peak(Lower),Target(Lower),Variance(Lower),Peak(Upper),Target(Upper),Variance(Upper)";
+    file << endl;
+    file.close();
+    file.open(Y_DIM_FILENAME);
+    // Header
+    file << "#";
+    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    {
+        string blob_id = "B" + to_string(i);
+        file << "," << "Den(" << blob_id << ")";
+        file << "," << "Wth(" << blob_id << ")";
+        file << "," << "Loc(" << blob_id << ")";
+        file << "," << "Max(" << blob_id << ")";
+        file << "," << "Scr(" << blob_id << ")";
+        file << "," << "Flt(" << blob_id << ")";
+    }
+    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        string filter_id = "F" + to_string(i);
+        file << "," << "Bias(" << filter_id << ")";
+        file << "," << "K0(" << filter_id << ")";
+        file << "," << "K1(" << filter_id << ")";
+        file << "," << "Val(" << filter_id << ")";
+        file << "," << "Vel(" << filter_id << ")";
+        file << "," << "Scr(" << filter_id << ")";
+    }
+    file << ",Centroid,Peak(Lower),Target(Lower),Variance(Lower),Peak(Upper),Target(Upper),Variance(Upper)";
+    file << endl;
+    file.close();
     pthread_mutex_init( &drawer_mutex, NULL );
+}
+
+TauDrawer::~TauDrawer()
+{
+    if(pid_data != NULL)
+        delete pid_data;
+    if(x_match_data != NULL)
+        delete x_match_data;
+    if(y_match_data != NULL)
+        delete y_match_data;
+    if(x_peak_data_l != NULL)
+        delete x_peak_data_l;
+    if(x_peak_data_u != NULL)
+        delete x_peak_data_u;
+    if(x_peak_data_lv != NULL)
+        delete x_peak_data_lv;
+    if(x_peak_data_uv != NULL)
+        delete x_peak_data_uv;
+    if(x_peak_data_lt != NULL)
+        delete x_peak_data_lt;
+    if(x_peak_data_ut != NULL)
+        delete x_peak_data_ut;
+    if(y_peak_data_l != NULL)
+        delete y_peak_data_l;
+    if(y_peak_data_u != NULL)
+        delete y_peak_data_u;
+    if(y_peak_data_lv != NULL)
+        delete y_peak_data_lv;
+    if(y_peak_data_uv != NULL)
+        delete y_peak_data_uv;
+    if(y_peak_data_lt != NULL)
+        delete y_peak_data_lt;
+    if(y_peak_data_ut != NULL)
+        delete y_peak_data_ut;
 }
 
 Mat& TauDrawer::GetDensitiesFrame(void)
@@ -66,7 +182,7 @@ Mat& TauDrawer::GetDensitiesFrame(void)
     putText(frame, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
     putText(frame, "State: " + string(stateString(rho.utility.BayeSys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
-    putText(frame, "X (" + to_string(rho.utility.Cx) + ", " + to_string(rho.utility.Cy) + ")", Point(rho.utility.Cx, rho.utility.Cy), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,255), 4);
+    putText(frame, "X (" + to_string(rho.utility.Cy) + ", " + to_string(rho.utility.Cx) + ")", Point(rho.utility.Cy-9, rho.utility.Cx+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
     
     rectangle(frame, Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Scalar(0,0,0));
     
@@ -78,7 +194,6 @@ Mat& TauDrawer::GetDensitiesFrame(void)
 void TauDrawer::DrawDensityGraph(Mat M)
 {
     int u, v, w = width, h = height;
-    Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
     rangex[3] = { w, (int)rho.utility.Cy, 0 },
@@ -93,7 +208,7 @@ void TauDrawer::DrawDensityGraph(Mat M)
     for( int i = 0, j = 1; i < 2; i++, j++ )
     {
         bool pT = 1;
-        bool first = 1;
+//        bool first = 1;
         /* Kalman Values */
         rho_kalman_t yk = rho.utility.DensityMapPair.x.kalmans[i], xk = rho.utility.DensityMapPair.y.kalmans[i];
         int mYv = rho.utility.DensityMapPair.x.kalmans[i].variance, mXv = rho.utility.DensityMapPair.y.kalmans[i].variance;
@@ -164,7 +279,7 @@ void TauDrawer::DrawDensityGraph(Mat M)
                 M.at<Vec3b>(y2, u) = greenish;
             }
             pT = !pT;
-            first = 0;
+//            first = 0;
 #ifdef DRAW_RHO_MAPS
             u = INR(OP_ALIGN((fX[y2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
             line(RMY, Point(y2,RHO_MAPS_HEIGHT), Point(y2,u), greenish);
@@ -210,11 +325,6 @@ void TauDrawer::DrawDensityGraph(Mat M)
     b(packet.sx, packet.sy);
     pthread_mutex_unlock(&predictions_mutex);
     
-//    line(M, Point(a.y, 0), Point(a.y, h), bluish);
-//    line(M, Point(b.y, 0), Point(b.y, h), bluish);
-//    line(M, Point(0, a.x), Point(w, a.x), bluish);
-//    line(M, Point(0, b.x), Point(w, b.x), bluish);
-    
     line(M, Point(0,Bx),Point(w,Bx), greenish);
     line(M, Point(By,0),Point(By,h), greenish);
     //    putText(M, "A", Point(A.x, A.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,150), 3);
@@ -222,7 +332,6 @@ void TauDrawer::DrawDensityGraph(Mat M)
     
     
     // Draw blobs
-//    printf("\t\t\t\t%d|%d\n", rho.utility.PredictionPair.x.NumBlobs, rho.utility.PredictionPair.y.NumBlobs);
     for( int i = 0; i < rho.utility.PredictionPair.y.NumBlobs; i++ )
     {
         int o = rho.utility.PredictionPair.y.BlobsOrder[i];
@@ -353,6 +462,491 @@ Vec3b TauDrawer::hsv2bgr(Vec3b hsv)
     
     return Vec3b(r*255,g*255,b*255);
 }
+
+Mat& TauDrawer::DrawRhoFrame()
+{
+    /* Gather data */
+    pthread_mutex_lock(&rho.c_mutex);
+    floating_t total_cvg_percent = (floating_t)rho.utility.TotalCoverage/(rho.utility.Width*rho.utility.Height),
+    filtered_cvg_percent = rho.utility.FilteredPercentage;
+    floating_t X_kumaraswamy[NUM_STATE_GROUPS] = { 0. },
+    Y_kumaraswamy[NUM_STATE_GROUPS] = { 0. },
+    C_kumaraswamy[NUM_STATE_GROUPS] = { 0. };
+    memcpy(X_kumaraswamy, rho.utility.PredictionPair.x.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memcpy(Y_kumaraswamy, rho.utility.PredictionPair.y.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memcpy(C_kumaraswamy, rho.utility.PredictionPair.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    floating_t
+    state_P[NUM_STATES] = { 0. };
+    state_t state = rho.utility.BayeSys.state;
+    memcpy(state_P, rho.utility.BayeSys.probabilities.map[state], sizeof(floating_t)*NUM_STATES);
+    
+    floating_t target_cvg_percent = rho.utility.TargetCoverageFactor;
+    pid_data[pid_data_x++] = target_cvg_percent - rho.utility.ThreshFilter.Value;
+    pthread_mutex_unlock(&rho.c_mutex);
+    
+    /* Write to file */
+    ofstream file(FILENAME, ofstream::out | ofstream::app);
+    file << frame_i++ << "," << total_cvg_percent << "," << filtered_cvg_percent;
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << "," << X_kumaraswamy[i];
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << "," << Y_kumaraswamy[i];
+    for(int i = 0; i < NUM_STATE_GROUPS; i++) file << "," << C_kumaraswamy[i];
+    for(int i = 0; i < NUM_STATES; i++) file << "," << state_P[i];
+    file << "," << target_cvg_percent << "," << pid_data[pid_data_x-1];
+    file << endl;
+    file.close();
+
+    /* Clear */
+    rho_frame = greyish;
+    
+    /* Draw */
+#define RF_SPACE 10
+#define RF_WIDTH rho_frame.cols
+#define RF_HEIGHT rho_frame.rows
+#define RF_FONT FONT_HERSHEY_PLAIN
+#define RF_TEXT_SM 1
+#define RF_TEXT_SM_OFFSET 16
+#define RF_TEXT_MD 2
+#define RF_TEXT_LG 4
+#define RF_TEXT_COLOR Scalar{245,245,245}
+#define RF_TEXT_PRECISION 2
+#define RF_LINE_WIDTH 1
+    
+#define CVG_SPLIT 0.05
+#define ST_SPLIT 0.5
+#define PID_SPLIT 0.45
+    
+#define RF_SCALED_HEIGHT(S) (RF_HEIGHT*S-RF_SPACE)
+    
+    /* Coverage */
+#define CVG_ORIGIN Point(RF_SPACE, RF_SPACE)
+#define CVG_WIDTH (RF_WIDTH-2*RF_SPACE)
+#define CVG_HEIGHT RF_SCALED_HEIGHT(CVG_SPLIT)
+#define CVG_TEXT_X (CVG_ORIGIN.x)
+#define CVG_TEXT_HEIGHT (CVG_ORIGIN.y+RF_TEXT_SM_OFFSET)
+#define CVG_END Point(CVG_ORIGIN.x+CVG_WIDTH, CVG_ORIGIN.y+CVG_HEIGHT)
+#define CVG_COLOR white
+#define CVG_TOP_BOUND 1.
+#define TOTAL_CVG_ORIGIN
+#define TOTAL_CVG_TEXT_X (TOTAL_CVG_ORIGIN.x+CVG_TEXT_SM_OFFSET)
+    // Bound
+    rectangle(rho_frame, CVG_ORIGIN, CVG_END, CVG_COLOR, RF_LINE_WIDTH);
+    putText(rho_frame, to_stringn(CVG_TOP_BOUND, RF_TEXT_PRECISION)+"%", Point(CVG_TEXT_X, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+    // Total
+    int total_offset = (1-(total_cvg_percent*100.)/CVG_TOP_BOUND)*CVG_WIDTH;
+    if(total_offset > CVG_ORIGIN.x)
+    {
+        rectangle(rho_frame, Point(CVG_ORIGIN.x+total_offset,CVG_ORIGIN.y), CVG_END, Scalar{200,0,0}, CV_FILLED);
+        putText(rho_frame, to_stringn(total_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+total_offset, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        //Filtered
+        int filtered_offset = (1-(total_cvg_percent*filtered_cvg_percent*100.)/CVG_TOP_BOUND)*CVG_WIDTH;
+        if(filtered_offset > CVG_ORIGIN.x)
+        {
+            rectangle(rho_frame, Point(CVG_ORIGIN.x+filtered_offset,CVG_ORIGIN.y), CVG_END, Scalar{0,200,0}, CV_FILLED);
+            if(CVG_ORIGIN.x+filtered_offset < RF_WIDTH - 100)
+                putText(rho_frame, to_stringn(filtered_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+filtered_offset, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        }
+    }
+    
+    /* States */
+#define ST_ORIGIN Point(RF_SPACE, CVG_ORIGIN.y+CVG_HEIGHT+RF_SPACE)
+#define ST_WIDTH (RF_WIDTH-2*RF_SPACE)
+#define ST_HEIGHT RF_SCALED_HEIGHT(ST_SPLIT)
+#define ST_BAR_MAX (ST_HEIGHT/2)
+#define ST_BAR_Y (ST_ORIGIN.y+ST_HEIGHT/2-1)
+#define ST_RADIUS (ST_BAR_MAX/3)
+#define ST_TEXT_X (ST_ORIGIN.x)
+#define ST_TEXT_HEIGHT (ST_ORIGIN.y+RF_TEXT_SM_OFFSET)
+#define ST_END Point(ST_ORIGIN.x+ST_WIDTH, ST_ORIGIN.y+ST_HEIGHT)
+#define ST_COLOR white
+    // Bound
+    rectangle(rho_frame, ST_ORIGIN, ST_END, ST_COLOR, RF_LINE_WIDTH);
+    
+    // Legend
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.5,ST_ORIGIN.y+ST_TEXT_X*3.5), white, CV_FILLED);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), blue, CV_FILLED);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), red, CV_FILLED);
+    putText(rho_frame, "X", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*0.5), RF_FONT, RF_TEXT_SM, blue);
+    putText(rho_frame, "Y", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*1.5), RF_FONT, RF_TEXT_SM, red);
+    
+    // Split Lines
+    line(rho_frame, Point(ST_ORIGIN.x,ST_ORIGIN.y+ST_HEIGHT/2), Point(ST_END.x,ST_ORIGIN.y+ST_HEIGHT/2), white, RF_LINE_WIDTH);
+    int width = ST_WIDTH/(NUM_STATE_GROUPS);
+    for(int i = 0, x = width+ST_ORIGIN.x; i < NUM_STATE_GROUPS; i++, x += width)
+        line(rho_frame, Point(x,ST_ORIGIN.y+RF_SPACE), Point(x,ST_ORIGIN.y+ST_HEIGHT-RF_SPACE), white, RF_LINE_WIDTH);
+    
+    //State Data
+    int bar_width = (width-2*RF_SPACE)/3;
+    for(int i = 0, x = ST_ORIGIN.x+RF_SPACE; i < NUM_STATE_GROUPS; i++, x += width)
+    {
+        rectangle(rho_frame, Point(x,ST_BAR_Y), Point(x+bar_width, ST_BAR_Y-X_kumaraswamy[i]*ST_BAR_MAX), blue, CV_FILLED);
+        rectangle(rho_frame, Point(x+bar_width,ST_BAR_Y), Point(x+2*bar_width, ST_BAR_Y-Y_kumaraswamy[i]*ST_BAR_MAX), red, CV_FILLED);
+        rectangle(rho_frame, Point(x+2*bar_width,ST_BAR_Y), Point(x+3*bar_width, ST_BAR_Y-C_kumaraswamy[i]*ST_BAR_MAX), greenish, CV_FILLED);
+        
+        int state_i = 1 + i*2;
+        string state_n = "U" + to_string(i);
+        Scalar c(redish);
+        if(state_i == state)
+        {
+            state_n = "S" + to_string(i);
+            c = bluish;
+        }
+        int r = ST_RADIUS*state_P[state_i];
+        putText(rho_frame, state_n, Point(x, ST_BAR_Y+2*RF_SPACE), RF_FONT, RF_TEXT_SM, c);
+        circle(rho_frame, Point(x+width/2-RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2), r, c, CV_FILLED);
+    }
+    
+    /* PID */
+#define PID_ORIGIN Point(RF_SPACE, ST_ORIGIN.y+ST_HEIGHT+RF_SPACE)
+#define PID_WIDTH (RF_WIDTH-2*RF_SPACE)
+#define PID_HEIGHT (RF_SCALED_HEIGHT(PID_SPLIT)-RF_SPACE)
+#define PID_TICKS 5
+#define PID_TICK_SPACING (PID_HEIGHT/(PID_TICKS+1))
+#define PID_HAS_SUBTICKS true
+#define PID_TICK_WIDTH 7
+#define PID_TICK_FRAME_INSET 2*RF_SPACE
+#define PID_SUBTICK_INSET 2
+#define PID_GRAPH_START PID_ORIGIN.x+RF_SPACE
+#define PID_GRAPH_WIDTH (PID_WIDTH-2*RF_SPACE)
+#define PID_MAX_BOUND 2. // percent
+#define PID_TEXT_X (PID_ORIGIN.x)
+#define PID_TEXT_HEIGHT (PID_ORIGIN.y+RF_TEXT_SM_OFFSET)
+#define PID_END Point(PID_ORIGIN.x+PID_WIDTH, PID_ORIGIN.y+PID_HEIGHT)
+#define PID_COLOR white
+    
+    // Bound
+    rectangle(rho_frame, PID_ORIGIN, PID_END, PID_COLOR, RF_LINE_WIDTH);
+    
+    // Ticks
+    if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), white);
+    for(int i = 1, y = PID_END.y - PID_TICK_SPACING; i <= PID_TICKS; i++, y -= PID_TICK_SPACING)
+    {
+        line(rho_frame, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), white, RF_LINE_WIDTH);
+        floating_t tick_value = PID_MAX_BOUND*((floating_t)i)/PID_TICKS;
+        putText((rho_frame), to_stringn(tick_value, 1) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), white);
+    }
+    
+    if(pid_data_x <= 0 || pid_data_x > PID_GRAPH_WIDTH)
+    {
+        pid_data_x = 0;
+        memset(pid_data, 0, sizeof(floating_t)*width);
+    }
+    
+    // Graph
+    int scaled_target_value = BOUND(target_cvg_percent*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 0, PID_HEIGHT);
+    line(rho_frame, Point(PID_GRAPH_START,PID_END.y - scaled_target_value), Point(PID_GRAPH_START+PID_GRAPH_WIDTH, PID_END.y - scaled_target_value), bluish);
+    int pid_prev = 0;
+    for(int i = 0, x = PID_GRAPH_START; i < pid_data_x; i++, x++)
+    {
+        floating_t curr = pid_data[i];
+        if(curr > PID_MAX_BOUND) continue;
+        int scaled_pid_value = BOUND(curr*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 0, PID_HEIGHT),
+        curr_scaled = PID_END.y - scaled_pid_value-1;
+        if(pid_prev == 0)
+            rho_frame.at<Vec3b>(curr_scaled,x) = red;
+        else
+            line(rho_frame, Point(x-1,pid_prev), Point(x, curr_scaled), red);
+        pid_prev = curr_scaled;
+    }
+    
+    return rho_frame;
+}
+
+Mat& TauDrawer::DrawRhoDetection(int dimension)
+{
+    Mat &mat = (dimension==X_DIMENSION)?rho_detection_x:rho_detection_y;
+    int &mX = (dimension==X_DIMENSION)?x_match_data_x:y_match_data_x,
+    &pX = (dimension==X_DIMENSION)?x_peak_data_x:y_peak_data_x;
+    int *mD = (dimension==X_DIMENSION)?x_match_data:y_match_data;
+    floating_t *pDu = (dimension==X_DIMENSION)?x_peak_data_u:y_peak_data_u;
+    floating_t *pDuv = (dimension==X_DIMENSION)?x_peak_data_uv:y_peak_data_uv;
+    floating_t *pDut = (dimension==X_DIMENSION)?x_peak_data_ut:y_peak_data_ut;
+    floating_t *pDl = (dimension==X_DIMENSION)?x_peak_data_l:y_peak_data_l;
+    floating_t *pDlv = (dimension==X_DIMENSION)?x_peak_data_lv:y_peak_data_lv;
+    floating_t *pDlt = (dimension==X_DIMENSION)?x_peak_data_lt:y_peak_data_lt;
+    
+    density_map_t &map = (dimension==X_DIMENSION)?rho.utility.DensityMapPair.x:rho.utility.DensityMapPair.y;
+    prediction_t &prediction = (dimension==X_DIMENSION)?rho.utility.PredictionPair.x:rho.utility.PredictionPair.y;
+    string filename =(dimension==X_DIMENSION)?X_DIM_FILENAME:Y_DIM_FILENAME;
+    int &iteration = (dimension==X_DIMENSION)?x_detection_i:y_detection_i;
+    
+#define MATCH_DATA_WIDTH 3
+#define MATCH_ENCODE(X,i,S) X |= S << (i*MATCH_DATA_WIDTH-1)
+#define MATCH_DECODE(X,i) ((1 << MATCH_DATA_WIDTH)-1) & X >> (i*MATCH_DATA_WIDTH-1)
+    
+    /* Gather data */
+    pthread_mutex_lock(&rho.c_mutex);
+    int match_value = 0;
+    rho_kalman_t tracking_filters[MAX_TRACKING_FILTERS];
+    int tracking_filters_order[MAX_TRACKING_FILTERS] = {0};
+    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        int c = prediction.TrackingFiltersOrder[i];
+        MATCH_ENCODE(match_value, i, c);
+        memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(rho_kalman_t));
+        tracking_filters_order[i] = c;
+//        printf("%d %d %x\n", i, c, match_value);
+    }
+//    printf("\n");
+//    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+//    {
+//        printf("%d %d\n", i, MATCH_DECODE(match_value, i));
+//    }
+    
+    mD[mX] = match_value;
+    
+    floating_t c_percent = (floating_t)(map.centroid)/(floating_t)(map.length);
+    
+    pDu[pX] = prediction.PreviousPeak[0];
+    pDl[pX] = prediction.PreviousPeak[1];
+    pDuv[pX] = map.kalmans[0].variance;
+    pDlv[pX] = map.kalmans[1].variance;
+    pDut[pX] = map.kalmans[0].value;
+    pDlt[pX] = map.kalmans[1].value;
+    
+    blob_t blobs[MAX_BLOBS];
+    for(int i = 0; i < MAX_BLOBS; i++)
+        memcpy(&blobs[i], &prediction.Blobs[prediction.BlobsOrder[i]], sizeof(blob_t));
+    
+    pthread_mutex_unlock(&rho.c_mutex);
+    
+    ofstream file(filename, ofstream::out | ofstream::app);
+    /* Write to file */
+    file << iteration++;
+    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    {
+        blob_t curr = blobs[i];
+        file << "," << curr.den << "," << curr.wth << "," << curr.loc << "," << curr.max << "," << curr.scr << "," << tracking_filters_order[i];
+    }
+    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        rho_kalman_t curr = tracking_filters[i];
+        file << "," << curr.bias << "," << curr.K[0] << "," << curr.K[1] << "," << curr.value << "," << curr.velocity << "," << curr.score;
+    }
+    file << "," << c_percent << ","  << pDl[pX] << "," << pDlt[pX] << "," << pDlv[pX] << "," << pDu[pX] << "," << pDut[pX] << "," << pDuv[pX];
+    file << endl;
+    file.close();
+    
+    /* Clear */
+    mat = greyish;
+    
+    /* Draw */
+#define RD_SPACE 10
+#define RD_WIDTH mat.cols
+#define RD_HEIGHT mat.rows
+#define RD_FONT FONT_HERSHEY_PLAIN
+#define RD_TEXT_SM 1
+#define RD_TEXT_SM_OFFSET 16
+#define RD_TEXT_MD 2
+#define RD_TEXT_LG 4
+#define RD_TEXT_COLOR Scalar{245,245,245}
+#define RD_TEXT_PRECISION 2
+#define RD_LINE_WIDTH 1
+#define RD_INNER_WIDTH (RD_WIDTH-2*RD_SPACE)
+#define RD_LINE_COLOR white
+    
+#define RD_SCALED_HEIGHT(S) (RD_HEIGHT*S-RF_SPACE)
+    
+#define BL_SPLIT 0.5
+#define MCH_SPLIT 0.2
+#define PK_SPLIT 0.3
+    
+    /* Blobs */
+#define BL_WIDTH RD_INNER_WIDTH
+#define BL_HEIGHT (RD_SCALED_HEIGHT(BL_SPLIT))
+#define BL_MAX_NUM 4
+#define BL_IND_HEIGHT ((BL_HEIGHT-RD_SPACE)/BL_MAX_NUM-RD_SPACE)
+#define BL_ORIGIN Point(RD_SPACE,RD_SPACE)
+#define BL_END Point(BL_ORIGIN.x+BL_WIDTH, BL_ORIGIN.y+BL_HEIGHT)
+#define BL_MAX_SIZE 100
+#define BL_MAX_RADIUS (BL_IND_HEIGHT*0.9)
+#define BL_RADIUS_SCALE BL_MAX_RADIUS/(BL_MAX_SIZE/(2*M_PI))
+
+    // Bounds
+    rectangle(mat, BL_ORIGIN, BL_END, RD_LINE_COLOR);
+    
+    // Blobs
+    for(int i = 0, y = BL_ORIGIN.y+RD_SPACE; i < BL_MAX_NUM; i++, y += (BL_IND_HEIGHT+RD_SPACE))
+    {
+        blob_t curr = blobs[i];
+        
+        Scalar c = RD_LINE_COLOR;
+        if(curr.den > 2000)
+            c = blackish;
+        rectangle(mat, Point(BL_ORIGIN.x+RD_SPACE, y), Point(BL_ORIGIN.x+BL_WIDTH-RD_SPACE, y+BL_IND_HEIGHT), c);
+        
+        if(curr.den > 2000) continue;
+        
+        putText(mat, to_string(i)+":"+to_string(tracking_filters_order[i]), Point(BL_ORIGIN.x+RD_TEXT_SM_OFFSET/2+3,y+RD_TEXT_SM_OFFSET-3), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        
+        if(curr.den > 0)
+        {
+            int r = BL_RADIUS_SCALE*curr.den/(2*M_PI);
+            circle(mat, Point(BL_ORIGIN.x+BL_MAX_RADIUS, y+BL_IND_HEIGHT/2), r, redish);
+        }
+        Point textOrigin(BL_ORIGIN.x+BL_MAX_RADIUS*2-RD_SPACE, y+RD_SPACE);
+        line(mat, textOrigin, Point(textOrigin.x, y+BL_IND_HEIGHT-RD_SPACE), RD_LINE_COLOR);
+        
+        int x_offset[2] = {RD_SPACE, RD_SPACE+80};
+        int y_offset[3] = {RD_SPACE, RD_SPACE+18, RD_SPACE+36};
+        
+        // Blob text
+        putText(mat, "Den: " + to_string(curr.den), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Wth: " + to_string(curr.wth), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Loc: " + to_string(curr.loc), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Max: " + to_string(curr.max), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        
+        putText(mat, "Score: " + to_stringn(curr.scr,3), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        
+        
+        // Matching text & tracking filters
+        Point matchOrigin(textOrigin.x+160, textOrigin.y);
+        line(mat, matchOrigin, Point(matchOrigin.x, y+BL_IND_HEIGHT-RD_SPACE), RD_LINE_COLOR);
+        
+        rho_kalman_t kalman = tracking_filters[tracking_filters_order[i]];
+        putText(mat, "Bi: " + to_stringn(kalman.bias,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "K0: " + to_stringn(kalman.K[0],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Vl: " + to_stringn(kalman.value,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "K1: " + to_stringn(kalman.K[1],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Sc: " + to_stringn(kalman.score,2), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Ve: " + to_stringn(kalman.velocity,2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+    }
+    
+    /* Matching */
+#define MCH_WIDTH RD_INNER_WIDTH
+#define MCH_HEIGHT (RD_SCALED_HEIGHT(MCH_SPLIT))
+#define MCH_MAX_NUM BL_MAX_NUM
+#define MCH_IND_HEIGHT ((MCH_HEIGHT)/MCH_MAX_NUM)
+#define MCH_ORIGIN Point(RD_SPACE,BL_END.y+RD_SPACE)
+#define MCH_END Point(MCH_ORIGIN.x+MCH_WIDTH, MCH_ORIGIN.y+MCH_HEIGHT)
+#define MCH_INSET_X (MCH_ORIGIN.x+3*RD_SPACE)
+#define MCH_INTERVAL_WIDTH 5 // pixels
+#define MCH_INTERVAL_SPACE 3 // pixels
+#define MCH_INTERVAL_TOTAL (MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE)
+#define MCH_NUM_INTERVALS ((MCH_END.x-MCH_INSET_X)/MCH_INTERVAL_TOTAL)
+#define MCH_LINE_WIDTH 3
+    
+    //Bounds
+    rectangle(mat, MCH_ORIGIN, MCH_END, RD_LINE_COLOR);
+    
+    //Label
+    for(int i = 1, y = MCH_ORIGIN.y+MCH_IND_HEIGHT; i <= MCH_MAX_NUM; i++, y += MCH_IND_HEIGHT)
+    {
+        if(i < MCH_MAX_NUM)
+            line(mat, Point(BL_ORIGIN.x+1, y), Point(BL_ORIGIN.x+BL_WIDTH-1, y), blackish);
+        putText(mat, to_string(i), Point(BL_ORIGIN.x+RD_SPACE, y-MCH_IND_HEIGHT/2), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+    }
+    
+    // Match Data
+    int prevD = mD[0], prevV, currD, currV, y = MCH_ORIGIN.y + MCH_IND_HEIGHT/2+MCH_LINE_WIDTH;
+    for(int i = 1, x = MCH_INSET_X; i < mX; i++, x+=MCH_INTERVAL_TOTAL)
+    {
+        currD = mD[i];
+        for(int j = 0; j < MCH_MAX_NUM; j++)
+        {
+            currV = MATCH_DECODE(currD,j);
+            prevV = MATCH_DECODE(prevD,j);
+            line(mat, Point(x,y+MCH_IND_HEIGHT*prevV), Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
+            line(mat, Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), Point(x+MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
+        }
+        prevD = currD;
+    }
+    // Match index handler
+    mX++;
+    if(mX < 0 || mX > MCH_NUM_INTERVALS)
+    {
+        mX = 0;
+        memset(mD, 0, sizeof(floating_t)*width);
+    }
+    
+    /* Peak */
+#define PK_WIDTH RD_INNER_WIDTH
+#define PK_HEIGHT (RD_SCALED_HEIGHT(PK_SPLIT)-RD_SPACE)
+#define PK_CENTROID_DISPLAY_PERCENT 10.
+#define PK_CENTROID_DISPLAY_HEIGHT (PK_HEIGHT*PK_CENTROID_DISPLAY_PERCENT/100)
+#define PK_GRAPH_PERCENT (100.-PK_CENTROID_DISPLAY_PERCENT)
+#define PK_GRAPH_HEIGHT (PK_HEIGHT*PK_GRAPH_PERCENT/100.)
+#define PK_ORIGIN Point(RD_SPACE,MCH_END.y+RD_SPACE)
+#define PK_END Point(PK_ORIGIN.x+PK_WIDTH, PK_ORIGIN.y+PK_HEIGHT)
+#define PK_GRAPH_ORIGIN Point(PK_ORIGIN.x, PK_ORIGIN.y+PK_GRAPH_HEIGHT)
+    
+#define PK_INSET_X (PK_ORIGIN.x+3*RD_SPACE)
+#define PK_INTERVAL_WIDTH 5 // pixels
+#define PK_INTERVAL_SPACE 3 // pixels
+#define PK_INTERVAL_TOTAL (PK_INTERVAL_WIDTH+PK_INTERVAL_SPACE)
+#define PK_NUM_INTERVALS ((PK_END.x-PK_INSET_X)/PK_INTERVAL_TOTAL)
+#define PK_LINE_WIDTH 3
+#define PK_GRAPH_MAX_VALUE 100
+    
+#define PK_TICKS 5
+#define PK_TICK_SPACING (PK_GRAPH_HEIGHT/(PK_TICKS))
+#define PK_HAS_SUBTICKS true
+#define PK_TICK_WIDTH 7
+#define PK_TICK_FRAME_INSET PK_ORIGIN.x+RD_SPACE
+#define PK_SUBTICK_INSET 2
+    
+    //Bounds
+    rectangle(mat, PK_ORIGIN, PK_END, RD_LINE_COLOR);
+    line(mat, Point(PK_ORIGIN.x,PK_ORIGIN.y+PK_CENTROID_DISPLAY_HEIGHT), Point(PK_ORIGIN.x+PK_WIDTH,PK_ORIGIN.y+PK_CENTROID_DISPLAY_HEIGHT), RD_LINE_COLOR);
+    
+    //Centroid
+    int centroid_x = PK_WIDTH*c_percent;
+    line(mat, Point(centroid_x, PK_ORIGIN.y), Point(centroid_x, PK_ORIGIN.y+PK_CENTROID_DISPLAY_HEIGHT), RD_LINE_COLOR);
+    putText(mat, to_stringn(c_percent,2)+"%", Point(PK_ORIGIN.x+RD_TEXT_SM_OFFSET,PK_ORIGIN.y+RD_TEXT_SM_OFFSET), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+    putText(mat, to_stringn(1-c_percent,2)+"%", Point(PK_END.x-60,PK_ORIGIN.y+RD_TEXT_SM_OFFSET), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+    
+    // Ticks
+    // Upper
+    if(PK_HAS_SUBTICKS) line(mat, Point(PK_TICK_FRAME_INSET+PK_SUBTICK_INSET,PK_END.y-PK_TICK_SPACING/2), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH-PK_SUBTICK_INSET,PK_END.y-PK_TICK_SPACING/2), RD_LINE_COLOR);
+    for(int i = 1, y = PK_END.y - PK_TICK_SPACING; i < PK_TICKS; i++, y -= PK_TICK_SPACING)
+    {
+        line(mat, Point(PK_TICK_FRAME_INSET,y), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH,y), RD_LINE_COLOR, RD_LINE_WIDTH);
+        floating_t tick_value = PK_GRAPH_MAX_VALUE*((floating_t)i)/PK_TICKS;
+        putText(mat, to_stringn(tick_value, 1), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH+RD_SPACE,y+RD_TEXT_SM_OFFSET/2.5), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        if(PK_HAS_SUBTICKS) line(mat, Point(PK_TICK_FRAME_INSET+PK_SUBTICK_INSET,y-PK_TICK_SPACING/2), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH-PK_SUBTICK_INSET,y-PK_TICK_SPACING/2), RD_LINE_COLOR);
+    }
+    line(mat, Point(PK_ORIGIN.x+PK_WIDTH/2, PK_ORIGIN.y+PK_CENTROID_DISPLAY_HEIGHT), Point(PK_ORIGIN.x+PK_WIDTH/2, PK_ORIGIN.y+PK_HEIGHT), RD_LINE_COLOR);
+    // Lower
+    if(PK_HAS_SUBTICKS) line(mat, Point(PK_TICK_FRAME_INSET+PK_SUBTICK_INSET,PK_END.y-PK_TICK_SPACING/2), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH-PK_SUBTICK_INSET,PK_END.y-PK_TICK_SPACING/2), RD_LINE_COLOR);
+    for(int i = 1, y = PK_END.y - PK_TICK_SPACING; i < PK_TICKS; i++, y -= PK_TICK_SPACING)
+    {
+        line(mat, Point(PK_TICK_FRAME_INSET+PK_WIDTH/2,y), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH+PK_WIDTH/2,y), RD_LINE_COLOR, RD_LINE_WIDTH);
+//        floating_t tick_value = PK_GRAPH_MAX_VALUE*((floating_t)i)/PK_TICKS;
+//        putText(mat, to_stringn(tick_value, 1), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH+RD_SPACE+PK_WIDTH/2,y+RD_TEXT_SM_OFFSET/2.5), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        if(PK_HAS_SUBTICKS) line(mat, Point(PK_TICK_FRAME_INSET+PK_SUBTICK_INSET+PK_WIDTH/2,y-PK_TICK_SPACING/2), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH-PK_SUBTICK_INSET+PK_WIDTH/2,y-PK_TICK_SPACING/2), RD_LINE_COLOR);
+    }
+    
+    // Graph data
+    int prev_u = pDu[0], prev_l = pDl[0], prev_uv = pDuv[0], prev_lv = pDlv[0], curr_u, curr_l, curr_uv, curr_lv;
+    for(int i = 1, x = PK_TICK_FRAME_INSET+2*RD_SPACE; i < pX && x < PK_END.x/2; i++, x++)
+    {
+        curr_u = pDu[i];
+        curr_l = pDl[i];
+        curr_uv = pDuv[i];
+        curr_lv = pDlv[i];
+        
+        line(mat, Point(x-1, PK_END.y-prev_u*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x, PK_END.y-curr_u*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), red);
+        line(mat, Point(x-1, PK_END.y-prev_uv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x, PK_END.y-curr_uv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), redish);
+        
+        line(mat, Point(x-1+PK_WIDTH/2, PK_END.y-prev_l*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x+PK_WIDTH/2, PK_END.y-curr_l*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), blue);
+        line(mat, Point(x-1+PK_WIDTH/2, PK_END.y-prev_lv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x+PK_WIDTH/2, PK_END.y-curr_lv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), bluish);
+        
+        prev_u = curr_u;
+        prev_l = curr_l;
+        prev_uv = curr_uv;
+        prev_lv = curr_lv;
+    }
+    pX++;
+    if(pX < 0 || pX > PK_WIDTH/2)
+    {
+        pX = 0;
+        memset(pDu, 0, sizeof(floating_t)*width);
+        memset(pDl, 0, sizeof(floating_t)*width);
+    }
+    
+    return mat;
+}
+
 
 //void TauDrawer::drawKalmans()
 //{

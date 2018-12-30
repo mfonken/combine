@@ -13,16 +13,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-//#define USE_SHORTHAND_TYPES
-#ifdef USE_SHORTHAND_TYPES
-typedef uint8_t   uh;
-typedef uint16_t  uw;
-typedef uint32_t  ul;
-typedef int8_t    sh;
-typedef int16_t   sw;
-typedef int32_t   sl;
-#endif
-
 typedef double          floating_t;
 typedef uint8_t         byte_t;
 typedef uint16_t        index_t;
@@ -51,6 +41,8 @@ typedef volatile bool   flag_t;
 
 #define FBOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
 
+#define USE_INTERRUPT_MODEL
+
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define KALMAN_DEBUG
@@ -76,13 +68,5 @@ typedef volatile bool   flag_t;
 #else
 #define LOG_KALMAN(...)
 #endif
-
-//static double timestamp(void)
-//{
-//    //    struct timeval stamp;
-//    //    gettimeofday(&stamp, NULL);
-//    //    return stamp.tv_sec + stamp.tv_usec/1000000.0;
-//    return 1; ///TODO: Implement local time
-//}
 
 #endif /* rho_global_h */

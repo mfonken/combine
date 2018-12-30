@@ -62,7 +62,6 @@ void Rho::Generate_Density_Map_Using_Interrupt_Model( cimage_t image, bool backg
         RhoVariables.ram.Q       =  utility.Qb;
     }
     
-//    RIM_PERFORM_RHO_C( image );
     RIM_PERFORM_RHO_FUNCTION( image );
     
     if( backgrounding )

@@ -8,8 +8,10 @@
 
 #include "rho_utility.h"
 
+#ifdef USE_INTERRUPT_MODEL
 /* Universal Port for interrupt model */
 pixel_base_t test_port = 0;
+#endif
 
 static packet_offset_lookup_t packet_offset_lookup = PACKET_OFFSETS;
 //static floating_t timestamp(void){struct timeval stamp; gettimeofday(&stamp, NULL); return stamp.tv_sec + stamp.tv_usec/1000000.0;}
@@ -30,7 +32,7 @@ floating_t
     b->scr = BLOB_SCORE_FACTOR*( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
 }
 
-static void printPacket( packet_t * p, int l )
+void printPacket( packet_t * p, int l )
 {
     printf("Packet Size - %lubytes\n", sizeof(packet_t));
     for(int i = 0; i < sizeof(packet_t); )
@@ -48,11 +50,6 @@ static void printPacket( packet_t * p, int l )
     floating_t pxfr = *(floating_t*)&pxr;
     printf("{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
 }
-
-#ifdef USE_INTERRUPT_MODEL
-/* Universal Port for interrupt model */
-pixel_base_t test_port = 0;
-#endif
 
 /* Quadrant density redistribution lookup table */
 const density_redistribution_lookup_t rlookup =
@@ -340,7 +337,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                     } /* Calculate Chaos - END */
                     if(_.fden > 10000)
                         _.fden++;
-                    printf("Chaos: %.3f(%d/%d)\n", _.chaos, r->PreviousDensity[cyc], _.fden);
+//                    printf("Chaos: %.3f(%d/%d)\n", _.chaos, r->PreviousDensity[cyc], _.fden);
                     
                     { /* Score blobs - START */
                         /* Return on empty frames */
@@ -391,14 +388,22 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                 } while( _.rcal && ++_.rcal_c < MAX_RHO_RECALCULATION_LEVEL );
 //                if( _.cmax == 0 ) continue;
                 { /* Sort blobs - START */
+                    /// NOTE: Smaller scores are better
+                    /* Assume all blobs are valid */
                     uint8_t num_poor = 0;
+                    
+                    /* Cycle through found blobs */
                     for(uint8_t i = 0, j; i < _.blbf; i++)
                     {
+                        /* Find index of first unsorted blob and set score as minimum */
                         for( j = 0; j < _.blbf && r->Blobs[j].srt;j++);
                         floating_t min = r->Blobs[j].scr;
+                        
+                        /* Cycle through other blobs */
                         for( uint8_t k = j+1; k < _.blbf; k++ )
                         {
                             blob_t *curr = &r->Blobs[k];
+                            /* If unscored and less than min, set as new min */
                             if( curr->scr < min && !curr->srt )
                             {
                                 min = curr->scr;
@@ -406,40 +411,34 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                                 j = k;
                             }
                         }
-                        if( min == r->Blobs[j].scr )
+                        /* Set best blob's sort flag */
+//                        if( min == r->Blobs[j].scr )
                             r->Blobs[j].srt = 1;
-                        if( r->Blobs[j].scr < MAX_BLOB_SCORE )
+                
+                        /* If best is valid, add to the sort order vector */
+                        if( min < MAX_BLOB_SCORE )
                             r->BlobsOrder[i-num_poor] = j;
+                        /* Otherise ignore */
                         else num_poor++;
                     }
-//                    if(r->BlobsOrder[0] == r->BlobsOrder[1])
-//                        printf("!\n");
                     /* Remove all unused blobs order indeces */
                     for(uint8_t i = _.blbf-num_poor; i < MAX_BLOBS; i++) r->BlobsOrder[i] = MAX_BLOBS;
                 } /* Sort blobs - END */
             } /* Analyze band - END */
         }
         
-//        for(uint8_t i = 0; i < _.blbf; i++)
-//        {
-//            uint8_t index = r->BlobsOrder[i];
-//            printf("%d:%d\n", index, r->Blobs[index].loc);
-//        }
-//        printf("-------------\n");
-         //LOG_RHO("Map(%d): max>%d\n", cyc, _.cmax);
         r->NumBlobs = _.blbf;
         for( uint8_t i = 0; i < _.blbf; i++ )
         {
             r->Blobs[i].srt = false;
         }
-//        if( _.cmax == 0 ) return;
         
-        r->PreviousPeak[cyc] = BOUND(_.cmax, 0, _.len);//d->length);
+        r->PreviousPeak[cyc] = BOUND(_.cmax, 0, _.len);
         r->PreviousDensity[cyc] = _.fden;
         utility->FilteredCoverage = _.fden;
         utility->FilteredPercentage = ZDIV( (floating_t)utility->FilteredCoverage, (floating_t)utility->TotalCoverage );
         
-        printf("fc:%d(%.4f) tc:%d(%.4f)\n", utility->FilteredCoverage, utility->FilteredPercentage, utility->TotalCoverage, (floating_t)utility->TotalCoverage/(utility->Width*utility->Height));
+//        printf("fc:%d(%.4f) tc:%d(%.4f)\n", utility->FilteredCoverage, utility->FilteredPercentage, utility->TotalCoverage, (floating_t)utility->TotalCoverage/(utility->Width*utility->Height));
         
         d->max[cyc] = _.cmax;
     
@@ -511,7 +510,6 @@ void RedistributeRhoUtilityDensities( rho_utility * utility )
 /* Correct and factor predictions from variance band filtering into global model */
 void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
 {
-//    printf("------------------------\n");
     /* Step predictions of all Kalmans */
     uint8_t valid_tracks = 0;
     for( valid_tracks = 0; valid_tracks < MAX_TRACKING_FILTERS; valid_tracks++ )
@@ -521,15 +519,10 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
         rho_kalman_t *curr = &(r->TrackingFilters[index]);
         floating_t score = RhoKalman.Score(curr);
         if( RhoKalman.IsExpired(curr)
-           || ( score < MIN_TRACKING_KALMAN_SCORE ) )
-        {
-//            printf("Bad score %.2f(%d)\n", score, index);
-            break;
-        }
+           || ( score < MIN_TRACKING_KALMAN_SCORE ) ) break;
         
         RhoKalman.Predict(curr, curr->velocity);
     }
-//    printf("valid tracks %d\n", valid_tracks);
     /* Match blobs to Kalmans */
     floating_t A, B;
     uint8_t m, n;
@@ -557,13 +550,7 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
             A = aa * bb;
             B = ab * ba;
             
-            if( A > B )
-            {
-                SWAP(blocA, blocB);
-//                printf("SWAP\n");
-            }
-//            printf("%.2fx%.2f = %.2f <> %.2fx%.2f = %.2f   %.2f:%.2f\n",aa,bb,A,ab,ba,B,blocA,blocB);
-            
+            if( A > B ) SWAP(blocA, blocB);
             RhoKalman.Update(filterA, blocA);
             RhoKalman.Update(filterB, blocB);
             
@@ -611,12 +598,6 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
         memset(r->Probabilities.P, 0, sizeof(r->Probabilities.P));
         r->Probabilities.P[0] = 1.;
     }
-    
-//    for( k = 0; k < MAX_TRACKING_FILTERS; k++ )
-//    {
-//        uint8_t index = k;
-//        printf("%d(%d):%.2f(%.2f)\n", index, k, r->TrackingFilters[index].value, RhoKalman.Score(&r->TrackingFilters[index]));
-//    }
 }
 
 void UpdateRhoUtilityPredictions( rho_utility * utility )
@@ -699,15 +680,15 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     }
     RhoKalman.Step( &utility->TargetFilter, utility->TargetCoverageFactor, 0. );
     RhoPID.Update( &utility->ThreshFilter, utility->FilteredPercentage, utility->TargetFilter.value);
+//    printf("tc.f%3.4f fp%3.4f tf.v%3.4f th.v%3.4f\n", utility->TargetCoverageFactor, utility->FilteredPercentage, utility->TargetFilter.value, utility->ThreshFilter.Value);
     
     /* Filtered-Tune on target difference */
-//    floating_t filtered_tune_factor = utility->ThreshFilter.Error;
     floating_t proposed_tune_factor = BOUND( ( 1. + ( background_tune_factor + state_tune_factor ) ) * ( PID_SCALE * -utility->ThreshFilter.Value ), -THRESH_STEP_MAX, THRESH_STEP_MAX);
     utility->Thresh = (byte_t)BOUND(utility->Thresh + proposed_tune_factor, THRESH_MIN, THRESH_MAX);
 
-    printf("*** THRESH IS %d(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
-    printf("btf:%.3f | stf%.3f | e%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
-    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", utility->ThreshFilter.Value, utility->ThreshFilter.Error, utility->TargetFilter.value, utility->TargetCoverageFactor);
+//    printf("*** THRESH IS %d(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
+//    printf("btf:%.3f | stf%.3f | e%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
+//    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", utility->ThreshFilter.Value, utility->ThreshFilter.Error, utility->TargetFilter.value, utility->TargetCoverageFactor);
 //    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 

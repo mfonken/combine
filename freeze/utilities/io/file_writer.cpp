@@ -10,12 +10,7 @@
 
 using namespace std;
 
-FileWriter::FileWriter()
-{
-    file_name = NULL;
-}
-
-FileWriter::FileWriter( const char * name)
+FileWriter::FileWriter( const char * name )
 {
     file_name = name;
 }
