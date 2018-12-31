@@ -334,12 +334,12 @@ Mat ImageUtility::generateImage()
         path_left = path_center_x - size.width/4,
         path_right = path_center_x + size.width/4,
         path_top = path_center_y - size.height/4,
-        path_bottom = path_center_y + size.height/4;
-//        radius_offset = abs(0.5 - phase)*2;
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS/**(0.5+radius_offset)*/, TARGET_COLOR, -1);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS/**(1.5-radius_offset)*/, TARGET_COLOR, -1);
-//    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(1.0+radius_offset), TARGET_COLOR, -1);
-//    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0+radius_offset), TARGET_COLOR, -1);
+        path_bottom = path_center_y + size.height/4,
+        radius_offset = abs(0.5 - phase);
+//    circle(frame, Point(p_x, p_y), TARGET_RADIUS/**(0.5+radius_offset)*/, TARGET_COLOR, -1);
+//    circle(frame, Point(s_x, s_y), TARGET_RADIUS/**(1.5-radius_offset)*/, TARGET_COLOR, -1);
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+radius_offset), TARGET_COLOR, -1);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0-radius_offset), TARGET_COLOR, -1);
     switch( path )
     {
         case CIRCLE_CENTERED:

@@ -182,7 +182,7 @@ Mat& TauDrawer::GetDensitiesFrame(void)
     putText(frame, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
     putText(frame, "State: " + string(stateString(rho.utility.BayeSys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
-    putText(frame, "X (" + to_string(rho.utility.Cy) + ", " + to_string(rho.utility.Cx) + ")", Point(rho.utility.Cy-9, rho.utility.Cx+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
+    putText(frame, "X (" + to_string(rho.utility.Cx) + ", " + to_string(rho.utility.Cy) + ")", Point(rho.utility.Cx-9, rho.utility.Cy+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
     
     rectangle(frame, Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Point(frame.cols-RHO_MAPS_INSET,frame.rows-RHO_MAPS_INSET), Scalar(0,0,0));
     
@@ -196,8 +196,8 @@ void TauDrawer::DrawDensityGraph(Mat M)
     int u, v, w = width, h = height;
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
-    rangex[3] = { w, (int)rho.utility.Cy, 0 },
-    rangey[3] = { h, (int)rho.utility.Cx, 0 },
+    rangex[3] = { w, (int)rho.utility.Cx, 0 },
+    rangey[3] = { h, (int)rho.utility.Cy, 0 },
     Bx = rho.utility.Bx,
     By = rho.utility.By;
     line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
@@ -463,6 +463,8 @@ Vec3b TauDrawer::hsv2bgr(Vec3b hsv)
     return Vec3b(r*255,g*255,b*255);
 }
 
+#define RHO_DRAWERS_BACKGROUND_COLOR blackish
+
 Mat& TauDrawer::DrawRhoFrame()
 {
     /* Gather data */
@@ -478,7 +480,8 @@ Mat& TauDrawer::DrawRhoFrame()
     floating_t
     state_P[NUM_STATES] = { 0. };
     state_t state = rho.utility.BayeSys.state;
-    memcpy(state_P, rho.utility.BayeSys.probabilities.map[state], sizeof(floating_t)*NUM_STATES);
+    for(int i = 0; i < NUM_STATES; i++)
+        state_P[i] = rho.utility.BayeSys.probabilities.map[i][state];
     
     floating_t target_cvg_percent = rho.utility.TargetCoverageFactor;
     pid_data[pid_data_x++] = target_cvg_percent - rho.utility.ThreshFilter.Value;
@@ -496,7 +499,7 @@ Mat& TauDrawer::DrawRhoFrame()
     file.close();
 
     /* Clear */
-    rho_frame = greyish;
+    rho_frame = RHO_DRAWERS_BACKGROUND_COLOR;
     
     /* Draw */
 #define RF_SPACE 10
@@ -510,6 +513,11 @@ Mat& TauDrawer::DrawRhoFrame()
 #define RF_TEXT_COLOR Scalar{245,245,245}
 #define RF_TEXT_PRECISION 2
 #define RF_LINE_WIDTH 1
+#define RF_LINE_COLOR white
+    
+    Scalar RF_COLOR_A(0,50,150),
+    RF_COLOR_B(150,100,0),
+    RF_COLOR_C(50,150,50);
     
 #define CVG_SPLIT 0.05
 #define ST_SPLIT 0.5
@@ -528,22 +536,23 @@ Mat& TauDrawer::DrawRhoFrame()
 #define CVG_TOP_BOUND 1.
 #define TOTAL_CVG_ORIGIN
 #define TOTAL_CVG_TEXT_X (TOTAL_CVG_ORIGIN.x+CVG_TEXT_SM_OFFSET)
+    
     // Bound
     rectangle(rho_frame, CVG_ORIGIN, CVG_END, CVG_COLOR, RF_LINE_WIDTH);
-    putText(rho_frame, to_stringn(CVG_TOP_BOUND, RF_TEXT_PRECISION)+"%", Point(CVG_TEXT_X, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+    putText(rho_frame, to_stringn(CVG_TOP_BOUND, RF_TEXT_PRECISION)+"%", Point(CVG_TEXT_X, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
     // Total
     int total_offset = (1-(total_cvg_percent*100.)/CVG_TOP_BOUND)*CVG_WIDTH;
     if(total_offset > CVG_ORIGIN.x)
     {
-        rectangle(rho_frame, Point(CVG_ORIGIN.x+total_offset,CVG_ORIGIN.y), CVG_END, Scalar{200,0,0}, CV_FILLED);
-        putText(rho_frame, to_stringn(total_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+total_offset, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        rectangle(rho_frame, Point(CVG_ORIGIN.x+total_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_B, CV_FILLED);
+        putText(rho_frame, to_stringn(total_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+total_offset, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
         //Filtered
         int filtered_offset = (1-(total_cvg_percent*filtered_cvg_percent*100.)/CVG_TOP_BOUND)*CVG_WIDTH;
         if(filtered_offset > CVG_ORIGIN.x)
         {
-            rectangle(rho_frame, Point(CVG_ORIGIN.x+filtered_offset,CVG_ORIGIN.y), CVG_END, Scalar{0,200,0}, CV_FILLED);
+            rectangle(rho_frame, Point(CVG_ORIGIN.x+filtered_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_C, CV_FILLED);
             if(CVG_ORIGIN.x+filtered_offset < RF_WIDTH - 100)
-                putText(rho_frame, to_stringn(filtered_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+filtered_offset, CVG_TEXT_HEIGHT), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+                putText(rho_frame, to_stringn(filtered_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+filtered_offset, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
         }
     }
     
@@ -562,37 +571,41 @@ Mat& TauDrawer::DrawRhoFrame()
     rectangle(rho_frame, ST_ORIGIN, ST_END, ST_COLOR, RF_LINE_WIDTH);
     
     // Legend
-    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.5,ST_ORIGIN.y+ST_TEXT_X*3.5), white, CV_FILLED);
-    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), blue, CV_FILLED);
-    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), red, CV_FILLED);
-    putText(rho_frame, "X", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*0.5), RF_FONT, RF_TEXT_SM, blue);
-    putText(rho_frame, "Y", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*1.5), RF_FONT, RF_TEXT_SM, red);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.,ST_ORIGIN.y+ST_TEXT_X*4.5), RF_LINE_COLOR);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), RF_COLOR_A, CV_FILLED);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), RF_COLOR_B, CV_FILLED);
+    rectangle(rho_frame, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+4*ST_TEXT_X), RF_COLOR_C, CV_FILLED);
+    putText(rho_frame, "X", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*0.5), RF_FONT, RF_TEXT_SM, RF_COLOR_A);
+    putText(rho_frame, "Y", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*1.5), RF_FONT, RF_TEXT_SM, RF_COLOR_B);
+    putText(rho_frame, "A", Point(3.5*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*2.5), RF_FONT, RF_TEXT_SM, RF_COLOR_C);
     
     // Split Lines
-    line(rho_frame, Point(ST_ORIGIN.x,ST_ORIGIN.y+ST_HEIGHT/2), Point(ST_END.x,ST_ORIGIN.y+ST_HEIGHT/2), white, RF_LINE_WIDTH);
+    line(rho_frame, Point(ST_ORIGIN.x,ST_ORIGIN.y+ST_HEIGHT/2), Point(ST_END.x,ST_ORIGIN.y+ST_HEIGHT/2), RF_LINE_COLOR, RF_LINE_WIDTH);
     int width = ST_WIDTH/(NUM_STATE_GROUPS);
     for(int i = 0, x = width+ST_ORIGIN.x; i < NUM_STATE_GROUPS; i++, x += width)
-        line(rho_frame, Point(x,ST_ORIGIN.y+RF_SPACE), Point(x,ST_ORIGIN.y+ST_HEIGHT-RF_SPACE), white, RF_LINE_WIDTH);
+        line(rho_frame, Point(x,ST_ORIGIN.y+RF_SPACE), Point(x,ST_ORIGIN.y+ST_HEIGHT-RF_SPACE), RF_LINE_COLOR, RF_LINE_WIDTH);
     
     //State Data
     int bar_width = (width-2*RF_SPACE)/3;
     for(int i = 0, x = ST_ORIGIN.x+RF_SPACE; i < NUM_STATE_GROUPS; i++, x += width)
     {
-        rectangle(rho_frame, Point(x,ST_BAR_Y), Point(x+bar_width, ST_BAR_Y-X_kumaraswamy[i]*ST_BAR_MAX), blue, CV_FILLED);
-        rectangle(rho_frame, Point(x+bar_width,ST_BAR_Y), Point(x+2*bar_width, ST_BAR_Y-Y_kumaraswamy[i]*ST_BAR_MAX), red, CV_FILLED);
-        rectangle(rho_frame, Point(x+2*bar_width,ST_BAR_Y), Point(x+3*bar_width, ST_BAR_Y-C_kumaraswamy[i]*ST_BAR_MAX), greenish, CV_FILLED);
+        rectangle(rho_frame, Point(x,ST_BAR_Y), Point(x+bar_width, ST_BAR_Y-X_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_A, CV_FILLED);
+        rectangle(rho_frame, Point(x+bar_width,ST_BAR_Y), Point(x+2*bar_width, ST_BAR_Y-Y_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_B, CV_FILLED);
+        rectangle(rho_frame, Point(x+2*bar_width,ST_BAR_Y), Point(x+3*bar_width, ST_BAR_Y-C_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_C, CV_FILLED);
         
-        int state_i = 1 + i*2;
+        int state_i = 2 + i*2;
         string state_n = "U" + to_string(i);
-        Scalar c(redish);
-        if(state_i == state)
+        Scalar c(RF_COLOR_B);
+        if(state_i-1 == state)
         {
+            state_i--;
             state_n = "S" + to_string(i);
-            c = bluish;
+            c = RF_COLOR_A;
         }
         int r = ST_RADIUS*state_P[state_i];
         putText(rho_frame, state_n, Point(x, ST_BAR_Y+2*RF_SPACE), RF_FONT, RF_TEXT_SM, c);
         circle(rho_frame, Point(x+width/2-RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2), r, c, CV_FILLED);
+        putText(rho_frame, to_string((int)(state_P[state_i]*100))+"%", Point(x+width/2-2.8*RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2+5), RF_FONT, RF_TEXT_SM, RF_LINE_COLOR);
     }
     
     /* PID */
@@ -617,13 +630,13 @@ Mat& TauDrawer::DrawRhoFrame()
     rectangle(rho_frame, PID_ORIGIN, PID_END, PID_COLOR, RF_LINE_WIDTH);
     
     // Ticks
-    if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), white);
+    if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), RF_LINE_COLOR);
     for(int i = 1, y = PID_END.y - PID_TICK_SPACING; i <= PID_TICKS; i++, y -= PID_TICK_SPACING)
     {
-        line(rho_frame, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), white, RF_LINE_WIDTH);
+        line(rho_frame, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), RF_LINE_COLOR, RF_LINE_WIDTH);
         floating_t tick_value = PID_MAX_BOUND*((floating_t)i)/PID_TICKS;
         putText((rho_frame), to_stringn(tick_value, 1) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
-        if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), white);
+        if(PID_HAS_SUBTICKS) line(rho_frame, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), RF_LINE_COLOR);
     }
     
     if(pid_data_x <= 0 || pid_data_x > PID_GRAPH_WIDTH)
@@ -634,7 +647,7 @@ Mat& TauDrawer::DrawRhoFrame()
     
     // Graph
     int scaled_target_value = BOUND(target_cvg_percent*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 0, PID_HEIGHT);
-    line(rho_frame, Point(PID_GRAPH_START,PID_END.y - scaled_target_value), Point(PID_GRAPH_START+PID_GRAPH_WIDTH, PID_END.y - scaled_target_value), bluish);
+    line(rho_frame, Point(PID_GRAPH_START,PID_END.y - scaled_target_value), Point(PID_GRAPH_START+PID_GRAPH_WIDTH, PID_END.y - scaled_target_value), RF_COLOR_B);
     int pid_prev = 0;
     for(int i = 0, x = PID_GRAPH_START; i < pid_data_x; i++, x++)
     {
@@ -643,9 +656,9 @@ Mat& TauDrawer::DrawRhoFrame()
         int scaled_pid_value = BOUND(curr*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 0, PID_HEIGHT),
         curr_scaled = PID_END.y - scaled_pid_value-1;
         if(pid_prev == 0)
-            rho_frame.at<Vec3b>(curr_scaled,x) = red;
+            rho_frame.at<Scalar>(curr_scaled,x) = RF_COLOR_A;
         else
-            line(rho_frame, Point(x-1,pid_prev), Point(x, curr_scaled), red);
+            line(rho_frame, Point(x-1,pid_prev), Point(x, curr_scaled), RF_COLOR_A);
         pid_prev = curr_scaled;
     }
     
@@ -728,7 +741,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
     file.close();
     
     /* Clear */
-    mat = greyish;
+    mat = RHO_DRAWERS_BACKGROUND_COLOR;
     
     /* Draw */
 #define RD_SPACE 10
@@ -748,8 +761,8 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
 #define RD_SCALED_HEIGHT(S) (RD_HEIGHT*S-RF_SPACE)
     
 #define BL_SPLIT 0.5
-#define MCH_SPLIT 0.2
-#define PK_SPLIT 0.3
+#define MCH_SPLIT 0.1
+#define PK_SPLIT 0.4
     
     /* Blobs */
 #define BL_WIDTH RD_INNER_WIDTH
@@ -766,6 +779,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
     rectangle(mat, BL_ORIGIN, BL_END, RD_LINE_COLOR);
     
     // Blobs
+    int num_tracks = 0;
     for(int i = 0, y = BL_ORIGIN.y+RD_SPACE; i < BL_MAX_NUM; i++, y += (BL_IND_HEIGHT+RD_SPACE))
     {
         blob_t curr = blobs[i];
@@ -781,6 +795,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
         
         if(curr.den > 0)
         {
+            num_tracks++;
             int r = BL_RADIUS_SCALE*curr.den/(2*M_PI);
             circle(mat, Point(BL_ORIGIN.x+BL_MAX_RADIUS, y+BL_IND_HEIGHT/2), r, redish);
         }
@@ -824,7 +839,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
 #define MCH_INTERVAL_SPACE 3 // pixels
 #define MCH_INTERVAL_TOTAL (MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE)
 #define MCH_NUM_INTERVALS ((MCH_END.x-MCH_INSET_X)/MCH_INTERVAL_TOTAL)
-#define MCH_LINE_WIDTH 3
+#define MCH_LINE_WIDTH 2
     
     //Bounds
     rectangle(mat, MCH_ORIGIN, MCH_END, RD_LINE_COLOR);
@@ -834,15 +849,15 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
     {
         if(i < MCH_MAX_NUM)
             line(mat, Point(BL_ORIGIN.x+1, y), Point(BL_ORIGIN.x+BL_WIDTH-1, y), blackish);
-        putText(mat, to_string(i), Point(BL_ORIGIN.x+RD_SPACE, y-MCH_IND_HEIGHT/2), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, to_string(i), Point(BL_ORIGIN.x+RD_SPACE, y-3), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
     }
     
     // Match Data
-    int prevD = mD[0], prevV, currD, currV, y = MCH_ORIGIN.y + MCH_IND_HEIGHT/2+MCH_LINE_WIDTH;
+    int prevD = mD[0], prevV, currD, currV, y = MCH_ORIGIN.y + MCH_IND_HEIGHT/2;
     for(int i = 1, x = MCH_INSET_X; i < mX; i++, x+=MCH_INTERVAL_TOTAL)
     {
         currD = mD[i];
-        for(int j = 0; j < MCH_MAX_NUM; j++)
+        for(int j = 0; j < num_tracks; j++)
         {
             currV = MATCH_DECODE(currD,j);
             prevV = MATCH_DECODE(prevD,j);
@@ -902,7 +917,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
     {
         line(mat, Point(PK_TICK_FRAME_INSET,y), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH,y), RD_LINE_COLOR, RD_LINE_WIDTH);
         floating_t tick_value = PK_GRAPH_MAX_VALUE*((floating_t)i)/PK_TICKS;
-        putText(mat, to_stringn(tick_value, 1), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH+RD_SPACE,y+RD_TEXT_SM_OFFSET/2.5), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, to_stringn(tick_value, 1) + "%", Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH+RD_SPACE,y+RD_TEXT_SM_OFFSET/2.5), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         if(PK_HAS_SUBTICKS) line(mat, Point(PK_TICK_FRAME_INSET+PK_SUBTICK_INSET,y-PK_TICK_SPACING/2), Point(PK_TICK_FRAME_INSET+PK_TICK_WIDTH-PK_SUBTICK_INSET,y-PK_TICK_SPACING/2), RD_LINE_COLOR);
     }
     line(mat, Point(PK_ORIGIN.x+PK_WIDTH/2, PK_ORIGIN.y+PK_CENTROID_DISPLAY_HEIGHT), Point(PK_ORIGIN.x+PK_WIDTH/2, PK_ORIGIN.y+PK_HEIGHT), RD_LINE_COLOR);
@@ -917,24 +932,38 @@ Mat& TauDrawer::DrawRhoDetection(int dimension)
     }
     
     // Graph data
-    int prev_u = pDu[0], prev_l = pDl[0], prev_uv = pDuv[0], prev_lv = pDlv[0], curr_u, curr_l, curr_uv, curr_lv;
+    ///
+    floating_t f = PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1, o = PK_WIDTH/2;
+    int prev_u = PK_END.y-BOUNDU(pDu[0]*f, PK_HEIGHT),
+    prev_l = PK_END.y-BOUNDU(pDl[0]*f, PK_HEIGHT),
+    prev_lv = PK_END.y-BOUNDU(pDlv[0]*f, PK_HEIGHT),
+    prev_lt = PK_END.y-BOUNDU(pDlt[0]*f, PK_HEIGHT),
+    prev_uv = PK_END.y-BOUNDU(pDuv[0]*f, PK_HEIGHT),
+    prev_ut = PK_END.y-BOUNDU(pDut[0]*f, PK_HEIGHT),
+    curr_l, curr_lv, curr_lt, curr_u, curr_uv, curr_ut;
     for(int i = 1, x = PK_TICK_FRAME_INSET+2*RD_SPACE; i < pX && x < PK_END.x/2; i++, x++)
     {
-        curr_u = pDu[i];
-        curr_l = pDl[i];
-        curr_uv = pDuv[i];
-        curr_lv = pDlv[i];
+        curr_u = PK_END.y-BOUNDU(pDu[i]*f, PK_HEIGHT);
+        curr_l = PK_END.y-BOUNDU(pDl[i]*f, PK_HEIGHT);
+        curr_uv = PK_END.y-BOUNDU(pDuv[i]*f, PK_HEIGHT);
+        curr_lv = PK_END.y-BOUNDU(pDlv[i]*f, PK_HEIGHT);
+        curr_ut = PK_END.y-BOUNDU(pDut[i]*f, PK_HEIGHT);
+        curr_lt = PK_END.y-BOUNDU(pDlt[i]*f, PK_HEIGHT);
         
-        line(mat, Point(x-1, PK_END.y-prev_u*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x, PK_END.y-curr_u*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), red);
-        line(mat, Point(x-1, PK_END.y-prev_uv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x, PK_END.y-curr_uv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), redish);
+        line(mat, Point(x-1, prev_u), Point(x, curr_u), red);
+        line(mat, Point(x-1, prev_uv), Point(x, curr_uv), redish);
+        line(mat, Point(x-1, prev_ut), Point(x, curr_ut), orangish);
         
-        line(mat, Point(x-1+PK_WIDTH/2, PK_END.y-prev_l*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x+PK_WIDTH/2, PK_END.y-curr_l*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), blue);
-        line(mat, Point(x-1+PK_WIDTH/2, PK_END.y-prev_lv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), Point(x+PK_WIDTH/2, PK_END.y-curr_lv*PK_GRAPH_HEIGHT/PK_GRAPH_MAX_VALUE-1), bluish);
+        line(mat, Point(x-1+o, prev_l), Point(x+o, curr_l), blue);
+        line(mat, Point(x-1+o, prev_lv), Point(x+o, curr_lv), bluish);
+        line(mat, Point(x-1+o, prev_lt), Point(x+o, curr_lt), greenish);
         
         prev_u = curr_u;
         prev_l = curr_l;
         prev_uv = curr_uv;
         prev_lv = curr_lv;
+        prev_ut = curr_ut;
+        prev_lt = curr_lt;
     }
     pX++;
     if(pX < 0 || pX > PK_WIDTH/2)

@@ -48,7 +48,8 @@ extern "C" {
         rho_pid_t           ThreshFilter;
         rho_kalman_t        TargetFilter;
         
-        byte_t              Thresh;
+        floating_t          Thresh;
+        byte_t              ThreshByte;
         density_2d_t        Q[4],
         Qb[4],
         Qf[4],

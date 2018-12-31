@@ -123,5 +123,6 @@
 #define MIN_TRACKING_KALMAN_SCORE 0.02
 
 #define PID_SCALE   10
+#define PID_DRIFT 1.1
 
 #endif /* global_config_h */

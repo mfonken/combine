@@ -184,7 +184,7 @@ void InitRhoUtility( rho_utility * utility, index_t width, index_t height )
     RhoVariables.ram.CX_ADDR = &utility->Cx;
     RhoVariables.ram.CY_ADDR = &utility->Cy;
     RhoVariables.ram.C_FRAME =  utility->cframe;
-    RhoVariables.ram.THRESH_ADDR = (density_t *)&utility->Thresh;
+    RhoVariables.ram.THRESH_ADDR = (density_t *)&utility->ThreshByte;
     RhoVariables.ram.CAM_PORT = &test_port;
     
     RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
@@ -607,10 +607,10 @@ void UpdateRhoUtilityPredictions( rho_utility * utility )
     
     prediction_update_variables _ =
     {
-        utility->PredictionPair.x.Primary,
         utility->PredictionPair.y.Primary,
-        utility->PredictionPair.x.Secondary,
+        utility->PredictionPair.x.Primary,
         utility->PredictionPair.y.Secondary,
+        utility->PredictionPair.x.Secondary,
         utility->Cx,
         utility->Cy,
         0
@@ -631,9 +631,9 @@ void UpdateRhoUtilityPredictions( rho_utility * utility )
     utility->Cx = _.Cx;
     utility->Cy = _.Cy;
 
+    /* NOTE: density maps invert axes */
     utility->DensityMapPair.y.centroid = _.Cx;
     utility->DensityMapPair.x.centroid = _.Cy;
-    /* NOTE: density maps invert axes */
 
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
@@ -684,10 +684,12 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     
     /* Filtered-Tune on target difference */
     floating_t proposed_tune_factor = BOUND( ( 1. + ( background_tune_factor + state_tune_factor ) ) * ( PID_SCALE * -utility->ThreshFilter.Value ), -THRESH_STEP_MAX, THRESH_STEP_MAX);
-    utility->Thresh = (byte_t)BOUND(utility->Thresh + proposed_tune_factor, THRESH_MIN, THRESH_MAX);
-
-//    printf("*** THRESH IS %d(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
-//    printf("btf:%.3f | stf%.3f | e%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
+//    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
+    utility->Thresh = BOUND(utility->Thresh + proposed_tune_factor, THRESH_MIN, THRESH_MAX);
+    utility->ThreshByte = (byte_t)utility->Thresh;
+    
+    printf("*** THRESH IS %.2f(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
+    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
 //    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", utility->ThreshFilter.Value, utility->ThreshFilter.Error, utility->TargetFilter.value, utility->TargetCoverageFactor);
 //    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }

@@ -35,7 +35,7 @@ using namespace std;
 #define sleep(X) usleep(X*1E6)
 #define KEY_DELAY 1E3/MAIN_FPS
 
-#define FILENAME                        "/Users/matthew/Desktop/out.csv"
+#define FILENAME                        "/Users/matthew/Desktop/p_data.csv"
 #define X_DIM_FILENAME                  "/Users/matthew/Desktop/x_data.csv"
 #define Y_DIM_FILENAME                  "/Users/matthew/Desktop/y_data.csv"
 
