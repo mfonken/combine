@@ -233,6 +233,9 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
     
     r->NuBlobs = 0;
     
+    r->TotalDensity = 0;
+    r->NumBlobs = 0;
+    
     index_t range[3] = { _.len, d->centroid, 0 };
     LOG_RHO("Range is <%d | %d | %d>\n", range[2], range[1], range[0]);
     
@@ -278,6 +281,7 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
                                 if( ( _.c1 > _.fpeak )
                                    && ( _.fpeak_2 > _.c2 ) )
                                     _.c1 = _.fpeak_2 - _.c1;
+                                _.tden += _.c1;
                             }
                             else
                                 _.c1 = 0;
@@ -427,25 +431,34 @@ void FilterAndSelectRhoUtility( rho_utility * utility, density_map_t * d, predic
             } /* Analyze band - END */
         }
         
-        r->NumBlobs = _.blbf;
-        for( uint8_t i = 0; i < _.blbf; i++ )
-        {
-            r->Blobs[i].srt = false;
-        }
+        r->NumBlobs += _.blbf;
+        
         
         r->PreviousPeak[cyc] = BOUND(_.cmax, 0, _.len);
         r->PreviousDensity[cyc] = _.fden;
+        r->TotalDensity += _.tden;
         utility->FilteredCoverage = _.fden;
         utility->FilteredPercentage = ZDIV( (floating_t)utility->FilteredCoverage, (floating_t)utility->TotalCoverage );
         
 //        printf("fc:%d(%.4f) tc:%d(%.4f)\n", utility->FilteredCoverage, utility->FilteredPercentage, utility->TotalCoverage, (floating_t)utility->TotalCoverage/(utility->Width*utility->Height));
         
         d->max[cyc] = _.cmax;
+    }
     
-        if( isnormal(_.chaos) && isnormal(_.pkp) )
-            r->NuBlobs += _.chaos * _.pkp * (floating_t)_.blbf;
-        else
-            r->NuBlobs = 0.;
+//    if( isnormal(_.chaos) && isnormal(_.pkp) )
+//        r->NuBlobs += _.chaos * _.pkp * (floating_t)_.blbf;
+//    else
+//        r->NuBlobs = 0.;
+    floating_t band_width = _.fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
+    floating_t target_density = utility->TargetFilter.value * utility->Width * utility->Height;// / band_factor;
+    floating_t A = EXPECTED_NUM_BLOBS * (floating_t)r->TotalDensity, B = r->NumBlobs * target_density;
+    r->NuBlobs = BOUNDU( ZDIV( (floating_t)r->TotalDensity, target_density ), 10.);
+    
+    printf("A:%6d B:%6d Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, utility->TargetFilter.value, r->TotalDensity, band_width, band_factor);
+    
+    for( uint8_t i = 0; i < _.blbf; i++ )
+    {
+        r->Blobs[i].srt = false;
     }
 }
 
@@ -582,13 +595,14 @@ void UpdateRhoUtilityPrediction( rho_utility * utility, prediction_t * r )
     r->Primary   = r->TrackingFilters[0].value;
     r->Secondary = r->TrackingFilters[1].value;
 
+    floating_t a = r->NuBlobs, b = (floating_t)((uint8_t)NUM_STATE_GROUPS - 1);
     if( r->NuBlobs > 0. )
     {
         floating_t curr_CDF, prev_CDF = 0.;
         for( uint8_t i = 0; i <= NUM_STATE_GROUPS; i++ )
         {
-            floating_t x = (floating_t)i / (floating_t)((uint8_t)NUM_STATE_GROUPS);
-            curr_CDF = 1 - pow( 1 - pow( x, r->NuBlobs ), NUM_STATE_GROUPS);
+            floating_t x = (floating_t)i / b;
+            curr_CDF = 1 - pow( 1 - pow( x, a ), b);
             if( i > 0 ) r->Probabilities.P[i-1] = curr_CDF - prev_CDF;
             prev_CDF = curr_CDF;
         }
@@ -665,12 +679,13 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
             RhoKalman.Reset( &utility->DensityMapPair.x.kalmans[1], utility->PredictionPair.x.PreviousPeak[1] );
             RhoKalman.Reset( &utility->DensityMapPair.y.kalmans[0], utility->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &utility->DensityMapPair.y.kalmans[1], utility->PredictionPair.y.PreviousPeak[1] );
-        case STABLE_SINGLE:
         case STABLE_MANY:
+            state_tune_factor = 10;
+        case STABLE_SINGLE:
         case UNSTABLE_NONE:
         case UNSTABLE_SINGLE:
         case UNSTABLE_MANY:
-            state_tune_factor = (UNSTABLE_DOUBLE - (floating_t)utility->BayeSys.state ) / NUM_STATES;
+            state_tune_factor *= (UNSTABLE_DOUBLE - (floating_t)utility->BayeSys.state ) / NUM_STATES;
             break;
         case STABLE_DOUBLE:
             utility->TargetCoverageFactor = utility->FilteredPercentage;
@@ -680,16 +695,18 @@ void UpdateRhoUtilityThreshold( rho_utility * utility )
     }
     RhoKalman.Step( &utility->TargetFilter, utility->TargetCoverageFactor, 0. );
     RhoPID.Update( &utility->ThreshFilter, utility->FilteredPercentage, utility->TargetFilter.value);
-//    printf("tc.f%3.4f fp%3.4f tf.v%3.4f th.v%3.4f\n", utility->TargetCoverageFactor, utility->FilteredPercentage, utility->TargetFilter.value, utility->ThreshFilter.Value);
     
     /* Filtered-Tune on target difference */
-    floating_t proposed_tune_factor = BOUND( ( 1. + ( background_tune_factor + state_tune_factor ) ) * ( PID_SCALE * -utility->ThreshFilter.Value ), -THRESH_STEP_MAX, THRESH_STEP_MAX);
+    floating_t proposed_tune_factor = BOUND( background_tune_factor + state_tune_factor + utility->ThreshFilter.Value, -THRESH_STEP_MAX, THRESH_STEP_MAX);
+    
+//    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(utility->BayeSys.state), state_tune_factor, utility->ThreshFilter.Value, proposed_tune_factor);
+    
 //    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
-    utility->Thresh = BOUND(utility->Thresh + proposed_tune_factor, THRESH_MIN, THRESH_MAX);
+    utility->Thresh = BOUND(utility->Thresh - proposed_tune_factor, THRESH_MIN, THRESH_MAX);
     utility->ThreshByte = (byte_t)utility->Thresh;
     
-    printf("*** THRESH IS %.2f(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
-    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
+//    printf("*** THRESH IS %.2f(%.2f) ***\n", utility->Thresh, utility->ThreshFilter.Value);
+//    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
 //    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", utility->ThreshFilter.Value, utility->ThreshFilter.Error, utility->TargetFilter.value, utility->TargetCoverageFactor);
 //    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", utility->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }

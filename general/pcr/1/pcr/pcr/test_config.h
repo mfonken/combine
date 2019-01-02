@@ -17,14 +17,14 @@ using namespace std;
 #define COMBINE_FPS     0
 
 #define TITLE_STRING                    "PCR Alpha v0.01"
-#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "frames/small"// "noise/dynamic_clouds"
-#define FRAME_IMAGE_SOURCE_NUM_FRAMES   26
+#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "frames/noiseS1"// "noise/dynamic_clouds"
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES   31
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
 //#define HAS_IMU
-//#define HAS_FILE
-#define HAS_GENERATOR
+#define HAS_FILE
+//#define HAS_GENERATOR
 
 #define FRAME_WIDTH                     500
 #define FRAME_HEIGHT                    700

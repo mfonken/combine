@@ -218,8 +218,9 @@ typedef struct
     floating_t      NuBlobs,
                     Primary,
                     Secondary;
-    density_t       PreviousPeak[2],
-                    PreviousDensity[2];
+    density_t       PreviousPeak[2];
+    density_2d_t    PreviousDensity[2],
+                    TotalDensity;
     prediction_probabilities Probabilities;
 } prediction_t;
 

@@ -106,12 +106,13 @@
 #define THRESH_STEP_MAX     10
 #define THRESH_STEP_BASE    6
 #define THRESH_STEP         1
-#define THRESH_MIN          1
+#define THRESH_MIN          200//1
 #define THRESH_MAX          255
 
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        40
 
+#define EXPECTED_NUM_BLOBS  2
 #define MAX_BLOBS           10
 #define MIN_BLOB_DENSITY    5
 #define MAX_BLOB_SCORE      4
@@ -122,7 +123,7 @@
 #define MAX_TRACKING_FILTERS 4
 #define MIN_TRACKING_KALMAN_SCORE 0.02
 
-#define PID_SCALE   10
+#define PID_SCALE   1//10
 #define PID_DRIFT 1.1
 
 #endif /* global_config_h */
