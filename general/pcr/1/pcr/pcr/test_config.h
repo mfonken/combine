@@ -23,8 +23,8 @@ using namespace std;
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
 //#define HAS_IMU
-#define HAS_FILE
-//#define HAS_GENERATOR
+//#define HAS_FILE
+#define HAS_GENERATOR
 
 #define FRAME_WIDTH                     500
 #define FRAME_HEIGHT                    700

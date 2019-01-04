@@ -26,6 +26,7 @@
 		34D311AA21C61FA2000C1D0C /* rho_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D3119C21C61FA2000C1D0C /* rho_wrapper.cpp */; };
 		34D311AE21C62FD3000C1D0C /* rho_interrupt_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 34D311AC21C62FD2000C1D0C /* rho_interrupt_model.c */; };
 		34D311B321C6F9EB000C1D0C /* tau_drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34D311B221C6F9EB000C1D0C /* tau_drawer.cpp */; };
+		34EC1D5721DF10AF003E77AA /* rho_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 34EC1D5621DF10AF003E77AA /* rho_core.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,6 +93,8 @@
 		34D311AF21C6F76B000C1D0C /* test_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test_config.h; sourceTree = "<group>"; };
 		34D311B121C6F9EA000C1D0C /* tau_drawer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tau_drawer.hpp; sourceTree = "<group>"; };
 		34D311B221C6F9EB000C1D0C /* tau_drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tau_drawer.cpp; sourceTree = "<group>"; };
+		34EC1D5521DF109C003E77AA /* rho_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_core.h; sourceTree = "<group>"; };
+		34EC1D5621DF10AF003E77AA /* rho_core.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rho_core.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -265,6 +268,8 @@
 				34D3119621C61FA2000C1D0C /* rho_structure.h */,
 				34D3119721C61FA2000C1D0C /* rho_utility.h */,
 				34D3119421C61FA2000C1D0C /* rho_utility.c */,
+				34EC1D5521DF109C003E77AA /* rho_core.h */,
+				34EC1D5621DF10AF003E77AA /* rho_core.c */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -325,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34EC1D5721DF10AF003E77AA /* rho_core.c in Sources */,
 				34D311AA21C61FA2000C1D0C /* rho_wrapper.cpp in Sources */,
 				34D3116E21C61947000C1D0C /* timestamp.c in Sources */,
 				34D311A221C61FA2000C1D0C /* state_machine_utility.c in Sources */,

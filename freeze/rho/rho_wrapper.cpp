@@ -21,13 +21,13 @@ Rho::Rho( int width, int height ) : width(width), height(height)
         a = sizeof(redistribution_variables),
         b = sizeof(rho_selection_variables),
         c = sizeof(prediction_update_variables),
-        d = sizeof(rho_utility)-sizeof(density_t)*C_FRAME_SIZE+(2*(RHO_WIDTH+RHO_HEIGHT))*sizeof(density_t),
+        d = sizeof(rho_core_t)-sizeof(density_t)*C_FRAME_SIZE+(2*(RHO_WIDTH+RHO_HEIGHT))*sizeof(density_t),
         e = a + b + c + d;
     LOG_RHO("\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     
-    RhoFunctions.Init(&utility, width, height);
+    RhoCore.Init(&utility, width, height);
     BayesianFunctions.Sys.Init( &utility.BayeSys );
     backgrounding_event = false;
     
@@ -41,7 +41,7 @@ void Rho::Perform( cimage_t & img, GlobalPacket * p )
     
     /* Core Rho Functions */
     Generate_Density_Map_Using_Interrupt_Model( img, backgrounding_event );
-    RhoFunctions.Perform( &utility, backgrounding_event );
+    RhoCore.Perform( &utility, backgrounding_event );
     /* * * * * * * * * * */
     
     pthread_mutex_unlock(&density_map_pair_mutex);

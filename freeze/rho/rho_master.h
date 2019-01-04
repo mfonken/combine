@@ -9,6 +9,6 @@
 #ifndef rho_master_h
 #define rho_master_h
 
-#include "rho_utility.h"
+#include "rho_core.h"
 
 #endif /* rho_master_h */

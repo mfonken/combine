@@ -28,7 +28,7 @@ int main( int argc, const char * argv[] )
     {
         pthread_mutex_lock(&tau.utility.outframe_mutex);
         imshow(TITLE_STRING, tau.GetDensitiesFrame());
-        imshow("Rho Frame", tau.DrawRhoFrame());
+//        imshow("Rho Frame", tau.DrawRhoFrame());
 //        imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //        imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         pthread_mutex_unlock(&tau.utility.outframe_mutex);
