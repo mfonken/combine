@@ -23,12 +23,13 @@ int main( int argc, const char * argv[] )
     env.pause();
     sleep(0.1);
     env.resume();
-    
+    Mat local_frame;
     while(1)
     {
+        local_frame = tau.DrawAll();
         pthread_mutex_lock(&tau.utility.outframe_mutex);
-        imshow(TITLE_STRING, tau.GetDensitiesFrame());
-//        imshow("Rho Frame", tau.DrawRhoFrame());
+//        imshow(TITLE_STRING, tau.GetDensitiesFrame());
+        imshow("Rho Frame", local_frame);
 //        imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //        imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         pthread_mutex_unlock(&tau.utility.outframe_mutex);

@@ -156,8 +156,8 @@
 				34D3117421C6199D000C1D0C /* time */,
 			);
 			name = utilities;
-			path = ../../../../../freeze/utilities;
-			sourceTree = "<group>";
+			path = /Users/matthew/Desktop/marbl/Techincal/combine/freeze/utilities;
+			sourceTree = "<absolute>";
 		};
 		34D3115421C61947000C1D0C /* io */ = {
 			isa = PBXGroup;
@@ -220,8 +220,8 @@
 				34D3118321C61FA2000C1D0C /* rho */,
 			);
 			name = tau;
-			path = ../../../../../freeze/tau;
-			sourceTree = "<group>";
+			path = /Users/matthew/Desktop/marbl/Techincal/combine/freeze/tau;
+			sourceTree = "<absolute>";
 		};
 		34D3118321C61FA2000C1D0C /* rho */ = {
 			isa = PBXGroup;

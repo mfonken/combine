@@ -299,7 +299,7 @@ void drawPosition(double x, double y, double z)
     //    imshow("Position", P);
 }
 
-Mat ImageUtility::generateImage()
+Mat& ImageUtility::generateImage()
 {
     path_tick = counter % path_num_ticks;
     if( !has_file && !has_camera ) frame = {0};
@@ -334,12 +334,9 @@ Mat ImageUtility::generateImage()
         path_left = path_center_x - size.width/4,
         path_right = path_center_x + size.width/4,
         path_top = path_center_y - size.height/4,
-        path_bottom = path_center_y + size.height/4,
-        radius_offset = abs(0.5 - phase);
-//    circle(frame, Point(p_x, p_y), TARGET_RADIUS/**(0.5+radius_offset)*/, TARGET_COLOR, -1);
-//    circle(frame, Point(s_x, s_y), TARGET_RADIUS/**(1.5-radius_offset)*/, TARGET_COLOR, -1);
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+radius_offset), TARGET_COLOR, -1);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0-radius_offset), TARGET_COLOR, -1);
+        path_bottom = path_center_y + size.height/4;
+    
+
     switch( path )
     {
         case CIRCLE_CENTERED:
@@ -359,6 +356,15 @@ Mat ImageUtility::generateImage()
         default:
             break;
     }
+    
+#ifdef GENERATOR_SIZE_OSCILLATION
+    double radius_offset = abs(0.5 - phase);
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+radius_offset), TARGET_COLOR, CV_FILLED);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0-radius_offset), TARGET_COLOR, CV_FILLED);
+#else
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+#endif
 //    circle(frame, Point(size.width/2, size.height/2), TARGET_RADIUS*2, NOISE_COLOR, -1);
     return frame;
 }

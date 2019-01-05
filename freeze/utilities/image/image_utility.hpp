@@ -91,7 +91,7 @@ public:
     Mat& GetNextFrame();
     bool isLive();
     void drawOutframe();
-    Mat generateImage();
+    Mat& generateImage();
     
     kpoint_t bea[2];
     int thresh;
