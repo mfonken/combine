@@ -10,12 +10,10 @@
 #define rho_structure_h
 
 #define DUAL_FILTER_CYCLE(X) \
-byte_t X, X##_; \
 for( X = 1, X##_ = 2; X##_ > 0; X--, X##_-- )
 
 #define BOUNDED_CYCLE_DUAL(A,B,C,D,E,F,G) \
-index_t C; \
-for(x = A; x > B; --C, D = E[x], F = G[x] )
+for(A = B; A > C; --A, D = E[A], F = G[A] )
 
 #define PACKET_ADDRESS_INITIALIZER(r)           \
 {                                               \

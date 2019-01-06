@@ -14,6 +14,7 @@
 #include "rho_config.h"
 #include "rho_kalman.h"
 #include "rho_pid.h"
+#include "state_machine_utility.h"
 #include "rho_global.h"
 
 /* Packet Generation Settings */
@@ -186,23 +187,6 @@ typedef struct
     density_redistribution_lookup_config_t config[4];
 } density_redistribution_lookup_t;
 
-typedef enum
-{
-    UNKNOWN_STATE = 0,
-    STABLE_NONE,
-    UNSTABLE_NONE,
-    STABLE_SINGLE,
-    UNSTABLE_SINGLE,
-    STABLE_DOUBLE,
-    UNSTABLE_DOUBLE,
-    STABLE_MANY,
-    UNSTABLE_MANY,
-    
-    NUM_STATES
-} state_t;
-
-#define NUM_STATE_GROUPS (NUM_STATES/2)
-
 typedef struct
 {
     floating_t  P[NUM_STATE_GROUPS];
@@ -266,5 +250,119 @@ typedef struct
   platform_flag_interace_functions Flags;
   platform_time_interace_functions Time;
 } platform_interface_functions;
+
+typedef struct
+{
+    index_t
+    xl[3],
+    yl[3];
+    density_2d_t
+    area[9];
+    
+    density_2d_t a, b, c, d, l, l_, p, q, x, y;
+} redistribution_variables;
+extern const density_redistribution_lookup_t rlookup;
+
+typedef struct
+{
+    index_t
+    len,
+    range[3],
+    cyc,
+    cyc_,
+    gapc,
+    width,
+    blbf,            /* Blob fill */
+    x,               /* Generic index */
+    start,
+    end;
+    density_t
+    fpeak,
+    fpeak_2,
+    fbandl,
+    c1,
+    c2,
+    b,
+    rcal_c; /* Recalculation counter */
+    variance_t
+    fvar;
+    density_2d_t
+    cmax,
+    cden,
+    tden,
+    fden,
+    tcov;   /* Total coverage */
+    bool
+    has,
+    rcal; /* Recalculate */
+    floating_t
+    avgc,
+    cavg,   /* cumulative average */
+    mavg,   /* moment average */
+    chaos;
+} rho_detection_variables;
+
+typedef struct
+{
+    index_t
+    Ax,
+    Ay,
+    Bx,
+    By,
+    Cx,
+    Cy;
+    int8_t qcheck;
+} prediction_update_variables;
+
+typedef struct
+{
+    packet_t *packet;
+    address_t pdPtr,
+    llPtr,
+    *alPtr;
+    byte_t
+    includes,
+    i,
+    j,
+    l,
+    t;
+} packet_generation_variables;
+
+typedef struct
+{
+    index_t
+        Width,
+        Height,
+        Cx,
+        Cy,
+        Bx,
+        By;
+    byte_t
+        ThreshByte,
+        BackgroundCounter,
+        BackgroundPeriod;
+    density_2d_t
+        Q[4],
+        Qb[4],
+        Qf[4],
+        QbT,
+        TotalCoverage,
+        FilteredCoverage,
+        TargetCoverage;
+    floating_t
+        FilteredPercentage,
+        TargetCoverageFactor,
+        CoverageFactor,
+        VarianceFactor,
+        Thresh;
+    density_map_pair_t  DensityMapPair;
+    prediction_pair_t   PredictionPair;
+    bayesian_system_t   BayeSys;
+    rho_pid_t           ThreshFilter;
+    rho_kalman_t        TargetFilter;
+    packet_t            Packet;
+    
+    index_t             cframe[C_FRAME_SIZE];
+} rho_core_t;
 
 #endif /* rho_c_types_h */

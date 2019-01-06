@@ -31,17 +31,9 @@ typedef volatile bool   flag_t;
 #define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
 #define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
 
-#define MAX(A,B)        ((A>B)?A:B)
-
-#define SWAP(A,B)      ({typeof(A) temp = A; A = B; B = temp;})
-//#define ALLOW_NEGATIVE_REDISTRIBUTION
-
-#define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
-#define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
-
-#define FBOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
-
 #define USE_INTERRUPT_MODEL
+
+//#define ALLOW_NEGATIVE_REDISTRIBUTION
 
 //#define RHO_DEBUG
 //#define STATEM_DEBUG
@@ -68,5 +60,21 @@ typedef volatile bool   flag_t;
 #else
 #define LOG_KALMAN(...)
 #endif
+
+#define MAX(A,B)        ((A>B)?A:B)
+
+#define SWAP(A,B)      ({typeof(A) temp = A; A = B; B = temp;})
+
+#define BOUNDU(X,MAX)    ((X>MAX)?(MAX-1):X)         // Bound in upper range
+#define BOUND(X,MIN,MAX) ((X<MIN)?MIN:BOUNDU(X,MAX)) // Bound in upper and lower range
+
+#define FBOUND(X,MIN,MAX) ((X<MIN)?MIN:((X>MAX)?MAX:X))
+
+#define SQUARE(X)                       ( X * X )
+#define DISTANCE_SQ(X,Y)                ( SQUARE(X) + SQUARE(Y) )
+#define INRANGE(X,Y,T)                  ( abs( X - Y ) < T )
+
+#define ZDIV_LNUM 1 << 10
+#define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
 
 #endif /* rho_global_h */

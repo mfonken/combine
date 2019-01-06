@@ -52,17 +52,17 @@ extern "C" {
     } rho_kalman_t;
     
 //    floating_t timestamp(void);
-    void        InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv );
-    void       ResetRhoKalman( rho_kalman_t * k, floating_t v );
-    void     PredictRhoKalman( rho_kalman_t * k, floating_t rate_new );
-    void      UpdateRhoKalman( rho_kalman_t * k, floating_t value_new );
-    floating_t  StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rate_new );
-    bool   IsRhoKalmanExpired( rho_kalman_t * k );
-    floating_t ScoreRhoKalman( rho_kalman_t * k );
-    void      PunishRhoKalman( rho_kalman_t * k );
+    void  InitializeRhoKalman( rho_kalman_t *, floating_t, floating_t, index_t, index_t, rho_kalman_uncertainty_c );
+    void       ResetRhoKalman( rho_kalman_t *, floating_t );
+    void     PredictRhoKalman( rho_kalman_t *, floating_t );
+    void      UpdateRhoKalman( rho_kalman_t *, floating_t );
+    floating_t  StepRhoKalman( rho_kalman_t *, floating_t, floating_t );
+    bool   IsRhoKalmanExpired( rho_kalman_t * );
+    floating_t ScoreRhoKalman( rho_kalman_t * );
+    void      PunishRhoKalman( rho_kalman_t * );
     
     struct rho_kalman {
-        void (*       Init)( rho_kalman_t *, floating_t, floating_t, floating_t, floating_t, floating_t, index_t, index_t );
+        void (*  Initialize)( rho_kalman_t *, floating_t, floating_t, index_t, index_t, rho_kalman_uncertainty_c );
         void (*      Reset)( rho_kalman_t *, floating_t );
         void (*    Predict)( rho_kalman_t *, floating_t );
         void (*     Update)( rho_kalman_t *, floating_t );
@@ -74,7 +74,7 @@ extern "C" {
     
     static const struct rho_kalman RhoKalman =
     {
-        .Init = InitRhoKalman,
+        .Initialize = InitializeRhoKalman,
         .Reset = ResetRhoKalman,
         .Predict = PredictRhoKalman,
         .Update = UpdateRhoKalman,

@@ -17,7 +17,7 @@ class Rho
 public:
     int                 width,
                         height;
-    rho_core_t          utility;
+    rho_core_t          core;
     pthread_mutex_t     c_mutex;
     pthread_mutex_t     density_map_pair_mutex;
     bool                backgrounding_event;

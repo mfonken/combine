@@ -10,7 +10,7 @@
 #define state_machine_utility_h
 
 #include <stdint.h>
-#include "rho_types.h"
+#include "rho_global.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,13 +30,6 @@ extern "C" {
 #define SHADOW_TOLERANCE                0.2
 #define DOUBT_STABILITY                 0.5
     
-#define SQUARE(X)                       ( X * X )
-#define DISTANCE_SQ(X,Y)                ( SQUARE(X) + SQUARE(Y) )
-#define INRANGE(X,Y,T)                  ( abs( X - Y ) < T )
-    
-#define ZDIV_LNUM 1 << 10
-#define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
-    
     /***************************************************************************************/
     
     /** Goals **
@@ -51,6 +44,23 @@ extern "C" {
     /* Tau states */
 #define state_dimension_t uint8_t
 #define loop_variables_state_dimension_t loop_variables_uint8_t //##state_dimension_t
+    
+    typedef enum
+    {
+        UNKNOWN_STATE = 0,
+        STABLE_NONE,
+        UNSTABLE_NONE,
+        STABLE_SINGLE,
+        UNSTABLE_SINGLE,
+        STABLE_DOUBLE,
+        UNSTABLE_DOUBLE,
+        STABLE_MANY,
+        UNSTABLE_MANY,
+        
+        NUM_STATES
+    } state_t;
+    
+    #define NUM_STATE_GROUPS ((uint8_t)NUM_STATES/2)
     
     static inline state_dimension_t stateToSelection(state_t s) {return ((state_dimension_t)((s+1)/2) - 1);};
     static inline const char *stateString(state_dimension_t s)
@@ -88,7 +98,7 @@ extern "C" {
     
     struct bayesian_map_functions
     {
-        void (*InitMap)(            bayesian_map_t * );
+        void (*InitializeMap)(      bayesian_map_t * );
         void (*NormalizeMap)(       bayesian_map_t * );
         void (*NormalizeState)(     bayesian_map_t *, state_dimension_t );
         void (*ResetState)(         bayesian_map_t *, state_dimension_t );
@@ -97,10 +107,10 @@ extern "C" {
     
     struct bayesian_system_functions
     {
-        void (*Init)(                bayesian_system_t * );
+        void (*Initialize)(          bayesian_system_t * );
         void (*UpdateProbabilities)( bayesian_system_t *, floating_t[4] );
         void (*UpdateState)(         bayesian_system_t * );
-        void (*Update)(              bayesian_system_t *, prediction_pair_t * );
+        void (*Update)(              bayesian_system_t *, floating_t[4] );
     };
     
     struct bayesian_functions
@@ -109,27 +119,27 @@ extern "C" {
         struct bayesian_system_functions Sys;
     };
     
-    void InitBayesianMap(               bayesian_map_t *                            );
+    void InitializeBayesianMap(         bayesian_map_t *                            );
     void NormalizeBayesianMap(          bayesian_map_t *                            );
     void NormalizeBayesianState(        bayesian_map_t *,       state_dimension_t   );
     void ResetBayesianState(            bayesian_map_t *,       state_dimension_t   );
     void PrintBayesianMap(              bayesian_map_t *,       state_t             );
-    void InitBayesianSystem(            bayesian_system_t *                         );
-    void UpdateBayesianSystem(          bayesian_system_t *,    prediction_pair_t * );
+    void InitializeBayesianSystem(      bayesian_system_t *                         );
+    void UpdateBayesianSystem(          bayesian_system_t *,    floating_t[4] );
     void UpdateBayesianProbabilities(   bayesian_system_t *,    floating_t[4]       );
     void UpdateBayesianState(           bayesian_system_t *                         );
     
     static const struct bayesian_functions BayesianFunctions =
     {
         { /* Map functions */
-            .InitMap                = InitBayesianMap,
+            .InitializeMap                = InitializeBayesianMap,
             .NormalizeMap           = NormalizeBayesianMap,
             .NormalizeState         = NormalizeBayesianState,
             .ResetState             = ResetBayesianState,
             .Print                  = PrintBayesianMap
         },
         { /* System functions */
-            .Init                   = InitBayesianSystem,
+            .Initialize                   = InitializeBayesianSystem,
             .Update                 = UpdateBayesianSystem,
             .UpdateProbabilities    = UpdateBayesianProbabilities,
             .UpdateState            = UpdateBayesianState

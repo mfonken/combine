@@ -25,9 +25,9 @@ static floating_t DOUBT( state_dimension_t i, state_t cs )
     return ret;
 }
 
-void InitBayesianMap( bayesian_map_t * bm )
+void InitializeBayesianMap( bayesian_map_t * bm )
 {
-    LOG_STATEM("Initializing State Machine.\n");
+    LOG_STATEM("Initializeializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
     bm->length = NUM_STATES;
     for( ; _.i < _.l; _.i++ )
@@ -84,7 +84,7 @@ void PrintBayesianMap( bayesian_map_t * bm, state_t s )
 #endif
 }
 
-void InitBayesianSystem( bayesian_system_t * sys )
+void InitializeBayesianSystem( bayesian_system_t * sys )
 {
     sys->state                = STABLE_NONE;
     sys->prev                 = UNKNOWN_STATE;
@@ -95,10 +95,10 @@ void InitBayesianSystem( bayesian_system_t * sys )
     sys->stability.alternate  = 0.;
     sys->stability.overall    = 0.;
     
-    BayesianFunctions.Map.InitMap( &sys->probabilities );
+    BayesianFunctions.Map.InitializeMap( &sys->probabilities );
 }
 
-void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
+void UpdateBayesianSystem( bayesian_system_t * sys, floating_t p[4] )
 {
     reset_loop_variables( &_, NUM_STATES );
     state_t next = sys->state;
@@ -116,7 +116,7 @@ void UpdateBayesianSystem( bayesian_system_t * sys, prediction_pair_t * p )
     /* Only update sys->next state on change */
     if( next != sys->state ) sys->next = next;
     
-    BayesianFunctions.Sys.UpdateProbabilities( sys, p->Probabilities.P );
+    BayesianFunctions.Sys.UpdateProbabilities( sys, p );
     BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
     BayesianFunctions.Sys.UpdateState( sys );
     PrintBayesianMap( &sys->probabilities, sys->state );

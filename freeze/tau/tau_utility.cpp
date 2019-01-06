@@ -56,7 +56,7 @@ static void cma( double new_val, double *avg, index_t num )
 
 void Tau::init( void )
 {
-    rho.utility.Thresh = THRESHOLD_MIN;
+    rho.core.Thresh = THRESHOLD_MIN;
     count = 0;
     avg = 0;
     tick = 0;
@@ -113,7 +113,7 @@ double Tau::perform( cimage_t &img )
 
 void Tau::updateThresh()
 {
-    utility.thresh = rho.utility.Thresh;
+    utility.thresh = rho.core.Thresh;
 }
 
 void Tau::updatePrediction()

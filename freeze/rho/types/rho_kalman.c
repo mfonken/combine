@@ -2,12 +2,12 @@
 
 /** SOURCE: http://preview.tinyurl.com/9djhrem */
 
-void InitRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, floating_t vu, floating_t bu, floating_t su, index_t minv, index_t maxv )
+void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t minv, index_t maxv, rho_kalman_uncertainty_c uncertainty )
 {
     k->lifespan    = ls;
-    k->uncertainty.value   = vu;
-    k->uncertainty.bias    = bu;
-    k->uncertainty.sensor  = su;
+    k->uncertainty.value   = uncertainty.value;
+    k->uncertainty.bias    = uncertainty.bias;
+    k->uncertainty.sensor  = uncertainty.sensor;
     
     k->origin    = timestamp();
     

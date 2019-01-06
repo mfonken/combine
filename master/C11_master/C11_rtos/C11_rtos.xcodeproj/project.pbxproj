@@ -127,8 +127,8 @@
 				34FF28D221798CE3006A1676 /* qmath */,
 			);
 			name = kinetic;
-			path = ../../../../freeze/kinetic;
-			sourceTree = "<group>";
+			path = /Users/matthew/Desktop/marbl/Techincal/combine/freeze/kinetic;
+			sourceTree = "<absolute>";
 		};
 		34FF28C921798CE3006A1676 /* filters */ = {
 			isa = PBXGroup;

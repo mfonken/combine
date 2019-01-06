@@ -8,7 +8,7 @@
 
 #include "rho_pid.h"
 
-void RhoPIDInit( rho_pid_t * PID, rho_pid_gain_t K )
+void RhoPIDInitialize( rho_pid_t * PID, rho_pid_gain_t K )
 {
     /* Zero Entire PID */
     memset( PID, 0, sizeof(rho_pid_t) );
@@ -58,10 +58,3 @@ void RhoPIDPrint( rho_pid_t * PID )
     printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
            PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
 }
-
-const rho_pid_functions RhoPID =
-{
-    .Init = RhoPIDInit,
-    .Update = RhoPIDUpdate,
-    .Print = RhoPIDPrint
-};
