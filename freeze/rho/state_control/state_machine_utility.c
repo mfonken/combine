@@ -149,7 +149,7 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
         else k = ( c + 1 ) - ( _.j << 1);
         
         LOG_STATEM("Updating %s by %.2f.\n", stateString(k), p[_.i]);
-        sys->probabilities.map[k][c] += 0.1 * p[_.i];
+        sys->probabilities.map[k][c] += p[_.i];
     }
 }
 

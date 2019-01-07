@@ -96,7 +96,6 @@
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
-
 #define RHO_GAP_MAX 10
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
@@ -113,8 +112,8 @@
 
 #define EXPECTED_NUM_BLOBS  2
 #define MAX_BLOBS           10
-#define MIN_BLOB_DENSITY    5
-#define MAX_BLOB_SCORE      4
+#define MIN_BLOB_DENSITY    2
+#define MAX_BLOB_SCORE      10
 #define BLOB_SCORE_FACTOR   0.5
 
 #define MAX_RHO_RECALCULATION_LEVEL 0

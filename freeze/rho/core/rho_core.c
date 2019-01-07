@@ -120,6 +120,7 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     
     DUAL_FILTER_CYCLE(_->cyc)
     {
+        _->cmax = 0;
         _->start = _->range[_->cyc];
         _->end = _->range[_->cyc_];
         
@@ -216,7 +217,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 void UpdateRhoCoreThreshold( rho_core_t * core )
 {
     /* Background-Tune on significant background */
-    floating_t  background_tune_factor = 0.;
+    floating_t  background_tune_factor = 1.;
     if( core->QbT > BACKGROUND_COVERAGE_MIN )
     {
         floating_t background_coverage_factor = 1 - ZDIV( BACKGROUND_COVERAGE_MIN, core->QbT );
@@ -224,7 +225,7 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     }
     
     /* State-Tune by BayeSM state */
-    floating_t state_tune_factor = 0.;
+    floating_t state_tune_factor = 1.;
     core->TargetCoverageFactor = FILTERED_COVERAGE_TARGET;
     switch(core->BayeSys.state)
     {
@@ -234,12 +235,12 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
         case STABLE_MANY:
-            state_tune_factor = 10;
+//            state_tune_factor = 10;
         case STABLE_SINGLE:
         case UNSTABLE_NONE:
         case UNSTABLE_SINGLE:
         case UNSTABLE_MANY:
-            state_tune_factor *= (UNSTABLE_DOUBLE - (floating_t)core->BayeSys.state ) / NUM_STATES;
+            state_tune_factor *= ((floating_t)UNSTABLE_DOUBLE - (floating_t)core->BayeSys.state ) / (floating_t)NUM_STATES;
             break;
         case STABLE_DOUBLE:
             core->TargetCoverageFactor = core->FilteredPercentage;
@@ -251,11 +252,12 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     RhoPID.Update( &core->ThreshFilter, core->FilteredPercentage, core->TargetFilter.value);
     
     /* Filtered-Tune on target difference */
-    floating_t proposed_tune_factor = BOUND( background_tune_factor + state_tune_factor + core->ThreshFilter.Value, -THRESH_STEP_MAX, THRESH_STEP_MAX);
+    floating_t target_tune_factor = -ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
+    floating_t proposed_tune_factor = BOUND( background_tune_factor * state_tune_factor * target_tune_factor, -THRESH_STEP_MAX, THRESH_STEP_MAX);
     core->Thresh = BOUND(core->Thresh - proposed_tune_factor, THRESH_MIN, THRESH_MAX);
     core->ThreshByte = (byte_t)core->Thresh;
     
-    //    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, core->ThreshFilter.Value, proposed_tune_factor);
+        printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor);
     //    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
     //    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
     //    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);

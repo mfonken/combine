@@ -694,7 +694,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
 #define PID_SUBTICK_INSET 2
 #define PID_GRAPH_START PID_ORIGIN.x+RF_SPACE
 #define PID_GRAPH_WIDTH (PID_WIDTH-2*RF_SPACE)
-#define PID_MAX_BOUND 2. // percent
+//#define PID_MAX_BOUND 2. // percent
 #define PID_TEXT_X (RF_SPACE)
 #define PID_TEXT_HEIGHT (PID_ORIGIN.y+RF_TEXT_SM_OFFSET)
 #define PID_END Point(PID_ORIGIN.x+PID_WIDTH, PID_ORIGIN.y+PID_HEIGHT)
@@ -704,23 +704,14 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     // Bound
     rectangle(mat, PID_ORIGIN, PID_END, PID_COLOR, RF_LINE_WIDTH);
     
-    // Ticks
-    if(PID_HAS_SUBTICKS) line(mat, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), RF_LINE_COLOR);
-    for(int i = 1, y = PID_END.y - PID_TICK_SPACING; i <= PID_TICKS; i++, y -= PID_TICK_SPACING)
+    int PID_MAX_BOUND = 2.;
+    for(int i = 0, x = PID_GRAPH_START; i < pid_data_x; i++, x++)
     {
-        line(mat, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), RF_LINE_COLOR, RF_LINE_WIDTH);
-        floating_t tick_value = PID_MAX_BOUND*((floating_t)i)/PID_TICKS;
-        putText((mat), to_stringn(tick_value, 1) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
-        if(PID_HAS_SUBTICKS) line(mat, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), RF_LINE_COLOR);
+        floating_t curr = pid_data[i], curr_target = pid_data_target[i];
+        if(curr > PID_MAX_BOUND) PID_MAX_BOUND = curr;
+        if(curr_target > PID_MAX_BOUND) PID_MAX_BOUND = curr_target;
     }
-    
-    if(pid_data_x < 0 || pid_data_x > PID_GRAPH_WIDTH / PID_INCREMENT)
-    {
-        pid_data_x = 0;
-        memset(pid_data, 0, sizeof(floating_t)*width);
-        memset(pid_data_target, 0, sizeof(floating_t)*width);
-    }
-    pid_data_x ++;
+    PID_MAX_BOUND += 2.;
     
     // Graph
     int pid_prev = 0, pid_prev_target = 0;
@@ -746,6 +737,25 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
         pid_prev = curr_scaled;
         pid_prev_target = curr_scaled_target;
     }
+    
+    // Ticks
+    if(PID_HAS_SUBTICKS) line(mat, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,PID_END.y-PID_TICK_SPACING/2), RF_LINE_COLOR);
+    for(int i = 1, y = PID_END.y - PID_TICK_SPACING; i <= PID_TICKS; i++, y -= PID_TICK_SPACING)
+    {
+        line(mat, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), RF_LINE_COLOR, RF_LINE_WIDTH);
+        floating_t tick_value = PID_MAX_BOUND*((floating_t)i)/PID_TICKS;
+        putText((mat), to_stringn(tick_value, 1) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        if(PID_HAS_SUBTICKS) line(mat, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), RF_LINE_COLOR);
+    }
+    
+    if(pid_data_x < 0 || pid_data_x > PID_GRAPH_WIDTH / PID_INCREMENT)
+    {
+        pid_data_x = 0;
+        memset(pid_data, 0, sizeof(floating_t)*width);
+        memset(pid_data_target, 0, sizeof(floating_t)*width);
+    }
+    pid_data_x ++;
+    
     pthread_mutex_unlock(&drawer_mutex);
     return mat;
 }
@@ -771,31 +781,6 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     string filename =(dimension==X_DIMENSION)?X_DIM_FILENAME:Y_DIM_FILENAME;
     int &iteration = (dimension==X_DIMENSION)?x_detection_i:y_detection_i;
     
-#define MATCH_DATA_WIDTH 3
-#define MATCH_ENCODE(X,i,S) X |= S << (i*MATCH_DATA_WIDTH-1)
-#define MATCH_DECODE(X,i) ((1 << MATCH_DATA_WIDTH)-1) & X >> (i*MATCH_DATA_WIDTH-1)
-    
-    /* Gather data */
-    pthread_mutex_lock(&rho.c_mutex);
-    int match_value = 0;
-    rho_kalman_t tracking_filters[MAX_TRACKING_FILTERS];
-    int tracking_filters_order[MAX_TRACKING_FILTERS] = {0};
-    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
-    {
-        int c = prediction.TrackingFiltersOrder[i];
-        MATCH_ENCODE(match_value, i, c);
-        memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(rho_kalman_t));
-        tracking_filters_order[i] = c;
-//        printf("%d %d %x\n", i, c, match_value);
-    }
-//    printf("\n");
-//    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
-//    {
-//        printf("%d %d\n", i, MATCH_DECODE(match_value, i));
-//    }
-    
-    mD[mX] = match_value;
-    
     floating_t c_percent = (floating_t)(map.centroid)/(floating_t)(map.length);
     
     pDu[pX] = prediction.PreviousPeak[0];
@@ -808,6 +793,45 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     blob_t blobs[MAX_BLOBS];
     for(int i = 0; i < MAX_BLOBS; i++)
         memcpy(&blobs[i], &prediction.Blobs[prediction.BlobsOrder[i]], sizeof(blob_t));
+    
+    
+#define MATCH_DATA_WIDTH 3
+#define MATCH_ENCODE(X,i,S) X |= S << (i*MATCH_DATA_WIDTH)
+#define MATCH_DECODE(X,i) ((1 << MATCH_DATA_WIDTH)-1) & X >> (i*MATCH_DATA_WIDTH)
+    
+    int num_tracks = 0;
+    for(int i = 0; i < MAX_BLOBS; i++)
+    {
+        blob_t curr = blobs[i];
+        if(curr.den > 0 && curr.den < 2000)
+            num_tracks++;
+    }
+    
+    /* Gather data */
+    int match_value = 0;
+    rho_kalman_t tracking_filters[MAX_TRACKING_FILTERS];
+    int tracking_filters_order[MAX_TRACKING_FILTERS] = {0};
+    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        if(i < num_tracks)
+        {
+            int c = prediction.TrackingFiltersOrder[i];
+            MATCH_ENCODE(match_value, i, c);
+            memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(rho_kalman_t));
+            tracking_filters_order[i] = c;
+        }
+        else
+        {
+            MATCH_ENCODE(match_value, i, MAX_TRACKING_FILTERS);
+        }
+        //        printf("%d %d %x\n", i, c, match_value);
+    }
+    mD[mX] = match_value;
+    //    printf("\n");
+    //    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    //    {
+    //        printf("%d %d\n", i, MATCH_DECODE(match_value, i));
+    //    }
     
     pthread_mutex_unlock(&rho.c_mutex);
     
@@ -868,7 +892,6 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     rectangle(mat, BL_ORIGIN, BL_END, RD_LINE_COLOR);
     
     // Blobs
-    int num_tracks = 0;
     for(int i = 0, y = BL_ORIGIN.y+RD_SPACE; i < BL_MAX_NUM; i++, y += (BL_IND_HEIGHT+RD_SPACE))
     {
         blob_t curr = blobs[i];
@@ -884,8 +907,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         
         if(curr.den > 0)
         {
-            num_tracks++;
-            int r = BL_RADIUS_SCALE*curr.den/(2*M_PI);
+            int r = BOUNDU(BL_RADIUS_SCALE*curr.den/(2*M_PI),BL_MAX_RADIUS);
             circle(mat, Point(BL_ORIGIN.x+BL_MAX_RADIUS, y+BL_IND_HEIGHT/2), r, redish);
         }
         Point textOrigin(BL_ORIGIN.x+BL_MAX_RADIUS*2-RD_SPACE, y+RD_SPACE);
@@ -924,11 +946,11 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
 #define MCH_ORIGIN Point(RD_SPACE+RD_ORIGIN.x,BL_END.y+RD_SPACE+RD_ORIGIN.y)
 #define MCH_END Point(MCH_ORIGIN.x+MCH_WIDTH, MCH_ORIGIN.y+MCH_HEIGHT)
 #define MCH_INSET_X (MCH_ORIGIN.x+3*RD_SPACE)
-#define MCH_INTERVAL_WIDTH 5 // pixels
-#define MCH_INTERVAL_SPACE 3 // pixels
+#define MCH_INTERVAL_WIDTH 3 // pixels
+#define MCH_INTERVAL_SPACE 5 // pixels
 #define MCH_INTERVAL_TOTAL (MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE)
 #define MCH_NUM_INTERVALS ((MCH_END.x-MCH_INSET_X)/MCH_INTERVAL_TOTAL)
-#define MCH_LINE_WIDTH 2
+#define MCH_LINE_WIDTH 1
     
     //Bounds
     rectangle(mat, MCH_ORIGIN, MCH_END, RD_LINE_COLOR);
@@ -946,12 +968,17 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     for(int i = 1, x = MCH_INSET_X; i < mX; i++, x+=MCH_INTERVAL_TOTAL)
     {
         currD = mD[i];
-        for(int j = 0; j < num_tracks; j++)
+        for(int j = 0; j < MCH_MAX_NUM; j++)
         {
             currV = MATCH_DECODE(currD,j);
             prevV = MATCH_DECODE(prevD,j);
-            line(mat, Point(x,y+MCH_IND_HEIGHT*prevV), Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
-            line(mat, Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), Point(x+MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
+            if(currV < MCH_MAX_NUM && prevV < MCH_MAX_NUM)
+            {
+                line(mat, Point(x,y+MCH_IND_HEIGHT*currV), Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
+                line(mat, Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*prevV), Point(x+MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE,y+MCH_IND_HEIGHT*currV), bluish, MCH_LINE_WIDTH);
+            }
+            if(i == mX-1 && prevV < MCH_MAX_NUM && currV < MCH_MAX_NUM && prevV != currV)
+                printf(" ");
         }
         prevD = currD;
     }

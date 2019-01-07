@@ -337,12 +337,12 @@ void UpdateTrackingFiltersRhoUtility( prediction_t * r )
         }
         
         /* Account for odd number of blobs */
-        if( n >= r->NumBlobs )
+        if( n > r->NumBlobs )
         {
             rho_kalman_t
             *filter = &r->TrackingFilters[m];
             floating_t
-            blob = (floating_t)r->Blobs[r->BlobsOrder[n]].loc;
+            blob = (floating_t)r->Blobs[r->BlobsOrder[n-1]].loc;
             RhoKalman.Update(filter, blob);
         }
     }
@@ -352,7 +352,11 @@ void UpdateTrackingFiltersRhoUtility( prediction_t * r )
     for( ; k < MAX_TRACKING_FILTERS; k++ )
         RhoKalman.Punish(&r->TrackingFilters[k]);
     for( k = 0; k < MAX_TRACKING_FILTERS; k++ )
+    {
         r->TrackingFilters[k].flag = false;
+        if(r->TrackingFilters[k].value == 699)
+            printf(" ");
+    }
 }
 
 index_t CalculateValidTracksRhoUtility( prediction_t * r )
@@ -376,7 +380,7 @@ void UpdateTrackingProbabilitiesRhoUtility( prediction_t * r )
 {
     if( r->NuBlobs > 0. )
     {
-        floating_t a = r->NuBlobs, b = (floating_t)NUM_STATE_GROUPS, curr_CDF, prev_CDF = 0.;
+        floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.;
         for( uint8_t i = 0; i < b; i++ )
         {
             floating_t x = (floating_t)(i+1) / b;

@@ -357,10 +357,12 @@ Mat& ImageUtility::generateImage()
             break;
     }
     
+#define GENERATOR_SIZE_OSCILLATION
+    
 #ifdef GENERATOR_SIZE_OSCILLATION
     double radius_offset = abs(0.5 - phase);
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.5+radius_offset), TARGET_COLOR, CV_FILLED);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.0-radius_offset), TARGET_COLOR, CV_FILLED);
+    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
+    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
 #else
     circle(frame, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
     circle(frame, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
