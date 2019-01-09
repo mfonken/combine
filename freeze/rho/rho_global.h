@@ -61,7 +61,9 @@ typedef volatile bool   flag_t;
 #define LOG_KALMAN(...)
 #endif
 
+#ifndef MAX
 #define MAX(A,B)        ((A>B)?A:B)
+#endif
 
 #define SWAP(A,B)      ({typeof(A) temp = A; A = B; B = temp;})
 

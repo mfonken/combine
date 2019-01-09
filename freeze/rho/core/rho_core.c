@@ -105,8 +105,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.DetectPairs( core );
         LOG_RHO("Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO("Updating threshold.\n");
-        RhoCore.UpdateThreshold( core );
+//        LOG_RHO("Updating threshold.\n");
+//        RhoCore.UpdateThreshold( core );
 //        LOG_RHO("Generating packets.\n");
 //        RhoCore.GeneratePacket( core );
     }
@@ -118,47 +118,23 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     rho_detection_variables *_ = (rho_detection_variables*)malloc(sizeof(rho_detection_variables));
     RhoUtility.Reset.Detect( _, d, r );
     
-    DUAL_FILTER_CYCLE(_->cyc)
-    {
-        _->cmax = 0;
-        _->start = _->range[_->cyc];
-        _->end = _->range[_->cyc_];
-        
-        RhoUtility.Update.PeakFilter( _, d, r );
-        
-        if( _->fvar > 0 )// && (_->fpeak == 0 || _->fpeak > _->fvar ))
-        {
-            if(_->fpeak > _->fvar)
-                _->fbandl = _->fpeak - _->fvar;
-            else
-                _->fbandl = 0;
-            
-            do
-            {
-                RhoUtility.Detect.Blobs( _, d, r);
-                RhoUtility.Detect.CalculateChaos( _, r );
-                RhoUtility.Detect.ScoreBlobs( _, d, r );
-            } while( _->rcal && ++_->rcal_c < MAX_RHO_RECALCULATION_LEVEL );
-            
-            RhoUtility.Detect.SortBlobs( _, r );
-        }
+    /* Perform detect */
+    RhoUtility.Detect.Perform( _, d, r );
     
-        r->PreviousPeak[_->cyc] = BOUND(_->cmax, 0, _->len);
-        r->PreviousDensity[_->cyc] = _->fden;
-        d->max[_->cyc] = _->cmax;
-    }
-    
+    /* Update prediction */
     floating_t target_density = core->TargetFilter.value * core->Width * core->Height;// / band_factor;
     r->NumBlobs = _->blbf;
-    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->blbf, target_density ), 10.);
+    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->blbf, target_density ), MAX_NU_BLOBS );
     r->TotalDensity = _->tden;
-    /* Reset sort flags */
-    for( uint8_t i = 0; i < MAX_BLOBS; i++ )
-        r->Blobs[i].srt = false;
     
+    /* Update core */
     core->TotalCoverage = _->tcov;
     core->FilteredCoverage   = _->fden;
     core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
+    
+    /* Reset sort flags */
+    for( uint8_t i = 0; i < MAX_BLOBS; i++ )
+        r->Blobs[i].srt = false;
     
 //    floating_t A = (floating_t)r->TotalDensity, B = target_density;
 //    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;

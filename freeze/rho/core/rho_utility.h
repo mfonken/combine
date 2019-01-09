@@ -46,8 +46,11 @@ extern "C" {
     void UpdatePeakFilterRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void UpdateTrackingFiltersRhoUtility( prediction_t * );
     index_t CalculateValidTracksRhoUtility( prediction_t * );
+    void SortTrackingFiltersRhoUtility( prediction_t * );
     void UpdateTrackingProbabilitiesRhoUtility( prediction_t * );
     
+    void PerformDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
+    bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
     void DetectBlobsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void DetectBlobRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *, density_map_t * );
@@ -74,6 +77,7 @@ extern "C" {
         void (*PeakFilter)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*TrackingFilters)( prediction_t * );
         index_t (*CalculateValidTracks)( prediction_t * );
+        void (*SortFilters)( prediction_t * );
         void (*TrackingProbabilities)( prediction_t * );
     } rho_utility_update_functions;
     
@@ -85,6 +89,8 @@ extern "C" {
     
     typedef struct
     {
+        void (*Perform)( rho_detection_variables *, density_map_t *, prediction_t * );
+        bool (*LowerBound)( rho_detection_variables * );
         void (*Blobs)( rho_detection_variables *, density_map_t *, prediction_t *);
         void (*Blob)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*SubtractBackground)( rho_detection_variables *, density_map_t * );
@@ -120,10 +126,13 @@ extern "C" {
         .Reset.Prediction = ResetForPredictionRhoUtility,
         
         .Update.PeakFilter = UpdatePeakFilterRhoUtility,
-        .Update.CalculateValidTracks = CalculateValidTracksRhoUtility,
         .Update.TrackingFilters = UpdateTrackingFiltersRhoUtility,
+        .Update.CalculateValidTracks = CalculateValidTracksRhoUtility,
+        .Update.SortFilters = SortTrackingFiltersRhoUtility,
         .Update.TrackingProbabilities = UpdateTrackingProbabilitiesRhoUtility,
         
+        .Detect.Perform = PerformDetectRhoUtility,
+        .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
         .Detect.Blobs = DetectBlobsRhoUtility,
         .Detect.Blob = DetectBlobRhoUtility,
         .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,

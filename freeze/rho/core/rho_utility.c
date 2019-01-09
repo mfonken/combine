@@ -89,21 +89,64 @@ void ResetForDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pr
     r->TotalDensity = 0;
     r->NumBlobs = 0;
     
-    for(uint8_t i = 0; i < MAX_BLOBS; i++)
+    index_t i;
+    for( i = 0; i < MAX_BLOBS; i++ )
     {
         memset(&r->Blobs[i], 0, sizeof(blob_t));
-        r->BlobsOrder[i] = MAX_BLOBS;
+        r->BlobsOrder[i] = i;
+    }
+    for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
+    {
+        r->TrackingFiltersOrder[i] = i;
+    }
+}
+
+void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
+{
+    DUAL_FILTER_CYCLE(_->cyc)
+    {
+        _->cmax = 0;
+        _->start = _->range[_->cyc];
+        _->end = _->range[_->cyc_];
+        
+        RhoUtility.Update.PeakFilter( _, d, r );
+        if( RhoUtility.Detect.LowerBound(_) )
+        {
+            do
+            {
+                RhoUtility.Detect.Blobs( _, d, r);
+                RhoUtility.Detect.CalculateChaos( _, r );
+                RhoUtility.Detect.ScoreBlobs( _, d, r );
+            } while( _->rcal && ++_->rcal_c < MAX_RHO_RECALCULATION_LEVEL );
+            
+            RhoUtility.Detect.SortBlobs( _, r );
+        }
+        
+        r->PreviousPeak[_->cyc] = BOUND(_->cmax, 0, _->len);
+        r->PreviousDensity[_->cyc] = _->fden;
+        d->max[_->cyc] = _->cmax;
     }
 }
 
 void UpdatePeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 {
     _->fpeak = (index_t)RhoKalman.Step(&d->kalmans[_->cyc], r->PreviousPeak[_->cyc], d->kalmans[_->cyc].velocity );
-    d->max[_->cyc] = r->PreviousPeak[_->cyc];
     _->fpeak_2 = _->fpeak << 1;
     _->fvar = BOUND((index_t)RHO_VARIANCE( d->kalmans[_->cyc].K[0] ), MIN_VARIANCE, MAX_VARIANCE);
     d->kalmans[_->cyc].variance = _->fvar;
-//    printf("var(%p)>%d\n", d, _->fvar);
+}
+
+inline bool CalculateBandLowerBoundRhoUtility( rho_detection_variables *_ )
+{
+    if( _->fvar > 0 )// && (_->fpeak == 0 || _->fpeak > _->fvar ))
+    {
+        if(_->fpeak > _->fvar)
+            _->fbandl = _->fpeak - _->fvar;
+        else
+            _->fbandl = 0;
+        return true;
+    }
+    return false;
 }
 
 inline void DetectBlobsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
@@ -117,16 +160,24 @@ inline void DetectBlobsRhoUtility( rho_detection_variables *_, density_map_t * d
 
 inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_, density_map_t * d )
 {
-    if( _->c1 > _->b)
+    if( _->c1 > _->b )
     {
-        _->c1 = BOUNDU(_->c1 - _->b, d->length);
+        _->c1 -= _->b;///*BOUNDU(*/_->c1 - _->b;//, d->length);
+//        if(_->c1 > 2000)
+//        {
+//            for(int i = 0; i < d->length; i++)
+//            {
+//                printf("%d\n", d->map[i]);
+//            }
+//            printf(" ");
+//        }
         _->tcov += _->c1;
         if( _->c1 > _->cmax )
             _->cmax = _->c1;
         
         /* Punish values above the filter peak */
         if( ( _->c1 > _->fpeak )
-           && ( _->fpeak_2 > _->c2 ) )
+           && ( _->fpeak_2 > _->c1 ) )
             _->c1 = _->fpeak_2 - _->c1;
         _->tden += _->c1;
     }
@@ -246,54 +297,62 @@ void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
 {
     /// NOTE: Smaller scores are better
     /* Assume all blobs are valid */
-    uint8_t num_poor = 0;
+    index_t i, io, j, jo, best_index;
+    floating_t best_score;
+    blob_t *curr, *check;
     
     /* Cycle through found blobs */
-    for(uint8_t i = 0, j = 0; i < _->blbf; i++)
+    for( i = 0; i < _->blbf; i++)
     {
-//        /* Find index of first unsorted blob and set score as minimum */
-//        for( j = 0; j < _->blbf;j++)
-//        {
-//            uint8_t k = r->BlobsOrder[j];
-//            if( r->Blobs[k].srt ) break;
-//        }
-        if( r->Blobs[j].srt ) break;
-        
-        floating_t min = r->Blobs[j].scr;
-        if(_->blbf == 2)
-            printf(" ");
-        
+        io = r->BlobsOrder[i];
+        curr = &r->Blobs[io];
+        if( curr->srt == true) continue;
+
+        best_score = curr->scr;
+        best_index = i;
         /* Cycle through other blobs */
-        for( uint8_t k = j+1; k < _->blbf; k++ )
+        for( j = i+1; j < _->blbf; j++ )
         {
-            blob_t *curr = &r->Blobs[k];
+            jo = r->BlobsOrder[j];
+            check = &r->Blobs[jo];
             /* If unscored and less than min, set as new min */
-            if( curr->scr < min && !curr->srt )
+            if( check->scr < best_score )
             {
-                min = curr->scr;
-                curr->srt = 1;
-                j = k;
+                best_score = curr->scr;
+                best_index = j;
             }
         }
-        /* Set best blob's sort flag */
-        r->Blobs[j].srt = true;
+//        if( best_index != i )
+        {
+            r->BlobsOrder[i] = best_index;
+            r->BlobsOrder[best_index] = i;
+        }
         
-        /* If best is valid, add to the sort order vector */
-        if( min < MAX_BLOB_SCORE )
-            r->BlobsOrder[i-num_poor] = j;
-        
-        /* Otherise ignore */
-        else num_poor++;
+        r->Blobs[i].srt = true;
     }
-    /* Remove all unused blobs order indeces */
-    for(uint8_t i = _->blbf-num_poor; i < MAX_BLOBS; i++)
-        r->BlobsOrder[i] = MAX_BLOBS;
+    for(; i < MAX_BLOBS; i++ )
+    {
+        r->BlobsOrder[i] = i;
+    }
+    
+//    printf("Blob order:");
+//    for(int i = 0; i < _->blbf; i++)
+//    {
+//        int io = r->BlobsOrder[i];
+//        blob_t * curr = &r->Blobs[io];
+//
+//        printf(" %d[%d]>%3.2f", io, i, curr->scr);
+//        curr->srt = false;
+//    }
+//    printf("\n");
+    if(r->BlobsOrder[0] == r->BlobsOrder[1])
+        printf(" ");
 }
 
 void UpdateTrackingFiltersRhoUtility( prediction_t * r )
 {
     index_t valid_tracks = RhoUtility.Update.CalculateValidTracks( r );
-    
+//    printf("Found %d valid/active tracking filter\n", valid_tracks);
     /* Match blobs to Kalmans */
     index_t m, n, k;
     for( m = 0; m < ( valid_tracks - 1 ); m += 2 )
@@ -306,13 +365,10 @@ void UpdateTrackingFiltersRhoUtility( prediction_t * r )
             *blobA = &r->Blobs[r->BlobsOrder[n]],
             *blobB = &r->Blobs[r->BlobsOrder[n+1]];
             
-            /* Ensure current blobs have not been already sorted */
-            if( blobA->srt || blobB->srt ) continue;
-            
             /* Retreive tracking filters pair */
             rho_kalman_t
-            *filterA = &r->TrackingFilters[m],
-            *filterB = &r->TrackingFilters[m+1];
+            *filterA = &r->TrackingFilters[r->TrackingFiltersOrder[m]],
+            *filterB = &r->TrackingFilters[r->TrackingFiltersOrder[m+1]];
             floating_t
             blocA = blobA->loc,
             blocB = blobB->loc;
@@ -327,51 +383,105 @@ void UpdateTrackingFiltersRhoUtility( prediction_t * r )
             /* Swap on upward determinant */
             if( aa * bb > ab * ba ) SWAP(blocA, blocB);
             
+//            printf("a:%3.2f,%3.2f b:%3.2f,%3.2f | aa:%3.2f bb:%3.2f ab:%3.f2 ba:%3.2f | A:%3.2f B:%3.2f\n", filterA->value, blocA, filterB->value, blocB, aa, bb, ab, ba, blocA, blocB);
+            
             /* Update filters */
             RhoKalman.Update(filterA, blocA);
             RhoKalman.Update(filterB, blocB);
-            
-            /* Mark blobs as sorted */
-            blobA->srt = true;
-            blobB->srt = true;
         }
         
         /* Account for odd number of blobs */
         if( n > r->NumBlobs )
         {
             rho_kalman_t
-            *filter = &r->TrackingFilters[m];
+            *filter = &r->TrackingFilters[r->TrackingFiltersOrder[m]];
             floating_t
             blob = (floating_t)r->Blobs[r->BlobsOrder[n-1]].loc;
             RhoKalman.Update(filter, blob);
         }
     }
 
+    /* Activate new filters */
     for( k = valid_tracks; k < r->NumBlobs && k < MAX_TRACKING_FILTERS; k++ )
-        RhoKalman.Step( &r->TrackingFilters[k], r->Blobs[r->BlobsOrder[k]].loc, 0. );
-    for( ; k < MAX_TRACKING_FILTERS; k++ )
-        RhoKalman.Punish(&r->TrackingFilters[k]);
-    for( k = 0; k < MAX_TRACKING_FILTERS; k++ )
     {
-        r->TrackingFilters[k].flag = false;
-        if(r->TrackingFilters[k].value == 699)
-            printf(" ");
+//        printf("Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
+        RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[k]], r->Blobs[r->BlobsOrder[k]].loc, 0. );
     }
+    
+    /* Punish unused ones */
+    for( ; k < MAX_TRACKING_FILTERS; k++ )
+    {
+//        printf("Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
+        RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[k]]);
+    }
+    
+    RhoUtility.Update.SortFilters( r );
+}
+
+void SortTrackingFiltersRhoUtility( prediction_t * r )
+{
+    rho_kalman_t *curr, *check;
+    floating_t best_score;
+    index_t i, io, j, jo, best_index = 0;
+    /* Score all filters */
+    for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
+    {
+        RhoKalman.Score( &r->TrackingFilters[i] );
+    }
+    
+    /* Swap sort */
+    /* Cycle through found blobs */
+    for( i = 0; i < MAX_TRACKING_FILTERS; i++)
+    {
+        io = r->TrackingFiltersOrder[i];
+        curr = &r->TrackingFilters[io];
+        if( curr->flag == true) continue;
+        
+        best_score = curr->score;
+        best_index = i;
+        /* Cycle through other blobs */
+        for( j = i+1; j < MAX_TRACKING_FILTERS; j++ )
+        {
+            jo = r->TrackingFiltersOrder[j];
+            check = &r->TrackingFilters[jo];
+            /* If unscored and less than min, set as new min */
+            if( check->score > best_score )
+            {
+                best_score = curr->score;
+                best_index = j;
+            }
+        }
+//        if( best_index != i )
+        {
+            r->TrackingFiltersOrder[i] = best_index;
+            r->TrackingFiltersOrder[best_index] = i;
+        }
+        
+        r->TrackingFilters[i].flag = true;
+    }
+    
+    for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
+    {
+        r->TrackingFilters[i].flag = false;
+    }
+    
+    if(r->TrackingFiltersOrder[0] == r->TrackingFiltersOrder[1])
+        printf(" ");
 }
 
 index_t CalculateValidTracksRhoUtility( prediction_t * r )
 {
-    index_t valid_tracks;
-    for( valid_tracks = 0; valid_tracks < MAX_TRACKING_FILTERS; valid_tracks++ )
+    index_t valid_tracks = 0, i, io;
+    for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
     {
-        uint8_t index = valid_tracks;
-        if( index >= MAX_TRACKING_FILTERS ) break;
-        rho_kalman_t *curr = &(r->TrackingFilters[index]);
-        floating_t score = RhoKalman.Score(curr);
+        io = r->TrackingFiltersOrder[i];
+        rho_kalman_t *curr = &r->TrackingFilters[io];
+        floating_t score = RhoKalman.Score( curr );
         if( RhoKalman.IsExpired(curr)
            || ( score < MIN_TRACKING_KALMAN_SCORE ) ) break;
         
         RhoKalman.Predict(curr, curr->velocity);
+        valid_tracks++;
     }
     return valid_tracks;
 }
@@ -394,6 +504,12 @@ void UpdateTrackingProbabilitiesRhoUtility( prediction_t * r )
         memset(r->Probabilities.P, 0, sizeof(r->Probabilities.P));
         r->Probabilities.P[0] = 1.;
     }
+//    printf("Probabilities:");
+//    for(int i = 0; i < 4; i++)
+//    {
+//        printf(" %3.2f", r->Probabilities.P[i]);
+//    }
+//    printf("\n");
 }
 
 void ResetForPredictionRhoUtility( prediction_update_variables * _, prediction_pair_t * p, index_t Cx, index_t Cy )

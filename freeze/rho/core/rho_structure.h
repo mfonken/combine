@@ -13,7 +13,7 @@
 for( X = 1, X##_ = 2; X##_ > 0; X--, X##_-- )
 
 #define BOUNDED_CYCLE_DUAL(A,B,C,D,E,F,G) \
-for(A = B; A > C; --A, D = E[A], F = G[A] )
+for(A = B, D = 0, F = 0; A > C; --A, D = E[A], F = G[A] )
 
 #define PACKET_ADDRESS_INITIALIZER(r)           \
 {                                               \

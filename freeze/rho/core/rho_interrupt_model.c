@@ -143,7 +143,7 @@ void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
     
     RhoInterrupts.FRAME_START();
     
-    RhoVariables.ram.QT = p = 0;
+    RhoVariables.ram.QT = 0;
     density_2d_t Q0 = 0, Q1 = 0, Q2 = 0, Q3 = 0, QN = 0, QN_ = 0;
     for( y = 0, p = 0; y < RhoVariables.registers.Cy; y++ )
     {
@@ -167,6 +167,7 @@ void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
         RhoVariables.ram.Dx[y] = QN - QN_;
         QN_ = QN;
     }
+    QN_ = 0;
     for( ; y < h; y++ )
     {
         for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )
