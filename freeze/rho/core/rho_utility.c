@@ -109,7 +109,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
         _->start = _->range[_->cyc];
         _->end = _->range[_->cyc_];
         
-        RhoUtility.Update.PeakFilter( _, d, r );
+        RhoUtility.Predict.PeakFilter( _, d, r );
         if( RhoUtility.Detect.LowerBound(_) )
         {
             do
@@ -128,7 +128,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
     }
 }
 
-void UpdatePeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
+void PredictPeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 {
     _->fpeak = (index_t)RhoKalman.Step(&d->kalmans[_->cyc], r->PreviousPeak[_->cyc], d->kalmans[_->cyc].velocity );
     _->fpeak_2 = _->fpeak << 1;
@@ -349,9 +349,9 @@ void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
         printf(" ");
 }
 
-void UpdateTrackingFiltersRhoUtility( prediction_t * r )
+void PredictTrackingFiltersRhoUtility( prediction_t * r )
 {
-    index_t valid_tracks = RhoUtility.Update.CalculateValidTracks( r );
+    index_t valid_tracks = RhoUtility.Predict.CalculateValidTracks( r );
 //    printf("Found %d valid/active tracking filter\n", valid_tracks);
     /* Match blobs to Kalmans */
     index_t m, n, k;
@@ -415,7 +415,7 @@ void UpdateTrackingFiltersRhoUtility( prediction_t * r )
         RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[k]]);
     }
     
-    RhoUtility.Update.SortFilters( r );
+    RhoUtility.Predict.SortFilters( r );
 }
 
 void SortTrackingFiltersRhoUtility( prediction_t * r )
@@ -486,7 +486,7 @@ index_t CalculateValidTracksRhoUtility( prediction_t * r )
     return valid_tracks;
 }
 
-void UpdateTrackingProbabilitiesRhoUtility( prediction_t * r )
+void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
 {
     if( r->NuBlobs > 0. )
     {
@@ -512,7 +512,7 @@ void UpdateTrackingProbabilitiesRhoUtility( prediction_t * r )
 //    printf("\n");
 }
 
-void ResetForPredictionRhoUtility( prediction_update_variables * _, prediction_pair_t * p, index_t Cx, index_t Cy )
+void ResetForPredictionRhoUtility( prediction_predict_variables * _, prediction_pair_t * p, index_t Cx, index_t Cy )
 {
     _->Ax = p->y.Primary;
     _->Ay = p->x.Primary;
@@ -522,7 +522,7 @@ void ResetForPredictionRhoUtility( prediction_update_variables * _, prediction_p
     _->Cy = Cy;
 }
 
-void CorrectPredictionAmbiguityRhoUtility( prediction_update_variables * _, rho_core_t * core )
+void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables * _, rho_core_t * core )
 {
     if(   !( ( _->Ax < _->Cx ) ^ ( _->Bx > _->Cx ) )
        || !( ( _->Ay < _->Cy ) ^ ( _->By > _->Cy ) ) ) /* Check if X or Y are ambiguous */

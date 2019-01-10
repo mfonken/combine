@@ -546,7 +546,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
     pid_data[pid_data_x] = rho.core.ThreshFilter.Value;
-     pid_data_target[pid_data_x] = target_cvg_percent;
+    pid_data_target[pid_data_x] = target_cvg_percent;
     pthread_mutex_unlock(&rho.c_mutex);
     
     /* Write to file */

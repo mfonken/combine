@@ -103,10 +103,13 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     {
         LOG_RHO("Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
+        
+        ///TODO: Add detection failure recognition
+        
         LOG_RHO("Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-//        LOG_RHO("Updating threshold.\n");
-//        RhoCore.UpdateThreshold( core );
+        LOG_RHO("Updating threshold.\n");
+        RhoCore.UpdateThreshold( core );
 //        LOG_RHO("Generating packets.\n");
 //        RhoCore.GeneratePacket( core );
     }
@@ -136,9 +139,9 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
         r->Blobs[i].srt = false;
     
-//    floating_t A = (floating_t)r->TotalDensity, B = target_density;
-//    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
-//    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
+    floating_t A = (floating_t)r->TotalDensity, B = target_density;
+    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
+    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
@@ -153,8 +156,8 @@ void DetectRhoCorePairs( rho_core_t * core )
 void UpdateRhoCorePrediction( prediction_t * r )
 {
     /* Step predictions of all Kalmans */
-    RhoUtility.Update.TrackingFilters( r );
-    RhoUtility.Update.TrackingProbabilities( r );
+    RhoUtility.Predict.TrackingFilters( r );
+    RhoUtility.Predict.TrackingProbabilities( r );
     
     r->Primary   = r->TrackingFilters[0].value;
     r->Secondary = r->TrackingFilters[1].value;
@@ -167,9 +170,11 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     LOG_RHO("Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
-    prediction_update_variables *_ = (prediction_update_variables*)malloc(sizeof(prediction_update_variables));
+    prediction_predict_variables *_ = (prediction_predict_variables*)malloc(sizeof(prediction_predict_variables));
     RhoUtility.Reset.Prediction( _, &core->PredictionPair, core->Cx, core->Cy );
 
+    RhoUtility.Predict.CorrectAmbiguity( _, core );
+    
     _->Cx = BOUNDU((index_t)(_->Ax + _->Bx) >> 1, core->Width );
     _->Cy = BOUNDU((index_t)(_->Ay + _->By) >> 1, core->Height);
     
@@ -182,9 +187,10 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     core->DensityMapPair.y.centroid = _->Cx;
     core->DensityMapPair.x.centroid = _->Cy;
     
-    /* Average X & Y probabilities */
+    /* Combine X & Y probabilities with confidence factor */
+    floating_t probability_confidence = 0.1; ///TODO: Incorporate confidence factor
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
-        core->PredictionPair.Probabilities.P[i] = ( core->PredictionPair.x.Probabilities.P[i] + core->PredictionPair.y.Probabilities.P[i] ) / 2.;
+        core->PredictionPair.Probabilities.P[i] = probability_confidence * ( core->PredictionPair.x.Probabilities.P[i] + core->PredictionPair.y.Probabilities.P[i] ) / 2.;
     
     BayesianFunctions.Sys.Update( &core->BayeSys, core->PredictionPair.Probabilities.P );
 }
@@ -193,7 +199,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 void UpdateRhoCoreThreshold( rho_core_t * core )
 {
     /* Background-Tune on significant background */
-    floating_t  background_tune_factor = 1.;
+    floating_t  background_tune_factor = 0.;
     if( core->QbT > BACKGROUND_COVERAGE_MIN )
     {
         floating_t background_coverage_factor = 1 - ZDIV( BACKGROUND_COVERAGE_MIN, core->QbT );
@@ -201,7 +207,7 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     }
     
     /* State-Tune by BayeSM state */
-    floating_t state_tune_factor = 1.;
+    floating_t state_tune_factor = 0.;
     core->TargetCoverageFactor = FILTERED_COVERAGE_TARGET;
     switch(core->BayeSys.state)
     {
@@ -211,12 +217,13 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
         case STABLE_MANY:
-//            state_tune_factor = 10;
+            state_tune_factor = -3;
+            break;
         case STABLE_SINGLE:
         case UNSTABLE_NONE:
         case UNSTABLE_SINGLE:
         case UNSTABLE_MANY:
-            state_tune_factor *= ((floating_t)UNSTABLE_DOUBLE - (floating_t)core->BayeSys.state ) / (floating_t)NUM_STATES;
+            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->BayeSys.state) ) / (floating_t)NUM_STATES;
             break;
         case STABLE_DOUBLE:
             core->TargetCoverageFactor = core->FilteredPercentage;
@@ -228,17 +235,19 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     RhoPID.Update( &core->ThreshFilter, core->FilteredPercentage, core->TargetFilter.value);
     
     /* Filtered-Tune on target difference */
-    floating_t target_tune_factor = -ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
-    floating_t proposed_tune_factor = BOUND( background_tune_factor * state_tune_factor * target_tune_factor, -THRESH_STEP_MAX, THRESH_STEP_MAX);
+    floating_t target_tune_factor = TARGET_TUNE_FACTOR * ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
+    state_tune_factor = 0.0;
+    floating_t proposed_tune_factor = BOUND( background_tune_factor + state_tune_factor + target_tune_factor, -THRESH_STEP_MAX, THRESH_STEP_MAX);
     core->Thresh = BOUND(core->Thresh - proposed_tune_factor, THRESH_MIN, THRESH_MAX);
     core->ThreshByte = (byte_t)core->Thresh;
     
-        printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor);
-    //    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
-    //    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
-    //    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
-    //    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", core->ThreshFilter.Value, core->ThreshFilter.Error, core->TargetFilter.value, core->TargetCoverageFactor);
-    //    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", core->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
+    
+    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor);
+//    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
+//    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
+//    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
+//    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", core->ThreshFilter.Value, core->ThreshFilter.Error, core->TargetFilter.value, core->TargetCoverageFactor);
+//    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", core->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 
 void GenerateRhoCorePacket( rho_core_t * core )

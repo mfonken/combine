@@ -312,7 +312,7 @@ typedef struct
     Cx,
     Cy;
     int8_t qcheck;
-} prediction_update_variables;
+} prediction_predict_variables;
 
 typedef struct
 {
@@ -354,6 +354,7 @@ typedef struct
         TargetCoverageFactor,
         CoverageFactor,
         VarianceFactor,
+        PreviousThreshFilterValue,
         Thresh;
     density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;

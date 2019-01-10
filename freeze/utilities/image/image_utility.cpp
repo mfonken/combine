@@ -25,8 +25,10 @@ image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
     has_file = false;
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
-#endif
     if(num_frames) LOG_IU("Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
+#elif defined HAS_GENERATOR
+    LOG_IU("Initialized with generator and dimensions %dx%d\n", width, height);
+#endif
     cimageInit(outimage, width, height);
     pthread_mutex_init(&outframe_mutex, NULL);
     pthread_mutex_init(&outimage_mutex, NULL);

@@ -50,7 +50,6 @@
 #define RHO_VARIANCE_SCALE  10.//RHO_SQRT_HEIGHT/3.0//1.32
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
-
 /* PID Filter Configs */
 #define PID_SCALE   1//10
 #define PID_DRIFT 1.1
@@ -58,7 +57,7 @@
 //#define STRICT_PROPORTIONAL_FACTOR 0.98
 //#define STRICT_INTEGRAL_FACTOR     0.02
 //#define STRICT_DERIVATIVE_FACTOR   0.001
-#define DEFAULT_PROPORTIONAL_FACTOR 0.98
+#define DEFAULT_PROPORTIONAL_FACTOR 0.9
 #define DEFAULT_INTEGRAL_FACTOR     0.002
 #define DEFAULT_DERIVATIVE_FACTOR   0.001
 #define DEFAULT_PID_GAIN (rho_pid_gain_t){ DEFAULT_PROPORTIONAL_FACTOR, DEFAULT_INTEGRAL_FACTOR, DEFAULT_DERIVATIVE_FACTOR }
@@ -104,7 +103,7 @@
 //#define FRAME_ROW_END                   0xef //
 
 #define THRESH_STEP_MAX     10
-#define THRESH_MIN          200//1
+#define THRESH_MIN          1
 #define THRESH_MAX          255
 
 #define MIN_VARIANCE        3
@@ -115,11 +114,14 @@
 #define MIN_BLOB_DENSITY    2
 #define MAX_BLOB_SCORE      10
 #define BLOB_SCORE_FACTOR   0.5
-#define MAX_NU_BLOBS        10.
+#define MAX_NU_BLOBS        5.
 
 #define MAX_RHO_RECALCULATION_LEVEL 0
 
 #define MAX_TRACKING_FILTERS 4
 #define MIN_TRACKING_KALMAN_SCORE 0.02
+
+#define TARGET_TUNE_FACTOR  1.0
+#define STATE_TUNE_FACTOR   0.2
 
 #endif /* global_config_h */

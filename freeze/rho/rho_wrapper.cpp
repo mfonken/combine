@@ -20,7 +20,7 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     size_t
         a = sizeof(redistribution_variables),
         b = sizeof(rho_detection_variables),
-        c = sizeof(prediction_update_variables),
+        c = sizeof(prediction_predict_variables),
         d = sizeof(rho_core_t)-sizeof(density_t)*C_FRAME_SIZE+(2*(RHO_WIDTH+RHO_HEIGHT))*sizeof(density_t),
         e = a + b + c + d;
     LOG_RHO("\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);

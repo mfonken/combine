@@ -41,13 +41,13 @@ extern "C" {
     void InitializeDensityMapRhoUtility( density_map_t *, index_t );
     
     void ResetForDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void ResetForPredictionRhoUtility( prediction_update_variables *, prediction_pair_t *, index_t, index_t );
+    void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_t, index_t );
     
-    void UpdatePeakFilterRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void UpdateTrackingFiltersRhoUtility( prediction_t * );
+    void PredictPeakFilterRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
+    void PredictTrackingFiltersRhoUtility( prediction_t * );
     index_t CalculateValidTracksRhoUtility( prediction_t * );
     void SortTrackingFiltersRhoUtility( prediction_t * );
-    void UpdateTrackingProbabilitiesRhoUtility( prediction_t * );
+    void PredictTrackingProbabilitiesRhoUtility( prediction_t * );
     
     void PerformDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
@@ -58,7 +58,7 @@ extern "C" {
     void ScoreBlobsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void SortBlobsRhoUtility( rho_detection_variables *, prediction_t * );
     
-    void CorrectPredictionAmbiguityRhoUtility( prediction_update_variables *, rho_core_t * core );
+    void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables *, rho_core_t * core );
     void RedistributeDensitiesRhoUtility( rho_core_t * );
     
     typedef struct
@@ -69,7 +69,7 @@ extern "C" {
     typedef struct
     {
         void (*Detect)( rho_detection_variables *, density_map_t *, prediction_t * );
-        void (*Prediction)( prediction_update_variables *, prediction_pair_t *, index_t, index_t );
+        void (*Prediction)( prediction_predict_variables *, prediction_pair_t *, index_t, index_t );
     } rho_utility_reset_functions;
     
     typedef struct
@@ -79,13 +79,9 @@ extern "C" {
         index_t (*CalculateValidTracks)( prediction_t * );
         void (*SortFilters)( prediction_t * );
         void (*TrackingProbabilities)( prediction_t * );
-    } rho_utility_update_functions;
-    
-    typedef struct
-    {
-        void (*CorrectAmbiguity)( prediction_update_variables *, rho_core_t * core );
+        void (*CorrectAmbiguity)( prediction_predict_variables *, rho_core_t * core );
         void (*RedistributeDensities)(  rho_core_t * );
-    } rho_utility_predict_functions;
+    } rho_utility_update_functions;
     
     typedef struct
     {
@@ -108,9 +104,8 @@ extern "C" {
         void (*GenerateBackground)( rho_core_t * );
         rho_utility_initializer_functions Initialize;
         rho_utility_reset_functions Reset;
-        rho_utility_update_functions Update;
+        rho_utility_update_functions Predict;
         rho_utility_detect_functions Detect;
-        rho_utility_predict_functions Predict;
     } rho_utility_functions;
     
     static const rho_utility_functions RhoUtility =
@@ -125,11 +120,13 @@ extern "C" {
         .Reset.Detect = ResetForDetectRhoUtility,
         .Reset.Prediction = ResetForPredictionRhoUtility,
         
-        .Update.PeakFilter = UpdatePeakFilterRhoUtility,
-        .Update.TrackingFilters = UpdateTrackingFiltersRhoUtility,
-        .Update.CalculateValidTracks = CalculateValidTracksRhoUtility,
-        .Update.SortFilters = SortTrackingFiltersRhoUtility,
-        .Update.TrackingProbabilities = UpdateTrackingProbabilitiesRhoUtility,
+        .Predict.PeakFilter = PredictPeakFilterRhoUtility,
+        .Predict.TrackingFilters = PredictTrackingFiltersRhoUtility,
+        .Predict.CalculateValidTracks = CalculateValidTracksRhoUtility,
+        .Predict.SortFilters = SortTrackingFiltersRhoUtility,
+        .Predict.TrackingProbabilities = PredictTrackingProbabilitiesRhoUtility,
+        .Predict.CorrectAmbiguity = CorrectPredictionAmbiguityRhoUtility,
+        .Predict.RedistributeDensities = RedistributeDensitiesRhoUtility,
         
         .Detect.Perform = PerformDetectRhoUtility,
         .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
@@ -138,10 +135,7 @@ extern "C" {
         .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,
         .Detect.CalculateChaos = CalculateDetectionChaosRhoUtility,
         .Detect.ScoreBlobs = ScoreBlobsRhoUtility,
-        .Detect.SortBlobs = SortBlobsRhoUtility,
-        
-        .Predict.CorrectAmbiguity = CorrectPredictionAmbiguityRhoUtility,
-        .Predict.RedistributeDensities = RedistributeDensitiesRhoUtility,
+        .Detect.SortBlobs = SortBlobsRhoUtility
     };
     
 #ifdef __cplusplus

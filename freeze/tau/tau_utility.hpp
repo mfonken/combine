@@ -21,7 +21,7 @@
 #include "rho_wrapper.hpp"
 
 #define MAX_COUNT               1000
-#define BACKGROUNDING_PERIOD    150000
+#define BACKGROUNDING_PERIOD    15000
 
 class Tau : public TestInterface
 {
