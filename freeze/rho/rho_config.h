@@ -31,14 +31,14 @@
 #define RHO_PREDICTION_LS   1.
 #define RHO_PREDICTION_VU   0.05
 #define RHO_PREDICTION_BU   0.001
-#define RHO_PREDICTION_SU   0.1
+#define RHO_PREDICTION_SU   0.05
 #define DEFAULT_PREDICTION_UNCERTAINTY \
 (rho_kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 
 #define RHO_TARGET_LS       5.
 #define RHO_TARGET_VU       0.001
 #define RHO_TARGET_BU       0.05
-#define RHO_TARGET_SU       0.5
+#define RHO_TARGET_SU       0.9
 #define DEFAULT_TARGET_UNCERTAINTY \
 (rho_kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 

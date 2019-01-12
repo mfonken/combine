@@ -43,6 +43,11 @@ image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
     path_tick = 0;
     path_num_ticks = PATH_NUM_TICKS;
     
+    Cx = width/2;
+    Cy = height/2;
+    pCx = Cx;
+    pCy = Cy;
+    
     noise = DEFAULT_NOISE;
     noise_rate = NOISE_RATE;
     
@@ -358,6 +363,10 @@ Mat& ImageUtility::generateImage()
         default:
             break;
     }
+    Cx = (int)(p_x+s_x) >> 1;
+    Cy = (int)(p_y+s_y) >> 1;
+    pCx = Cx;
+    pCy = Cy;
     
 #define GENERATOR_SIZE_OSCILLATION
     

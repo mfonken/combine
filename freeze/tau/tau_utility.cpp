@@ -58,7 +58,10 @@ void Tau::init( void )
 {
     rho.core.Thresh = THRESHOLD_MIN;
     count = 0;
+    accuracy_count = 0;
     avg = 0;
+    accuracy = 0;
+    current_accuracy = 0;
     tick = 0;
     utility.generator_active = true;
 }
@@ -74,7 +77,11 @@ void Tau::trigger( void )
     
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
+    {
         cma(p, &avg, ++count);
+        cma(current_accuracy, &accuracy, ++accuracy_count);
+        if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
+    }
 }
 
 std::string Tau::serialize( void )
@@ -107,6 +114,11 @@ double Tau::perform( cimage_t &img )
         updatePrediction();
     }
     gettimeofday( &b, NULL);
+    
+    double Cx = utility.pCx-rho.core.Cx,
+    Cy = utility.pCy-rho.core.Cy;
+    current_accuracy = sqrt(Cx*Cx + Cy*Cy);
+    
     printPacket(&packet, 4);
     return timeDiff(a,b);
 }

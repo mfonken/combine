@@ -333,6 +333,10 @@ typedef struct
     index_t
         Width,
         Height,
+        Px,
+        Py,
+        Sx,
+        Sy,
         Cx,
         Cy,
         Bx,

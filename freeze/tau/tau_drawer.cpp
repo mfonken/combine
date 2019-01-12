@@ -200,10 +200,14 @@ Mat& TauDrawer::GetDensitiesFrame(Mat& M)
     putText(M, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
     putText(M, "State: " + string(stateString(rho.core.BayeSys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
+    putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
+    line(M, Point(rho.core.Cx, rho.core.Cy), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
     putText(M, "X (" + to_string(rho.core.Cx) + ", " + to_string(rho.core.Cy) + ")", Point(rho.core.Cx-9, rho.core.Cy+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
+    putText(M, "o", Point(rho.core.Px-9, rho.core.Py+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
+    putText(M, "o", Point(rho.core.Sx-9, rho.core.Sy+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
     
     double dnow = now();
-    rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH), Point(W,H), Scalar(0,0,0), CV_FILLED);
+    rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH*2), Point(W,H), Scalar(0,0,0), CV_FILLED);
     if(--frame_rate_counter == 0)
     {
         frame_rate_counter = frame_rate_display_delay;
@@ -211,6 +215,7 @@ Mat& TauDrawer::GetDensitiesFrame(Mat& M)
     }
     timestamp = dnow;
     
+    putText(M, to_string((int)accuracy), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH*3/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(100,150,0));
     putText(M, to_string(frame_rate), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(0,100,150));
     pthread_mutex_unlock(&drawer_mutex);
     
@@ -561,7 +566,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     file.close();
     
     /* Clear */
-    //rectangle(M, Point(global_offset,0), Point(global_offset+rho_frame.cols,H), RHO_DRAWERS_BACKGROUND_COLOR);
+    rectangle(mat, Point(global_offset,0), Point(global_offset+rho_frame.cols,H), RHO_DRAWERS_BACKGROUND_COLOR, CV_FILLED);
     
     /* Draw */
 #define RF_SPACE 10

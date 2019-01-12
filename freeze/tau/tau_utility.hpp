@@ -12,6 +12,8 @@
 /// FIND PLACE FOR THIS
 #define THRESHOLD_MIN 100
 
+#define AVERAGE_COUNT 10
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
@@ -40,8 +42,11 @@ public:
     void updateThresh();
     void updatePrediction();
     
-    int                 count;
-    double              avg;
+    int                 count,
+                        accuracy_count;
+    double              avg,
+                        accuracy,
+                        current_accuracy;
     
     kpoint_t            A, B;
     cimage_t            image;

@@ -51,6 +51,10 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Centroid */
     core->Cx   = width/2;
     core->Cy   = height/2;
+    core->Px   = width/2;
+    core->Py   = height/2;
+    core->Sx   = width/2;
+    core->Sy   = height/2;
     core->DensityMapPair.x.centroid = core->Cx;
     core->DensityMapPair.y.centroid = core->Cy;
     
@@ -139,9 +143,9 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
         r->Blobs[i].srt = false;
     
-    floating_t A = (floating_t)r->TotalDensity, B = target_density;
-    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
-    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
+//    floating_t A = (floating_t)r->TotalDensity, B = target_density;
+//    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
+//    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
@@ -180,6 +184,10 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     
     LOG_RHO("Cx>%d | Cy>%d\n", _->Cx, _->Cy);
     
+    core->Px = _->Ax;
+    core->Py = _->Ay;
+    core->Sx = _->Bx;
+    core->Sy = _->By;
     core->Cx = _->Cx;
     core->Cy = _->Cy;
     
@@ -242,7 +250,7 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     core->ThreshByte = (byte_t)core->Thresh;
     
     
-    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor);
+//    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor);
 //    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
 //    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
 //    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);

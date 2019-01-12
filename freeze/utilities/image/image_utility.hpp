@@ -92,7 +92,7 @@ public:
     bool isLive();
     void drawOutframe();
     Mat& generateImage();
-    
+    int Cx, Cy, pCx, pCy;
     kpoint_t bea[2];
     int thresh;
     bool    generator_active,

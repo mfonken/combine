@@ -13,7 +13,7 @@ using namespace cv;
 using namespace std;
 
 #define MAIN_FPS        60
-#define TAU_FPS         60
+#define TAU_FPS         15
 #define COMBINE_FPS     0
 
 #define TITLE_STRING                    "PCR Alpha v0.01"
