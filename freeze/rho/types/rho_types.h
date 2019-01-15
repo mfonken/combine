@@ -164,6 +164,8 @@ typedef struct
                     max[2];
     index_t         length,
                     centroid;
+    density_2d_t    total_density,
+                    filtered_density;
     bool            has_background;
     rho_kalman_t    kalmans[2];
 } density_map_t;
@@ -189,7 +191,8 @@ typedef struct
 
 typedef struct
 {
-    floating_t  P[NUM_STATE_GROUPS];
+    floating_t  P[NUM_STATE_GROUPS],
+                confidence;
 } prediction_probabilities;
 
 typedef struct
@@ -204,7 +207,8 @@ typedef struct
                     Secondary;
     density_t       PreviousPeak[2];
     density_2d_t    PreviousDensity[2],
-                    TotalDensity;
+                    TotalDensity,
+                    FilterDensity[2];
     prediction_probabilities Probabilities;
 } prediction_t;
 
@@ -289,9 +293,8 @@ typedef struct
     density_2d_t
     cmax,
     cden,
-    tden,
-    fden,
-    tcov;   /* Total coverage */
+    tden, /* Target density */
+    fden; /* Filtered density */
     bool
     has,
     rcal; /* Recalculate */

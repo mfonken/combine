@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/rho/core/rho_utility.c"
-            timestampString = "568787427.596383"
+            timestampString = "569221261.182928"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "212"
-            endingLineNumber = "212"
+            startingLineNumber = "217"
+            endingLineNumber = "217"
             landmarkName = "DetectBlobRhoUtility"
             landmarkType = "9">
          </BreakpointContent>
@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/rho/core/rho_utility.c"
-            timestampString = "568787427.596446"
+            timestampString = "569221261.183019"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "269"
-            endingLineNumber = "269"
+            startingLineNumber = "274"
+            endingLineNumber = "274"
             landmarkName = "ScoreBlobsRhoUtility"
             landmarkType = "9">
          </BreakpointContent>
@@ -138,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "568964703.596024"
+            timestampString = "569221261.183076"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "235"
@@ -154,7 +154,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "568964703.596103"
+            timestampString = "569221261.183117"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "985"
@@ -170,7 +170,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "568964703.596148"
+            timestampString = "569221261.183174"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "411"
@@ -185,28 +185,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../../freeze/rho/core/rho_core.c"
-            timestampString = "568964703.5961879"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "234"
-            endingLineNumber = "234"
-            landmarkName = "UpdateRhoCoreThreshold"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "../../../freeze/rho/core/rho_utility.c"
-            timestampString = "568787427.5966671"
+            timestampString = "569221261.183229"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
+            startingLineNumber = "313"
+            endingLineNumber = "313"
             landmarkName = "SortBlobsRhoUtility"
             landmarkType = "9">
          </BreakpointContent>
@@ -214,32 +198,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../../freeze/rho/core/rho_utility.c"
-            timestampString = "568787427.596707"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "469"
-            endingLineNumber = "469"
-            landmarkName = "SortTrackingFiltersRhoUtility"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../../freeze/rho/core/rho_utility.c"
-            timestampString = "568787427.596745"
+            filePath = "../../../freeze/rho/state_control/state_machine_utility.c"
+            timestampString = "569221261.183275"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "354"
-            endingLineNumber = "354"
-            landmarkName = "PredictTrackingFiltersRhoUtility"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
+            landmarkName = "NormalizeBayesianState"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -250,12 +218,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/rho/core/rho_core.c"
-            timestampString = "568964703.596258"
+            timestampString = "569221261.183338"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "246"
-            endingLineNumber = "246"
-            landmarkName = "UpdateRhoCoreThreshold"
+            startingLineNumber = "147"
+            endingLineNumber = "147"
+            landmarkName = "DetectRhoCore"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -266,12 +234,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/rho/core/rho_core.c"
-            timestampString = "568964703.596297"
+            timestampString = "569221261.183396"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
-            landmarkName = "UpdateRhoCoreThreshold"
+            startingLineNumber = "137"
+            endingLineNumber = "137"
+            landmarkName = "DetectRhoCore"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -281,13 +249,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "pcr/main.cpp"
-            timestampString = "568964007.404263"
+            filePath = "../../../freeze/rho/core/rho_core.c"
+            timestampString = "569221261.183437"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
-            landmarkName = "main( int argc, const char * argv[] )"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
+            landmarkName = "UpdateRhoCoreThreshold"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

@@ -7,7 +7,7 @@
 #include "timestamp.h"
 //#include <sys/time.h>
 
-#define KALMAN_PUNISH_FACTOR  0.2
+#define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001
 #define KALMAN_MATURATION     3 // Seconds
 

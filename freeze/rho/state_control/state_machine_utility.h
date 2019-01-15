@@ -30,6 +30,8 @@ extern "C" {
 #define SHADOW_TOLERANCE                0.2
 #define DOUBT_STABILITY                 0.5
     
+#define STABILITY_FACTOR                3.0
+    
     /***************************************************************************************/
     
     /** Goals **

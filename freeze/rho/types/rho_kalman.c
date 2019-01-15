@@ -81,6 +81,7 @@ void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new )
     k->timestamp  = timestamp();
     k->flag = false;
     
+    k->value = BOUND(k->value, k->min_value, k->max_value);
     LOG_KALMAN("Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
 };
 
@@ -94,7 +95,7 @@ floating_t StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rat
 
 bool IsRhoKalmanExpired( rho_kalman_t * k )
 {
-    return false;//((timestamp() - k->timestamp) > k->lifespan);
+    return ((timestamp() - k->timestamp) > k->lifespan);
 }
 
 inline floating_t ScoreRhoKalman( rho_kalman_t * k )

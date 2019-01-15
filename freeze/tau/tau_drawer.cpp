@@ -550,7 +550,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
         state_P[i] = rho.core.BayeSys.probabilities.map[i][state];
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
-    pid_data[pid_data_x] = rho.core.ThreshFilter.Value;
+    pid_data[pid_data_x] = rho.core.TargetFilter.value;
     pid_data_target[pid_data_x] = target_cvg_percent;
     pthread_mutex_unlock(&rho.c_mutex);
     

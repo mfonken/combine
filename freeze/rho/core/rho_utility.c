@@ -69,6 +69,8 @@ void InitializeDensityMapRhoUtility( density_map_t * dmap, index_t len )
     dmap->length = len;
     dmap->max[0] = 0;
     dmap->max[1] = 0;
+    dmap->filtered_density = 0;
+    dmap->total_density = 0;
     RhoKalman.Initialize( &dmap->kalmans[0], 0, RHO_DEFAULT_LS, 0, len, DEFAULT_KALMAN_UNCERTAINTY );
     RhoKalman.Initialize( &dmap->kalmans[1], 0, RHO_DEFAULT_LS, 0, len, DEFAULT_KALMAN_UNCERTAINTY );
 }
@@ -114,7 +116,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
         {
             do
             {
-                RhoUtility.Detect.Blobs( _, d, r);
+                RhoUtility.Detect.Blobs( _, d, r );
                 RhoUtility.Detect.CalculateChaos( _, r );
                 RhoUtility.Detect.ScoreBlobs( _, d, r );
             } while( _->rcal && ++_->rcal_c < MAX_RHO_RECALCULATION_LEVEL );
@@ -151,11 +153,15 @@ inline bool CalculateBandLowerBoundRhoUtility( rho_detection_variables *_ )
 
 inline void DetectBlobsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 { /* Detect blobs - START */
+    d->total_density = 0;
+    d->filtered_density = 0;
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c1, d->map, _->b, d->background)
     {
         RhoUtility.Detect.SubtractBackground( _, d );
         RhoUtility.Detect.Blob( _, d, r );
     }
+    d->total_density = _->tden;
+    d->filtered_density = _->fden;
 } /* Detect blobs - END */
 
 inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_, density_map_t * d )
@@ -171,7 +177,7 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_
 //            }
 //            printf(" ");
 //        }
-        _->tcov += _->c1;
+        _->tden += _->c1;
         if( _->c1 > _->cmax )
             _->cmax = _->c1;
         
@@ -179,7 +185,6 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_
         if( ( _->c1 > _->fpeak )
            && ( _->fpeak_2 > _->c1 ) )
             _->c1 = _->fpeak_2 - _->c1;
-        _->tden += _->c1;
     }
     else
         _->c1 = 0;
@@ -350,14 +355,17 @@ void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
 }
 
 void PredictTrackingFiltersRhoUtility( prediction_t * r )
-{
+{    
     index_t valid_tracks = RhoUtility.Predict.CalculateValidTracks( r );
 //    printf("Found %d valid/active tracking filter\n", valid_tracks);
+    
+    floating_t aa, bb, ab, ba, total_difference = 0., average_difference = 0.;
+    
     /* Match blobs to Kalmans */
-    index_t m, n, k;
-    for( m = 0; m < ( valid_tracks - 1 ); m += 2 )
+    index_t m = 0, n = 0, updated = 0;
+    for( ; m < ( valid_tracks - 1 ); m ++ )
     {
-        for( n = 0; n < ( r->NumBlobs - 1 ); n += 2 )
+        for( ; n < ( r->NumBlobs - 1 ); n++ )
         { /* Update tracking filters in pairs following determinant */
             
             /* Retreive current blob pair */
@@ -374,48 +382,91 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             blocB = blobB->loc;
             
             /* Calculate distances between filters and blobs */
-            floating_t
-            aa = fabs(filterA->value - blocA),
-            bb = fabs(filterB->value - blocB),
-            ab = fabs(filterA->value - blocB),
+            aa = fabs(filterA->value - blocA);
+            bb = fabs(filterB->value - blocB);
+            ab = fabs(filterA->value - blocB);
             ba = fabs(filterB->value - blocA);
             
+            if( aa > MAX_TRACKING_MATCH_DIFFERNCE )
+            {
+                aa = MAX_TRACKING_MATCH_DIFFERNCE;
+                RhoKalman.Punish(filterA);
+            }
+            if( ab > MAX_TRACKING_MATCH_DIFFERNCE )
+            {
+                ab = MAX_TRACKING_MATCH_DIFFERNCE;
+                RhoKalman.Punish(filterA);
+            }
+            if( bb > MAX_TRACKING_MATCH_DIFFERNCE )
+            {
+                bb = MAX_TRACKING_MATCH_DIFFERNCE;
+                RhoKalman.Punish(filterB);
+            }
+            if( ba > MAX_TRACKING_MATCH_DIFFERNCE )
+            {
+                ba = MAX_TRACKING_MATCH_DIFFERNCE;
+                RhoKalman.Punish(filterB);
+            }
+            
             /* Swap on upward determinant */
-            if( aa * bb > ab * ba ) SWAP(blocA, blocB);
+            if( aa * bb > ab * ba )
+            {
+                SWAP(blocA, blocB);
+                total_difference += aa + bb;
+            }
+            else
+                total_difference += ab + ba;
+            updated += 2;
             
 //            printf("a:%3.2f,%3.2f b:%3.2f,%3.2f | aa:%3.2f bb:%3.2f ab:%3.f2 ba:%3.2f | A:%3.2f B:%3.2f\n", filterA->value, blocA, filterB->value, blocB, aa, bb, ab, ba, blocA, blocB);
             
             /* Update filters */
             RhoKalman.Update(filterA, blocA);
             RhoKalman.Update(filterB, blocB);
+            
+            m++; n++;
         }
         
-        /* Account for odd number of blobs */
-        if( n > r->NumBlobs )
+        /* Account for odd number of and spare blobs */
+        if( m < valid_tracks && n < r->NumBlobs )
         {
             rho_kalman_t
             *filter = &r->TrackingFilters[r->TrackingFiltersOrder[m]];
             floating_t
-            blob = (floating_t)r->Blobs[r->BlobsOrder[n-1]].loc;
-            RhoKalman.Update(filter, blob);
+            bloc = (floating_t)r->Blobs[r->BlobsOrder[n]].loc;
+            RhoKalman.Update(filter, bloc);
+            
+            aa = fabs(filter->value - bloc);
+            total_difference += aa;
+            updated++;
         }
     }
-
+    
     /* Activate new filters */
-    for( k = valid_tracks; k < r->NumBlobs && k < MAX_TRACKING_FILTERS; k++ )
+    for( ; n < r->NumBlobs; n++ )
     {
-//        printf("Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
-        RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[k]], r->Blobs[r->BlobsOrder[k]].loc, 0. );
+        //        printf("Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
+        RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[n]], r->Blobs[r->BlobsOrder[n]].loc, 0. );
     }
     
     /* Punish unused ones */
-    for( ; k < MAX_TRACKING_FILTERS; k++ )
+    for( ; m < MAX_TRACKING_FILTERS; m++ )
     {
 //        printf("Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
-        RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[k]]);
+        RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[m]]);
     }
     
     RhoUtility.Predict.SortFilters( r );
+    
+    if( updated )
+    {
+        average_difference = total_difference / (floating_t)updated;
+//        printf("ttldiff:%3.3f upd:%d > avgdiff:%3.3f | pconf:%3.3f\n" , total_difference, updated, average_difference, 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERNCE ));
+        if( average_difference < MAX_TRACKING_MATCH_DIFFERNCE )
+            r->Probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERNCE ) );
+        else
+            r->Probabilities.confidence = 0.;
+    }
 }
 
 void SortTrackingFiltersRhoUtility( prediction_t * r )
@@ -490,11 +541,12 @@ void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
 {
     if( r->NuBlobs > 0. )
     {
-        floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.;
-        for( uint8_t i = 0; i < b; i++ )
+        floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.,
+        interval[4] = STATE_KUMARASWAMY_INTERVALS;
+        for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
         {
-            floating_t x = (floating_t)(i+1) / b;
-            curr_CDF = KUMARASWAMY_CDF(x,a,b);
+//            floating_t x = interval[i] / b;
+            curr_CDF = KUMARASWAMY_CDF(interval[i],a,b);
             r->Probabilities.P[i] = curr_CDF - prev_CDF;
             prev_CDF = curr_CDF;
         }
@@ -504,7 +556,7 @@ void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
         memset(r->Probabilities.P, 0, sizeof(r->Probabilities.P));
         r->Probabilities.P[0] = 1.;
     }
-//    printf("Probabilities:");
+//    printf("Probabilities(%.5f):", r->Probabilities.confidence);
 //    for(int i = 0; i < 4; i++)
 //    {
 //        printf(" %3.2f", r->Probabilities.P[i]);
@@ -531,6 +583,14 @@ void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables * _, rho
         _->qcheck = (  core->Qf[0] > core->Qf[1] ) + ( core->Qf[2] < core->Qf[3] ) - 1;
         if( ( _->Ax > _->Bx ) ^ ( ( _->qcheck > 0 ) ^ ( _->Ay < _->By ) ) ) SWAP(_->Ax, _->Bx);
     }
+}
+
+void CombineAxisProbabilitesRhoUtility( prediction_pair_t * p )
+{
+    /* Combine X & Y probabilities with confidence factor */
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+        p->Probabilities.P[i] = ( ( p->x.Probabilities.confidence  * p->x.Probabilities.P[i] ) + ( p->y.Probabilities.confidence * p->y.Probabilities.P[i] ) ) / 2;
+    p->Probabilities.confidence = ( p->x.Probabilities.confidence + p->y.Probabilities.confidence ) / 2;
 }
 
 /* Perform density redistribution from combining current frame and background */

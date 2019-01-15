@@ -49,11 +49,18 @@ void NormalizeBayesianState( bayesian_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     floating_t * total = &_.v;
-    for( _.j = 0; _.j < _.l; _.j++ ) *total += bm->map[_.j][i];
+    for( _.j = 0; _.j < _.l; _.j++ )
+    {
+        _.u = bm->map[i][_.j];
+        if( _.u >= 0. )
+            *total += _.u;
+        else
+            bm->map[i][_.j] = 0.;
+    }
     if(*total)
     {
         _.v = ZDIV( 1., (*total) );
-        for( _.j = 0; _.j < _.l; _.j++ ) bm->map[_.j][i] *= _.v;
+        for( _.j = 0; _.j < _.l; _.j++ ) bm->map[i][_.j] *= _.v;
     }
     else bm->map[_.i][i] = 1.0;
 }
@@ -61,7 +68,7 @@ void NormalizeBayesianState( bayesian_map_t * bm, state_dimension_t i )
 void ResetBayesianState( bayesian_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
-    for( _.j = 0; _.j < _.l; _.j++ ) bm->map[_.j][i] = 0.0;
+    for( _.j = 0; _.j < _.l; _.j++ ) bm->map[i][_.j] = 0.0;
     bm->map[i][i] = 1.0;
 }
 
@@ -77,7 +84,7 @@ void PrintBayesianMap( bayesian_map_t * bm, state_t s )
         {
             char c = ' ';
             if(_.j == (state_dimension_t)s) c = '|';
-            printf("\t%c[%.2f]%c",c, bm->map[_.i][_.j],c);
+            printf("\t%c[%.2f]%c",c, bm->map[_.j][_.i],c);
         }
     }
     printf("\n");
@@ -101,12 +108,16 @@ void InitializeBayesianSystem( bayesian_system_t * sys )
 void UpdateBayesianSystem( bayesian_system_t * sys, floating_t p[4] )
 {
     reset_loop_variables( &_, NUM_STATES );
+    
+    BayesianFunctions.Sys.UpdateProbabilities( sys, p );
+    BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
+    
     state_t next = sys->state;
-  
+    
     /* Find most probable next state */
     for( ; _.i < _.l; _.i++ )
     {
-        _.v = sys->probabilities.map[_.i][(state_dimension_t)sys->state];
+        _.v = sys->probabilities.map[(state_dimension_t)sys->state][_.i];
         if( _.v > _.u )
         {
             _.u = _.v;
@@ -116,8 +127,6 @@ void UpdateBayesianSystem( bayesian_system_t * sys, floating_t p[4] )
     /* Only update sys->next state on change */
     if( next != sys->state ) sys->next = next;
     
-    BayesianFunctions.Sys.UpdateProbabilities( sys, p );
-    BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
     BayesianFunctions.Sys.UpdateState( sys );
     PrintBayesianMap( &sys->probabilities, sys->state );
 }
@@ -127,7 +136,7 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
     state_t           c = sys->state;
     state_dimension_t x = stateNumber(c);
     int8_t            k = -1;
-    
+
 #ifdef STATEM_DEBUG
     for( _.i = 0; _.i < NUM_STATE_GROUPS; _.i++)
         if( p[_.i] > 10 )
@@ -142,14 +151,26 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
         _.j = x - _.i;
         if(!isStable(c))
         {
-            if( x == _.i ) k = c - 1;
+            if( !_.j ) k = c - 1;
             else k = c - ( _.j << 1 );
         }
         else if( x == _.i ) k = c;
-        else k = ( c + 1 ) - ( _.j << 1);
+        else
+        {
+            k = ( c + 1 ) - ( _.j << 1);
+//            p[_.i] *= STABILITY_FACTOR;
+        }
         
         LOG_STATEM("Updating %s by %.2f.\n", stateString(k), p[_.i]);
-        sys->probabilities.map[k][c] += p[_.i];
+        sys->probabilities.map[c][k] += p[_.i];
+        sys->probabilities.map[c][k] /= 2;
+        
+        if( !isStable(c) && k == c - 1 )
+        {
+            floating_t transfer = sys->probabilities.map[c][k] / 2;
+            sys->probabilities.map[c][k] += transfer;
+            sys->probabilities.map[c][c] -= transfer;
+        }
     }
 }
 
