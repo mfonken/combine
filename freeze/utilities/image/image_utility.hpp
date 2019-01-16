@@ -28,12 +28,16 @@
 //#include "tau_structures.hpp"
 #endif
 
+//#define DEBUG_IU
+
 #ifndef LOG
 #define LOG(...) printf(__VA_ARGS__)
 #endif
 
-#ifndef LOG_IU
+#ifdef DEBUG_IU
 #define LOG_IU(...) LOG("<ImageUtility> " __VA_ARGS__)
+#else
+#define LOG_IU(...)
 #endif
 
 
@@ -91,7 +95,7 @@ public:
     Mat& GetNextFrame();
     bool isLive();
     void drawOutframe();
-    Mat& generateImage();
+    void generateImage(Mat&);
     int Cx, Cy, pCx, pCy;
     kpoint_t bea[2];
     int thresh;

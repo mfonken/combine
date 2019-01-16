@@ -26,9 +26,10 @@ image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
     if(num_frames) LOG_IU("Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
-#elif defined HAS_GENERATOR
-    LOG_IU("Initialized with generator and dimensions %dx%d\n", width, height);
 #endif
+//#ifdef HAS_GENERATOR
+//    LOG_IU("Initialized with generator and dimensions %dx%d\n", width, height);
+//#endif
     cimageInit(outimage, width, height);
     pthread_mutex_init(&outframe_mutex, NULL);
     pthread_mutex_init(&outimage_mutex, NULL);
@@ -96,7 +97,7 @@ void ImageUtility::InitFile()
         LOG_IU("With %d %dx%d frames.\n", num_frames, size.width, size.height);
         counter = 1;
         
-        file.append( to_string(counter%num_frames+1) );
+        file.append(to_string(counter%num_frames+1) );
         file.append(".png");
     }
     else
@@ -158,6 +159,7 @@ void ImageUtility::trigger()
         preoutframe = GetNextImage();
     else if(has_camera)
         preoutframe = GetNextFrame();
+    else preoutframe = { 0 };
 
     if( background_request )
     {
@@ -166,7 +168,7 @@ void ImageUtility::trigger()
         background_request = false;
     }
     else if(has_generator)
-        preoutframe = generateImage();
+        generateImage(preoutframe);
     
 #ifdef THRESH_IMAGE
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
@@ -220,6 +222,7 @@ Mat& ImageUtility::GetNextImage()
 Mat& ImageUtility::GetImage()
 {
     file = subdir + to_string( counter%num_frames+1) + ".png";
+    LOG_IU("Opening file: %s\n", file.c_str());
     image = imread( file, IMREAD_COLOR );
     if( image.empty() )                      // Check for invalid input
     {
@@ -306,7 +309,7 @@ void drawPosition(double x, double y, double z)
     //    imshow("Position", P);
 }
 
-Mat& ImageUtility::generateImage()
+void ImageUtility::generateImage(Mat& M)
 {
     path_tick = counter % path_num_ticks;
     if( !has_file && !has_camera ) frame = {0};
@@ -314,7 +317,7 @@ Mat& ImageUtility::generateImage()
     switch(noise)
     {
         case STATIC_SMALL:
-            rectangle(frame, Point(NOISE_ORIGIN_X,NOISE_ORIGIN_Y), Point(NOISE_ORIGIN_X+NOISE_WIDTH,NOISE_ORIGIN_Y+NOISE_HEIGHT), NOISE_COLOR, -1);
+            rectangle(M, Point(NOISE_ORIGIN_X,NOISE_ORIGIN_Y), Point(NOISE_ORIGIN_X+NOISE_WIDTH,NOISE_ORIGIN_Y+NOISE_HEIGHT), NOISE_COLOR, -1);
             break;
         case STATIC_LARGE:
             break;
@@ -372,12 +375,11 @@ Mat& ImageUtility::generateImage()
     
 #ifdef GENERATOR_SIZE_OSCILLATION
     double radius_offset = abs(0.5 - phase);
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
+    circle(M, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
+    circle(M, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
 #else
-    circle(frame, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
-    circle(frame, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+    circle(M, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+    circle(M, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
 #endif
 //    circle(frame, Point(size.width/2, size.height/2), TARGET_RADIUS*2, NOISE_COLOR, -1);
-    return frame;
 }

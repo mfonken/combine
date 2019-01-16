@@ -150,9 +150,9 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
         r->Blobs[i].srt = false;
     
-    floating_t A = (floating_t)r->TotalDensity, B = target_density;
-    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
-    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
+//    floating_t A = (floating_t)r->TotalDensity, B = target_density;
+//    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
+//    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
@@ -225,15 +225,15 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     switch(core->BayeSys.state)
     {
+        case STABLE_MANY:
+            state_tune_factor = -3;
+            break;
         case STABLE_NONE:
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[0], core->PredictionPair.x.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[1], core->PredictionPair.x.PreviousPeak[1] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
-            break;
-        case STABLE_MANY:
-            state_tune_factor = -3;
-            break;
+            state_tune_factor = 1;
         case STABLE_SINGLE:
         case UNSTABLE_NONE:
         case UNSTABLE_SINGLE:
