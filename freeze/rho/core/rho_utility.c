@@ -168,16 +168,11 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_
 {
     if( _->c1 > _->b )
     {
-        _->c1 -= _->b;///*BOUNDU(*/_->c1 - _->b;//, d->length);
-//        if(_->c1 > 2000)
-//        {
-//            for(int i = 0; i < d->length; i++)
-//            {
-//                printf("%d\n", d->map[i]);
-//            }
-//            printf(" ");
-//        }
         _->tden += _->c1;
+        
+        // Subtract background
+        _->c1 -= _->b;
+        
         if( _->c1 > _->cmax )
             _->cmax = _->c1;
         
@@ -350,8 +345,8 @@ void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
 //        curr->srt = false;
 //    }
 //    printf("\n");
-    if(r->BlobsOrder[0] == r->BlobsOrder[1])
-        printf(" ");
+//    if(r->BlobsOrder[0] == r->BlobsOrder[1])
+//        printf(" ");
 }
 
 void PredictTrackingFiltersRhoUtility( prediction_t * r )
@@ -443,7 +438,7 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
     }
     
     /* Activate new filters */
-    for( ; n < r->NumBlobs; n++ )
+    for( ; n < r->NumBlobs && n < MAX_BLOBS; n++ )
     {
         //        printf("Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[k], k);
         RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[n]], r->Blobs[r->BlobsOrder[n]].loc, 0. );
@@ -516,8 +511,8 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
         r->TrackingFilters[i].flag = false;
     }
     
-    if(r->TrackingFiltersOrder[0] == r->TrackingFiltersOrder[1])
-        printf(" ");
+//    if(r->TrackingFiltersOrder[0] == r->TrackingFiltersOrder[1])
+//        printf(" ");
 }
 
 index_t CalculateValidTracksRhoUtility( prediction_t * r )
@@ -539,23 +534,16 @@ index_t CalculateValidTracksRhoUtility( prediction_t * r )
 
 void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
 {
-    if( r->NuBlobs > 0. )
+    floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.,
+    interval[4] = STATE_KUMARASWAMY_INTERVALS;
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
-        floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.,
-        interval[4] = STATE_KUMARASWAMY_INTERVALS;
-        for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
-        {
 //            floating_t x = interval[i] / b;
-            curr_CDF = KUMARASWAMY_CDF(interval[i],a,b);
-            r->Probabilities.P[i] = curr_CDF - prev_CDF;
-            prev_CDF = curr_CDF;
-        }
+        curr_CDF = KUMARASWAMY_CDF(interval[i],a,b);
+        r->Probabilities.P[i] = curr_CDF - prev_CDF;
+        prev_CDF = curr_CDF;
     }
-    else
-    {
-        memset(r->Probabilities.P, 0, sizeof(r->Probabilities.P));
-        r->Probabilities.P[0] = 1.;
-    }
+    
 //    printf("Probabilities(%.5f):", r->Probabilities.confidence);
 //    for(int i = 0; i < 4; i++)
 //    {
@@ -591,6 +579,68 @@ void CombineAxisProbabilitesRhoUtility( prediction_pair_t * p )
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
         p->Probabilities.P[i] = ( ( p->x.Probabilities.confidence  * p->x.Probabilities.P[i] ) + ( p->y.Probabilities.confidence * p->y.Probabilities.P[i] ) ) / 2;
     p->Probabilities.confidence = ( p->x.Probabilities.confidence + p->y.Probabilities.confidence ) / 2;
+}
+
+void CalculateTuneRhoUtility( rho_core_t * core )
+{
+    /* Background-Tune on significant background */
+    RhoUtility.Calculate.BackgroundTuneFactor( core );
+    
+    /* State-Tune by BayeSM state */
+    RhoUtility.Calculate.StateTuneFactor( core );
+    
+    /* Filtered-Tune on target difference */
+    RhoUtility.Calculate.TargetTuneFactor( core );
+    
+    core->Tune.proposed = BOUND( core->Tune.background + core->Tune.state + core->Tune.target, -THRESH_STEP_MAX, THRESH_STEP_MAX);
+}
+
+void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * core )
+{
+    floating_t background_tune_factor = 0.;
+    if( core->QbT > BACKGROUND_COVERAGE_MIN )
+    {
+        floating_t background_coverage_factor = 1 - ZDIV( BACKGROUND_COVERAGE_MIN, core->QbT );
+        background_tune_factor = -pow( BOUND(background_coverage_factor, -2, 2), 3);
+    }
+    core->Tune.background = background_tune_factor;
+}
+
+void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
+{
+    floating_t state_tune_factor = 0.;
+    core->TargetCoverageFactor = core->TargetFilter.value;
+    switch(core->BayeSys.state)
+    {
+        case UNSTABLE_MANY:
+        case STABLE_MANY:
+            state_tune_factor = -3;
+            break;
+        case STABLE_NONE:
+            RhoKalman.Reset( &core->DensityMapPair.x.kalmans[0], core->PredictionPair.x.PreviousPeak[0] );
+            RhoKalman.Reset( &core->DensityMapPair.x.kalmans[1], core->PredictionPair.x.PreviousPeak[1] );
+            RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
+            RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
+            state_tune_factor = 1;
+        case STABLE_SINGLE:
+        case UNSTABLE_NONE:
+        case UNSTABLE_SINGLE:
+            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->BayeSys.state) ) / (floating_t)NUM_STATES;
+            break;
+        case STABLE_DOUBLE:
+            core->TargetCoverageFactor = ZDIV( core->TotalCoverage, ( (floating_t)core->Width * (floating_t)core->Height ) );
+            break;
+        default:
+            break;
+    }
+    RhoKalman.Step( &core->TargetFilter, core->TargetCoverageFactor, 0. );
+    RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value);
+    core->Tune.state = state_tune_factor;
+}
+
+void CalculateTargetTuneFactor( rho_core_t * core )
+{
+    core->Tune.target = TARGET_TUNE_FACTOR * ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
 }
 
 /* Perform density redistribution from combining current frame and background */
@@ -668,7 +718,7 @@ void RedistributeDensitiesRhoUtility( rho_core_t * core )
     }
 }
 
-void GenerateBackgroundRhoUtility( rho_core_t * core )
+inline void GenerateBackgroundRhoUtility( rho_core_t * core )
 {
     floating_t xt = RhoUtility.CalculateCentroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Bx, BACKGROUND_CENTROID_CALC_THRESH );
     floating_t yt = RhoUtility.CalculateCentroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->By, BACKGROUND_CENTROID_CALC_THRESH );

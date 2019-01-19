@@ -11,11 +11,11 @@
 
 #define __PCR__
 
-/* Camera Config */
+/* Camera Config */ 
 #define RHO_WIDTH        1280
 #define RHO_HEIGHT       800
 
-#define BACKGROUND_PERIOD   10 // Frames
+#define BACKGROUNDING_PERIOD   10 // Frames
 
 #define FILTERED_COVERAGE_TARGET   0.007
 //#define FILTERED_COVERAGE_PIXELS   ((index_t)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
@@ -110,7 +110,7 @@
 #define MAX_VARIANCE        20
 
 #define EXPECTED_NUM_BLOBS  2
-#define MAX_BLOBS           10
+#define MAX_BLOBS           4
 #define MIN_BLOB_DENSITY    2
 #define MAX_BLOB_SCORE      10
 #define BLOB_SCORE_FACTOR   0.5
@@ -118,7 +118,7 @@
 
 #define MAX_RHO_RECALCULATION_LEVEL 0
 
-#define MAX_TRACKING_FILTERS 4
+#define MAX_TRACKING_FILTERS MAX_BLOBS
 #define MIN_TRACKING_KALMAN_SCORE 0.02
 #define MAX_TRACKING_MATCH_DIFFERNCE 500
 #define TRACKING_MATCH_TRUST 0.4

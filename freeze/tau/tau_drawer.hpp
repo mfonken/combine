@@ -51,6 +51,7 @@ public:
     *x_peak_data_l, *x_peak_data_u, *x_peak_data_uv, *x_peak_data_lv, *x_peak_data_ut, *x_peak_data_lt,
     *y_peak_data_l, *y_peak_data_u, *y_peak_data_uv, *y_peak_data_lv, *y_peak_data_ut, *y_peak_data_lt;
     int *x_match_data, *y_match_data;
+    int scale_x = 0;
     
     double timestamp;
     int frame_rate_counter, frame_rate;

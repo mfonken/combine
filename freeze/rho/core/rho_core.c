@@ -71,7 +71,7 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     
     /* Background */
     core->BackgroundCounter = 0;
-    core->BackgroundPeriod = BACKGROUND_PERIOD;
+    core->BackgroundPeriod = BACKGROUNDING_PERIOD;
     
     /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
     /* Connect to Interrupt Model variable structure */
@@ -103,8 +103,11 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 void PerformRhoCore( rho_core_t * core, bool background_event )
 {
     if(background_event)
-        return;
-//        RhoUtility.GenerateBackground( core );
+    {
+        floating_t xt = RhoUtility.CalculateCentroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+        floating_t yt = RhoUtility.CalculateCentroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->By, BACKGROUND_CENTROID_CALC_THRESH );
+        core->QbT = MAX(xt, yt);
+    }
     else
     {
         LOG_RHO("Filtering and selecting pairs.\n");
@@ -133,18 +136,17 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     RhoUtility.Detect.Perform( _, d, r );
     
     /* Update prediction */
-    floating_t target_density = core->TargetFilter.value * (floating_t)core->Width * (floating_t)core->Height;// / band_factor;
+    _->target_density = core->TargetFilter.value * (floating_t)core->Width * (floating_t)core->Height;
     r->NumBlobs = _->blbf;
-    index_t blob_factor = (floating_t)_->blbf;
-    if( blob_factor == 0 ) blob_factor = 1;
-    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * blob_factor, target_density ), MAX_NU_BLOBS );
+    _->assumed_blobs = (floating_t)_->blbf;
+    if( _->assumed_blobs == 0 ) _->assumed_blobs = 1;
+
+    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->assumed_blobs, _->target_density ), MAX_NU_BLOBS );
     r->TotalDensity = d->total_density;
     
     /* Update core */
     core->TotalCoverage += _->tden;
     core->FilteredCoverage += _->fden;
-    if(_->fden == 0)
-        printf(" ");
     
     /* Reset sort flags */
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
@@ -162,6 +164,7 @@ void DetectRhoCorePairs( rho_core_t * core )
     LOG_RHO("Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
     
+    /* Calculate accumulated filtered percentage from both axes */
     core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
 //    LOG_RHO("Filted percentage: %.4f\n", core->FilteredPercentage);
 }
@@ -186,7 +189,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     
     prediction_predict_variables *_ = (prediction_predict_variables*)malloc(sizeof(prediction_predict_variables));
     RhoUtility.Reset.Prediction( _, &core->PredictionPair, core->Cx, core->Cy );
-
+    
     RhoUtility.Predict.CorrectAmbiguity( _, core );
     RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
     
@@ -212,51 +215,11 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 /* Use background and state information to update image threshold */
 void UpdateRhoCoreThreshold( rho_core_t * core )
 {
-    /* Background-Tune on significant background */
-    floating_t  background_tune_factor = 0.;
-    if( core->QbT > BACKGROUND_COVERAGE_MIN )
-    {
-        floating_t background_coverage_factor = 1 - ZDIV( BACKGROUND_COVERAGE_MIN, core->QbT );
-        background_tune_factor = pow( BOUND(background_coverage_factor, -1, 1), 3);
-    }
-    
-    /* State-Tune by BayeSM state */
-    floating_t state_tune_factor = 0.;
-    core->TargetCoverageFactor = core->TargetFilter.value;
-    switch(core->BayeSys.state)
-    {
-        case STABLE_MANY:
-            state_tune_factor = -3;
-            break;
-        case STABLE_NONE:
-            RhoKalman.Reset( &core->DensityMapPair.x.kalmans[0], core->PredictionPair.x.PreviousPeak[0] );
-            RhoKalman.Reset( &core->DensityMapPair.x.kalmans[1], core->PredictionPair.x.PreviousPeak[1] );
-            RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
-            RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
-            state_tune_factor = 1;
-        case STABLE_SINGLE:
-        case UNSTABLE_NONE:
-        case UNSTABLE_SINGLE:
-        case UNSTABLE_MANY:
-            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->BayeSys.state) ) / (floating_t)NUM_STATES;
-            break;
-        case STABLE_DOUBLE:
-            core->TargetCoverageFactor = ZDIV( core->TotalCoverage, ( (floating_t)core->Width * (floating_t)core->Height ) );
-            break;
-        default:
-            break;
-    }
-    RhoKalman.Step( &core->TargetFilter, core->TargetCoverageFactor, 0. );
-    RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value);
-    
-    /* Filtered-Tune on target difference */
-    floating_t target_tune_factor = TARGET_TUNE_FACTOR * ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
-    floating_t proposed_tune_factor = BOUND( background_tune_factor + state_tune_factor + target_tune_factor, -THRESH_STEP_MAX, THRESH_STEP_MAX);
-    core->Thresh = BOUND(core->Thresh - proposed_tune_factor, THRESH_MIN, THRESH_MAX);
+    RhoUtility.Calculate.Tune( core );
+    core->Thresh = BOUND(core->Thresh - core->Tune.proposed, THRESH_MIN, THRESH_MAX);
     core->ThreshByte = (byte_t)core->Thresh;
     
-    
-    printf("(%s) STune:%3.4f TFilter.V:%3.4f Proposed:%3.4f ... %3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, proposed_tune_factor, core->TargetCoverageFactor);
+//    printf("(%s) STune:%3.4f TFilter.V:%3.4f BkdTune:%3.4f Proposed:%3.4f ... %3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, background_tune_factor,  proposed_tune_factor, core->TargetCoverageFactor);
 //    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
 //    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
 //    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);

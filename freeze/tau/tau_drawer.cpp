@@ -708,25 +708,35 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     
     // Bound
     rectangle(mat, PID_ORIGIN, PID_END, PID_COLOR, RF_LINE_WIDTH);
-    
-    int PID_MAX_BOUND = 2.;
-    for(int i = 0, x = PID_GRAPH_START; i < pid_data_x; i++, x++)
+
+    int interval = 50;
+    if( pid_data_x < interval)
+        scale_x = 0;
+    else if( pid_data_x % interval == 0 )
+        scale_x = pid_data_x - interval;
+
+    floating_t PID_MAX_BOUND = 0.70, PID_MIN_BOUND = 0.67, PID_DIFF = PID_MAX_BOUND - PID_MIN_BOUND;
+    for(int i = scale_x; i < pid_data_x; i++)
     {
-        floating_t curr = pid_data[i], curr_target = pid_data_target[i];
+        floating_t curr = pid_data[i] * 100., curr_target = pid_data_target[i] * 100.;
         if(curr > PID_MAX_BOUND) PID_MAX_BOUND = curr;
+        if(curr < PID_MIN_BOUND) PID_MIN_BOUND = curr;
         if(curr_target > PID_MAX_BOUND) PID_MAX_BOUND = curr_target;
+        if(curr_target < PID_MIN_BOUND) PID_MIN_BOUND = curr_target;
     }
-    PID_MAX_BOUND += 2.;
-    
+//    PID_MAX_BOUND += 0.2;
+    PID_DIFF = PID_MAX_BOUND - PID_MIN_BOUND;
+
+#define SCALE(X) BOUND((X-PID_MIN_BOUND/100.)*100./PID_DIFF*(PID_HEIGHT-PID_TICK_SPACING)+1, 1, PID_HEIGHT)
     // Graph
     int pid_prev = 0, pid_prev_target = 0;
     for(int i = 0, x = PID_GRAPH_START; i < pid_data_x; i++, x++)
     {
         floating_t curr = pid_data[i], curr_target = pid_data_target[i];
-        if(curr > PID_MAX_BOUND) continue;
-        int scaled_pid_value = BOUND(curr*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 1, PID_HEIGHT),
+        if(curr > PID_DIFF) continue;
+        int scaled_pid_value = SCALE(curr),
         curr_scaled = PID_END.y - scaled_pid_value,
-        scaled_pid_target_value = BOUND(curr_target*100/PID_MAX_BOUND*(PID_HEIGHT-PID_TICK_SPACING), 1, PID_HEIGHT),
+        scaled_pid_target_value = SCALE(curr_target),// BOUND((curr_target*(100./PID_DIFF-PID_MIN_BOUND))*(PID_HEIGHT-PID_TICK_SPACING), 1, PID_HEIGHT),
         curr_scaled_target = PID_END.y - scaled_pid_target_value;
         int xs = i * PID_INCREMENT + PID_ORIGIN.x;
         if(pid_prev == 0)
@@ -748,8 +758,8 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     for(int i = 1, y = PID_END.y - PID_TICK_SPACING; i <= PID_TICKS; i++, y -= PID_TICK_SPACING)
     {
         line(mat, Point(PID_TICK_FRAME_INSET,y), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH,y), RF_LINE_COLOR, RF_LINE_WIDTH);
-        floating_t tick_value = PID_MAX_BOUND*((floating_t)i)/PID_TICKS;
-        putText((mat), to_stringn(tick_value, 1) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
+        floating_t tick_value = PID_DIFF*((floating_t)i)/PID_TICKS + PID_MIN_BOUND;
+        putText((mat), to_stringn(tick_value, 2) + "%", Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH+RF_SPACE,y+RF_TEXT_SM_OFFSET/2.5), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
         if(PID_HAS_SUBTICKS) line(mat, Point(PID_TICK_FRAME_INSET+PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), Point(PID_TICK_FRAME_INSET+PID_TICK_WIDTH-PID_SUBTICK_INSET,y-PID_TICK_SPACING/2), RF_LINE_COLOR);
     }
     
@@ -982,8 +992,8 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
                 line(mat, Point(x,y+MCH_IND_HEIGHT*currV), Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*currV), red, MCH_LINE_WIDTH);
                 line(mat, Point(x+MCH_INTERVAL_WIDTH,y+MCH_IND_HEIGHT*prevV), Point(x+MCH_INTERVAL_WIDTH+MCH_INTERVAL_SPACE,y+MCH_IND_HEIGHT*currV), bluish, MCH_LINE_WIDTH);
             }
-            if(i == mX-1 && prevV < MCH_MAX_NUM && currV < MCH_MAX_NUM && prevV != currV)
-                printf(" ");
+//            if(i == mX-1 && prevV < MCH_MAX_NUM && currV < MCH_MAX_NUM && prevV != currV)
+//                printf(" ");
         }
         prevD = currD;
     }

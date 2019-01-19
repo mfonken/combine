@@ -149,6 +149,7 @@ void ImageUtility::InitGenerator()
 void ImageUtility::RequestBackground()
 {
     background_request = true;
+    background_ready = false;
 }
 
 void ImageUtility::trigger()
@@ -160,15 +161,16 @@ void ImageUtility::trigger()
     else if(has_camera)
         preoutframe = GetNextFrame();
     else preoutframe = { 0 };
-
+    
+    if(has_generator)
+        generateImage(preoutframe);
+    
     if( background_request )
     {
         putText(preoutframe, "BACKGROUNDING", Point(10,100), FONT_HERSHEY_PLAIN, 1, Vec3b(0,245,15), 2);
         background_ready = true;
         background_request = false;
     }
-    else if(has_generator)
-        generateImage(preoutframe);
     
 #ifdef THRESH_IMAGE
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
@@ -177,8 +179,6 @@ void ImageUtility::trigger()
 #endif
     
     cimageFromMat(outframe, outimage);
-//    outframe = { 0 };
-//    cimageToMat(outimage, outframe);
 }
 
 std::string ImageUtility::serialize()
@@ -374,12 +374,15 @@ void ImageUtility::generateImage(Mat& M)
 #define GENERATOR_SIZE_OSCILLATION
     
 #ifdef GENERATOR_SIZE_OSCILLATION
-    double radius_offset = abs(0.5 - phase);
-    circle(M, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
-    circle(M, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
+    if(!background_request)
+    {
+        double radius_offset = abs(0.5 - phase);
+        circle(M, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
+        circle(M, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
 #else
-    circle(M, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
-    circle(M, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+        circle(M, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+        circle(M, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
 #endif
-//    circle(frame, Point(size.width/2, size.height/2), TARGET_RADIUS*2, NOISE_COLOR, -1);
+//      circle(frame, Point(size.width/2, size.height/2), TARGET_RADIUS*2, NOISE_COLOR, -1);
+    }
 }

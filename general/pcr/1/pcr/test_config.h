@@ -12,8 +12,8 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        30
-#define TAU_FPS         15
+#define MAIN_FPS        10
+#define TAU_FPS         30
 #define COMBINE_FPS     0
 
 #define TITLE_STRING                    "PCR Alpha v0.01"
@@ -26,7 +26,7 @@ using namespace std;
 #define HAS_FILE
 #define HAS_GENERATOR
 
-#define FRAME_WIDTH                     500
+#define FRAME_WIDTH                     600
 #define FRAME_HEIGHT                    700
 
 /* IMAGE PROCESSING */

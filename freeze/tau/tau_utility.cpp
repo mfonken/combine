@@ -106,6 +106,8 @@ double Tau::perform( cimage_t &img )
         rho.Perform( img, &packet );
         utility.background_ready = false;
         tick = 0;
+        
+        gettimeofday( &a, NULL);
     }
     else
     {

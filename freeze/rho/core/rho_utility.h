@@ -62,6 +62,11 @@ extern "C" {
     void CombineAxisProbabilitesRhoUtility( prediction_pair_t * );
     void RedistributeDensitiesRhoUtility( rho_core_t * );
     
+    void CalculateTuneRhoUtility( rho_core_t * );
+    void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * );
+    void CalculateStateTuneFactorRhoUtility( rho_core_t * );
+    void CalculateTargetTuneFactor( rho_core_t * );
+    
     typedef struct
     {
         void (*DensityMap)( density_map_t *, index_t );
@@ -99,6 +104,14 @@ extern "C" {
     
     typedef struct
     {
+        void (*Tune)( rho_core_t * );
+        void (*BackgroundTuneFactor)( rho_core_t * );
+        void (*StateTuneFactor)( rho_core_t * );
+        void (*TargetTuneFactor)( rho_core_t * );
+    } rho_utility_calculate_functions;
+    
+    typedef struct
+    {
         void (*CumulateMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
         void (*CalculateBlobScore)( blob_t *, density_t, byte_t );
         floating_t (*CalculateCentroid)( density_t *, index_t, index_t *, density_t );
@@ -108,6 +121,7 @@ extern "C" {
         rho_utility_reset_functions Reset;
         rho_utility_predict_functions Predict;
         rho_utility_detect_functions Detect;
+        rho_utility_calculate_functions Calculate;
     } rho_utility_functions;
     
     static const rho_utility_functions RhoUtility =
@@ -138,7 +152,12 @@ extern "C" {
         .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,
         .Detect.CalculateChaos = CalculateDetectionChaosRhoUtility,
         .Detect.ScoreBlobs = ScoreBlobsRhoUtility,
-        .Detect.SortBlobs = SortBlobsRhoUtility
+        .Detect.SortBlobs = SortBlobsRhoUtility,
+        
+        .Calculate.Tune = CalculateTuneRhoUtility,
+        .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,
+        .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
+        .Calculate.TargetTuneFactor = CalculateTargetTuneFactor
     };
     
 #ifdef __cplusplus

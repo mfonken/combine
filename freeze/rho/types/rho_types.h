@@ -269,6 +269,15 @@ extern const density_redistribution_lookup_t rlookup;
 
 typedef struct
 {
+    floating_t
+    background,
+    state,
+    target,
+    proposed;
+} rho_tune_t;
+
+typedef struct
+{
     index_t
     len,
     range[3],
@@ -279,7 +288,8 @@ typedef struct
     blbf,            /* Blob fill */
     x,               /* Generic index */
     start,
-    end;
+    end,
+    assumed_blobs;
     density_t
     fpeak,
     fpeak_2,
@@ -302,7 +312,8 @@ typedef struct
     avgc,
     cavg,   /* cumulative average */
     mavg,   /* moment average */
-    chaos;
+    chaos,
+    target_density;
 } rho_detection_variables;
 
 typedef struct
@@ -363,6 +374,7 @@ typedef struct
         VarianceFactor,
         PreviousThreshFilterValue,
         Thresh;
+    rho_tune_t          Tune;
     density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
     bayesian_system_t   BayeSys;

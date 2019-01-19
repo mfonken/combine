@@ -29,7 +29,7 @@ extern "C" {
 #define STATE_DISTANCE                  2.0
 #define SHADOW_TOLERANCE                0.2
 #define DOUBT_STABILITY                 0.5
-    
+#define STATE_DECAY                     0.95
 #define STABILITY_FACTOR                3.0
     
     /***************************************************************************************/
