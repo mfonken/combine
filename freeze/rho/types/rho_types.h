@@ -163,9 +163,7 @@ typedef struct
                    *filtered,
                     max[2];
     index_t         length,
-                    centroid;
-    density_2d_t    total_density,
-                    filtered_density;
+    centroid;
     bool            has_background;
     rho_kalman_t    kalmans[2];
 } density_map_t;
@@ -304,7 +302,9 @@ typedef struct
     cmax,
     cden,
     tden, /* Target density */
-    fden; /* Filtered density */
+    fden, /* Filtered density */
+    total_density,
+    filtered_density;
     bool
     has,
     rcal; /* Recalculate */

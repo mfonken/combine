@@ -6,98 +6,24 @@
 
 #include "rho_core.h"
 
-#ifdef USE_INTERRUPT_MODEL
-/* Universal Port for interrupt model */
-pixel_base_t test_port = 0;
-#endif
-
 void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
-{
-    memset(core, 0, sizeof(rho_core_t));
+{   
+    /* Generic Data */
+    RhoUtility.Initialize.Data( core, width, height );
     
-    /* core frame */
-    core->Width = width;
-    core->Height = height;
+    /* Filters */
+    RhoUtility.Initialize.Filters( core );
     
-    /* Threshold Filter */
-    RhoPID.Initialize(&core->ThreshFilter, DEFAULT_PID_GAIN );
+    /* Density Data */
+    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
+    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
     
-    /* Coverage Filter */
-    core->TargetCoverageFactor  = (floating_t)FILTERED_COVERAGE_TARGET;
-    RhoKalman.Initialize(&core->TargetFilter, core->TargetCoverageFactor, RHO_TARGET_LS, 0, 1, DEFAULT_TARGET_UNCERTAINTY );
+    /* Prediction Structures */
+    RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
+    RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
     
-    /* Density Filters */
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height );
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width  );
-    
-    /* Prediction Filters */
-    for(uint8_t i = 0; i < MAX_TRACKING_FILTERS; i++)
-    {
-        RhoKalman.Initialize( &core->PredictionPair.x.TrackingFilters[i], 0., RHO_PREDICTION_LS, 0, height, DEFAULT_PREDICTION_UNCERTAINTY );
-        RhoKalman.Initialize( &core->PredictionPair.y.TrackingFilters[i], 0., RHO_PREDICTION_LS, 0, width, DEFAULT_PREDICTION_UNCERTAINTY  );
-        core->PredictionPair.x.TrackingFiltersOrder[i] = i;
-        core->PredictionPair.y.TrackingFiltersOrder[i] = i;
-    }
-    
-    /* Blobs */
-    for(uint8_t i = 0; i < MAX_BLOBS; i++)
-    {
-        memset(&core->PredictionPair.x.Blobs[i], 0, sizeof(blob_t));
-        memset(&core->PredictionPair.y.Blobs[i], 0, sizeof(blob_t));
-        core->PredictionPair.x.BlobsOrder[i] = i;
-        core->PredictionPair.y.BlobsOrder[i] = i;
-    }
-    
-    /* Centroid */
-    core->Cx   = width/2;
-    core->Cy   = height/2;
-    core->Px   = width/2;
-    core->Py   = height/2;
-    core->Sx   = width/2;
-    core->Sy   = height/2;
-    core->DensityMapPair.x.centroid = core->Cx;
-    core->DensityMapPair.y.centroid = core->Cy;
-    
-    core->TargetCoverageFactor = FILTERED_COVERAGE_TARGET;
-    
-    /* Prediction probabilities */
-    memset(&core->PredictionPair.x.Probabilities, 0, sizeof(floating_t)*4);
-    memset(&core->PredictionPair.y.Probabilities, 0, sizeof(floating_t)*4);
-    
-    /* Packet */
-    core->Packet.header.ID       = PACKET_HEADER_ID;
-    core->Packet.header.includes = PACKET_INCLUDES;
-    memset(core->Packet.data, 0, sizeof(packet_offset_lookup_t));
-    
-    /* Background */
-    core->BackgroundCounter = 0;
-    core->BackgroundPeriod = BACKGROUNDING_PERIOD;
-    
-    /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
-    /* Connect to Interrupt Model variable structure */
-    RhoVariables.ram.Dx      =  core->DensityMapPair.x.map;
-    RhoVariables.ram.Dy      =  core->DensityMapPair.y.map;
-    RhoVariables.ram.Q       =  core->Q;
-    RhoVariables.ram.CX_ADDR = &core->Cx;
-    RhoVariables.ram.CY_ADDR = &core->Cy;
-    RhoVariables.ram.C_FRAME =  core->cframe;
-    RhoVariables.ram.THRESH_ADDR = (density_t *)&core->ThreshByte;
-    RhoVariables.ram.CAM_PORT = &test_port;
-    
-    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
-    RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W    =  core->Width;
-    RhoVariables.global.H    =  core->Height;
-    
-    /* Frame Initializeializer routine */
-    RhoInterrupts.FRAME_INIT();
-    
-    /* Interrupt model mutex Initializeializer */
-    pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
-    pthread_mutex_lock(&RhoVariables.global.rho_int_mutex);
-    
-    RhoVariables.connected = true;
-    /*****  INTERRUPT MODEL CROSS-CONNECTOR VARIABLES END  *****/
+    /* Frame Conversion Model Connection */
+    RhoInterrupts.INIT_FROM_CORE( core );
 }
 
 void PerformRhoCore( rho_core_t * core, bool background_event )
@@ -110,63 +36,48 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
     else
     {
-        LOG_RHO("Filtering and selecting pairs.\n");
+        LOG_RHO(DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
-        
-        ///TODO: Add detection failure recognition
-        
-        LOG_RHO("Updating predictions.\n");
+        LOG_RHO(DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO("Updating threshold.\n");
+        LOG_RHO(DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-//        LOG_RHO("Generating packets.\n");
-//        RhoCore.GeneratePacket( core );
+        LOG_RHO(DEBUG_2,"Generating packets.\n");
+        RhoCore.GeneratePacket( core );
     }
 }
 
 /* Calculate and process data in variance band from density filter to generate predictions */
 void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
 {
-    rho_detection_variables *_ = (rho_detection_variables*)malloc(sizeof(rho_detection_variables));
-    RhoUtility.Reset.Detect( _, d, r );
+    rho_detection_variables _;
+    RhoUtility.Reset.Detect( &_, d, r );
     core->TotalCoverage = 0;
     core->FilteredCoverage = 0;
+    _.target_density = core->TargetFilter.value * (floating_t)core->Width * (floating_t)core->Height;
     
     /* Perform detect */
-    RhoUtility.Detect.Perform( _, d, r );
+    LOG_RHO(DEBUG_1, "Performing detect:\n");
+    RhoUtility.Detect.Perform( &_, d, r );
     
-    /* Update prediction */
-    _->target_density = core->TargetFilter.value * (floating_t)core->Width * (floating_t)core->Height;
-    r->NumBlobs = _->blbf;
-    _->assumed_blobs = (floating_t)_->blbf;
-    if( _->assumed_blobs == 0 ) _->assumed_blobs = 1;
-
-    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->assumed_blobs, _->target_density ), MAX_NU_BLOBS );
-    r->TotalDensity = d->total_density;
+    /* Update frame statistics */
+    LOG_RHO(DEBUG_1, "Calculating frame statistics:\n");
+    RhoUtility.Detect.CalculateFrameStatistics( &_, r );
     
     /* Update core */
-    core->TotalCoverage += _->tden;
-    core->FilteredCoverage += _->fden;
-    
-    /* Reset sort flags */
-    for( uint8_t i = 0; i < MAX_BLOBS; i++ )
-        r->Blobs[i].srt = false;
-    
-//    floating_t A = (floating_t)r->TotalDensity, B = target_density;
-//    floating_t band_width = _->fvar * 2, band_factor = r->PreviousPeak[0] / band_width;
-//    printf("A:%6d B:%6d | Nu:%2.4f Bn:%d Dt:%d(%2.4f) Dc:%d Bw:%3.4f Bf:%3.4f\n", (int)A, (int)B, r->NuBlobs, r->NumBlobs, (int)target_density, core->TargetFilter.value, r->TotalDensity, band_width, band_factor);
+    core->TotalCoverage += _.tden;
+    core->FilteredCoverage += _.fden;
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
-    LOG_RHO("Detecting X Map:\n");
+    LOG_RHO(DEBUG_2, "Detecting X Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
-    LOG_RHO("Detecting Y Map:\n");
+    LOG_RHO(DEBUG_2, "Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
     
     /* Calculate accumulated filtered percentage from both axes */
     core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
-//    LOG_RHO("Filted percentage: %.4f\n", core->FilteredPercentage);
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
@@ -182,33 +93,17 @@ void UpdateRhoCorePrediction( prediction_t * r )
 
 void UpdateRhoCorePredictions( rho_core_t * core )
 {
-    LOG_RHO("Updating X Map:\n");
+    LOG_RHO(DEBUG_2,"Updating X Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
-    LOG_RHO("Updating Y Map:\n");
+    LOG_RHO(DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
-    prediction_predict_variables *_ = (prediction_predict_variables*)malloc(sizeof(prediction_predict_variables));
-    RhoUtility.Reset.Prediction( _, &core->PredictionPair, core->Cx, core->Cy );
+    prediction_predict_variables _;
     
-    RhoUtility.Predict.CorrectAmbiguity( _, core );
+    RhoUtility.Reset.Prediction( &_, &core->PredictionPair, core->Cx, core->Cy );
+    RhoUtility.Predict.CorrectAmbiguity( &_, core );
     RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
-    
-    _->Cx = BOUNDU((index_t)(_->Ax + _->Bx) >> 1, core->Width );
-    _->Cy = BOUNDU((index_t)(_->Ay + _->By) >> 1, core->Height);
-    
-    LOG_RHO("Cx>%d | Cy>%d\n", _->Cx, _->Cy);
-    
-    core->Px = _->Ax;
-    core->Py = _->Ay;
-    core->Sx = _->Bx;
-    core->Sy = _->By;
-    core->Cx = _->Cx;
-    core->Cy = _->Cy;
-    
-    /* NOTE: density maps invert axes */
-    core->DensityMapPair.y.centroid = _->Cx;
-    core->DensityMapPair.x.centroid = _->Cy;
-    
+    RhoUtility.Predict.UpdateCorePredictionData( &_, core );
     BayesianFunctions.Sys.Update( &core->BayeSys, core->PredictionPair.Probabilities.P );
 }
 
@@ -218,44 +113,10 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
     RhoUtility.Calculate.Tune( core );
     core->Thresh = BOUND(core->Thresh - core->Tune.proposed, THRESH_MIN, THRESH_MAX);
     core->ThreshByte = (byte_t)core->Thresh;
-    
-//    printf("(%s) STune:%3.4f TFilter.V:%3.4f BkdTune:%3.4f Proposed:%3.4f ... %3.4f\n", stateString(core->BayeSys.state), state_tune_factor, target_tune_factor, background_tune_factor,  proposed_tune_factor, core->TargetCoverageFactor);
-//    if(proposed_tune_factor < 0.001) proposed_tune_factor *= PID_DRIFT;
-//    printf("*** THRESH IS %.2f(%.2f) ***\n", core->Thresh, core->ThreshFilter.Value);
-//    printf("btf:%.3f | stf%.3f | ptf%.6f \n", background_tune_factor, state_tune_factor, proposed_tune_factor);
-//    printf("thf.v:%.3f | thf.e:%.3f | tgf.v:%.3f | tc.f:%.3f\n", core->ThreshFilter.Value, core->ThreshFilter.Error, core->TargetFilter.value, core->TargetCoverageFactor);
-//    printf("Background coverage compare: Actual>%dpx vs. Target>%d±%dpx\n", core->QbT, BACKGROUND_COVERAGE_MIN, BACKGROUND_COVERAGE_TOL_PX);
 }
 
 void GenerateRhoCorePacket( rho_core_t * core )
 {
-    packet_value_lookup_t  packet_value_lookup  = PACKET_ADDRESS_INITIALIZER(core->PredictionPair);
-    packet_offset_lookup_t packet_offset_lookup = PACKET_OFFSETS;
-    packet_generation_variables _ =
-    {
-        &core->Packet,
-        (address_t)&core->Packet.data,
-        (address_t)&packet_offset_lookup,
-        (address_t*)&packet_value_lookup,
-        0
-    };
-    _.packet->header.timestamp = timestamp();
-    while( _.i++ < NUM_PACKET_ELEMENTS )
-    {
-        if( _.packet->header.includes & 0x01 )
-        {
-            if(!_.t) _.l = (*(packing_template_t*)_.llPtr).a;
-            else          _.l = (*(packing_template_t*)_.llPtr).b;
-            for( _.j = 0; _.j < _.l; _.j++)
-                ((byte_t*)_.pdPtr)[_.j] = *(((byte_t*)*_.alPtr)+_.j);
-            _.pdPtr += _.l;
-        }
-        _.alPtr++;
-        _.includes >>= 1;
-        if((_.t=!_.t )) ++_.llPtr;
-    }
-    
+    RhoUtility.GeneratePacket( core );
     RhoUtility.PrintPacket( &core->Packet, 3    );
 }
-
-

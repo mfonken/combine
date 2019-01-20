@@ -37,8 +37,10 @@ extern "C" {
     floating_t CalculateCentroidRhoUtility( density_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
-    
-    void InitializeDensityMapRhoUtility( density_map_t *, index_t );
+    void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
+    void InitializeFiltersRhoUtility( rho_core_t * );
+    void InitializePredictionRhoUtility( prediction_t *, index_t );
+    void InitializeDensityMapRhoUtility( density_map_t *, index_t, index_t );
     
     void ResetForDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_t, index_t );
@@ -57,19 +59,26 @@ extern "C" {
     void CalculateDetectionChaosRhoUtility( rho_detection_variables *, prediction_t *  );
     void ScoreBlobsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void SortBlobsRhoUtility( rho_detection_variables *, prediction_t * );
+    void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *, prediction_t * );
     
     void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables *, rho_core_t * );
-    void CombineAxisProbabilitesRhoUtility( prediction_pair_t * );
     void RedistributeDensitiesRhoUtility( rho_core_t * );
+    void CombineAxisProbabilitesRhoUtility( prediction_pair_t * );
+    void UpdateCorePredictionDataRhoUtility( prediction_predict_variables *, rho_core_t * );
     
     void CalculateTuneRhoUtility( rho_core_t * );
     void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * );
     void CalculateStateTuneFactorRhoUtility( rho_core_t * );
     void CalculateTargetTuneFactor( rho_core_t * );
     
+    void GeneratePacketRhoUtility( rho_core_t * );
+    
     typedef struct
     {
-        void (*DensityMap)( density_map_t *, index_t );
+        void (*Data)( rho_core_t *, index_t, index_t );
+        void (*Filters)( rho_core_t * );
+        void (*Prediction)( prediction_t *, index_t );
+        void (*DensityMap)( density_map_t *, index_t, index_t );
     } rho_utility_initializer_functions;
     
     typedef struct
@@ -88,6 +97,7 @@ extern "C" {
         void (*CorrectAmbiguity)( prediction_predict_variables *, rho_core_t * );
         void (*CombineProbabilities)( prediction_pair_t * );
         void (*RedistributeDensities)(  rho_core_t * );
+        void (*UpdateCorePredictionData)( prediction_predict_variables *, rho_core_t * );
     } rho_utility_predict_functions;
     
     typedef struct
@@ -100,6 +110,7 @@ extern "C" {
         void (*CalculateChaos)( rho_detection_variables *, prediction_t * );
         void (*ScoreBlobs)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*SortBlobs)( rho_detection_variables *, prediction_t * );
+        void (*CalculateFrameStatistics)( rho_detection_variables *, prediction_t * );
     } rho_utility_detect_functions;
     
     typedef struct
@@ -117,6 +128,7 @@ extern "C" {
         floating_t (*CalculateCentroid)( density_t *, index_t, index_t *, density_t );
         void (*PrintPacket)( packet_t *, index_t );
         void (*GenerateBackground)( rho_core_t * );
+        void (*GeneratePacket)( rho_core_t * );
         rho_utility_initializer_functions Initialize;
         rho_utility_reset_functions Reset;
         rho_utility_predict_functions Predict;
@@ -130,7 +142,11 @@ extern "C" {
         .CalculateBlobScore = CalculateBlobScoreRhoUtility,
         .CalculateCentroid = CalculateCentroidRhoUtility,
         .PrintPacket = PrintPacketRhoUtility,
+        .GeneratePacket = GeneratePacketRhoUtility,
         
+        .Initialize.Data = InitializeDataRhoUtility,
+        .Initialize.Filters = InitializeFiltersRhoUtility,
+        .Initialize.Prediction = InitializePredictionRhoUtility,
         .Initialize.DensityMap = InitializeDensityMapRhoUtility,
         
         .Reset.Detect = ResetForDetectRhoUtility,
@@ -144,6 +160,7 @@ extern "C" {
         .Predict.CorrectAmbiguity = CorrectPredictionAmbiguityRhoUtility,
         .Predict.CombineProbabilities = CombineAxisProbabilitesRhoUtility,
         .Predict.RedistributeDensities = RedistributeDensitiesRhoUtility,
+        .Predict.UpdateCorePredictionData = UpdateCorePredictionDataRhoUtility,
         
         .Detect.Perform = PerformDetectRhoUtility,
         .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
@@ -153,6 +170,7 @@ extern "C" {
         .Detect.CalculateChaos = CalculateDetectionChaosRhoUtility,
         .Detect.ScoreBlobs = ScoreBlobsRhoUtility,
         .Detect.SortBlobs = SortBlobsRhoUtility,
+        .Detect.CalculateFrameStatistics = CalculatedFrameStatisticsRhoUtility,
         
         .Calculate.Tune = CalculateTuneRhoUtility,
         .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,

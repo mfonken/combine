@@ -35,30 +35,49 @@ typedef volatile bool   flag_t;
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
-//#define RHO_DEBUG
+#define RHO_DEBUG
 //#define STATEM_DEBUG
 //#define KALMAN_DEBUG
+//#define PACKET_DEBUG
+
+enum LogLevel
+{
+    TEST = 0,
+    DEBUG_0,
+    DEBUG_1,
+    DEBUG_2,
+    ALWAYS
+};
+
+#define TEST_LOG_LEVEL ALWAYS
 
 #ifndef LOG
-#define LOG(...) printf(__VA_ARGS__)
+#define LOG(L,...) if(L >= TEST_LOG_LEVEL) \
+{  for(uint8_t i=L;i<ALWAYS;i++) printf("\t"); printf(__VA_ARGS__); }
 #endif
 
 #ifdef RHO_DEBUG
-#define LOG_RHO(...) LOG("<Rho> " __VA_ARGS__)
+#define LOG_RHO(L,...) LOG(L,"<Rho> " __VA_ARGS__)
 #else
 #define LOG_RHO(...)
 #endif
 
 #ifdef STATEM_DEBUG
-#define LOG_STATEM(...) LOG("<State> " __VA_ARGS__)
+#define LOG_STATEM(L,...) LOG(L,"<State> " __VA_ARGS__)
 #else
 #define LOG_STATEM(...)
 #endif
 
 #ifdef KALMAN_DEBUG
-#define LOG_KALMAN(...) LOG("<Kalman> " __VA_ARGS__)
+#define LOG_KALMAN(L,...) LOG(L,"<Kalman> " __VA_ARGS__)
 #else
 #define LOG_KALMAN(...)
+#endif
+
+#ifdef PACKET_DEBUG
+#define LOG_PACKET(L,...) LOG(L,"<Packet> " __VA_ARGS__)
+#else
+#define LOG_PACKET(...)
 #endif
 
 #ifndef MAX

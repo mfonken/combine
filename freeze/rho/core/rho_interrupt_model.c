@@ -12,7 +12,41 @@
 #define BURN_ROWS 0
 #define BURN_COLS 0
 
+#ifdef USE_INTERRUPT_MODEL
+/* Universal Port for interrupt model */
+pixel_base_t test_port = 0;
+#endif
+
 rho_variables RhoVariables = { 0 };
+
+void RIM_INIT_FROM_CORE( rho_core_t * core )
+{
+    /***** INTERRUPT MODEL CROSS-CONNECTOR VARIABLES START *****/
+    /* Connect to Interrupt Model variable structure */
+    RhoVariables.ram.Dx      =  core->DensityMapPair.x.map;
+    RhoVariables.ram.Dy      =  core->DensityMapPair.y.map;
+    RhoVariables.ram.Q       =  core->Q;
+    RhoVariables.ram.CX_ADDR = &core->Cx;
+    RhoVariables.ram.CY_ADDR = &core->Cy;
+    RhoVariables.ram.C_FRAME =  core->cframe;
+    RhoVariables.ram.THRESH_ADDR = (density_t *)&core->ThreshByte;
+    RhoVariables.ram.CAM_PORT = &test_port;
+    
+    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
+    RhoVariables.global.y_delimiter = Y_DEL;
+    RhoVariables.global.W    =  core->Width;
+    RhoVariables.global.H    =  core->Height;
+    
+    /* Frame Initializeializer routine */
+    RhoInterrupts.FRAME_INIT();
+    
+    /* Interrupt model mutex Initializeializer */
+    pthread_mutex_init(&RhoVariables.global.rho_int_mutex, NULL);
+    pthread_mutex_lock(&RhoVariables.global.rho_int_mutex);
+    
+    RhoVariables.connected = true;
+    /*****  INTERRUPT MODEL CROSS-CONNECTOR VARIABLES END  *****/
+}
 
 void RIM_PERFORM_RHO_C( cimage_t image )
 {
@@ -71,7 +105,7 @@ void RIM_FRAME_END( void )
     density_2d_t * Qp = RhoVariables.ram.Q;
     for( uint8_t i = 0; i < 4; i++ )
         RhoVariables.ram.QT += Qp[i];
-    LOG_RHO(">>>frame density is %d<<<\n", RhoVariables.ram.QT);
+    LOG_RHO(DEBUG_0, ">>>frame density is %d<<<\n", RhoVariables.ram.QT);
 }
 
 void RIM_ROW_INT( void )
@@ -197,6 +231,6 @@ void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
     RhoVariables.ram.Q[3] = Q3;
     RhoVariables.ram.QT = Q0 + Q1 + Q2 + Q3;
     
-    LOG_RHO("Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
-    LOG_RHO("# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
+    LOG_RHO(DEBUG_0, "Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
+    LOG_RHO(DEBUG_0, "# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
 }

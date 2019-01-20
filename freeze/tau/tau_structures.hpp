@@ -19,11 +19,11 @@
 #include "kalman.hpp"
 
 #ifndef LOG
-#define LOG(...) printf(__VA_ARGS__)
+#define LOG(L,...) printf(__VA_ARGS__)
 #endif
 
 #ifdef TAU_DEBUG
-#define LOG_TAU(...) LOG("<Tau> " __VA_ARGS__)
+#define LOG_TAU(L,...) LOG(L,"<Tau> " __VA_ARGS__)
 #else
 #define LOG_TAU(...)
 #endif

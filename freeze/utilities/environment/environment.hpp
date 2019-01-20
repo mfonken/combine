@@ -22,11 +22,11 @@
 #include "serial_wrapper.hpp"
 
 #ifndef LOG
-#define LOG(...) printf(__VA_ARGS__)
+#define LOG(L,...) printf(__VA_ARGS__)
 #endif
 
 #ifdef ENV_DEBUG
-#define LOG_ENV(...) LOG("<Environment> " __VA_ARGS__)
+#define LOG_ENV(L,...) LOG(L, "<Environment> " __VA_ARGS__)
 #else
 #define LOG_ENV(...)
 #endif

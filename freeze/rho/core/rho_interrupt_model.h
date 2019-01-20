@@ -24,6 +24,7 @@ extern "C" {
     void RIM_PERFORM_RHO_C( cimage_t );
     void RIM_PERFORM_RHO_FUNCTION( cimage_t );
     
+    void RIM_INIT_FROM_CORE( rho_core_t * );
     void RIM_FRAME_INIT(  void );
     void RIM_FRAME_START( void );
     void RIM_FRAME_END(   void );
@@ -34,6 +35,7 @@ extern "C" {
     typedef struct rho_interrupts rho_interrupts;
     struct rho_interrupts
     {
+        void (*INIT_FROM_CORE)( rho_core_t * );
         void (*FRAME_INIT)(  void );
         void (*FRAME_START)( void );
         void (*FRAME_END)(   void );
@@ -43,6 +45,7 @@ extern "C" {
     };
     static const rho_interrupts RhoInterrupts =
     {
+        .INIT_FROM_CORE = RIM_INIT_FROM_CORE,
         .FRAME_INIT  = RIM_FRAME_INIT,
         .FRAME_START = RIM_FRAME_START,
         .FRAME_END   = RIM_FRAME_END,

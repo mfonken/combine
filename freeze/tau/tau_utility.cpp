@@ -96,12 +96,12 @@ double Tau::perform( cimage_t &img )
     if( ++tick >= BACKGROUNDING_PERIOD )
     {
         utility.RequestBackground();
-        LOG_TAU("Waiting for utility to generate background...\n");
+        LOG_TAU(ALWAYS, "Waiting for utility to generate background...\n");
         
         while(!utility.background_ready)
             utility.trigger();
         
-        LOG_RHO("Background ready.\n");
+        LOG_RHO(ALWAYS, "Background ready.\n");
         rho.backgrounding_event = true;
         rho.Perform( img, &packet );
         utility.background_ready = false;

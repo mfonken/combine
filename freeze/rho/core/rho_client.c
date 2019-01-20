@@ -47,8 +47,7 @@ inline void PixelThreshLoop( register byte_t * capture_address,   // capture buf
      "r"(capture_offset),
      "r"(capture_base),
      "r"(thresh_address)
-     );
-    
+    );
 #endif
 }
 
