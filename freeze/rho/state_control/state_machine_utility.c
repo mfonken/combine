@@ -17,17 +17,9 @@ state_global_t _;
 static inline void reset_loop_variables( state_global_t * _, state_dimension_t l )
 { _->l = l; _->i = 0; _->j = 0; _->u = 0; _->v = 0.; }
 
-static floating_t DOUBT( state_dimension_t i, state_t cs )
+void InitializeMarkovMap( markov_map_t * bm )
 {
-    floating_t ret = ( (floating_t)( ( i << 1 ) + 1 ) ) / NUM_STATES;
-    if( isStable(cs) && ( i < stateNumber(cs) ) )
-        ret *= (floating_t)DOUBT_STABILITY;
-    return ret;
-}
-
-void InitializeBayesianMap( bayesian_map_t * bm )
-{
-    LOG_STATEM("Initializeializing State Machine.\n");
+    LOG_STATEM(DEBUG_2, "Initializeializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
     bm->length = NUM_STATES;
     for( ; _.i < _.l; _.i++ )
@@ -38,14 +30,14 @@ void InitializeBayesianMap( bayesian_map_t * bm )
     }
 }
 
-void NormalizeBayesianMap( bayesian_map_t * bm )
+void NormalizeMarkovMap( markov_map_t * bm )
 {
     reset_loop_variables( &_, bm->length );
     for(  _.i = 0; _.i < _.l; _.i++ )
-        BayesianFunctions.Map.NormalizeState( bm, _.i );
+        MarkovFunctions.Map.NormalizeState( bm, _.i );
 }
 
-void NormalizeBayesianState( bayesian_map_t * bm, state_dimension_t i )
+void NormalizeMarkovState( markov_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     floating_t * total = &_.v;
@@ -65,14 +57,14 @@ void NormalizeBayesianState( bayesian_map_t * bm, state_dimension_t i )
     else bm->map[_.i][i] = 1.0;
 }
 
-void ResetBayesianState( bayesian_map_t * bm, state_dimension_t i )
+void ResetMarkovState( markov_map_t * bm, state_dimension_t i )
 {
     reset_loop_variables( &_, bm->length );
     for( _.j = 0; _.j < _.l; _.j++ ) bm->map[i][_.j] = 0.0;
     bm->map[i][i] = 1.0;
 }
 
-void PrintBayesianMap( bayesian_map_t * bm, state_t s )
+void PrintMarkovMap( markov_map_t * bm, state_t s )
 {
 #ifdef STATEM_DEBUG
     reset_loop_variables( &_, bm->length );
@@ -91,7 +83,7 @@ void PrintBayesianMap( bayesian_map_t * bm, state_t s )
 #endif
 }
 
-void InitializeBayesianSystem( bayesian_system_t * sys )
+void InitializeMarkovSystem( markov_system_t * sys )
 {
     sys->state                = STABLE_NONE;
     sys->prev                 = UNKNOWN_STATE;
@@ -102,15 +94,33 @@ void InitializeBayesianSystem( bayesian_system_t * sys )
     sys->stability.alternate  = 0.;
     sys->stability.overall    = 0.;
     
-    BayesianFunctions.Map.InitializeMap( &sys->probabilities );
+    MarkovFunctions.Map.InitializeMap( &sys->probabilities );
 }
 
-void UpdateBayesianSystem( bayesian_system_t * sys, floating_t p[4] )
+void DecayInactiveMarkovSystem( markov_system_t * sys )
+{
+    reset_loop_variables( &_, NUM_STATES );
+    uint8_t c = sys->state;
+    if( c == UNKNOWN_STATE ) return;
+    for( _.i = 0; _.i < NUM_STATES; _.i++ )
+    {
+        if( _.i == c ||
+           ( !isStable(c) && ( _.i == ( c - 1 ) ) ) ) continue;
+        uint8_t state_distance = abs( _.i - c );
+        for( _.j = 0; _.j < NUM_STATES; _.j++ ) // Punish based on relevance(distance) from current state
+        {
+            sys->probabilities.map[_.i][_.j] -= STATE_PUNISH * state_distance;
+            if( sys->probabilities.map[_.i][_.j] < 0 ) sys->probabilities.map[_.i][_.j] = 0.;
+        }
+    }
+}
+
+void UpdateMarkovSystem( markov_system_t * sys, floating_t p[4] )
 {
     reset_loop_variables( &_, NUM_STATES );
     
-    BayesianFunctions.Sys.UpdateProbabilities( sys, p );
-    BayesianFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
+    MarkovFunctions.Sys.UpdateProbabilities( sys, p );
+    MarkovFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
     
     state_t next = sys->state;
     
@@ -127,15 +137,17 @@ void UpdateBayesianSystem( bayesian_system_t * sys, floating_t p[4] )
     /* Only update sys->next state on change */
     if( next != sys->state ) sys->next = next;
     
-    BayesianFunctions.Sys.UpdateState( sys );
-    PrintBayesianMap( &sys->probabilities, sys->state );
+    MarkovFunctions.Sys.UpdateState( sys );
+    MarkovFunctions.Sys.DecayInactive( sys );
+    PrintMarkovMap( &sys->probabilities, sys->state );
 }
 
-void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
+void UpdateMarkovProbabilities( markov_system_t * sys, floating_t p[4] )
 {
     state_t           c = sys->state;
     state_dimension_t x = stateNumber(c);
-    int8_t           k = -1;
+    int8_t            k = -1;
+    bool              stable = isStable(c);
 
 #ifdef STATEM_DEBUG
     for( _.i = 0; _.i < NUM_STATE_GROUPS; _.i++)
@@ -146,7 +158,9 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
     if(!isStable(c)) printf("not ");
         printf("stable.\n");
 #endif
-
+    
+    _.u = 0.;
+    
     for( _.i = 0; _.i < NUM_STATE_GROUPS; _.i++ )
     {
         _.j = x - _.i;
@@ -156,38 +170,40 @@ void UpdateBayesianProbabilities( bayesian_system_t * sys, floating_t p[4] )
             else k = c - ( _.j << 1 );
         }
         else if( x == _.i ) k = c;
-        else
-        {
-            k = ( c + 1 ) - ( _.j << 1);
-//            p[_.i] *= STABILITY_FACTOR;
-        }
+        else k = ( c + 1 ) - ( _.j << 1);
         
-        LOG_STATEM("Updating %s by %.2f.\n", stateString(k), p[_.i]);
+        LOG_STATEM(DEBUG_2, "Updating %s by %.2f.\n", stateString(k), p[_.i]);
+        if( stable )
+        { // Stable states must return to unstable before dropping
+            if( _.i < c )
+                _.u += p[_.i];
+            else if ( _.i == c + 1)
+            { // Put all drop suggestions into instability for current stable state
+                sys->probabilities.map[c][k] += _.u;
+                _.u = 0.;
+            }
+        }
         sys->probabilities.map[c][k] += p[_.i];
         sys->probabilities.map[c][k] /= 2.;
         
-        if( !isStable(c) && k == c - 1 )
+        if( !stable && k == c - 1 )
         {
             floating_t transfer = sys->probabilities.map[c][c] * STATE_DECAY;
             sys->probabilities.map[c][k] += transfer;
             sys->probabilities.map[c][c] -= transfer;
         }
     }
-//    printf("Pre-normalize:\n");
-//    PrintBayesianMap( &sys->probabilities, sys->state );
 }
 
-void UpdateBayesianState( bayesian_system_t * sys )
+void UpdateMarkovState( markov_system_t * sys )
 {
     if(sys->next != UNKNOWN_STATE )
     {
-        LOG_STATEM("Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
-        if(sys->next != sys->state) {LOG_STATEM("~~~ State is %s ~~~\n", stateString(sys->next));}
+        LOG_STATEM(DEBUG_2, "Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
+        if(sys->next != sys->state) {LOG_STATEM(DEBUG_2, "~~~ State is %s ~~~\n", stateString(sys->next));}
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;
-        BayesianFunctions.Map.ResetState( &sys->probabilities, sys->prev );
-        
-//        sys->state = BOUNDU(sys->state, UNKNOWN_STATE);
+//        MarkovFunctions.Map.ResetState( &sys->probabilities, sys->prev );
     }
 }

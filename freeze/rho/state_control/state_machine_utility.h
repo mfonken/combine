@@ -30,6 +30,7 @@ extern "C" {
 #define SHADOW_TOLERANCE                0.2
 #define DOUBT_STABILITY                 0.5
 #define STATE_DECAY                     0.95
+#define STATE_PUNISH                    0.025
 #define STABILITY_FACTOR                3.0
     
     /***************************************************************************************/
@@ -80,12 +81,12 @@ extern "C" {
         floating_t overall;
     } stability_t;
     
-    /* Markov state tree with bayesian base */
+    /* Markov state tree with markov base */
     typedef struct
     {
         floating_t map[NUM_STATES][NUM_STATES];
         state_dimension_t length;
-    } bayesian_map_t;
+    } markov_map_t;
     
     /* System self-diagnostic state control type */
     typedef struct
@@ -95,56 +96,59 @@ extern "C" {
         state_t         next;
         state_dimension_t  selection_index;
         stability_t     stability;
-        bayesian_map_t  probabilities;
-    } bayesian_system_t;
+        markov_map_t  probabilities;
+    } markov_system_t;
     
-    struct bayesian_map_functions
+    struct markov_map_functions
     {
-        void (*InitializeMap)(      bayesian_map_t * );
-        void (*NormalizeMap)(       bayesian_map_t * );
-        void (*NormalizeState)(     bayesian_map_t *, state_dimension_t );
-        void (*ResetState)(         bayesian_map_t *, state_dimension_t );
-        void (*Print)(              bayesian_map_t *, state_t s );
+        void (*InitializeMap)(      markov_map_t * );
+        void (*NormalizeMap)(       markov_map_t * );
+        void (*NormalizeState)(     markov_map_t *, state_dimension_t );
+        void (*ResetState)(         markov_map_t *, state_dimension_t );
+        void (*Print)(              markov_map_t *, state_t s );
     };
     
-    struct bayesian_system_functions
+    struct markov_system_functions
     {
-        void (*Initialize)(          bayesian_system_t * );
-        void (*UpdateProbabilities)( bayesian_system_t *, floating_t[4] );
-        void (*UpdateState)(         bayesian_system_t * );
-        void (*Update)(              bayesian_system_t *, floating_t[4] );
+        void (*Initialize)(          markov_system_t *                );
+        void (*DecayInactive)(       markov_system_t *                );
+        void (*UpdateProbabilities)( markov_system_t *, floating_t[4] );
+        void (*UpdateState)(         markov_system_t *                );
+        void (*Update)(              markov_system_t *, floating_t[4] );
     };
     
-    struct bayesian_functions
+    struct markov_functions
     {
-        struct bayesian_map_functions    Map;
-        struct bayesian_system_functions Sys;
+        struct markov_map_functions    Map;
+        struct markov_system_functions Sys;
     };
     
-    void InitializeBayesianMap(         bayesian_map_t *                            );
-    void NormalizeBayesianMap(          bayesian_map_t *                            );
-    void NormalizeBayesianState(        bayesian_map_t *,       state_dimension_t   );
-    void ResetBayesianState(            bayesian_map_t *,       state_dimension_t   );
-    void PrintBayesianMap(              bayesian_map_t *,       state_t             );
-    void InitializeBayesianSystem(      bayesian_system_t *                         );
-    void UpdateBayesianSystem(          bayesian_system_t *,    floating_t[4] );
-    void UpdateBayesianProbabilities(   bayesian_system_t *,    floating_t[4]       );
-    void UpdateBayesianState(           bayesian_system_t *                         );
+    void InitializeMarkovMap(         markov_map_t *                            );
+    void NormalizeMarkovMap(          markov_map_t *                            );
+    void NormalizeMarkovState(        markov_map_t *,       state_dimension_t   );
+    void ResetMarkovState(            markov_map_t *,       state_dimension_t   );
+    void PrintMarkovMap(              markov_map_t *,       state_t             );
+    void InitializeMarkovSystem(      markov_system_t *                         );
+    void DecayInactiveMarkovSystem(   markov_system_t *                         );
+    void UpdateMarkovSystem(          markov_system_t *,    floating_t[4]       );
+    void UpdateMarkovProbabilities(   markov_system_t *,    floating_t[4]       );
+    void UpdateMarkovState(           markov_system_t *                         );
     
-    static const struct bayesian_functions BayesianFunctions =
+    static const struct markov_functions MarkovFunctions =
     {
         { /* Map functions */
-            .InitializeMap                = InitializeBayesianMap,
-            .NormalizeMap           = NormalizeBayesianMap,
-            .NormalizeState         = NormalizeBayesianState,
-            .ResetState             = ResetBayesianState,
-            .Print                  = PrintBayesianMap
+            .InitializeMap          = InitializeMarkovMap,
+            .NormalizeMap           = NormalizeMarkovMap,
+            .NormalizeState         = NormalizeMarkovState,
+            .ResetState             = ResetMarkovState,
+            .Print                  = PrintMarkovMap
         },
         { /* System functions */
-            .Initialize                   = InitializeBayesianSystem,
-            .Update                 = UpdateBayesianSystem,
-            .UpdateProbabilities    = UpdateBayesianProbabilities,
-            .UpdateState            = UpdateBayesianState
+            .Initialize             = InitializeMarkovSystem,
+            .DecayInactive          = DecayInactiveMarkovSystem,
+            .Update                 = UpdateMarkovSystem,
+            .UpdateProbabilities    = UpdateMarkovProbabilities,
+            .UpdateState            = UpdateMarkovState
         }
     };
     

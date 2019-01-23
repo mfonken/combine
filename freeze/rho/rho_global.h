@@ -36,7 +36,7 @@ typedef volatile bool   flag_t;
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define RHO_DEBUG
-//#define STATEM_DEBUG
+#define STATEM_DEBUG
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 

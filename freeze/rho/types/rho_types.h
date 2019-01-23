@@ -377,7 +377,7 @@ typedef struct
     rho_tune_t          Tune;
     density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
-    bayesian_system_t   BayeSys;
+    markov_system_t   BayeSys;
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
     packet_t            Packet;

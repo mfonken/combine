@@ -40,6 +40,7 @@ floating_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C,
 
 void PrintPacketRhoUtility( packet_t * p, index_t l )
 {
+#ifdef PACKET_DEBUG
     LOG_PACKET(DEBUG_0,"Packet Size - %lubytes\n", sizeof(packet_t));
     for(int i = 0; i < sizeof(packet_t); )
     {
@@ -55,6 +56,7 @@ void PrintPacketRhoUtility( packet_t * p, index_t l )
     uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
     floating_t pxfr = *(floating_t*)&pxr;
     LOG_PACKET(DEBUG_0,"{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
+#endif
 }
 
 void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height )

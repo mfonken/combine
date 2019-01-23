@@ -101,7 +101,7 @@ double Tau::perform( cimage_t &img )
         while(!utility.background_ready)
             utility.trigger();
         
-        LOG_RHO(ALWAYS, "Background ready.\n");
+//        LOG_RHO(DEBUG_1, "Background ready.\n");
         rho.backgrounding_event = true;
         rho.Perform( img, &packet );
         utility.background_ready = false;

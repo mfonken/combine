@@ -104,7 +104,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoUtility.Predict.CorrectAmbiguity( &_, core );
     RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
     RhoUtility.Predict.UpdateCorePredictionData( &_, core );
-    BayesianFunctions.Sys.Update( &core->BayeSys, core->PredictionPair.Probabilities.P );
+    MarkovFunctions.Sys.Update( &core->BayeSys, core->PredictionPair.Probabilities.P );
 }
 
 /* Use background and state information to update image threshold */
