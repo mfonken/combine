@@ -153,6 +153,8 @@ index_t
     srt;
 floating_t
     scr;
+byte_t
+    tracking_id;
 } blob_t;
 
 /* Rho Structures* */
@@ -342,6 +344,30 @@ typedef struct
     t;
 } packet_generation_variables;
 
+#define DETECTION_BUFFER_SIZE ( 1 << 8 )
+#define DETECTION_BUFFER_MASK ( DETECTION_BUFFER_SIZE - 1 )
+#define MAX_DENSITY           ( 1 << 8 )
+
+typedef struct
+{
+    uint8_t
+    thresh,
+    density,
+    tracking_id,
+    RESERVED;
+} detection_element_t;
+
+typedef struct
+{
+    uint16_t index,
+            fill,
+            length,
+            first;
+    detection_element_t buffer[DETECTION_BUFFER_SIZE];
+} detection_ring_buffer_t;
+
+typedef detection_ring_buffer_t detection_map_t;
+
 typedef struct
 {
     index_t
@@ -357,8 +383,7 @@ typedef struct
         By;
     byte_t
         ThreshByte,
-        BackgroundCounter,
-        BackgroundPeriod;
+        BackgroundCounter;
     density_2d_t
         Q[4],
         Qb[4],
@@ -366,7 +391,8 @@ typedef struct
         QbT,
         TotalCoverage,
         FilteredCoverage,
-        TargetCoverage;
+        TargetCoverage,
+        BackgroundPeriod;
     floating_t
         FilteredPercentage,
         TargetCoverageFactor,
@@ -377,9 +403,10 @@ typedef struct
     rho_tune_t          Tune;
     density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
-    markov_system_t   BayeSys;
+    markov_system_t     BayeSys;
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
+    detection_map_t     DetectionMap;
     packet_t            Packet;
     
     index_t             cframe[C_FRAME_SIZE];

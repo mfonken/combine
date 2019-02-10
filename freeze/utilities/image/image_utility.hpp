@@ -77,7 +77,7 @@ public:
     void InitGenerator();
     
     VideoCapture cam;
-    Mat outframe, preoutframe, frame, image;
+    Mat outframe, preoutframe, frame, image, preimage;
     cimage_t outimage;
     pthread_mutex_t frame_mtuex,
                     outframe_mutex,
@@ -89,10 +89,10 @@ public:
     
     void RequestBackground();
     
-    Mat& GetNextImage();
-    Mat& GetImage();
+    Mat GetNextImage();
+    Mat GetImage();
     int loop(char c);
-    Mat& GetNextFrame();
+    Mat GetNextFrame();
     bool isLive();
     void drawOutframe();
     void generateImage(Mat&);
@@ -108,6 +108,7 @@ private:
     int iteration;
     int counter;
     int args;
+    bool single_frame;
     bool live;
     bool has_file,
          has_camera,

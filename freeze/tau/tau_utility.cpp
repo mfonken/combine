@@ -82,6 +82,8 @@ void Tau::trigger( void )
         cma(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
+    
+    rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
 }
 
 std::string Tau::serialize( void )

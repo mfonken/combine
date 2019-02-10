@@ -46,7 +46,7 @@
 #define IU_BRIGHTNESS   230
 
 // ?
-#define     D_FIXED                 5.0e-2
+#define D_FIXED                 5.0e-2
 
 
 #endif /* image_config_h */

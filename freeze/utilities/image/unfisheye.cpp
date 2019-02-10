@@ -7,7 +7,7 @@
 //
 
 #include "unfisheye.hpp"
-#include <highgui.h>
+#include <highgui.hpp>
 
 using namespace cv;
 

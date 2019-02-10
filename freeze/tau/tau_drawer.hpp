@@ -38,7 +38,7 @@
 
 using namespace cv;
 
-static Mat emptyMat(0,0,CV_8UC3, Scalar(0,0,0));
+static Mat emptyMat(FRAME_WIDTH,FRAME_HEIGHT,CV_8UC3, Scalar(0,0,0));
 
 class TauDrawer : public Tau
 {

@@ -16,7 +16,8 @@ num_frames(num), size(width, height), name(n), subdir(f),
 frame(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
 preoutframe(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
-image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
+image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
+preimage(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_CAMERA
 ,cam(CAMERA_ID)
 ,image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
@@ -25,10 +26,10 @@ image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
     has_file = false;
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
-    if(num_frames) LOG_IU("Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
+    if(num_frames) LOG_IU(DEBUG_2, "Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
 #endif
 //#ifdef HAS_GENERATOR
-//    LOG_IU("Initialized with generator and dimensions %dx%d\n", width, height);
+//    LOG_IU(DEBUG_2, "Initialized with generator and dimensions %dx%d\n", width, height);
 //#endif
     cimageInit(outimage, width, height);
     pthread_mutex_init(&outframe_mutex, NULL);
@@ -51,6 +52,8 @@ image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
     
     noise = DEFAULT_NOISE;
     noise_rate = NOISE_RATE;
+    
+    single_frame = (FRAME_IMAGE_SOURCE_NUM_FRAMES == 1);
     
     background_ready = false;
 }
@@ -76,7 +79,7 @@ void ImageUtility::init()
     = false;
 #endif
     
-    LOG_IU("Initializing Image Utility: ");
+    LOG_IU(DEBUG_2, "Initializing Image Utility: ");
     if(has_file) InitFile();
     if(has_camera) InitCamera();
     if(has_generator) InitGenerator();
@@ -94,7 +97,7 @@ void ImageUtility::InitFile()
     subdir = file;
     if(num_frames > 0)
     {
-        LOG_IU("With %d %dx%d frames.\n", num_frames, size.width, size.height);
+        LOG_IU(DEBUG_2, "With %d %dx%d frames.\n", num_frames, size.width, size.height);
         counter = 1;
         
         file.append(to_string(counter%num_frames+1) );
@@ -102,15 +105,15 @@ void ImageUtility::InitFile()
     }
     else
     {
-        LOG_IU("With a single %dx%d frame.\n", size.width, size.height);
+        LOG_IU(DEBUG_2, "With a single %dx%d frame.\n", size.width, size.height);
         file.append(".bmp");
     }
-    LOG_IU("\tOpening file: %s\n", file.c_str());
+    LOG_IU(DEBUG_2, "\tOpening file: %s\n", file.c_str());
     
     image = imread(file, IMREAD_COLOR );
     if( image.empty() )                      // Check for invalid input
     {
-        LOG_IU("Could not open or find the image.\n");
+        LOG_IU(DEBUG_2, "Could not open or find the image.\n");
         return;
     }
     live = true;
@@ -120,18 +123,18 @@ void ImageUtility::InitCamera()
 {
     counter = 0;
     
-    cam.set(CV_CAP_PROP_FRAME_WIDTH,  IU_WIDTH);
-    cam.set(CV_CAP_PROP_FRAME_HEIGHT, IU_HEIGHT);
-    cam.set(CV_CAP_PROP_FPS,          IU_FRAME_RATE);
+    cam.set(CAP_PROP_FRAME_WIDTH,  IU_WIDTH);
+    cam.set(CAP_PROP_FRAME_HEIGHT, IU_HEIGHT);
+    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
     
     if (!cam.isOpened())
     {
-        LOG_IU("Could not open or find camera.\n");
+        LOG_IU(DEBUG_2, "Could not open or find camera.\n");
         return;
     }
     cam.read(image);
     
-    LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
+    LOG_IU(DEBUG_2, "Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
     
 #ifdef GREYSCALE
     Mat grey;
@@ -155,7 +158,8 @@ void ImageUtility::RequestBackground()
 void ImageUtility::trigger()
 {
     preoutframe = {0};
-    ++counter;
+    if(!single_frame)
+        ++counter;
     if(has_file)
         preoutframe = GetNextImage();
     else if(has_camera)
@@ -177,7 +181,10 @@ void ImageUtility::trigger()
 #else
     preoutframe.copyTo(outframe);
 #endif
-    
+    if(preoutframe.cols == 0)
+        printf("");
+    if(outframe.cols == 0)
+        printf("");
     cimageFromMat(outframe, outimage);
 }
 
@@ -208,7 +215,7 @@ int ImageUtility::loop(char c)
     return 1;
 }
 
-Mat& ImageUtility::GetNextImage()
+Mat ImageUtility::GetNextImage()
 {
     if(!live) return(image);
     
@@ -219,21 +226,21 @@ Mat& ImageUtility::GetNextImage()
     return GetImage();
 }
 
-Mat& ImageUtility::GetImage()
+Mat ImageUtility::GetImage()
 {
-    file = subdir + to_string( counter%num_frames+1) + ".png";
-    LOG_IU("Opening file: %s\n", file.c_str());
-    image = imread( file, IMREAD_COLOR );
-    if( image.empty() )                      // Check for invalid input
+    file = subdir + to_string( counter%(num_frames+1) ) + ".png";
+    LOG_IU(DEBUG_2, "Opening file: %s\n", file.c_str());
+    preimage = imread( file, IMREAD_COLOR );
+    if( preimage.empty() )                      // Check for invalid input
     {
-        LOG_IU("Could not open or find the image.\n");
+        LOG_IU(DEBUG_2, "Could not open or find the image.\n");
         return image;
     }
-    resize(image,image,size);
+    resize(preimage,image,size);
     return image;
 }
 
-Mat& ImageUtility::GetNextFrame()
+Mat ImageUtility::GetNextFrame()
 {
     cam >> image;
     resize(image, image, size, 1, 1);
@@ -377,11 +384,11 @@ void ImageUtility::generateImage(Mat& M)
     if(!background_request)
     {
         double radius_offset = abs(0.5 - phase);
-        circle(M, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, CV_FILLED);
-        circle(M, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, CV_FILLED);
+        circle(M, Point(p_x, p_y), TARGET_RADIUS*(0.75+radius_offset), TARGET_COLOR, FILLED);
+        circle(M, Point(s_x, s_y), TARGET_RADIUS*(1.25-radius_offset), TARGET_COLOR, FILLED);
 #else
-        circle(M, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
-        circle(M, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, CV_FILLED);
+        circle(M, Point(p_x, p_y), TARGET_RADIUS, TARGET_COLOR, FILLED);
+        circle(M, Point(s_x, s_y), TARGET_RADIUS, TARGET_COLOR, FILLED);
 #endif
 //      circle(frame, Point(size.width/2, size.height/2), TARGET_RADIUS*2, NOISE_COLOR, -1);
     }

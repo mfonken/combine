@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <string>
 
+#include "rho_drawer_xprm.hpp"
 #include "environment_master.h"
 #include "image_utility.hpp"
 #include "rho_wrapper.hpp"
@@ -58,6 +59,7 @@ public:
     GlobalPacket        packet;
     pthread_mutex_t     predictions_mutex,
                       * utility_mutex;
+    RhoDrawer           rho_drawer;
 };
 
 #endif /* tau_utility_hpp */

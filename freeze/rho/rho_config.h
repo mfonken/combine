@@ -15,7 +15,7 @@
 #define RHO_WIDTH        1280
 #define RHO_HEIGHT       800
 
-#define BACKGROUNDING_PERIOD   10 // Frames
+#define BACKGROUNDING_PERIOD   10000 // Frames
 
 #define FILTERED_COVERAGE_TARGET   0.007
 //#define FILTERED_COVERAGE_PIXELS   ((index_t)(FILTERED_COVERAGE_TARGET*FRAME_SIZE))
@@ -104,7 +104,7 @@
 
 #define THRESH_STEP_MAX     10
 #define THRESH_MIN          1
-#define THRESH_MAX          255
+#define THRESH_MAX          254
 
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20

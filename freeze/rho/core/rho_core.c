@@ -14,6 +14,9 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Filters */
     RhoUtility.Initialize.Filters( core );
     
+    /* Detection map */
+    DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
+    
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
@@ -42,8 +45,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.UpdatePredictions( core );
         LOG_RHO(DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-        LOG_RHO(DEBUG_2,"Generating packets.\n");
-        RhoCore.GeneratePacket( core );
+//        LOG_RHO(DEBUG_2,"Generating packets.\n");
+//        RhoCore.GeneratePacket( core );
     }
 }
 
@@ -97,6 +100,8 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     LOG_RHO(DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
+    
+    DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
     
     prediction_predict_variables _;
     

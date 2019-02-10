@@ -18,7 +18,8 @@
 
 #include "rho_structure.h"
 
-#include "rho_types.h"
+//#include "rho_types.h"
+#include "detection_map.h"
 
 #ifdef __PCR__
 #include "rho_interrupt_model.h"

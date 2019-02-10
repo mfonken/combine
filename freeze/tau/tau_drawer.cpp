@@ -174,7 +174,8 @@ Mat TauDrawer::DrawAll(void)
 Mat& TauDrawer::GetDensitiesFrame(Mat& M)
 {
     pthread_mutex_lock(&drawer_mutex);
-    utility.outframe.copyTo(M(Rect(0,0,w,h)));
+    Mat temp(utility.outframe);
+    temp.copyTo(M(Rect(0,0,w,h)));
     DrawDensityGraph(M);
     DrawDensityMaps(M);
     
@@ -207,7 +208,7 @@ Mat& TauDrawer::GetDensitiesFrame(Mat& M)
     putText(M, "o", Point(rho.core.Sx-9, rho.core.Sy+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
     
     double dnow = now();
-    rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH*2), Point(W,H), Scalar(0,0,0), CV_FILLED);
+    rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH*2), Point(W,H), Scalar(0,0,0), FILLED);
     if(--frame_rate_counter == 0)
     {
         frame_rate_counter = frame_rate_display_delay;
@@ -566,7 +567,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     file.close();
     
     /* Clear */
-    rectangle(mat, Point(global_offset,0), Point(global_offset+rho_frame.cols,H), RHO_DRAWERS_BACKGROUND_COLOR, CV_FILLED);
+    rectangle(mat, Point(global_offset,0), Point(global_offset+rho_frame.cols,H), RHO_DRAWERS_BACKGROUND_COLOR, FILLED);
     
     /* Draw */
 #define RF_SPACE 10
@@ -611,13 +612,13 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     if(total_offset > CVG_ORIGIN.x)
     {
         putText(mat, to_stringn(CVG_TOP_BOUND, RF_TEXT_PRECISION)+"%", Point(CVG_TEXT_X, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
-        rectangle(mat, Point(CVG_ORIGIN.x+total_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_B, CV_FILLED);
+        rectangle(mat, Point(CVG_ORIGIN.x+total_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_B, FILLED);
         putText(mat, to_stringn(total_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+total_offset, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
         //Filtered
         int filtered_offset = (1-(total_cvg_percent*filtered_cvg_percent*100.)/CVG_TOP_BOUND)*CVG_WIDTH;
         if(filtered_offset > CVG_ORIGIN.x)
         {
-            rectangle(mat, Point(CVG_ORIGIN.x+filtered_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_C, CV_FILLED);
+            rectangle(mat, Point(CVG_ORIGIN.x+filtered_offset+1,CVG_ORIGIN.y+1), Point(CVG_END.x-1,CVG_END.y-1), RF_COLOR_C, FILLED);
             if(CVG_ORIGIN.x+filtered_offset < RF_WIDTH - 100)
                 putText(mat, to_stringn(filtered_cvg_percent*100, RF_TEXT_PRECISION)+"%", Point(CVG_ORIGIN.x+filtered_offset, CVG_TEXT_HEIGHT+2), RF_FONT, RF_TEXT_SM, RF_TEXT_COLOR);
         }
@@ -651,9 +652,9 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     int bar_width = (width-2*RF_SPACE)/3;
     for(int i = 0, x = ST_ORIGIN.x+RF_SPACE; i < NUM_STATE_GROUPS; i++, x += width)
     {
-        rectangle(mat, Point(x,ST_BAR_Y), Point(x+bar_width, ST_BAR_Y+2-X_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_A, CV_FILLED);
-        rectangle(mat, Point(x+bar_width,ST_BAR_Y), Point(x+2*bar_width, ST_BAR_Y+2-Y_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_B, CV_FILLED);
-        rectangle(mat, Point(x+2*bar_width,ST_BAR_Y), Point(x+3*bar_width, ST_BAR_Y+2-C_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_C, CV_FILLED);
+        rectangle(mat, Point(x,ST_BAR_Y), Point(x+bar_width, ST_BAR_Y+2-X_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_A, FILLED);
+        rectangle(mat, Point(x+bar_width,ST_BAR_Y), Point(x+2*bar_width, ST_BAR_Y+2-Y_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_B, FILLED);
+        rectangle(mat, Point(x+2*bar_width,ST_BAR_Y), Point(x+3*bar_width, ST_BAR_Y+2-C_kumaraswamy[i]*ST_BAR_MAX), RF_COLOR_C, FILLED);
         
         int state_i = 2 + i*2;
         string state_n = "U" + to_string(i);
@@ -666,22 +667,22 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
         }
         int r = ST_RADIUS*state_P[state_i];
         putText(mat, state_n, Point(x, ST_BAR_Y+2*RF_SPACE), RF_FONT, RF_TEXT_SM, c);
-        circle(mat, Point(x+width/2-RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2), r, c, CV_FILLED);
+        circle(mat, Point(x+width/2-RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2), r, c, FILLED);
         putText(mat, to_string((int)(state_P[state_i]*100))+"%", Point(x+width/2-2.8*RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2+5), RF_FONT, RF_TEXT_SM, RF_LINE_COLOR);
     }
     
     // Legend
-    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.,ST_ORIGIN.y+ST_TEXT_X*4.5), RHO_DRAWERS_BACKGROUND_COLOR, CV_FILLED);
+    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.,ST_ORIGIN.y+ST_TEXT_X*4.5), RHO_DRAWERS_BACKGROUND_COLOR, FILLED);
     rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_ORIGIN.x+ST_TEXT_X*4.,ST_ORIGIN.y+ST_TEXT_X*4.5), RF_LINE_COLOR);
-    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), RF_COLOR_A, CV_FILLED);
-    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), RF_COLOR_B, CV_FILLED);
-    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+4*ST_TEXT_X), RF_COLOR_C, CV_FILLED);
+    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), RF_COLOR_A, FILLED);
+    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+2*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), RF_COLOR_B, FILLED);
+    rectangle(mat, Point(ST_ORIGIN.x+ST_TEXT_X,ST_ORIGIN.y+3*ST_TEXT_X), Point(ST_ORIGIN.x+2*ST_TEXT_X,ST_ORIGIN.y+4*ST_TEXT_X), RF_COLOR_C, FILLED);
     putText(mat, "X", Point(ST_ORIGIN.x+2.75*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*0.75), RF_FONT, RF_TEXT_SM, RF_COLOR_A);
     putText(mat, "Y", Point(ST_ORIGIN.x+2.75*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*1.75), RF_FONT, RF_TEXT_SM, RF_COLOR_B);
     putText(mat, "A", Point(ST_ORIGIN.x+2.75*ST_TEXT_X, ST_TEXT_HEIGHT+ST_TEXT_X*2.75), RF_FONT, RF_TEXT_SM, RF_COLOR_C);
     
     // Nu
-    rectangle(mat, Point(ST_END.x-ST_TEXT_X*4,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_END.x-ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*4.5), RHO_DRAWERS_BACKGROUND_COLOR, CV_FILLED);
+    rectangle(mat, Point(ST_END.x-ST_TEXT_X*4,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_END.x-ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*4.5), RHO_DRAWERS_BACKGROUND_COLOR, FILLED);
     rectangle(mat, Point(ST_END.x-ST_TEXT_X*4,ST_ORIGIN.y+ST_TEXT_X*0.5), Point(ST_END.x-ST_TEXT_X*0.5,ST_ORIGIN.y+ST_TEXT_X*4.5), RF_LINE_COLOR);
     putText(mat, to_stringn(x_nu,2), Point(ST_END.x-ST_TEXT_X*3.5,ST_TEXT_HEIGHT+ST_TEXT_X*0.75), RF_FONT, RF_TEXT_SM, RF_COLOR_A);
     putText(mat, to_stringn(y_nu,2), Point(ST_END.x-ST_TEXT_X*3.5,ST_TEXT_HEIGHT+ST_TEXT_X*1.75), RF_FONT, RF_TEXT_SM, RF_COLOR_B);

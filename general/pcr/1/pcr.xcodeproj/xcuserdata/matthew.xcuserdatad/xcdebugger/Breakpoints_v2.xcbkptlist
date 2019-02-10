@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "569650630.6376081"
+            timestampString = "571388483.536738"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "235"
-            endingLineNumber = "235"
+            startingLineNumber = "234"
+            endingLineNumber = "234"
             landmarkName = "TauDrawer::DrawDensityGraph(Mat &amp;M)"
             landmarkType = "7">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "569650630.637647"
+            timestampString = "571388483.536804"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "997"
-            endingLineNumber = "997"
+            startingLineNumber = "996"
+            endingLineNumber = "996"
             landmarkName = "TauDrawer::DrawRhoDetection(int dimension, Mat&amp;M)"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../../freeze/tau/tau_drawer.cpp"
-            timestampString = "569650630.637681"
+            timestampString = "571388483.5368609"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "411"
-            endingLineNumber = "411"
+            startingLineNumber = "410"
+            endingLineNumber = "410"
             landmarkName = "TauDrawer::DrawDensityGraph(Mat &amp;M)"
             landmarkType = "7">
          </BreakpointContent>
@@ -193,6 +193,22 @@
             endingLineNumber = "58"
             landmarkName = "NormalizeMarkovState"
             landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../freeze/utilities/image/image_utility.cpp"
+            timestampString = "571388483.536938"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
+            landmarkName = "ImageUtility::trigger()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

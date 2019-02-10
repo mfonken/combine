@@ -12,12 +12,12 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        10
-#define TAU_FPS         30
+#define MAIN_FPS        15
+#define TAU_FPS         15
 #define COMBINE_FPS     0
 
-#define TITLE_STRING                    "PCR Alpha v0.01"
-#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "noise/dynamic_clouds"//"frames/noiseS1"
+#define TITLE_STRING                    "PCR Alpha v0.03 xprm"
+#define FRAME_IMAGE_IMAGE_SOURCE_PATH   "fade"//"noise/dynamic_clouds"//"frames/noiseS1"
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   1//31
 
 /* GLOBAL SETUP */
@@ -26,8 +26,8 @@ using namespace std;
 #define HAS_FILE
 //#define HAS_GENERATOR
 
-#define FRAME_WIDTH                     600
-#define FRAME_HEIGHT                    700
+#define FRAME_WIDTH                     500
+#define FRAME_HEIGHT                    500
 
 /* IMAGE PROCESSING */
 #define FRAME_IMAGE_ROOT                "/Users/matthew/Desktop/PersonalResources/TestImages/"

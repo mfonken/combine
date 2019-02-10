@@ -64,7 +64,7 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     /* Reset entire structure */
     memset(core, 0, sizeof(rho_core_t));
     
-    /* core frame */
+    /* Core frame */
     core->Width = width;
     core->Height = height;
     
@@ -427,18 +427,24 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             *blobB = &r->Blobs[r->BlobsOrder[n+1]];
             
             /* Retreive tracking filters pair */
+            byte_t
+            fAi = r->TrackingFiltersOrder[m],
+            fBi = r->TrackingFiltersOrder[m+1];
+            
             rho_kalman_t
-            *filterA = &r->TrackingFilters[r->TrackingFiltersOrder[m]],
-            *filterB = &r->TrackingFilters[r->TrackingFiltersOrder[m+1]];
-            floating_t
-            blocA = blobA->loc,
-            blocB = blobB->loc;
+            *filterA = &r->TrackingFilters[fAi],
+            *filterB = &r->TrackingFilters[fBi];
+            
+            bool swapped = false;
+//            floating_t
+//            blocA = blobA->loc,
+//            blocB = blobB->loc;
             
             /* Calculate distances between filters and blobs */
-            aa = fabs(filterA->value - blocA);
-            bb = fabs(filterB->value - blocB);
-            ab = fabs(filterA->value - blocB);
-            ba = fabs(filterB->value - blocA);
+            aa = fabs(filterA->value - blobA->loc);
+            bb = fabs(filterB->value - blobB->loc);
+            ab = fabs(filterA->value - blobB->loc);
+            ba = fabs(filterB->value - blobA->loc);
             
             if( aa > MAX_TRACKING_MATCH_DIFFERNCE )
             {
@@ -464,7 +470,7 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             /* Swap on upward determinant */
             if( aa * bb > ab * ba )
             {
-                SWAP(blocA, blocB);
+                swapped = true;
                 total_difference += aa + bb;
             }
             else
@@ -472,8 +478,20 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             updated += 2;
 
             /* Update filters */
-            RhoKalman.Update(filterA, blocA);
-            RhoKalman.Update(filterB, blocB);
+            if(swapped)
+            {
+                RhoKalman.Update(filterA, blobB->loc);
+                RhoKalman.Update(filterB, blobA->loc);
+                blobB->tracking_id = fAi;
+                blobA->tracking_id = fBi;
+            }
+            else
+            {
+                RhoKalman.Update(filterA, blobA->loc);
+                RhoKalman.Update(filterB, blobB->loc);
+                blobA->tracking_id = fAi;
+                blobB->tracking_id = fBi;
+            }
             
             m++; n++;
         }
