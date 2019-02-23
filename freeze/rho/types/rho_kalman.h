@@ -45,7 +45,8 @@ extern "C" {
         rho_kalman_uncertainty_c
         uncertainty;
         bool
-        flag;
+        sorted,
+        valid;
         index_t
         min_value,
         max_value;

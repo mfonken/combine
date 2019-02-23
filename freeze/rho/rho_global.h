@@ -40,6 +40,8 @@ typedef volatile bool   flag_t;
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 
+#ifndef LOG_LEVEL
+#define LOG_LEVEL
 enum LogLevel
 {
     TEST = 0,
@@ -48,6 +50,7 @@ enum LogLevel
     DEBUG_2,
     ALWAYS
 };
+#endif
 
 #define TEST_LOG_LEVEL ALWAYS
 

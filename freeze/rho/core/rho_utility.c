@@ -553,7 +553,7 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
     {
         io = r->TrackingFiltersOrder[i];
         curr = &r->TrackingFilters[io];
-        if( curr->flag == true) continue;
+        if( curr->sorted == true) continue;
         
         best_score = curr->score;
         best_index = i;
@@ -576,12 +576,12 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
             r->TrackingFiltersOrder[best_index] = i;
         }
         
-        r->TrackingFilters[i].flag = true;
+        r->TrackingFilters[i].sorted = true;
     }
     
     for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
     {
-        r->TrackingFilters[i].flag = false;
+        r->TrackingFilters[i].sorted = false;
     }
 }
 
@@ -592,11 +592,13 @@ index_t CalculateValidTracksRhoUtility( prediction_t * r )
     {
         io = r->TrackingFiltersOrder[i];
         rho_kalman_t *curr = &r->TrackingFilters[io];
+        curr->valid = false;
         floating_t score = RhoKalman.Score( curr );
         if( RhoKalman.IsExpired(curr)
            || ( score < MIN_TRACKING_KALMAN_SCORE ) ) break;
         
         RhoKalman.Predict(curr, curr->velocity);
+        curr->valid = true;
         valid_tracks++;
     }
     return valid_tracks;

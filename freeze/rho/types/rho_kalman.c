@@ -79,7 +79,6 @@ void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new )
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
     k->timestamp  = timestamp();
-    k->flag = false;
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
     LOG_KALMAN("Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
