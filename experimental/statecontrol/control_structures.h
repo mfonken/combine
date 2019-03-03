@@ -62,9 +62,18 @@ typedef struct
 
 typedef struct
 {
-    double map[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
+    double expected[NUM_STATES][NUM_OBSERVATION_SYMBOLS];
+    double best[NUM_OBSERVATION_SYMBOLS];
+    double gamma[NUM_STATES];
     uint8_t num_observation_symbols;
 } observation_matrix_t;
+    
+typedef struct
+{
+    double map[NUM_STATES][NUM_STATES],
+    best_sum;
+    uint8_t num_observation_symbols;
+} expectation_matrix_t;
 
 typedef struct
 {
@@ -72,7 +81,11 @@ typedef struct
     fsm_system_t            A;                   // Transition matrix
     observation_matrix_t    B;                   // Observation matrix
     observation_buffer_t    O;                   // Observation sequence
+    expectation_matrix_t    E;                   // Expectation matrix
     double                  K[NUM_STATES];       // Kumaraswamy boundaries
+    double                  G[NUM_OBSERVATION_SYMBOLS][NUM_STATES+1];       // Expectation vector
+    double                  alpha[NUM_STATES];       // Forward solve vector
+    double                  beta[NUM_STATES];       // Backward solve vector
     
     uint8_t
         T, // Number of observations

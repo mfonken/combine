@@ -46,7 +46,8 @@ extern "C" {
         uncertainty;
         bool
         sorted,
-        valid;
+        valid,
+        flag;
         index_t
         min_value,
         max_value;
