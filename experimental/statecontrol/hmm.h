@@ -23,7 +23,7 @@ double ForwardSolveHMM(              hidden_markov_model_t *, uint8_t );
 double BackwardRecursionHMM(         hidden_markov_model_t *, uint8_t, uint8_t );
 double BackwardSolveHMM(             hidden_markov_model_t *, uint8_t );
 void   UpdateObservationMatrixHMM(   hidden_markov_model_t *, uint8_t );
-void   BaumWelchObservationSolveHMM( hidden_markov_model_t *, uint8_t );
+void   BaumWelchObservationSolveHMM( hidden_markov_model_t * );
 void   BaumWelchTransitionSolveHMM( hidden_markov_model_t *, uint8_t );
 void   BaumWelchSolveHMM( hidden_markov_model_t *, uint8_t );
 
@@ -35,7 +35,7 @@ typedef struct
     double (*BackwardRecursion)(         hidden_markov_model_t *, uint8_t, uint8_t );
     double (*BackwardSolve)(             hidden_markov_model_t *, uint8_t );
     void   (*UpdateObservationMatrix)(   hidden_markov_model_t *, uint8_t );
-    void   (*BaumWelchObservationSolve)( hidden_markov_model_t *, uint8_t );
+    void   (*BaumWelchObservationSolve)( hidden_markov_model_t * );
     void   (*BaumWelchTransitionSolve)( hidden_markov_model_t *, uint8_t );
     void   (*BaumWelchSolve)( hidden_markov_model_t *, uint8_t );
 } hidden_markov_model_function_t;

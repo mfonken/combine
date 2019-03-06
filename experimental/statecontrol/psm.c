@@ -36,17 +36,17 @@ void UpdatePSM( psm_t * model, double nu )
     FSMFunctions.Sys.Update( &model->hmm.A, state_bands );
     
     /* Calculate best cluster/observation and update observation matrix */
-    uint8_t estimated_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    uint8_t best_cluster_id = PSMFunctions.FindBestCluster( model, estimated_state );
-    model->hmm.T = addToObservationBuffer( &model->hmm.O, best_cluster_id );
-    
-    /* Update state path prediction to best cluster */
-    HMMFunctions.ForwardSolve( &model->hmm );
-    
-    /* Update predictions */
-    vec2 * proposed_center = &model->state_bands.band[ model->hmm.best_state ].true_center;
-    model->proposed_nu = proposed_center->a;
-    model->proposed_thresh = proposed_center->b;
+//    uint8_t estimated_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
+//    uint8_t best_cluster_id = PSMFunctions.FindBestCluster( model, estimated_state );
+//    model->hmm.T = addToObservationBuffer( &model->hmm.O, best_cluster_id );
+//
+//    /* Update state path prediction to best cluster */
+//    HMMFunctions.ForwardSolve( &model->hmm );
+//
+//    /* Update predictions */
+//    vec2 * proposed_center = &model->state_bands.band[ model->hmm.best_state ].true_center;
+//    model->proposed_nu = proposed_center->a;
+//    model->proposed_thresh = proposed_center->b;
     
     /* Update primary & secondary to reconstruct */
     gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[best_cluster_id];

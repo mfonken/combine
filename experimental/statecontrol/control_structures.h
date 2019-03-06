@@ -68,22 +68,44 @@ typedef struct
     uint8_t num_observation_symbols;
 } observation_matrix_t;
     
+//typedef struct
+//{
+//    double map[NUM_STATES][NUM_STATES],
+//    best_sum;
+//    uint8_t num_observation_symbols;
+//} expectation_matrix_t;
+    
+typedef double state_expectation_element_t[NUM_STATES][NUM_STATES];
+typedef state_expectation_element_t state_expectation_matrix_t[NUM_OBSERVATION_SYMBOLS][NUM_OBSERVATION_SYMBOLS];
+
+#define MAX_VAL_INDEX NUM_STATES
+typedef double expectation_element_t[NUM_STATES+1];
+typedef expectation_element_t expectation_matrix_t[NUM_OBSERVATION_SYMBOLS];
+    
+#define GAMMA_VALUE_INDEX 1
+#define GAMMAA
+typedef double gamma_element_t[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
 typedef struct
 {
-    double map[NUM_STATES][NUM_STATES],
-    best_sum;
-    uint8_t num_observation_symbols;
-} expectation_matrix_t;
-
+    gamma_element_t
+    value,
+    cumulative_value,
+    cumulative_maximum;
+    double maximum[NUM_OBSERVATION_SYMBOLS];
+} gamma_matrix_t;
+    
 typedef struct
 {
     double                  p[NUM_STATES];       // Initial probabilities
     fsm_system_t            A;                   // Transition matrix
     observation_matrix_t    B;                   // Observation matrix
     observation_buffer_t    O;                   // Observation sequence
+    state_expectation_matrix_t Es;               // State expectation matrix
     expectation_matrix_t    E;                   // Expectation matrix
     double                  K[NUM_STATES];       // Kumaraswamy boundaries
-    double                  G[NUM_OBSERVATION_SYMBOLS][NUM_STATES+1];       // Expectation vector
+    gamma_matrix_t          G;                   // Gamma expectation matrix
+    gamma_matrix_t          Gc;                  // Cumulative gamma expectation matrix
+    gamma_matrix_t          Gm;                  // Maximum gamma expectation matrix
     double                  alpha[NUM_STATES];       // Forward solve vector
     double                  beta[NUM_STATES];       // Backward solve vector
     

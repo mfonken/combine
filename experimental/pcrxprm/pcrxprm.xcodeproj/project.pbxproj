@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		34001A58220A92990060DC03 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34001A57220A92990060DC03 /* main.cpp */; };
-		34001AAA220A92B50060DC03 /* state_machine_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = 34001A62220A92B50060DC03 /* state_machine_utility.c */; };
 		34001AAC220A92B50060DC03 /* rho_pid.c in Sources */ = {isa = PBXBuildFile; fileRef = 34001A67220A92B50060DC03 /* rho_pid.c */; };
 		34001AAD220A92B50060DC03 /* rho_kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 34001A6B220A92B50060DC03 /* rho_kalman.c */; };
 		34001AAE220A92B50060DC03 /* rho_utility.c in Sources */ = {isa = PBXBuildFile; fileRef = 34001A6E220A92B50060DC03 /* rho_utility.c */; };
@@ -28,6 +27,10 @@
 		34001AC2220A92B50060DC03 /* environment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34001AA4220A92B50060DC03 /* environment.cpp */; };
 		347841F1220A979900BC9698 /* detection_map.c in Sources */ = {isa = PBXBuildFile; fileRef = 347841F0220A979900BC9698 /* detection_map.c */; };
 		347841FB220AA44500BC9698 /* rho_drawer_xprm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 347841F9220AA44500BC9698 /* rho_drawer_xprm.cpp */; };
+		34D03E7C222F92350057F73C /* hmm.c in Sources */ = {isa = PBXBuildFile; fileRef = 34D03E72222F92350057F73C /* hmm.c */; };
+		34D03E7D222F92350057F73C /* psm.c in Sources */ = {isa = PBXBuildFile; fileRef = 34D03E74222F92350057F73C /* psm.c */; };
+		34D03E7E222F92350057F73C /* gmm.c in Sources */ = {isa = PBXBuildFile; fileRef = 34D03E76222F92350057F73C /* gmm.c */; };
+		34D03E7F222F92350057F73C /* fsm.c in Sources */ = {isa = PBXBuildFile; fileRef = 34D03E78222F92350057F73C /* fsm.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,8 +48,6 @@
 /* Begin PBXFileReference section */
 		34001A54220A92990060DC03 /* pcrxprm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pcrxprm; sourceTree = BUILT_PRODUCTS_DIR; };
 		34001A57220A92990060DC03 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		34001A61220A92B50060DC03 /* state_machine_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = state_machine_utility.h; sourceTree = "<group>"; };
-		34001A62220A92B50060DC03 /* state_machine_utility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = state_machine_utility.c; sourceTree = "<group>"; };
 		34001A67220A92B50060DC03 /* rho_pid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_pid.c; sourceTree = "<group>"; };
 		34001A68220A92B50060DC03 /* rho_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_types.h; sourceTree = "<group>"; };
 		34001A69220A92B50060DC03 /* rho_kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_kalman.h; sourceTree = "<group>"; };
@@ -98,6 +99,18 @@
 		347841F0220A979900BC9698 /* detection_map.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = detection_map.c; path = /Users/matthew/Desktop/marbl/Techincal/combine/freeze/rho/xprm/detection_map.c; sourceTree = "<absolute>"; };
 		347841F9220AA44500BC9698 /* rho_drawer_xprm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rho_drawer_xprm.cpp; sourceTree = "<group>"; };
 		347841FA220AA44500BC9698 /* rho_drawer_xprm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rho_drawer_xprm.hpp; sourceTree = "<group>"; };
+		34D03E70222F92340057F73C /* control_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = control_types.h; path = ../../../experimental/statecontrol/control_types.h; sourceTree = "<group>"; };
+		34D03E71222F92340057F73C /* control_structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = control_structures.h; path = ../../../experimental/statecontrol/control_structures.h; sourceTree = "<group>"; };
+		34D03E72222F92350057F73C /* hmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hmm.c; path = ../../../experimental/statecontrol/hmm.c; sourceTree = "<group>"; };
+		34D03E73222F92350057F73C /* hmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hmm.h; path = ../../../experimental/statecontrol/hmm.h; sourceTree = "<group>"; };
+		34D03E74222F92350057F73C /* psm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psm.c; path = ../../../experimental/statecontrol/psm.c; sourceTree = "<group>"; };
+		34D03E75222F92350057F73C /* fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fsm.h; path = ../../../experimental/statecontrol/fsm.h; sourceTree = "<group>"; };
+		34D03E76222F92350057F73C /* gmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gmm.c; path = ../../../experimental/statecontrol/gmm.c; sourceTree = "<group>"; };
+		34D03E77222F92350057F73C /* psm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = psm.h; path = ../../../experimental/statecontrol/psm.h; sourceTree = "<group>"; };
+		34D03E78222F92350057F73C /* fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fsm.c; path = ../../../experimental/statecontrol/fsm.c; sourceTree = "<group>"; };
+		34D03E79222F92350057F73C /* kumaraswamy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kumaraswamy.h; path = ../../../experimental/statecontrol/kumaraswamy.h; sourceTree = "<group>"; };
+		34D03E7A222F92350057F73C /* fsm_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fsm_support.h; path = ../../../experimental/statecontrol/fsm_support.h; sourceTree = "<group>"; };
+		34D03E7B222F92350057F73C /* gmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gmm.h; path = ../../../experimental/statecontrol/gmm.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,8 +172,18 @@
 		34001A60220A92B50060DC03 /* state_control */ = {
 			isa = PBXGroup;
 			children = (
-				34001A61220A92B50060DC03 /* state_machine_utility.h */,
-				34001A62220A92B50060DC03 /* state_machine_utility.c */,
+				34D03E71222F92340057F73C /* control_structures.h */,
+				34D03E79222F92350057F73C /* kumaraswamy.h */,
+				34D03E70222F92340057F73C /* control_types.h */,
+				34D03E7A222F92350057F73C /* fsm_support.h */,
+				34D03E75222F92350057F73C /* fsm.h */,
+				34D03E78222F92350057F73C /* fsm.c */,
+				34D03E76222F92350057F73C /* gmm.c */,
+				34D03E7B222F92350057F73C /* gmm.h */,
+				34D03E73222F92350057F73C /* hmm.h */,
+				34D03E72222F92350057F73C /* hmm.c */,
+				34D03E77222F92350057F73C /* psm.h */,
+				34D03E74222F92350057F73C /* psm.c */,
 			);
 			path = state_control;
 			sourceTree = "<group>";
@@ -344,11 +367,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34D03E7C222F92350057F73C /* hmm.c in Sources */,
 				34001AAE220A92B50060DC03 /* rho_utility.c in Sources */,
 				34001AB4220A92B50060DC03 /* tau_structures.cpp in Sources */,
+				34D03E7D222F92350057F73C /* psm.c in Sources */,
 				34001ABB220A92B50060DC03 /* serial_wrapper.cpp in Sources */,
 				34001AC2220A92B50060DC03 /* environment.cpp in Sources */,
-				34001AAA220A92B50060DC03 /* state_machine_utility.c in Sources */,
 				34001AB1220A92B50060DC03 /* rho_interrupt_model.c in Sources */,
 				34001ABD220A92B50060DC03 /* gaussian.cpp in Sources */,
 				34001ABA220A92B50060DC03 /* sercom.c in Sources */,
@@ -357,12 +381,14 @@
 				34001A58220A92990060DC03 /* main.cpp in Sources */,
 				34001AAF220A92B50060DC03 /* rho_core.c in Sources */,
 				34001AB5220A92B50060DC03 /* tau_drawer.cpp in Sources */,
+				34D03E7E222F92350057F73C /* gmm.c in Sources */,
 				34001ABE220A92B50060DC03 /* kalman.cpp in Sources */,
 				34001AAD220A92B50060DC03 /* rho_kalman.c in Sources */,
 				34001AC0220A92B50060DC03 /* image_utility.cpp in Sources */,
 				34001ABC220A92B50060DC03 /* file_writer.cpp in Sources */,
 				34001AC1220A92B50060DC03 /* timestamp.c in Sources */,
 				347841FB220AA44500BC9698 /* rho_drawer_xprm.cpp in Sources */,
+				34D03E7F222F92350057F73C /* fsm.c in Sources */,
 				34001AAC220A92B50060DC03 /* rho_pid.c in Sources */,
 				34001AB6220A92B50060DC03 /* tau_utility.cpp in Sources */,
 			);
