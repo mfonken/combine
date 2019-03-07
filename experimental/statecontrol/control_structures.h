@@ -68,13 +68,6 @@ typedef struct
     uint8_t num_observation_symbols;
 } observation_matrix_t;
     
-//typedef struct
-//{
-//    double map[NUM_STATES][NUM_STATES],
-//    best_sum;
-//    uint8_t num_observation_symbols;
-//} expectation_matrix_t;
-    
 typedef double state_expectation_element_t[NUM_STATES][NUM_STATES];
 typedef state_expectation_element_t state_expectation_matrix_t[NUM_OBSERVATION_SYMBOLS][NUM_OBSERVATION_SYMBOLS];
 
@@ -104,10 +97,6 @@ typedef struct
     expectation_matrix_t    E;                   // Expectation matrix
     double                  K[NUM_STATES];       // Kumaraswamy boundaries
     gamma_matrix_t          G;                   // Gamma expectation matrix
-    gamma_matrix_t          Gc;                  // Cumulative gamma expectation matrix
-    gamma_matrix_t          Gm;                  // Maximum gamma expectation matrix
-    double                  alpha[NUM_STATES];       // Forward solve vector
-    double                  beta[NUM_STATES];       // Backward solve vector
     
     uint8_t
         T, // Number of observations
@@ -131,6 +120,12 @@ typedef struct
         proposed_nu,
         proposed_primary_id,
         proposed_secondary_id;
+    uint8_t
+        best_state,
+        best_cluster_id;
+    double
+        best_confidence,
+        best_cluster_weight;
 } psm_t;
     
 #ifdef __cplusplus

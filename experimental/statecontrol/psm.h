@@ -16,29 +16,33 @@ extern "C" {
 
 #include <stdio.h>
 
-#include "hmm.h"
+#include "gmm.h"
 
-void InitializePSM(                      psm_t * );
-void ReportObservationsPSM(              psm_t *, observation_t *, uint8_t );
-void UpdatePSM(                          psm_t *, double  );
-void UpdateStateBandsPSM(                psm_t *, double , double *, uint8_t );
-void InfluenceStateBandsPSM(             psm_t *, band_list_t * );
-void FindLowerBoundariesOfStateBandPSM(  psm_t *, cluster_boundary_list_t *, band_list_t * );
-void FindTrueCentersOfStateBandsPSM(     psm_t *, cluster_boundary_list_t *, band_list_t * );
-uint8_t FindBestClusterPSM(              psm_t *, uint8_t );
-uint8_t GetCurrentBandPSM(               psm_t *, band_list_t * );
+void InitializePSM(                     psm_t * );
+void ReportObservationsPSM(             psm_t *, observation_t *, uint8_t );
+void UpdatePSM(                         psm_t *, double  );
+void UpdateStateBandsPSM(               psm_t *, double , double *, uint8_t );
+void InfluenceStateBandsPSM(            psm_t *, band_list_t * );
+void FindLowerBoundariesOfStateBandPSM( psm_t *, cluster_boundary_list_t *, band_list_t * );
+void FindTrueCentersOfStateBandsPSM(    psm_t *, cluster_boundary_list_t *, band_list_t * );
+void UpdateBestStatePSM(                psm_t * );
+void UpdateBestClusterPSM(              psm_t *, band_list_t * );
+uint8_t GetCurrentBandPSM(              psm_t *, band_list_t * );
+void GenerateProposalsPSM(              psm_t * );
 
 typedef struct
 {
-    void (*Initialize)(                      psm_t * );
-    void (*ReportObservations)(              psm_t *, observation_t *, uint8_t );
-    void (*Update)(                          psm_t *, double  );
-    void (*UpdateStateBands)(                psm_t *, double , double *, uint8_t );
-    void (*InfluenceStateBands)(             psm_t *, band_list_t * );
-    void (*FindStateBandLowerBoundaries)(    psm_t *, cluster_boundary_list_t *, band_list_t * );
-    void (*FindStateBandCenters)(            psm_t *, cluster_boundary_list_t *, band_list_t * );
-    uint8_t (*FindBestCluster)(              psm_t *, uint8_t );
-    uint8_t (*GetCurrentBand)(               psm_t *, band_list_t * );
+    void (*Initialize)(                     psm_t * );
+    void (*ReportObservations)(             psm_t *, observation_t *, uint8_t );
+    void (*Update)(                         psm_t *, double  );
+    void (*UpdateStateBands)(               psm_t *, double , double *, uint8_t );
+    void (*InfluenceStateBands)(            psm_t *, band_list_t * );
+    void (*FindStateBandLowerBoundaries)(   psm_t *, cluster_boundary_list_t *, band_list_t * );
+    void (*FindStateBandCenters)(           psm_t *, cluster_boundary_list_t *, band_list_t * );
+    void (*UpdateBestState)(                psm_t * );
+    void (*UpdateBestCluster)(              psm_t *, band_list_t * );
+    uint8_t (*GetCurrentBand)(              psm_t *, band_list_t * );
+    void (*GenerateProposals)(              psm_t * );
 } psm_functions_t;
 
 static const psm_functions_t PSMFunctions =
@@ -50,8 +54,10 @@ static const psm_functions_t PSMFunctions =
     .InfluenceStateBands = InfluenceStateBandsPSM,
     .FindStateBandLowerBoundaries = FindLowerBoundariesOfStateBandPSM,
     .FindStateBandCenters = FindTrueCentersOfStateBandsPSM,
-    .FindBestCluster = FindBestClusterPSM,
+    .UpdateBestState = UpdateBestStatePSM,
+    .UpdateBestCluster = UpdateBestClusterPSM,
     .GetCurrentBand = GetCurrentBandPSM,
+    .GenerateProposals = GenerateProposalsPSM,
 };
     
 #ifdef __cplusplus

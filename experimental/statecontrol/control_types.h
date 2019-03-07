@@ -23,7 +23,12 @@ extern "C" {
 #define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
 #endif
     
+#define IN_RANGE(A,X,Y) ( ( A > X ) && ( A < Y ) )
+#define SET_MAX(A,B)    ( A = MAX ( A, B ) )
+    
 #define MAX_THRESH 255
+    
+#define TARGET_STATE 2
     
     //#define NUM_STATES              10
 #define NUM_OBSERVATION_SYMBOLS 2//5 // Should be max number of clusters in GMM
@@ -372,17 +377,19 @@ extern "C" {
     {
         uint8_t
         data[MAX_OBSERVATIONS],
-        next, first;
+        next, first, last, curr, prev;
     } observation_buffer_t;
     
     static uint8_t addToObservationBuffer( observation_buffer_t * buffer, uint8_t v )
     {
-        uint8_t index = buffer->next;
+        buffer->prev = buffer->curr;
+        buffer->curr = v;
+        buffer->last = buffer->next;
         buffer->data[buffer->next++] = v;
         buffer->next &= MAX_OBSERVATION_MASK;
         if(buffer->next == buffer->first)
             buffer->first = ( buffer->next + 1 ) & MAX_OBSERVATION_MASK;
-        return index;
+        return buffer->last;
     }
     
 #ifdef __cplusplus

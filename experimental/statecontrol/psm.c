@@ -36,22 +36,16 @@ void UpdatePSM( psm_t * model, double nu )
     FSMFunctions.Sys.Update( &model->hmm.A, state_bands );
     
     /* Calculate best cluster/observation and update observation matrix */
-//    uint8_t estimated_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-//    uint8_t best_cluster_id = PSMFunctions.FindBestCluster( model, estimated_state );
-//    model->hmm.T = addToObservationBuffer( &model->hmm.O, best_cluster_id );
-//
-//    /* Update state path prediction to best cluster */
-//    HMMFunctions.ForwardSolve( &model->hmm );
-//
-//    /* Update predictions */
-//    vec2 * proposed_center = &model->state_bands.band[ model->hmm.best_state ].true_center;
-//    model->proposed_nu = proposed_center->a;
-//    model->proposed_thresh = proposed_center->b;
+    uint8_t estimated_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
+    model->hmm.T = addToObservationBuffer( &model->hmm.O, estimated_state );
+
+    /* Update state path prediction to best cluster */
+    HMMFunctions.UpdateObservationMatrix( &model->hmm );
+    PSMFunctions.UpdateBestState( model );
+    PSMFunctions.UpdateBestCluster( model, &model->state_bands );
     
-    /* Update primary & secondary to reconstruct */
-    gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[best_cluster_id];
-    model->proposed_primary_id = cluster->primary_id;
-    model->proposed_primary_id = cluster->secondary_id;
+    /* Generate proposals to complete update */
+    PSMFunctions.GenerateProposals( model );
 }
 
 void UpdateStateBandsPSM( psm_t * model, double nu, double * bands, uint8_t num_bands )
@@ -185,23 +179,48 @@ void FindTrueCentersOfStateBandsPSM( psm_t * model, cluster_boundary_list_t * cl
     }
 }
 
-uint8_t FindBestClusterPSM( psm_t * model, uint8_t estimated_state )
+void UpdateBestStatePSM( psm_t * model )
 {
-    uint8_t best_cluster_id = 0;
-    double best_cluster_weight = 0.;
+    uint8_t best_observation_id = 0;
+    double best_observation_weight = 0.;
+    
+    /* Determine target observation band */
+    for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
+    {
+        double check = model->hmm.B.expected[TARGET_STATE][i];
+        if( check > best_observation_weight )
+        {
+            best_observation_id = i;
+            best_observation_weight = check;
+        }
+    }
+    model->best_state = best_observation_id;
+    model->best_confidence = best_observation_weight;
+}
+
+void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
+{
+    double
+        lower_bound = band_list->band[model->best_state].lower_boundary,
+        upper_bound = ( model->best_state + 1 >= NUM_STATE_GROUPS ) ?
+            MAX_THRESH : band_list->band[model->best_state + 1].lower_boundary,
+        best_cluster_weight = 0.;
+    int8_t best_cluster_id = -1;
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
     {
         gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[i];
-        GMMFunctions.Cluster.Weigh( cluster );
-        if( cluster->weight > best_cluster_weight )
+        if( IN_RANGE( cluster->gaussian_out.mean.b, lower_bound, upper_bound ) )
         {
-            best_cluster_weight = cluster->weight;
-            best_cluster_id = i;
+            GMMFunctions.Cluster.Weigh( cluster );
+            if( cluster->weight > best_cluster_weight )
+            {
+                best_cluster_weight = cluster->weight;
+                best_cluster_id = i;
+            }
         }
-        model->hmm.B.map[i][estimated_state] += cluster->weight;
-        model->hmm.B.map[i][estimated_state] /= 2.;
     }
-    return best_cluster_id;
+    model->best_cluster_id = best_cluster_id;
+    model->best_cluster_weight = best_cluster_weight;
 }
 
 uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
@@ -214,4 +233,17 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
             break;
     }
     return state;
+}
+
+void GenerateProposalsPSM( psm_t * model )
+{
+    /* Update predictions */
+    vec2 * proposed_center = &model->state_bands.band[ model->best_state ].true_center;
+    model->proposed_nu = proposed_center->a;
+    model->proposed_thresh = proposed_center->b;
+    
+    /* Update primary & secondary to reconstruct */
+    gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[model->best_cluster_id];
+    model->proposed_primary_id = cluster->primary_id;
+    model->proposed_primary_id = cluster->secondary_id;
 }

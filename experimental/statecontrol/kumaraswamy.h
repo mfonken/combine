@@ -13,8 +13,11 @@
 extern "C" {
 #endif
 
-//#include "control_types.h"
+#ifdef TEST
 #include "control_types_test.h"
+#else
+#include "control_types.h"
+#endif
 
 #define KUMARASWAMY_CDF(X,A,B) ( 1 - pow( 1 - pow( X, A ), B) )
 

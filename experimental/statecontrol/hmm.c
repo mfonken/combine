@@ -16,32 +16,33 @@ void InitializeHMM( hidden_markov_model_t * model )
 static uint8_t prev = 0;
 double ForwardRecursionHMM( hidden_markov_model_t * model, uint8_t i, uint8_t t )
 {
-    if( model->alpha[i] == 0 )
-    {
-        double sum = 0.;
-        if( t == model->O.first )
-        {
-            uint8_t o = prev;
-            printf("c:%.3f d:%.3f ", model->p[i], model->B.expected[i][o]);
-            return model->p[i] * model->B.expected[i][o];
-            
-        }
-        else
-        {
-            uint8_t t_ = t - 1;
-            if( !t ) t_ = MAX_OBSERVATION_MASK;
-            double a, b;
-            for( uint8_t j = 0; j < model->N; j++ )
-            {
-                a = HMMFunctions.ForwardRecursion( model, j, t_ );
-                b = model->A.probabilities.map[j][i];
-                sum += a * b;
-            }
-            uint8_t o = model->O.data[t];
-            model->alpha[i] = sum * model->B.expected[i][o];
-        }
-    }
-    return model->alpha[i];
+    return 0;
+//    if( model->alpha[i] == 0 )
+//    {
+//        double sum = 0.;
+//        if( t == model->O.first )
+//        {
+//            uint8_t o = prev;
+//            printf("c:%.3f d:%.3f ", model->p[i], model->B.expected[i][o]);
+//            return model->p[i] * model->B.expected[i][o];
+//
+//        }
+//        else
+//        {
+//            uint8_t t_ = t - 1;
+//            if( !t ) t_ = MAX_OBSERVATION_MASK;
+//            double a, b;
+//            for( uint8_t j = 0; j < model->N; j++ )
+//            {
+//                a = HMMFunctions.ForwardRecursion( model, j, t_ );
+//                b = model->A.probabilities.map[j][i];
+//                sum += a * b;
+//            }
+//            uint8_t o = model->O.data[t];
+//            model->alpha[i] = sum * model->B.expected[i][o];
+//        }
+//    }
+//    return model->alpha[i];
 }
 
 double ForwardSolveHMM( hidden_markov_model_t * model, uint8_t t )
@@ -62,27 +63,28 @@ double ForwardSolveHMM( hidden_markov_model_t * model, uint8_t t )
 
 double BackwardRecursionHMM( hidden_markov_model_t * model, uint8_t i, uint8_t t )
 {
-    if( model->beta[i] == 0 )
-    {
-        double sum = 0.;
-        if( t >= model->O.last )
-            return 1.;
-        else
-        {
-            uint8_t t_ = t + 1;
-            if( !t ) t_ = MAX_OBSERVATION_MASK;
-            double a, b;
-            for( uint8_t j = 0; j < model->N; j++ )
-            {
-                a = HMMFunctions.BackwardRecursion( model, i, t_ );
-                uint8_t o = model->O.data[t_];
-                b = model->A.probabilities.map[i][j] * model->B.expected[j][o];
-                sum += a * b;
-            }
-        }
-        model->beta[i] = sum;
-    }
-    return model->beta[i];
+    return 0;
+//    if( model->beta[i] == 0 )
+//    {
+//        double sum = 0.;
+//        if( t >= model->O.last )
+//            return 1.;
+//        else
+//        {
+//            uint8_t t_ = t + 1;
+//            if( !t ) t_ = MAX_OBSERVATION_MASK;
+//            double a, b;
+//            for( uint8_t j = 0; j < model->N; j++ )
+//            {
+//                a = HMMFunctions.BackwardRecursion( model, i, t_ );
+//                uint8_t o = model->O.data[t_];
+//                b = model->A.probabilities.map[i][j] * model->B.expected[j][o];
+//                sum += a * b;
+//            }
+//        }
+//        model->beta[i] = sum;
+//    }
+//    return model->beta[i];
 }
 
 double BackwardSolveHMM( hidden_markov_model_t * model, uint8_t t )
@@ -101,73 +103,27 @@ double BackwardSolveHMM( hidden_markov_model_t * model, uint8_t t )
     return pr_now_given_model;
 }
 
-void UpdateObservationMatrixHMM( hidden_markov_model_t * model, uint8_t t )
+void UpdateObservationMatrixHMM( hidden_markov_model_t * model )
 {
-//    /* Observation matrix update */
-//    uint8_t o = model->O.data[t];
-//    double current_gamma;
-//    for( uint8_t i = 0; i < NUM_STATES; i++ )
-//    {
-//        current_gamma = model->G[i];
-//        model->B.observed[i][o] += current_gamma;
-//        model->B.gamma[i] += current_gamma;
-//    }
-//    for( uint8_t i = 0; i < NUM_STATES; i++ )
-//    {
-//        current_gamma = model->B.gamma[i];
-//        double row_sum = 0.;
-//        for( uint8_t j = 0; j < NUM_OBSERVATION_SYMBOLS; j++ )
-//        {
-//            model->B.expected[i][j] = ZDIV( model->B.observed[i][j], current_gamma );
-//            row_sum += model->B.expected[i][j];
-//        }
-//        for( uint8_t j = 0; j < NUM_OBSERVATION_SYMBOLS; j++ )
-//        {
-//            model->B.expected[i][j] /= row_sum;
-//        }
-//    }
-}
-
-void BaumWelchTransitionSolveHMM( hidden_markov_model_t * model, uint8_t t )
-{
-    /* Expectation matrix update */
-    memset( model->beta, 0., sizeof(model->beta) );
-    double state_expectation = 0., cumulated_expectation = 0., best_expectation = 0.;
-    uint8_t o = model->O.data[t+1];
-    printf("%d:\n",o);
-    for( uint8_t i = 0; i < NUM_STATES; i++ )
-    {
-        for( uint8_t j = 0; j < NUM_STATES; j++ )
-        {
-            double a = model->A.probabilities.map[i][j],
-            b = model->B.expected[j][o];
-            printf("[%d][%d] a:%.3f b:%.3f ", i, j, a, b);
-            double c = HMMFunctions.ForwardRecursion( model, i, t ),
-            d = HMMFunctions.BackwardRecursion( model, j, t + 1 );
-            state_expectation = a * b * c * d;
-            printf(" e:%.3f\n", state_expectation);
-            
-            model->E[j][i] = state_expectation;
-            if( state_expectation > best_expectation )
-                best_expectation = state_expectation;
-            cumulated_expectation += state_expectation;
-        }
-    }
-    printf("E:");
-    for( uint8_t i = 0; i < NUM_STATES; i++ )
-    {
-        for( uint8_t j = 0; j < NUM_STATES; j++ )
-        {
-            printf(" %.4f", model->E[j][i] / cumulated_expectation);
-        }
-    }
-    printf("\n");
-
+    /* Gamma matrix update */
+    HMMFunctions.BaumWelchGammaSolve( model );
     
-    prev = model->O.data[model->O.first];
+    /* Observation matrix update */
+    for( uint8_t j = 0; j < NUM_STATES; j++ )
+    {
+        double row_sum = 0.;
+        for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
+            row_sum += model->G.cumulative_value[i][j];
+        for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
+        {
+            printf("|%.4f|", model->G.cumulative_value[i][j]);
+            model->B.expected[j][i] = ZDIV( model->G.cumulative_value[i][j], row_sum );
+        }
+        printf("\n");
+    }
 }
 
-void BaumWelchObservationSolveHMM( hidden_markov_model_t * model )
+void BaumWelchGammaSolveHMM( hidden_markov_model_t * model )
 {
     /* Expectation matrix update */
     double state_expectation = 0.;
@@ -234,6 +190,47 @@ void BaumWelchObservationSolveHMM( hidden_markov_model_t * model )
     printf("\n");
 }
 
+
+void BaumWelchTransitionSolveHMM( hidden_markov_model_t * model, uint8_t t )
+{
+//    /* Expectation matrix update */
+//    memset( model->beta, 0., sizeof(model->beta) );
+//    double state_expectation = 0., cumulated_expectation = 0., best_expectation = 0.;
+//    uint8_t o = model->O.data[t+1];
+//    printf("%d:\n",o);
+//    for( uint8_t i = 0; i < NUM_STATES; i++ )
+//    {
+//        for( uint8_t j = 0; j < NUM_STATES; j++ )
+//        {
+//            double a = model->A.probabilities.map[i][j],
+//            b = model->B.expected[j][o];
+//            printf("[%d][%d] a:%.3f b:%.3f ", i, j, a, b);
+//            double c = HMMFunctions.ForwardRecursion( model, i, t ),
+//            d = HMMFunctions.BackwardRecursion( model, j, t + 1 );
+//            state_expectation = a * b * c * d;
+//            printf(" e:%.3f\n", state_expectation);
+//            
+//            model->E[j][i] = state_expectation;
+//            if( state_expectation > best_expectation )
+//                best_expectation = state_expectation;
+//            cumulated_expectation += state_expectation;
+//        }
+//    }
+//    printf("E:");
+//    for( uint8_t i = 0; i < NUM_STATES; i++ )
+//    {
+//        for( uint8_t j = 0; j < NUM_STATES; j++ )
+//        {
+//            printf(" %.4f", model->E[j][i] / cumulated_expectation);
+//        }
+//    }
+//    printf("\n");
+//    
+//    
+//    prev = model->O.data[model->O.first];
+}
+
+
 void BaumWelchTransitionStepHMM( hidden_markov_model_t * model, uint8_t t )
 {
     
@@ -242,5 +239,5 @@ void BaumWelchTransitionStepHMM( hidden_markov_model_t * model, uint8_t t )
 void BaumWelchSolveHMM( hidden_markov_model_t * model, uint8_t t )
 {
 //    HMMFunctions.BaumWelchTransitionSolve( model, t );
-    HMMFunctions.BaumWelchObservationSolve( model );
+//    HMMFunctions.BaumWelchObservationSolve( model );
 }
