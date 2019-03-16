@@ -11,6 +11,12 @@
 
 #include "rho_types.h"
 
+#define WRITE_DETECTION_MAP_TO_FILE "/Users/matthew/Desktop/gmmtest/data/dm.txt"
+#define DETECTION_MAP_DESCRIPTOR "double_circle_corner_triangle_fade"
+#define SHAKE_INJECTION 10
+
+static FILE * detection_map_file;
+
 void InitializeDetectionMap( detection_map_t *, uint16_t );
 uint8_t GetDetectionMapFirstIndex( detection_map_t * );
 void IncrementDetectionMapIndex( detection_map_t * );

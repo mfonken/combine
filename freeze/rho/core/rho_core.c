@@ -102,6 +102,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
+//    PSMFunctions.Update( &core->PredictiveStateModel, ( core->PredictionPair.x.NuBlobs + core->PredictionPair.y.NuBlobs ) / 2 ); /// TODO: Generalize to be dimensionless
     
     prediction_predict_variables _;
     
@@ -109,7 +110,6 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoUtility.Predict.CorrectAmbiguity( &_, core );
     RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
     RhoUtility.Predict.UpdateCorePredictionData( &_, core );
-    MarkovFunctions.Sys.Update( &core->BayeSys, core->PredictionPair.Probabilities.P );
 }
 
 /* Use background and state information to update image threshold */

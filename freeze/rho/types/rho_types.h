@@ -14,8 +14,9 @@
 #include "rho_config.h"
 #include "rho_kalman.h"
 #include "rho_pid.h"
-#include "state_machine_utility.h"
 #include "rho_global.h"
+
+#include "psm.h"
 
 /* Packet Generation Settings */
 #define YES 1
@@ -403,10 +404,10 @@ typedef struct
     rho_tune_t          Tune;
     density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
-    markov_system_t     BayeSys;
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
+    psm_t               PredictiveStateModel;
     packet_t            Packet;
     
     index_t             cframe[C_FRAME_SIZE];

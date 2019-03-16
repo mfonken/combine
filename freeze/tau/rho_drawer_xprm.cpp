@@ -44,7 +44,7 @@ void RhoDrawer::DrawDetectionMap( detection_map_t * map )
 #ifdef PRINT_DETECTION_MAP
             printf(" - [%2d](%3d, %3d, %d)\n", c, e->thresh, e->density, e->tracking_id);
 #endif
-            int x = ((double)e->density / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET;
+            int x = ((double)e->density / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
             int y = (( 1 - (double)e->thresh / MAX_DETECTION_MAP_THRESH_VALUE) * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET*2;
             
             Vec3b color = rwhite;

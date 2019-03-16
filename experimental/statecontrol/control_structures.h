@@ -122,7 +122,9 @@ typedef struct
         proposed_secondary_id;
     uint8_t
         best_state,
-        best_cluster_id;
+        best_cluster_id,
+        observation_state,
+        current_state;
     double
         best_confidence,
         best_cluster_weight;

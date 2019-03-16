@@ -27,7 +27,7 @@
 //#include "rho_client.h"
 #endif
 
-#define KUMARASWAMY_CDF(X,A,B) (1 - pow( 1 - pow( X, A ), B))
+//#define KUMARASWAMY_CDF(X,A,B) (1 - pow( 1 - pow( X, A ), B))
 
 #ifdef __cplusplus
 extern "C" {

@@ -91,22 +91,24 @@ void ImageUtility::InitFile()
 {
     counter = 0;
     file = IMAGE_ROOT;
-    
     file.append(subdir);
-    file.append("/");
-    subdir = file;
-    if(num_frames > 0)
+    if( file.find(".png") == string::npos )
     {
-        LOG_IU(DEBUG_2, "With %d %dx%d frames.\n", num_frames, size.width, size.height);
-        counter = 1;
-        
-        file.append(to_string(counter%num_frames+1) );
-        file.append(".png");
-    }
-    else
-    {
-        LOG_IU(DEBUG_2, "With a single %dx%d frame.\n", size.width, size.height);
-        file.append(".bmp");
+        file.append("/");
+        subdir = file;
+        if(num_frames > 0)
+        {
+            LOG_IU(DEBUG_2, "With %d %dx%d frames.\n", num_frames, size.width, size.height);
+            counter = 1;
+            
+            file.append(to_string(counter%num_frames+1) );
+            file.append(".png");
+        }
+        else
+        {
+            LOG_IU(DEBUG_2, "With a single %dx%d frame.\n", size.width, size.height);
+            file.append(".bmp");
+        }
     }
     LOG_IU(DEBUG_2, "\tOpening file: %s\n", file.c_str());
     
@@ -228,7 +230,8 @@ Mat ImageUtility::GetNextImage()
 
 Mat ImageUtility::GetImage()
 {
-    file = subdir + to_string( counter%(num_frames+1) ) + ".png";
+    if(subdir.find(".png") == string::npos )
+        file = subdir + to_string( counter%(num_frames+1) ) + ".png";
     LOG_IU(DEBUG_2, "Opening file: %s\n", file.c_str());
     preimage = imread( file, IMREAD_COLOR );
     if( preimage.empty() )                      // Check for invalid input

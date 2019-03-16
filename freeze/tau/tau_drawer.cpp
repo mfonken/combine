@@ -171,11 +171,10 @@ Mat TauDrawer::DrawAll(void)
     return frame;
 }
 
-Mat& TauDrawer::GetDensitiesFrame(Mat& M)
+Mat& TauDrawer::GetDensitiesFrame(Mat &M)
 {
     pthread_mutex_lock(&drawer_mutex);
-    Mat temp(utility.outframe);
-    temp.copyTo(M(Rect(0,0,w,h)));
+    utility.outframe.copyTo(M);
     DrawDensityGraph(M);
     DrawDensityMaps(M);
     
@@ -199,7 +198,7 @@ Mat& TauDrawer::GetDensitiesFrame(Mat& M)
     putText(M, to_string(Qf[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_+36), FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     
     putText(M, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
-    putText(M, "State: " + string(stateString(rho.core.BayeSys.state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
+    putText(M, "State: " + string(stateString(rho.core.PredictiveStateModel.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
     
     putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
     line(M, Point(rho.core.Cx, rho.core.Cy), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
@@ -546,9 +545,9 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     state_P[NUM_STATES] = { 0. },
     x_nu = rho.core.PredictionPair.x.NuBlobs,
     y_nu = rho.core.PredictionPair.y.NuBlobs;
-    state_t state = rho.core.BayeSys.state;
+    state_t state = rho.core.PredictiveStateModel.hmm.A.state;
     for(int i = 0; i < NUM_STATES; i++)
-        state_P[i] = rho.core.BayeSys.probabilities.map[i][state];
+        state_P[i] = rho.core.PredictiveStateModel.hmm.A.probabilities.map[i][state];
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
     pid_data[pid_data_x] = rho.core.TargetFilter.value;

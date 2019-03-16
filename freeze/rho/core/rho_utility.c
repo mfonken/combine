@@ -525,6 +525,7 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
         RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[m]]);
     }
     
+    /* Calculate confidence */
     if( updated )
     {
         average_difference = total_difference / (floating_t)updated;
@@ -628,8 +629,9 @@ void ResetForPredictionRhoUtility( prediction_predict_variables * _, prediction_
 
 void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables * _, rho_core_t * core )
 {
+    /* Check if X or Y are ambiguous */
     if(   !( ( _->Ax < _->Cx ) ^ ( _->Bx > _->Cx ) )
-       || !( ( _->Ay < _->Cy ) ^ ( _->By > _->Cy ) ) ) /* Check if X or Y are ambiguous */
+       || !( ( _->Ay < _->Cy ) ^ ( _->By > _->Cy ) ) )
     {
         RhoUtility.Predict.RedistributeDensities( core );
         _->qcheck = (  core->Qf[0] > core->Qf[1] ) + ( core->Qf[2] < core->Qf[3] ) - 1;
@@ -693,7 +695,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     floating_t state_tune_factor = 0.;
     core->TargetCoverageFactor = core->TargetFilter.value;
-    switch(core->BayeSys.state)
+    switch(core->PredictiveStateModel.current_state)
     {
         case UNSTABLE_MANY:
         case STABLE_MANY:
@@ -708,7 +710,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
         case STABLE_SINGLE:
         case UNSTABLE_NONE:
         case UNSTABLE_SINGLE:
-            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->BayeSys.state) ) / (floating_t)NUM_STATES;
+            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->PredictiveStateModel.current_state) ) / (floating_t)NUM_STATES;
             break;
         case STABLE_DOUBLE:
             core->TargetCoverageFactor = ZDIV( core->TotalCoverage, ( (floating_t)core->Width * (floating_t)core->Height ) );

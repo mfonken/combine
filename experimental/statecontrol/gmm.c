@@ -213,6 +213,7 @@ void SortClusterBoundariesOfGaussianMixtureModel( gaussian_mixture_model_t * mod
      * - Index is offset one to account for index 0
      */
     
+    
     /* Initialize list ascending list of all clusters to sort */
     uint8_t sorted[MAX_CLUSTERS], left_to_sort = model->num_clusters, num_boundaries = 0;
     for( uint8_t i = 0; i < model->num_clusters; i++ )

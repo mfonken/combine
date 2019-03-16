@@ -45,7 +45,7 @@
 //#define RHO_SQRT_HEIGHT     sqrt(CAPTURE_HEIGHT)
 //#define RHO_DIM_INFLUENCE   0.1
 //#define RHO_K_TARGET_IND    0.3
-#define RHO_K_TARGET        0.12//RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)
+#define RHO_K_TARGET        10//0.12//RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)
 #define RHO_VARIANCE_NORMAL 20.//RHO_SQRT_HEIGHT/5.0
 #define RHO_VARIANCE_SCALE  10.//RHO_SQRT_HEIGHT/3.0//1.32
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
@@ -102,7 +102,7 @@
 //#define FRAME_ROW_DELIMETER             0xabab //
 //#define FRAME_ROW_END                   0xef //
 
-#define THRESH_STEP_MAX     10
+#define THRESH_STEP_MAX     5
 #define THRESH_MIN          1
 #define THRESH_MAX          254
 

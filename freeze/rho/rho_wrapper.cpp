@@ -28,7 +28,7 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     pthread_mutex_init(&c_mutex, NULL);
     
     RhoCore.Initialize(&core, width, height);
-    MarkovFunctions.Sys.Initialize( &core.BayeSys );
+    PSMFunctions.Initialize( &core.PredictiveStateModel );
     backgrounding_event = false;
     
     RhoInterrupts.FRAME_INIT();

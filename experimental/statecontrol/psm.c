@@ -36,12 +36,13 @@ void UpdatePSM( psm_t * model, double nu )
     FSMFunctions.Sys.Update( &model->hmm.A, state_bands );
     
     /* Calculate best cluster/observation and update observation matrix */
-    uint8_t estimated_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    model->hmm.T = addToObservationBuffer( &model->hmm.O, estimated_state );
+    model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
+    model->hmm.T = addToObservationBuffer( &model->hmm.O, model->observation_state );
 
     /* Update state path prediction to best cluster */
     HMMFunctions.UpdateObservationMatrix( &model->hmm );
-    PSMFunctions.UpdateBestState( model );
+    
+    model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
     PSMFunctions.UpdateBestCluster( model, &model->state_bands );
     
     /* Generate proposals to complete update */
@@ -57,7 +58,10 @@ void UpdateStateBandsPSM( psm_t * model, double nu, double * bands, uint8_t num_
 void InfluenceStateBandsPSM( psm_t * model, band_list_t * band_list )
 {
     cluster_boundary_list_t cluster_boundaries = { MAX_CLUSTERS*2, 0 };
-    GMMFunctions.Model.SortClusterBoundaries( &model->gmm, &cluster_boundaries );
+    if( model->gmm.num_clusters )
+        GMMFunctions.Model.SortClusterBoundaries( &model->gmm, &cluster_boundaries );
+    else
+        
     PSMFunctions.FindStateBandLowerBoundaries( model, &cluster_boundaries, band_list );
     PSMFunctions.FindStateBandCenters( model, &cluster_boundaries, band_list );
 }
@@ -179,7 +183,7 @@ void FindTrueCentersOfStateBandsPSM( psm_t * model, cluster_boundary_list_t * cl
     }
 }
 
-void UpdateBestStatePSM( psm_t * model )
+uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, double * confidence )
 {
     uint8_t best_observation_id = 0;
     double best_observation_weight = 0.;
@@ -194,8 +198,8 @@ void UpdateBestStatePSM( psm_t * model )
             best_observation_weight = check;
         }
     }
-    model->best_state = best_observation_id;
-    model->best_confidence = best_observation_weight;
+    if( confidence != NULL) *confidence = best_observation_weight;
+    return best_observation_id;
 }
 
 void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
@@ -242,8 +246,11 @@ void GenerateProposalsPSM( psm_t * model )
     model->proposed_nu = proposed_center->a;
     model->proposed_thresh = proposed_center->b;
     
-    /* Update primary & secondary to reconstruct */
+    /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[model->best_cluster_id];
     model->proposed_primary_id = cluster->primary_id;
     model->proposed_primary_id = cluster->secondary_id;
+    
+    /* Update current state */
+    model->current_state = PSMFunctions.FindMostLikelyHiddenState( model, model->hmm.A.state, NULL );
 }
