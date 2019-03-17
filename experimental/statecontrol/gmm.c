@@ -121,6 +121,8 @@ void WeighGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 void InitializeGaussianMixtureModel( gaussian_mixture_model_t * model )
 {
     memset( model, 0, sizeof(gaussian_mixture_model_t) );
+    for( uint16_t i = 0; i < MAX_CLUSTERS; i++ )
+        model->cluster[i] = &(model->cluster_mem[i]);
 }
 double GetScoreSumOfClustersInGaussianMixtureModel( gaussian_mixture_model_t * model, vec2 * input )
 {
@@ -128,7 +130,7 @@ double GetScoreSumOfClustersInGaussianMixtureModel( gaussian_mixture_model_t * m
     gaussian_mixture_cluster_t * cluster;
     for( uint8_t i = 0; i < model->num_clusters; i++)
     {
-        cluster = &model->cluster[i];
+        cluster = model->cluster[i];
         GMMFunctions.Cluster.GetScore( cluster, input );
         score_sum += cluster->score;
     }
@@ -140,7 +142,7 @@ double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t 
     gaussian_mixture_cluster_t * cluster;
     for( uint8_t i = 0; i < model->num_clusters; i++)
     {
-        cluster = &model->cluster[i];
+        cluster = model->cluster[i];
         GMMFunctions.Cluster.UpdateInputProbability( cluster, total_probability );
         if( cluster->score > MIN_CLUSTER_SCORE)
             GMMFunctions.Cluster.ContributeToOutput( cluster, input, output );
@@ -160,7 +162,7 @@ double GetMaxErrorOfGaussianMixtureModel( gaussian_mixture_model_t * model, vec2
 void AddClusterToGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
 {
     uint8_t new_index = model->num_clusters;
-    GMMFunctions.Cluster.Initialize( &model->cluster[new_index], observation, value );
+    GMMFunctions.Cluster.Initialize( model->cluster[new_index], observation, value );
     model->num_clusters++;
 }
 void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
@@ -168,7 +170,7 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
     gaussian_mixture_cluster_t * cluster;
     for( uint8_t i = 0; i < model->num_clusters; i++ )
     {
-        cluster = &model->cluster[i];
+        cluster = model->cluster[i];
         GMMFunctions.Cluster.Update( cluster, observation, value );
     }
 }
@@ -204,67 +206,4 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
            || ( ( max_error > MAX_ERROR )
                && ( best_distance > MIN_MAHALANOBIS_DISTANCE_SQ ) ) ) )
         GMMFunctions.Model.AddCluster( model, observation, value );
-}
-void SortClusterBoundariesOfGaussianMixtureModel( gaussian_mixture_model_t * model, cluster_boundary_list_t * cluster_boundaries )
-{
-    /* Cluster sort list
-     * - Min boundaries are sorted as -<index+1>
-     * - Max boundaries are sorted as +<index+1>
-     * - Index is offset one to account for index 0
-     */
-    
-    
-    /* Initialize list ascending list of all clusters to sort */
-    uint8_t sorted[MAX_CLUSTERS], left_to_sort = model->num_clusters, num_boundaries = 0;
-    for( uint8_t i = 0; i < model->num_clusters; i++ )
-        sorted[i] = i+1;
-    
-    /* Cycle and sort all cluster boundaries */
-    do
-    {
-        for( uint8_t i = 0; i < model->num_clusters; i++ )
-        {
-            /* Skip clusters already sorted */
-            if( sorted[i] == 0 ) continue;
-            
-            /* Reset status variables */
-            bool next_is_min = true;
-            double next_boundary = model->cluster[0].min_y;
-            int8_t next_cluster = 1;
-            
-            /* Cycle through clusters to find next boundary (could be min or max of a cluster) */
-            for( uint8_t j = 1; j < model->num_clusters; j++ )
-            {
-                if( model->cluster[j].min_y < next_boundary )
-                {
-                    next_boundary = model->cluster[j].min_y;
-                    next_cluster = j+1;
-                    next_is_min = true;
-                }
-                if( model->cluster[j].max_y < next_boundary )
-                {
-                    next_boundary = model->cluster[j].max_y;
-                    next_cluster = j+1;
-                    next_is_min = false;
-                }
-            }
-            
-            /* Store boundary in cluster boundaries and mark cluster as sorted if ended */
-            cluster_boundary_t next_cluster_boundary = (cluster_boundary_t){ next_boundary, -next_cluster };
-            if( !next_is_min )
-            {
-                next_cluster_boundary.label *= -1;
-                sorted[next_cluster-1] = 0;
-                left_to_sort--;
-            }
-            cluster_boundaries->list[num_boundaries++] = next_cluster_boundary;
-            
-            /* End if sort list is filled */
-            if( num_boundaries >= cluster_boundaries->length )
-            {
-                left_to_sort = 0;
-                break;
-            }
-        }
-    } while( left_to_sort > 0 );
 }

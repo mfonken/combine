@@ -16,7 +16,7 @@
 
 Rho::Rho( int width, int height ) : width(width), height(height)
 {
-    LOG_RHO(ALWAYS, "Initializing Rho Utility: %dx%d & [KTarg-%.3f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
+    LOG_RHO(ALWAYS, "Initializing Rho Utility: %dx%d & [KTarg-%d, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     size_t
         a = sizeof(redistribution_variables),
         b = sizeof(rho_detection_variables),

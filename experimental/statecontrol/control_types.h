@@ -47,6 +47,8 @@ extern "C" {
 #define VALID_CLUSTER_STD_DEV 2.
 #define MIN_CLUSTER_SCORE 1e-3f
 #define FALLBACK_MAX_ERROR 1e-2f
+    
+#define MAX_INPUT_COVARIANCE 200/// Change to dynamic
 
 #define MIN(A,B) (A<B?A:B)
 #define MAX(A,B) (A>B?A:B)
@@ -225,6 +227,7 @@ extern "C" {
     {
         vec2 mean;
         mat2x2 covariance;
+        uint8_t combinations;
     } gaussian2d_t;
     
     static gaussian1d_t getGaussian1dFrom2dY( gaussian2d_t * a )
@@ -238,6 +241,23 @@ extern "C" {
         double k = cov_y_a_var / ( cov_y_a_var + cov_y_b_var), mean_diff = b->mean - a->mean;
         c->mean = a->mean + k * mean_diff;
         c->std_dev = a->std_dev * ( 1 - k );
+    }
+    static void mulGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
+    { /* See https://math.stackexchange.com/questions/157172/product-of-two-multivariate-gaussians-distributions */
+        mat2x2 a_computation, b_computation, c_computation;
+        
+        getMat2x2Inverse( &a->covariance, &a_computation );
+        getMat2x2Inverse( &b->covariance, &b_computation );
+        mat2x2AddMat2x2( &a_computation, &b_computation, &c_computation );
+        getMat2x2Inverse( &c_computation, &c->covariance );
+        
+        vec2 a_computation_vec, b_computation_vec, c_computation_vec;
+        mat2x2DotVec2( &a_computation, &a->mean, &a_computation_vec );
+        mat2x2DotVec2( &b_computation, &b->mean, &b_computation_vec );
+        vec2AddVec2( &a_computation_vec, &b_computation_vec, &c_computation_vec );
+        mat2x2DotVec2( &c->covariance, &c_computation_vec, &c->mean );
+        
+        c->combinations = a->combinations + b->combinations + 1;
     }
     static void divGaussian1d( gaussian1d_t * a, gaussian1d_t * b, gaussian1d_t * c )
     {
@@ -273,8 +293,11 @@ extern "C" {
     
     typedef struct
     {
-        double lower_boundary;
-        vec2 true_center;
+        double
+        lower_boundary,
+        upper_boundary;
+        vec2
+        true_center;
     } band_t;
     
     typedef struct
@@ -309,6 +332,26 @@ extern "C" {
         scalarMulVec2( weight, &delta_mean, &weighted_mean );
         vec2AddVec2( &weighted_mean, &gaussian->mean, &gaussian->mean );
         return delta_mean;
+    }
+
+    static bool LimitCovariance( mat2x2 * covariance )
+    {
+        bool limited = false;
+        double max = covariance->a, check;
+        for(uint8_t i = 1; i < 4; i++ )
+        {
+            check = ((double *)covariance)[i];
+            if( check > max )
+                max = check;
+        }
+        if( max > MAX_INPUT_COVARIANCE )
+        {
+            double correction_factor = MAX_INPUT_COVARIANCE / max;
+            for(uint8_t i = 0; i < 4; i++ )
+                ((double *)covariance)[i] *= correction_factor;
+            limited = true;
+        }
+        return limited;
     }
     
     static void UpdateCovarianceWithWeight( vec2 * A, vec2 * B, gaussian2d_t * gaussian, double weight )
@@ -362,15 +405,23 @@ extern "C" {
         }
     }
     
-    static uint8_t GetNumLabels( label_manager_t * labels )
+    static uint32_t GetValidLabels( label_manager_t * labels )
     {
-        uint8_t num = 0;
+#if MAX_LABELS > 32
+#warning "Valid label mask is max 32 bit wide."
+#endif
+        uint32_t valid_vector = 0;
         for( uint8_t i = 0; i < MAX_LABELS; i++ )
         {
-            if( labels->average[i] > MIN_LABEL_CONTRIBUTION )
-                num++;
+            valid_vector |= ( labels->average[i] > MIN_LABEL_CONTRIBUTION ) << i;
         }
-        return num;
+        return valid_vector;
+    }
+    static uint8_t CountSet( uint32_t v )
+    {
+        uint8_t c = 0;
+        for( uint8_t i = 0, m = 1; i < 32; i++, c += !!(v & m), m <<= 1 );
+        return c;
     }
     
     typedef struct

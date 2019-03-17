@@ -22,9 +22,8 @@ void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_t *, uint8_t );
 void UpdatePSM(                         psm_t *, double  );
 void UpdateStateBandsPSM(               psm_t *, double , double *, uint8_t );
-void InfluenceStateBandsPSM(            psm_t *, band_list_t * );
-void FindLowerBoundariesOfStateBandPSM( psm_t *, cluster_boundary_list_t *, band_list_t * );
-void FindTrueCentersOfStateBandsPSM(    psm_t *, cluster_boundary_list_t *, band_list_t * );
+void UpdateStateBandPSM(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
+void DiscoverStateBandsPSM(             psm_t *, band_list_t * );
 uint8_t FindMostLikelyHiddenStatePSM(   psm_t *, uint8_t, double * );
 void UpdateBestClusterPSM(              psm_t *, band_list_t * );
 uint8_t GetCurrentBandPSM(              psm_t *, band_list_t * );
@@ -36,9 +35,8 @@ typedef struct
     void (*ReportObservations)(             psm_t *, observation_t *, uint8_t );
     void (*Update)(                         psm_t *, double  );
     void (*UpdateStateBands)(               psm_t *, double , double *, uint8_t );
-    void (*InfluenceStateBands)(            psm_t *, band_list_t * );
-    void (*FindStateBandLowerBoundaries)(   psm_t *, cluster_boundary_list_t *, band_list_t * );
-    void (*FindStateBandCenters)(           psm_t *, cluster_boundary_list_t *, band_list_t * );
+    void (*UpdateStateBand)(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
+    void (*DiscoverStateBands)(             psm_t *, band_list_t * );
     uint8_t (*FindMostLikelyHiddenState)(   psm_t *, uint8_t, double * );
     void (*UpdateBestCluster)(              psm_t *, band_list_t * );
     uint8_t (*GetCurrentBand)(              psm_t *, band_list_t * );
@@ -51,9 +49,8 @@ static const psm_functions_t PSMFunctions =
     .ReportObservations = ReportObservationsPSM,
     .Update = UpdatePSM,
     .UpdateStateBands = UpdateStateBandsPSM,
-    .InfluenceStateBands = InfluenceStateBandsPSM,
-    .FindStateBandLowerBoundaries = FindLowerBoundariesOfStateBandPSM,
-    .FindStateBandCenters = FindTrueCentersOfStateBandsPSM,
+    .UpdateStateBand = UpdateStateBandPSM,
+    .DiscoverStateBands = DiscoverStateBandsPSM,
     .FindMostLikelyHiddenState = FindMostLikelyHiddenStatePSM,
     .UpdateBestCluster = UpdateBestClusterPSM,
     .GetCurrentBand = GetCurrentBandPSM,

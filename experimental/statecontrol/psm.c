@@ -51,136 +51,111 @@ void UpdatePSM( psm_t * model, double nu )
 
 void UpdateStateBandsPSM( psm_t * model, double nu, double * bands, uint8_t num_bands )
 {
-    PSMFunctions.InfluenceStateBands( model, &model->state_bands );
+    PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
 }
 
-void InfluenceStateBandsPSM( psm_t * model, band_list_t * band_list )
+void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
 {
-    cluster_boundary_list_t cluster_boundaries = { MAX_CLUSTERS*2, 0 };
-    if( model->gmm.num_clusters )
-        GMMFunctions.Model.SortClusterBoundaries( &model->gmm, &cluster_boundaries );
+    if( i > band_list->length ) return;
+    if( c == 0 )
+    { /* If no gaussian for band, zero state info */
+        if( !i )
+        {
+            band_list->band[i].lower_boundary = 700.;
+            band_list->band[i].upper_boundary = 700.;
+            band_list->band[i].true_center = (vec2){ 0., 0. };
+        }
+        else
+        {
+            band_list->band[i].lower_boundary = band_list->band[i-1].lower_boundary;
+            band_list->band[i].upper_boundary = band_list->band[i-1].upper_boundary;
+            band_list->band[i].true_center = band_list->band[i-1].true_center;
+        }
+    }
+    else if( c == -1 )
+    {
+        double boundary = band_list->band[i-1].upper_boundary;
+        band_list->band[i].lower_boundary = boundary;
+        band_list->band[i].upper_boundary = boundary;
+        band_list->band[i].true_center = (vec2){ band_list->band[i-1].true_center.a, boundary };
+    }
     else
-        
-    PSMFunctions.FindStateBandLowerBoundaries( model, &cluster_boundaries, band_list );
-    PSMFunctions.FindStateBandCenters( model, &cluster_boundaries, band_list );
+    { /* Otherwise set using cumulated band gaussian */
+        double radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV;
+        band_list->band[i].lower_boundary = band_gaussian->mean.b + radius;
+        band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
+        band_list->band[i].true_center = band_gaussian->mean;
+        if(i)
+        {
+            band_list->band[i-1].upper_boundary = band_list->band[i].lower_boundary;
+        }
+    }
 }
 
-void FindLowerBoundariesOfStateBandPSM( psm_t * model, cluster_boundary_list_t * cluster_boundaries, band_list_t * band_list )
+void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 {
-    uint8_t cluster_label_counts[MAX_CLUSTERS] = { 0 };
+    uint32_t processed_clusters = { 0 };
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
-        cluster_label_counts[i] = GetNumLabels( &model->gmm.cluster[i].labels );
+        GMMFunctions.Cluster.UpdateLimits( model->gmm.cluster[i] );
     
-    uint8_t band_id = 0, num_in_band = 0, num_observation_groups = 0;
-    bool valid_band = false;
-    double band_nu = 0;
-    for( uint8_t i = 0; i < cluster_boundaries->length ; i++ )
+    gaussian2d_t band_gaussian = { 0 };
+    band_list->band[0].lower_boundary = 700;
+    
+    int8_t current_band_id = 0, num_clusters_in_band = 0, num_to_process = model->gmm.num_clusters;
+    uint32_t running_label_vector = 0;
+    while(num_to_process-- > 0)
     {
-        /* Estimate mean of cluster in band */
-        uint8_t label = cluster_boundaries->list[i].label;
-        gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[label];
-        double mean_y_offset = band_list->band[band_id].true_center.b - cluster->gaussian_out.mean.b;
-        double mean_x_offset = GetMeanXAtGaussianYOffset( &cluster->gaussian_out, mean_y_offset );
-        double max_contrib = cluster->labels.average[0];
-        for( uint j = 1; j < MAX_LABELS; j++ )
+        /* Get next min cluster */
+        uint8_t min_id = 0;
+        double min_boundary = 0, check_boundary;
+        for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
-            if( max_contrib < cluster->labels.average[j] )
-                max_contrib = cluster->labels.average[j];
+            if( processed_clusters & m ) continue;
+            check_boundary = model->gmm.cluster[i]->max_y;
+            if( check_boundary > min_boundary )
+            {
+                min_boundary = check_boundary;
+                min_id = i;
+            }
         }
         
-        /* Factored mean accounts for contributing blobs in cluster */
-        double factored_mean_x_offset = mean_x_offset * ZDIV( 1., max_contrib );
-        if( BOUNDARY_START(label) )
-        {
-            num_in_band++;
-            band_nu += factored_mean_x_offset;
+        /* Check if new cluster has new label(s) */
+        uint32_t current_label_vector = GetValidLabels( &model->gmm.cluster[min_id]->labels );
+        uint32_t check = current_label_vector & ~running_label_vector;
+        if( check )
+        { /* If new labels in cluster */
+            uint32_t new_label_vector = running_label_vector | current_label_vector;
+            /* If new update skipped bands, if any */
+            current_band_id = CountSet(new_label_vector);
+            for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
+            {
+                PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
+                num_clusters_in_band = -1;
+            }
+            band_gaussian = model->gmm.cluster[min_id]->gaussian_in;
+            num_clusters_in_band = 1;
+            running_label_vector = new_label_vector;
         }
         else
-        {
-            num_in_band--;
-            band_nu -= factored_mean_x_offset;
+        { /* Otherwise cumulate current gaussian into band gaussian */
+            mulGaussian2d( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
+            num_clusters_in_band++;
         }
         
-        /* Ignore invalid band (bands with too many labels aka too much noise) */
-        valid_band = num_in_band < band_list->length;
-        
-        /* Update band id is less than new band, start new observation group */
-        if( valid_band &&
-           ( band_id < num_in_band ) )
-        {
-            band_id = num_in_band;
-            
-            if( band_id > 0 )
-            {
-                band_list->band[band_id].lower_boundary = cluster_boundaries->list[i].value;
-                band_list->band[band_id].true_center.a = band_nu;
-            }
-            
-            num_observation_groups++;
-        }
-    }
-    model->hmm.B.num_observation_symbols = num_observation_groups;
-}
+        if( !num_to_process )
+            PSMFunctions.UpdateStateBand( band_list, current_band_id, num_clusters_in_band, &band_gaussian );
 
-void FindTrueCentersOfStateBandsPSM( psm_t * model, cluster_boundary_list_t * cluster_boundaries, band_list_t * band_list )
-{
-    /* Cycle down clusters and count ones that open (have max) in band */
-    gaussian1d_t band_gaussian = { 0, 0 };
-    uint8_t band_elements[MAX_CLUSTERS] = { 0 }, num_band_elements = 0;
-    bool bump_to_next_band = false;
-    for( uint8_t i = band_list->length - 1; i >= 0; i-- )
-    {
-        if( !bump_to_next_band )
-        {
-            band_gaussian.mean = 0;
-            band_gaussian.std_dev = 0;
-        }
-        else
-            bump_to_next_band = false;
-        
-        for( uint8_t j = cluster_boundaries->length - 1; j >= 0; j-- )
-        {
-            uint8_t label = cluster_boundaries->list[j].label;
-            double lower_boundary = band_list->band[i].lower_boundary;
-            if( BOUNDARY_START(label) )
-            {
-                if( cluster_boundaries->list[j].value >= lower_boundary)
-                {
-                    gaussian1d_t new_gaussian = getGaussian1dFrom2dY( &model->gmm.cluster[label].gaussian_out );
-                    /* Copy if band gaussian is not initialized */
-                    if( !band_gaussian.std_dev )
-                        copyGaussian1d( &new_gaussian, &band_gaussian );
-                    /* Combine if not */
-                    else
-                        mulGaussian1d( &band_gaussian, &new_gaussian, &band_gaussian );
-                    band_elements[num_band_elements++] = label;
-                }
-            }
-            else if( --num_band_elements > 0 )
-            {/* If next band is not empty, recalculated band_gaussian */
-                gaussian1d_t new_gaussian = getGaussian1dFrom2dY( &model->gmm.cluster[band_elements[0]].gaussian_out );
-                copyGaussian1d( &new_gaussian, &band_gaussian );
-                
-                /* Contruct band gaussian without ended gaussian */
-                for( uint8_t i = 1; i < num_band_elements; i++ )
-                {
-                    new_gaussian = getGaussian1dFrom2dY( &model->gmm.cluster[band_elements[i]].gaussian_out );
-                    mulGaussian1d( &band_gaussian, &new_gaussian, &band_gaussian );
-                }
-            }
-            else
-            { /* Artificially calculated center of empty bands */
-                double upper_boundary = (i+2 >= band_list->length)
-                ? MAX_THRESH
-                : band_list->band[i+1].lower_boundary,
-                band_mean = (upper_boundary - lower_boundary) / 2,
-                band_std_dev = ( band_mean - lower_boundary ) / 2;
-                band_gaussian = (gaussian1d_t){ band_mean, band_std_dev };
-            }
-        }
-        band_list->band[i].true_center.b = band_gaussian.mean;
+        processed_clusters |= 1 << min_id;
     }
+    for( uint8_t i = current_band_id+1; i < band_list->length; i++ )
+        PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
+    band_list->band[band_list->length-1].upper_boundary = 0;
+    
+    printf("State bands: \n");
+    for( uint8_t i = 0; i < band_list->length; i++ )
+        printf(" %d: (%.3f %.3f)  C<%.3f %.3f>\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
+    printf("\n");
 }
 
 uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, double * confidence )
@@ -212,7 +187,7 @@ void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
     int8_t best_cluster_id = -1;
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
     {
-        gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[i];
+        gaussian_mixture_cluster_t * cluster = model->gmm.cluster[i];
         if( IN_RANGE( cluster->gaussian_out.mean.b, lower_bound, upper_bound ) )
         {
             GMMFunctions.Cluster.Weigh( cluster );
@@ -247,7 +222,7 @@ void GenerateProposalsPSM( psm_t * model )
     model->proposed_thresh = proposed_center->b;
     
     /* Update primary & secondary to be reconstructed */
-    gaussian_mixture_cluster_t * cluster = &model->gmm.cluster[model->best_cluster_id];
+    gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];
     model->proposed_primary_id = cluster->primary_id;
     model->proposed_primary_id = cluster->secondary_id;
     

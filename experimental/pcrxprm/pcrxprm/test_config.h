@@ -18,7 +18,7 @@ using namespace std;
 
 #define TITLE_STRING                    "PCR Alpha v0.03 xprm"
 #define GROUP_NAME                      "gradient//"
-#define FILE_NAME                       "double_circle_corner_triangle_fade"//double_circle_fade"//"single_circle_fade"//""//"single_triangle_fade" //"double_circle_corner_triangle_fade"
+#define FILE_NAME                       "double_circle_fade"//"single_triangle_fade"//double_circle_corner_triangle_fade"//"single_circle_fade"
 #define FILE_TYPE                       ".png"
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME FILE_NAME FILE_TYPE
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   1//31

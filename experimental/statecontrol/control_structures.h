@@ -46,18 +46,18 @@ typedef struct
 
 typedef struct
 {
-    gaussian_mixture_cluster_t
+    gaussian_mixture_cluster_t *
         cluster[MAX_CLUSTERS];
     uint8_t
         num_clusters,
         selected_cluster;
-    double
-        initial_variance;
     vec2
         min_in,
         max_in,
         max_out,
         min_out;
+    gaussian_mixture_cluster_t
+        cluster_mem[MAX_CLUSTERS];
 } gaussian_mixture_model_t;
 
 typedef struct

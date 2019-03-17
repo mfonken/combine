@@ -84,7 +84,7 @@ void Tau::trigger( void )
     }
     
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
-    rho.core.Thresh+=1;//0.2; ///TEST
+    rho.core.Thresh+=0.2; ///TEST
 }
 
 std::string Tau::serialize( void )

@@ -33,7 +33,6 @@ double GetMaxErrorOfGaussianMixtureModel(              gaussian_mixture_model_t 
 void AddClusterToGaussianMixtureModel(                 gaussian_mixture_model_t *, observation_t *, vec2 * );
 void UpdateGaussianMixtureModel(                       gaussian_mixture_model_t *, observation_t *, vec2 * );
 void AddValueToGaussianMixtureModel(                   gaussian_mixture_model_t *, observation_t *, vec2 * );
-void SortClusterBoundariesOfGaussianMixtureModel(      gaussian_mixture_model_t *, cluster_boundary_list_t * );
 
 typedef struct
 {
@@ -56,7 +55,6 @@ typedef struct
     void   (*AddCluster)(               gaussian_mixture_model_t *, observation_t *, vec2 * );
     void   (*Update)(                   gaussian_mixture_model_t *, observation_t *, vec2 * );
     void   (*AddValue)(                 gaussian_mixture_model_t *, observation_t *, vec2 * );
-    void   (*SortClusterBoundaries)(    gaussian_mixture_model_t *, cluster_boundary_list_t * );
 } gaussian_mixture_model_functions;
 
 typedef struct
@@ -83,7 +81,6 @@ static gaussian_mixture_functions GMMFunctions =
     .Model.AddCluster               = AddClusterToGaussianMixtureModel,
     .Model.Update                   = UpdateGaussianMixtureModel,
     .Model.AddValue                 = AddValueToGaussianMixtureModel,
-    .Model.SortClusterBoundaries    = SortClusterBoundariesOfGaussianMixtureModel,
 };
 
 #ifdef __cplusplus
