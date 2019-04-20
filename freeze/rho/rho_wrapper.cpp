@@ -18,12 +18,18 @@ Rho::Rho( int width, int height ) : width(width), height(height)
 {
     LOG_RHO(ALWAYS, "Initializing Rho Utility: %dx%d & [KTarg-%d, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     size_t
+        aa = CAPTURE_WIDTH + CAPTURE_HEIGHT,
         a = sizeof(redistribution_variables),
         b = sizeof(rho_detection_variables),
         c = sizeof(prediction_predict_variables),
-        d = sizeof(rho_core_t)-sizeof(density_t)*C_FRAME_SIZE+(2*(RHO_WIDTH+RHO_HEIGHT))*sizeof(density_t),
-        e = a + b + c + d;
-    LOG_RHO(ALWAYS, "\tSizes: RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", a, b, c, d>>10, ((double)e)/1024);
+        d = sizeof(rho_core_t)-sizeof(core.cframe),
+        e = a + b + c + d,
+        f = sizeof(density_map_pair_t),
+        g = sizeof(prediction_pair_t),
+        h = sizeof(rho_pid_t),
+        j = sizeof(psm_t);
+    LOG_RHO(ALWAYS, "\tSizes: Frame-%.3fkB RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
+    LOG_RHO(ALWAYS, "\tdenmapp-%luB\tpredmap: %luB\tpid: %luB\tpsm: %luB\n",f,g,h,j);
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     

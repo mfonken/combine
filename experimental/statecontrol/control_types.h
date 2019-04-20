@@ -18,6 +18,9 @@ extern "C" {
 #include <math.h>
 #include <string.h>
     
+#include "rho_kalman.h"
+#include "rho_config.h"
+    
 #ifndef ZDIV
 #define ZDIV_LNUM 1 << 10
 #define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
@@ -27,17 +30,19 @@ extern "C" {
 #define SET_MAX(A,B)    ( A = MAX ( A, B ) )
     
 #define MAX_THRESH 255
+#define MIN_THRESH 0
+#define THRESH_RANGE (MAX_THRESH - MIN_THRESH)
     
 #define TARGET_STATE 2
     
     //#define NUM_STATES              10
-#define NUM_OBSERVATION_SYMBOLS 2//5 // Should be max number of clusters in GMM
-#define MAX_OBSERVATIONS        (1 << 5) // Length of history
+#define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
+#define MAX_OBSERVATIONS        (1 << 3) // Length of history
 #define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
     
 #define MAX_DISTANCE 10000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-#define MAX_CLUSTERS 100
+#define MAX_CLUSTERS 10
 #define MAX_ERROR 20
 #define INITIAL_VARIANCE 1
 #define INV_INITIAL_VARIANCE (1/INITIAL_VARIANCE)
@@ -50,8 +55,13 @@ extern "C" {
     
 #define MAX_INPUT_COVARIANCE 200/// Change to dynamic
 
+#ifndef MIN
 #define MIN(A,B) (A<B?A:B)
+#endif
+    
+#ifndef MAX
 #define MAX(A,B) (A>B?A:B)
+#endif
     
 #define ALPHA 0.5
 #define BETA 4.
@@ -172,27 +182,22 @@ extern "C" {
 
     typedef enum
     {
-        UNKNOWN_STATE = 0,
-        STABLE_NONE,
-        UNSTABLE_NONE,
-        STABLE_SINGLE,
-        UNSTABLE_SINGLE,
-        STABLE_DOUBLE,
-        UNSTABLE_DOUBLE,
-        STABLE_MANY,
-        UNSTABLE_MANY,
+        UNKNOWN_STATE = -1,
+        UNDER_POPULATED,
+        TARGET_POPULATED,
+        OVER_POPULATED,
+        CHAOTIC,
         NUM_STATES
     } state_t;
     
-#define NUM_STATE_GROUPS ((uint8_t)NUM_STATES/2)
+#define NUM_STATE_GROUPS NUM_STATES
     
     /* Stability tracking for selec tions */
     typedef struct
     {
-        double primary;
-        double secondary;
-        double alternate;
-        double overall;
+        rho_kalman_t
+            state,
+            system;
     } stability_t;
     
     /* FSM state tree with fsm base */
@@ -281,6 +286,12 @@ extern "C" {
     
     typedef struct
     {
+        observation_t observations[MAX_OBSERVATIONS];
+        uint8_t length;
+    } observation_list_t;
+    
+    typedef struct
+    {
         double value;
         int8_t label;
     } cluster_boundary_t;
@@ -303,7 +314,7 @@ extern "C" {
     typedef struct
     {
         uint8_t length;
-        band_t band[NUM_STATE_GROUPS];
+        band_t band[NUM_STATES];
     } band_list_t;
     
     typedef struct
@@ -431,7 +442,7 @@ extern "C" {
         next, first, last, curr, prev;
     } observation_buffer_t;
     
-    static uint8_t addToObservationBuffer( observation_buffer_t * buffer, uint8_t v )
+    static uint8_t AddToObservationBuffer( observation_buffer_t * buffer, uint8_t v )
     {
         buffer->prev = buffer->curr;
         buffer->curr = v;

@@ -84,7 +84,12 @@ void Tau::trigger( void )
     }
     
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
-    rho.core.Thresh+=0.2; ///TEST
+    rho.core.Thresh+=1; ///TEST
+    rho.core.ThreshByte = (byte_t)rho.core.Thresh;
+    if(!(rho.core.ThreshByte % THRESH_FRAME_PRINT_STEP))
+    {
+        imwrite(FRAME_SAVE_ROOT + string("thresh_frame_") + to_string(rho.core.ThreshByte) + string(".png"), utility.outframe);
+    }
 }
 
 std::string Tau::serialize( void )

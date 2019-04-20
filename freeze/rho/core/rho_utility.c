@@ -86,6 +86,9 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     /* Background */
     core->BackgroundCounter = 0;
     core->BackgroundPeriod = BACKGROUNDING_PERIOD;
+    
+    core->Thresh = (double)(MAX_THRESH - MIN_THRESH) / 2.;
+    core->ThreshByte = (byte_t)core->Thresh;
 }
 
 void InitializeFiltersRhoUtility( rho_core_t * core )
@@ -141,8 +144,8 @@ void ResetForDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pr
     _->range[1] = d->centroid;
     _->range[2] = 0;
     
-    memset(&r->Probabilities, 0, sizeof(floating_t)*NUM_STATE_GROUPS);
-    memset(&r->Probabilities, 0, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
+    memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
 
     r->NuBlobs = 0;
     r->TotalDensity = 0;
@@ -643,7 +646,7 @@ void CombineAxisProbabilitesRhoUtility( prediction_pair_t * p )
 {
     /* Combine X & Y probabilities with confidence factor */
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
-        p->Probabilities.P[i] = ( ( p->x.Probabilities.confidence  * p->x.Probabilities.P[i] ) + ( p->y.Probabilities.confidence * p->y.Probabilities.P[i] ) ) / 2;
+        p->Probabilities.P[i] = ( ( p->x.Probabilities.confidence * p->x.Probabilities.P[i] ) + ( p->y.Probabilities.confidence * p->y.Probabilities.P[i] ) ) / 2;
     p->Probabilities.confidence = ( p->x.Probabilities.confidence + p->y.Probabilities.confidence ) / 2;
 }
 
@@ -671,7 +674,7 @@ void CalculateTuneRhoUtility( rho_core_t * core )
     /* Background-Tune on significant background */
     RhoUtility.Calculate.BackgroundTuneFactor( core );
     
-    /* State-Tune by BayeSM state */
+    /* State-Tune by FSM state */
     RhoUtility.Calculate.StateTuneFactor( core );
     
     /* Filtered-Tune on target difference */
@@ -697,30 +700,24 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     switch(core->PredictiveStateModel.current_state)
     {
-        case UNSTABLE_MANY:
-        case STABLE_MANY:
-            state_tune_factor = -3;
-            break;
-        case STABLE_NONE:
+        case CHAOTIC:
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[0], core->PredictionPair.x.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[1], core->PredictionPair.x.PreviousPeak[1] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
-            state_tune_factor = 1;
-        case STABLE_SINGLE:
-        case UNSTABLE_NONE:
-        case UNSTABLE_SINGLE:
-            state_tune_factor += STATE_TUNE_FACTOR * ((floating_t)UNSTABLE_DOUBLE - (floating_t)(core->PredictiveStateModel.current_state) ) / (floating_t)NUM_STATES;
+        case OVER_POPULATED:
+        case UNDER_POPULATED:
+            state_tune_factor += STATE_TUNE_FACTOR * ( (floating_t)TARGET_POPULATED - (floating_t)(core->PredictiveStateModel.current_state) ) / (floating_t)NUM_STATES;
             break;
-        case STABLE_DOUBLE:
+        case TARGET_POPULATED:
             core->TargetCoverageFactor = ZDIV( core->TotalCoverage, ( (floating_t)core->Width * (floating_t)core->Height ) );
             break;
         default:
             break;
     }
-    RhoKalman.Step( &core->TargetFilter, core->TargetCoverageFactor, 0. );
-    RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value);
-    core->Tune.state = state_tune_factor;
+    RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );
+    RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
+    core->Tune.state = core->ThreshFilter.Value;
 }
 
 void CalculateTargetTuneFactor( rho_core_t * core )
@@ -839,4 +836,21 @@ void GeneratePacketRhoUtility( rho_core_t * core )
     }
     
     RhoUtility.PrintPacket( &core->Packet, 3    );
+}
+
+void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, floating_t thresh )
+{
+    index_t i = 0;
+    for( ; i < r->NumBlobs && i < MAX_OBSERVATIONS; i++ )
+    {
+        index_t io = r->TrackingFiltersOrder[i];
+        floating_t x = r->TrackingFilters[io].value;
+        r->ObservationList.observations[i] = (observation_t){ x, thresh, io };
+    }
+    r->ObservationList.length = i;
+}
+void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
+{
+    RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->Thresh );
+    RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->Thresh );
 }

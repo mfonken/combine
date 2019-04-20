@@ -172,9 +172,9 @@
 		34001A60220A92B50060DC03 /* state_control */ = {
 			isa = PBXGroup;
 			children = (
-				34D03E71222F92340057F73C /* control_structures.h */,
-				34D03E79222F92350057F73C /* kumaraswamy.h */,
 				34D03E70222F92340057F73C /* control_types.h */,
+				34D03E79222F92350057F73C /* kumaraswamy.h */,
+				34D03E71222F92340057F73C /* control_structures.h */,
 				34D03E7A222F92350057F73C /* fsm_support.h */,
 				34D03E75222F92350057F73C /* fsm.h */,
 				34D03E78222F92350057F73C /* fsm.c */,

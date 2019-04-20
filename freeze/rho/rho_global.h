@@ -35,10 +35,14 @@ typedef volatile bool   flag_t;
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define RHO_DEBUG
-//#define STATEM_DEBUG
+//#define RHO_DEBUG
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
+
+//#define PSM_DEBUG
+//#define HMM_DEBUG
+//#define GMM_DEBUG
+//#define FSM_DEBUG
 
 #ifndef LOG_LEVEL
 #define LOG_LEVEL
@@ -52,7 +56,7 @@ enum LogLevel
 };
 #endif
 
-#define TEST_LOG_LEVEL ALWAYS
+#define TEST_LOG_LEVEL DEBUG_1
 
 #ifndef LOG
 #define LOG(L,...) if(L >= TEST_LOG_LEVEL) \
@@ -63,12 +67,6 @@ enum LogLevel
 #define LOG_RHO(L,...) LOG(L,"<Rho> " __VA_ARGS__)
 #else
 #define LOG_RHO(...)
-#endif
-
-#ifdef STATEM_DEBUG
-#define LOG_STATEM(L,...) LOG(L,"<State> " __VA_ARGS__)
-#else
-#define LOG_STATEM(...)
 #endif
 
 #ifdef KALMAN_DEBUG
@@ -82,6 +80,31 @@ enum LogLevel
 #else
 #define LOG_PACKET(...)
 #endif
+
+#ifdef PSM_DEBUG
+#define LOG_PSM(L,...) LOG(L,"<PSM> " __VA_ARGS__)
+#else
+#define LOG_PSM(...)
+#endif
+
+#ifdef HMM_DEBUG
+#define LOG_HMM(L,...) LOG(L,"<HMM> " __VA_ARGS__)
+#else
+#define LOG_HMM(...)
+#endif
+
+#ifdef GMM_DEBUG
+#define LOG_GMM(L,...) LOG(L,"<GMM> " __VA_ARGS__)
+#else
+#define LOG_GMM(...)
+#endif
+
+#ifdef FSM_DEBUG
+#define LOG_FSM(L,...) LOG(L,"<FSM> " __VA_ARGS__)
+#else
+#define LOG_FSM(...)
+#endif
+
 
 #ifndef MAX
 #define MAX(A,B)        ((A>B)?A:B)

@@ -43,8 +43,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.DetectPairs( core );
         LOG_RHO(DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO(DEBUG_2,"Updating threshold.\n");
-        RhoCore.UpdateThreshold( core );
+//        LOG_RHO(DEBUG_2,"Updating threshold.\n");
+//        RhoCore.UpdateThreshold( core );
 //        LOG_RHO(DEBUG_2,"Generating packets.\n");
 //        RhoCore.GeneratePacket( core );
     }
@@ -101,22 +101,26 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     LOG_RHO(DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
+    /*** TEST ***/
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
-//    PSMFunctions.Update( &core->PredictiveStateModel, ( core->PredictionPair.x.NuBlobs + core->PredictionPair.y.NuBlobs ) / 2 ); /// TODO: Generalize to be dimensionless
-    
-    prediction_predict_variables _;
-    
-    RhoUtility.Reset.Prediction( &_, &core->PredictionPair, core->Cx, core->Cy );
-    RhoUtility.Predict.CorrectAmbiguity( &_, core );
-    RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
-    RhoUtility.Predict.UpdateCorePredictionData( &_, core );
+    /************/
+//    RhoUtility.Predict.GenerateObservationLists( core );
+//    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuBlobs ); /// TODO: Generalize to be dimensionless
+//    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuBlobs );
+//    
+//    prediction_predict_variables _;
+//    
+//    RhoUtility.Reset.Prediction( &_, &core->PredictionPair, core->Cx, core->Cy );
+//    RhoUtility.Predict.CorrectAmbiguity( &_, core );
+//    RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
+//    RhoUtility.Predict.UpdateCorePredictionData( &_, core );
 }
 
 /* Use background and state information to update image threshold */
 void UpdateRhoCoreThreshold( rho_core_t * core )
 {
     RhoUtility.Calculate.Tune( core );
-    core->Thresh = BOUND(core->Thresh - core->Tune.proposed, THRESH_MIN, THRESH_MAX);
+    core->Thresh = BOUND(core->Thresh + core->Tune.proposed, THRESH_MIN, THRESH_MAX);
     core->ThreshByte = (byte_t)core->Thresh;
 }
 

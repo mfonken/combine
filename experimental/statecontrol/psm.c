@@ -11,48 +11,70 @@
 void InitializePSM( psm_t * model )
 {
     GMMFunctions.Model.Initialize( &model->gmm );
-    KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES );
+    HMMFunctions.Initialize( &model->hmm );
+    KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1 );
     model->state_bands.length = NUM_STATE_GROUPS;
+    
+#ifdef __PSM__
+    double default_bands_intervals[] = STATE_KUMARASWAMY_INTERVALS;
+    double prev_boundary = 0., vertical_center = 0;
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+    {
+        band_t * band = &model->state_bands.band[i];
+        band->lower_boundary = prev_boundary;
+        band->upper_boundary = default_bands_intervals[i];
+        vertical_center = ( ( (double)( band->upper_boundary + band->lower_boundary ) ) * THRESH_RANGE ) / 2;
+        band->true_center = (vec2){ 0, vertical_center };
+    }
+#else
     memset( model->state_bands.band, 0, sizeof(model->state_bands.band) );
+#endif
 }
 
-void ReportObservationsPSM( psm_t * model, observation_t * observations, uint8_t num_observations )
+void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list )
 {
     /* Cycle through and add observations to gaussian mixture model */
     vec2 value = { 0 };
-    for( uint8_t i = 0; i < num_observations && i < MAX_OBSERVATIONS; i++ )
-        GMMFunctions.Model.AddValue( &model->gmm, &observations[i], &value );
-    model->hmm.M = model->gmm.num_clusters;
+    for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
+        GMMFunctions.Model.AddValue( &model->gmm, &observation_list->observations[i], &value );
+    model->current_observation = observation_list->length;
     // Analyse value
 }
 
-void UpdatePSM( psm_t * model, double nu )
+void UpdatePSM( psm_t * model, observation_list_t * observation_list, double nu )
 {
+#ifdef __PSM__
+    /* Report tracking observations & update state band knowledge  */
+    PSMFunctions.ReportObservations( model, observation_list );
+    PSMFunctions.DiscoverStateBands( model, &model->state_bands );
+    
+    /* Calculate current observation and update observation matrix */
+    model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
+    model->hmm.T = AddToObservationBuffer( &model->hmm.O, model->current_observation );// model->observation_state );
+    ///TODO: Compare model->observation_state with hmm recommendation
+    
+    /* Update state path prediction to best cluster */
+    HMMFunctions.UpdateObservationMatrix( &model->hmm );
+    
     /* Update state bands */
-    double state_bands[NUM_STATE_GROUPS] = { 0. };
-    PSMFunctions.UpdateStateBands( model, nu, state_bands, NUM_STATE_GROUPS );
+    floating_t state_bands[NUM_STATE_GROUPS] = { 0. },
+    observation_set[NUM_STATE_GROUPS];
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+        observation_set[i] = model->hmm.B.expected[i][model->current_observation];
+    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, state_bands, observation_set, NUM_STATE_GROUPS );
     
     /* Update states/transition matrix */
     FSMFunctions.Sys.Update( &model->hmm.A, state_bands );
-    
-    /* Calculate best cluster/observation and update observation matrix */
-    model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    model->hmm.T = addToObservationBuffer( &model->hmm.O, model->observation_state );
-
-    /* Update state path prediction to best cluster */
-    HMMFunctions.UpdateObservationMatrix( &model->hmm );
     
     model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
     PSMFunctions.UpdateBestCluster( model, &model->state_bands );
     
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
-}
-
-void UpdateStateBandsPSM( psm_t * model, double nu, double * bands, uint8_t num_bands )
-{
-    PSMFunctions.DiscoverStateBands( model, &model->state_bands );
-    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
+#else
+    double bands[NUM_STATE_GROUPS] = { 0 };
+//    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
+#endif
 }
 
 void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
@@ -100,7 +122,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         GMMFunctions.Cluster.UpdateLimits( model->gmm.cluster[i] );
     
     gaussian2d_t band_gaussian = { 0 };
-    band_list->band[0].lower_boundary = 700;
+    band_list->band[0].lower_boundary = HEIGHT;
     
     int8_t current_band_id = 0, num_clusters_in_band = 0, num_to_process = model->gmm.num_clusters;
     uint32_t running_label_vector = 0;
@@ -152,10 +174,10 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
     band_list->band[band_list->length-1].upper_boundary = 0;
     
-    printf("State bands: \n");
+    LOG_PSM(DEBUG_2, "State bands: \n");
     for( uint8_t i = 0; i < band_list->length; i++ )
-        printf(" %d: (%.3f %.3f)  C<%.3f %.3f>\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
-    printf("\n");
+        LOG_PSM(DEBUG_2, " %d: (%.3f %.3f)  C<%.3f %.3f>\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
+    LOG_PSM(DEBUG_2, "\n");
 }
 
 uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, double * confidence )
@@ -216,8 +238,12 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
 
 void GenerateProposalsPSM( psm_t * model )
 {
+    if( !model->gmm.num_clusters
+       || model->best_cluster_id >= model->gmm.num_clusters
+       || model->best_cluster_id < 0 ) return;
+    
     /* Update predictions */
-    vec2 * proposed_center = &model->state_bands.band[ model->best_state ].true_center;
+    vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
     model->proposed_nu = proposed_center->a;
     model->proposed_thresh = proposed_center->b;
     

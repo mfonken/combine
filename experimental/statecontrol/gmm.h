@@ -13,7 +13,7 @@
 extern "C" {
 #endif
     
-#include "hmm.h"
+#include "fsm.h"
 
 /* Cluster functions */
 void InitializeGaussianMixtureCluster(                 gaussian_mixture_cluster_t *, observation_t *, vec2 * );

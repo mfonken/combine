@@ -192,7 +192,7 @@ typedef struct
 
 typedef struct
 {
-    floating_t  P[NUM_STATE_GROUPS],
+    floating_t  P[NUM_STATES],
                 confidence;
 } prediction_probabilities;
 
@@ -210,6 +210,7 @@ typedef struct
     density_2d_t    PreviousDensity[2],
                     TotalDensity,
                     FilterDensity[2];
+    observation_list_t ObservationList;
     prediction_probabilities Probabilities;
 } prediction_t;
 

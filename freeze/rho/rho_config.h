@@ -9,7 +9,10 @@
 #ifndef global_config_h
 #define global_config_h
 
+#include "rho_global.h"
+
 #define __PCR__
+//#define __PSM__
 
 /* Camera Config */ 
 #define RHO_WIDTH        1280
@@ -125,7 +128,5 @@
 
 #define TARGET_TUNE_FACTOR  1.0
 #define STATE_TUNE_FACTOR   0.2
-
-#define STATE_KUMARASWAMY_INTERVALS { 0.2, 0.4, 0.65, 1.0 }
 
 #endif /* global_config_h */

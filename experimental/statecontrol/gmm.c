@@ -30,7 +30,7 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
 }
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
-    printf("m_maha: %.2f\n", cluster->mahalanobis_sq);
+    LOG_GMM(DEBUG_2, "m_maha: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
     double score_weight = ALPHA * safe_exp( -BETA * cluster->mahalanobis_sq );
@@ -41,7 +41,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     vec2 delta_mean_in = WeightedIncreaseMean( (vec2 *)observation, &cluster->gaussian_in, weight );
     vec2 delta_mean_out = WeightedIncreaseMean( output, &cluster->gaussian_out, weight );
     
-//    printf("m_mean: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
+//    LOG_GMM(DEBUG_2, "m_mean: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
     UpdateCovarianceWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
     UpdateCovarianceWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
@@ -56,17 +56,17 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
 }
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
-    vec2 input_delta;
+    vec2 input_delta = { 0 };
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
     cluster->mahalanobis_sq = CalculateMahalanobisDistanceSquared( &cluster->inv_covariance_in, &input_delta);
     cluster->score = safe_exp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
-//    printf("m_norm: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
-    double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d,
+//    LOG_GMM(DEBUG_2, "m_norm: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
+    double //cholesky_dms = cluster->llt_in.a * cluster->llt_in.d,
     norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
-//    printf(" %.2f %.2f\n", cholesky_dms, norm_factor);
+//    LOG_GMM(DEBUG_2, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
 }
 void UpdateInputProbabilityOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, double total_probability )
@@ -78,10 +78,10 @@ void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cl
 {
     vec2 input_delta;
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
-    vec2 inv_covariance_delta;
+    vec2 inv_covariance_delta = { 0 };
     mat2x2DotVec2(&cluster->inv_covariance_in, &input_delta, &inv_covariance_delta);
     
-    vec2 input_covariance, pre_condition, pre_output;
+    vec2 input_covariance, pre_condition = { 0 }, pre_output;
     mat2x2 cov_out_T = { cluster->gaussian_out.covariance.a, cluster->gaussian_out.covariance.c,
                          cluster->gaussian_out.covariance.b, cluster->gaussian_out.covariance.d };
     mat2x2DotVec2( &cov_out_T, &inv_covariance_delta, &input_covariance );
@@ -199,7 +199,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     double max_error = GMMFunctions.Model.GetMaxError( model, &output, value, &min_max_delta );
     
     GMMFunctions.Model.Update( model, observation, value );
-//    printf("Max error: %.2f\n", max_error);
+//    LOG_GMM(DEBUG_2, "Max error: %.2f\n", max_error);
     /* Add cluster if error or distance is to high for a cluster match */
     if( model->num_clusters < MAX_CLUSTERS
        && ( !model->num_clusters

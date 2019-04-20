@@ -124,7 +124,8 @@ typedef struct
         best_state,
         best_cluster_id,
         observation_state,
-        current_state;
+        current_state,
+        current_observation;
     double
         best_confidence,
         best_cluster_weight;

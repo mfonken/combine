@@ -9,20 +9,22 @@ int main(int argc, const char * argv[])
       );
     Environment env(&tau, TAU_FPS);
     env.start();
-//    env.pause();
-//    sleep(0.1);
-//    env.resume();
+    env.pause();
+    sleep(0.1);
+    env.resume();
     Mat local_frame;
     while(1)
     {
         local_frame = tau.GetDensitiesFrame(tau.frame);
-//        imshow("Thresh Frame", tau.utility.outframe);
-        imshow(TITLE_STRING, local_frame);
-        imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
-//        imshow("Rho Frame", local_frame);
-//        imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
-//        imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
-
+        if(local_frame.data != nullptr)
+        {
+//          imshow("Thresh Frame", tau.utility.outframe);
+          imshow(TITLE_STRING, local_frame);
+          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
+//          imshow("Rho Frame", local_frame);
+//          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
+//          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
+        }
         char c = waitKey(KEY_DELAY);
         switch(c)
         {
