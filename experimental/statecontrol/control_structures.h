@@ -34,6 +34,7 @@ typedef struct
     double
         mahalanobis_sq,
         log_gaussian_norm_factor,
+        probability_of_in,
         probability_condition_input,
         score, weight;
     mat2x2

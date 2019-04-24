@@ -37,21 +37,37 @@ extern "C" {
     
     //#define NUM_STATES              10
 #define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
-#define MAX_OBSERVATIONS        (1 << 3) // Length of history
+#define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
     
-#define MAX_DISTANCE 10000.f
+#define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-#define MAX_CLUSTERS 10
-#define MAX_ERROR 20
-#define INITIAL_VARIANCE 1
-#define INV_INITIAL_VARIANCE (1/INITIAL_VARIANCE)
-#define MIN_MAHALANOBIS_DISTANCE_SQ 1.386f
-#define MAX_MAHALANOBIS_SQ_FOR_UPDATE 1000.f
+//#define ABSOLUTE_MAX_CLUSTERS 300
+#define MAX_CLUSTERS 100
+#define MAX_ERROR 0.2
+#define INITIAL_VARIANCE 50//150//3//3
+#define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
+#define MAX_MAHALANOBIS_SQ 9//.386f
+#define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ//20.f
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
-#define VALID_CLUSTER_STD_DEV 2.
-#define MIN_CLUSTER_SCORE 1e-3f
+#define VALID_CLUSTER_STD_DEV 0.25
+#define MIN_CLUSTER_SCORE 0.0005///1e-3f
 #define FALLBACK_MAX_ERROR 1e-2f
+#define ALPHA 0.025
+#define BETA 1
+
+//#define MAX_DISTANCE 10000.f
+//#define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
+//#define MAX_CLUSTERS 10
+//#define MAX_ERROR 20
+//#define INITIAL_VARIANCE 1
+//#define INV_INITIAL_VARIANCE (1/INITIAL_VARIANCE)
+//#define MIN_MAHALANOBIS_DISTANCE_SQ 1.386f
+//#define MAX_MAHALANOBIS_SQ_FOR_UPDATE 1000.f
+//#define SMALL_VALUE_ERROR_OFFSET 1e-4f
+//#define VALID_CLUSTER_STD_DEV 2.
+//#define MIN_CLUSTER_SCORE 1e-3f
+//#define FALLBACK_MAX_ERROR 1e-2f
     
 #define MAX_INPUT_COVARIANCE 200/// Change to dynamic
 
@@ -62,9 +78,6 @@ extern "C" {
 #ifndef MAX
 #define MAX(A,B) (A>B?A:B)
 #endif
-    
-#define ALPHA 0.5
-#define BETA 4.
     
 #define MAX_LABELS 10
 #define LABEL_MOVING_AVERAGE_MAX_HISTORY 10
@@ -109,8 +122,8 @@ extern "C" {
         if( det )
         {
             res->a = mat->a / det;
-            res->b = mat->b / det;
-            res->c = mat->c / det;
+            res->b = -mat->b / det;
+            res->c = -mat->c / det;
             res->d = mat->d / det;
         }
         else
@@ -165,10 +178,11 @@ extern "C" {
     {
         mat2x2 L = { 0., 0., 0., 0. };
         L.a = sqrt( mat->a );
+        L.b = mat->b;
         L.c = ZDIV( mat->c, L.a );
-        L.d = sqrt( mat->d - L.c );
-        mat2x2 LT = { L.a, L.c, L.b, L.d };
-        mat2x2MulMat2x2( &L, &LT, llt );
+        L.d = sqrt( mat->d - L.c * L.c );
+        if( L.d == 0) L.d = 1;
+        *llt = L;
     }
     
     static double CalculateMahalanobisDistanceSquared(mat2x2 * inv_covariance, vec2 * delta)
@@ -306,7 +320,8 @@ extern "C" {
     {
         double
         lower_boundary,
-        upper_boundary;
+        upper_boundary,
+        variance;
         vec2
         true_center;
     } band_t;
@@ -375,11 +390,13 @@ extern "C" {
         mat2x2 covariance_delta_factor, unweighted_covariance_factor =
         { delta_mean_a_a, delta_mean_a_b, delta_mean_a_b, delta_mean_b_b };
         
-        printf("m_covf: <%.2f %.2f> [%.2f %.2f | %.2f %.2f]\n", A->a, A->b, unweighted_covariance_factor.a, unweighted_covariance_factor.b, unweighted_covariance_factor.c, unweighted_covariance_factor.d);
+//        printf("m_covf: <%.2f %.2f> [%.2f %.2f | %.2f %.2f]\n", A->a, A->b, unweighted_covariance_factor.a, unweighted_covariance_factor.b, unweighted_covariance_factor.c, unweighted_covariance_factor.d);
         
         mat2x2SubMat2x2( &unweighted_covariance_factor, &gaussian->covariance, &covariance_delta_factor );
         scalarMulMat2x2( weight, &covariance_delta_factor, &covariance_delta_factor );
         mat2x2AddMat2x2( &gaussian->covariance, &covariance_delta_factor, &gaussian->covariance );
+        
+        LimitCovariance( &gaussian->covariance );
     }
     
     static bool ReportLabel( label_manager_t * labels, uint8_t new_label )

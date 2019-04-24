@@ -20,6 +20,7 @@ extern "C" {
 
 // TEMP LOCATION
 #define HEIGHT 700
+#define WIDTH HEIGHT
     
 void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_list_t * );

@@ -12,8 +12,8 @@
 #include "rho_types.h"
 
 #define WRITE_DETECTION_MAP_TO_FILE "/Users/matthew/Desktop/gmmtest/data/dm.txt"
-#define DETECTION_MAP_DESCRIPTOR "triple_circle_corner_triangle_fade_high_contrast"//"double_circle_corner_triangle_fade_high_contrast"
-#define SHAKE_INJECTION 10
+#define DETECTION_MAP_DESCRIPTOR "double_circle_corner_triangle_fade_high_contrast"//"triple_circle_corner_triangle_fade_high_contrast"
+#define SHAKE_INJECTION 1//10
 
 static FILE * detection_map_file;
 

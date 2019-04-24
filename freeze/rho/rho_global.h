@@ -39,8 +39,8 @@ typedef volatile bool   flag_t;
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 
-//#define PSM_DEBUG
-//#define HMM_DEBUG
+#define PSM_DEBUG
+#define HMM_DEBUG
 //#define GMM_DEBUG
 //#define FSM_DEBUG
 
@@ -89,8 +89,10 @@ enum LogLevel
 
 #ifdef HMM_DEBUG
 #define LOG_HMM(L,...) LOG(L,"<HMM> " __VA_ARGS__)
+#define LOG_HMM_BARE(L,...) LOG(L,"" __VA_ARGS__)
 #else
 #define LOG_HMM(...)
+#define LOG_HMM_BARE(...)
 #endif
 
 #ifdef GMM_DEBUG

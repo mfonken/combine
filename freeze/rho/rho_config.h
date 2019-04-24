@@ -12,7 +12,9 @@
 #include "rho_global.h"
 
 #define __PCR__
-//#define __PSM__
+#define __PSM__
+
+#define SPOOF_STATE_BANDS
 
 /* Camera Config */ 
 #define RHO_WIDTH        1280

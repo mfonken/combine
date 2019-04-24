@@ -14,9 +14,9 @@
 
 #define DETECTION_ELEMENT_RADIUS    4
 
-#define DETECTION_MAP_FRAME_OWIDTH  500
-#define DETECTION_MAP_FRAME_OHEIGHT 500
-#define DETECTION_MAP_INSET         15
+#define DETECTION_MAP_FRAME_OWIDTH  700
+#define DETECTION_MAP_FRAME_OHEIGHT DETECTION_MAP_FRAME_OWIDTH
+#define DETECTION_MAP_INSET         0//15
 #define DETECTION_MAP_FRAME_IWIDTH  DETECTION_MAP_FRAME_OWIDTH-DETECTION_MAP_INSET+DETECTION_ELEMENT_RADIUS
 #define DETECTION_MAP_FRAME_IHEIGHT DETECTION_MAP_FRAME_OHEIGHT-DETECTION_MAP_INSET+DETECTION_ELEMENT_RADIUS
 
@@ -25,16 +25,41 @@
 
 #define DETECTION_MAP_INTERVAL  10
 
+#define COV_SCALE 0.25
+
+#define NUM_LABELS_TO_SHOW 5
+
 using namespace cv;
+
+static double GetCovarianceAngle( mat2x2 * covariance )
+{
+    double a = covariance->a, b = covariance->b, d = covariance->d,
+    a_minus_d = a - d,
+    radius = sqrt( a_minus_d * a_minus_d + 4. * b * b ),
+    lambda = a_minus_d + radius;
+    return atan2( -2 * b, a - lambda ) * 180 / M_PI;
+}
+
+template <typename T>
+static std::string pto_string(const T a_value, const int n = 6)
+{
+    std::ostringstream out;
+    out.precision(n);
+    out << std::fixed << a_value;
+    return out.str();
+}
+
 
 class RhoDrawer
 {
     uint16_t counter = 0;
     Mat detection_map_frame;
+    psm_t * psm;
 public:
-    RhoDrawer();
+    RhoDrawer(psm_t *);
 
     void DrawDetectionMap( detection_map_t * );
+    void PostProcess( psm_t * );
     
     Mat& GetDetectionMapFrame() {return detection_map_frame;}
 };

@@ -155,6 +155,7 @@ void UpdateObservationMatrixHMM( hidden_markov_model_t * model )
 {
     /* Gamma matrix update */
     HMMFunctions.BaumWelchGammaSolve( model );
+    HMMFunctions.PrintObservationMatrix( model );
     
     /* Observation matrix update */
     for( uint8_t j = 0; j < NUM_STATES; j++ )
@@ -162,12 +163,14 @@ void UpdateObservationMatrixHMM( hidden_markov_model_t * model )
         double row_sum = 0.;
         for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
             row_sum += model->G.cumulative_value[i][j];
+        
+        LOG_HMM(DEBUG_2, "Gamma:\n");
         for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
         {
-            LOG_HMM(DEBUG_2, "|%.4f|", model->G.cumulative_value[i][j]);
+            LOG_HMM_BARE(DEBUG_2, "|%.4f|", model->G.cumulative_value[i][j]);
             model->B.expected[j][i] = ZDIV( model->G.cumulative_value[i][j], row_sum );
         }
-        LOG_HMM(DEBUG_2, "\n");
+        LOG_HMM_BARE(DEBUG_2, "\n");
     }
 }
 
@@ -184,7 +187,7 @@ void BaumWelchGammaSolveHMM( hidden_markov_model_t * model )
 {
     /* Update state expectation matrix */
     uint8_t k = model->O.prev, l = model->O.curr;
-    LOG_HMM(DEBUG_2, "%s,%s  ", k?"E":"N", l?"E":"N");
+//    LOG_HMM(DEBUG_2, "%s,%s  ", k?"E":"N", l?"E":"N");
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
         for( uint8_t j = 0; j < NUM_STATES; j++ )
@@ -194,7 +197,7 @@ void BaumWelchGammaSolveHMM( hidden_markov_model_t * model )
 //            c = model->p[i],
 //            d = model->B.expected[i][k];
             model->Es[k][l][i][j] = ForwardBackward(model, k, l, i, j);//)a * b * c * d;
-            LOG_HMM(DEBUG_2, "%.4f%s", model->Es[k][l][i][j], i&&j?" ":",");
+//            LOG_HMM(DEBUG_2, "%.4f%s", model->Es[k][l][i][j], i&&j?" ":",");
         }
     }
     /* Update maximum expectation matarix */
@@ -239,7 +242,7 @@ void BaumWelchGammaSolveHMM( hidden_markov_model_t * model )
         model->G.maximum[k] += observation_max;
     model->G.maximum[l] += observation_max;
 
-    LOG_HMM(DEBUG_2, "\n");
+    LOG_HMM_BARE(DEBUG_2, "\n");
 }
 
 
@@ -314,9 +317,9 @@ void PrintObservationMatrixHMM( hidden_markov_model_t * model )
         double row_s = 0;
         for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
         {
-            LOG_HMM(DEBUG_2, "|%.4f|", model->B.expected[j][i]);
+            LOG_HMM_BARE(DEBUG_2, "|%.4f|", model->B.expected[j][i]);
             row_s += model->B.expected[j][i];
         }
-        LOG_HMM(DEBUG_2, " = %.3f\n", row_s);
+        LOG_HMM_BARE(DEBUG_2, " = %.3f\n", row_s);
     }
 }

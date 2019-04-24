@@ -38,6 +38,8 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
         GMMFunctions.Model.AddValue( &model->gmm, &observation_list->observations[i], &value );
     model->current_observation = observation_list->length;
+    if( observation_list->length > 0 )
+        model->previous_thresh = observation_list->observations[0].b;
     // Analyse value
 }
 
@@ -45,7 +47,8 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, double nu 
 {
 #ifdef __PSM__
     /* Report tracking observations & update state band knowledge  */
-    PSMFunctions.ReportObservations( model, observation_list );
+    if( observation_list->length > 0 )
+        PSMFunctions.ReportObservations( model, observation_list );
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     
     /* Calculate current observation and update observation matrix */
@@ -72,7 +75,7 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, double nu 
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
 #else
-    double bands[NUM_STATE_GROUPS] = { 0 };
+//    double bands[NUM_STATE_GROUPS] = { 0 };
 //    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
 #endif
 }
@@ -84,15 +87,11 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
     { /* If no gaussian for band, zero state info */
         if( !i )
         {
-            band_list->band[i].lower_boundary = 700.;
-            band_list->band[i].upper_boundary = 700.;
-            band_list->band[i].true_center = (vec2){ 0., 0. };
+            band_list->band[i] = (band_t){ HEIGHT, HEIGHT,  0., (vec2){ 0., 0. } };
         }
         else
         {
-            band_list->band[i].lower_boundary = band_list->band[i-1].lower_boundary;
-            band_list->band[i].upper_boundary = band_list->band[i-1].upper_boundary;
-            band_list->band[i].true_center = band_list->band[i-1].true_center;
+            memcpy( &band_list->band[i], &band_list->band[i-1], sizeof(band_t) );
         }
     }
     else if( c == -1 )
@@ -101,13 +100,15 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
         band_list->band[i].lower_boundary = boundary;
         band_list->band[i].upper_boundary = boundary;
         band_list->band[i].true_center = (vec2){ band_list->band[i-1].true_center.a, boundary };
+        band_list->band[i].variance = band_list->band[i-1].variance;
     }
     else
     { /* Otherwise set using cumulated band gaussian */
-        double radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV;
+        double radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV * 5;
         band_list->band[i].lower_boundary = band_gaussian->mean.b + radius;
         band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
         band_list->band[i].true_center = band_gaussian->mean;
+        band_list->band[i].variance = band_gaussian->covariance.d;
         if(i)
         {
             band_list->band[i-1].upper_boundary = band_list->band[i].lower_boundary;
@@ -117,6 +118,20 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
 
 void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 {
+#ifdef SPOOF_STATE_BANDS
+    band_list->length = NUM_STATE_GROUPS;
+    double prev = 0, curr, center;
+    double spoof_bands[] = { 0.25, 0.5, 0.75, 1. };
+    double spoof_deviation = 40.;
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+    {
+        curr = spoof_bands[i] * HEIGHT;
+        center = ( curr + prev ) / 2;
+        band_list->band[NUM_STATE_GROUPS - 1 - i] = (band_t){ curr, prev, spoof_deviation, (vec2){ (1 - spoof_bands[i]) * WIDTH, center } };
+        prev = curr;
+    }
+    return;
+#else
     uint32_t processed_clusters = { 0 };
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
         GMMFunctions.Cluster.UpdateLimits( model->gmm.cluster[i] );
@@ -174,10 +189,14 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
     band_list->band[band_list->length-1].upper_boundary = 0;
     
-    LOG_PSM(DEBUG_2, "State bands: \n");
-    for( uint8_t i = 0; i < band_list->length; i++ )
-        LOG_PSM(DEBUG_2, " %d: (%.3f %.3f)  C<%.3f %.3f>\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
-    LOG_PSM(DEBUG_2, "\n");
+    if(band_list->length > 0)
+    {
+        LOG_PSM(DEBUG_2, "State bands: \n");
+        for( uint8_t i = 0; i < band_list->length; i++ )
+            LOG_PSM(DEBUG_2, " %d: (%.3f %.3f)  C<%.3f %.3f>[%.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
+        LOG_PSM(DEBUG_2, "\n");
+    }
+#endif
 }
 
 uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, double * confidence )
@@ -229,8 +248,8 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
     uint8_t state = 0;
     for( ; state < band_list->length-1; state++ )
     {
-        /* If next boundary is abovet thresh, band is in current thresh */
-        if( model->previous_thresh < band_list->band[state+1].lower_boundary )
+        /* If next boundary is above thresh, band is in current thresh */
+        if( model->previous_thresh > band_list->band[state+1].lower_boundary )
             break;
     }
     return state;

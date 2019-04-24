@@ -15,22 +15,6 @@
 extern "C" {
 #endif    
     
-#ifndef LOG_LEVEL
-#define LOG_LEVEL
-    enum LogLevel
-    {
-        TEST = 0,
-        DEBUG_0,
-        DEBUG_1,
-        DEBUG_2,
-        ALWAYS
-    };
-#endif
-    
-#ifndef TEST_LOG_LEVEL
-#define TEST_LOG_LEVEL ALWAYS
-#endif
-    
 static inline uint8_t stateToSelection(uint8_t s) {return ((uint8_t)((s+1)/2) - 1);};
 static inline const char *stateString(int8_t s)
 {

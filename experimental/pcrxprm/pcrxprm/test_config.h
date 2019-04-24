@@ -13,24 +13,27 @@ using namespace cv;
 using namespace std;
 
 #define MAIN_FPS        15
-#define TAU_FPS         15
+#define TAU_FPS         10
 #define COMBINE_FPS     0
 
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define TITLE_STRING                    "PCR Alpha v0.03 xprm"
+#define IMAGE_TICKS                     2000
+
+#define TITLE_STRING                    "PCR Alpha v0.7 xprm"
 #define GROUP_NAME                      "gradient"//"frames"
-#define FILE_NAME                       "triple_circle_corner_triangle_fade_high_contrast"//"double_circle_corner_triangle_fade_high_contrast"// noiseS1"//"double_circle_corner_triangle_fade"//"single_triangle_fade"//"double_circle_fade"//"single_circle_fade"
+#define FILE_NAME                       "double_circle_corner_triangle_fade_high_contrast"//"triple_circle_corner_triangle_fade_high_contrast"// noiseS1"//"double_circle_corner_triangle_fade"//"single_triangle_fade"//"double_circle_fade"//"single_circle_fade"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 
 #if TYPE == IMAGE_SINGLE
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME FILE_TYPE
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES   IMAGE_TICKS
 #elif TYPE == IMAGE_SET
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME "/"
-#endif
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   31
+#endif
 
 #define THRESH_FRAME_PRINT_STEP         30
 

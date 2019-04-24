@@ -118,6 +118,7 @@ void ImageUtility::InitFile()
         LOG_IU(DEBUG_2, "Could not open or find the image.\n");
         return;
     }
+    
     live = true;
 }
 
@@ -183,10 +184,26 @@ void ImageUtility::trigger()
 #else
     preoutframe.copyTo(outframe);
 #endif
+    
+#ifdef ROTATE_IMAGE
+    double angle = 360 * (double)counter / (double)num_frames;
+    Point2f center(outframe.cols/2.0, outframe.rows/2.0);
+    Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
+    Rect2f bbox = cv::RotatedRect(Point2f(), outframe.size(), angle).boundingRect2f();
+    rot.at<double>(0,2) += bbox.width/2.0 - outframe.cols/2.0;
+    rot.at<double>(1,2) += bbox.height/2.0 - outframe.rows /2.0;
+    
+    Size original_size = outframe.size();
+    warpAffine(outframe, outframe, rot, bbox.size());
+    resize(outframe, outframe, original_size);
+#endif
+    
+    
     if(preoutframe.cols == 0)
         printf("");
     if(outframe.cols == 0)
         printf("");
+    
     cimageFromMat(outframe, outimage);
 }
 
@@ -214,6 +231,7 @@ int ImageUtility::loop(char c)
     }
     if( has_file ) preoutframe = GetImage();
     if( has_camera ) preoutframe = GetNextFrame();
+    
     return 1;
 }
 
@@ -356,7 +374,6 @@ void ImageUtility::generateImage(Mat& M)
         path_top = path_center_y - size.height/4,
         path_bottom = path_center_y + size.height/4;
     
-
     switch( path )
     {
         case CIRCLE_CENTERED:
