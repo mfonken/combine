@@ -63,7 +63,7 @@ typedef struct
 
 typedef struct
 {
-    double expected[NUM_STATES][NUM_OBSERVATION_SYMBOLS];
+    double expected[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
     double best[NUM_OBSERVATION_SYMBOLS];
     double gamma[NUM_STATES];
     uint8_t num_observation_symbols;
@@ -81,10 +81,7 @@ typedef expectation_element_t expectation_matrix_t[NUM_OBSERVATION_SYMBOLS];
 typedef double gamma_element_t[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
 typedef struct
 {
-    gamma_element_t
-    value,
-    cumulative_value,
-    cumulative_maximum;
+    gamma_element_t cumulative_value;
     double maximum[NUM_OBSERVATION_SYMBOLS];
 } gamma_matrix_t;
     
@@ -95,8 +92,6 @@ typedef struct
     observation_matrix_t    B;                   // Observation matrix
     observation_buffer_t    O;                   // Observation sequence
     state_expectation_matrix_t Es;               // State expectation matrix
-    expectation_matrix_t    E;                   // Expectation matrix
-    double                  K[NUM_STATES];       // Kumaraswamy boundaries
     gamma_matrix_t          G;                   // Gamma expectation matrix
     
     uint8_t
@@ -124,12 +119,15 @@ typedef struct
     uint8_t
         best_state,
         best_cluster_id,
-        observation_state,
-        current_state,
+        observation_state;
+    state_t
+        current_state;
+    observation_symbol_t
         current_observation;
     double
         best_confidence,
-        best_cluster_weight;
+        best_cluster_weight,
+        state_intervals[NUM_STATE_GROUPS];
 } psm_t;
     
 #ifdef __cplusplus

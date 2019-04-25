@@ -11,19 +11,19 @@
 void InitializePSM( psm_t * model )
 {
     GMMFunctions.Model.Initialize( &model->gmm );
-    HMMFunctions.Initialize( &model->hmm );
+    HMMFunctions.Initialize( &model->hmm, MANY_SYMBOL );
     KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1 );
     model->state_bands.length = NUM_STATE_GROUPS;
     
 #ifdef __PSM__
-    double default_bands_intervals[] = STATE_KUMARASWAMY_INTERVALS;
-    double prev_boundary = 0., vertical_center = 0;
+    floating_t default_bands_intervals[] = STATE_KUMARASWAMY_INTERVALS;
+    floating_t prev_boundary = 0., vertical_center = 0;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
         band_t * band = &model->state_bands.band[i];
         band->lower_boundary = prev_boundary;
         band->upper_boundary = default_bands_intervals[i];
-        vertical_center = ( ( (double)( band->upper_boundary + band->lower_boundary ) ) * THRESH_RANGE ) / 2;
+        vertical_center = ( ( (floating_t)( band->upper_boundary + band->lower_boundary ) ) * THRESH_RANGE ) / 2;
         band->true_center = (vec2){ 0, vertical_center };
     }
 #else
@@ -37,37 +37,67 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     vec2 value = { 0 };
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
         GMMFunctions.Model.AddValue( &model->gmm, &observation_list->observations[i], &value );
-    model->current_observation = observation_list->length;
+//    model->current_observation = observation_list->length;
+    HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
+    
     if( observation_list->length > 0 )
         model->previous_thresh = observation_list->observations[0].b;
     // Analyse value
 }
 
-void UpdatePSM( psm_t * model, observation_list_t * observation_list, double nu )
+void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
+{
+    floating_t observation_set[NUM_STATE_GROUPS], cumulative = 0.;
+    LOG_PSM(PSM_DEBUG, "Hidden:");
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+    {
+        cumulative += model->hmm.B.expected[model->current_observation][i];
+        observation_set[i] = cumulative;
+        LOG_PSM_BARE(PSM_DEBUG, "[%.4f]", model->hmm.B.expected[model->current_observation][i]);
+    }
+    LOG_PSM_BARE(PSM_DEBUG, "\n");
+    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, observation_set, NUM_STATE_GROUPS );
+    
+    LOG_PSM(PSM_DEBUG, "Update:");
+    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
+    {
+        LOG_PSM_BARE(PSM_DEBUG, "[%.4f]", model->state_intervals[i]);
+    }
+    LOG_PSM_BARE(PSM_DEBUG, "\n");
+}
+
+static uint count = 0;
+
+void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu )
 {
 #ifdef __PSM__
     /* Report tracking observations & update state band knowledge  */
     if( observation_list->length > 0 )
+    {
+        model->current_observation = round(nu);
+        if(model->current_observation >= MANY_SYMBOL)
+            model->current_observation = MANY_SYMBOL;
         PSMFunctions.ReportObservations( model, observation_list );
-    PSMFunctions.DiscoverStateBands( model, &model->state_bands );
+    }
     
     /* Calculate current observation and update observation matrix */
+    PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    model->hmm.T = AddToObservationBuffer( &model->hmm.O, model->current_observation );// model->observation_state );
+    
     ///TODO: Compare model->observation_state with hmm recommendation
     
     /* Update state path prediction to best cluster */
+    HMMFunctions.BaumWelchGammaSolve( &model->hmm );
     HMMFunctions.UpdateObservationMatrix( &model->hmm );
     
-    /* Update state bands */
-    floating_t state_bands[NUM_STATE_GROUPS] = { 0. },
-    observation_set[NUM_STATE_GROUPS];
-    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
-        observation_set[i] = model->hmm.B.expected[i][model->current_observation];
-    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, state_bands, observation_set, NUM_STATE_GROUPS );
-    
-    /* Update states/transition matrix */
-    FSMFunctions.Sys.Update( &model->hmm.A, state_bands );
+    if(count++ % 10 == 0)
+    {
+        /* Update state bands */
+        PSMFunctions.UpdateStateIntervals( model, nu );
+        
+        /* Update states/transition matrix */
+        FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
+    }
     
     model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
     PSMFunctions.UpdateBestCluster( model, &model->state_bands );
@@ -75,7 +105,7 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, double nu 
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
 #else
-//    double bands[NUM_STATE_GROUPS] = { 0 };
+//    floating_t bands[NUM_STATE_GROUPS] = { 0 };
 //    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
 #endif
 }
@@ -96,7 +126,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
     }
     else if( c == -1 )
     {
-        double boundary = band_list->band[i-1].upper_boundary;
+        floating_t boundary = band_list->band[i-1].upper_boundary;
         band_list->band[i].lower_boundary = boundary;
         band_list->band[i].upper_boundary = boundary;
         band_list->band[i].true_center = (vec2){ band_list->band[i-1].true_center.a, boundary };
@@ -104,7 +134,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
     }
     else
     { /* Otherwise set using cumulated band gaussian */
-        double radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV * 5;
+        floating_t radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV * 5;
         band_list->band[i].lower_boundary = band_gaussian->mean.b + radius;
         band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
         band_list->band[i].true_center = band_gaussian->mean;
@@ -120,9 +150,9 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 {
 #ifdef SPOOF_STATE_BANDS
     band_list->length = NUM_STATE_GROUPS;
-    double prev = 0, curr, center;
-    double spoof_bands[] = { 0.25, 0.5, 0.75, 1. };
-    double spoof_deviation = 40.;
+    floating_t prev = 0, curr, center;
+    floating_t spoof_bands[] = { 0.25, 0.5, 0.75, 1. };
+    floating_t spoof_deviation = 40.;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
         curr = spoof_bands[i] * HEIGHT;
@@ -145,7 +175,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     {
         /* Get next min cluster */
         uint8_t min_id = 0;
-        double min_boundary = 0, check_boundary;
+        floating_t min_boundary = 0, check_boundary;
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
             if( processed_clusters & m ) continue;
@@ -191,23 +221,23 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     
     if(band_list->length > 0)
     {
-        LOG_PSM(DEBUG_2, "State bands: \n");
+        LOG_PSM(PSM_DEBUG, "State bands: \n");
         for( uint8_t i = 0; i < band_list->length; i++ )
-            LOG_PSM(DEBUG_2, " %d: (%.3f %.3f)  C<%.3f %.3f>[%.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
-        LOG_PSM(DEBUG_2, "\n");
+            LOG_PSM(PSM_DEBUG, " %d: (%.3f %.3f)  C<%.3f %.3f>[%.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
+        LOG_PSM(PSM_DEBUG, "\n");
     }
 #endif
 }
 
-uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, double * confidence )
+uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, floating_t * confidence )
 {
     uint8_t best_observation_id = 0;
-    double best_observation_weight = 0.;
+    floating_t best_observation_weight = 0.;
     
     /* Determine target observation band */
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
     {
-        double check = model->hmm.B.expected[TARGET_STATE][i];
+        floating_t check = model->hmm.B.expected[TARGET_STATE][i];
         if( check > best_observation_weight )
         {
             best_observation_id = i;
@@ -220,7 +250,7 @@ uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, 
 
 void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
 {
-    double
+    floating_t
         lower_bound = band_list->band[model->best_state].lower_boundary,
         upper_bound = ( model->best_state + 1 >= NUM_STATE_GROUPS ) ?
             MAX_THRESH : band_list->band[model->best_state + 1].lower_boundary,

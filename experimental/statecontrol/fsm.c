@@ -159,19 +159,21 @@ void UpdateFSMState( fsm_system_t * sys )
 
 void PrintFSMMap( fsm_map_t * bm, state_t s )
 {
-#ifdef FSM_DEBUG
+#ifdef LOG_FSM
     reset_loop_variables( &_, bm->length );
-    for( _.i = 0; _.i < _.l; _.i++ ) LOG_FSM( DEBUG_2, "\t\t %s-[%d]", stateString((uint8_t)_.i), _.i);
+    LOG_FSM(DEBUG_1, "\t\t\t ");
+    for( _.i = 0; _.i < _.l; _.i++ ) LOG_FSM_BARE(DEBUG_1, "%s-[%d]\t\t ", stateString((uint8_t)_.i), _.i);
     for( _.i = 0; _.i < _.l; _.i++ )
     {
-        LOG_FSM( DEBUG_2, "\n%s-[%d]", stateString((uint8_t)_.i), _.i);
+        LOG_FSM_BARE(DEBUG_1, "\n");
+        LOG_FSM(DEBUG_1, "%s-[%d]", stateString((uint8_t)_.i), _.i);
         for( _.j = 0; _.j < _.l; _.j++ )
         {
             char c = ' ';
             if(_.j == (uint8_t)s) c = '|';
-            LOG_FSM( DEBUG_2, "\t%c[%.5f]%c",c, bm->map[_.j][_.i],c);
+            LOG_FSM_BARE(DEBUG_1, "\t%c[%.5f]%c",c, bm->map[_.j][_.i],c);
         }
     }
-    LOG_FSM( DEBUG_2, "\n");
+    LOG_FSM_BARE(DEBUG_1, "\n");
 #endif
 }

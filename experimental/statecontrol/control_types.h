@@ -204,6 +204,16 @@ extern "C" {
         NUM_STATES
     } state_t;
     
+    typedef enum
+    {
+        UNKNOWN_SYMBOL = -1,
+        ZERO_SYMBOL,
+        ONE_SYMBOL,
+        TWO_SYMBOL,
+        THREE_SYMBOL,
+        MANY_SYMBOL
+    } observation_symbol_t;
+    
 #define NUM_STATE_GROUPS NUM_STATES
     
     /* Stability tracking for selec tions */
@@ -454,20 +464,21 @@ extern "C" {
     
     typedef struct
     {
-        uint8_t
+        observation_symbol_t
         data[MAX_OBSERVATIONS],
         next, first, last, curr, prev;
     } observation_buffer_t;
     
-    static uint8_t AddToObservationBuffer( observation_buffer_t * buffer, uint8_t v )
+    static uint8_t AddToObservationBuffer( observation_buffer_t * buffer, observation_symbol_t v )
     {
         buffer->prev = buffer->curr;
         buffer->curr = v;
         buffer->last = buffer->next;
-        buffer->data[buffer->next++] = v;
-        buffer->next &= MAX_OBSERVATION_MASK;
+        uint8_t next_index = (uint8_t)buffer->next + 1;
+        buffer->data[next_index] = v;
+        buffer->next = (observation_symbol_t)( next_index & MAX_OBSERVATION_MASK );
         if(buffer->next == buffer->first)
-            buffer->first = ( buffer->next + 1 ) & MAX_OBSERVATION_MASK;
+            buffer->first = (observation_symbol_t)( ( (uint8_t)buffer->next + 1 ) & MAX_OBSERVATION_MASK );
         return buffer->last;
     }
     

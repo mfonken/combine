@@ -14,7 +14,7 @@
 #define __PCR__
 #define __PSM__
 
-#define SPOOF_STATE_BANDS
+//#define SPOOF_STATE_BANDS
 
 /* Camera Config */ 
 #define RHO_WIDTH        1280

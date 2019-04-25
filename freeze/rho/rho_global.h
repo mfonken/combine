@@ -35,19 +35,11 @@ typedef volatile bool   flag_t;
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 
-//#define RHO_DEBUG
-//#define KALMAN_DEBUG
-//#define PACKET_DEBUG
-
-#define PSM_DEBUG
-#define HMM_DEBUG
-//#define GMM_DEBUG
-//#define FSM_DEBUG
-
 #ifndef LOG_LEVEL
 #define LOG_LEVEL
 enum LogLevel
 {
+    OFF = -1,
     TEST = 0,
     DEBUG_0,
     DEBUG_1,
@@ -56,11 +48,22 @@ enum LogLevel
 };
 #endif
 
-#define TEST_LOG_LEVEL DEBUG_1
+//#define RHO_DEBUG
+//#define KALMAN_DEBUG
+//#define PACKET_DEBUG
+
+#define PSM_DEBUG ALWAYS
+#define HMM_DEBUG DEBUG_2
+#define GMM_DEBUG DEBUG_1
+//#define FSM_DEBUG
+
+#define TEST_LOG_LEVEL DEBUG_2
 
 #ifndef LOG
 #define LOG(L,...) if(L >= TEST_LOG_LEVEL) \
 {  for(uint8_t i=L;i<ALWAYS;i++) printf("\t"); printf(__VA_ARGS__); }
+#define LOG_BARE(L,...) if(L >= TEST_LOG_LEVEL) \
+{ printf(__VA_ARGS__); }
 #endif
 
 #ifdef RHO_DEBUG
@@ -83,13 +86,15 @@ enum LogLevel
 
 #ifdef PSM_DEBUG
 #define LOG_PSM(L,...) LOG(L,"<PSM> " __VA_ARGS__)
+#define LOG_PSM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_PSM(...)
+#define LOG_PSM_BARE(...)
 #endif
 
 #ifdef HMM_DEBUG
 #define LOG_HMM(L,...) LOG(L,"<HMM> " __VA_ARGS__)
-#define LOG_HMM_BARE(L,...) LOG(L,"" __VA_ARGS__)
+#define LOG_HMM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_HMM(...)
 #define LOG_HMM_BARE(...)
@@ -97,14 +102,18 @@ enum LogLevel
 
 #ifdef GMM_DEBUG
 #define LOG_GMM(L,...) LOG(L,"<GMM> " __VA_ARGS__)
+#define LOG_HMM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_GMM(...)
+#define LOG_GMM_BARE(L,...)
 #endif
 
 #ifdef FSM_DEBUG
 #define LOG_FSM(L,...) LOG(L,"<FSM> " __VA_ARGS__)
+#define LOG_FSM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_FSM(...)
+#define LOG_FSM_BARE(L,...)
 #endif
 
 

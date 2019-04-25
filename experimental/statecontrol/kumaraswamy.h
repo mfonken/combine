@@ -21,6 +21,7 @@ extern "C" {
 
 #define STATE_KUMARASWAMY_INTERVALS { 0.2, 0.4, 0.65, 1.0 }
     
+#define KUMARASWAMY_PDF(X,A,B) ( A * B * pow( x, ( A - 1 ) ) * pow( 1 - pow( x, A ), B - 1 ) )
 #define KUMARASWAMY_CDF(X,A,B) ( 1 - pow( 1 - pow( X, A ), B) )
 
 typedef struct
@@ -45,8 +46,16 @@ static void GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * inte
     for( uint8_t i = 0; i < num_bands; i++ )
     {
         curr_CDF = PerformKumaraswamyCDF( k, band_list[i] );
-        interval[i] = curr_CDF - prev_CDF;
-        prev_CDF = curr_CDF;
+        if( curr_CDF < prev_CDF )
+        {
+            curr_CDF = prev_CDF;
+            interval[i] = 0.;
+        }
+        else
+        {
+            interval[i] = curr_CDF - prev_CDF;
+            prev_CDF = curr_CDF;
+        }
     }
 }
 
