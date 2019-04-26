@@ -42,16 +42,15 @@ extern "C" {
     
 #define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-//#define ABSOLUTE_MAX_CLUSTERS 300
 #define MAX_CLUSTERS 100
 #define MAX_ERROR 0.2
-#define INITIAL_VARIANCE 50//150//3//3
+#define INITIAL_VARIANCE 100.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
-#define MAX_MAHALANOBIS_SQ 9//.386f
-#define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ//20.f
+#define MAX_MAHALANOBIS_SQ 9
+#define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
 #define VALID_CLUSTER_STD_DEV 0.25
-#define MIN_CLUSTER_SCORE 0.0005///1e-3f
+#define MIN_CLUSTER_SCORE 0.0005
 #define FALLBACK_MAX_ERROR 1e-2f
 #define ALPHA 0.025
 #define BETA 1
@@ -121,10 +120,10 @@ extern "C" {
         double det = getMat2x2Determinant( mat );
         if( det )
         {
-            res->a = mat->a / det;
-            res->b = -mat->b / det;
-            res->c = -mat->c / det;
-            res->d = mat->d / det;
+            res->d = mat->a / det;
+            res->c = -mat->b / det;
+            res->b = -mat->c / det;
+            res->a = mat->d / det;
         }
         else
             memset( res, ZDIV_LNUM, sizeof(mat2x2) );
@@ -138,7 +137,7 @@ extern "C" {
     static void mat2x2DotVec2(mat2x2 * mat, vec2 * vec, vec2 * res)
     {
         res->a = mat->a * vec->a + mat->b * vec->b;
-        res->a = mat->c * vec->a + mat->d * vec->b;
+        res->b = mat->c * vec->a + mat->d * vec->b;
     }
     static void mat2x2AddMat2x2(mat2x2 * A, mat2x2 * B, mat2x2 * C)
     {
@@ -191,6 +190,7 @@ extern "C" {
         mat2x2DotVec2(inv_covariance, delta, &inv_covariance_delta);
         double mahalanobis_distance_squared;
         vec2DotVec2(delta, &inv_covariance_delta, &mahalanobis_distance_squared);
+        mahalanobis_distance_squared = BOUNDU(mahalanobis_distance_squared, MAX_MAHALANOBIS_SQ + 1);
         return mahalanobis_distance_squared;
     }
 
@@ -304,8 +304,9 @@ extern "C" {
     
     typedef struct
     {
-        double a, b;
-        uint8_t label;
+        index_t density;
+        uint8_t thresh,
+                label;
     } observation_t;
     
     typedef struct

@@ -48,13 +48,14 @@ enum LogLevel
 };
 #endif
 
-//#define RHO_DEBUG
+#define RHO_DEBUG DEBUG_1
+#define RHO_DEBUG_2 DEBUG_2
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 
-#define PSM_DEBUG ALWAYS
-#define HMM_DEBUG DEBUG_2
-#define GMM_DEBUG DEBUG_1
+#define PSM_DEBUG OFF
+#define HMM_DEBUG OFF
+#define GMM_DEBUG DEBUG_2
 //#define FSM_DEBUG
 
 #define TEST_LOG_LEVEL DEBUG_2
@@ -68,8 +69,10 @@ enum LogLevel
 
 #ifdef RHO_DEBUG
 #define LOG_RHO(L,...) LOG(L,"<Rho> " __VA_ARGS__)
+#define LOG_RHO_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_RHO(...)
+#define LOG_RHO_BARE(L,...)
 #endif
 
 #ifdef KALMAN_DEBUG
@@ -102,7 +105,7 @@ enum LogLevel
 
 #ifdef GMM_DEBUG
 #define LOG_GMM(L,...) LOG(L,"<GMM> " __VA_ARGS__)
-#define LOG_HMM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
+#define LOG_GMM_BARE(L,...) LOG_BARE(L,"" __VA_ARGS__)
 #else
 #define LOG_GMM(...)
 #define LOG_GMM_BARE(L,...)

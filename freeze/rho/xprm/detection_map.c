@@ -37,7 +37,7 @@ void IncrementDetectionMapIndex( detection_map_t * map )
         map->fill = DETECTION_BUFFER_MASK;
 }
 
-void AddBlobToPredictionMap( detection_map_t * map, uint8_t thresh, uint8_t density, uint8_t tracking_id )
+void AddBlobToPredictionMap( detection_map_t * map, uint8_t thresh, index_t density, uint8_t tracking_id )
 {
     detection_element_t e = { thresh, density, tracking_id };
     map->buffer[map->index] = e;
@@ -54,22 +54,23 @@ void AddBlobToPredictionMap( detection_map_t * map, uint8_t thresh, uint8_t dens
 
 void AddBlobSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, uint8_t thresh )
 {
-    uint8_t p = 0, i, io;
+    uint8_t p = 0, i;
 
     prediction_t * pair[2] = { &pp->x, &pp->y };
     for( ; p < 2; p++ )
     {
-        for( i = 0; i < pair[p]->NumBlobs; i++ )
+        for( i = 0; i < pair[p]->ObservationList.length; i++ )
         {
-            io = pair[p]->BlobsOrder[i];
-            blob_t * b = &pair[p]->Blobs[io];
-            double estimated_density = (double)b->den + (double)*pair[p]->PreviousPeak;
-//            double A = (double)(b->den<<8), B = (double)MAX_DENSITY;
-            uint8_t byteDensity = estimated_density;//(uint8_t)ZDIV( A, B );
-            int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
-            byteDensity = (uint8_t)BOUND((int)byteDensity+ar, 0, 255);
-            thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
-            DetectionMapFunctions.Add( map, thresh, byteDensity, b->tracking_id);
+//            io = pair[p]->BlobsOrder[i];
+//            blob_t * b = &pair[p]->Blobs[io];
+//            double estimated_density = (double)b->den + (double)*pair[p]->PreviousPeak;
+////            double A = (double)(b->den<<8), B = (double)MAX_DENSITY;
+//            uint8_t byteDensity = estimated_density;//(uint8_t)ZDIV( A, B );
+//            int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
+//            byteDensity = (uint8_t)BOUND((int)byteDensity+ar, 0, 255);
+//            thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
+            observation_t * o = &pair[p]->ObservationList.observations[i];
+            DetectionMapFunctions.Add( map, o->thresh, o->density, o->label);
         }
     }
     map->first = DetectionMapFunctions.FirstIndex( map );

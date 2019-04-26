@@ -206,7 +206,8 @@ typedef struct
     floating_t      NuBlobs,
                     Primary,
                     Secondary;
-    density_t       PreviousPeak[2];
+    density_t       PreviousPeak[2],
+                    PreviousCentroid;
     density_2d_t    PreviousDensity[2],
                     TotalDensity,
                     FilterDensity[2];
@@ -353,10 +354,11 @@ typedef struct
 typedef struct
 {
     uint8_t
-    thresh,
-    density,
-    tracking_id,
-    RESERVED;
+    thresh;
+    index_t
+    density;
+    uint8_t
+    tracking_id;
 } detection_element_t;
 
 typedef struct

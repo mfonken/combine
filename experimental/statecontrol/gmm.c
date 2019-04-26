@@ -11,8 +11,8 @@
 void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
     if(cluster == NULL) return;
-    cluster->gaussian_in.mean.a = observation->a;
-    cluster->gaussian_in.mean.b = observation->b;
+    cluster->gaussian_in.mean.a = observation->density;
+    cluster->gaussian_in.mean.b = observation->thresh;
     cluster->gaussian_out.mean.a = output->a;
     cluster->gaussian_out.mean.b = output->b;
     
@@ -60,6 +60,8 @@ void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec
     vec2 input_delta = { 0 };
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
     cluster->mahalanobis_sq = CalculateMahalanobisDistanceSquared( &cluster->inv_covariance_in, &input_delta);
+    if(cluster->mahalanobis_sq < 1)
+        printf("#");
     cluster->probability_of_in = safe_exp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
@@ -69,6 +71,8 @@ void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster 
     norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
     LOG_GMM(GMM_DEBUG, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
+    if(isnan(norm_factor))
+        printf("!");
 }
 void UpdateInputProbabilityOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, double total_probability )
 {
@@ -193,14 +197,15 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     }
     else
     {
-        model->min_in  = (vec2){ MIN( model->min_in.a, observation->a ), MIN( model->min_in.b, observation->b ) };
-        model->max_in  = (vec2){ MAX( model->max_in.a, observation->a ), MAX( model->max_in.b, observation->b ) };
+        model->min_in  = (vec2){ MIN( model->min_in.a, observation->density ), MIN( model->min_in.b, observation->thresh ) };
+        model->max_in  = (vec2){ MAX( model->max_in.a, observation->density ), MAX( model->max_in.b, observation->thresh ) };
         model->min_out = (vec2){ MIN( model->min_out.a, value->a ),      MIN( model->min_out.b, value->b )      };
         model->max_out = (vec2){ MAX( model->max_out.a, value->a ),      MAX( model->max_out.b, value->b )      };
     }
     vec2 output = { 0., 0. };
-    double total_probability = GMMFunctions.Model.GetScoreSumOfClusters( model, (vec2 *)observation );
-    double best_distance = GMMFunctions.Model.GetOutputAndBestDistance( model, total_probability, (vec2 *)observation, &output);
+    vec2 observation_vec = (vec2){ (double)observation->density, (double)observation->thresh };
+    double total_probability = GMMFunctions.Model.GetScoreSumOfClusters( model, &observation_vec );
+    double best_distance = GMMFunctions.Model.GetOutputAndBestDistance( model, total_probability, &observation_vec, &output);
     
     vec2 min_max_delta;
     vec2SubVec2( &model->max_out, &model->min_out, &min_max_delta );

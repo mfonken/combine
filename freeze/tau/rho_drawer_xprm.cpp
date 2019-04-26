@@ -69,6 +69,8 @@ void RhoDrawer::PostProcess(psm_t * psm)
         int b = 255-j*5, r =j*5;
         if( b<0) b=0; if( r>255) r=255;
         Point center = Point(gaus.mean.a+DETECTION_MAP_INSET, gaus.mean.b+DETECTION_MAP_INSET);
+        center.x = ((double)center.x / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
+        center.y = ((double)center.y / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET*2;
         double cs = pow(gaus.combinations+1,sqrt(M_PI)); // Combination scale
         Size size = Size(gaus.covariance.a*COV_SCALE*cs, gaus.covariance.d*COV_SCALE*cs);
         ellipse(detection_map_frame, center, size, angle, 0, 360, Vec3b{(uint8_t)b,0,(uint8_t)r}, 1, 5, 0);

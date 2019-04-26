@@ -655,7 +655,7 @@ void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_c
     _->Cx = BOUNDU((index_t)(_->Ax + _->Bx) >> 1, core->Width );
     _->Cy = BOUNDU((index_t)(_->Ay + _->By) >> 1, core->Height);
     
-    LOG_RHO(DEBUG_2, "Cx>%d | Cy>%d\n", _->Cx, _->Cy);
+    LOG_RHO(RHO_DEBUG, "Cx>%d | Cy>%d\n", _->Cx, _->Cy);
     
     core->Px = _->Ax;
     core->Py = _->Ay;
@@ -667,6 +667,9 @@ void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_c
     /* NOTE: density maps invert axes */
     core->DensityMapPair.y.centroid = _->Cx;
     core->DensityMapPair.x.centroid = _->Cy;
+
+    core->PredictionPair.y.PreviousCentroid = _->Cx;
+    core->PredictionPair.x.PreviousCentroid = _->Cy;
 }
 
 void CalculateTuneRhoUtility( rho_core_t * core )
@@ -838,19 +841,38 @@ void GeneratePacketRhoUtility( rho_core_t * core )
     RhoUtility.PrintPacket( &core->Packet, 3    );
 }
 
-void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, floating_t thresh )
+void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t thresh )
 {
     index_t i = 0;
     for( ; i < r->NumBlobs && i < MAX_OBSERVATIONS; i++ )
     {
         index_t io = r->TrackingFiltersOrder[i];
+        if( io >= MAX_TRACKING_FILTERS ) continue;
         floating_t x = r->TrackingFilters[io].value;
-        r->ObservationList.observations[i] = (observation_t){ x, thresh, io };
+        io = r->BlobsOrder[i];
+        blob_t * b = &r->Blobs[io];
+        bool below_centroid = (density_t)x < r->PreviousCentroid;
+        
+        index_t density =  (index_t)b->den + (index_t)r->PreviousPeak[(uint8_t)below_centroid];
+//        int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
+//        density = (index_t)density+ar;
+//        thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
+        density = BOUNDU(density,500);
+        LOG_RHO_BARE(RHO_DEBUG_2, "\t\t(%d) <%d %d %d>\n", i, density, thresh, io);
+        r->ObservationList.observations[i] = (observation_t){ density, thresh, io };
     }
     r->ObservationList.length = i;
 }
 void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
-    RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->Thresh );
-    RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->Thresh );
+    if(core->PredictionPair.x.NumBlobs > 0)
+    {
+        LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:\n");
+        RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->ThreshByte );
+    }
+    if(core->PredictionPair.y.NumBlobs > 0)
+    {
+        LOG_RHO(RHO_DEBUG_2, "Creating observation list for Y:\n");
+        RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->ThreshByte );
+    }
 }

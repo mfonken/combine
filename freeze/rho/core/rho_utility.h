@@ -74,7 +74,7 @@ extern "C" {
     
     void GeneratePacketRhoUtility( rho_core_t * );
     
-    void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, floating_t );
+    void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, uint8_t );
     void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * );
     
     typedef struct
@@ -102,7 +102,7 @@ extern "C" {
         void (*CombineProbabilities)( prediction_pair_t * );
         void (*RedistributeDensities)(  rho_core_t * );
         void (*UpdateCorePredictionData)( prediction_predict_variables *, rho_core_t * );
-        void (*GenerateObservationList)( prediction_t *, floating_t );
+        void (*GenerateObservationList)( prediction_t *, uint8_t );
         void (*GenerateObservationLists)( rho_core_t * core );
     } rho_utility_predict_functions;
     

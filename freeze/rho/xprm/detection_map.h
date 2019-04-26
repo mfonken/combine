@@ -20,7 +20,7 @@ static FILE * detection_map_file;
 void InitializeDetectionMap( detection_map_t *, uint16_t );
 uint8_t GetDetectionMapFirstIndex( detection_map_t * );
 void IncrementDetectionMapIndex( detection_map_t * );
-void AddBlobToPredictionMap( detection_map_t *, uint8_t, uint8_t, uint8_t );
+void AddBlobToPredictionMap( detection_map_t *, uint8_t, index_t, uint8_t );
 void AddBlobSetToPredictionMap( detection_map_t *, prediction_pair_t *, uint8_t );
 
 typedef struct
@@ -28,7 +28,7 @@ typedef struct
     void (*Init)( detection_map_t *, uint16_t );
     uint8_t (*FirstIndex)( detection_map_t * );
     void (*Increment)( detection_map_t * );
-    void (*Add)( detection_map_t *, uint8_t, uint8_t, uint8_t );
+    void (*Add)( detection_map_t *, uint8_t, index_t, uint8_t );
     void (*AddSet)( detection_map_t *, prediction_pair_t *, uint8_t );
 } detection_map_function;
 

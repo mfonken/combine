@@ -41,7 +41,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
     
     if( observation_list->length > 0 )
-        model->previous_thresh = observation_list->observations[0].b;
+        model->previous_thresh = observation_list->observations[0].thresh;
     // Analyse value
 }
 
