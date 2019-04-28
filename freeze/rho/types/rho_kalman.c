@@ -10,6 +10,7 @@ void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t
     k->uncertainty.sensor  = uncertainty.sensor;
     
     k->origin    = timestamp();
+    k->timestamp = k->origin;
     
     k->min_value = minv;
     k->max_value = maxv;

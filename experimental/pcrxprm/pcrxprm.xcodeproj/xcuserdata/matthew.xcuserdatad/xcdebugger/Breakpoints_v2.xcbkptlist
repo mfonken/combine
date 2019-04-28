@@ -121,22 +121,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../../freeze/rho/core/rho_utility.c"
-            timestampString = "577945572.456163"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "723"
-            endingLineNumber = "723"
-            landmarkName = "CalculateStateTuneFactorRhoUtility()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "pcrxprm/main.cpp"
             timestampString = "577164405.495109"
             startingColumnNumber = "9223372036854775807"
@@ -154,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/xprm/detection_map.h"
-            timestampString = "577945572.456277"
+            timestampString = "578094590.252255"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "35"
@@ -170,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "577945572.456323"
+            timestampString = "578175315.298875"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "RhoDrawer::DrawDetectionMap( detection_map_t * map )"
             landmarkType = "7">
          </BreakpointContent>
@@ -186,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/hmm.c"
-            timestampString = "577861191.196529"
+            timestampString = "578175315.29895"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "163"
-            endingLineNumber = "163"
+            startingLineNumber = "164"
+            endingLineNumber = "164"
             landmarkName = "BaumWelchGammaSolveHiddenMarkovModel()"
             landmarkType = "9">
          </BreakpointContent>
@@ -202,28 +186,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/hmm.c"
-            timestampString = "577861191.196584"
+            timestampString = "578175315.299019"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "202"
-            endingLineNumber = "202"
+            startingLineNumber = "203"
+            endingLineNumber = "203"
             landmarkName = "BaumWelchGammaSolveHiddenMarkovModel()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../statecontrol/psm.c"
-            timestampString = "577945572.456743"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
-            landmarkName = "UpdatePSM()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -250,7 +218,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/core/rho_core.c"
-            timestampString = "577945572.456839"
+            timestampString = "578094590.252458"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "108"
@@ -265,13 +233,61 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
+            filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
+            timestampString = "578175315.299159"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "68"
+            endingLineNumber = "68"
+            landmarkName = "RhoDrawer::PostProcess(psm_t * psm)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
             filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.456881"
+            timestampString = "578175315.299227"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
+            landmarkName = "UpdateNormalOfGaussianMixtureCluster()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../freeze/rho/core/rho_core.c"
+            timestampString = "578094590.25322"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
             endingLineNumber = "64"
-            landmarkName = "GetScoreOfGaussianMixtureCluster()"
+            landmarkName = "DetectRhoCore()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../statecontrol/gmm.c"
+            timestampString = "578175315.299346"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "92"
+            endingLineNumber = "92"
+            landmarkName = "ContributeToOutputOfGaussianMixtureCluster()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -282,11 +298,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "577945572.456936"
+            timestampString = "578175315.299466"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "76"
+            endingLineNumber = "76"
             landmarkName = "RhoDrawer::PostProcess(psm_t * psm)"
             landmarkType = "7">
          </BreakpointContent>
@@ -298,12 +314,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/psm.c"
-            timestampString = "577945572.457148"
+            timestampString = "578175315.299516"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
-            landmarkName = "ReportObservationsPSM()"
+            startingLineNumber = "196"
+            endingLineNumber = "196"
+            landmarkName = "DiscoverStateBandsPSM()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -313,13 +329,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.457191"
+            filePath = "../statecontrol/psm.c"
+            timestampString = "578175315.299607"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
-            landmarkName = "UpdateGaussianMixtureCluster()"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
+            landmarkName = "DiscoverStateBandsPSM()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -329,94 +345,62 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.4572411"
+            filePath = "../statecontrol/kumaraswamy.h"
+            timestampString = "578170927.296329"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
-            landmarkName = "GetScoreSumOfClustersInGaussianMixtureModel()"
+            startingLineNumber = "49"
+            endingLineNumber = "49"
+            landmarkName = "GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * interval, double * band_list, uint8_t num_bands )"
             landmarkType = "9">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GetKumaraswamyVector"
+                  moduleName = "pcrxprm"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/statecontrol/kumaraswamy.h"
+                  timestampString = "578170819.72294"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "49"
+                  endingLineNumber = "49"
+                  offsetFromSymbolStart = "100">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "GetKumaraswamyVector"
+                  moduleName = "pcrxprm"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/statecontrol/kumaraswamy.h"
+                  timestampString = "578170819.7244869"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "49"
+                  endingLineNumber = "49"
+                  offsetFromSymbolStart = "100">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.457285"
+            filePath = "../statecontrol/fsm.c"
+            timestampString = "578175315.2997119"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "217"
-            endingLineNumber = "217"
-            landmarkName = "AddValueToGaussianMixtureModel()"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
+            landmarkName = "UpdateFSMState()"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.457327"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "207"
-            endingLineNumber = "207"
-            landmarkName = "AddValueToGaussianMixtureModel()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.457368"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "30"
-            endingLineNumber = "30"
-            landmarkName = "InitializeGaussianMixtureCluster()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../statecontrol/gmm.c"
-            timestampString = "577945572.457405"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
-            landmarkName = "UpdateNormalOfGaussianMixtureCluster()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "577945572.457441"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
-            landmarkName = "RhoDrawer::PostProcess(psm_t * psm)"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

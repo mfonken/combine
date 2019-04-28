@@ -699,8 +699,9 @@ void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * core )
 
 void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
-    floating_t state_tune_factor = 0.;
     core->TargetCoverageFactor = core->TargetFilter.value;
+    floating_t TotalPixels = (floating_t)core->Width * (floating_t)core->Height;
+    LOG_RHO(ALWAYS, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
     {
         case CHAOTIC:
@@ -710,15 +711,17 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
         case OVER_POPULATED:
         case UNDER_POPULATED:
-            state_tune_factor += STATE_TUNE_FACTOR * ( (floating_t)TARGET_POPULATED - (floating_t)(core->PredictiveStateModel.current_state) ) / (floating_t)NUM_STATES;
-            break;
         case TARGET_POPULATED:
-            core->TargetCoverageFactor = ZDIV( core->TotalCoverage, ( (floating_t)core->Width * (floating_t)core->Height ) );
+            if( core->PredictiveStateModel.best_confidence > MIN_STATE_CONFIDENCE )
+                core->TargetCoverageFactor = ZDIV( core->PredictiveStateModel.proposed_nu * core->PredictiveStateModel.proposed_avg_den, TotalPixels );
+            else
+                core->TargetCoverageFactor = ZDIV( core->TotalCoverage, TotalPixels );
+            RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );
             break;
         default:
             break;
     }
-    RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );
+    LOG_RHO(ALWAYS, "TCF:%.4f\n", core->TargetCoverageFactor);
     RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
     core->Tune.state = core->ThreshFilter.Value;
 }

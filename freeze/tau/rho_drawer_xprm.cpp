@@ -22,6 +22,7 @@ Vec3b rcolors[] =
 
 uint8_t NUM_COLORS = sizeof(rcolors)/sizeof(rcolors[0]);
 Vec3b rwhite = {255,255,255};
+Vec3b rblack = {0,0,0};
 
 RhoDrawer::RhoDrawer(psm_t * model)
 : detection_map_frame(Size(DETECTION_MAP_FRAME_OWIDTH, DETECTION_MAP_FRAME_OHEIGHT), CV_8UC3, Scalar(0,0,0)),
@@ -72,21 +73,28 @@ void RhoDrawer::PostProcess(psm_t * psm)
         center.x = ((double)center.x / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
         center.y = ((double)center.y / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET*2;
         double cs = pow(gaus.combinations+1,sqrt(M_PI)); // Combination scale
-        Size size = Size(gaus.covariance.a*COV_SCALE*cs, gaus.covariance.d*COV_SCALE*cs);
-        ellipse(detection_map_frame, center, size, angle, 0, 360, Vec3b{(uint8_t)b,0,(uint8_t)r}, 1, 5, 0);
+        Size size = Size(fabs(gaus.covariance.a*COV_SCALE*cs), fabs(gaus.covariance.d*COV_SCALE*cs));
+        if(size.width <= 0 || size.height <= 0) continue;
+         ellipse(detection_map_frame, center, size, angle, 0, 360, Vec3b{(uint8_t)b,0,(uint8_t)r}, 1, 5, 0);
         label_manager_t &labels = (*psm->gmm.cluster[j]).labels;
         for(int i = 0, offset = -12; i < NUM_LABELS_TO_SHOW; i++, offset+=12)
         {
             Scalar c(rcolors[i][0]*0.7,rcolors[i][1]*0.7,rcolors[i][2]*0.7);
             putText(detection_map_frame, pto_string(labels.average[i],1), Point(center.x, center.y+offset), FONT_HERSHEY_PLAIN, 1, c, 2);
         }
+        
+        putText(detection_map_frame, pto_string(j,0), Point(center.x-size.width/2, center.y-size.height/2), FONT_HERSHEY_PLAIN, 1, rwhite, 2);
     }
     
     for( uint8_t i = 0; i < psm->state_bands.length; i++ )
     {
         band_t * band = &psm->state_bands.band[i];
         double l = band->lower_boundary, u = band->upper_boundary;
+        l = (l / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
+        u = (u / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
         vec2 tc = band->true_center;
+        tc.a = ((double)tc.a / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
+        tc.b = ((double)tc.b / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
         if(tc.a == 0 && tc.b == 0) tc = (vec2){0, (double)DETECTION_MAP_FRAME_IHEIGHT};
         int tc_line_len = 20;
         
@@ -107,8 +115,11 @@ void RhoDrawer::PostProcess(psm_t * psm)
             double prev_x = 0, variance_scale = 100;//ZDIV( 1, band->variance * M_PI * 2 );
             for(uint16_t y = 1; y < DETECTION_MAP_FRAME_IHEIGHT && i < NUM_COLORS; y++)
             {
-                double upper = y - band->true_center.b;
-                double inner = ZDIV( upper, band->variance );
+                double tcb = ( band->true_center.b / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
+                double upper = y - tcb;
+                double variance = band->variance;
+                variance = ( variance / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
+                double inner = ZDIV( upper, variance );
                 double exponent = -0.5 * inner * inner;
                 double x = variance_scale * safe_exp(exponent);
                 x = MAX(0, x);

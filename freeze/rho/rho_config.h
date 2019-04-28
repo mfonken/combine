@@ -93,6 +93,7 @@
 #define C_FRAME_SIZE            ((int)(MAX_COVERAGE * FRAME_SIZE))
 #define Y_DEL                   0xaaaa
 
+#define MIN_STATE_CONFIDENCE    0.5
 #define BACKGROUND_PERCENT_MIN  0.02
 #define BACKGROUND_COVERAGE_MIN ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001

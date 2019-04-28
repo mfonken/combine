@@ -14,3 +14,8 @@ double timestamp(void)
     gettimeofday(&stamp, NULL);
     return stamp.tv_sec + stamp.tv_usec/1000000.0;
 }
+
+bool istimedout( double check, double time_out )
+{
+    return ( timestamp() - check ) > time_out;
+}

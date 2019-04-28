@@ -41,8 +41,13 @@ typedef struct
         inv_covariance_in,
         llt_in;
     label_manager_t labels;
-    double max_y, min_y;
-    uint8_t primary_id, secondary_id;
+    double
+        max_y,
+        min_y,
+        timestamp;
+    uint8_t
+        primary_id,
+        secondary_id;
 } gaussian_mixture_cluster_t;
 
 typedef struct
@@ -114,6 +119,7 @@ typedef struct
         previous_thresh,
         proposed_thresh,
         proposed_nu,
+        proposed_avg_den,
         proposed_primary_id,
         proposed_secondary_id;
     uint8_t

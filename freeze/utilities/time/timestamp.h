@@ -10,8 +10,18 @@
 #define timestamp_h
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/time.h>
 
-double timestamp(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+double timestamp( void );
+bool istimedout( double, double );
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* timestamp_h */

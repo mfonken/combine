@@ -36,7 +36,11 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     /* Cycle through and add observations to gaussian mixture model */
     vec2 value = { 0 };
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
-        GMMFunctions.Model.AddValue( &model->gmm, &observation_list->observations[i], &value );
+    {
+        observation_t * observation = &observation_list->observations[i];
+        value = (vec2){ observation->density, observation->thresh };
+        GMMFunctions.Model.AddValue( &model->gmm, observation, &value );
+    }
 //    model->current_observation = observation_list->length;
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
     
@@ -90,17 +94,15 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
     HMMFunctions.BaumWelchGammaSolve( &model->hmm );
     HMMFunctions.UpdateObservationMatrix( &model->hmm );
     
-    if(count++ % 10 == 0)
+//    if(count++ % 10 == 0)
     {
         /* Update state bands */
         PSMFunctions.UpdateStateIntervals( model, nu );
         
         /* Update states/transition matrix */
         FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
+        model->current_state = model->hmm.A.state;
     }
-    
-    model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
-    PSMFunctions.UpdateBestCluster( model, &model->state_bands );
     
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
@@ -112,12 +114,12 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
 
 void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
 {
-    if( i > band_list->length ) return;
+    if( i > band_list->length ) i = band_list->length - 1;
     if( c == 0 )
     { /* If no gaussian for band, zero state info */
         if( !i )
         {
-            band_list->band[i] = (band_t){ HEIGHT, HEIGHT,  0., (vec2){ 0., 0. } };
+            band_list->band[i] = (band_t){ THRESH_MAX, THRESH_MAX,  0., (vec2){ 0., 0. } };
         }
         else
         {
@@ -167,8 +169,8 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         GMMFunctions.Cluster.UpdateLimits( model->gmm.cluster[i] );
     
     gaussian2d_t band_gaussian = { 0 };
-    band_list->band[0].lower_boundary = HEIGHT;
-    
+    band_list->band[0].lower_boundary = 0;
+    /// NOTE: Minimum boundary has greatest y
     int8_t current_band_id = 0, num_clusters_in_band = 0, num_to_process = model->gmm.num_clusters;
     uint32_t running_label_vector = 0;
     while(num_to_process-- > 0)
@@ -179,6 +181,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
             if( processed_clusters & m ) continue;
+            if( model->gmm.cluster[i]->gaussian_in.mean.a > WIDTH ) continue;
             check_boundary = model->gmm.cluster[i]->max_y;
             if( check_boundary > min_boundary )
             {
@@ -195,6 +198,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
             uint32_t new_label_vector = running_label_vector | current_label_vector;
             /* If new update skipped bands, if any */
             current_band_id = CountSet(new_label_vector);
+            
             for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
             {
                 PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
@@ -206,12 +210,25 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         }
         else
         { /* Otherwise cumulate current gaussian into band gaussian */
-            mulGaussian2d( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
-            num_clusters_in_band++;
+            double stddevs = NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b );
+            LOG_PSM(PSM_DEBUG_2,  "bcy: %.4f vs min: %d | stddevs: %.4f\n", band_gaussian.covariance.d, MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC, stddevs);
+            if( band_gaussian.covariance.d < MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC
+               || NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b )
+               < MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC )
+            {
+                LOG_PSM(PSM_DEBUG_2, "Combining cluster %d\n", min_id);
+                mulGaussian2d( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
+                num_clusters_in_band++;
+            }
         }
         
+        LOG_PSM(PSM_DEBUG_2, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
+        
+        
         if( !num_to_process )
+        { /* Always update band on last cluster */
             PSMFunctions.UpdateStateBand( band_list, current_band_id, num_clusters_in_band, &band_gaussian );
+        }
 
         processed_clusters |= 1 << min_id;
     }
@@ -237,7 +254,7 @@ uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, 
     /* Determine target observation band */
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
     {
-        floating_t check = model->hmm.B.expected[TARGET_STATE][i];
+        floating_t check = model->hmm.B.expected[observation_state][i];
         if( check > best_observation_weight )
         {
             best_observation_id = i;
@@ -259,7 +276,7 @@ void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
     {
         gaussian_mixture_cluster_t * cluster = model->gmm.cluster[i];
-        if( IN_RANGE( cluster->gaussian_out.mean.b, lower_bound, upper_bound ) )
+        if( IN_RANGE( cluster->gaussian_in.mean.b, upper_bound, lower_bound ) )
         {
             GMMFunctions.Cluster.Weigh( cluster );
             if( cluster->weight > best_cluster_weight )
@@ -287,20 +304,23 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
 
 void GenerateProposalsPSM( psm_t * model )
 {
-    if( !model->gmm.num_clusters
-       || model->best_cluster_id >= model->gmm.num_clusters
-       || model->best_cluster_id < 0 ) return;
+    if( !model->gmm.num_clusters ) return;
+    
+    /* Update current state */
+    model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
+    PSMFunctions.UpdateBestCluster( model, &model->state_bands );
+    
+    if( model->best_cluster_id >= model->gmm.num_clusters
+       || model->best_cluster_id < 0) return;
     
     /* Update predictions */
     vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
-    model->proposed_nu = proposed_center->a;
+    model->proposed_avg_den = proposed_center->a;
     model->proposed_thresh = proposed_center->b;
     
     /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];
     model->proposed_primary_id = cluster->primary_id;
-    model->proposed_primary_id = cluster->secondary_id;
-    
-    /* Update current state */
-    model->current_state = PSMFunctions.FindMostLikelyHiddenState( model, model->hmm.A.state, NULL );
+    model->proposed_secondary_id = cluster->secondary_id;
+    model->proposed_nu = GetNumberOfValidLabels( &cluster->labels );
 }

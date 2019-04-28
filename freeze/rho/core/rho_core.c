@@ -39,13 +39,13 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
     else
     {
-        LOG_RHO(RHO_DEBUG,"Filtering and selecting pairs.\n");
+        LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
-        LOG_RHO(RHO_DEBUG,"Updating predictions.\n");
+        LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO(RHO_DEBUG,"Updating threshold.\n");
+        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-//        LOG_RHO(RHO_DEBUG,"Generating packets.\n");
+//        LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
 //        RhoCore.GeneratePacket( core );
     }
 }
@@ -60,11 +60,11 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     _.target_density = core->TargetFilter.value * (floating_t)core->Width * (floating_t)core->Height;
     
     /* Perform detect */
-    LOG_RHO(RHO_DEBUG, "Performing detect:\n");
+    LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
     RhoUtility.Detect.Perform( &_, d, r );
     
     /* Update frame statistics */
-    LOG_RHO(RHO_DEBUG, "Calculating frame statistics:\n");
+    LOG_RHO(RHO_DEBUG_2, "Calculating frame statistics:\n");
     RhoUtility.Detect.CalculateFrameStatistics( &_, r );
     
     /* Update core */
@@ -74,9 +74,9 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
-    LOG_RHO(RHO_DEBUG, "Detecting X Map:\n");
+    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
-    LOG_RHO(RHO_DEBUG, "Detecting Y Map:\n");
+    LOG_RHO(RHO_DEBUG_2, "Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
     
     /* Calculate accumulated filtered percentage from both axes */
@@ -96,9 +96,9 @@ void UpdateRhoCorePrediction( prediction_t * r )
 
 void UpdateRhoCorePredictions( rho_core_t * core )
 {
-    LOG_RHO(RHO_DEBUG,"Updating X Map:\n");
+    LOG_RHO(RHO_DEBUG_2,"Updating X Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
-    LOG_RHO(RHO_DEBUG,"Updating Y Map:\n");
+    LOG_RHO(RHO_DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
     /*** TEST ***/

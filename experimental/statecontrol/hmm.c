@@ -25,27 +25,25 @@ void InitializeHiddenMarkovModel( hidden_markov_model_t * model, observation_sym
     /* Initialize each observation set as Kumarawwamy distribution */
     kumaraswamy_t kumaraswamy;
     KumaraswamyFunctions.Initialize( &kumaraswamy, NUM_STATE_GROUPS );
-    double alpha_step = 1. / kumaraswamy.beta;
+    double alpha_step = 1. ;/// kumaraswamy.beta;
     
     double x = alpha_step, observation_alpha[NUM_OBSERVATION_SYMBOLS] = { 0. }, bands[NUM_STATE_GROUPS], intervals[NUM_STATE_GROUPS];
     for( uint8_t i = 0.; i < NUM_OBSERVATION_SYMBOLS; i++, x += alpha_step )
         observation_alpha[i] = x;
         
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
-        bands[i] = (double)(i+1)/(double)NUM_STATE_GROUPS;
+        bands[i] = (double)(i+1)/(double)(NUM_STATE_GROUPS);
     
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
-        KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i] * ( NUM_STATES - 1 ), intervals, bands, NUM_STATE_GROUPS);
+        KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i], intervals, bands, NUM_STATE_GROUPS);
         memcpy( model->A.probabilities.map[i], intervals, sizeof(double) * NUM_STATE_GROUPS );
     }
     
-    for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
-        bands[i] = (double)(i+1)/(double)NUM_STATE_GROUPS;
-    
+    kumaraswamy.beta = NUM_OBSERVATION_SYMBOLS;
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
     {
-        KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i] * ( NUM_OBSERVATION_SYMBOLS - 1 ), intervals, bands, NUM_STATE_GROUPS);
+        KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i], intervals, bands, NUM_STATE_GROUPS);
         memcpy( model->B.expected[i], intervals, sizeof(double) * NUM_STATE_GROUPS );
     }
     
@@ -70,10 +68,13 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
     for( uint8_t j = 0; j < NUM_STATES; j++ )
     {
         LOG_HMM(HMM_DEBUG, "%s ", stateString(j));
-        double row_sum = 0., row_s = 0.;
+        double row_sum = 0., curr = 0., row_s = 0.;
         for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
         {
-            row_sum += model->G.cumulative_value[i][j];
+            curr = model->G.cumulative_value[i][j];
+            if( curr > MAX_SINGLE_CONFIDENCE )
+                return;
+            row_sum += curr;
         }
 
         for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )

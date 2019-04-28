@@ -16,7 +16,7 @@ static inline void reset_loop_variables( state_global_t * _, uint8_t l )
 
 void InitializeFSMMap( fsm_map_t * bm )
 {
-    LOG_FSM(DEBUG_2, "Initializeializing State Machine.\n");
+    LOG_FSM(FSM_DEBUG, "Initializeializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
     bm->length = NUM_STATES;
     for( ; _.i < _.l; _.i++ )
@@ -43,8 +43,6 @@ void NormalizeFSMState( fsm_map_t * bm, uint8_t i )
         _.u = bm->map[i][_.j];
         if( _.u >= 0. )
             *total += _.u;
-        else
-            bm->map[i][_.j] = 0.;
     }
     if(*total)
     {
@@ -69,7 +67,7 @@ void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
     sys->selection_index      = 0;
     
     RhoKalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
-    RhoKalman.Initialize( &sys->stability.system, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
+    RhoKalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
     
     FSMFunctions.Map.InitializeMap( &sys->probabilities );
 }
@@ -113,7 +111,7 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
     sys->next = next;
     
     FSMFunctions.Sys.UpdateState( sys );
-    FSMFunctions.Sys.DecayInactive( sys );
+//    FSMFunctions.Sys.DecayInactive( sys );
     PrintFSMMap( &sys->probabilities, sys->state );
 }
 
@@ -122,15 +120,16 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )
     state_t           c = sys->state;
 
 #ifdef FSM_DEBUG
-    LOG_FSM( DEBUG_2, "Probabilies are [0]%.2f [1]%.2f [2]%.2f [3]%.2f.\n", p[0], p[1], p[2], p[3]);
-    LOG_FSM( DEBUG_2, "State %s is ", stateString(c));
+    LOG_FSM( FSM_DEBUG, "Probabilies are [0]%.2f [1]%.2f [2]%.2f [3]%.2f.\n", p[0], p[1], p[2], p[3]);
+    LOG_FSM( FSM_DEBUG, "State %s has stability %.4f\n", stateString(c), sys->stability.state.value );
 #endif
-    
+    floating_t curr = 0;
     for( _.i = 0; _.i < NUM_STATES; _.i++ )
     {
-        LOG_FSM(DEBUG_2, "Updating %s by %.2f.\n", stateString(_.i), p[_.i]);
-        sys->probabilities.map[c][_.i] += p[_.i];
-        sys->probabilities.map[c][_.i] /= 2.;
+        LOG_FSM(FSM_DEBUG, "Updating %s by %.2f.\n", stateString(_.i), p[_.i]);
+        curr = WeightedAverage( sys->probabilities.map[c][_.i], p[_.i], ( sys->stability.state.value + 1 ) / 2 );
+        if( curr <= MAX_SINGLE_CONFIDENCE )
+            sys->probabilities.map[c][_.i] = curr;
     }
     floating_t state_change_rate = timestamp() - sys->stability.state.timestamp;
     RhoKalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
@@ -141,17 +140,15 @@ void UpdateFSMState( fsm_system_t * sys )
     /* State change */
     if(sys->next != UNKNOWN_STATE )
     {
-        LOG_FSM(DEBUG_2, "Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
-        if(sys->next != sys->state) {LOG_FSM(DEBUG_2, "~~~ State is %s ~~~\n", stateString(sys->next));}
+        LOG_FSM(FSM_DEBUG, "Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
+        if(sys->next != sys->state) {LOG_FSM(FSM_DEBUG, "~~~ State is %s ~~~\n", stateString(sys->next));}
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;
         
         RhoKalman.Reset( &sys->stability.state, 0. );
-        FSMFunctions.Map.ResetState( &sys->probabilities, sys->prev );
-    }
-    else
-    {
+//        FSMFunctions.Map.ResetState( &sys->probabilities, sys->prev );
+        
         floating_t system_change_rate = timestamp() - sys->stability.system.timestamp;
         RhoKalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
     }
@@ -161,19 +158,20 @@ void PrintFSMMap( fsm_map_t * bm, state_t s )
 {
 #ifdef LOG_FSM
     reset_loop_variables( &_, bm->length );
-    LOG_FSM(DEBUG_1, "\t\t\t ");
-    for( _.i = 0; _.i < _.l; _.i++ ) LOG_FSM_BARE(DEBUG_1, "%s-[%d]\t\t ", stateString((uint8_t)_.i), _.i);
+    LOG_FSM(FSM_DEBUG_2, "\t\t\t  ");
+    for( _.i = 0; _.i < _.l; _.i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)_.i), _.i);
+    LOG_FSM_BARE(FSM_DEBUG_2, "\n");
     for( _.i = 0; _.i < _.l; _.i++ )
     {
-        LOG_FSM_BARE(DEBUG_1, "\n");
-        LOG_FSM(DEBUG_1, "%s-[%d]", stateString((uint8_t)_.i), _.i);
+        LOG_FSM(FSM_DEBUG_2, " %s-[%d]", stateString((uint8_t)_.i), _.i);
         for( _.j = 0; _.j < _.l; _.j++ )
         {
             char c = ' ';
             if(_.j == (uint8_t)s) c = '|';
-            LOG_FSM_BARE(DEBUG_1, "\t%c[%.5f]%c",c, bm->map[_.j][_.i],c);
+            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c",c, bm->map[_.j][_.i],c);
         }
+        LOG_FSM_BARE(FSM_DEBUG_2, "\n");
     }
-    LOG_FSM_BARE(DEBUG_1, "\n");
+    LOG_FSM_BARE(FSM_DEBUG_2, "\n");
 #endif
 }

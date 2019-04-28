@@ -11,6 +11,7 @@
 
 #include "rho_master.h"
 #include "opencv_master.h"
+#include <string.h>
 
 #define DETECTION_ELEMENT_RADIUS    4
 

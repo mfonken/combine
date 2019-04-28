@@ -31,7 +31,9 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
 }
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
-    LOG_GMM(GMM_DEBUG, "m_maha: %.2f\n", cluster->mahalanobis_sq);
+    if (isnan(cluster->log_gaussian_norm_factor))
+        return;
+//    LOG_GMM(GMM_DEBUG, "m_maha: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
     double score_weight = ALPHA * safe_exp( -BETA * cluster->mahalanobis_sq );
@@ -44,8 +46,8 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     
     LOG_GMM(GMM_DEBUG, "m_mean: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
-    UpdateCovarianceWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
-    UpdateCovarianceWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
+    UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
+    UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
     
     GetMat2x2LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
     getMat2x2Inverse( &cluster->gaussian_in.covariance, &cluster->inv_covariance_in );
@@ -54,6 +56,8 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     GMMFunctions.Cluster.UpdateLimits( cluster );
     
     ReportLabel( &cluster->labels, observation->label );
+    
+    cluster->timestamp = timestamp();
 }
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
@@ -61,7 +65,9 @@ void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
     cluster->mahalanobis_sq = CalculateMahalanobisDistanceSquared( &cluster->inv_covariance_in, &input_delta);
     if(cluster->mahalanobis_sq < 1)
-        printf("#");
+    {
+        //printf("#");
+    }
     cluster->probability_of_in = safe_exp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
@@ -72,7 +78,9 @@ void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster 
     LOG_GMM(GMM_DEBUG, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
     if(isnan(norm_factor))
-        printf("!");
+    {
+        //printf("!");
+    }
 }
 void UpdateInputProbabilityOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, double total_probability )
 {
@@ -115,8 +123,8 @@ void WeighGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
         else if ( check > second )
             second = check;
     }
-    double a = ( cluster->gaussian_out.covariance.b * cluster->gaussian_out.covariance.c ),
-    b = ( cluster->gaussian_out.covariance.a * cluster->gaussian_out.covariance.d );
+    double a = ( cluster->gaussian_in.covariance.b * cluster->gaussian_in.covariance.c ),
+    b = ( cluster->gaussian_in.covariance.a * cluster->gaussian_in.covariance.d );
     double eccentricity_factor = ZDIV( a, b );
     cluster->weight = ( first + second ) * eccentricity_factor;
     cluster->primary_id = first;
@@ -182,7 +190,10 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
     }
     for( uint8_t i = 0; i < model->num_clusters; i++ )
     {
-        if( (*model->cluster)[i].score < MIN_CLUSTER_SCORE)
+        gaussian_mixture_cluster_t * cluster = model->cluster[i];
+        if( cluster->score < MIN_CLUSTER_SCORE
+           || istimedout( cluster->timestamp, MAX_CLUSTER_LIFETIME )
+           || isnan(cluster->log_gaussian_norm_factor))
             GMMFunctions.Model.RemoveCluster( model, i );
     }
 }
@@ -199,8 +210,8 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     {
         model->min_in  = (vec2){ MIN( model->min_in.a, observation->density ), MIN( model->min_in.b, observation->thresh ) };
         model->max_in  = (vec2){ MAX( model->max_in.a, observation->density ), MAX( model->max_in.b, observation->thresh ) };
-        model->min_out = (vec2){ MIN( model->min_out.a, value->a ),      MIN( model->min_out.b, value->b )      };
-        model->max_out = (vec2){ MAX( model->max_out.a, value->a ),      MAX( model->max_out.b, value->b )      };
+        model->min_out = (vec2){ MIN( model->min_out.a, value->a ), MIN( model->min_out.b, value->b ) };
+        model->max_out = (vec2){ MAX( model->max_out.a, value->a ), MAX( model->max_out.b, value->b ) };
     }
     vec2 output = { 0., 0. };
     vec2 observation_vec = (vec2){ (double)observation->density, (double)observation->thresh };

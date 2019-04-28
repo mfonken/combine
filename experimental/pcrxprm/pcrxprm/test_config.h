@@ -23,7 +23,7 @@ using namespace std;
 
 #define TITLE_STRING                    "PCR Alpha v0.7 xprm"
 #define GROUP_NAME                      "gradient"//"frames"
-#define FILE_NAME                       "double_circle_corner_triangle_fade_high_contrast"//"triple_circle_corner_triangle_fade_high_contrast"// noiseS1"//"double_circle_corner_triangle_fade"//"single_triangle_fade"//"double_circle_fade"//"single_circle_fade"
+#define FILE_NAME                       "double_circle_fade"//"triple_circle_corner_triangle_fade_high_contrast"// noiseS1"//"double_circle_corner_triangle_fade"//"single_triangle_fade"//"double_circle_corner_triangle_fade_high_contrast"//"single_circle_fade"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 

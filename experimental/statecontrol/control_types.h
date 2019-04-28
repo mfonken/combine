@@ -33,26 +33,33 @@ extern "C" {
 #define MIN_THRESH 0
 #define THRESH_RANGE (MAX_THRESH - MIN_THRESH)
     
-#define TARGET_STATE 2
+#define TARGET_STATE TARGET_POPULATED
     
     //#define NUM_STATES              10
 #define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
 #define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
     
+#define MAX_SINGLE_CONFIDENCE 0.9
+    
+#define MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC 3
+#define MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC 8
+#define MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC ( MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC * MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC )
+    
+#define MAX_CLUSTER_LIFETIME 15 // sec
 #define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-#define MAX_CLUSTERS 100
+#define MAX_CLUSTERS 25
 #define MAX_ERROR 0.2
-#define INITIAL_VARIANCE 100.
+#define INITIAL_VARIANCE 50//150.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
 #define MAX_MAHALANOBIS_SQ 9
 #define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
 #define VALID_CLUSTER_STD_DEV 0.25
-#define MIN_CLUSTER_SCORE 0.0005
+#define MIN_CLUSTER_SCORE 0.05
 #define FALLBACK_MAX_ERROR 1e-2f
-#define ALPHA 0.025
+#define ALPHA 0.00001//0.0025
 #define BETA 1
 
 //#define MAX_DISTANCE 10000.f
@@ -190,7 +197,7 @@ extern "C" {
         mat2x2DotVec2(inv_covariance, delta, &inv_covariance_delta);
         double mahalanobis_distance_squared;
         vec2DotVec2(delta, &inv_covariance_delta, &mahalanobis_distance_squared);
-        mahalanobis_distance_squared = BOUNDU(mahalanobis_distance_squared, MAX_MAHALANOBIS_SQ + 1);
+        mahalanobis_distance_squared = BOUNDU(mahalanobis_distance_squared, MAX_DISTANCE);
         return mahalanobis_distance_squared;
     }
 
@@ -391,12 +398,13 @@ extern "C" {
         return limited;
     }
     
-    static void UpdateCovarianceWithWeight( vec2 * A, vec2 * B, gaussian2d_t * gaussian, double weight )
+    static void UpdateGaussianWithWeight( vec2 * A, vec2 * B, gaussian2d_t * gaussian, double weight )
     {
         double delta_mean_a_a = A->a * B->a,
         delta_mean_a_b = A->a * B->b,
         delta_mean_b_b = A->b * B->b;
         if( delta_mean_a_a == 0. ) delta_mean_a_a += SMALL_VALUE_ERROR_OFFSET;
+        if( delta_mean_a_b == 0. ) delta_mean_a_b += SMALL_VALUE_ERROR_OFFSET;
         if( delta_mean_b_b == 0. ) delta_mean_b_b += SMALL_VALUE_ERROR_OFFSET;
         mat2x2 covariance_delta_factor, unweighted_covariance_factor =
         { delta_mean_a_a, delta_mean_a_b, delta_mean_a_b, delta_mean_b_b };
@@ -462,6 +470,10 @@ extern "C" {
         for( uint8_t i = 0, m = 1; i < 32; i++, c += !!(v & m), m <<= 1 );
         return c;
     }
+    static uint32_t GetNumberOfValidLabels( label_manager_t * labels )
+    {
+        return CountSet( GetValidLabels( labels ) );
+    }
     
     typedef struct
     {
@@ -481,6 +493,18 @@ extern "C" {
         if(buffer->next == buffer->first)
             buffer->first = (observation_symbol_t)( ( (uint8_t)buffer->next + 1 ) & MAX_OBSERVATION_MASK );
         return buffer->last;
+    }
+    
+    static floating_t NumStdDevsFromYMean( gaussian2d_t * gaussian, floating_t check_value )
+    {
+        floating_t diff = fabs( gaussian->mean.b - check_value );
+        floating_t num_std_devs = ZDIV( diff, sqrt( gaussian->covariance.d ) );
+        return num_std_devs;
+    }
+    
+    static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
+    {
+        return ( ( a * w ) + ( b * ( 1 - w ) ) );
     }
     
 #ifdef __cplusplus

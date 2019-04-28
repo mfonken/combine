@@ -24,7 +24,7 @@ extern "C" {
     
 void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_list_t * );
-void UpdateStateIntervalsPSM(               psm_t *, double );
+void UpdateStateIntervalsPSM(           psm_t *, double );
 void UpdatePSM(                         psm_t *, observation_list_t *, double );
 void UpdateStateBandPSM(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
 void DiscoverStateBandsPSM(             psm_t *, band_list_t * );
@@ -37,7 +37,7 @@ typedef struct
 {
     void (*Initialize)(                     psm_t * );
     void (*ReportObservations)(             psm_t *, observation_list_t * );
-    void (*UpdateStateIntervals)(               psm_t *, double );
+    void (*UpdateStateIntervals)(           psm_t *, double );
     void (*Update)(                         psm_t *, observation_list_t *, double nu );
     void (*UpdateStateBand)(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
     void (*DiscoverStateBands)(             psm_t *, band_list_t * );
@@ -49,16 +49,16 @@ typedef struct
 
 static const psm_functions_t PSMFunctions =
 {
-    .Initialize = InitializePSM,
-    .ReportObservations = ReportObservationsPSM,
-    .UpdateStateIntervals = UpdateStateIntervalsPSM,
-    .Update = UpdatePSM,
-    .UpdateStateBand = UpdateStateBandPSM,
-    .DiscoverStateBands = DiscoverStateBandsPSM,
-    .FindMostLikelyHiddenState = FindMostLikelyHiddenStatePSM,
-    .UpdateBestCluster = UpdateBestClusterPSM,
-    .GetCurrentBand = GetCurrentBandPSM,
-    .GenerateProposals = GenerateProposalsPSM,
+    .Initialize                 = InitializePSM,
+    .ReportObservations         = ReportObservationsPSM,
+    .UpdateStateIntervals       = UpdateStateIntervalsPSM,
+    .Update                     = UpdatePSM,
+    .UpdateStateBand            = UpdateStateBandPSM,
+    .DiscoverStateBands         = DiscoverStateBandsPSM,
+    .FindMostLikelyHiddenState  = FindMostLikelyHiddenStatePSM,
+    .UpdateBestCluster          = UpdateBestClusterPSM,
+    .GetCurrentBand             = GetCurrentBandPSM,
+    .GenerateProposals          = GenerateProposalsPSM,
 };
     
 #ifdef __cplusplus
