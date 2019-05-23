@@ -4,10 +4,10 @@
 #include "global_lib.h"
 #include "OV9712_regs.h"
 
-static void OV9712_Init( I2C_Handle_t * );
-static void OV9712_Write( uint8_t, uint8_t );
-static void OV9712_Enable( void );
-static void OV9712_Disable( void );
+void OV9712_Init( I2C_Handle_t * );
+void OV9712_Write( uint8_t, uint8_t );
+void OV9712_Enable( void );
+void OV9712_Disable( void );
 
 typedef struct 
 {

@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "timestamp.h"
-
 #include "rho_structure.h"
 #include "rho_client.h"
 

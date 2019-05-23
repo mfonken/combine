@@ -16,7 +16,7 @@
 
 I2C_Handle_t * CAM_I2C_PORT;
 
-cam_register_t OV9712_regs[] =
+register_t OV9712_regs[] =
 {
   {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
   {REG5C,	0x6a}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
@@ -61,7 +61,7 @@ static void OV9712_Init( I2C_Handle_t * i2c_port )
 static void OV9712_Write( uint8_t r, uint8_t v )
 {
   uint8_t data[2] = { r, v };
-  HAL_I2C_Master_Transmit(CAM_I2C_PORT, OV9712_ADDR, data, 2, 100);  // data is the start pointer of our array
+  HAL_I2C_Master_Transmit(CAM_I2C_PORT, OV9712_ADDR, data, 2, 100);
 }
 
 static void OV9712_Enable()

@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "rho_global.h"
-#include "timestamp.h"
-//#include <sys/time.h>
 
 #define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001

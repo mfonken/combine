@@ -4,8 +4,8 @@
 #include "global_types.h"
 
 #ifdef __STM32__
-
 #define _PLATFORM_ STM
+
 #include "stm32l4xx_hal.h"
 
 /* DMA Config */
@@ -19,15 +19,9 @@
 
 #define USART_Handle_t  USART_HandleTypeDef
 #define TIMER_Handle_t  TIM_HandleTypeDef
-#define I2C_Handle_T    I2C_HandleTypeDef
+#define I2C_Handle_t    I2C_HandleTypeDef
 
 #endif /* __STM32__ */
-
-/* Rho */
-#define __RHO__
-
-/* Camera type */
-#define _CAMERA_ OV9712
 
 #define USART_TIMEOUT	100
 

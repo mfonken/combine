@@ -12,7 +12,6 @@
 #include <string.h>
 #include "rho_global.h"
 #include "rho_config.h"
-#include "timestamp.h"
 
 #ifdef __cplusplus
 extern "C" {
