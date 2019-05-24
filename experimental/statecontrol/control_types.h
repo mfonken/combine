@@ -37,7 +37,7 @@ extern "C" {
     
     //#define NUM_STATES              10
 #define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
-#define MAX_OBSERVATIONS        (1 << 7) // Length of history
+#define MAX_OBSERVATIONS        (1 << 3) // Length of history
 #define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
     
 #define MAX_SINGLE_CONFIDENCE 0.9
@@ -49,7 +49,7 @@ extern "C" {
 #define MAX_CLUSTER_LIFETIME 15 // sec
 #define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-#define MAX_CLUSTERS 25
+#define MAX_CLUSTERS 15
 #define MAX_ERROR 0.2
 #define INITIAL_VARIANCE 50//150.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)

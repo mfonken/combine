@@ -85,7 +85,7 @@ void Tau::trigger( void )
     }
     
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
-//    rho.core.Thresh+=1; ///TEST
+//    rho.core.Thresh+=0.5; ///TEST
     rho.core.ThreshByte = (byte_t)rho.core.Thresh;
     if(!(rho.core.ThreshByte % THRESH_FRAME_PRINT_STEP))
     {

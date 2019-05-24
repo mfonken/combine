@@ -49,7 +49,7 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
     
     PID->PrevError = PID->Error;
 
-    PID->TotalError *= 0.9;
+    PID->TotalError *= PID_ERROR_DECAY;
 }
 
 void RhoPIDPrint( rho_pid_t * PID )

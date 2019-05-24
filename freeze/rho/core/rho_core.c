@@ -105,8 +105,8 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
     /************/
     RhoUtility.Predict.GenerateObservationLists( core );
-     PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuBlobs ); /// TODO: Generalize to be dimensionless
-//    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuBlobs );
+    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuBlobs ); /// TODO: Generalize to be dimensionless
+    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuBlobs );
     
     prediction_predict_variables _;
     

@@ -21,6 +21,7 @@ extern "C" {
 // TEMP LOCATION
 #define HEIGHT 700
 #define WIDTH HEIGHT
+#define SPOOF_STATE_BANDS { 0.1, 0.3, 0.75, 1.0 }
     
 void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_list_t * );

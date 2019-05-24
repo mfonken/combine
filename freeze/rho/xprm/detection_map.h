@@ -12,8 +12,15 @@
 #include "rho_types.h"
 
 #define WRITE_DETECTION_MAP_TO_FILE "/Users/matthew/Desktop/gmmtest/data/dm.txt"
-#define DETECTION_MAP_DESCRIPTOR "double_circle_fade"
-#define SHAKE_INJECTION 1//10
+
+#define DETECTION_MAP_NAME "double_circle_corner_triangle_fade"
+#ifdef __PSM__
+#define DETECTION_MAP_DESCRIPTOR DETECTION_MAP_NAME "_psm_on"
+#else
+#define DETECTION_MAP_DESCRIPTOR DETECTION_MAP_NAME "_psm_off"
+#endif
+
+#define SHAKE_INJECTION 10
 
 static FILE * detection_map_file;
 

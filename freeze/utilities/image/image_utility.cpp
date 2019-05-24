@@ -13,14 +13,14 @@ using namespace std;
 
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height) :
 num_frames(num), size(width, height), name(n), subdir(f),
-frame(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
-preoutframe(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
-outframe(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
-image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0)),
-preimage(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
+frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+image(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_CAMERA
 ,cam(CAMERA_ID)
-,image(Size(IU_WIDTH, IU_HEIGHT), CV_8UC3, Scalar(0,0,0))
+,image(Size(width, height), CV_8UC3, Scalar(0,0,0))
 #endif
 {
     has_file = false;
@@ -126,8 +126,8 @@ void ImageUtility::InitCamera()
 {
     counter = 0;
     
-    cam.set(CAP_PROP_FRAME_WIDTH,  IU_WIDTH);
-    cam.set(CAP_PROP_FRAME_HEIGHT, IU_HEIGHT);
+    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
+    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
     cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
     
     if (!cam.isOpened())
@@ -287,13 +287,13 @@ void ImageUtility::drawOutframe()
     putText(outframe, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
 #ifdef TILT_LINES
     double top_x, bot_x, lef_y, rig_y, tr = tan(0/*-bno.roll * DEG_TO_RAD*/);
-    top_x = IU_WIDTH/2 - IU_HEIGHT/2*tr;
-    bot_x = IU_WIDTH/2 + IU_HEIGHT/2*tr;
-    lef_y = IU_HEIGHT/2 + IU_WIDTH/2*tr;
-    rig_y = IU_HEIGHT/2 - IU_WIDTH/2*tr;
+    top_x = width/2 - height/2*tr;
+    bot_x = width/2 + height/2*tr;
+    lef_y = height/2 + width/2*tr;
+    rig_y = height/2 - width/2*tr;
     
-    line(outframe, Point(top_x,0), Point(bot_x,IU_HEIGHT), Vec3b(255,245,255));
-    line(outframe, Point(0,lef_y), Point(IU_WIDTH,rig_y), Vec3b(255,245,255));
+    line(outframe, Point(top_x,0), Point(bot_x,height), Vec3b(255,245,255));
+    line(outframe, Point(0,lef_y), Point(width,rig_y), Vec3b(255,245,255));
 #endif
 }
 

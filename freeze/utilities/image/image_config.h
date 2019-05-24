@@ -39,8 +39,8 @@
 #define NOISE_WIDTH     150
 #define NOISE_HEIGHT    100
 
-#define IU_WIDTH        FRAME_WIDTH
-#define IU_HEIGHT       FRAME_HEIGHT
+//#define IU_WIDTH        FRAME_WIDTH
+//#define IU_HEIGHT       FRAME_HEIGHT
 #define IU_FRAME_RATE   60
 
 #define IU_THRESHOLD    1//00

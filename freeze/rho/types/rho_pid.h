@@ -18,6 +18,8 @@
 extern "C" {
 #endif
     
+#define PID_ERROR_DECAY 0.9
+    
     typedef double floating_t;
     
     typedef struct

@@ -66,11 +66,12 @@ void AddBlobSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, u
 //            double estimated_density = (double)b->den + (double)*pair[p]->PreviousPeak;
 ////            double A = (double)(b->den<<8), B = (double)MAX_DENSITY;
 //            uint8_t byteDensity = estimated_density;//(uint8_t)ZDIV( A, B );
-//            int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
 //            byteDensity = (uint8_t)BOUND((int)byteDensity+ar, 0, 255);
 //            thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
             observation_t * o = &pair[p]->ObservationList.observations[i];
-            DetectionMapFunctions.Add( map, o->thresh, o->density, o->label);
+            
+            int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
+            DetectionMapFunctions.Add( map, o->thresh + ar, o->density + br, o->label);
         }
     }
     map->first = DetectionMapFunctions.FirstIndex( map );
