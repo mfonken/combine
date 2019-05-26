@@ -84,7 +84,7 @@ public:
                     outimage_mutex,
                     tau_cross_mutex,
                     self_mutex;
-    ImageUtility( std::string, std::string f = "", int num = 0, int width = IU_WIDTH, int height = IU_HEIGHT);
+    ImageUtility( std::string, std::string f, int num, int width, int height);
     virtual ~ImageUtility();
     
     void RequestBackground();

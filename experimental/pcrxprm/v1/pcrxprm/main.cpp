@@ -1,8 +1,8 @@
 #include "tau_master.h"
 
-int main(int argc, const char * argv[])
+int run( char instructions[] = {}, int num_instructions = 0, bool end_after_instructions = false, int width = FRAME_WIDTH, int height = FRAME_HEIGHT)
 {
-    TauDrawer tau("Tau", FRAME_WIDTH, FRAME_HEIGHT
+    TauDrawer tau("Tau", width, height
 #ifndef HAS_CAMERA
       , FRAME_IMAGE_IMAGE_SOURCE_PATH, FRAME_IMAGE_SOURCE_NUM_FRAMES
 #endif
@@ -13,6 +13,8 @@ int main(int argc, const char * argv[])
     sleep(0.1);
     env.resume();
     Mat local_frame;
+    
+    int instruction_index = 0;
     while(1)
     {
         local_frame = tau.GetDensitiesFrame(tau.frame);
@@ -25,7 +27,19 @@ int main(int argc, const char * argv[])
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         }
+
+        
         char c = waitKey(KEY_DELAY);
+        if(num_instructions)
+        {
+            c = instructions[instruction_index];
+            if(instruction_index >= num_instructions)
+            {
+                if(end_after_instructions) return 0;
+            }
+            else instruction_index++;
+        }
+        ofstream file;
         switch(c)
         {
             case ' ':
@@ -49,6 +63,10 @@ int main(int argc, const char * argv[])
                 env.pause();
                 //                printf("%d\n", tau.count);
                 printf("Tau averaged %fms and error %.3fpx for %d iterations\n", tau.avg*1000, tau.accuracy, tau.count);
+                
+                file.open(PERF_FILENAME, ofstream::app | ofstream::out);
+                file << width << "," << tau.avg*1000 << "," << tau.count << endl;
+                file.close();
                 break;
             case 'p':
                 struct timeval tp;
@@ -58,4 +76,40 @@ int main(int argc, const char * argv[])
                 break;
         }
     }
+}
+
+int main(int argc, const char * argv[])
+{
+#ifdef AUTOMATION_RUN
+#ifdef AUTOMATION_INSTRUCTIONS
+    char instructions[] = AUTOMATION_INSTRUCTIONS;
+    int num_instructions = sizeof(instructions)/sizeof(instructions[0]);
+#else
+    char instructions[] = { '\0' };
+    int num_instructions = 0;
+#endif
+    
+#ifdef AUTOMATION_END_AFTER_INSTRUCTIONS
+    bool end_after_instructions = true;
+#else
+    bool end_after_instructions = false;
+#endif
+#endif
+    
+#ifdef AUTOMATION_RUN
+#ifdef AUTOMATION_SIZES
+    int sizes[] = AUTOMATION_SIZES;
+    int num_sizes = sizeof(sizes)/sizeof(sizes[0]);
+    for(int i = 0; i < num_sizes; i++)
+    {
+        run( instructions, num_instructions, end_after_instructions, sizes[i], sizes[i] );
+    }
+    return 0;
+#else
+    return run( instructions, num_instructions );
+#endif
+#else
+    return run();
+#endif
+    
 }

@@ -70,7 +70,7 @@ void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
     LOG_PSM_BARE(PSM_DEBUG, "\n");
 }
 
-static uint count = 0;
+//static uint count = 0;
 
 void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu )
 {
@@ -107,8 +107,10 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
 #else
-//    floating_t bands[NUM_STATE_GROUPS] = { 0 };
-//    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
+    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
+    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, bands, NUM_STATE_GROUPS );
+    FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
+    model->current_state = model->hmm.A.state;
 #endif
 }
 
@@ -141,7 +143,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
         band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
         band_list->band[i].true_center = band_gaussian->mean;
         band_list->band[i].variance = band_gaussian->covariance.d;
-        if(i)
+        if(i > 0)
         {
             band_list->band[i-1].upper_boundary = band_list->band[i].lower_boundary;
         }
@@ -304,6 +306,9 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
 
 void GenerateProposalsPSM( psm_t * model )
 {
+    /* Initial proposal in case of failure */
+    model->proposed_nu = model->best_state;
+    
     if( !model->gmm.num_clusters ) return;
     
     /* Update current state */

@@ -89,14 +89,17 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
         LOG_HMM_BARE(HMM_DEBUG, " = %.3f\n", row_s);
     }
 #else
-    double observation_sums[NUM_OBSERVATION_SYMBOLS] = { 0. };
+    double observation_sums[NUM_OBSERVATION_SYMBOLS] = { 0. }, curr = 0.;
     /* Normalize by symbol */
     for( uint8_t j = 0; j < NUM_OBSERVATION_SYMBOLS; j++ )
     {
         double row_sum = 0.;
         for( uint8_t i = 0; i < NUM_STATES; i++ )
         {
-            row_sum += model->G.cumulative_value[j][i];
+            curr = model->G.cumulative_value[j][i];;
+            if( curr > MAX_SINGLE_CONFIDENCE )
+                goto hmm_print;
+            row_sum += curr;
         }
         
         if( row_sum != 0. )
@@ -108,7 +111,7 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
             }
         }
     }
-    
+hmm_print:
     for( uint8_t j = 0; j < NUM_STATES; j++ )
     {
         LOG_HMM(HMM_DEBUG, "%s ", stateString(j));

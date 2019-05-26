@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/utilities/image/image_cpp_types.h"
-            timestampString = "577575530.709742"
+            timestampString = "579754890.3049591"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "25"
@@ -26,7 +26,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/tau_utility.cpp"
-            timestampString = "577859726.2475441"
+            timestampString = "579755911.106108"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "103"
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/utilities/image/image_utility.cpp"
-            timestampString = "577599696.884511"
+            timestampString = "578779254.84505"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "92"
@@ -58,7 +58,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/xprm/detection_map.c"
-            timestampString = "577945572.456038"
+            timestampString = "578205108.981493"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "18"
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/tau_drawer.cpp"
-            timestampString = "577945432.758286"
+            timestampString = "578978430.767259"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "34"
@@ -122,29 +122,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "pcrxprm/main.cpp"
-            timestampString = "577164405.495109"
+            timestampString = "579755911.106232"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "5"
             endingLineNumber = "5"
-            landmarkName = "main(int argc, const char * argv[])"
+            landmarkName = "run( char instructions[] = {}, int num_instructions = 0, bool end_after_instructions = false, int width = FRAME_WIDTH, int height = FRAME_HEIGHT)"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../freeze/rho/xprm/detection_map.h"
-            timestampString = "578094590.252255"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
-            landmarkName = "unknown"
-            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -154,7 +138,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "578175315.298875"
+            timestampString = "578790417.5570689"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "36"
@@ -170,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/hmm.c"
-            timestampString = "578175315.29895"
+            timestampString = "578205108.98212"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "164"
-            endingLineNumber = "164"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "BaumWelchGammaSolveHiddenMarkovModel()"
             landmarkType = "9">
          </BreakpointContent>
@@ -186,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/hmm.c"
-            timestampString = "578175315.299019"
+            timestampString = "578205108.9821939"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "203"
-            endingLineNumber = "203"
+            startingLineNumber = "206"
+            endingLineNumber = "206"
             landmarkName = "BaumWelchGammaSolveHiddenMarkovModel()"
             landmarkType = "9">
          </BreakpointContent>
@@ -202,11 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/xprm/detection_map.c"
-            timestampString = "577945572.4567961"
+            timestampString = "578205108.982268"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "AddBlobSetToPredictionMap()"
             landmarkType = "9">
          </BreakpointContent>
@@ -218,7 +202,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/core/rho_core.c"
-            timestampString = "578094590.252458"
+            timestampString = "579755911.106343"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "108"
@@ -234,7 +218,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "578175315.299159"
+            timestampString = "578790417.557204"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "68"
@@ -250,7 +234,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/gmm.c"
-            timestampString = "578175315.299227"
+            timestampString = "578787680.018765"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "82"
@@ -266,7 +250,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/rho/core/rho_core.c"
-            timestampString = "578094590.25322"
+            timestampString = "579755911.106423"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
@@ -282,7 +266,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/gmm.c"
-            timestampString = "578175315.299346"
+            timestampString = "578787680.021073"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "92"
@@ -298,7 +282,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../freeze/tau/rho_drawer_xprm.cpp"
-            timestampString = "578175315.299466"
+            timestampString = "578790417.557309"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "76"
@@ -314,12 +298,60 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/psm.c"
-            timestampString = "578175315.299516"
+            timestampString = "579755911.106491"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
-            landmarkName = "DiscoverStateBandsPSM()"
+            startingLineNumber = "63"
+            endingLineNumber = "63"
+            landmarkName = "UpdateStateIntervalsPSM()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../statecontrol/hmm.c"
+            timestampString = "578205108.982728"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "UpdateObservationMatrixHiddenMarkovModel()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../freeze/rho/rho_wrapper.cpp"
+            timestampString = "579754295.730872"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "Rho::Rho( int width, int height )"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../freeze/rho/core/rho_utility.c"
+            timestampString = "579755911.106566"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "703"
+            endingLineNumber = "703"
+            landmarkName = "CalculateStateTuneFactorRhoUtility()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -330,12 +362,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../statecontrol/psm.c"
-            timestampString = "578175315.299607"
+            timestampString = "579755911.106608"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "215"
-            endingLineNumber = "215"
-            landmarkName = "DiscoverStateBandsPSM()"
+            startingLineNumber = "110"
+            endingLineNumber = "110"
+            landmarkName = "UpdatePSM()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -345,46 +377,30 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../statecontrol/kumaraswamy.h"
-            timestampString = "578170927.296329"
+            filePath = "../../freeze/rho/core/rho_utility.c"
+            timestampString = "579755911.1066459"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "49"
-            endingLineNumber = "49"
-            landmarkName = "GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * interval, double * band_list, uint8_t num_bands )"
+            startingLineNumber = "403"
+            endingLineNumber = "403"
+            landmarkName = "CalculatedFrameStatisticsRhoUtility()"
             landmarkType = "9">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "GetKumaraswamyVector"
-                  moduleName = "pcrxprm"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/statecontrol/kumaraswamy.h"
-                  timestampString = "578170819.72294"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "49"
-                  endingLineNumber = "49"
-                  offsetFromSymbolStart = "100">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "GetKumaraswamyVector"
-                  moduleName = "pcrxprm"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/statecontrol/kumaraswamy.h"
-                  timestampString = "578170819.7244869"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "49"
-                  endingLineNumber = "49"
-                  offsetFromSymbolStart = "100">
-               </Location>
-            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../freeze/rho/core/rho_core.c"
+            timestampString = "579755911.106684"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "DetectRhoCore()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -393,13 +409,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../statecontrol/fsm.c"
-            timestampString = "578175315.2997119"
+            filePath = "../../freeze/rho/core/rho_utility.c"
+            timestampString = "579755911.106721"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "155"
-            endingLineNumber = "155"
-            landmarkName = "UpdateFSMState()"
+            startingLineNumber = "737"
+            endingLineNumber = "737"
+            landmarkName = "CalculateTargetTuneFactor()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

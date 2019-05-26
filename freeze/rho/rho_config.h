@@ -12,7 +12,7 @@
 #include "rho_global.h"
 
 #define __PCR__
-#define __PSM__
+//#define __PSM__
 
 //#define SPOOF_STATE_BANDS
 
@@ -129,7 +129,7 @@
 #define MAX_TRACKING_MATCH_DIFFERNCE 500
 #define TRACKING_MATCH_TRUST 0.4
 
-#define TARGET_TUNE_FACTOR  1.0
-#define STATE_TUNE_FACTOR   0.2
+#define TARGET_TUNE_FACTOR  10//1.0
+#define STATE_TUNE_FACTOR   1.0
 
 #endif /* global_config_h */
