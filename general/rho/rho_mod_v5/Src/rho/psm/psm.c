@@ -70,8 +70,6 @@ void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
     LOG_PSM_BARE(PSM_DEBUG, "\n");
 }
 
-static uint count = 0;
-
 void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu )
 {
 #ifdef __PSM__

@@ -80,7 +80,7 @@ static void OV9712_Disable()
   Set_GPIO_Type( MCLK_GPIO_Port, GPIO_MODE_INPUT);
 }
 
-cam_register_t dummy[] =
+register_t dummy[] =
 {
   /* Clock Selection */
   {REG5C,               0x59}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])

@@ -1,18 +1,17 @@
 //
-//  global_config.h
-//  rho_client
+//  rho_config.h
 //
 //  Created by Matthew Fonken on 9/19/18.
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#ifndef global_config_h
-#define global_config_h
+#ifndef rho_config_h
+#define rho_config_h
 
 #include "rho_global.h"
 
 #define __PCR__
-#define __PSM__
+//#define __PSM__
 
 //#define SPOOF_STATE_BANDS
 
@@ -74,14 +73,14 @@
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 
-#ifndef USE_INTERRUPT_MODEL
+//#ifndef USE_INTERRUPT_MODEL
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
 #ifdef DYNAMIC_BUFFER
 #define CAPTURE_BUFFER_SIZE     CAPTURE_BUFFER_WIDTH    //*CAPTURE_BUFFER_HEIGHT
 #else
 #define CAPTURE_BUFFER_SIZE     (CAPTURE_BUFFER_WIDTH*CAPTURE_BUFFER_HEIGHT)
-#endif
+//#endif
 
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      1//((uint32_t)((CAPTURE_BUFFER_WIDTH*(CAPTURE_BUFFER_HEIGHT+1.))*COVERAGE_NORMAL_MAX)+2)
@@ -132,4 +131,4 @@
 #define TARGET_TUNE_FACTOR  1.0
 #define STATE_TUNE_FACTOR   0.2
 
-#endif /* global_config_h */
+#endif /* rho_config_h */

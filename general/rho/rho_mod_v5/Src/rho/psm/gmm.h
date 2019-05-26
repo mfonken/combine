@@ -6,6 +6,8 @@
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
 
+#ifdef __PSM__
+
 #ifndef gmm_h
 #define gmm_h
 
@@ -91,3 +93,5 @@ static gaussian_mixture_functions GMMFunctions =
 #endif
     
 #endif /* gmm_h */
+
+#endif

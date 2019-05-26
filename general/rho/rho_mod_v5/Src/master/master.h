@@ -1,7 +1,12 @@
 #ifndef master_h
 #define master_h
 
+#ifdef __RHO__
+#error "test"
+#include "rho_master.h"
+#else
 #include "global_lib.h"
+#endif
 
 #define MASTER_RUN_AFTER_INIT true
 

@@ -1230,6 +1230,12 @@
                 <file>
                     <name>$PROJ_DIR$\..\Src\master\platforms\stm32_interface.h</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\stm32l4xx_hal_msp.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\stm32l4xx_it.c</name>
+                </file>
             </group>
             <group>
                 <name>Resources</name>
@@ -1243,14 +1249,101 @@
                     <name>$PROJ_DIR$\..\Src\master\resources.h</name>
                 </file>
             </group>
+            <group>
+                <name>Rho</name>
+                <group>
+                    <name>Core</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_client.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_client.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_core.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_core.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_structure.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_utility.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\core\rho_utility.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>PSM</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\control_structures.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\control_types.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\fsm.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\fsm.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\fsm_support.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\gmm.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\gmm.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\hmm.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\hmm.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\kumaraswamy.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\psm.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\psm\psm.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>Types</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\types\rho_kalman.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\types\rho_kalman.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\types\rho_pid.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\types\rho_pid.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\Src\rho\types\rho_types.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\rho\rho_config.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\rho\rho_global.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\rho\rho_master.h</name>
+                </file>
+            </group>
             <file>
                 <name>$PROJ_DIR$\..\Src\main.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Src\stm32l4xx_hal_msp.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\Src\stm32l4xx_it.c</name>
             </file>
         </group>
     </group>

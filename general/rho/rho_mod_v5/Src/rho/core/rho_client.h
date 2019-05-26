@@ -35,8 +35,8 @@ void TransmitRhoSystemPacket( void );
 /************************************************************************
  *                      Global Buffers                                  *
  ***********************************************************************/
-static capture_t _capture_buffer_internal[CAPTURE_BUFFER_SIZE];
-static index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
+capture_t _capture_buffer_internal[CAPTURE_BUFFER_SIZE];
+index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
 
 /************************************************************************
  *                      Rho Core Variables                              *
@@ -113,8 +113,8 @@ static rho_system_t RhoSystem =
 {
     { /* VARIABLES */
         { /* Utility */
-            CAPTURE_WIDTH,
-            CAPTURE_HEIGHT
+            (address_t)CAPTURE_WIDTH,
+            (address_t)CAPTURE_HEIGHT
         },
         { 0 },/* Addresses */
         { 0 },/* Flags */

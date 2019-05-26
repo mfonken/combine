@@ -24,7 +24,6 @@
 #else
 #define PXL_JMP 1
 #endif
-
     area    rho, code, readonly
 	preserve8
   

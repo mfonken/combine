@@ -622,10 +622,10 @@ void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
 
 void ResetForPredictionRhoUtility( prediction_predict_variables * _, prediction_pair_t * p, index_t Cx, index_t Cy )
 {
-    _->Ax = p->y.Primary;
-    _->Ay = p->x.Primary;
-    _->Bx = p->y.Secondary;
-    _->By = p->x.Secondary;
+    _->Ax = (index_t)p->y.Primary;
+    _->Ay = (index_t)p->x.Primary;
+    _->Bx = (index_t)p->y.Secondary;
+    _->By = (index_t)p->x.Secondary;
     _->Cx = Cx;
     _->Cy = Cy;
 }

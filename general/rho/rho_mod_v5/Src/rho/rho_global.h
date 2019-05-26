@@ -9,7 +9,7 @@
 #ifndef rho_global_h
 #define rho_global_h
 
-#define "global_config.h"
+#define "global_lib.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -23,7 +23,7 @@ typedef int16_t         sdensity_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
 //typedef uint32_t        register_t;
-typedef register_t *    address_t;
+typedef uint32_t *      address_t;
 typedef floating_t      timestamp_t;
 typedef uint8_t         capture_t;
 typedef volatile bool   flag_t;
@@ -50,20 +50,20 @@ enum LogLevel
 };
 #endif
 
-#define RHO_DEBUG               DEBUG_2
-#define RHO_DEBUG_2             DEBUG_1
+//#define RHO_DEBUG               DEBUG_2
+//#define RHO_DEBUG_2             DEBUG_1
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 
 //#define PSM_DEBUG               OFF
 //#define PSM_DEBUG_2             OFF
 
-#define HMM_DEBUG               ALWAYS
+//#define HMM_DEBUG               ALWAYS
 //#define GMM_DEBUG               DEBUG_2
-#define FSM_DEBUG               ALWAYS
-#define FSM_DEBUG_2             DEBUG_2
+//#define FSM_DEBUG               ALWAYS
+//#define FSM_DEBUG_2             DEBUG_2
 
-#define TEST_LOG_LEVEL          DEBUG_2
+#define TEST_LOG_LEVEL          ALWAYS
 
 #ifndef LOG
 #define LOG(L,...)              if(L >= TEST_LOG_LEVEL) \

@@ -17,7 +17,7 @@
 extern "C" {
 #endif
     
-    typedef double floating_t;
+//    typedef double floating_t;
     
     typedef struct
     {

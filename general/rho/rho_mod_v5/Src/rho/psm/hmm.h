@@ -6,6 +6,8 @@
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
 
+#ifdef __PSM__
+
 #ifndef hmm_h
 #define hmm_h
 
@@ -46,3 +48,5 @@ static const hidden_markov_model_function_t HMMFunctions =
 #endif
 
 #endif /* hmm_h */
+
+#endif

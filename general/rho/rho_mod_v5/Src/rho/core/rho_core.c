@@ -14,9 +14,6 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Filters */
     RhoUtility.Initialize.Filters( core );
     
-    /* Detection map */
-    DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
-    
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
@@ -24,9 +21,6 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Prediction Structures */
     RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
     RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
-    
-    /* Frame Conversion Model Connection */
-    RhoInterrupts.INIT_FROM_CORE( core );
 }
 
 void PerformRhoCore( rho_core_t * core, bool background_event )
@@ -100,10 +94,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     LOG_RHO(RHO_DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
-    
-    /*** TEST ***/
-    DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
-    /************/
+
     RhoUtility.Predict.GenerateObservationLists( core );
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuBlobs ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuBlobs );

@@ -137,8 +137,6 @@ static double ForwardBackward( hidden_markov_model_t * model, uint8_t k, uint8_t
     return a * b * c * d;
 }
 
-static uint count = 0;
-
 void inline ReportObservationToHiddenMarkovModel( hidden_markov_model_t * model, observation_symbol_t observation )
 {
     model->T = AddToObservationBuffer( &model->O, observation );
@@ -148,7 +146,6 @@ void BaumWelchGammaSolveHiddenMarkovModel( hidden_markov_model_t * model )
 {
     /* Update state expectation matrix */
     uint8_t k = model->O.prev, l = model->O.curr;
-    LOG_HMM(HMM_DEBUG, "%4d: %s,%s  ", ++count, observation_strings[k], observation_strings[l] );
     LOG_HMM_BARE(HMM_DEBUG, "\n");
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
