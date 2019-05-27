@@ -13,11 +13,7 @@
 extern "C" {
 #endif
 
-#ifdef TEST
-#include "control_types_test.h"
-#else
 #include "control_types.h"
-#endif
 
 #define STATE_KUMARASWAMY_INTERVALS { 0.2, 0.4, 0.65, 1.0 }
     

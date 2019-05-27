@@ -15,7 +15,11 @@
 #include "rho_kalman.h"
 #include "rho_pid.h"
 
+#ifdef __PSM__
 #include "psm.h"
+#else
+#include "fsm.h"
+#endif
 
 /* Packet Generation Settings */
 #define YES 1
@@ -144,6 +148,19 @@ typedef struct
 
 typedef struct
 {
+    index_t density;
+    uint8_t thresh,
+            label;
+} observation_t;
+
+typedef struct
+{
+    observation_t observations[MAX_OBSERVATIONS];
+    uint8_t length;
+} observation_list_t;
+
+typedef struct
+{
 density_t
     max,
     den;
@@ -204,7 +221,8 @@ typedef struct
                     NumBlobs;
     floating_t      NuBlobs,
                     Primary,
-                    Secondary;
+                    Secondary,
+                    AverageDensity;
     density_t       PreviousPeak[2],
                     PreviousCentroid;
     density_2d_t    PreviousDensity[2],
@@ -218,6 +236,10 @@ typedef struct
 {
     prediction_t    x,y;
     prediction_probabilities Probabilities;
+    
+    floating_t      NuBlobs,
+                    BestConfidence,
+                    AverageDensity;
 } prediction_pair_t;
 
 typedef struct
@@ -232,30 +254,30 @@ typedef struct
   void (*Pause)(void);
   void (*Resume)(void);
   void (*Reset)(void);
-} platform_dma_interface_functions;
+} rho_platform_dma_interface_functions;
 
 typedef struct 
 {
   uint8_t (*Transmit)( byte_t *, index_t);
-} platform_uart_interace_functions;
+} rho_platform_uart_interace_functions;
 
 typedef struct 
 {
   void (*Activate)( rho_system_flags_variables *);
-} platform_flag_interace_functions;
+} rho_platform_flag_interace_functions;
 
 typedef struct 
 {
   uint32_t (*Now)( void );
-} platform_time_interace_functions;
+} rho_platform_time_interace_functions;
 
 typedef struct
 {
-  platform_dma_interface_functions DMA;
-  platform_uart_interace_functions Usart;
-  platform_flag_interace_functions Flags;
-  platform_time_interace_functions Time;
-} platform_interface_functions;
+  rho_platform_dma_interface_functions DMA;
+  rho_platform_uart_interace_functions USART;
+  rho_platform_flag_interace_functions Flags;
+  rho_platform_time_interace_functions Time;
+} rho_platform_interface_functions;
 
 typedef struct
 {
@@ -409,7 +431,11 @@ typedef struct
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
+#ifdef __PSM__
     psm_t               PredictiveStateModel;
+#else
+    fsm_system_t        StateMachine;
+#endif
     packet_t            Packet;
     
     index_t             cframe[C_FRAME_SIZE];

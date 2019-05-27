@@ -46,7 +46,7 @@ extern "C" {
      */
     
     /* Tau states */
-#define loop_variables_t loop_variables_uint8_t //##t
+#define loop_variables_t loop_variables_uint8_t
     
     typedef struct
     {

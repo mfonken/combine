@@ -1132,7 +1132,7 @@
                     </file>
                 </group>
                 <group>
-                    <name>PSM</name>
+                    <name>State</name>
                     <file>
                         <name>$PROJ_DIR$\..\Src\rho\psm\control_structures.h</name>
                     </file>
@@ -1149,25 +1149,7 @@
                         <name>$PROJ_DIR$\..\Src\rho\psm\fsm_support.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\gmm.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\gmm.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\hmm.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\hmm.h</name>
-                    </file>
-                    <file>
                         <name>$PROJ_DIR$\..\Src\rho\psm\kumaraswamy.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\psm.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\Src\rho\psm\psm.h</name>
                     </file>
                 </group>
                 <group>

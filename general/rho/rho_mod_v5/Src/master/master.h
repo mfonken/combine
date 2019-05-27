@@ -2,7 +2,6 @@
 #define master_h
 
 #ifdef __RHO__
-#error "test"
 #include "rho_master.h"
 #else
 #include "global_lib.h"
@@ -23,6 +22,6 @@ static master_functions_t Master =
 {
   .Init = Master_Init,
   .Run  = Master_Run
-}
+};
 
 #endif

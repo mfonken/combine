@@ -156,7 +156,7 @@ void UpdateFSMState( fsm_system_t * sys )
 
 void PrintFSMMap( fsm_map_t * bm, state_t s )
 {
-#ifdef LOG_FSM
+#ifdef FSM_DEBUG
     reset_loop_variables( &_, bm->length );
     LOG_FSM(FSM_DEBUG_2, "\t\t\t  ");
     for( _.i = 0; _.i < _.l; _.i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)_.i), _.i);

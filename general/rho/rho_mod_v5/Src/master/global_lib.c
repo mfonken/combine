@@ -7,6 +7,8 @@ static void InitPlatform( TIMER_Handle_t * timer, USART_Handle_t * usart, I2C_Ha
   Utilities.I2C = i2c;
   
   Utilities.Ready = true;
+  
+  timestamp = _PLATFORM_Timestamp;
 }
 
 #ifdef __RHO__

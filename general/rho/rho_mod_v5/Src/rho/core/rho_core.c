@@ -96,8 +96,12 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
 
     RhoUtility.Predict.GenerateObservationLists( core );
+#ifdef __PSM__
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuBlobs ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuBlobs );
+#else
+     
+#endif
     
     prediction_predict_variables _;
     

@@ -403,6 +403,7 @@ void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *_, prediction
     r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->assumed_blobs, _->target_density ), MAX_NU_BLOBS );
     r->NumBlobs = _->blbf;
     r->TotalDensity = _->tden;
+    r->AverageDensity = ZDIV( (floating_t)r->TotalDensity, r->NuBlobs );
     
     /* Reset sort flags */
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
@@ -701,8 +702,12 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     core->TargetCoverageFactor = core->TargetFilter.value;
     floating_t TotalPixels = (floating_t)core->Width * (floating_t)core->Height;
+#ifdef __PSM__
     LOG_RHO(ALWAYS, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
+#else
+    switch(core->StateMachine.Sys.state)
+#endif
     {
         case CHAOTIC:
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[0], core->PredictionPair.x.PreviousPeak[0] );
@@ -712,8 +717,17 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
         case OVER_POPULATED:
         case UNDER_POPULATED:
         case TARGET_POPULATED:
+#ifdef __PSM__
             if( core->PredictiveStateModel.best_confidence > MIN_STATE_CONFIDENCE )
                 core->TargetCoverageFactor = ZDIV( core->PredictiveStateModel.proposed_nu * core->PredictiveStateModel.proposed_avg_den, TotalPixels );
+#else
+            if( core->PredictionPair.BestConfidence > MIN_STATE_CONFIDENCE )
+            {
+                core->PredictionPair.NuBlobs = MAX( core->PredictionPair.x.NuBlobs, core->PredictionPair.y.NuBlobs );
+                core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
+                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuBlobs * core->PredictivePair.AverageDensity, TotalPixels );
+            }
+#endif
             else
                 core->TargetCoverageFactor = ZDIV( core->TotalCoverage, TotalPixels );
             RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );

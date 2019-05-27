@@ -152,4 +152,6 @@ static platform_interface_functions Platform =
   .Time.Now             = _PLATFORM_Timestamp
 };
 
+uint32_t (*timestamp)(void); 
+
 #endif /* global_lib_h */

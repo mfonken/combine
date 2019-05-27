@@ -180,7 +180,7 @@ void DeactivateRhoSystem(void)
 
 void TransmitRhoSystemPacket( void )
 {
-    RhoSystem.Functions.Platform.Usart.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
+    RhoSystem.Functions.Platform.USART.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
 }
 
 /***************************************************************************************/
@@ -218,7 +218,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformI
     RhoSystem.Functions.Platform.DMA.Resume     = PlatformInterface->DMA.Resume;
     RhoSystem.Functions.Platform.DMA.Reset      = PlatformInterface->DMA.Reset;
     
-    RhoSystem.Functions.Platform.Usart.Transmit = PlatformInterface->Usart.Transmit;
+    RhoSystem.Functions.Platform.USART.Transmit = PlatformInterface->USART.Transmit;
     
     RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
     

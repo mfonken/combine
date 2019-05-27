@@ -56,7 +56,7 @@
 
 /* PID Filter Configs */
 #define PID_SCALE   1//10
-#define PID_DRIFT 1.1
+#define PID_DRIFT   1.1
 
 //#define STRICT_PROPORTIONAL_FACTOR 0.98
 //#define STRICT_INTEGRAL_FACTOR     0.02
