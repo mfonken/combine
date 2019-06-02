@@ -42,7 +42,7 @@ void RhoDrawer::DrawDetectionMap( detection_map_t * map )
         if( !map->fill ) printf(" Empty\n");
         else printf("\n");
 #endif
-        uint8_t i = map->first, c = 0;
+        int16_t i = map->first, c = 0;
         for( ; c < map->fill; c++, i = c % map->length)
         {
             detection_element_t * e = &map->buffer[i];

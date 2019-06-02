@@ -48,8 +48,8 @@ enum LogLevel
 };
 #endif
 
-#define RHO_DEBUG   DEBUG_2
-#define RHO_DEBUG_2 DEBUG_1
+//#define RHO_DEBUG   DEBUG_2
+//#define RHO_DEBUG_2 DEBUG_1
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 

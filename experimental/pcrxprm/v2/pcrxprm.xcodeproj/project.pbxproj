@@ -166,7 +166,7 @@
 				34001A6C220A92B50060DC03 /* core */,
 			);
 			name = rho;
-			path = ../../freeze/rho;
+			path = ../../../freeze/rho;
 			sourceTree = SOURCE_ROOT;
 		};
 		34001A60220A92B50060DC03 /* state_control */ = {
@@ -211,7 +211,8 @@
 				34001A6F220A92B50060DC03 /* rho_core.h */,
 				34001A72220A92B50060DC03 /* rho_core.c */,
 			);
-			path = core;
+			name = core;
+			path = core.h;
 			sourceTree = "<group>";
 		};
 		34001A7E220A92B50060DC03 /* tau */ = {

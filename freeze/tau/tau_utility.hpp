@@ -10,7 +10,7 @@
 #define tau_utility_hpp
 
 /// FIND PLACE FOR THIS
-#define THRESHOLD_MIN 1//00
+#define DEFAULT_THRESH 100
 
 #define AVERAGE_COUNT 10
 

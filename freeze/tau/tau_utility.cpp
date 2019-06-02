@@ -57,7 +57,7 @@ static void cma( double new_val, double *avg, index_t num )
 
 void Tau::init( void )
 {
-    rho.core.Thresh = THRESHOLD_MIN;
+    rho.core.Thresh = DEFAULT_THRESH;
     count = 0;
     accuracy_count = 0;
     avg = 0;

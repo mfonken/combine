@@ -22,7 +22,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
         {
 //          imshow("Thresh Frame", tau.utility.outframe);
           imshow(TITLE_STRING, local_frame);
-          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
+//          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
 //          imshow("Rho Frame", local_frame);
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
