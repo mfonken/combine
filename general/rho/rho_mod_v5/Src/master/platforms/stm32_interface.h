@@ -13,18 +13,21 @@
 
 #include "global_config.h"
 
-#define STMInterruptHandler HAL_GPIO_EXTI_Callback
-#define STMUartCompleted HAL_UART_TxCpltCallback
+#define STM_InterruptHandler HAL_GPIO_EXTI_Callback
+#define STM_UartCompleted HAL_UART_TxCpltCallback
 
-void            STMInterruptHandler( uint16_t GPIO_Pin );
-void            STMPauseDMA( void );
-void            STMResumeDMA( void );
-void            STMResetDMA( void );
-uint8_t         STMUartTxDMA( uint8_t * buffer, uint16_t length );
-uint16_t        STMUartRxDMA( uint8_t * buffer );
-void            STMUartCompleted( USART_Handle_t *huart );
-void            STMWritePin( uint32_t * port, uint16_t pin, uint8_t state );
-uint32_t        STMTimestamp(void);
+void            STM_InterruptHandler( uint16_t GPIO_Pin );
+void            STM_InitDMA( void );
+void            STM_PauseDMA( void );
+void            STM_ResumeDMA( void );
+void            STM_ResetDMA( void );
+uint8_t         STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length );
+uint16_t        STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer );
+bool            STM_UartCompleted( USART_Handle_t *huart );
+void            STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * data, uint16_t size, uint32_t timeout );
+void            STM_SetPortMode( uint32_t * port, uint8_t type );
+void            STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state );
+uint32_t        STM_Timestamp(void);
 
 #endif
 

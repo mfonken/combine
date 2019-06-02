@@ -128,7 +128,7 @@ enum LogLevel
 #define MAX(A,B)                ( ( A > B ) ? A : B )
 #endif
 
-#define SWAP(A,B)               ( { typeof(A) temp = A; A = B; B = temp; } )
+#define SWAP(A,B)               { index_t temp = A; A = B; B = temp; }
 
 #define BOUNDU(X,MAX)           ( ( X > MAX ) ? MAX : X )         // Bound in upper range
 #define BOUND(X,MIN,MAX)        ( ( X < MIN ) ? MIN : BOUNDU( X, MAX ) ) // Bound in upper and lower range

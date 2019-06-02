@@ -14,9 +14,7 @@
 #define	CAMERA_WIDTH_R	        (((REG57_V >> 3) & 0x07 ) | (REG59_V << 3))
 #define	CAMERA_HEIGHT_R	        ((REG57_V & 0x03) | (REG58_V << 2))
 
-I2C_Handle_t * CAM_I2C_PORT;
-
-register_t OV9712_regs[] =
+static register_t OV9712_regs[] =
 {
   {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
   {REG5C,	0x6a}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
@@ -45,39 +43,40 @@ register_t OV9712_regs[] =
   {ENDR}
 };
 
-static void OV9712_Init( I2C_Handle_t * i2c_port )
+void OV9712_Init( OV9712_t * ov9712, I2C_Handle_t * i2c_port, OV9712_pins_t * pins )
 {
-  OV9712_Enable();
+  ov9712->CAM_I2C_PORT = i2c_port;
+  memcpy( &ov9712->Pins, pins, sizeof(OV9712_pins_t) );
+  OV9712_Functions.Enable(ov9712);
   HAL_Delay(10);
-  CAM_I2C_PORT = i2c_port;
   register_t reg;
   for( int i = 0; ; i++ )
   {
     reg = OV9712_regs[i];
     if( reg.Address == ENDR ) break;
-    OV9712_Write( reg.Address, reg.Value );
+    OV9712_Functions.Write( ov9712, reg.Address, reg.Value );
   }
 }
-static void OV9712_Write( uint8_t r, uint8_t v )
+static void OV9712_Write( OV9712_t * ov9712, uint8_t r, uint8_t v )
 {
   uint8_t data[2] = { r, v };
-  HAL_I2C_Master_Transmit(CAM_I2C_PORT, OV9712_ADDR, data, 2, 100);
+  Platform.I2C.Transmit( ov9712->CAM_I2C_PORT, ov9712->ADDR, data, 2, 100);
 }
 
-static void OV9712_Enable()
+static void OV9712_Enable( OV9712_t * ov9712 )
 {
-  HAL_GPIO_WritePin( EN_1V5_GPIO_Port, EN_1V5_Pin, GPIO_PIN_SET );
-  HAL_GPIO_WritePin( CAM_EN_GPIO_Port, CAM_EN_Pin, GPIO_PIN_SET );
-  HAL_GPIO_WritePin( PWDN_GPIO_Port, PWDN_Pin, GPIO_PIN_RESET );
-  Set_GPIO_Type( MCLK_GPIO_Port, GPIO_MODE_AF_PP);
+  Platform.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_SET);
+  Platform.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_SET);
+  Platform.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_RESET);
+  Platform.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_AF_PP);
 }
 
-static void OV9712_Disable()
+static void OV9712_Disable( OV9712_t * ov9712 )
 {
-  HAL_GPIO_WritePin( EN_1V5_GPIO_Port, EN_1V5_Pin, GPIO_PIN_RESET );
-  HAL_GPIO_WritePin( CAM_EN_GPIO_Port, CAM_EN_Pin, GPIO_PIN_RESET );
-  HAL_GPIO_WritePin( PWDN_GPIO_Port, PWDN_Pin, GPIO_PIN_SET );
-  Set_GPIO_Type( MCLK_GPIO_Port, GPIO_MODE_INPUT);
+  Platform.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_RESET);
+  Platform.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_RESET);
+  Platform.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_SET);
+  Platform.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_INPUT);
 }
 
 register_t dummy[] =

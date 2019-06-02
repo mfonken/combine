@@ -9,7 +9,7 @@ void Master_Init( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * u
   Platform.Init( timer, usart, i2c );
   
 #ifdef __OV9712__
-  OV9712.Init(i2c);
+  OV9712_Functions.Init( &OV9712, i2c, NULL );
 #endif
   
 #ifdef __RHO__

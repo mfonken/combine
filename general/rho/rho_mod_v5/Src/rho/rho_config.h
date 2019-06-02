@@ -120,6 +120,7 @@
 #define MAX_BLOB_SCORE      10
 #define BLOB_SCORE_FACTOR   0.5
 #define MAX_NU_BLOBS        NUM_STATE_GROUPS+1
+#define MAX_OBSERVATIONS    1 << 4
 
 #define MAX_RHO_RECALCULATION_LEVEL 0
 
@@ -130,5 +131,8 @@
 
 #define TARGET_TUNE_FACTOR  1.0
 #define STATE_TUNE_FACTOR   0.2
+
+#define PIXEL_COUNT_TRUST_FACTOR   0.2
+#define PIXEL_COUNT_DROP_FACTOR    0.75
 
 #endif /* rho_config_h */

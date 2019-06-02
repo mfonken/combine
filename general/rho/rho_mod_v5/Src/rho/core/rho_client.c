@@ -15,8 +15,8 @@ inline void PixelThreshLoop( register byte_t * capture_address,   // capture buf
                             const register byte_t thresh_value,
                             const register byte_t sub_sample )
 {
-    register register_t width = RhoSystem.Variables.Utility.Width;
-    register register_t capture_value;// = *capture_address;
+    register index_t width = RhoSystem.Variables.Utility.Width;
+    register index_t capture_value;// = *capture_address;
     //  register address_t capture_base = (address_t)RhoSystem.Variables.Buffers.Capture;
     //  register register_t capture_offset = 0;
 #ifndef __ASSEMBLY_RHO__
@@ -59,7 +59,7 @@ inline index_t CaptureFrame()
     t_counter = 0,
     t_max = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshMax - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
     byte_t
-    thresh_value = *RhoSystem.Variables.Utility.Thresh,
+    thresh_value = (byte_t)RhoSystem.Variables.Utility.Thresh,
     *capture_address = RhoSystem.Variables.Buffers.Capture;
     index_t
     *thresh_address = RhoSystem.Variables.Buffers.Thresh;
@@ -160,8 +160,7 @@ void ProcessRhoSystemFrameCapture( void )
 inline void PerformRhoSystemProcess( void )
 {
     RhoSystem.Functions.Perform.FrameCapture();
-    RhoFunctions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags.Backgrounding);
-    
+    RhoSystem.Functions.Perform.RhoProcess();    
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
@@ -180,7 +179,7 @@ void DeactivateRhoSystem(void)
 
 void TransmitRhoSystemPacket( void )
 {
-    RhoSystem.Functions.Platform.USART.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
+    RhoSystem.Functions.Platform.USART.Transmit( NULL, (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
 }
 
 /***************************************************************************************/
@@ -188,7 +187,6 @@ void TransmitRhoSystemPacket( void )
 /***************************************************************************************/
 void InitRhoSystem( address_t CameraPort, address_t UartTxPort )
 {
-    RhoSystem.Functions.Platform.Flags.Activate( &RhoSystem.Variables.Flags );
     DeactivateBackgrounding();
     
     RhoSystem.Variables.Addresses.CameraPort = CameraPort;
@@ -208,7 +206,7 @@ void InitRhoSystem( address_t CameraPort, address_t UartTxPort )
     RhoSystem.Variables.Buffers.BeaconPacket->header.includes = BEACON_DEFAULT_PERIOD;
     
     RhoSystem.Functions.Memory.Zero();
-    RhoFunctions.Init( &RhoSystem.Variables.Utility );
+    RhoSystem.Functions.Perform.Init( (address_t)CAPTURE_WIDTH, (address_t)CAPTURE_HEIGHT );
 }
 
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformInterface )
@@ -220,7 +218,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformI
     
     RhoSystem.Functions.Platform.USART.Transmit = PlatformInterface->USART.Transmit;
     
-    RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
+//    RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
     
     RhoSystem.Functions.Platform.Time.Now       = PlatformInterface->Time.Now;
 }

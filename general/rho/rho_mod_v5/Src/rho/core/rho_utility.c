@@ -706,7 +706,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     LOG_RHO(ALWAYS, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
 #else
-    switch(core->StateMachine.Sys.state)
+    switch(core->StateMachine.state)
 #endif
     {
         case CHAOTIC:
@@ -725,7 +725,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             {
                 core->PredictionPair.NuBlobs = MAX( core->PredictionPair.x.NuBlobs, core->PredictionPair.y.NuBlobs );
                 core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
-                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuBlobs * core->PredictivePair.AverageDensity, TotalPixels );
+                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuBlobs * core->PredictionPair.AverageDensity, TotalPixels );
             }
 #endif
             else

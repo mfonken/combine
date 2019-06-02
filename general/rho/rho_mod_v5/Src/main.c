@@ -43,10 +43,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch2_ch4;
-
 USART_HandleTypeDef husart1;
 DMA_HandleTypeDef hdma_usart1_tx;
 

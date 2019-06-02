@@ -1087,6 +1087,9 @@
                     <name>$PROJ_DIR$\..\Src\master\platforms\stm32_interface.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Src\master\platforms\stm32_master.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Src\stm32l4xx_hal_msp.c</name>
                 </file>
                 <file>

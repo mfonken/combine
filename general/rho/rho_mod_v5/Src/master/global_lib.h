@@ -6,17 +6,21 @@
 #include "system.h"
 #include "printers.h"
 
-#ifdef __OV9712__
-#include "OV9712.h"
+#ifndef _PLATFORM_
+#error "No platform specified!"
+#else
+#define PLATFORM_SPECIFIC_FUNCTION_STRINGIFY(x,y) x ## _ ## y
+#define PLATFORM_SPECIFIC_FUNCTION_BUILDER(x,y)  PLATFORM_SPECIFIC_FUNCTION_STRINGIFY(x,y)
+#define PLATFORM_SPECIFIC(FUNC) PLATFORM_SPECIFIC_FUNCTION_BUILDER(_PLATFORM_, FUNC)
 #endif
 
-#ifdef __RHO__
-#include "rho_master.h"
-#endif
+//
+//#ifdef __RHO__
+//#include "rho_master.h"
+//#endif
 
-#ifdef __STM__
-#include "stm32l4xx_it.h"
-#include "stm32_interface.h"
+#ifdef __STM32__
+#include "stm32_master.h"
 #endif
 
 void InitPlatform( TIMER_Handle_t *, USART_Handle_t *, I2C_Handle_t * );
@@ -56,25 +60,30 @@ typedef struct
 #endif
 
 /*** Platform interfaces ***/
-/* Interrupt */
-inline void      _PLATFORM_InterruptHandler( uint16_t );
-
-/* DMA */
-inline void      _PLATFORM_InitDMA( void );
-inline void      _PLATFORM_PauseDMA( void );
-inline void      _PLATFORM_ResumeDMA( void );
-inline void      _PLATFORM_ResetDMA( void );
-
-/* UART */
-inline uint8_t   _PLATFORM_UartTxDMA( uint8_t *, uint16_t );
-inline uint16_t  _PLATFORM_UartRxDMA( uint8_t * );
-inline bool      _PLATFORM_UartCompleted( USART_Handle_t * );
+///* Interrupt */
+//inline void      _PLATFORM_InterruptHandler( uint16_t );
+//
+///* DMA */
+//inline void      _PLATFORM_InitDMA( void );
+//inline void      _PLATFORM_PauseDMA( void );
+//inline void      _PLATFORM_ResumeDMA( void );
+//inline void      _PLATFORM_ResetDMA( void );
+//
+///* UART */
+//inline uint8_t   _PLATFORM_UartTxDMA( uint8_t *, uint16_t );
+//inline uint16_t  _PLATFORM_UartRxDMA( uint8_t * );
+//inline bool      _PLATFORM_UartCompleted( USART_Handle_t * );
+//
 
 /* GPIO */
-inline void      _PLATFORM_WritePin(uint32_t *, uint16_t, uint8_t );
+inline void      SetPortMode(gpio_t *, uint8_t );
+inline void      WritePin(gpio_t *, uint8_t );
 
-/* Time */
-inline uint32_t  _PLATFORM_Timestamp(void);
+//inline void      _PLATFORM_SetPortType(uint32_t *, uint8_t );
+//inline void      _PLATFORM_WritePin(uint32_t *, uint16_t, uint8_t );
+//
+///* Time */
+//inline uint32_t  _PLATFORM_Timestamp(void);
 
 typedef struct
 {
@@ -91,14 +100,20 @@ typedef struct
 
 typedef struct
 {
-  uint8_t(*Transmit)( uint8_t *, uint16_t );
-  uint16_t(*Receive)( uint8_t * );
+  uint8_t(*Transmit)( USART_Handle_t *, uint8_t *, uint16_t );
+  uint16_t(*Receive)( USART_Handle_t *, uint8_t * );
   bool (*Completed)( USART_Handle_t * );
 } platform_interface_uart_functions;
 
 typedef struct
 {
-  void(*Write)( uint32_t *, uint16_t, uint8_t );
+  void (*Transmit)( I2C_Handle_t *, uint16_t, uint8_t *, uint16_t, uint32_t );
+} platform_interface_i2c_functions;
+  
+typedef struct
+{
+  void (*SetPortMode)(gpio_t *, uint8_t );
+  void(*Write)( gpio_t *, uint8_t );
 } platform_interface_gpio_functions;
 
 typedef struct
@@ -116,6 +131,7 @@ typedef struct
   platform_interface_interrupt_functions Interrupt;
   platform_interface_dma_functions       DMA;
   platform_interface_uart_functions      USART;
+  platform_interface_i2c_functions       I2C;
   platform_interface_gpio_functions      GPIO;
   platform_interface_time_functions      Time;
 } platform_interface_functions;
@@ -132,26 +148,25 @@ static platform_interface_functions Platform =
   .Rho.Packet.Transmit  = TransmitPacket,
   .Rho.Packet.Receive   = ReceivePacket,
 #endif
-  .Interrupt.Handler    = _PLATFORM_InterruptHandler,
+  .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),
   
-  .DMA.Init             = _PLATFORM_InitDMA,
-  .DMA.Pause            = _PLATFORM_PauseDMA,
-  .DMA.Resume           = _PLATFORM_ResumeDMA,
-  .DMA.Reset            = _PLATFORM_ResetDMA,
+  .DMA.Init             = PLATFORM_SPECIFIC(InitDMA),
+  .DMA.Pause            = PLATFORM_SPECIFIC(PauseDMA),
+  .DMA.Resume           = PLATFORM_SPECIFIC(ResumeDMA),
+  .DMA.Reset            = PLATFORM_SPECIFIC(ResetDMA),
   
-  .USART.Transmit       = _PLATFORM_UartTxDMA,
-  .USART.Receive        = _PLATFORM_UartRxDMA,
-  .USART.Completed      = _PLATFORM_UartCompleted,
+  .USART.Transmit       = PLATFORM_SPECIFIC(UartTxDMA),
+  .USART.Receive        = PLATFORM_SPECIFIC(UartRxDMA),
+  .USART.Completed      = PLATFORM_SPECIFIC(UartCompleted),
   
-  .GPIO.Write           = _PLATFORM_WritePin,
+  .I2C.Transmit         = PLATFORM_SPECIFIC(I2CMasterTx),
   
-#ifdef __RHO__
-  .Flags.Activate       = ActivateClientFlags,
-#endif
+  .GPIO.SetPortMode     = SetPortMode,
+  .GPIO.Write           = WritePin,
   
-  .Time.Now             = _PLATFORM_Timestamp
+  .Time.Now             = PLATFORM_SPECIFIC(Timestamp)
 };
 
-uint32_t (*timestamp)(void); 
+static uint32_t (*timestamp)(void); 
 
 #endif /* global_lib_h */

@@ -1,6 +1,6 @@
 #include "global_lib.h"
 
-static void InitPlatform( TIMER_Handle_t * timer, USART_Handle_t * usart, I2C_Handle_t * i2c )
+void InitPlatform( TIMER_Handle_t * timer, USART_Handle_t * usart, I2C_Handle_t * i2c )
 {
   Utilities.Timer = timer;
   Utilities.Usart = usart;
@@ -8,24 +8,34 @@ static void InitPlatform( TIMER_Handle_t * timer, USART_Handle_t * usart, I2C_Ha
   
   Utilities.Ready = true;
   
-  timestamp = _PLATFORM_Timestamp;
+  timestamp = PLATFORM_SPECIFIC(Timestamp);
+}
+
+void WritePin( gpio_t * gpio, uint8_t val )
+{
+  PLATFORM_SPECIFIC(WritePin)( gpio->port, gpio->pin, val );
+}
+
+void SetPortMode(gpio_t * gpio, uint8_t val )
+{
+  PLATFORM_SPECIFIC(SetPortMode)( gpio->port, val );
 }
 
 #ifdef __RHO__
-static void SetActiveClientFlags( rho_system_flags_variables * Flags )
+void SetActiveClientFlags( rho_system_flags_variables * Flags )
 {
   ActiveFlags = Flags;
 }
-static void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart )
+void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart )
 {
 }
 
-static inline bool TransmitPacket( packet_t * packet )
+inline bool TransmitPacket( packet_t * packet )
 {
   return (bool)Platform.USART.Transmit( (uint8_t *)packet, sizeof(packet_t));
 }
 
-static inline uint16_t ReceivePacket( packet_t * packet )
+inline uint16_t ReceivePacket( packet_t * packet )
 {
   return Platform.USART.Receive( (uint8_t *)packet );
 }
