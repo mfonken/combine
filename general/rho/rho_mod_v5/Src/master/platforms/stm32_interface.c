@@ -26,7 +26,7 @@
 //
 //static inline void STM_InitPCLKDMA( void )
 //{
-//  if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.capture, CAPTURE_BUFFER_SIZE) != HAL_OK) 
+//  if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
 //      Error_Handler();
 //  __HAL_TIM_ENABLE_DMA(this_timer, TIM2_DMA_CC);
 //  __HAL_TIM_ENABLE_IT(this_timer, TIM2_IT_CC);
@@ -59,7 +59,7 @@
 //{
 //  ActiveFlags.UARTBusy = 0;
 //}
-void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * data, uint16_t size, uint32_t timeout )
+void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
 {
   HAL_I2C_Master_Transmit( hi2c, addr, data, size, timeout);
 }

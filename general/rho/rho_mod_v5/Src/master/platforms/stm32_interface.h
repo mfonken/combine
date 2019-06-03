@@ -24,7 +24,7 @@ void            STM_ResetDMA( void );
 uint8_t         STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length );
 uint16_t        STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer );
 bool            STM_UartCompleted( USART_Handle_t *huart );
-void            STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * data, uint16_t size, uint32_t timeout );
+void            STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout );
 void            STM_SetPortMode( uint32_t * port, uint8_t type );
 void            STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state );
 uint32_t        STM_Timestamp(void);

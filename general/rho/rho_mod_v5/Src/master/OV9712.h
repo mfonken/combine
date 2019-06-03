@@ -2,12 +2,12 @@
 #define OV9712_h
 
 #include "OV9712_regs.h"
-#include "global_lib.h"
+#include "platform.h"
 
 typedef struct
-{ 
+{
   /* Pins */
-  gpio_t 
+  gpio_t
     LOW_VOLTAGE,
     ENABLE,
     POWER_DOWN,
@@ -27,7 +27,7 @@ void OV9712_Write( OV9712_t *, uint8_t, uint8_t );
 void OV9712_Enable( OV9712_t * );
 void OV9712_Disable( OV9712_t * );
 
-typedef struct 
+typedef struct
 {
   void (*Init)( OV9712_t *, I2C_Handle_t *, OV9712_pins_t * );
   void (*Write)( OV9712_t *, uint8_t, uint8_t);
@@ -36,7 +36,7 @@ typedef struct
 } OV9712_functions;
 
 
-static OV9712_functions OV9712_Functions = 
+static OV9712_functions OV9712_Functions =
 {
   .Init = OV9712_Init,
   .Write = OV9712_Write,

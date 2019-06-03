@@ -1,28 +1,27 @@
 #include "system.h"
 
-void InitSystem(system_states_list_t * states, I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * usart )
+void InitSystem(
+  system_t * system,
+  system_states_list_t * states,
+  system_state_enum starting_state )
 {
-  System.state_list = states;
-  System.i2c = i2c;
-  System.timer = timer;
-  System.usart = usart;
-  
-  SetState(STARTING);
+  system.state_list = states;
+  SystemFunctions.State.Set( system, starting_state);
 }
 
-system_state_t GetState(void)
+void NextStateSystem( system_t * system )
 {
-  return (*System.state_list)[System.state];
+  SystemFunctions.State.Set( system, SystemFunctions.State.Get(system).next );
 }
 
-void NextState(void)
+system_state_t GetStateSystem( system_t * system )
 {
-  SetState( GetState().next );
+  return (*system.state_list)[System.state];
 }
 
-void SetState( system_state_enum new_state )
-{   
+void SetStateSystem( system_t * system, system_state_enum new_state )
+{
   System.state = new_state;
-  
-  GetState().routine();
+
+  SystemFunctions.State.Get(system).routine();
 }

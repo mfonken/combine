@@ -9,7 +9,11 @@
 #ifndef rho_global_h
 #define rho_global_h
 
-#include  "global_lib.h"
+#ifdef __OV9712__
+#include "OV9712.h"
+#else
+#include "platform.h"
+#endif
 
 #include <stdbool.h>
 #include <stdint.h>

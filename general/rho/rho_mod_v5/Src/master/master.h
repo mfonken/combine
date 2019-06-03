@@ -1,15 +1,7 @@
 #ifndef master_h
 #define master_h
 
-#ifdef __RHO__
-#include "rho_master.h"
-#else
-#ifdef __OV9712__
-#include "OV9712.h"
-#else
-#include "global_lib.h"
-#endif
-#endif
+#include "system.h"
 
 #define MASTER_RUN_AFTER_INIT true
 

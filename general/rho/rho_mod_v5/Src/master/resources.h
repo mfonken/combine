@@ -1,7 +1,7 @@
 #ifndef resources_h
 #define resources_h
 
-#define STR(A) #A
+#include "printers.h"
 
 #define ASCII_CLEAR 0x0c
 

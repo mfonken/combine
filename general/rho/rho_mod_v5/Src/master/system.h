@@ -2,7 +2,15 @@
 #define system_h
 
 #include <stdint.h>
-#include "global_lib.h"
+#ifdef __RHO__
+#include "rho_master.h"
+#else
+#ifdef __OV9712__
+#include "OV9712.h"
+#else
+#include "platform.h"
+#endif
+#endif
 
 #define DEFAULT_ID      0xab
 
@@ -16,14 +24,14 @@ typedef enum
   ACTIVE,
   INACTIVE,
   RECONFIGURING,
-  
+
   NUM_SYSTEM_STATES
 } system_state_enum;
 
 typedef struct
 {
-  system_state_enum 
-    state, 
+  system_state_enum
+    state,
     next;
   void (*routine)(void);
 } system_state_t;
@@ -39,25 +47,42 @@ typedef struct
 {
   /* Header */
   system_header_t header;
-  
+
   /* State Control */
   system_state_enum state;
   system_states_list_t * state_list;
-  
-  /* Utilities */
-  I2C_Handle_t * i2c; 
-  TIMER_Handle_t * timer; 
-  USART_Handle_t * usart;
-} system_global_t;
+} system_t;
 
-void InitSystem( system_states_list_t *, I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
-void NextState(void);
-void SetState( system_state_enum );
-
-static system_global_t System =
+static system_t System =
 {
   { DEFAULT_ID },
   STARTING, // State
+};
+
+void InitSystem( system_t *, system_states_list_t *, system_state_enum );
+void NextStateSystem( system_t * );
+system_state_t GetStateSystem( system_t * );
+void SetStateSystem( system_t *,  system_state_enum );
+
+typedef struct
+{
+  void (*NextState( system_t * );
+  system_state_t (*GetState)( system_t * );
+  void (*SetState)( system_t *,  system_state_enum );
+} system_state_functions;
+
+typedef struct
+{
+  void (*Init)( system_t *, system_states_list_t *, system_state_enum );
+  system_state_functions State;
+} system_functions;
+
+static system_functions SystemFunctions =
+{
+  .Init = InitSystem,
+  .State.Next =  NextStateSystem,
+  .State.Get = GetStateSystem,
+  .State.Set = SetStateSystem
 };
 
 #endif

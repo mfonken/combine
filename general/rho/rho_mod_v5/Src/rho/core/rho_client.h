@@ -50,7 +50,7 @@ address_t
   ThreshEnd,                      /* Actual end of thresh buffer */
   ThreshMax,                      /* Shared address of threshold value */
   PixelCount,                     /* Shared address of pixel count value */
-  UartTxPort;                   
+  HostTxPort;
 } rho_system_address_variables;
 
 typedef struct
@@ -131,7 +131,7 @@ static rho_system_t RhoSystem =
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,
             .TransmitPacket     = TransmitRhoSystemPacket
         },
-        { 0 }, /* Utility */        
+        { 0 }, /* Utility */
         { /* Memory */
             .Zero               = ZeroRhoSystemMemory
         }

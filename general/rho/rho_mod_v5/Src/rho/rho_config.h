@@ -15,7 +15,7 @@
 
 //#define SPOOF_STATE_BANDS
 
-/* Camera Config */ 
+/* Camera Config */
 #define RHO_WIDTH               1280
 #define RHO_HEIGHT              800
 
@@ -113,6 +113,8 @@
 
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20
+
+#define MAX_BLOB_HEIGHT     200
 
 #define EXPECTED_NUM_BLOBS  2
 #define MAX_BLOBS           4

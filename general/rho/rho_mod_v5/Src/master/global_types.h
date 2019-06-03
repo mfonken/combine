@@ -17,4 +17,6 @@ typedef struct
   uint8_t pin;
 } gpio_t;
 
+typedef uint32_t * generic_handle_t;
+
 #endif /* global_types_h */
