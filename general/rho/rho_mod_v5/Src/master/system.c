@@ -1,12 +1,10 @@
 #include "system.h"
 
 void InitSystem(
-  system_t * system,
-  system_states_list_t * states,
-  system_state_enum starting_state )
+  system_t * system )
 {
-  system.state_list = states;
-  SystemFunctions.State.Set( system, starting_state);
+//  system.state_list = states;
+  SystemFunctions.State.Set( system, system->state );
 }
 
 void NextStateSystem( system_t * system )
@@ -16,7 +14,7 @@ void NextStateSystem( system_t * system )
 
 system_state_t GetStateSystem( system_t * system )
 {
-  return (*system.state_list)[System.state];
+  return *(system->state_list)[system->state];
 }
 
 void SetStateSystem( system_t * system, system_state_enum new_state )

@@ -1057,12 +1057,6 @@
                     <name>$PROJ_DIR$\..\Src\master\global_config.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\Src\master\global_lib.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\Src\master\global_lib.h</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\Src\master\global_types.h</name>
                 </file>
                 <file>
@@ -1070,6 +1064,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Src\master\master.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\master\platform.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Src\master\platform.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Src\master\system.c</name>
@@ -1081,13 +1081,13 @@
             <group>
                 <name>Platform</name>
                 <file>
+                    <name>$PROJ_DIR$\..\Src\master\platforms\platform_interface_master.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Src\master\platforms\stm32_interface.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Src\master\platforms\stm32_interface.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\Src\master\platforms\stm32_master.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Src\stm32l4xx_hal_msp.c</name>

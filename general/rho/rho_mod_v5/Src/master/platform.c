@@ -2,18 +2,11 @@
 
 void InitPlatform( platform_t * platform, protocol_t host_communication_protocol, generic_handle_t host_communication_handle )
 {
-  platform.host_communication_protocol = host_communication_protocol;
-  platform.host_communication_handle = host_communication_handle;
+  *platform = (platform_t){ host_communication_protocol, host_communication_handle };
 
   timestamp = PLATFORM_SPECIFIC(Timestamp);
 
-  #ifdef __OV9712__
-    OV9712_Functions.Init( &OV9712, i2c, NULL );
-  #endif
 
-  #ifdef __RHO__
-    RhoSystem.Functions.Perform.ConnectToInterface( &Platform );
-  #endif
 }
 
 void WritePin( gpio_t * gpio, uint8_t val )
@@ -29,7 +22,7 @@ void SetPortMode(gpio_t * gpio, uint8_t val )
 uint8_t TransmitToHost( uint8_t * buffer, uint16_t length )
 {
 #if HOST_COMMUNICATION_PROTOCOL == USART
-  return PlatformFunction.USART.Transmit( (USART_Handle_t *)Platform.host_communication_handle, buffer, length );
+  return PlatformFunctions.USART.Transmit( (USART_Handle_t *)Platform.host_communication_handle, buffer, length );
 #elif HOST_COMMUNICATION_PROTOCOL == I2C
   PlatformFunction.I2C.Transmit( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, buffer, length );
   return 1;
@@ -40,7 +33,7 @@ uint8_t TransmitToHost( uint8_t * buffer, uint16_t length )
 uint16_t ReceiveFromHost( uint8_t * buffer )
 {
   #if HOST_COMMUNICATION_PROTOCOL == USART
-    return PlatformFunction.USART.Receive( (USART_Handle_t *)Platform.host_communication_handle, buffer );
+    return PlatformFunctions.USART.Receive( (USART_Handle_t *)Platform.host_communication_handle, buffer );
   #elif HOST_COMMUNICATION_PROTOCOL == I2C
     PlatformFunction.I2C.Receive( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, data, len );
     return 1;

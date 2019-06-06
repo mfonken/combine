@@ -210,7 +210,7 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
 
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformInterface )
 {
-  RhoSystem.Functions.Platform = PlatformInterface;
+//  RhoSystem.Functions.Platform = PlatformInterface;
 //     RhoSystem.Functions.Platform.DMA.Init       = PlatformInterface->DMA.Init;
 //     RhoSystem.Functions.Platform.DMA.Pause      = PlatformInterface->DMA.Pause;
 //     RhoSystem.Functions.Platform.DMA.Resume     = PlatformInterface->DMA.Resume;

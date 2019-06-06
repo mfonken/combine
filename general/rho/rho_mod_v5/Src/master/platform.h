@@ -4,7 +4,7 @@
 #include "resources.h"
 #include "global_config.h"
 #include "system.h"
-#include "platform_master.h"
+#include "platform_interface_master.h"
 
 #ifndef _PLATFORM_
 #error "No platform specified!"
@@ -14,20 +14,24 @@
 #define PLATFORM_SPECIFIC(FUNC) PLATFORM_SPECIFIC_FUNCTION_BUILDER(_PLATFORM_, FUNC)
 #endif
 
-#ifndef HOST_ADDR
-#error "HOST_ADDR is not defined."
+#ifndef HOST_ADDRESS
+#error "HOST_ADDRESS is not defined."
 #endif
+
+typedef enum
+{
+  NO_PROTOCOL_TYPE = 0,
+  I2C_PROTOCOL_TYPE,
+//  SPI_PROTOCOL_TYPE,
+  USART_PROTOCOL_TYPE,
+//  USB_PROTOCOL_TYPE
+} protocol_t;
 
 typedef struct
 {
   /* Utilities */
-  typedef union
-  {
-    I2C_Handle_t * hi2c;
-    SPI_Handle_t * hspi;
-    USART_Handle_t * husart;
-    USB_Handle_t * husb;
-  } host_communication_handle;
+  protocol_t host_communication_protocol;
+  generic_handle_t host_communication_handle;
 } platform_t;
 
 static platform_t Platform;

@@ -60,23 +60,23 @@ void OV9712_Init( OV9712_t * ov9712, I2C_Handle_t * i2c_port, OV9712_pins_t * pi
 static void OV9712_Write( OV9712_t * ov9712, uint8_t r, uint8_t v )
 {
   uint8_t data[2] = { r, v };
-  Platform.I2C.Transmit( ov9712->CAM_I2C_PORT, ov9712->ADDR, data, 2, 100);
+  PlatformFunctions.I2C.Transmit( ov9712->CAM_I2C_PORT, ov9712->ADDR, data, 2, 100);
 }
 
 static void OV9712_Enable( OV9712_t * ov9712 )
 {
-  Platform.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_SET);
-  Platform.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_SET);
-  Platform.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_RESET);
-  Platform.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_AF_PP);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_AF_PP);
 }
 
 static void OV9712_Disable( OV9712_t * ov9712 )
 {
-  Platform.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_RESET);
-  Platform.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_RESET);
-  Platform.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_SET);
-  Platform.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_INPUT);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_INPUT);
 }
 
 register_t dummy[] =

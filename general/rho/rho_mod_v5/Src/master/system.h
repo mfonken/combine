@@ -59,21 +59,21 @@ static system_t System =
   STARTING, // State
 };
 
-void InitSystem( system_t *, system_states_list_t *, system_state_enum );
+void InitSystem( system_t * );
 void NextStateSystem( system_t * );
 system_state_t GetStateSystem( system_t * );
 void SetStateSystem( system_t *,  system_state_enum );
 
 typedef struct
 {
-  void (*NextState( system_t * );
-  system_state_t (*GetState)( system_t * );
-  void (*SetState)( system_t *,  system_state_enum );
+  void (*Next)( system_t * );
+  system_state_t (*Get)( system_t * );
+  void (*Set)( system_t *,  system_state_enum );
 } system_state_functions;
 
 typedef struct
 {
-  void (*Init)( system_t *, system_states_list_t *, system_state_enum );
+  void (*Init)( system_t * );
   system_state_functions State;
 } system_functions;
 

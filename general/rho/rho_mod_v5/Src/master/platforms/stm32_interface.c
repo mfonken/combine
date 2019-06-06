@@ -61,7 +61,7 @@
 //}
 void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
 {
-  HAL_I2C_Master_Transmit( hi2c, addr, data, size, timeout);
+  HAL_I2C_Master_Transmit( hi2c, addr, buffer, length, timeout);
 }
 
 void STM_SetPortMode( uint32_t * port, uint8_t type )
