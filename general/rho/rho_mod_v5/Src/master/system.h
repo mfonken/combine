@@ -1,6 +1,9 @@
 #ifndef system_h
 #define system_h
 
+/***************************************************************************************/
+/*                                    Includes                                         */
+/***************************************************************************************/
 #include <stdint.h>
 #ifdef __RHO__
 #include "rho_master.h"
@@ -12,17 +15,17 @@
 #endif
 #endif
 
-#define DEFAULT_ID      0xab
-
+/***************************************************************************************/
+/*                              Type Definitions                                       */
+/***************************************************************************************/
 typedef enum
 {
-  STARTING = 0,
-  INITIALIZING,
+  INITIALIZING = 0,
   CONNECTING_TO_HOST,
   CONFIGURING,
   READY,
   ACTIVE,
-  INACTIVE,
+  IDLE,
   RECONFIGURING,
 
   NUM_SYSTEM_STATES
@@ -55,20 +58,30 @@ typedef struct
 
 static system_t System =
 {
-  { DEFAULT_ID },
+  { THIS_ID },
   STARTING, // State
 };
 
-void InitSystem( system_t * );
-void NextStateSystem( system_t * );
-system_state_t GetStateSystem( system_t * );
-void SetStateSystem( system_t *,  system_state_enum );
+/***************************************************************************************/
+/*                             Function Definitions                                    */
+/***************************************************************************************/
+void InitSystem(               system_t *, system_states_list_t );
+void NextStateSystem(          system_t *                       );
+system_state_t GetStateSystem( system_t *                       );
+void SetStateSystem(           system_t *,  system_state_enum   );
+void PerformStateSystem(       system_t *                       );
+void EnterStateSystem(         system_t *,  system_state_enum   );
 
+/***************************************************************************************/
+/*                             Function Structures                                     */
+/***************************************************************************************/
 typedef struct
 {
-  void (*Next)( system_t * );
-  system_state_t (*Get)( system_t * );
-  void (*Set)( system_t *,  system_state_enum );
+  void (*Next)(           system_t *, system_states_list_t );
+  system_state_t (*Get)(  system_t *                       );
+  void (*Set)(            system_t *, system_state_enum    );
+  void (*Perform)(        system_t *                       );
+  void (*Enter)(          system_t *, system_state_enum    );
 } system_state_functions;
 
 typedef struct
@@ -77,12 +90,17 @@ typedef struct
   system_state_functions State;
 } system_functions;
 
+/***************************************************************************************/
+/*                               Global Instances                                      */
+/***************************************************************************************/
 static system_functions SystemFunctions =
 {
-  .Init = InitSystem,
-  .State.Next =  NextStateSystem,
-  .State.Get = GetStateSystem,
-  .State.Set = SetStateSystem
+  .Init           = InitSystem,
+  .State.Next     = NextStateSystem,    /* Enter next state               */
+  .State.Get      = GetStateSystem,     /* Get current state              */
+  .State.Set      = SetStateSystem,     /* Set state, no perform          */
+  .State.Perform  = PerformStateSystem, /* Peform current state's routine */
+  .State.Enter    = EnterStateSystem    /* Set and perform state          */
 };
 
 #endif

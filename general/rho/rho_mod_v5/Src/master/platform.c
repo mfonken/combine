@@ -5,8 +5,6 @@ void InitPlatform( platform_t * platform, protocol_t host_communication_protocol
   *platform = (platform_t){ host_communication_protocol, host_communication_handle };
 
   timestamp = PLATFORM_SPECIFIC(Timestamp);
-
-
 }
 
 void WritePin( gpio_t * gpio, uint8_t val )
@@ -19,12 +17,50 @@ void SetPortMode(gpio_t * gpio, uint8_t val )
   PLATFORM_SPECIFIC(SetPortMode)( gpio->port, val );
 }
 
+platform_status_enum PerformHostCommand(
+  host_command_type_enum command,
+  platform_wait_priority_level_enum priority )
+{
+  platform_status_enum status = NO_STATUS;
+  uint16_t return_data = 0;
+  host_command_t packet = { HOST_ADDRESS, THIS_ID, priority, command, {0} };
+  for( uint8_t i = 0;
+    i < HOST_COMM_RETRIES
+    && status != SUCCESS;
+    i++ )
+  {
+    switch( command )
+    {
+      case PING_HOST:
+        return_data = PlatformFunctions.Host.Transmit( packet, sizeof(host_command_t) );
+        if( return_data == 0 )
+        {
+          status = FAILURE;
+          continue;
+        }
+        return_data = PlatformFunctions.Host.Receive( /* Enter correct buffer */ );
+        if( return_data == 0 )
+        {
+          status = INVALID_OUTPUT;
+          continue;
+        }
+        status = SUCCESS;
+        break;
+      default:
+        status = INVALID_INPUT;
+        break;
+    }
+    PlatformFunctions.Wait( HOST_COMMAND_RETRY_TIME );
+  }
+  return status;
+}
+
 uint8_t TransmitToHost( uint8_t * buffer, uint16_t length )
 {
 #if HOST_COMMUNICATION_PROTOCOL == USART
   return PlatformFunctions.USART.Transmit( (USART_Handle_t *)Platform.host_communication_handle, buffer, length );
 #elif HOST_COMMUNICATION_PROTOCOL == I2C
-  PlatformFunction.I2C.Transmit( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, buffer, length );
+  PlatformFunctions.I2C.Transmit( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, buffer, length );
   return 1;
 #else
 #error "Invalid host communication protocol!"
@@ -35,7 +71,7 @@ uint16_t ReceiveFromHost( uint8_t * buffer )
   #if HOST_COMMUNICATION_PROTOCOL == USART
     return PlatformFunctions.USART.Receive( (USART_Handle_t *)Platform.host_communication_handle, buffer );
   #elif HOST_COMMUNICATION_PROTOCOL == I2C
-    PlatformFunction.I2C.Receive( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, data, len );
+    PlatformFunctions.I2C.Receive( (I2C_Handle_t *)Platform.host_communication_handle, HOST_ADDRESS, data, len );
     return 1;
   #else
   #error "Invalid host communication protocol!"
@@ -61,4 +97,5 @@ inline uint16_t ReceivePacket( packet_t * packet )
 {
   return Platform.USART.Receive( (uint8_t *)packet );
 }
+
 #endif

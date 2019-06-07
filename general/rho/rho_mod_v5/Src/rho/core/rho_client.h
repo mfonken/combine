@@ -83,9 +83,11 @@ typedef struct
 {
     void (*Init)( address_t, address_t );
     void (*FrameCapture)( void );
-    void (*RhoProcess)( void );
+    void (*CoreProcesss)( void );
     void (*ConnectToInterface)( platform_interface_functions * );
     void (*TransmitPacket)( void );
+    void (*Activate)( void );
+    void (*Deactivate)( void );
 } rho_perform_functions;
 
 typedef struct
@@ -127,9 +129,11 @@ static rho_system_t RhoSystem =
         { /* Perform */
             .Init               = InitRhoSystem,
             .FrameCapture       = ProcessRhoSystemFrameCapture,
-            .RhoProcess         = PerformRhoSystemProcess,
+            .CoreProcesss       = PerformRhoSystemProcess,
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,
             .TransmitPacket     = TransmitRhoSystemPacket
+            .Activate           = ActivateRhoSystem,
+            .Deactiveate        = DeactivateRhoSystem,
         },
         { 0 }, /* Utility */
         { /* Memory */
@@ -138,8 +142,8 @@ static rho_system_t RhoSystem =
     }
 };
 
-static inline void   activityEnable( void ) { RhoSystem.Variables.Flags.Active  = 1; }
-static inline void   activityDisable(void ) { RhoSystem.Variables.Flags.Active  = 0; }
+static inline void   enable(         void ) { RhoSystem.Variables.Flags.Active  = 1; }
+static inline void   disable(        void ) { RhoSystem.Variables.Flags.Active  = 0; }
 static inline void   irqEnable(      void ) { RhoSystem.Variables.Flags.IRQ     = 1; }
 static inline void   irqDisable(     void ) { RhoSystem.Variables.Flags.IRQ     = 0; }
 static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flags.Row     = 1; }

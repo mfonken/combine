@@ -1,11 +1,17 @@
 #ifndef platform_h
 #define platform_h
 
+/***************************************************************************************/
+/*                                    Includes                                         */
+/***************************************************************************************/
 #include "resources.h"
 #include "global_config.h"
 #include "system.h"
 #include "platform_interface_master.h"
 
+/***************************************************************************************/
+/*                                  Macro Definitions                                   */
+/***************************************************************************************/
 #ifndef _PLATFORM_
 #error "No platform specified!"
 #else
@@ -18,6 +24,9 @@
 #error "HOST_ADDRESS is not defined."
 #endif
 
+/***************************************************************************************/
+/*                                  Type Definitions                                   */
+/***************************************************************************************/
 typedef enum
 {
   NO_PROTOCOL_TYPE = 0,
@@ -34,10 +43,48 @@ typedef struct
   generic_handle_t host_communication_handle;
 } platform_t;
 
-static platform_t Platform;
+typedef enum
+{
+  PING_HOST = 0x01,
+} host_command_type_enum;
+/* Keep these to a minimum */
 
-void InitPlatform( platform_t *, protocol_t, generic_handle_t );
+/* Wait type for commands with required response */
+typedef enum
+{
+  NONE = 0,
+  PATIENT,
+  WANTED,
+  NEEDED,
+  CRITICAL
+} platform_wait_priority_level_enum;
 
+typedef enum
+{
+  NO_STATUS = 0,
+  SUCCESS,
+  FAILURE,
+  INVALID_INPUT,
+  INVALID_OUTPUT
+} platform_status_enum;
+
+typedef struct
+{
+  uint8_t
+    host_id,
+    this_id;
+  platform_priority_level_enum
+    priority : 8;
+  host_command_type_enum
+    command : 8;
+  // uint8_t
+  //   return_data[HOST_COMMAND_RETURN_LENGTH];
+} host_command_t;
+
+
+/***************************************************************************************/
+/*                               Function Definitions                                  */
+/***************************************************************************************/
 #ifdef __RHO__
 /* Application interfaces */
 static rho_system_flags_variables * ActiveFlags;
@@ -47,10 +94,25 @@ static void ActivateFlagsRhoInterface( rho_system_flags_variables * Flags );
 inline uint8_t   TransmitPacket( packet_t * );
 inline uint16_t  ReceivePacket( packet_t * );
 
+void InitPlatform( platform_t *, protocol_t, generic_handle_t );
+
+/*** Custom platform interfaces ***/
+/* GPIO */
+inline void SetPortMode(gpio_t *, uint8_t );
+inline void WritePin(gpio_t *, uint8_t );
+
+/* Host */
+inline uint8_t TransmitToHost( uint8_t *, uint16_t );
+inline uint16_t ReceiveFromHost( uint8_t * );
+platform_status_enum PerformHostCommand( host_command_type_enum, platform_wait_priority_level_enum );
+
+/***************************************************************************************/
+/*                               Function Structures                                   */
+/***************************************************************************************/
 typedef struct
 {
-  uint8_t(*Transmit)( packet_t * );
-  uint16_t(*Receive)( packet_t * );
+  uint8_t (*Transmit)( packet_t * );
+  uint8_t (*Receive)( packet_t * );
 } rho_interface_packet_functions;
 
 typedef struct
@@ -61,32 +123,23 @@ typedef struct
 } rho_interface_functions;
 #endif
 
-/*** Custom platform interfaces ***/
-/* GPIO */
-inline void      SetPortMode(gpio_t *, uint8_t );
-inline void      WritePin(gpio_t *, uint8_t );
-
-/* Host */
-inline uint8_t TransmitToHost( uint8_t *, uint16_t );
-inline uint16_t ReceiveFromHost( uint8_t * );
-
 typedef struct
 {
-  void(*Handler)( uint16_t );
+  void (*Handler)( uint16_t );
 } platform_interface_interrupt_functions;
 
 typedef struct
 {
-  void(*Init)( void );
-  void(*Pause)( void );
-  void(*Resume)( void );
-  void(*Reset)( void );
+  void (*Init)( void );
+  void (*Pause)( void );
+  void (*Resume)( void );
+  void (*Reset)( void );
 } platform_interface_dma_functions;
 
 typedef struct
 {
-  uint8_t(*Transmit)( USART_Handle_t *, uint8_t *, uint16_t );
-  uint16_t(*Receive)( USART_Handle_t *, uint8_t * );
+  uint8_t (*Transmit)( USART_Handle_t *, uint8_t *, uint16_t );
+  uint16_t (*Receive)( USART_Handle_t *, uint8_t * );
   bool (*Completed)( USART_Handle_t * );
 } platform_interface_uart_functions;
 
@@ -98,23 +151,25 @@ typedef struct
 typedef struct
 {
   void (*SetPortMode)(gpio_t *, uint8_t );
-  void(*Write)( gpio_t *, uint8_t );
+  void (*Write)( gpio_t *, uint8_t );
 } platform_interface_gpio_functions;
 
 typedef struct
 {
-  uint32_t(*Now)( void );
+  uint32_t (*Now)( void );
 } platform_interface_time_functions;
 
 typedef struct
 {
-  uint8_t(*Transmit)( uint8_t *, uint16_t );
-  uint16_t(*Receive)( uint8_t * );
+  uint8_t (*Transmit)( uint8_t *, uint16_t );
+  uint16_t (*Receive)( uint8_t * );
+  platform_status_enum (*Command) ( host_command_type_enum, platform_wait_priority_level_enum );
 } platform_interface_host_functions;
 
 typedef struct
 {
   void (*Init)( platform_t *, protocol_t, generic_handle_t );
+  void (*Wait)( uint32_t );
 #ifdef __RHO__
   rho_interface_functions                Rho;
   platform_interface_packet_functions    Packet;
@@ -128,10 +183,19 @@ typedef struct
   platform_interface_host_functions      Host;
 } platform_interface_functions;
 
+static uint32_t (*timestamp)(void);
+
+/***************************************************************************************/
+/*                                Global Instances                                     */
+/***************************************************************************************/
+
+/* Global platform */
+static platform_t Platform;
 
 static platform_interface_functions PlatformFunctions =
 {
   .Init                 = InitPlatform,
+  .Wait                 = PLATFORM_SPECIFIC(Wait),
 
 #ifdef __RHO__
   .Rho.Init             = InitRhoInterface,
@@ -140,6 +204,7 @@ static platform_interface_functions PlatformFunctions =
   .Rho.Packet.Transmit  = TransmitPacket,
   .Rho.Packet.Receive   = ReceivePacket,
 #endif
+
   .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),
 
   .DMA.Init             = PLATFORM_SPECIFIC(InitDMA),
@@ -159,9 +224,8 @@ static platform_interface_functions PlatformFunctions =
   .Time.Now             = PLATFORM_SPECIFIC(Timestamp),
 
   .Host.Transmit        = TransmitToHost,
-  .Host.Receive         = ReceiveFromHost
+  .Host.Receive         = ReceiveFromHost,
+  .Host.Command         = PerformHostCommand
 };
-
-static uint32_t (*timestamp)(void);
 
 #endif /* platform_h */

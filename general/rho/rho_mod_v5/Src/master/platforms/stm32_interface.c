@@ -59,17 +59,17 @@
 //{
 //  ActiveFlags.UARTBusy = 0;
 //}
-void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
+inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
 {
   HAL_I2C_Master_Transmit( hi2c, addr, buffer, length, timeout);
 }
 
-void STM_SetPortMode( uint32_t * port, uint8_t type )
+inline void STM_SetPortMode( uint32_t * port, uint8_t type )
 {
   //Set_GPIO_Type( port, type );
 }
 
-void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
+inline void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
 {
   HAL_GPIO_WritePin( (GPIO_TypeDef *)port, pin, (GPIO_PinState)state);
 }
@@ -78,3 +78,8 @@ void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
 //{
 //  return HAL_GetTick();
 //}
+
+inline void STM_Wait( uint32_t nTime );
+{
+  DelayMs( nTime );
+}

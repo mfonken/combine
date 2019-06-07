@@ -3,11 +3,18 @@
 
 #include "global_types.h"
 
+#define THIS_ID           0x01
+
 /* Global configurations */
 #define HOST_COMMUNICATION_PROTOCOL USART
 
-#define USART_TIMEOUT	100
-#define HOST_ADDRESS    0x01
+#define USART_TIMEOUT	              100
+
+#define HOST_ADDRESS                0x01
+#define HOST_COMM_RETRIES           3
+#define HOST_COMMAND_RETURN_LENGTH  2
+#define HOST_COMMAND_WAIT_TIME      5000
+#define HOST_COMMAND_RETRY_TIME     1000
 
 #ifdef __STM32__
 

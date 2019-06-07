@@ -164,13 +164,13 @@ inline void PerformRhoSystemProcess( void )
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
-void ActivateRhoSystem(void)
+void ActivateRhoSystem( void  )
 {
     RhoSystem.Variables.Flags.Active = true;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
-void DeactivateRhoSystem(void)
+void DeactivateRhoSystem( void )
 {
     RhoSystem.Variables.Flags.Active = false;
     // TODO: zero period

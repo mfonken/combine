@@ -27,7 +27,8 @@ bool            STM_UartCompleted( USART_Handle_t *huart );
 void            STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout );
 void            STM_SetPortMode( uint32_t * port, uint8_t type );
 void            STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state );
-uint32_t        STM_Timestamp(void);
+uint32_t        STM_Timestamp( void );
+void            STM_Wait( uint32_t );
 
 #endif
 
