@@ -44,16 +44,16 @@ typedef struct
 
 static behavior_functions BehaviorFunctions =
 {
-    .Perform.SelfCheck = PerformBehaviorSelfCheck,
-    .Perform.ConfirmInit = PerformBehaviorConfirmInit,
-    .Perform.WaitForWake = PerformBehaviorWaitForWake,
-    .Perform.Probe.Send = PerformBehaviorProbeSend,
-    .Perform.Probe.Receive = PerformBehaviorProbeReceive,
-    .Perform.Scheduler.Schedule = PerformBehaviorSchedulerSchedule,
-    .Perform.Scheduler.Deschedule = PerformBehaviorSchedulerDeschedule,
-    .Perform.Interrupter.Send = PerformBehaviorInterrupterSend,
-    .Perform.Interrupter.Receive = PerformBehaviorInterrupterReceive,
-    .Perform.Interrupter.Perform = PerformBehaviorInterrupterPerform
+    .Perform.SelfCheck              = PerformBehaviorSelfCheck,
+    .Perform.ConfirmInit            = PerformBehaviorConfirmInit,
+    .Perform.WaitForWake            = PerformBehaviorWaitForWake,
+    .Perform.Probe.Send             = PerformBehaviorProbeSend,
+    .Perform.Probe.Receive          = PerformBehaviorProbeReceive,
+    .Perform.Scheduler.Schedule     = PerformBehaviorSchedulerSchedule,
+    .Perform.Scheduler.Deschedule   = PerformBehaviorSchedulerDeschedule,
+    .Perform.Interrupter.Send       = PerformBehaviorInterrupterSend,
+    .Perform.Interrupter.Receive    = PerformBehaviorInterrupterReceive,
+    .Perform.Interrupter.Perform    = PerformBehaviorInterrupterPerform
 };
 
 //static generic_function_t BehaviorScheduledTasks[] =

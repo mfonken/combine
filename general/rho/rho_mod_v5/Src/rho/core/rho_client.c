@@ -10,7 +10,7 @@
 
 //#define __ASSEMBLY_RHO__
 
-inline void PixelThreshLoop( register byte_t * capture_address,   // capture buffer index
+__attribute__((naked)) inline void PixelThreshLoop( register byte_t * capture_address,   // capture buffer index
                             register index_t * thresh_address,    // address of thresh buffer
                             const register byte_t thresh_value,
                             const register byte_t sub_sample )
@@ -188,8 +188,8 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
 {
     DeactivateBackgrounding();
 
-    RhoSystem.Variables.Addresses.CameraPort = CameraPort;
-    RhoSystem.Variables.Addresses.HostTxPort = HostTxPort;
+    RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
+    RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
 
 #ifdef DYNAMIC_BUFFER
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture[CAPTURE_WIDTH];
@@ -200,7 +200,7 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
     RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh[THRESH_BUFFER_MAX];
     RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
 
-    RhoSystem.Variables.Buffers.BeaconPacket = malloc( sizeof( packet_t ) );
+    RhoSystem.Variables.Buffers.BeaconPacket  = malloc( sizeof( packet_t ) );
     RhoSystem.Variables.Buffers.BeaconPacket->header.ID = BEACON_PACKET_ID;
     RhoSystem.Variables.Buffers.BeaconPacket->header.includes = BEACON_DEFAULT_PERIOD;
 
@@ -210,7 +210,7 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
 
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformInterface )
 {
-//  RhoSystem.Functions.Platform = PlatformInterface;
+ *RhoSystem.Functions.Platform = *PlatformInterface;
 //     RhoSystem.Functions.Platform.DMA.Init       = PlatformInterface->DMA.Init;
 //     RhoSystem.Functions.Platform.DMA.Pause      = PlatformInterface->DMA.Pause;
 //     RhoSystem.Functions.Platform.DMA.Resume     = PlatformInterface->DMA.Resume;

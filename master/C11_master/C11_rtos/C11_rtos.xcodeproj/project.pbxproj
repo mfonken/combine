@@ -151,13 +151,13 @@
 		34FF28D221798CE3006A1676 /* qmath */ = {
 			isa = PBXGroup;
 			children = (
-				34FF28D321798CE3006A1676 /* point.h */,
-				34FF28D421798CE3006A1676 /* vector.c */,
-				34FF28D521798CE3006A1676 /* quaternion.h */,
 				34FF28D621798CE3006A1676 /* qmath.h */,
+				34FF28D321798CE3006A1676 /* point.h */,
 				34FF28D721798CE3006A1676 /* point.c */,
-				34FF28D821798CE3006A1676 /* vector.h */,
+				34FF28D521798CE3006A1676 /* quaternion.h */,
 				34FF28D921798CE3006A1676 /* quaternion.c */,
+				34FF28D821798CE3006A1676 /* vector.h */,
+				34FF28D421798CE3006A1676 /* vector.c */,
 			);
 			path = qmath;
 			sourceTree = "<group>";

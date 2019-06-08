@@ -83,7 +83,7 @@ typedef struct
 {
     void (*Init)( address_t, address_t );
     void (*FrameCapture)( void );
-    void (*CoreProcesss)( void );
+    void (*CoreProcess)( void );
     void (*ConnectToInterface)( platform_interface_functions * );
     void (*TransmitPacket)( void );
     void (*Activate)( void );
@@ -129,7 +129,7 @@ static rho_system_t RhoSystem =
         { /* Perform */
             .Init               = InitRhoSystem,
             .FrameCapture       = ProcessRhoSystemFrameCapture,
-            .CoreProcesss       = PerformRhoSystemProcess,
+            .CoreProcess        = PerformRhoSystemProcess,
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,
             .TransmitPacket     = TransmitRhoSystemPacket
             .Activate           = ActivateRhoSystem,

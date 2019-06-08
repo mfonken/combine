@@ -55,16 +55,16 @@ typedef struct
 
 static handler_functions HandlerFunctions =
 {
-    .Interrupt.Queue = ComponentInterruptQueuer,
-    .Interrupt.Handle = ComponentInterruptHandler,
-    .Input.Rho = RhoInputHandler,
-    .Output.Rho = RhoOutputHandler,
-    .Input.Motion = MotionInputHandler,
-    .Output.Motion = MotionOutputHandler,
-    .Input.Host = HostInputHandler,
-    .Output.Host = HostOutputHandler,
-    .Input.Touch = TouchInterruptHandler,
-    .Output.SubRadio = SubRadioOutputHandler
+    .Interrupt.Queue    = ComponentInterruptQueuer,
+    .Interrupt.Handle   = ComponentInterruptHandler,
+    .Input.Rho          = RhoInputHandler,
+    .Output.Rho         = RhoOutputHandler,
+    .Input.Motion       = MotionInputHandler,
+    .Output.Motion      = MotionOutputHandler,
+    .Input.Host         = HostInputHandler,
+    .Output.Host        = HostOutputHandler,
+    .Input.Touch        = TouchInterruptHandler,
+    .Output.SubRadio    = SubRadioOutputHandler
 };
 
 typedef union
