@@ -30,6 +30,7 @@ void DeactivateRhoSystem( void );
 void InitRhoSystem( address_t, address_t );
 void ZeroRhoSystemMemory( void );
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * );
+void ConfigureRhoSystem( void ); /* Prepare hardware utilities */
 void TransmitRhoSystemPacket( void );
 
 /************************************************************************
@@ -85,6 +86,7 @@ typedef struct
     void (*FrameCapture)( void );
     void (*CoreProcess)( void );
     void (*ConnectToInterface)( platform_interface_functions * );
+    void (*Configure)( void );
     void (*TransmitPacket)( void );
     void (*Activate)( void );
     void (*Deactivate)( void );
@@ -131,11 +133,11 @@ static rho_system_t RhoSystem =
             .FrameCapture       = ProcessRhoSystemFrameCapture,
             .CoreProcess        = PerformRhoSystemProcess,
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,
-            .TransmitPacket     = TransmitRhoSystemPacket
+            .TransmitPacket     = TransmitRhoSystemPacket,
             .Activate           = ActivateRhoSystem,
-            .Deactiveate        = DeactivateRhoSystem,
+            .Deactivate         = DeactivateRhoSystem
         },
-        { 0 }, /* Utility */
+        { 0 }, /* Platform */
         { /* Memory */
             .Zero               = ZeroRhoSystemMemory
         }

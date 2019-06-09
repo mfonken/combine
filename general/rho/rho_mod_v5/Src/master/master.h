@@ -9,43 +9,46 @@
 /***************************************************************************************/
 /*                              Function Definitions                                   */
 /***************************************************************************************/
-void Master_Init( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t *, bool );
+void Master_Connect( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
+void Master_Init( void );
 void Master_Run( void );
 
 /***************************************************************************************/
 /*                              Function Structures                                    */
 /***************************************************************************************/
 typedef struct
-{
-  void (*Init)( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t *, bool );
+{ 
+  void (*Connect)( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
+  void (*Init)( void );
   void (*Run)( void );
 } master_functions_t;
 
-static master_functions_t Master =
+static master_functions_t MasterFunctions =
 {
-  .Init = Master_Init,
-  .Run  = Master_Run
+  .Connect = Master_Connect,
+  .Init    = Master_Init,
+  .Run     = Master_Run
 };
 
 /***************************************************************************************/
 /*                                  Routines Definitions                               */
 /***************************************************************************************/
-static void InitializePlatform();
-static void ConnectToHost();
-static void ConfigureApplication();
-static void ExitInitialization();
-static inline void ApplicationCore();
+void InitializePlatform( void );
+void ConnectToHost( void );
+void ConfigureApplication( void );
+void ExitInitialization( void );
+inline void ApplicationCore( void );
 
 /***************************************************************************************/
 /*                                Core State List                                      */
 /***************************************************************************************/
-system_states_list_t global_states_list =
+static system_states_list_t global_states_list =
 {
   { INITIALIZING,       CONNECTING_TO_HOST, InitializePlatform    },
   { CONNECTING_TO_HOST, CONFIGURING,        ConnectToHost         },
   { CONFIGURING,        READY,              ConfigureApplication  },
   { READY,              ACTIVE,             ExitInitialization    },
-  { ACTIVE,             IDLE,               ApplicationCore       }
+  { ACTIVE,             IDLE,               ApplicationCore       },
   { 0 },
 };
 

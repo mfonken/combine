@@ -4,13 +4,10 @@
 /***************************************************************************************/
 /*                                    Includes                                         */
 /***************************************************************************************/
-#include "resources.h"
-#include "global_config.h"
-#include "system.h"
 #include "platform_interface_master.h"
 
 /***************************************************************************************/
-/*                                  Macro Definitions                                   */
+/*                                  Macro Definitions                                  */
 /***************************************************************************************/
 #ifndef _PLATFORM_
 #error "No platform specified!"
@@ -62,7 +59,7 @@ typedef enum
 typedef enum
 {
   NO_STATUS = 0,
-  SUCCESS,
+  PASSED,
   FAILURE,
   INVALID_INPUT,
   INVALID_OUTPUT
@@ -73,7 +70,7 @@ typedef struct
   uint8_t
     host_id,
     this_id;
-  platform_priority_level_enum
+  platform_wait_priority_level_enum
     priority : 8;
   host_command_type_enum
     command : 8;
@@ -84,6 +81,8 @@ typedef struct
 /***************************************************************************************/
 /*                               Function Definitions                                  */
 /***************************************************************************************/
+void InitPlatform( platform_t *, protocol_t, generic_handle_t );
+
 #ifdef __RHO__
 /* Application interfaces */
 static rho_system_flags_variables * ActiveFlags;
@@ -92,8 +91,7 @@ static void ActivateFlagsRhoInterface( rho_system_flags_variables * Flags );
 
 inline uint8_t   TransmitPacket( packet_t * );
 inline uint16_t  ReceivePacket( packet_t * );
-
-void InitPlatform( platform_t *, protocol_t, generic_handle_t );
+#endif
 
 /*** Custom platform interfaces ***/
 /* GPIO */
@@ -108,6 +106,7 @@ platform_status_enum PerformHostCommand( host_command_type_enum, platform_wait_p
 /***************************************************************************************/
 /*                               Function Structures                                   */
 /***************************************************************************************/
+#ifdef __RHO__
 typedef struct
 {
   uint8_t (*Transmit)( packet_t * );
@@ -129,10 +128,10 @@ typedef struct
 
 typedef struct
 {
-  void (*Init)( void );
+  void (*Init)( address_t, address_t );
   void (*Pause)( void );
   void (*Resume)( void );
-  void (*Reset)( void );
+  void (*Reset)( address_t );
 } platform_interface_dma_functions;
 
 typedef struct
@@ -226,5 +225,7 @@ static platform_interface_functions PlatformFunctions =
   .Host.Receive         = ReceiveFromHost,
   .Host.Command         = PerformHostCommand
 };
+
+
 
 #endif /* platform_h */

@@ -26,7 +26,6 @@ typedef uint16_t        density_t;
 typedef int16_t         sdensity_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
-typedef uint32_t *      address_t;
 typedef floating_t      timestamp_t;
 typedef uint8_t         capture_t;
 typedef volatile bool   flag_t;

@@ -11,7 +11,6 @@
 #ifdef __OV9712__
 #include "OV9712.h"
 #else
-#include "platform.h"
 #endif
 #endif
 
@@ -59,34 +58,36 @@ typedef struct
 static system_t System =
 {
   { THIS_ID },
-  STARTING, // State
+  INITIALIZING, // State
 };
 
 /***************************************************************************************/
 /*                             Function Definitions                                    */
 /***************************************************************************************/
-void InitSystem(               system_t *, system_states_list_t );
-void NextStateSystem(          system_t *                       );
-system_state_t GetStateSystem( system_t *                       );
-void SetStateSystem(           system_t *,  system_state_enum   );
-void PerformStateSystem(       system_t *                       );
-void EnterStateSystem(         system_t *,  system_state_enum   );
+void InitSystem(               system_t *, system_states_list_t * );
+void NextStateSystem(          system_t *                         );
+system_state_t GetStateSystem( system_t *                         );
+void SetStateSystem(           system_t *,  system_state_enum     );
+void PerformStateSystem(       system_t *                         );
+void EnterStateSystem(         system_t *,  system_state_enum     );
+bool IsInStateSystem(          system_t *,  system_state_enum     );
 
 /***************************************************************************************/
 /*                             Function Structures                                     */
 /***************************************************************************************/
 typedef struct
 {
-  void (*Next)(           system_t *, system_states_list_t );
+  void (*Next)(           system_t * );
   system_state_t (*Get)(  system_t *                       );
   void (*Set)(            system_t *, system_state_enum    );
   void (*Perform)(        system_t *                       );
   void (*Enter)(          system_t *, system_state_enum    );
+  bool (*IsIn)(           system_t *, system_state_enum    );
 } system_state_functions;
 
 typedef struct
 {
-  void (*Init)( system_t * );
+  void (*Init)( system_t *, system_states_list_t * );
   system_state_functions State;
 } system_functions;
 
@@ -100,7 +101,8 @@ static system_functions SystemFunctions =
   .State.Get      = GetStateSystem,     /* Get current state              */
   .State.Set      = SetStateSystem,     /* Set state, no perform          */
   .State.Perform  = PerformStateSystem, /* Peform current state's routine */
-  .State.Enter    = EnterStateSystem    /* Set and perform state          */
+  .State.Enter    = EnterStateSystem,   /* Set and perform state          */
+  .State.IsIn     = IsInStateSystem     /* Check if system is in state    */
 };
 
 #endif

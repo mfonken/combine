@@ -3,12 +3,12 @@
 /***************************************************************************************/
 /*                                  Core Routines                                      */
 /***************************************************************************************/
-static void InitializePlatform()
+static void InitializePlatform( void )
 {
-  PlatformFunctions.Init( &Platform, USART_PROTOCOL_TYPE, (generic_handle_t)usart );
+  PlatformFunctions.Init( &Platform, HOST_COMMUNICATION_PROTOCOL, (generic_handle_t)Master.IOs.HOST_DEFAULT_CHANNEL );
 }
 
-static void ConnectToHost()
+static void ConnectToHost( void )
 {
   while( PlatformFunctions.Host.Command( PING_HOST, NEEDED ) != SUCCESS )
   {
@@ -16,28 +16,29 @@ static void ConnectToHost()
   }
 }
 
-static void ConfigureApplication()
+static void ConfigureApplication( void )
 {
 #ifdef __RHO__
   RhoSystem.Functions.Perform.ConnectToInterface( &Platform );
+  RhoSystem.Functions.Perform.Configure( &Platform );
 #endif
 #ifdef __OV9712__
-  OV9712_Functions.Init( &OV9712, i2c, NULL );
+  OV9712_Functions.Init( &OV9712, Master.IOs.CAMERA_COMMUNICATION_CHANNEL, NULL );
 #endif
 }
 
-static void ExitInitialization()
+static void ExitInitialization( void )
 {
-  if( SystemFunctions.State.Get(System) == READY )
+  if( SystemFunctions.State.IsIn( &System, READY ) )
   {
-    Master.Run();
+    MasterFunctions.Run();
   }
 #ifdef __RHO__
   RhoSystem.Functions.Perform.Activate();
 #endif
 }
 
-static inline void ApplicationCore()
+static inline void ApplicationCore( void )
 {
 #ifdef __RHO__
     RhoSystem.Functions.Perform.CoreProcess();
@@ -47,22 +48,31 @@ static inline void ApplicationCore()
 /***************************************************************************************/
 /*                                Master Initialize                                    */
 /***************************************************************************************/
-void Master_Init( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * usart )
+void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * usart )
+{
+  Master.IOs.I2C_Primary = i2c;
+  Master.IOs.USART_Primary = usart;
+  Master.Utilities.Timer_Primary = timer;
+  
+  MasterFunctions.Init();
+}
+  
+void Master_Init( void )
 {
   /* Initialize state manager */
-  SystemFunctions.Init( &System, global_states_list );
+  SystemFunctions.Init( &System, &global_states_list );
 
   /* Initialize core platform */
-  SystemFunctions.State.Enter(System, INITIALIZING );
+  SystemFunctions.State.Enter( &System, INITIALIZING );
 
   /* Connect to host, this is critical for finishing initialization hence endless loop */
-  SystemFunctions.State.Enter(System, CONNECTING_TO_HOST );
+  SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
 
   /* Configure application items */
-  SystemFunctions.State.Enter(System, CONFIGURING );
+  SystemFunctions.State.Enter( &System, CONFIGURING );
 
   /* Exit initialization, enter run */
-  SystemFunctions.State.Enter(System, READY );
+  SystemFunctions.State.Enter( &System, READY );
 }
 
 /***************************************************************************************/
@@ -70,10 +80,10 @@ void Master_Init( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * u
 /***************************************************************************************/
 void Master_Run( void )
 {
-  System.State.Set(ACTIVE);
+  SystemFunctions.State.Set( &System, ACTIVE);
 
   while(1)
   {
-    System.State.Perform();
+    SystemFunctions.State.Perform( &System );
   }
 }

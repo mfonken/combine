@@ -14,7 +14,7 @@ void WritePin( gpio_t * gpio, uint8_t val )
 
 void SetPortMode(gpio_t * gpio, uint8_t val )
 {
-  PLATFORM_SPECIFIC(SetPortMode)( gpio->port, val );
+  PLATFORM_SPECIFIC(SetPortMode)( gpio->port, gpio->pin, val );
 }
 
 platform_status_enum PerformHostCommand(
@@ -23,7 +23,7 @@ platform_status_enum PerformHostCommand(
 {
   platform_status_enum status = NO_STATUS;
   uint16_t return_data = 0;
-  host_command_t packet = { HOST_ADDRESS, THIS_ID, priority, command, {0} };
+  host_command_t packet = { HOST_ADDRESS, THIS_ID, priority, command };
   for( uint8_t i = 0;
     i < HOST_COMM_RETRIES
     && status != SUCCESS;
@@ -32,13 +32,13 @@ platform_status_enum PerformHostCommand(
     switch( command )
     {
       case PING_HOST:
-        return_data = PlatformFunctions.Host.Transmit( packet, sizeof(host_command_t) );
+        return_data = PlatformFunctions.Host.Transmit( (uint8_t *)&packet, sizeof(host_command_t) );
         if( return_data == 0 )
         {
           status = FAILURE;
           continue;
         }
-        return_data = PlatformFunctions.Host.Receive( /* Enter correct buffer */ );
+//        return_data = PlatformFunctions.Host.Receive( /* Enter correct buffer */ );
         if( return_data == 0 )
         {
           status = INVALID_OUTPUT;

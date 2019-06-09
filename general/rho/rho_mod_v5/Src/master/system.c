@@ -2,7 +2,7 @@
 
 void InitSystem(
   system_t * system,
-  system_states_list_t state_list )
+  system_states_list_t * state_list )
 {
   system->state_list = state_list;
 //  system.state_list = states;
@@ -32,6 +32,11 @@ void PerformStateSystem( system_t * system )
 
 void EnterStateSystem( system_t * system, system_state_enum new_state )
 {
-  System.State.Set( system, new_state);
-  System.State.Perform( system );
+  SystemFunctions.State.Set( system, new_state);
+  SystemFunctions.State.Perform( system );
+}
+
+bool IsInStateSystem( system_t * system, system_state_enum check_state )
+{
+  return ( SystemFunctions.State.Get( system ).state == check_state );
 }

@@ -1,9 +1,7 @@
 #ifndef global_types_h
 #define global_types_h
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
+#include "resources.h"
 
 typedef struct
 {
@@ -17,6 +15,7 @@ typedef struct
   uint8_t pin;
 } gpio_t;
 
-typedef uint32_t * generic_handle_t;
+typedef uint32_t *      address_t;
+typedef uint32_t *      generic_handle_t;
 
 #endif /* global_types_h */

@@ -1210,6 +1210,9 @@
                     <name>$PROJ_DIR$\..\Src\master\master.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Src\master\master_interface.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Src\master\platform.c</name>
                 </file>
                 <file>

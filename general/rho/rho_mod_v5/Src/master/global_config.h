@@ -6,9 +6,14 @@
 #define THIS_ID           0x01
 
 /* Global configurations */
-#define HOST_COMMUNICATION_PROTOCOL USART
+#define HOST_COMMUNICATION_PROTOCOL     USART_PROTOCOL_TYPE
+#define HOST_DEFAULT_CHANNEL            USART_Primary
+
+#define CAMERA_COMMUNICATION_PROTOCOL   I2C_PROTOCOL_TYPE
+#define CAMERA_COMMUNICATION_CHANNEL    I2C_Primary
 
 #define USART_TIMEOUT	              100
+#define UART_TIMEOUT	              USART_TIMEOUT
 
 #define HOST_ADDRESS                0x01
 #define HOST_COMM_RETRIES           3
@@ -37,5 +42,7 @@
 #define USART_Handle_t  USART_HandleTypeDef
 //#define USB_Handle_t    USB_HandleTypeDef
 #endif /* __STM32__ */
+
+
 
 #endif /* global_config_h */

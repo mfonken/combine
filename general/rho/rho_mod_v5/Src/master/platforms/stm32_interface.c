@@ -8,8 +8,9 @@
 
 #include "stm32_interface.h"
 
-static inline void STM_InterruptHandler( uint16_t GPIO_Pin )
+inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
+#ifdef __RHO__
   if(!ActiveFlags->IRQ) return;
   switch(GPIO_Pin)
   {
@@ -17,47 +18,55 @@ static inline void STM_InterruptHandler( uint16_t GPIO_Pin )
     ActiveFlags->Frame = !(flag_t)(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
     return;
     case HREF_Pin:
-    ActiveFlags->Row     =  (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
+    ActiveFlags->Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
     return;
     default:
     return;
   }
+#endif
 }
 
-static inline void STM_InitPCLKDMA( void )
+inline void STM_InitDMA( address_t src, address_t dst )
 {
-  if(HAL_DMA_Start_IT(this_timer->hdma[TIM2_DMA_ID], svd.camera_port, (uint32_t)svb.capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
+#ifdef __RHO__
+#ifdef __OV9712__
+  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID], *src, *dst, CAPTURE_BUFFER_SIZE) != HAL_OK)
   Error_Handler();
-  __HAL_TIM_ENABLE_DMA(this_timer, TIM2_DMA_CC);
-  __HAL_TIM_ENABLE_IT(this_timer, TIM2_IT_CC);
-  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
+  __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, TIM2_DMA_CC);
+  __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, TIM2_IT_CC);
+  TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
+#endif
+#endif
 }
-static inline void STM_PauseDMA( void )
+inline void STM_PauseDMA( void )
 {
-  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
+  TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, TIM2_CHANNEL, TIM_CCx_DISABLE);
 }
-static inline void STM_ResumeDMA( void )
+inline void STM_ResumeDMA( void )
 {
-  TIM_CCxChannelCmd(this_timer->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
+  TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
 }
-static inline void STM_ResetDMA( void )
+inline void STM_ResetDMA( address_t dst )
 {
-  this_timer->hdma[TIM2_DMA_ID]->Instance->CMAR = (uint32_t)svb.capture;
+  Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID]->Instance->CMAR = *dst;
 }
 
-static inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )
+inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )
 {
-  HAL_UART_Transmit_DMA( this_uart, &buffer, length, UART_TIMEOUT );
+  return HAL_USART_Transmit_DMA( Master.IOs.USART_Primary, buffer, length );
 }
 
-static inline uint16_t STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer )
+inline uint16_t STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer )
 {
   ///TODO: Actually implement
   return 1;
 }
-static inline bool STM_UartCompleted( USART_Handle_t * huart )
+inline bool STM_UartCompleted( USART_Handle_t * huart )
 {
+#ifdef __RHO__
   ActiveFlags.UARTBusy = 0;
+#endif
+  return false;
 }
 
 inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
@@ -65,9 +74,12 @@ inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffe
   HAL_I2C_Master_Transmit( hi2c, addr, buffer, length, timeout);
 }
 
-inline void STM_SetPortMode( uint32_t * port, uint8_t type )
+inline void STM_SetPortMode( uint32_t * port, uint16_t pin, uint8_t mode )
 {
-  Set_GPIO_Type( port, type );
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  GPIO_InitStruct.Pin = pin;
+  GPIO_InitStruct.Mode = mode;
+  HAL_GPIO_Init( (GPIO_TypeDef *)port, &GPIO_InitStruct );
 }
 
 inline void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
@@ -75,12 +87,12 @@ inline void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
   HAL_GPIO_WritePin( (GPIO_TypeDef *)port, pin, (GPIO_PinState)state);
 }
 
-static inline uint32_t STM_Timestamp(void)
+inline uint32_t STM_Timestamp(void)
 {
   return HAL_GetTick();
 }
 
-inline void STM_Wait( uint32_t nTime );
+inline void STM_Wait( uint32_t nTime )
 {
-  DelayMs( nTime );
+  HAL_Delay( nTime );
 }
