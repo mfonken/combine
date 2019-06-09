@@ -208,9 +208,11 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
     RhoSystem.Functions.Perform.Init( (address_t)CAPTURE_WIDTH, (address_t)CAPTURE_HEIGHT );
 }
 
-void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformInterface )
+void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_interface, camera_application_flags * flags )
 {
-  memcpy( (void *)&RhoSystem.Functions.Platform, PlatformInterface, sizeof(platform_interface_functions) );
+  memcpy( (void *)&RhoSystem.Functions.Platform, platform_interface, sizeof(platform_interface_functions) );
+  RhoSystem.Variables.Flags = flags;
+
 //     RhoSystem.Functions.Platform.DMA.Init       = PlatformInterface->DMA.Init;
 //     RhoSystem.Functions.Platform.DMA.Pause      = PlatformInterface->DMA.Pause;
 //     RhoSystem.Functions.Platform.DMA.Resume     = PlatformInterface->DMA.Resume;
@@ -222,7 +224,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * PlatformI
 //
 //     RhoSystem.Functions.Platform.Time.Now       = PlatformInterface->Time.Now;
 }
-                                                    
+
 void ConfigureRhoSystem( void )
 {
   RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (address_t)RhoSystem.Variables.Buffers.Capture );

@@ -11,17 +11,17 @@
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
 #ifdef __RHO__
-  if(!ActiveFlags->IRQ) return;
+  if(!Platform.CameraFlags.IRQ) return;
   switch(GPIO_Pin)
   {
     case VSYNC_Pin:
-    ActiveFlags->Frame = !(flag_t)(VSYNC_GPIO_Port->IDR & VSYNC_Pin);
-    return;
+        Platform.CameraFlags.Frame = !(flag_t)( VSYNC_GPIO_Port->IDR & VSYNC_Pin );
+        return;
     case HREF_Pin:
-    ActiveFlags->Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin);
-    return;
+        Platform.CameraFlags.Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin );
+        return;
     default:
-    return;
+        return;
   }
 #endif
 }
@@ -64,7 +64,7 @@ inline uint16_t STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer )
 inline bool STM_UartCompleted( USART_Handle_t * huart )
 {
 #ifdef __RHO__
-  ActiveFlags.UARTBusy = 0;
+  Platform.CameraFlags.UARTBusy = 0;
 #endif
   return false;
 }

@@ -15,6 +15,17 @@ typedef struct
   uint8_t pin;
 } gpio_t;
 
+typedef struct
+{
+flag_t
+  Active,
+  IRQ,
+  Frame,
+  Row,
+  Backgrounding,
+  UARTBusy;
+} camera_application_flags;
+
 typedef uint32_t *      address_t;
 typedef uint32_t *      generic_handle_t;
 

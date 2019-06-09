@@ -33,18 +33,18 @@ extern "C" {
 #ifndef MAX
 #define MAX(A,B) (A>B?A:B)
 #endif
-  
+
 #define IN_RANGE(A,X,Y) ( ( A > X ) && ( A < Y ) )
 #define SET_MAX(A,B)    ( A = MAX ( A, B ) )
 
 #define MAX_THRESH 255
 #define MIN_THRESH 0
 #define THRESH_RANGE (MAX_THRESH - MIN_THRESH)
-  
+
 #define MAX_SINGLE_CONFIDENCE 0.9
 
 #define TARGET_STATE TARGET_POPULATED
-  
+
       typedef enum
     {
         UNKNOWN_STATE = -1,
@@ -55,7 +55,7 @@ extern "C" {
         NUM_STATES
     } state_t;
 #define NUM_STATE_GROUPS NUM_STATES
-    
+
     /* Stability tracking for selec tions */
     typedef struct
     {
@@ -64,7 +64,7 @@ extern "C" {
             system;
     } stability_t;
 
-//    
+//
 //    //#define NUM_STATES              10
 //#define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
 //#define MAX_OBSERVATIONS        (1 << 7) // Length of history

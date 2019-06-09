@@ -73,7 +73,7 @@ typedef struct
 {
     rho_core_t                      Utility;
     rho_system_address_variables    Addresses;
-    rho_system_flags_variables      Flags;
+    camera_application_flags       *Flags;
     rho_system_buffer_variables     Buffers;
 } rho_system_variables;
 
@@ -85,7 +85,7 @@ typedef struct
     void (*Init)( address_t, address_t );
     void (*FrameCapture)( void );
     void (*CoreProcess)( void );
-    void (*ConnectToInterface)( platform_interface_functions * );
+    void (*ConnectToInterface)( platform_interface_functions *, camera_application_flags * );
     void (*Configure)( void );
     void (*TransmitPacket)( void );
     void (*Activate)( void );

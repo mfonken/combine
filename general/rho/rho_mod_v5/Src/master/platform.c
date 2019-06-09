@@ -79,11 +79,6 @@ uint16_t ReceiveFromHost( uint8_t * buffer )
 }
 
 #ifdef __RHO__
-void SetActiveClientFlags( rho_system_flags_variables * Flags )
-{
-  ActiveFlags = Flags;
-}
-
 void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart )
 {
 }

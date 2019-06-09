@@ -17,7 +17,7 @@ void Master_Run( void );
 /*                              Function Structures                                    */
 /***************************************************************************************/
 typedef struct
-{ 
+{
   void (*Connect)( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
   void (*Init)( void );
   void (*Run)( void );
@@ -38,6 +38,7 @@ void ConnectToHost( void );
 void ConfigureApplication( void );
 void ExitInitialization( void );
 inline void ApplicationCore( void );
+void ErrorStateHandler( void );
 
 /***************************************************************************************/
 /*                                Core State List                                      */
@@ -49,6 +50,7 @@ static system_states_list_t global_states_list =
   { CONFIGURING,        READY,              ConfigureApplication  },
   { READY,              ACTIVE,             ExitInitialization    },
   { ACTIVE,             IDLE,               ApplicationCore       },
+  { ERROR_STATE,        IDLE,               ErrorStateHandler     },
   { 0 },
 };
 

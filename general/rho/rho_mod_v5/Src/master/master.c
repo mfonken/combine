@@ -42,7 +42,14 @@ static inline void ApplicationCore( void )
 {
 #ifdef __RHO__
     RhoSystem.Functions.Perform.CoreProcess();
+#else
+#warning "No application core."
 #endif
+}
+
+static void ErrorStateHandler( void )
+{
+    ///TODO: Implement handler method for unexpected entry of error state
 }
 
 /***************************************************************************************/
@@ -53,10 +60,10 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t 
   Master.IOs.I2C_Primary = i2c;
   Master.IOs.USART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
-  
+
   MasterFunctions.Init();
 }
-  
+
 void Master_Init( void )
 {
   /* Initialize state manager */
@@ -80,7 +87,7 @@ void Master_Init( void )
 /***************************************************************************************/
 void Master_Run( void )
 {
-  SystemFunctions.State.Set( &System, ACTIVE);
+  SystemFunctions.State.Set( &System, ACTIVE );
 
   while(1)
   {

@@ -35,9 +35,14 @@ typedef enum
 
 typedef struct
 {
-  /* Utilities */
-  protocol_t host_communication_protocol;
-  generic_handle_t host_communication_handle;
+  /* Application utilities */
+#ifdef __RHO__
+  camera_application_flags CameraFlags;
+#endif
+
+  /* Generic utilities */
+  protocol_t HostProtocol;
+  generic_handle_t HostHandle;
 } platform_t;
 
 typedef enum
@@ -59,7 +64,7 @@ typedef enum
 typedef enum
 {
   NO_STATUS = 0,
-  PASSED,
+  OK,
   FAILURE,
   INVALID_INPUT,
   INVALID_OUTPUT
@@ -85,9 +90,7 @@ void InitPlatform( platform_t *, protocol_t, generic_handle_t );
 
 #ifdef __RHO__
 /* Application interfaces */
-static rho_system_flags_variables * ActiveFlags;
 static void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart );
-static void ActivateFlagsRhoInterface( rho_system_flags_variables * Flags );
 
 inline uint8_t   TransmitPacket( packet_t * );
 inline uint16_t  ReceivePacket( packet_t * );

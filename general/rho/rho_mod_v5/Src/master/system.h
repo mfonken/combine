@@ -26,7 +26,7 @@ typedef enum
   ACTIVE,
   IDLE,
   RECONFIGURING,
-
+  ERROR_STATE
   NUM_SYSTEM_STATES
 } system_state_enum;
 
@@ -71,6 +71,7 @@ void SetStateSystem(           system_t *,  system_state_enum     );
 void PerformStateSystem(       system_t *                         );
 void EnterStateSystem(         system_t *,  system_state_enum     );
 bool IsInStateSystem(          system_t *,  system_state_enum     );
+system_state_t * GetStateFromListSystem( system_t *, system_state_enum );
 
 /***************************************************************************************/
 /*                             Function Structures                                     */
@@ -83,6 +84,7 @@ typedef struct
   void (*Perform)(        system_t *                       );
   void (*Enter)(          system_t *, system_state_enum    );
   bool (*IsIn)(           system_t *, system_state_enum    );
+  system_state_t * (*GetFromList)( system_t *, system_state_enum );
 } system_state_functions;
 
 typedef struct
@@ -102,7 +104,8 @@ static system_functions SystemFunctions =
   .State.Set      = SetStateSystem,     /* Set state, no perform          */
   .State.Perform  = PerformStateSystem, /* Peform current state's routine */
   .State.Enter    = EnterStateSystem,   /* Set and perform state          */
-  .State.IsIn     = IsInStateSystem     /* Check if system is in state    */
+  .State.IsIn     = IsInStateSystem,    /* Check if system is in state    */
+  .State.GetFromList = GetStateFromListSystem /* Get state data from list */
 };
 
 #endif

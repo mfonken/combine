@@ -120,17 +120,6 @@ address_t
 
 typedef struct
 {
-flag_t
-  Active,
-  IRQ,
-  Frame,
-  Row,
-  Backgrounding,
-  UARTBusy;
-} rho_system_flags_variables;
-
-typedef struct
-{
 byte_t
     ID,
     includes;
@@ -236,7 +225,7 @@ typedef struct
 {
     prediction_t    x,y;
     prediction_probabilities Probabilities;
-    
+
     floating_t      NuBlobs,
                     BestConfidence,
                     AverageDensity;
@@ -256,17 +245,17 @@ typedef struct
   void (*Reset)(void);
 } rho_platform_dma_interface_functions;
 
-typedef struct 
+typedef struct
 {
   uint8_t (*Transmit)( byte_t *, index_t);
 } rho_platform_uart_interace_functions;
 
-typedef struct 
+typedef struct
 {
-  void (*Activate)( rho_system_flags_variables *);
+  void (*Activate)( camera_application_flags * );
 } rho_platform_flag_interace_functions;
 
-typedef struct 
+typedef struct
 {
   uint32_t (*Now)( void );
 } rho_platform_time_interace_functions;
@@ -286,7 +275,7 @@ typedef struct
     yl[3];
     density_2d_t
     area[9];
-    
+
     density_2d_t a, b, c, d, l, l_, p, q, x, y;
 } redistribution_variables;
 extern const density_redistribution_lookup_t rlookup;
@@ -437,7 +426,7 @@ typedef struct
     fsm_system_t        StateMachine;
 #endif
     packet_t            Packet;
-    
+
     index_t             cframe[C_FRAME_SIZE];
 } rho_core_t;
 
