@@ -25,6 +25,16 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
   }
 #endif
 }
+void STM_InterruptEnable( void )
+{
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+}
+void STM_InterruptDisable( void )
+{
+    HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+    HAL_NVIC_DisableIRQ(EXTI1_IRQn);
+}
 
 inline void STM_InitDMA( address_t src, address_t dst )
 {

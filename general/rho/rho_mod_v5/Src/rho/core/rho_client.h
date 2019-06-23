@@ -51,17 +51,17 @@ address_t
   ThreshEnd,                      /* Actual end of thresh buffer */
   ThreshMax,                      /* Shared address of threshold value */
   PixelCount,                     /* Shared address of pixel count value */
-  HostTxPort;
+  HostTxPort,
+  CaptureIndex,                   /* Address capture buffer is processed */
+  ThreshIndex;                   /* Address threshold buffer is filled */
 } rho_system_address_variables;
 
 typedef struct
 {
 capture_t
-    *Capture,                       /* Raw capture buffer for DMA */
-    *CaptureIndex;                   /* Address capture buffer is processed */
+    *Capture;                       /* Raw capture buffer for DMA */
 index_t
-    *Thresh,                        /* Threshold processing buffer */
-    *ThreshIndex;                   /* Address threshold buffer is filled */
+    *Thresh;                        /* Threshold processing buffer */
 density_t
     *DensityY,                      /* Processed density X array */
     *DensityX;                      /* Processed density Y array */

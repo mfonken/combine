@@ -127,6 +127,8 @@ typedef struct
 typedef struct
 {
   void (*Handler)( uint16_t );
+  void (*Enable)( void );
+  void (*Disable)( void );
 } platform_interface_interrupt_functions;
 
 typedef struct
@@ -207,6 +209,8 @@ static platform_interface_functions PlatformFunctions =
 #endif
 
   .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),
+  .Interrupt.Enable     = PLATFORM_SPECIFIC(InterruptEnable),
+  .Interrupt.Disable    = PLATFORM_SPECIFIC(InterruptDisable),
 
   .DMA.Init             = PLATFORM_SPECIFIC(InitDMA),
   .DMA.Pause            = PLATFORM_SPECIFIC(PauseDMA),
