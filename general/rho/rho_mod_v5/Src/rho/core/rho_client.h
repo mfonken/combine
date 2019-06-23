@@ -118,7 +118,8 @@ static rho_system_t RhoSystem =
     { /* VARIABLES */
         { /* Utility */
             CAPTURE_WIDTH,
-            CAPTURE_HEIGHT
+            CAPTURE_HEIGHT,
+            CAPTURE_SUB_SAMPLE,
         },
         { 0 },/* Addresses */
         { 0 },/* Flags */

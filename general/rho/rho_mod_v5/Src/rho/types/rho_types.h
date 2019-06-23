@@ -387,6 +387,7 @@ typedef struct
     index_t
         Width,
         Height,
+        Subsample,
         Px,
         Py,
         Sx,
