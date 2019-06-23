@@ -294,6 +294,7 @@ typedef struct
     index_t
     len,
     range[3],
+    rows_left,
     cyc,
     cyc_,
     gapc,

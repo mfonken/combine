@@ -57,9 +57,11 @@ address_t
 typedef struct
 {
 capture_t
-    *Capture;                       /* Raw capture buffer for DMA */
+    *Capture,                       /* Raw capture buffer for DMA */
+    *CaptureIndex;                   /* Address capture buffer is processed */
 index_t
-    *Thresh;                        /* Threshold processing buffer */
+    *Thresh,                        /* Threshold processing buffer */
+    *ThreshIndex;                   /* Address threshold buffer is filled */
 density_t
     *DensityY,                      /* Processed density X array */
     *DensityX;                      /* Processed density Y array */
