@@ -21,6 +21,42 @@ void CalculateBlobScoreRhoUtility( blob_t *b, density_t total_density, byte_t pe
     b->scr = BLOB_SCORE_FACTOR*( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
 }
 
+#ifdef USE_INTERRUPT_MODEL
+/* Universal Port for interrupt model */
+pixel_base_t test_port = 0;
+#endif
+
+/* Quadrant density redistribution lookup table */
+const density_redistribution_lookup_t rlookup =
+{
+    {
+        { // Case #1
+            { { 0, 1, 3, 4 }, { 2, 5 }, { 6, 7 }, { 8 } },
+            { { 0 }, { 1, 2 }, { 3, 6 }, { 4, 5, 7, 8 } },
+            { { 0, 1, 2, 3 }, { 1, 3 }, { 2, 3 }, { 3 } },
+            { 4, 2, 2, 1 }
+        },
+        { // Case #2
+            { { 0, 3 }, { 1, 2, 4, 5 }, { 6 }, { 7, 8 } },
+            { { 0, 1 }, { 2 }, { 3, 4, 6, 7 }, { 5, 8 } },
+            { { 0, 2 }, { 0, 1, 2, 3 }, { 2 }, { 2, 3 } },
+            { 2, 4, 1, 2 }
+        },
+        { // Case #3
+            { { 0, 1 }, { 2 }, { 3, 4, 6, 7 }, { 5, 8 } },
+            { { 0, 3 }, { 1, 2, 4, 5 }, { 6 }, { 7, 8 } },
+            { { 0, 1 }, { 1 }, { 0, 1, 2, 3 }, { 1, 3 } },
+            { 2, 1, 4, 2 }
+        },
+        { // Case #4
+            { { 0 }, { 1, 2 }, { 3, 6 }, { 4, 5, 7, 8 } },
+            { { 0, 1, 3, 4 }, { 2, 5 }, { 6, 7 }, { 8 } },
+            { { 0 }, { 0, 1 }, { 0, 2 }, { 0, 1, 2, 3 } },
+            { 1, 2, 2, 4 }
+        }
+    }
+};
+
 /* Generic centroid and mass calculator */
 floating_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C, /*register*/ density_t thresh )
 {

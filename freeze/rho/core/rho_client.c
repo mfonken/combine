@@ -73,11 +73,11 @@ inline index_t CaptureFrame()
     return t_counter;
 }
 
-inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t t_len, register index_t y_counter, register index_t y_len )
+inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t ThreshBufferFillIndex, register index_t y_counter, register index_t y_len )
 {
     register index_t t_value = 0;
     register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
-    while( t_counter < t_len )
+    while( t_counter < ThreshBufferFillIndex )
     {
         t_value = RhoSystem.Variables.Buffers.Thresh[t_counter++];
         if(t_value == Y_DEL)
@@ -129,17 +129,14 @@ inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
     return ( *PixelCount < ( (floating_t)OldCount * PIXEL_COUNT_DROP_FACTOR ) );
 }
 
-inline void ProcessFrame( index_t t_len )
+inline void ProcessFrame( index_t ThreshBufferFillIndex )
 {
-    if( HasPixelCountDrop( (index_t *)RhoSystem.Variables.Addresses.PixelCount, t_len ) )
+    if( HasPixelCountDrop( RhoSystem.Variables.Addresses.PixelCount, ThreshBufferFillIndex ) )
         ActivateBackgrounding();
     else DeactivateBackgrounding();
     
-    uint8_t start = 0, end = 0;
-    section_process_t ProcessedTopSectionData    = ProcessFrameSection( start, t_len, end, RhoSystem.Variables.Utility.Cy );
-    start   = ProcessedTopSectionData.pixels;
-    end     = ProcessedTopSectionData.rows;
-    section_process_t ProcessedBottomSectionData = ProcessFrameSection( start, t_len, end, RhoSystem.Variables.Utility.Height );
+    section_process_t ProcessedTopSectionData = ProcessFrameSection(          0, ThreshBufferFillIndex,        0, RhoSystem.Variables.Utility.Cy     );
+    section_process_t ProcessedBottomSectionData = ProcessFrameSection( ProcessedTopSectionData.pixels, ThreshBufferFillIndex, ProcessedTopSectionData.rows, RhoSystem.Variables.Utility.Height );
     
     RhoSystem.Variables.Buffers.Quadrant[0] = ProcessedTopSectionData.left;
     RhoSystem.Variables.Buffers.Quadrant[1] = ProcessedTopSectionData.right;
