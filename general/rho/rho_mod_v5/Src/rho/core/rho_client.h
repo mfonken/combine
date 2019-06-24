@@ -29,7 +29,7 @@ void ActivateRhoSystem( void );
 void DeactivateRhoSystem( void );
 void InitRhoSystem( address_t, address_t );
 void ZeroRhoSystemMemory( void );
-void ConnectRhoSystemPlatformInterface( platform_interface_functions * );
+void ConnectRhoSystemPlatformInterface( platform_interface_functions *, camera_application_flags * );
 void ConfigureRhoSystem( void ); /* Prepare hardware utilities */
 void TransmitRhoSystemPacket( void );
 
@@ -147,13 +147,13 @@ static rho_system_t RhoSystem =
     }
 };
 
-static inline void   enable(         void ) { RhoSystem.Variables.Flags.Active  = 1; }
-static inline void   disable(        void ) { RhoSystem.Variables.Flags.Active  = 0; }
-static inline void   irqEnable(      void ) { RhoSystem.Variables.Flags.IRQ     = 1; }
-static inline void   irqDisable(     void ) { RhoSystem.Variables.Flags.IRQ     = 0; }
-static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flags.Row     = 1; }
-static inline void   rowFlagReset(   void ) { RhoSystem.Variables.Flags.Row     = 0; }
-static inline void   frameFlagSet(   void ) { RhoSystem.Variables.Flags.Frame   = 1; }
-static inline void   frameFlagReset( void ) { RhoSystem.Variables.Flags.Frame   = 0; }
+static inline void   enable(         void ) { RhoSystem.Variables.Flags->Active  = 1; }
+static inline void   disable(        void ) { RhoSystem.Variables.Flags->Active  = 0; }
+static inline void   irqEnable(      void ) { RhoSystem.Variables.Flags->IRQ     = 1; }
+static inline void   irqDisable(     void ) { RhoSystem.Variables.Flags->IRQ     = 0; }
+static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flags->Row     = 1; }
+static inline void   rowFlagReset(   void ) { RhoSystem.Variables.Flags->Row     = 0; }
+static inline void   frameFlagSet(   void ) { RhoSystem.Variables.Flags->Frame   = 1; }
+static inline void   frameFlagReset( void ) { RhoSystem.Variables.Flags->Frame   = 0; }
 
 #endif /* rho_client_h */

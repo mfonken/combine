@@ -35,14 +35,14 @@ typedef enum
 
 typedef struct
 {
+  /* Generic utilities */
+  protocol_t HostProtocol;
+  generic_handle_t HostHandle;
+  
   /* Application utilities */
 #ifdef __RHO__
   camera_application_flags CameraFlags;
 #endif
-
-  /* Generic utilities */
-  protocol_t HostProtocol;
-  generic_handle_t HostHandle;
 } platform_t;
 
 typedef enum

@@ -128,7 +128,7 @@ inline section_process_t ProcessFrameSection( register index_t t_counter, regist
 
 inline void ActivateBackgrounding( void )
 {
-    RhoSystem.Variables.Flags.Backgrounding = true;
+    RhoSystem.Variables.Flags->Backgrounding = true;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.background;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
@@ -136,7 +136,7 @@ inline void ActivateBackgrounding( void )
 
 inline void DeactivateBackgrounding( void )
 {
-    RhoSystem.Variables.Flags.Backgrounding = false;
+    RhoSystem.Variables.Flags->Backgrounding = false;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.map;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Q;
@@ -199,7 +199,7 @@ inline void PerformRhoSystemProcess( void )
 
 void ActivateRhoSystem( void  )
 {
-    RhoSystem.Variables.Flags.Active = true;
+    RhoSystem.Variables.Flags->Active = true;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
@@ -253,7 +253,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_
 //
 //     RhoSystem.Functions.Platform.Host.Transmit = PlatformInterface->Host.Transmit;
 //
-// //    RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
+// //    RhoSystem.Functions.Platform.Flags->Activate = PlatformInterface->Flags.Activate;
 //
 //     RhoSystem.Functions.Platform.Time.Now       = PlatformInterface->Time.Now;
 }
