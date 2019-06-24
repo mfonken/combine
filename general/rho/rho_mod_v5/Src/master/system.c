@@ -9,14 +9,14 @@ void InitSystem(
   SystemFunctions.State.Set( system, system->state );
 }
 
-void NextStateSystem( system_t * systen )
+void NextStateSystem( system_t * system )
 {
-  SystemFunctions.State.Enter( system, SystemFunctions.State.Get(system).next );
+  SystemFunctions.State.Enter( system, SystemFunctions.State.Get(system)->next );
 }
 
-system_state_t GetStateSystem( system_t * system )
+system_state_t * GetStateSystem( system_t * system )
 {
-  return *(SystemFunctions.State.GetFromList( system, system->state ))[system->state];
+  return SystemFunctions.State.GetFromList( system, system->state );
 }
 
 void SetStateSystem( system_t * system, system_state_enum new_state )
@@ -26,7 +26,7 @@ void SetStateSystem( system_t * system, system_state_enum new_state )
 
 void PerformStateSystem( system_t * system )
 {
-  void (*routine)(void) = SystemFunctions.State.Get(system).routine;
+  void (*routine)(void) = SystemFunctions.State.Get(system)->routine;
   if( routine != NULL ) routine();
 }
 
@@ -38,7 +38,7 @@ void EnterStateSystem( system_t * system, system_state_enum new_state )
 
 bool IsInStateSystem( system_t * system, system_state_enum check_state )
 {
-  return ( SystemFunctions.State.Get( system ).state == check_state );
+  return ( SystemFunctions.State.Get( system )->state == check_state );
 }
 
 system_state_t * GetStateFromListSystem( system_t * system, system_state_enum state )
@@ -48,7 +48,7 @@ system_state_t * GetStateFromListSystem( system_t * system, system_state_enum st
         If not found, return is ERROR_STATE */
     for( uint8_t i = 0; i < ERROR_STATE; i++ )
     {
-        state_type = &system->state_list[i];
+        state_type = &(*system->state_list)[i];
         if( state_type->state == state ) break;
     }
     return state_type;

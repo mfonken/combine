@@ -15,6 +15,7 @@ typedef struct
   uint8_t pin;
 } gpio_t;
 
+typedef volatile bool   flag_t;
 typedef struct
 {
 flag_t

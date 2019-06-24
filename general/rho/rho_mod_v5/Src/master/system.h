@@ -26,7 +26,7 @@ typedef enum
   ACTIVE,
   IDLE,
   RECONFIGURING,
-  ERROR_STATE
+  ERROR_STATE,
   NUM_SYSTEM_STATES
 } system_state_enum;
 
@@ -66,11 +66,11 @@ static system_t System =
 /***************************************************************************************/
 void InitSystem(               system_t *, system_states_list_t * );
 void NextStateSystem(          system_t *                         );
-system_state_t GetStateSystem( system_t *                         );
 void SetStateSystem(           system_t *,  system_state_enum     );
 void PerformStateSystem(       system_t *                         );
 void EnterStateSystem(         system_t *,  system_state_enum     );
 bool IsInStateSystem(          system_t *,  system_state_enum     );
+system_state_t * GetStateSystem( system_t *                            );
 system_state_t * GetStateFromListSystem( system_t *, system_state_enum );
 
 /***************************************************************************************/
@@ -78,12 +78,12 @@ system_state_t * GetStateFromListSystem( system_t *, system_state_enum );
 /***************************************************************************************/
 typedef struct
 {
-  void (*Next)(           system_t * );
-  system_state_t (*Get)(  system_t *                       );
+  void (*Next)(           system_t *                       );
   void (*Set)(            system_t *, system_state_enum    );
   void (*Perform)(        system_t *                       );
   void (*Enter)(          system_t *, system_state_enum    );
   bool (*IsIn)(           system_t *, system_state_enum    );
+  system_state_t * (*Get)(         system_t *                    );
   system_state_t * (*GetFromList)( system_t *, system_state_enum );
 } system_state_functions;
 
@@ -100,11 +100,11 @@ static system_functions SystemFunctions =
 {
   .Init           = InitSystem,
   .State.Next     = NextStateSystem,    /* Enter next state               */
-  .State.Get      = GetStateSystem,     /* Get current state              */
   .State.Set      = SetStateSystem,     /* Set state, no perform          */
   .State.Perform  = PerformStateSystem, /* Peform current state's routine */
   .State.Enter    = EnterStateSystem,   /* Set and perform state          */
   .State.IsIn     = IsInStateSystem,    /* Check if system is in state    */
+  .State.Get      = GetStateSystem,     /* Get current state              */
   .State.GetFromList = GetStateFromListSystem /* Get state data from list */
 };
 

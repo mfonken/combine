@@ -20,7 +20,7 @@ __attribute__((naked)) inline void PixelThreshLoop( register byte_t * capture_ad
     //  register address_t capture_base = (address_t)RhoSystem.Variables.Buffers.Capture;
     //  register register_t capture_offset = 0;
 #ifndef __ASSEMBLY_RHO__
-    while( ( ( capture_value = *(capture_address+=sub_sample)) < width ) && !RhoSystem.Variables.Flags.Row )
+    while( ( ( capture_value = *(capture_address+=sub_sample)) < width ) && !RhoSystem.Variables.Flags->Row )
         if( capture_value > thresh_value )
             *(thresh_address++) = (index_t)( capture_address -  RhoSystem.Variables.Buffers.Capture );
 #else
@@ -53,7 +53,7 @@ __attribute__((naked)) inline void PixelThreshLoop( register byte_t * capture_ad
 
 inline index_t CaptureFrame()
 {
-    while(RhoSystem.Variables.Flags.Row);
+    while(RhoSystem.Variables.Flags->Row);
     index_t
     y_counter = (index_t)RhoSystem.Variables.Utility.Height,
     t_counter = 0,
@@ -66,9 +66,9 @@ inline index_t CaptureFrame()
     while( ( --y_counter > 0 ) && ( t_counter < t_max ) )
     {
         RhoSystem.Variables.Buffers.Thresh[t_counter++] = Y_DEL;
-        while(RhoSystem.Variables.Flags.Row);
+        while(RhoSystem.Variables.Flags->Row);
         PixelThreshLoop( capture_address, thresh_address, thresh_value, 1 );
-        while(!RhoSystem.Variables.Flags.Row);
+        while(!RhoSystem.Variables.Flags->Row);
     }
     return t_counter;
 }
@@ -103,7 +103,7 @@ inline section_process_t ProcessFrameSection( register index_t t_counter, regist
 
 inline void ActivateBackgrounding( void )
 {
-    RhoSystem.Variables.Flags.Backgrounding = true;
+    RhoSystem.Variables.Flags->Backgrounding = true;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.background;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
@@ -111,7 +111,7 @@ inline void ActivateBackgrounding( void )
 
 inline void DeactivateBackgrounding( void )
 {
-    RhoSystem.Variables.Flags.Backgrounding = false;
+    RhoSystem.Variables.Flags->Backgrounding = false;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
     RhoSystem.Variables.Buffers.DensityY = RhoSystem.Variables.Utility.DensityMapPair.y.map;
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Q;
@@ -152,7 +152,7 @@ inline void ProcessFrame( index_t t_len )
 void ProcessRhoSystemFrameCapture( void )
 {
     RhoSystem.Functions.Memory.Zero();
-    while(!RhoSystem.Variables.Flags.Frame);
+    while(!RhoSystem.Variables.Flags->Frame);
 
     ProcessFrame( CaptureFrame() );
 }
@@ -166,13 +166,13 @@ inline void PerformRhoSystemProcess( void )
 
 void ActivateRhoSystem( void  )
 {
-    RhoSystem.Variables.Flags.Active = true;
+    RhoSystem.Variables.Flags->Active = true;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 void DeactivateRhoSystem( void )
 {
-    RhoSystem.Variables.Flags.Active = false;
+    RhoSystem.Variables.Flags->Active = false;
     // TODO: zero period
     RhoSystem.Functions.Perform.TransmitPacket();
 }
@@ -220,7 +220,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_
 //
 //     RhoSystem.Functions.Platform.Host.Transmit = PlatformInterface->Host.Transmit;
 //
-// //    RhoSystem.Functions.Platform.Flags.Activate = PlatformInterface->Flags.Activate;
+// //    RhoSystem.Functions.Platform.Flags->Activate = PlatformInterface->Flags.Activate;
 //
 //     RhoSystem.Functions.Platform.Time.Now       = PlatformInterface->Time.Now;
 }
