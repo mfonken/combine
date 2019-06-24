@@ -292,44 +292,43 @@ typedef struct
 typedef struct
 {
     index_t
-    len,
-    range[3],
-    rows_left,
-    cyc,
-    cyc_,
-    gapc,
-    width,
-    blbf,            /* Blob fill */
-    x,               /* Generic index */
-    start,
-    end,
-    assumed_blobs;
+      len,
+      range[3],
+      cyc,
+      cyc_,
+      gapc,
+      width,
+      blbf,            /* Blob fill */
+      x,               /* Generic index */
+      start,
+      end,
+      assumed_blobs;
     density_t
-    fpeak,
-    fpeak_2,
-    fbandl,
-    c1,
-    c2,
-    b,
-    rcal_c; /* Recalculation counter */
-    variance_t
-    fvar;
+      fpeak,
+      fpeak_2,
+      fbandl,
+      c1,
+      c2,
+      b,
+      rcal_c; /* Recalculation counter */
+      variance_t
+      fvar;
     density_2d_t
-    cmax,
-    cden,
-    tden, /* Target density */
-    fden, /* Filtered density */
-    total_density,
-    filtered_density;
+      cmax,
+      cden,
+      tden, /* Target density */
+      fden, /* Filtered density */
+      total_density,
+      filtered_density;
     bool
-    has,
-    rcal; /* Recalculate */
+      has,
+      rcal; /* Recalculate */
     floating_t
-    avgc,
-    cavg,   /* cumulative average */
-    mavg,   /* moment average */
-    chaos,
-    target_density;
+      avgc,
+      cavg,   /* cumulative average */
+      mavg,   /* moment average */
+      chaos,
+      target_density;
 } rho_detection_variables;
 
 typedef struct
@@ -389,6 +388,7 @@ typedef struct
         Width,
         Height,
         Subsample,
+        RowsLeft,
         Px,
         Py,
         Sx,

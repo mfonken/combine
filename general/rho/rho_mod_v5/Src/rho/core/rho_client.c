@@ -8,22 +8,20 @@
 
 #include "rho_client.h"
 
-//#define __ASSEMBLY_RHO__
+ #define __ASSEMBLY_RHO__
 // #define __CHECK_FRAME_FLAG__
 
-__attribute__((naked)) inline void PixelThreshLoop(
+//__attribute__((naked))
+inline void PixelThreshLoop(
                             register byte_t * capture_address,   // capture buffer index
                             register index_t * thresh_address,    // address of thresh buffer
                             const register byte_t thresh_value,
                             const register byte_t sub_sample,
-                            const register index_t width,
+                            const register address_t capture_end,
                             const register address_t capture_buffer,
                             const register address_t flag_address )
 {
-    register uint32_t working_register;
-    // = *capture_address;
-    //  register address_t capture_base = (address_t)RhoSystem.Variables.Buffers.Capture;
-    //  register register_t capture_offset = 0;
+    register uint32_t working_register = 0;
 #ifndef __ASSEMBLY_RHO__
     while( 1 )
     {
@@ -32,42 +30,42 @@ __attribute__((naked)) inline void PixelThreshLoop(
         if( working_register ) return;
 #endif
         capture_address += sub_sample;
-        if(capture_address >= width) return;
+        if((uint32_t)capture_address >= (uint32_t)capture_end) return;
 
         working_register = *(capture_address);
-        if(working_register >= thresh )
+        if(working_register >= thresh_value )
         {
-            working_register = capture_address - capture_buffer;
+            working_register = (uint32_t)capture_address - (uint32_t)capture_buffer;
             *(thresh_address++) = working_register;
         }
     }
 #else
     __asm volatile
     (
-    ".capture:\n\t"
+    "capture:\n\t"
 #ifdef __CHECK_FRAME_FLAG__
         "ldrb    %0, [%7]    ; Load flag byte\n\t"
         "cmp     %0, #1      ; Check if set\n\t"
-        "bge     .end        ; End if set\n\t"
+        "bge     end        ; End if set\n\t"
 #endif
         "add     %2, %2, %1  ; Increment capture index by sub_sample\n\t"
         "cmp     %2, %3      ; Check if capture index has reach buffer Width\n\t"
-        "bge     .end        ; If so end\n\t"
+        "bge     end        ; If so end\n\t"
 
         "ldrb    %0, [%2]    ; Load byte at capture index into RO\n\t"
         "cmp     %0, %4      ; Compare with threshold value\n\t"
-        "blt     .capture    ; If less than, continue to next capture\n\t"
+        "blt     capture    ; If less than, continue to next capture\n\t"
 
         "sub     %0, %2, %5  ; Subtract capture buffer start from index\n\t"
-        "strw    %0, [%6]    ; Store offset word at thresh index\n\t"
+        "strh    %0, [%6]    ; Store offset word at thresh index\n\t"
         "add     %6, %6, #2  ; Increment thresh index by word\n\t"
-        "b       .capture    ; Branch back to next capture\n"
-    ".end\n"
+        "b       capture    ; Branch back to next capture\n"
+    "end:\n"
         ::
         "r"(working_register),  // %0
         "r"(sub_sample),        // %1
         "r"(capture_address),   // %2
-        "r"(width),             // %3
+        "r"(capture_end),       // %3
         "r"(thresh_value),      // %4
         "r"(capture_buffer),    // %5
         "r"(thresh_address),    // %6
@@ -76,26 +74,26 @@ __attribute__((naked)) inline void PixelThreshLoop(
 #endif
 }
 
-inline void CaptureFrame()
+void CaptureFrame( void )
 {
     /* Reset buffer indeces */
-    RhoSystem.Variables.Addresses.CaptureIndex = RhoSystem.Variables.Buffers.Capture;
-    RhoSystem.Variables.Addresses.ThreshIndex = RhoSystem.Variables.Buffers.Thresh;
-    RhoSystem.Variables.Utility.rows_left = (index_t)RhoSystem.Variables.Utility.Height;
-    while(!RhoSystem.Variables.Flags.Row);
+    RhoSystem.Variables.Addresses.CaptureIndex = (address_t)RhoSystem.Variables.Buffers.Capture;
+    RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
+    while(!RhoSystem.Variables.Flags->Row);
     do
     {
         PixelThreshLoop(
-            RhoSystem.Variables.Addresses.CaptureIndex,
-            RhoSystem.Variables.Addresses.ThreshIndex,
+            (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
+            (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
             (byte_t)RhoSystem.Variables.Utility.Thresh,
             (byte_t)RhoSystem.Variables.Utility.Subsample,
-            RhoSystem.Variables.Utility.Width,
-            RhoSystem.Variables.Buffers.Capture,
-            RhoSystem.Variables.Flags.Row );
-        if(--RhoSystem.Variables.Utility.rows_left <= 0) break;
-        *(RhoSystem.Variables.Buffers.ThreshIndex++) = Y_DEL;
-    } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
+            (address_t)RhoSystem.Variables.Addresses.CaptureEnd,
+            (address_t)RhoSystem.Variables.Buffers.Capture,
+            (address_t)RhoSystem.Variables.Flags->Row );
+        if(--RhoSystem.Variables.Utility.RowsLeft <= 0) break;
+        *(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
+    } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
 }
 
 inline section_process_t ProcessFrameSection( register index_t t_counter, register index_t t_len, register index_t y_counter, register index_t y_len )
@@ -157,14 +155,14 @@ inline bool HasPixelCountDrop( index_t * PixelCount, index_t NewCount )
 inline void ProcessFrame()
 {
     /* Calculate how much the thresh buffer is filled */
-    t_len = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshIndex - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
+    index_t t_len = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshIndex - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
 
     if( HasPixelCountDrop( (index_t *)RhoSystem.Variables.Addresses.PixelCount, t_len ) )
         ActivateBackgrounding();
     else DeactivateBackgrounding();
 
     uint8_t start = 0, end = 0;
-    section_process_t ProcessedTopSectionData, ProcessedBottomSectionData
+    section_process_t ProcessedTopSectionData, ProcessedBottomSectionData;
     ProcessedTopSectionData    = ProcessFrameSection( start,
                                                       t_len,
                                                       end,
@@ -206,7 +204,7 @@ void ActivateRhoSystem( void  )
 void DeactivateRhoSystem( void )
 {
     // TODO: zero period
-    RhoSystem.Variables.Flags.Active = false;
+    RhoSystem.Variables.Flags->Active = false;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 

@@ -15,14 +15,20 @@
 /************************************************************************
  *                      Global Function Prototypes                      *
  ***********************************************************************/
-void PixelThreshLoop( register byte_t *, register index_t *, const register byte_t, const register byte_t );
-index_t CaptureFrame( void );
+void PixelThreshLoop( register byte_t *,
+                      register index_t *,
+                      const register byte_t,
+                      const register byte_t,
+                      const register address_t,
+                      const register address_t,
+                      const register address_t );
+void CaptureFrame( void );
 section_process_t ProcessFrameSection( register index_t, register index_t, register index_t, register index_t );
 void ActivateBackgrounding( void );
 void DeactivateBackgrounding( void );
 void FilterPixelCount( index_t *, index_t );
 bool HasPixelCountDrop( index_t *, index_t );
-void ProcessFrame( index_t );
+void ProcessFrame( void );
 void ProcessRhoSystemFrameCapture( void );
 void PerformRhoSystemProcess( void );
 void ActivateRhoSystem( void );
