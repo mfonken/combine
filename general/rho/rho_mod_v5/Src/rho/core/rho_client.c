@@ -42,25 +42,25 @@ inline void PixelThreshLoop(
 #else
     __asm volatile
     (
-    "capture:\n\t"
+    "capture:                                                           \n\t"
 #ifdef __CHECK_FRAME_FLAG__
-        "ldrb    %0, [%7]    ; Load flag byte\n\t"
-        "cmp     %0, #1      ; Check if set\n\t"
-        "bge     end        ; End if set\n\t"
+        "ldrb    %0, [%7]    ; Load flag byte                           \n\t"
+        "cmp     %0, #1      ; Check if set                             \n\t"
+        "bge     end         ; End if set                               \n\t"
 #endif
-        "add     %2, %2, %1  ; Increment capture index by sub_sample\n\t"
-        "cmp     %2, %3      ; Check if capture index has reach buffer Width\n\t"
-        "bge     end        ; If so end\n\t"
+        "add     %2, %2, %1  ; Increment capture index by sub_sample    \n\t"
+        "cmp     %2, %3      ; Check if capture reached max width       \n\t"
+        "bge     end         ; If so end                                \n\t"
 
-        "ldrb    %0, [%2]    ; Load byte at capture index into RO\n\t"
-        "cmp     %0, %4      ; Compare with threshold value\n\t"
-        "blt     capture    ; If less than, continue to next capture\n\t"
+        "ldrb    %0, [%2]    ; Load byte at capture index into RO       \n\t"
+        "cmp     %0, %4      ; Compare with threshold value             \n\t"
+        "blt     capture     ; If less than, continue to next capture   \n\t"
 
-        "sub     %0, %2, %5  ; Subtract capture buffer start from index\n\t"
-        "strh    %0, [%6]    ; Store offset word at thresh index\n\t"
-        "add     %6, %6, #2  ; Increment thresh index by word\n\t"
-        "b       capture    ; Branch back to next capture\n"
-    "end:\n"
+        "sub     %0, %2, %5  ; Subtract capture buffer start from index \n\t"
+        "strh    %0, [%6]    ; Store offset word at thresh index        \n\t"
+        "add     %6, %6, #2  ; Increment thresh index by word           \n\t"
+        "b       capture    ; Branch back to next capture               \n"
+    "end:                                                               \n"
         ::
         "r"(working_register),  // %0
         "r"(sub_sample),        // %1
