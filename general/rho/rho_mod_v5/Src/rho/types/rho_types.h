@@ -161,7 +161,7 @@ floating_t
     scr;
 byte_t
     tracking_id;
-} blob_t;
+} region_t;
 
 /* Rho Structures* */
 typedef struct
@@ -205,10 +205,10 @@ typedef struct
 {
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-    blob_t          Blobs[MAX_BLOBS];
-    uint8_t         BlobsOrder[MAX_BLOBS],
-                    NumBlobs;
-    floating_t      NuBlobs,
+    region_t          Regions[MAX_BLOBS];
+    uint8_t         RegionsOrder[MAX_BLOBS],
+                    NumRegions;
+    floating_t      NuRegions,
                     Primary,
                     Secondary,
                     AverageDensity;
@@ -226,15 +226,15 @@ typedef struct
     prediction_t    x,y;
     prediction_probabilities Probabilities;
 
-    floating_t      NuBlobs,
+    floating_t      NuRegions,
                     BestConfidence,
                     AverageDensity;
 } prediction_pair_t;
 
 typedef struct
 {
-    index_t pixels, rows;           /* Process location variables */
     density_2d_t left, right;       /* Direction density values */
+    index_t pixels, rows;
 } section_process_t;
 
 typedef struct
@@ -298,17 +298,16 @@ typedef struct
       cyc_,
       gapc,
       width,
-      blbf,            /* Blob fill */
+      blbf,            /* Region fill */
       x,               /* Generic index */
       start,
       end,
-      assumed_blobs;
+      assumed_regions;
     density_t
       fpeak,
       fpeak_2,
       fbandl,
-      c1,
-      c2,
+      c,
       b,
       rcal_c; /* Recalculation counter */
       variance_t

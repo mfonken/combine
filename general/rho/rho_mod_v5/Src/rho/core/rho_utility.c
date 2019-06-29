@@ -8,12 +8,12 @@
 
 void CumulateMomentsRhoUtility( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
-    floating_t n_=1/((floating_t)(++(*n)));
+    floating_t n_=1/(++(*n));
     *m0+=((v-*m0)*n_);
     *m1+=(((v*i)-*m1)*n_);
 }
 
-void CalculateBlobScoreRhoUtility( blob_t * b, density_t total_density, byte_t peak )
+void CalculateRegionScoreRhoUtility( region_t * b, density_t total_density, byte_t peak )
 {
     floating_t
     delta_d = ( (floating_t)b->den / (floating_t)total_density) - 0.5,
@@ -110,11 +110,11 @@ void InitializePredictionRhoUtility( prediction_t * r, index_t l )
         RhoKalman.Initialize( &r->TrackingFilters[i], 0., RHO_PREDICTION_LS, 0, l, DEFAULT_PREDICTION_UNCERTAINTY );
         r->TrackingFiltersOrder[i] = i;
     }
-    /* Blobs */
+    /* Regions */
     for(uint8_t i = 0; i < MAX_BLOBS; i++)
     {
-        memset(&r->Blobs[i], 0, sizeof(blob_t));
-        r->BlobsOrder[i] = i;
+        memset(&r->Regions[i], 0, sizeof(region_t));
+        r->RegionsOrder[i] = i;
     }
 }
 
@@ -147,15 +147,15 @@ void ResetForDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pr
     memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
     memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
 
-    r->NuBlobs = 0;
+    r->NuRegions = 0;
     r->TotalDensity = 0;
-    r->NumBlobs = 0;
+    r->NumRegions = 0;
 
     index_t i;
     for( i = 0; i < MAX_BLOBS; i++ )
     {
-        memset(&r->Blobs[i], 0, sizeof(blob_t));
-        r->BlobsOrder[i] = i;
+        memset(&r->Regions[i], 0, sizeof(region_t));
+        r->RegionsOrder[i] = i;
     }
     for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
     {
@@ -176,12 +176,12 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
         {
             do
             {
-                RhoUtility.Detect.Blobs( _, d, r );
+                RhoUtility.Detect.Regions( _, d, r );
                 RhoUtility.Detect.CalculateChaos( _, r );
-                RhoUtility.Detect.ScoreBlobs( _, d, r );
+                RhoUtility.Detect.ScoreRegions( _, d, r );
             } while( _->rcal && ++_->rcal_c < MAX_RHO_RECALCULATION_LEVEL );
 
-            RhoUtility.Detect.SortBlobs( _, r );
+            RhoUtility.Detect.SortRegions( _, r );
         }
 
         r->PreviousPeak[_->cyc] = BOUND(_->cmax, 0, _->len);
@@ -211,51 +211,48 @@ inline bool CalculateBandLowerBoundRhoUtility( rho_detection_variables *_ )
     return false;
 }
 
-inline void DetectBlobsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
-{ /* Detect blobs - START */
+inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
+{ /* Detect regions - START */
     _->tden = 0;
     _->fden = 0;
-    BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c1, d->map, _->b, d->background)
+    BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c, d->map, _->b, d->background)
     {
         RhoUtility.Detect.SubtractBackground( _, d );
-        RhoUtility.Detect.Blob( _, d, r );
+        RhoUtility.Detect.Region( _, d, r );
     }
-} /* Detect blobs - END */
+} /* Detect regions - END */
 
 inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_, density_map_t * d )
 {
-    if( _->c1 > _->b )
+    if( _->c > _->b )
     {
-        _->tden += _->c1;
+        _->tden += _->c;
 
         // Subtract background
-        _->c1 -= _->b;
-
-        if( _->c1 > _->cmax )
-            _->cmax = _->c1;
+        _->c -= _->b;
 
         /* Punish values above the filter peak */
-        if( ( _->c1 > _->fpeak )
-           && ( _->fpeak_2 > _->c1 ) )
-            _->c1 = _->fpeak_2 - _->c1;
+        if( ( _->c > _->fpeak )
+           && ( _->fpeak_2 > _->c ) )
+            _->c = _->fpeak_2 - _->c;
     }
     else
-        _->c1 = 0;
+        _->c = 0;
 }
 
-inline void DetectBlobRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
+inline void DetectRegionRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 {
     /* Check if CMA value is in band */
-    if( _->c1 > _->fbandl )
+    if( _->c > _->fbandl )
     {
         /* De-offset valid values */
-        _->c2 = _->c1 - _->fbandl;
+        _->c -= _->fbandl;
 
-        /* Process new values into blob */
-        RhoUtility.CumulateMoments( (floating_t)_->c2, (floating_t)_->x, &_->cavg, &_->mavg, &_->avgc );
+        /* Process new values into region */
+        RhoUtility.CumulateMoments( (floating_t)_->c, (floating_t)_->x, &_->cavg, &_->mavg, &_->avgc );
 
         /* Update max */
-        if(_->c2 > _->cmax) _->cmax = _->c2;
+        if(_->c > _->cmax) _->cmax = _->c;
 
         /* Increment width */
         _->width++;
@@ -264,20 +261,20 @@ inline void DetectBlobRhoUtility( rho_detection_variables *_, density_map_t * d,
         _->has = 1; _->gapc = 0;
     }
 
-    /* Process completed blobs and increment count */
+    /* Process completed regions and increment count */
     else if( ++_->gapc > RHO_GAP_MAX && _->has )
     {
-        /* Get latest blob centroid */
+        /* Get latest region centroid */
         _->cden = (density_2d_t)_->cavg;
         _->fden += _->cden;
 
-        /* Check if new blob is dense enough to be saved */
+        /* Check if new region is dense enough to be saved */
         if( _->cden > MIN_BLOB_DENSITY)
         {
-            /* Create new blob at secondary */
+            /* Create new region at secondary */
             index_t loc = (index_t)ZDIV( _->mavg, _->cavg );
-            r->Blobs[_->blbf] = (blob_t){ d->map[loc], _->cden, loc, _->width };
-            r->BlobsOrder[_->blbf] = _->blbf;
+            r->Regions[_->blbf] = (region_t){ d->map[loc], _->cden, loc, _->width };
+            r->RegionsOrder[_->blbf] = _->blbf;
             _->blbf++;
         }
 
@@ -293,43 +290,43 @@ inline void DetectBlobRhoUtility( rho_detection_variables *_, density_map_t * d,
     }
 }
 
-void CalculateDetectionChaosRhoUtility( rho_detection_variables *_, prediction_t * r )
+void CalculateChaosRhoUtility( rho_detection_variables *_, prediction_t * r )
 {
     _->chaos = (floating_t)r->PreviousDensity[_->cyc] / (floating_t)_->fden;
     /* Assume no recalculations are needed */
     _->rcal = false;
 }
 
-void ScoreBlobsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
+void ScoreRegionsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 {
     /* Return on empty frames */
     if(_->fden > 0 )
     {
-        /* Cycle blobs */
+        /* Cycle regions */
         for(uint8_t i = 0; i < _->blbf; i++)
         {
-            /* Get blob at index from order array and check validity */
-            uint8_t j = r->BlobsOrder[i];
+            /* Get region at index from order array and check validity */
+            uint8_t j = r->RegionsOrder[i];
             if(j >= MAX_BLOBS) continue;
-            blob_t * curr = &r->Blobs[j];
+            region_t * curr = &r->Regions[j];
 
-            /* Score current blob */
-            RhoUtility.CalculateBlobScore( curr, _->fden, _->cmax );
+            /* Score current region */
+            RhoUtility.CalculateRegionScore( curr, _->fden, _->cmax );
 
-            /* Recalculate blobs with chaos */
+            /* Recalculate regions with chaos */
             if(curr->scr > _->chaos)
             {
-                /* Recalculate around chaotic blob */
+                /* Recalculate around chaotic region */
                 _->rcal = true;
 
                 /* Remove this index */
-                r->BlobsOrder[i] = MAX_BLOBS;
+                r->RegionsOrder[i] = MAX_BLOBS;
 
                 /* Get centroid peak and update filter double peak */
                 sdensity_t cpeak = (sdensity_t)d->map[curr->loc];
                 _->fpeak_2 = cpeak << 1;
 
-                /* Raise lower band half of blob centroid to band center when below */
+                /* Raise lower band half of region centroid to band center when below */
                 if( cpeak < _->fpeak)
                     _->fbandl += abs( (sdensity_t)_->fpeak - cpeak) >> 1;
 
@@ -350,28 +347,28 @@ void ScoreBlobsRhoUtility( rho_detection_variables *_, density_map_t * d, predic
     }
 }
 
-void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
+void SortRegionsRhoUtility( rho_detection_variables *_, prediction_t * r )
 {
     /// NOTE: Smaller scores are better
-    /* Assume all blobs are valid */
+    /* Assume all regions are valid */
     index_t i, io, j, jo, best_index;
     floating_t best_score;
-    blob_t *curr, *check;
+    region_t *curr, *check;
 
-    /* Cycle through found blobs */
+    /* Cycle through found regions */
     for( i = 0; i < _->blbf; i++)
     {
-        io = r->BlobsOrder[i];
-        curr = &r->Blobs[io];
+        io = r->RegionsOrder[i];
+        curr = &r->Regions[io];
         if( curr->srt ) continue;
 
         best_score = curr->scr;
         best_index = i;
-        /* Cycle through other blobs */
+        /* Cycle through other regions */
         for( j = i+1; j < _->blbf; j++ )
         {
-            jo = r->BlobsOrder[j];
-            check = &r->Blobs[jo];
+            jo = r->RegionsOrder[j];
+            check = &r->Regions[jo];
 
             /* If unscored and less than min, set as new min */
             if( check->scr < best_score )
@@ -382,32 +379,32 @@ void SortBlobsRhoUtility( rho_detection_variables *_, prediction_t * r )
         }
 
         {
-            r->BlobsOrder[i] = best_index;
-            r->BlobsOrder[best_index] = i;
+            r->RegionsOrder[i] = best_index;
+            r->RegionsOrder[best_index] = i;
         }
 
-        r->Blobs[i].srt = true;
+        r->Regions[i].srt = true;
     }
     for(; i < MAX_BLOBS; i++ )
     {
-        r->BlobsOrder[i] = i;
+        r->RegionsOrder[i] = i;
     }
 }
 
 void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *_, prediction_t * r )
 {
     /* Update frame statistics */
-    _->assumed_blobs = (floating_t)_->blbf;
-    if( _->assumed_blobs == 0 ) _->assumed_blobs = 1;
+    _->assumed_regions = (floating_t)_->blbf;
+    if( _->assumed_regions == 0 ) _->assumed_regions = 1;
 
-    r->NuBlobs = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->assumed_blobs, _->target_density ), MAX_NU_BLOBS );
-    r->NumBlobs = _->blbf;
+    r->NuRegions = BOUNDU( ZDIV( (floating_t)_->tden * (floating_t)_->assumed_regions, _->target_density ), MAX_NU_BLOBS );
+    r->NumRegions = _->blbf;
     r->TotalDensity = _->tden;
-    r->AverageDensity = ZDIV( (floating_t)r->TotalDensity, r->NuBlobs );
+    r->AverageDensity = ZDIV( (floating_t)r->TotalDensity, r->NuRegions );
 
     /* Reset sort flags */
     for( uint8_t i = 0; i < MAX_BLOBS; i++ )
-        r->Blobs[i].srt = false;
+        r->Regions[i].srt = false;
 }
 
 void PredictTrackingFiltersRhoUtility( prediction_t * r )
@@ -418,17 +415,17 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
     /* Declare essential variables */
     floating_t aa, bb, ab, ba, total_difference = 0., average_difference = 0.;
 
-    /* Match blobs to Kalmans */
+    /* Match regions to Kalmans */
     index_t m = 0, n = 0, updated = 0;
     for( ; m < ( valid_tracks - 1 ); m ++ )
     {
-        for( ; n < ( r->NumBlobs - 1 ); n++ )
+        for( ; n < ( r->NumRegions - 1 ); n++ )
         { /* Update tracking filters in pairs following determinant */
 
-            /* Retreive current blob pair */
-            blob_t
-            *blobA = &r->Blobs[r->BlobsOrder[n]],
-            *blobB = &r->Blobs[r->BlobsOrder[n+1]];
+            /* Retreive current region pair */
+            region_t
+            *regionA = &r->Regions[r->RegionsOrder[n]],
+            *regionB = &r->Regions[r->RegionsOrder[n+1]];
 
             /* Retreive tracking filters pair */
             byte_t
@@ -441,14 +438,14 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
 
             bool swapped = false;
 //            floating_t
-//            blocA = blobA->loc,
-//            blocB = blobB->loc;
+//            blocA = regionA->loc,
+//            blocB = regionB->loc;
 
-            /* Calculate distances between filters and blobs */
-            aa = fabs(filterA->value - blobA->loc);
-            bb = fabs(filterB->value - blobB->loc);
-            ab = fabs(filterA->value - blobB->loc);
-            ba = fabs(filterB->value - blobA->loc);
+            /* Calculate distances between filters and regions */
+            aa = fabs(filterA->value - regionA->loc);
+            bb = fabs(filterB->value - regionB->loc);
+            ab = fabs(filterA->value - regionB->loc);
+            ba = fabs(filterB->value - regionA->loc);
 
             if( aa > MAX_TRACKING_MATCH_DIFFERNCE )
             {
@@ -484,29 +481,29 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             /* Update filters */
             if(swapped)
             {
-                RhoKalman.Update(filterA, blobB->loc);
-                RhoKalman.Update(filterB, blobA->loc);
-                blobB->tracking_id = fAi;
-                blobA->tracking_id = fBi;
+                RhoKalman.Update(filterA, regionB->loc);
+                RhoKalman.Update(filterB, regionA->loc);
+                regionB->tracking_id = fAi;
+                regionA->tracking_id = fBi;
             }
             else
             {
-                RhoKalman.Update(filterA, blobA->loc);
-                RhoKalman.Update(filterB, blobB->loc);
-                blobA->tracking_id = fAi;
-                blobB->tracking_id = fBi;
+                RhoKalman.Update(filterA, regionA->loc);
+                RhoKalman.Update(filterB, regionB->loc);
+                regionA->tracking_id = fAi;
+                regionB->tracking_id = fBi;
             }
 
             m++; n++;
         }
 
-        /* Account for odd number of and spare blobs */
-        if( m < valid_tracks && n < r->NumBlobs )
+        /* Account for odd number of and spare regions */
+        if( m < valid_tracks && n < r->NumRegions )
         {
             rho_kalman_t
             *filter = &r->TrackingFilters[r->TrackingFiltersOrder[m]];
             floating_t
-            bloc = (floating_t)r->Blobs[r->BlobsOrder[n]].loc;
+            bloc = (floating_t)r->Regions[r->RegionsOrder[n]].loc;
             RhoKalman.Update(filter, bloc);
 
             aa = fabs(filter->value - bloc);
@@ -516,10 +513,10 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
     }
 
     /* Activate new filters */
-    for( ; n < r->NumBlobs && n < MAX_BLOBS; n++ )
+    for( ; n < r->NumRegions && n < MAX_BLOBS; n++ )
     {
         LOG_RHO( DEBUG_0, "Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[n], n );
-        RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[n]], r->Blobs[r->BlobsOrder[n]].loc, 0. );
+        RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[n]], r->Regions[r->RegionsOrder[n]].loc, 0. );
     }
 
     /* Punish unused ones */
@@ -553,7 +550,7 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
         RhoKalman.Score( &r->TrackingFilters[i] );
     }
 
-    /* Swap sort - Cycle through found blobs */
+    /* Swap sort - Cycle through found regions */
     for( i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
         io = r->TrackingFiltersOrder[i];
@@ -562,7 +559,7 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
 
         best_score = curr->score;
         best_index = i;
-        /* Cycle through other blobs */
+        /* Cycle through other regions */
         for( j = i+1; j < MAX_TRACKING_FILTERS; j++ )
         {
             jo = r->TrackingFiltersOrder[j];
@@ -611,7 +608,7 @@ index_t CalculateValidTracksRhoUtility( prediction_t * r )
 
 void PredictTrackingProbabilitiesRhoUtility( prediction_t * r )
 {
-    floating_t a = r->NuBlobs+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.,
+    floating_t a = r->NuRegions+1, b = (floating_t)NUM_STATE_GROUPS+1, curr_CDF, prev_CDF = 0.,
     interval[4] = STATE_KUMARASWAMY_INTERVALS;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
@@ -723,9 +720,9 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 #else
             if( core->PredictionPair.BestConfidence > MIN_STATE_CONFIDENCE )
             {
-                core->PredictionPair.NuBlobs = MAX( core->PredictionPair.x.NuBlobs, core->PredictionPair.y.NuBlobs );
+                core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
                 core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
-                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuBlobs * core->PredictionPair.AverageDensity, TotalPixels );
+                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity, TotalPixels );
             }
 #endif
             else
@@ -861,13 +858,13 @@ void GeneratePacketRhoUtility( rho_core_t * core )
 void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t thresh )
 {
     index_t i = 0;
-    for( ; i < r->NumBlobs && i < MAX_OBSERVATIONS; i++ )
+    for( ; i < r->NumRegions && i < MAX_OBSERVATIONS; i++ )
     {
         index_t io = r->TrackingFiltersOrder[i];
         if( io >= MAX_TRACKING_FILTERS ) continue;
         floating_t x = r->TrackingFilters[io].value;
-        io = r->BlobsOrder[i];
-        blob_t * b = &r->Blobs[io];
+        io = r->RegionsOrder[i];
+        region_t * b = &r->Regions[io];
         bool below_centroid = (density_t)x < r->PreviousCentroid;
 
         index_t density =  (index_t)b->den + (index_t)r->PreviousPeak[(uint8_t)below_centroid];
@@ -882,12 +879,12 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t
 }
 void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
-    if(core->PredictionPair.x.NumBlobs > 0)
+    if(core->PredictionPair.x.NumRegions > 0)
     {
         LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:\n");
         RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->ThreshByte );
     }
-    if(core->PredictionPair.y.NumBlobs > 0)
+    if(core->PredictionPair.y.NumRegions > 0)
     {
         LOG_RHO(RHO_DEBUG_2, "Creating observation list for Y:\n");
         RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->ThreshByte );
