@@ -12,7 +12,7 @@ void CumulateMomentsRhoUtility( floating_t v, floating_t i, floating_t *m0, floa
     floating_t n_=1/(++(*n));
     *m0+=((v-*m0)*n_);
     *m1+=(((v*i)-*m1)*n_);
-#elif
+#else
     ++(*n);
     *m0+=v;
     *m1+=v*i;
@@ -28,7 +28,7 @@ void CalculateRegionScoreRhoUtility( region_t * b, density_t total_density, byte
 }
 
 /* Generic centroid and mass calculator */
-floating_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C, register density_t thresh )
+density_2d_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C, register density_t thresh )
 {
     floating_t avg = 0, mavg = 0, cnt = 0, tot = 0;
     for( index_t i = 0; i < l; i++ )
@@ -42,7 +42,7 @@ floating_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C,
         }
     }
     *C = (index_t)(mavg/avg);
-    return tot;
+    return(density_2d_t)tot;
 }
 
 inline void PrintPacketRhoUtility( packet_t * p, index_t l )
@@ -191,7 +191,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
             RhoUtility.Detect.SortRegions( _, r );
         }
 
-        r->PreviousPeak[_->cyc] = BOUND(_->cmax, 0, _->len);
+        r->PreviousPeak[_->cyc] = BOUNDU(_->cmax, _->len);
         r->PreviousDensity[_->cyc] = _->fden;
         d->max[_->cyc] = _->cmax;
     }
@@ -201,7 +201,7 @@ void PredictPeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d,
 {
     _->fpeak = (index_t)RhoKalman.Step(&d->kalmans[_->cyc], r->PreviousPeak[_->cyc], d->kalmans[_->cyc].velocity );
     _->fpeak_2 = _->fpeak << 1;
-    _->fvar = BOUND((index_t)RHO_VARIANCE( d->kalmans[_->cyc].K[0] ), MIN_VARIANCE, MAX_VARIANCE);
+    _->fvar = BOUND((index_t)(RHO_VARIANCE( d->kalmans[_->cyc].K[0]) ), MIN_VARIANCE, MAX_VARIANCE);
     d->kalmans[_->cyc].variance = _->fvar;
 }
 
@@ -274,10 +274,10 @@ inline void DetectRegionRhoUtility( rho_detection_variables *_, density_map_t * 
     )
     {
         _->cden = (density_2d_t)_->cavg;
-#elif
+#else
     && _->avgc )
     {
-        _->cden = (density_2d_t)_->cavg / _->avgc;
+        _->cden = (density_2d_t)( _->cavg / _->avgc );
 #endif
         _->fden += _->cden;
 
@@ -832,8 +832,8 @@ void RedistributeDensitiesRhoUtility( rho_core_t * core )
 
 inline void GenerateBackgroundRhoUtility( rho_core_t * core )
 {
-    floating_t xt = RhoUtility.CalculateCentroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Bx, BACKGROUND_CENTROID_CALC_THRESH );
-    floating_t yt = RhoUtility.CalculateCentroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->By, BACKGROUND_CENTROID_CALC_THRESH );
+    density_2d_t xt = RhoUtility.CalculateCentroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Bx, BACKGROUND_CENTROID_CALC_THRESH );
+    density_2d_t yt = RhoUtility.CalculateCentroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->By, BACKGROUND_CENTROID_CALC_THRESH );
     core->QbT = MAX(xt, yt);
 }
 

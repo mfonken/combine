@@ -7,6 +7,8 @@
 //
 
 #include "stm32_interface.h"
+#include "main.h"
+#include "platform.h"
 
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
@@ -36,17 +38,13 @@ void STM_InterruptDisable( void )
     HAL_NVIC_DisableIRQ(EXTI1_IRQn);
 }
 
-inline void STM_InitDMA( address_t src, address_t dst )
+inline void STM_InitDMA( address_t src, address_t dst, uint16_t size )
 {
-#ifdef __RHO__
-#ifdef __OV9712__
-  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID], *src, *dst, CAPTURE_BUFFER_SIZE) != HAL_OK)
+  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID], *src, *dst, size) != HAL_OK)
   Error_Handler();
   __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, TIM2_DMA_CC);
   __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, TIM2_IT_CC);
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, TIM2_CHANNEL, TIM_CCx_ENABLE);
-#endif
-#endif
 }
 inline void STM_PauseDMA( void )
 {

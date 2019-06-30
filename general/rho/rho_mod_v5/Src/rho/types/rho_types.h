@@ -262,14 +262,6 @@ typedef struct
 
 typedef struct
 {
-  rho_platform_dma_interface_functions DMA;
-  rho_platform_uart_interace_functions USART;
-  rho_platform_flag_interace_functions Flags;
-  rho_platform_time_interace_functions Time;
-} rho_platform_interface_functions;
-
-typedef struct
-{
     index_t
     xl[3],
     yl[3];
@@ -301,8 +293,7 @@ typedef struct
       blbf,            /* Region fill */
       x,               /* Generic index */
       start,
-      end,
-      assumed_regions;
+      end;
     density_t
       fpeak,
       fpeak_2,
@@ -327,7 +318,8 @@ typedef struct
       cavg,   /* cumulative average */
       mavg,   /* moment average */
       chaos,
-      target_density;
+      target_density,
+      assumed_regions;
 } rho_detection_variables;
 
 typedef struct

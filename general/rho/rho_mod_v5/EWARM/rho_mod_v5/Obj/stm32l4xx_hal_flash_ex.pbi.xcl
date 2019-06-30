@@ -346,6 +346,7 @@ C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\S
 -DUSE_HAL_DRIVER=1
 -DSTM32L432xx=1
 -D__STM32__=1
+-D__RHO__=1
 -D__OV9712__=1
 -D_DLIB_CONFIG_FILE_HEADER_NAME="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.1\\arm\\inc\\c\\DLib_Config_Full.h"
 -D_DLIB_CONFIG_FILE_STRING="C:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.1\\arm\\inc\\c\\DLib_Config_Full.h"

@@ -10,7 +10,8 @@
 #define rho_client_h
 
 #include <stdio.h>
-#include "rho_types.h"
+#include "rho_core.h"
+//#include "rho_types.h"
 
 /************************************************************************
  *                      Global Function Prototypes                      *

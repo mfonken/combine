@@ -100,7 +100,7 @@ inline section_process_t ProcessFrameSection( const address_t t_start, register 
 {
     register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
     register index_t t_value = 0, *t_addr = (index_t*)t_start;
-    while( t_addr < t_end )
+    while( (uint32_t)t_addr < (uint32_t)t_end )
     {
         t_value = *t_addr++;
         if(t_value == Y_DEL)
@@ -122,7 +122,7 @@ inline section_process_t ProcessFrameSection( const address_t t_start, register 
         }
     }
     index_t pixels = t_addr - (index_t *)t_start;
-    return (section_process_t){ Q_left, Q_right, pixels, y_index };
+    return (section_process_t){ Q_left, Q_right, pixels, rows };
 }
 
 void ActivateBackgrounding( void )
@@ -148,9 +148,9 @@ inline void FilterPixelCount( index_t * PixelCount, index_t NewCount )
 
 inline bool HasPixelCountDrop( void )
 {
-    index_t * PixelCount = RhoSystem.Variables.Addresses.PixelCount,
+    index_t * PixelCount = (index_t *)RhoSystem.Variables.Addresses.PixelCount,
         NewCount = (index_t)((uint32_t)RhoSystem.Variables.Addresses.ThreshIndex - (uint32_t)RhoSystem.Variables.Buffers.Thresh);
-    floating_t FactoredOldCount = (floating_t)(*PixelCount) * PIXEL_COUNT_DROP_FACTOR );
+    floating_t FactoredOldCount = (floating_t)((*PixelCount) * PIXEL_COUNT_DROP_FACTOR );
     FilterPixelCount( PixelCount, NewCount );
     return ( *PixelCount < FactoredOldCount );
 }
@@ -163,13 +163,14 @@ void ProcessFrame()
     else DeactivateBackgrounding();
 #endif
 
-    section_process_t ProcessedTopSectionData, ProcessedBottomSectionData;
-    ProcessedTopSectionData = ProcessFrameSection( RhoSystem.Variables.Buffers.Thresh,
-                                                   RhoSystem.Variables.Addresses.Index,
+    address_t t_addr = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
+    ProcessedTopSectionData = ProcessFrameSection( t_addr,
+                                                   RhoSystem.Variables.Addresses.ThreshIndex,
                                                    0,
                                                    RhoSystem.Variables.Utility.Cy );
-    ProcessedBtmSectionData = ProcessFrameSection( ProcessedTopSectionData.pixels,
-                                                   RhoSystem.Variables.Addresses.Index,
+    ProcessedBtmSectionData = ProcessFrameSection( (address_t)((uint32_t)t_addr + (uint32_t)ProcessedTopSectionData.pixels),
+                                                   RhoSystem.Variables.Addresses.ThreshIndex,
                                                    ProcessedTopSectionData.rows,
                                                    RhoSystem.Variables.Utility.Height );
 
@@ -192,7 +193,7 @@ void ProcessRhoSystemFrameCapture( void )
 void PerformRhoSystemProcess( void )
 {
     RhoSystem.Functions.Perform.FrameCapture();
-    RhoCore.Functions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
+    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
@@ -248,7 +249,7 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_
 
 void ConfigureRhoSystem( void )
 {
-  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (address_t)RhoSystem.Variables.Buffers.Capture );
+  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (address_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE );
 }
 
 void ZeroRhoSystemMemory( void )

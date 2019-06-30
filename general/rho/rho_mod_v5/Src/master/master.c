@@ -1,4 +1,5 @@
 #include "master.h"
+#include "platform.h"
 
 /***************************************************************************************/
 /*                                  Core Routines                                      */
@@ -19,8 +20,8 @@ static void ConnectToHost( void )
 static void ConfigureApplication( void )
 {
 #ifdef __RHO__
-  RhoSystem.Functions.Perform.ConnectToInterface( &Platform );
-  RhoSystem.Functions.Perform.Configure( &Platform );
+  RhoSystem.Functions.Perform.ConnectToInterface( &PlatformFunctions, &Platform.CameraFlags );
+  RhoSystem.Functions.Perform.Configure();
 #endif
 #ifdef __OV9712__
   OV9712_Functions.Init( &OV9712, Master.IOs.CAMERA_COMMUNICATION_CHANNEL, &Default_OV9712_Pins );

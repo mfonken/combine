@@ -83,14 +83,14 @@ void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart )
 {
 }
 
-inline bool TransmitPacket( packet_t * packet )
-{
-  return (bool)Platform.USART.Transmit( (uint8_t *)packet, sizeof(packet_t));
-}
-
-inline uint16_t ReceivePacket( packet_t * packet )
-{
-  return Platform.USART.Receive( (uint8_t *)packet );
-}
+//inline bool TransmitPacket( packet_t * packet )
+//{
+//  return (bool)Platform.USART.Transmit( (uint8_t *)packet, sizeof(packet_t));
+//}
+//
+//inline uint16_t ReceivePacket( packet_t * packet )
+//{
+//  return Platform.USART.Receive( (uint8_t *)packet );
+//}
 
 #endif

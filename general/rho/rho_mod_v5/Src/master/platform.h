@@ -95,11 +95,11 @@ typedef struct
 void InitPlatform( platform_t *, protocol_t, generic_handle_t );
 
 #ifdef __RHO__
-/* Application interfaces */
-static void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart );
-
-inline uint8_t   TransmitPacket( packet_t * );
-inline uint16_t  ReceivePacket( packet_t * );
+///* Application interfaces */
+//static void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart );
+//
+//inline uint8_t   TransmitPacket( packet_t * );
+//inline uint16_t  ReceivePacket( packet_t * );
 #endif
 
 /*** Custom platform interfaces ***/
@@ -116,18 +116,18 @@ platform_status_enum PerformHostCommand( host_command_type_enum, platform_wait_p
 /*                               Function Structures                                   */
 /***************************************************************************************/
 #ifdef __RHO__
-typedef struct
-{
-  uint8_t (*Transmit)( packet_t * );
-  uint8_t (*Receive)( packet_t * );
-} rho_interface_packet_functions;
-
-typedef struct
-{
-  void (*Init)( TIMER_Handle_t *, USART_Handle_t * );
-  void (*ActivateFlags)( rho_system_flags variables * );
-  rho_interface_packet_functions Packet;
-} rho_interface_functions;
+//typedef struct
+//{
+//  uint8_t (*Transmit)( packet_t * );
+//  uint8_t (*Receive)( packet_t * );
+//} rho_interface_packet_functions;
+//
+//typedef struct
+//{
+//  void (*Init)( TIMER_Handle_t *, USART_Handle_t * );
+//  void (*ActivateFlags)( rho_system_flags variables * );
+//  rho_interface_packet_functions Packet;
+//} rho_interface_functions;
 #endif
 
 typedef struct
@@ -139,7 +139,7 @@ typedef struct
 
 typedef struct
 {
-  void (*Init)( address_t, address_t );
+  void (*Init)( address_t, address_t, uint16_t );
   void (*Pause)( void );
   void (*Resume)( void );
   void (*Reset)( address_t );
@@ -180,8 +180,8 @@ typedef struct
   void (*Init)( platform_t *, protocol_t, generic_handle_t );
   void (*Wait)( uint32_t );
 #ifdef __RHO__
-  rho_interface_functions                Rho;
-  platform_interface_packet_functions    Packet;
+//  rho_interface_functions                Rho;
+//  platform_interface_packet_functions    Packet;
 #endif
   platform_interface_interrupt_functions Interrupt;
   platform_interface_dma_functions       DMA;
@@ -207,11 +207,11 @@ static platform_interface_functions PlatformFunctions =
   .Wait                 = PLATFORM_SPECIFIC(Wait),
 
 #ifdef __RHO__
-  .Rho.Init             = InitRhoInterface,
-  .Rho.ActivateFlags    = ActivateFlagsRhoInterface,
-
-  .Rho.Packet.Transmit  = TransmitPacket,
-  .Rho.Packet.Receive   = ReceivePacket,
+//  .Rho.Init             = InitRhoInterface,
+//  .Rho.ActivateFlags    = ActivateFlagsRhoInterface,
+//
+//  .Rho.Packet.Transmit  = TransmitPacket,
+//  .Rho.Packet.Receive   = ReceivePacket,
 #endif
 
   .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),

@@ -15,7 +15,7 @@
 #include <math.h>
 
 #include "rho_structure.h"
-#include "rho_client.h"
+#include "rho_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +23,7 @@ extern "C" {
 
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
-    floating_t CalculateCentroidRhoUtility( density_t *, index_t, index_t *, density_t );
+    density_2d_t CalculateCentroidRhoUtility( density_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
     void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
@@ -119,7 +119,7 @@ extern "C" {
     {
         void (*CumulateMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
         void (*CalculateRegionScore)( region_t *, density_t, byte_t );
-        floating_t (*CalculateCentroid)( density_t *, index_t, index_t *, density_t );
+        density_2d_t (*CalculateCentroid)( density_t *, index_t, index_t *, density_t );
         void (*PrintPacket)( packet_t *, index_t );
         void (*GenerateBackground)( rho_core_t * );
         void (*GeneratePacket)( rho_core_t * );

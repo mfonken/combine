@@ -28,7 +28,7 @@
 void            STM_InterruptHandler( uint16_t GPIO_Pin );
 void            STM_InterruptEnable( void );
 void            STM_InterruptDisable( void );
-void            STM_InitDMA( address_t, address_t );
+void            STM_InitDMA( address_t, address_t, uint16_t );
 void            STM_PauseDMA( void );
 void            STM_ResumeDMA( void );
 void            STM_ResetDMA( address_t );
