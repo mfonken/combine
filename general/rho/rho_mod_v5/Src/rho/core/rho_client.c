@@ -125,7 +125,7 @@ inline section_process_t ProcessFrameSection( const address_t t_start, register 
     return (section_process_t){ Q_left, Q_right, pixels, y_index };
 }
 
-inline void ActivateBackgrounding( void )
+void ActivateBackgrounding( void )
 {
     RhoSystem.Variables.Flags->Backgrounding = true;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.background;
@@ -133,7 +133,7 @@ inline void ActivateBackgrounding( void )
     RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.Qb;
 }
 
-inline void DeactivateBackgrounding( void )
+void DeactivateBackgrounding( void )
 {
     RhoSystem.Variables.Flags->Backgrounding = false;
     RhoSystem.Variables.Buffers.DensityX = RhoSystem.Variables.Utility.DensityMapPair.x.map;
@@ -155,7 +155,7 @@ inline bool HasPixelCountDrop( void )
     return ( *PixelCount < FactoredOldCount );
 }
 
-inline void ProcessFrame()
+void ProcessFrame()
 {
 #ifdef __ENABLE_BACKGROUNDING__
     /* Check for pixel drop event */
@@ -179,7 +179,7 @@ inline void ProcessFrame()
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedBtmSectionData.right;
 }
 
-inline void ProcessRhoSystemFrameCapture( void )
+void ProcessRhoSystemFrameCapture( void )
 {
     RhoSystem.Functions.Memory.Zero();
     RhoSystem.Functions.Platform.Interrupt.Enable();
@@ -189,7 +189,7 @@ inline void ProcessRhoSystemFrameCapture( void )
 }
 
 /* Main application process */
-inline void PerformRhoSystemProcess( void )
+void PerformRhoSystemProcess( void )
 {
     RhoSystem.Functions.Perform.FrameCapture();
     RhoCore.Functions.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
@@ -244,17 +244,6 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_
 {
   memcpy( (void *)&RhoSystem.Functions.Platform, platform_interface, sizeof(platform_interface_functions) );
   RhoSystem.Variables.Flags = flags;
-
-//     RhoSystem.Functions.Platform.DMA.Init       = PlatformInterface->DMA.Init;
-//     RhoSystem.Functions.Platform.DMA.Pause      = PlatformInterface->DMA.Pause;
-//     RhoSystem.Functions.Platform.DMA.Resume     = PlatformInterface->DMA.Resume;
-//     RhoSystem.Functions.Platform.DMA.Reset      = PlatformInterface->DMA.Reset;
-//
-//     RhoSystem.Functions.Platform.Host.Transmit = PlatformInterface->Host.Transmit;
-//
-// //    RhoSystem.Functions.Platform.Flags->Activate = PlatformInterface->Flags.Activate;
-//
-//     RhoSystem.Functions.Platform.Time.Now       = PlatformInterface->Time.Now;
 }
 
 void ConfigureRhoSystem( void )

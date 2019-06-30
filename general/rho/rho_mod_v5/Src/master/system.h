@@ -19,7 +19,7 @@
 /***************************************************************************************/
 typedef enum
 {
-  INITIALIZING = 0,
+  INITIALIZING = 1,
   CONNECTING_TO_HOST,
   CONFIGURING,
   READY,

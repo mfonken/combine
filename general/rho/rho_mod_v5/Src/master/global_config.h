@@ -36,6 +36,7 @@
 #define CAMERA_PORT     (GPIOA->IDR)
 #define UART_TX_PORT    (USART1->TDR)
 
+#define GPIO_Port_t     GPIO_TypeDef
 #define TIMER_Handle_t  TIM_HandleTypeDef
 #define I2C_Handle_t    I2C_HandleTypeDef
 //#define SPI_Handle_t    SPI_HandleTypeDef

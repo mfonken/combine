@@ -50,8 +50,7 @@ static system_states_list_t global_states_list =
   { CONFIGURING,        READY,              ConfigureApplication  },
   { READY,              ACTIVE,             ExitInitialization    },
   { ACTIVE,             IDLE,               ApplicationCore       },
-  { ERROR_STATE,        IDLE,               ErrorStateHandler     },
-  { 0 },
+  { ERROR_STATE,        IDLE,               ErrorStateHandler     }
 };
 
 #endif

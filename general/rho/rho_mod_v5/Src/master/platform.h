@@ -24,6 +24,12 @@
 /***************************************************************************************/
 /*                                  Type Definitions                                   */
 /***************************************************************************************/
+typedef struct
+{
+  GPIO_Port_t * port;
+  uint16_t pin;
+} GPIO_t;
+
 typedef enum
 {
   NO_PROTOCOL_TYPE = 0,
@@ -98,8 +104,8 @@ inline uint16_t  ReceivePacket( packet_t * );
 
 /*** Custom platform interfaces ***/
 /* GPIO */
-inline void SetPortMode(gpio_t *, uint8_t );
-inline void WritePin(gpio_t *, uint8_t );
+inline void SetPortMode(GPIO_t *, uint16_t );
+inline void WritePin(GPIO_t *, uint16_t );
 
 /* Host */
 inline uint8_t TransmitToHost( uint8_t *, uint16_t );
@@ -153,8 +159,8 @@ typedef struct
 
 typedef struct
 {
-  void (*SetPortMode)(gpio_t *, uint8_t );
-  void (*Write)( gpio_t *, uint8_t );
+  void (*SetPortMode)(GPIO_t *, uint16_t );
+  void (*Write)( GPIO_t *, uint16_t );
 } platform_interface_gpio_functions;
 
 typedef struct

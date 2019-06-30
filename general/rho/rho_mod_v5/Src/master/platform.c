@@ -7,12 +7,12 @@ void InitPlatform( platform_t * platform, protocol_t host_communication_protocol
   timestamp = PLATFORM_SPECIFIC(Timestamp);
 }
 
-void WritePin( gpio_t * gpio, uint8_t val )
+void WritePin( GPIO_t * gpio, uint16_t val )
 {
   PLATFORM_SPECIFIC(WritePin)( gpio->port, gpio->pin, val );
 }
 
-void SetPortMode(gpio_t * gpio, uint8_t val )
+void SetPortMode(GPIO_t * gpio, uint16_t val )
 {
   PLATFORM_SPECIFIC(SetPortMode)( gpio->port, gpio->pin, val );
 }

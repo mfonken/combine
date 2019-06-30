@@ -10,7 +10,7 @@ static void InitializePlatform( void )
 
 static void ConnectToHost( void )
 {
-  while( PlatformFunctions.Host.Command( PING_HOST, NEEDED ) != SUCCESS )
+  while( PlatformFunctions.Host.Command( PING_HOST, NEEDED ) != OK )
   {
     PlatformFunctions.Wait( HOST_COMMAND_WAIT_TIME );
   }
@@ -23,7 +23,7 @@ static void ConfigureApplication( void )
   RhoSystem.Functions.Perform.Configure( &Platform );
 #endif
 #ifdef __OV9712__
-  OV9712_Functions.Init( &OV9712, Master.IOs.CAMERA_COMMUNICATION_CHANNEL, NULL );
+  OV9712_Functions.Init( &OV9712, Master.IOs.CAMERA_COMMUNICATION_CHANNEL, &Default_OV9712_Pins );
 #endif
 }
 
@@ -73,7 +73,7 @@ void Master_Init( void )
   SystemFunctions.State.Enter( &System, INITIALIZING );
 
   /* Connect to host, this is critical for finishing initialization hence endless loop */
-  SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
+  //SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
 
   /* Configure application items */
   SystemFunctions.State.Enter( &System, CONFIGURING );

@@ -21,7 +21,7 @@ system_state_t * GetStateSystem( system_t * system )
 
 void SetStateSystem( system_t * system, system_state_enum new_state )
 {
-  System.state = new_state;
+  system->state = new_state;
 }
 
 void PerformStateSystem( system_t * system )

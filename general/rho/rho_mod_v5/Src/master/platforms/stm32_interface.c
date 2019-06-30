@@ -84,7 +84,7 @@ inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffe
   HAL_I2C_Master_Transmit( hi2c, addr, buffer, length, timeout);
 }
 
-inline void STM_SetPortMode( uint32_t * port, uint16_t pin, uint8_t mode )
+inline void STM_SetPortMode( GPIO_TypeDef * port, uint16_t pin, uint8_t mode )
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = pin;
@@ -92,9 +92,9 @@ inline void STM_SetPortMode( uint32_t * port, uint16_t pin, uint8_t mode )
   HAL_GPIO_Init( (GPIO_TypeDef *)port, &GPIO_InitStruct );
 }
 
-inline void STM_WritePin( uint32_t * port, uint16_t pin, uint8_t state )
+inline void STM_WritePin( GPIO_TypeDef * port, uint16_t pin, uint8_t state )
 {
-  HAL_GPIO_WritePin( (GPIO_TypeDef *)port, pin, (GPIO_PinState)state);
+  HAL_GPIO_WritePin( port, pin, (GPIO_PinState)state);
 }
 
 inline uint32_t STM_Timestamp(void)

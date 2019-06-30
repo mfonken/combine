@@ -9,12 +9,6 @@ typedef struct
   uint8_t Value;
 } register_t;
 
-typedef struct
-{
-  uint32_t * port;
-  uint8_t pin;
-} gpio_t;
-
 typedef volatile bool   flag_t;
 typedef struct
 {

@@ -1,15 +1,16 @@
 #ifndef OV9712_h
 #define OV9712_h
 
+#include "main.h"
 #include "OV9712_regs.h"
 #include "platform.h"
 
 typedef struct
 {
   /* Pins */
-  gpio_t
-    LOW_VOLTAGE,
+  GPIO_t
     ENABLE,
+    LOW_VOLTAGE,
     POWER_DOWN,
     MASTER_CLOCK;
 } OV9712_pins_t;
@@ -19,7 +20,7 @@ typedef struct
   uint8_t
     ADDR;
   I2C_Handle_t * CAM_I2C_PORT;
-  OV9712_pins_t Pins;
+  OV9712_pins_t * Pins;
 } OV9712_t;
 
 void OV9712_Init( OV9712_t *, I2C_Handle_t *, OV9712_pins_t * );
@@ -42,6 +43,14 @@ static OV9712_functions OV9712_Functions =
   .Write = OV9712_Write,
   .Enable = OV9712_Enable,
   .Disable = OV9712_Disable
+};
+
+static OV9712_pins_t Default_OV9712_Pins =
+{
+  { GPIOA,          CAM_EN_Pin }, // ENABLE
+  { GPIOA,          EN_1V5_Pin }, // LOW_VOLTAGE
+  { GPIOA,          PWDN_Pin   }, // POWER_DOWN
+  { MCLK_GPIO_Port, MCLK_Pin   }  // MASTER_CLOCK
 };
 
 static OV9712_t OV9712 =

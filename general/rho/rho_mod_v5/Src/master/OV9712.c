@@ -7,12 +7,12 @@
 #define CAMERA_WIDTH_LSB	( CAMERA_WIDTH_F  & 0x07)
 #define CAMERA_HEIGHT_MSB	((CAMERA_HEIGHT_F >> 2) & 0xff)
 #define CAMERA_HEIGHT_LSB	( CAMERA_HEIGHT_F & 0x03)
-#define REG57_V			(uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
-#define REG58_V			(uint8_t)CAMERA_HEIGHT_MSB
-#define REG59_V			(uint8_t)CAMERA_WIDTH_MSB
+#define REG57_V			    (uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
+#define REG58_V			    (uint8_t)CAMERA_HEIGHT_MSB
+#define REG59_V			    (uint8_t)CAMERA_WIDTH_MSB
 
-#define	CAMERA_WIDTH_R	        (((REG57_V >> 3) & 0x07 ) | (REG59_V << 3))
-#define	CAMERA_HEIGHT_R	        ((REG57_V & 0x03) | (REG58_V << 2))
+#define	CAMERA_WIDTH_R	    (((REG57_V >> 3) & 0x07 ) | (REG59_V << 3))
+#define	CAMERA_HEIGHT_R	    ((REG57_V & 0x03) | (REG58_V << 2))
 
 static register_t OV9712_regs[] =
 {
@@ -46,7 +46,8 @@ static register_t OV9712_regs[] =
 void OV9712_Init( OV9712_t * ov9712, I2C_Handle_t * i2c_port, OV9712_pins_t * pins )
 {
   ov9712->CAM_I2C_PORT = i2c_port;
-  memcpy( &ov9712->Pins, pins, sizeof(OV9712_pins_t) );
+  if( pins == NULL) return;
+  ov9712->Pins = pins;
   OV9712_Functions.Enable(ov9712);
   HAL_Delay(10);
   register_t reg;
@@ -65,18 +66,20 @@ static void OV9712_Write( OV9712_t * ov9712, uint8_t r, uint8_t v )
 
 static void OV9712_Enable( OV9712_t * ov9712 )
 {
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_SET);
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_SET);
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_RESET);
-  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_AF_PP);
+  if( ov9712->Pins == NULL) return;
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->ENABLE, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->LOW_VOLTAGE, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->POWER_DOWN, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins->MASTER_CLOCK, GPIO_MODE_AF_PP);
 }
 
 static void OV9712_Disable( OV9712_t * ov9712 )
 {
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.LOW_VOLTAGE, GPIO_PIN_RESET);
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.ENABLE, GPIO_PIN_RESET);
-  PlatformFunctions.GPIO.Write( &ov9712->Pins.POWER_DOWN, GPIO_PIN_SET);
-  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins.MASTER_CLOCK, GPIO_MODE_INPUT);
+  if( ov9712->Pins == NULL) return;
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->ENABLE, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->LOW_VOLTAGE, GPIO_PIN_RESET);
+  PlatformFunctions.GPIO.Write( &ov9712->Pins->POWER_DOWN, GPIO_PIN_SET);
+  PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins->MASTER_CLOCK, GPIO_MODE_INPUT);
 }
 
 register_t dummy[] =
