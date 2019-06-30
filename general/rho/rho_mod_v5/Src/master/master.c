@@ -30,13 +30,13 @@ static void ConfigureApplication( void )
 
 static void ExitInitialization( void )
 {
+#ifdef __RHO__
+  RhoSystem.Functions.Perform.Activate();
+#endif
   if( SystemFunctions.State.IsIn( &System, READY ) )
   {
     MasterFunctions.Run();
   }
-#ifdef __RHO__
-  RhoSystem.Functions.Perform.Activate();
-#endif
 }
 
 static inline void ApplicationCore( void )

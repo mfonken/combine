@@ -192,6 +192,7 @@ void ProcessRhoSystemFrameCapture( void )
 /* Main application process */
 void PerformRhoSystemProcess( void )
 {
+    if( RhoSystem.Variables.Flags->Active == false ) return;
     RhoSystem.Functions.Perform.FrameCapture();
     RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
     RhoSystem.Functions.Perform.TransmitPacket();
