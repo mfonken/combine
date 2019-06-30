@@ -8,9 +8,15 @@
 
 void CumulateMomentsRhoUtility( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
+#ifdef __USE_RUNNING_AVERAGE__
     floating_t n_=1/(++(*n));
     *m0+=((v-*m0)*n_);
     *m1+=(((v*i)-*m1)*n_);
+#elif
+    ++(*n);
+    *m0+=v;
+    *m1+=v*i;
+#endif
 }
 
 void CalculateRegionScoreRhoUtility( region_t * b, density_t total_density, byte_t peak )
@@ -30,6 +36,7 @@ floating_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C,
         density_t c = map[i];
         if( c > thresh )
         {
+            /* Note only fraction m1/m0 is needed so either average method works*/
             RhoUtility.CumulateMoments((floating_t)c, (floating_t)i, &avg, &mavg, &cnt);
             tot += c;
         }
@@ -262,10 +269,16 @@ inline void DetectRegionRhoUtility( rho_detection_variables *_, density_map_t * 
     }
 
     /* Process completed regions and increment count */
-    else if( ++_->gapc > RHO_GAP_MAX && _->has )
+    else if( ++_->gapc > RHO_GAP_MAX && _->has
+#ifdef __USE_RUNNING_AVERAGE__
+    )
     {
-        /* Get latest region centroid */
         _->cden = (density_2d_t)_->cavg;
+#elif
+    && _->avgc )
+    {
+        _->cden = (density_2d_t)_->cavg / _->avgc;
+#endif
         _->fden += _->cden;
 
         /* Check if new region is dense enough to be saved */
