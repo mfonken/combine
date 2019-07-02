@@ -3,7 +3,7 @@
 //  tau+
 //
 //  Created by Matthew Fonken on 3/31/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #include "rho_interrupt_model.h"

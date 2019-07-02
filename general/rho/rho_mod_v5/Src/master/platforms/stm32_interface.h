@@ -3,7 +3,7 @@
 //  rho_client
 //
 //  Created by Matthew Fonken on 9/22/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #ifdef __STM32__

@@ -3,7 +3,7 @@
 //  tau+
 //
 //  Created by Matthew Fonken on 2/7/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #ifndef rho_utility_h
@@ -100,7 +100,7 @@ extern "C" {
         bool (*LowerBound)( rho_detection_variables * );
         void (*Regions)( rho_detection_variables *, density_map_t *, prediction_t *);
         void (*Region)( rho_detection_variables *, density_map_t *, prediction_t * );
-        void (*SubtractBackground)( rho_detection_variables *, density_map_t * );
+        void (*SubtractBackground)( rho_detection_variables *);
         void (*CalculateChaos)( rho_detection_variables *, prediction_t * );
         void (*ScoreRegions)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*SortRegions)( rho_detection_variables *, prediction_t * );

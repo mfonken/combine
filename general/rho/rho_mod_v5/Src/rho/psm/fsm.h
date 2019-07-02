@@ -3,7 +3,7 @@
 //  tau+
 //
 //  Created by Matthew Fonken on 2/8/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #ifndef fsm_h

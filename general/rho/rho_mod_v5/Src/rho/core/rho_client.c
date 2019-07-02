@@ -3,7 +3,7 @@
 //  rho_client
 //
 //  Created by Matthew Fonken on 9/19/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #include "rho_client.h"

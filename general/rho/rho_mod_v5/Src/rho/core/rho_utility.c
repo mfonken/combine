@@ -1,7 +1,7 @@
 //
 //  rho_utility.c
 //  Created by Matthew Fonken on 2/7/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #include "rho_utility.h"
@@ -229,7 +229,7 @@ inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t *
     }
 } /* Detect regions - END */
 
-inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_, density_map_t * d )
+inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_ )
 {
     if( _->c > _->b )
     {
@@ -391,10 +391,8 @@ void SortRegionsRhoUtility( rho_detection_variables *_, prediction_t * r )
             }
         }
 
-        {
-            r->RegionsOrder[i] = best_index;
-            r->RegionsOrder[best_index] = i;
-        }
+        r->RegionsOrder[i] = best_index;
+        r->RegionsOrder[best_index] = i;
 
         r->Regions[i].srt = true;
     }
@@ -450,9 +448,6 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             *filterB = &r->TrackingFilters[fBi];
 
             bool swapped = false;
-//            floating_t
-//            blocA = regionA->loc,
-//            blocB = regionB->loc;
 
             /* Calculate distances between filters and regions */
             aa = fabs(filterA->value - regionA->loc);
@@ -881,9 +876,6 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t
         bool below_centroid = (density_t)x < r->PreviousCentroid;
 
         index_t density =  (index_t)b->den + (index_t)r->PreviousPeak[(uint8_t)below_centroid];
-//        int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
-//        density = (index_t)density+ar;
-//        thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
         density = BOUNDU( density, MAX_BLOB_HEIGHT );
         LOG_RHO_BARE(RHO_DEBUG_2, "\t\t(%d) <%d %d %d>\n", i, density, thresh, io);
         r->ObservationList.observations[i] = (observation_t){ density, thresh, io };
