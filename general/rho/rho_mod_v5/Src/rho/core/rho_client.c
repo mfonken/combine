@@ -77,12 +77,12 @@ inline void CaptureRow(
 void CaptureFrame( void )
 {
     /* Reset buffer indeces */
-    RhoSystem.Variables.Addresses.CaptureIndex = (address_t)RhoSystem.Variables.Buffers.Capture;
     RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
     RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
     while(RhoSystem.Variables.Flags->Row);
     do
     {
+        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)RhoSystem.Variables.Buffers.Capture;
         CaptureRow(
             (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
             (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,

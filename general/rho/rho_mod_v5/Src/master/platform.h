@@ -44,7 +44,7 @@ typedef struct
   /* Generic utilities */
   protocol_t HostProtocol;
   generic_handle_t HostHandle;
-  
+
   /* Application utilities */
 #ifdef __RHO__
   camera_application_flags CameraFlags;
@@ -142,7 +142,7 @@ typedef struct
   void (*Init)( address_t, address_t, uint16_t );
   void (*Pause)( void );
   void (*Resume)( void );
-  void (*Reset)( address_t );
+  void (*Reset)( void );
 } platform_interface_dma_functions;
 
 typedef struct
