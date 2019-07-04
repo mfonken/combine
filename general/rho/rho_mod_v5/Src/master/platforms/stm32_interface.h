@@ -28,10 +28,10 @@
 void            STM_InterruptHandler( uint16_t GPIO_Pin );
 void            STM_InterruptEnable( void );
 void            STM_InterruptDisable( void );
-void            STM_InitDMA( address_t, address_t, uint16_t );
+void            STM_InitDMA( uint32_t, uint32_t, uint16_t, bool );
 void            STM_PauseDMA( void );
 void            STM_ResumeDMA( void );
-void            STM_ResetDMA( address_t );
+void            STM_ResetDMA( uint32_t );
 uint8_t         STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length );
 uint16_t        STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer );
 bool            STM_UartCompleted( USART_Handle_t *huart );

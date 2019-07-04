@@ -484,11 +484,11 @@ extern "C" {
 //        floating_t num_std_devs = ZDIV( diff, sqrt( gaussian->covariance.d ) );
 //        return num_std_devs;
 //    }
-//
-//    static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
-//    {
-//        return ( ( a * w ) + ( b * ( 1 - w ) ) );
-//    }
+
+    static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
+    {
+        return ( ( a * w ) + ( b * ( 1 - w ) ) );
+    }
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "rho_core.h"
-//#include "rho_types.h"
 
 /************************************************************************
  *                      Global Function Prototypes                      *
@@ -34,10 +33,9 @@ void ProcessRhoSystemFrameCapture( void );
 void PerformRhoSystemProcess( void );
 void ActivateRhoSystem( void );
 void DeactivateRhoSystem( void );
-void InitRhoSystem( address_t, address_t );
+void InitializeRhoSystem( uint32_t, uint32_t );
 void ZeroRhoSystemMemory( void );
 void ConnectRhoSystemPlatformInterface( platform_interface_functions *, camera_application_flags * );
-void ConfigureRhoSystem( void ); /* Prepare hardware utilities */
 void TransmitRhoSystemPacket( void );
 
 /************************************************************************
@@ -51,14 +49,16 @@ static index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
  ***********************************************************************/
 typedef struct
 {
-address_t
+  uint32_t
   CameraPort,                     /* Parallel port register to camera */
+  HostTxPort;                     /* Output channel to host */
+  
+address_t
   CaptureEnd,                     /* Effective end address for capture buffer */
   CaptureMax,                     /* Actual end address for capture buffer */
   ThreshEnd,                      /* Actual end of thresh buffer */
   ThreshMax,                      /* Shared address of threshold value */
   PixelCount,                     /* Shared address of pixel count value */
-  HostTxPort,
   CaptureIndex,                   /* Address capture buffer is processed */
   ThreshIndex;                   /* Address threshold buffer is filled */
 } rho_system_address_variables;
@@ -91,11 +91,10 @@ typedef struct
  ***********************************************************************/
 typedef struct
 {
-    void (*Init)( address_t, address_t );
+    void (*Initialize)( uint32_t, uint32_t );
     void (*FrameCapture)( void );
     void (*CoreProcess)( void );
     void (*ConnectToInterface)( platform_interface_functions *, camera_application_flags * );
-    void (*Configure)( void );
     void (*TransmitPacket)( void );
     void (*Activate)( void );
     void (*Deactivate)( void );
@@ -139,7 +138,7 @@ static rho_system_t RhoSystem =
     },
     { /* FUNCTIONS */
         { /* Perform */
-            .Init               = InitRhoSystem,
+            .Initialize         = InitializeRhoSystem,
             .FrameCapture       = ProcessRhoSystemFrameCapture,
             .CoreProcess        = PerformRhoSystemProcess,
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,

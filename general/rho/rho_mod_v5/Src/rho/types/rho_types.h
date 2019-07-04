@@ -420,7 +420,7 @@ typedef struct
 #endif
     packet_t            Packet;
 
-    index_t             cframe[C_FRAME_SIZE];
+//    index_t             cframe[C_FRAME_SIZE];
 } rho_core_t;
 
 #endif /* rho_c_types_h */

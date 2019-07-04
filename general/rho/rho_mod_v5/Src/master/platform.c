@@ -3,8 +3,6 @@
 void InitPlatform( platform_t * platform, protocol_t host_communication_protocol, generic_handle_t host_communication_handle )
 {
   *platform = (platform_t){ host_communication_protocol, host_communication_handle };
-
-  timestamp = PLATFORM_SPECIFIC(Timestamp);
 }
 
 void WritePin( GPIO_t * gpio, uint16_t val )

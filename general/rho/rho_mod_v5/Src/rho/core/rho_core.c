@@ -7,7 +7,7 @@
 #include "rho_core.h"
 
 void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
-{
+{ 
     /* Generic Data */
     RhoUtility.Initialize.Data( core, width, height );
 

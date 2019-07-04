@@ -29,6 +29,8 @@ typedef uint32_t        density_2d_t;
 typedef floating_t      timestamp_t;
 typedef uint8_t         capture_t;
 
+//uint32_t(**timestamp)(void);
+
 #define byte_t_max          ( (sizeof(byte_t)       << 3 ) - 1 )
 #define index_t_max         ( (sizeof(index_t)      << 3 ) - 1 )
 #define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )

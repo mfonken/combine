@@ -21,6 +21,8 @@
 #error "HOST_ADDRESS is not defined."
 #endif
 
+#define TIMESTAMP PLATFORM_SPECIFIC(Timestamp)
+
 /***************************************************************************************/
 /*                                  Type Definitions                                   */
 /***************************************************************************************/
@@ -139,10 +141,10 @@ typedef struct
 
 typedef struct
 {
-  void (*Init)( address_t, address_t, uint16_t );
+  void (*Init)( uint32_t, uint32_t, uint16_t, bool );
   void (*Pause)( void );
   void (*Resume)( void );
-  void (*Reset)( address_t );
+  void (*Reset)( uint32_t );
 } platform_interface_dma_functions;
 
 typedef struct
@@ -191,8 +193,6 @@ typedef struct
   platform_interface_time_functions      Time;
   platform_interface_host_functions      Host;
 } platform_interface_functions;
-
-static uint32_t (*timestamp)(void);
 
 /***************************************************************************************/
 /*                                Global Instances                                     */

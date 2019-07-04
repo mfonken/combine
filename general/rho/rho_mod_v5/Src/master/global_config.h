@@ -28,10 +28,10 @@
 #define _PLATFORM_ STM
 
 /* DMA Config */
-#define TIM2_DMA_ID     TIM_DMA_ID_CC2
-#define TIM2_DMA_CC	    TIM_DMA_CC2
-#define TIM2_IT_CC      TIM_IT_CC2
-#define TIM2_CHANNEL    TIM_CHANNEL_2
+#define RHO_TIM_DMA_ID      TIM_DMA_ID_CC2
+#define RHO_TIM_DMA_CC	    TIM_DMA_CC2
+#define RHO_TIM_IT_CC       TIM_IT_CC2
+#define RHO_TIM_CHANNEL     TIM_CHANNEL_2
 
 #define CAMERA_PORT     (GPIOA->IDR)
 #define UART_TX_PORT    (USART1->TDR)

@@ -26,7 +26,7 @@ void RhoPIDInitialize( rho_pid_t * PID, rho_pid_gain_t K )
         PID->Gain.Ki = K.Ki;
         PID->Gain.Kd = K.Kd;
     }
-    PID->Timestamp = timestamp();
+    PID->Timestamp = TIMESTAMP();
 }
 
 void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
@@ -35,7 +35,7 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
     
     PID->Pv = PID->Error * PID->Gain.Kp;
     
-    PID->Dt = timestamp() - PID->Timestamp;
+    PID->Dt = TIMESTAMP() - PID->Timestamp;
     PID->TotalError += PID->Error * PID->Dt;
     PID->Iv = PID->Gain.Ki * PID->TotalError;
     

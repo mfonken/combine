@@ -26,9 +26,9 @@ extern "C" {
     
     typedef struct
     {
-        rho_pid_gain_t
+      rho_pid_gain_t
         Gain;
-        floating_t
+      floating_t
         Pv,
         Iv,
         Dv,

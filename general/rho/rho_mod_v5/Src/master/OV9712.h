@@ -47,10 +47,10 @@ static OV9712_functions OV9712_Functions =
 
 static OV9712_pins_t Default_OV9712_Pins =
 {
-  { GPIOA,          CAM_EN_Pin }, // ENABLE
-  { GPIOA,          EN_1V5_Pin }, // LOW_VOLTAGE
-  { GPIOA,          PWDN_Pin   }, // POWER_DOWN
-  { MCLK_GPIO_Port, MCLK_Pin   }  // MASTER_CLOCK
+  { CAM_EN_GPIO_Port,   CAM_EN_Pin }, // ENABLE
+  { EN_1V5_GPIO_Port,   EN_1V5_Pin }, // LOW_VOLTAGE
+  { PWDN_GPIO_Port,     PWDN_Pin   }, // POWER_DOWN
+  { MCLK_GPIO_Port,     MCLK_Pin   }  // MASTER_CLOCK
 };
 
 static OV9712_t OV9712 =

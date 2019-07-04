@@ -49,9 +49,9 @@ void OV9712_Init( OV9712_t * ov9712, I2C_Handle_t * i2c_port, OV9712_pins_t * pi
   if( pins == NULL) return;
   ov9712->Pins = pins;
   OV9712_Functions.Enable(ov9712);
-  HAL_Delay(10);
+  HAL_Delay(1);
   register_t reg;
-  for( int i = 0; ; i++ )
+  for( int i = 0; i < sizeof(OV9712_regs) / sizeof(OV9712_regs[0]); i++ )
   {
     reg = OV9712_regs[i];
     if( reg.Address == ENDR ) break;

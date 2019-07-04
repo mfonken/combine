@@ -194,8 +194,8 @@ void PerformRhoSystemProcess( void )
 {
     if( RhoSystem.Variables.Flags->Active == false ) return;
     RhoSystem.Functions.Perform.FrameCapture();
-    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
-    RhoSystem.Functions.Perform.TransmitPacket();
+//    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
+//    RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 void ActivateRhoSystem( void  )
@@ -218,12 +218,14 @@ inline void TransmitRhoSystemPacket( void )
 /***************************************************************************************/
 /*                                  Initializers                                       */
 /***************************************************************************************/
-void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
+void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
 {
+    /* Connect global rho timestamp */
     DeactivateBackgrounding();
 
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
+  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
 
 #ifdef DYNAMIC_BUFFER
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture[CAPTURE_WIDTH];
@@ -239,18 +241,13 @@ void InitRhoSystem( address_t CameraPort, address_t HostTxPort )
     RhoSystem.Variables.Buffers.BeaconPacket->header.includes = BEACON_DEFAULT_PERIOD;
 
     RhoSystem.Functions.Memory.Zero();
-    RhoSystem.Functions.Perform.Init( (address_t)CAPTURE_WIDTH, (address_t)CAPTURE_HEIGHT );
+    RhoCore.Initialize( &RhoSystem.Variables.Utility, CAPTURE_WIDTH, CAPTURE_HEIGHT );
 }
 
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_interface, camera_application_flags * flags )
 {
   memcpy( (void *)&RhoSystem.Functions.Platform, platform_interface, sizeof(platform_interface_functions) );
   RhoSystem.Variables.Flags = flags;
-}
-
-void ConfigureRhoSystem( void )
-{
-  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (address_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE );
 }
 
 void ZeroRhoSystemMemory( void )

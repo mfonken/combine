@@ -20,12 +20,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
     density_2d_t CalculateCentroidRhoUtility( density_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
+    
     void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
     void InitializeFiltersRhoUtility( rho_core_t * );
     void InitializePredictionRhoUtility( prediction_t *, index_t );
@@ -44,8 +44,8 @@ extern "C" {
     bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
     void DetectRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void DetectRegionRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *, density_map_t * );
-    void CalculateChaosRhoUtility( rho_detection_variables *, prediction_t *  );
+    void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * );
+    void CalculateChaosRhoUtility( rho_detection_variables *, prediction_t * );
     void ScoreRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void SortRegionsRhoUtility( rho_detection_variables *, prediction_t * );
     void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *, prediction_t * );

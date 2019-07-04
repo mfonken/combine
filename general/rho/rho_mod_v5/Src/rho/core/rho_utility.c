@@ -101,7 +101,7 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
 void InitializeFiltersRhoUtility( rho_core_t * core )
 {
     /* Threshold Filter */
-    RhoPID.Initialize(&core->ThreshFilter, DEFAULT_PID_GAIN );
+    RhoPID.Initialize( &core->ThreshFilter, DEFAULT_PID_GAIN );
 
     /* Coverage Filter */
     core->TargetCoverageFactor  = (floating_t)FILTERED_COVERAGE_TARGET;
@@ -138,7 +138,7 @@ void InitializeDensityMapRhoUtility( density_map_t * dmap, index_t len, index_t 
     dmap->max[0] = 0;
     dmap->max[1] = 0;
     dmap->centroid = centroid;
-    RhoKalman.Initialize( &dmap->kalmans[0], 0, RHO_DEFAULT_LS, 0, len, DEFAULT_KALMAN_UNCERTAINTY );
+    RhoKalman.Initialize( &dmap->kalmans[0],  0, RHO_DEFAULT_LS, 0, len, DEFAULT_KALMAN_UNCERTAINTY );
     RhoKalman.Initialize( &dmap->kalmans[1], 0, RHO_DEFAULT_LS, 0, len, DEFAULT_KALMAN_UNCERTAINTY );
 }
 
@@ -224,7 +224,7 @@ inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t *
     _->fden = 0;
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c, d->map, _->b, d->background)
     {
-        RhoUtility.Detect.SubtractBackground( _, d );
+        RhoUtility.Detect.SubtractBackground( _ );
         RhoUtility.Detect.Region( _, d, r );
     }
 } /* Detect regions - END */
@@ -844,7 +844,7 @@ void GeneratePacketRhoUtility( rho_core_t * core )
         (address_t*)&packet_value_lookup,
         0
     };
-    _.packet->header.timestamp = timestamp();
+    _.packet->header.timestamp = TIMESTAMP();
     while( _.i++ < NUM_PACKET_ELEMENTS )
     {
         if( _.packet->header.includes & 0x01 )
