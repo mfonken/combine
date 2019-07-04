@@ -98,8 +98,17 @@ void CaptureFrame( void )
 
 inline section_process_t ProcessFrameSection( const address_t t_start, register const address_t t_end, register index_t rows, register index_t y_max )
 {
+    register uint32_t working_register = 0, calc_register = 0;
     register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
-    register index_t t_value = 0, *t_addr = (index_t*)t_start;
+    register index_t
+        t_value = 0,
+       *t_addr = (index_t*)t_start,
+        row = 0,
+        Cx = RhoSystem.Variables.Utility.Cx,
+       *Dx = RhoSystem.Variables.Utility.DensityMapPair.x.map,
+       *Dy = RhoSystem.Variables.Utility.DensityMapPair.y.map,
+       *Dx_end = (address)( (uint23_t)Dx + y_max );
+#ifndef __ASSEMBLY_RHO__
     while( (uint32_t)t_addr < (uint32_t)t_end )
     {
         t_value = *t_addr++;
@@ -121,6 +130,47 @@ inline section_process_t ProcessFrameSection( const address_t t_start, register 
             RhoSystem.Variables.Utility.DensityMapPair.y.map[t_value]++;
         }
     }
+#else
+    __asm volatile
+    (
+    "loop_process:                                                      \n\t"
+        "ldrh    %0, [%1], #2   ; Load next threshold buffer            \n\t"
+        "cmp     %0, #"CAPTURE_BUFFER_WIDTH" ; Is value outside or equal frame width    \n\t"
+        "bge     row_end        ; Go to end row                         \n\t"
+    "left_value:                                                        \n\t"
+        "cmp     %0, %2         ; If value is right (greater) x centroid\n\t"
+        "bgt     right_value    ; Branch to right quadrant updated      \n\t"
+        "add     %9, %9, #1     ; Increment left quadrant               \n\t"
+        "b       row_update     ; Branch to row map update              \n\t"
+    "right_value:                                                       \n\t"
+        "add     %10, %10, #1   ; Increment right quadrant              \n\t"
+    "row_update:                                                        \n\t"
+        "ldrh    %5, [%4, %0]   ; Load word at row map                  \n\t"
+        "add     %5, %5, #1     ; Increment row map value               \n\t"
+        "strh    %5, [%4, %0]   ; Store incremented value               \n\t"
+        "b       loop_process   ; Loop back to start next values        \n\t"
+    "row_end:                                                           \n\t"
+        "add     %7, %9, %10    ; Add left and right quadrants to total \n\t"
+        "sub     %5, %7, %8     ; Calculate active pixels in row        \n\t"
+        "strh    %5, [%3, #2]!  ; Store at next column address          \n\t"
+        "cmp     %5, %6         ; Check if all rows are processed       \n\t"
+        "mov     %8, %9         ; Move current total px to previous     \n\t"
+        "blt     loop_process   ; Loop back to start next values        \n\t"
+    "end:                       ; End if all rows are processed         \n"
+        ::
+        "r"(working_register),  // %0
+        "r"(t_addr),            // %1
+        "r"(Cx),                // %2
+        "r"(Dx_i),              // %3
+        "r"(Dy),                // %4
+        "r"(calc_register),     // %5
+        "r"(rows)               // %6
+        "r"(Q_total),           // %7
+        "r"(Q_prev),            // %8
+        "r"(Q_left),            // %9
+        "r"(Q_right),           // %10
+    );
+#endif
     index_t pixels = t_addr - (index_t *)t_start;
     return (section_process_t){ Q_left, Q_right, pixels, rows };
 }
