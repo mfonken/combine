@@ -18,13 +18,15 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
   {
     case VSYNC_Pin:
         Platform.CameraFlags.Frame = !(flag_t)( VSYNC_GPIO_Port->IDR & VSYNC_Pin );
-        return;
+        break;
     case HREF_Pin:
         Platform.CameraFlags.Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin );
-        return;
+        break;
     default:
         return;
   }
+
+  if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame ) STM_ResetDMA();
 #endif
 }
 void STM_InterruptEnable( void )
@@ -45,6 +47,7 @@ inline void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_st
   __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
   __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, (uint32_t)init_state);
+    _dma_destination = dst;
 }
 inline void STM_PauseDMA( void )
 {
@@ -54,9 +57,10 @@ inline void STM_ResumeDMA( void )
 {
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, TIM_CCx_ENABLE);
 }
-inline void STM_ResetDMA( uint32_t dst )
+inline void STM_ResetDMA( void )
 {
-  Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CMAR = dst;
+    if(_dma_destination != null)
+        Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID]->Instance->CMAR = _dma_destination;
 }
 
 inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )

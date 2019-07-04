@@ -22,6 +22,8 @@
 #define STM_InterruptHandler HAL_GPIO_EXTI_Callback
 #define STM_UartCompleted HAL_UART_TxCpltCallback
 
+static address_t _dma_destination = null;
+
 /***************************************************************************************/
 /*                              Function Definitions                                   */
 /***************************************************************************************/
@@ -31,7 +33,7 @@ void            STM_InterruptDisable( void );
 void            STM_InitDMA( uint32_t, uint32_t, uint16_t, bool );
 void            STM_PauseDMA( void );
 void            STM_ResumeDMA( void );
-void            STM_ResetDMA( uint32_t );
+void            STM_ResetDMA( void );
 uint8_t         STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length );
 uint16_t        STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer );
 bool            STM_UartCompleted( USART_Handle_t *huart );
