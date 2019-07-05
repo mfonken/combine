@@ -24,6 +24,7 @@ typedef uint8_t         byte_t;
 typedef uint16_t        index_t;
 typedef uint16_t        density_t;
 typedef int16_t         sdensity_t;
+typedef uint8_t         dmap_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
 typedef floating_t      timestamp_t;
@@ -35,8 +36,14 @@ typedef uint8_t         capture_t;
 #define index_t_max         ( (sizeof(index_t)      << 3 ) - 1 )
 #define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
 #define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
+#define dmap_t_max          ( (sizeof(dmap_t)       << 3 ) - 1 )
 
-#define USE_INTERRUPT_MODEL
+static dmap_t FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+              FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
+              BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+              BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
+
+// #define USE_INTERRUPT_MODEL
 
 //#define ALLOW_NEGATIVE_REDISTRIBUTION
 

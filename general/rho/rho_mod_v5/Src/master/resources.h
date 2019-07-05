@@ -9,4 +9,6 @@
 
 #define ASCII_CLEAR 0x0c
 
+#define STR(X) #X
+
 #endif /* resources_h */

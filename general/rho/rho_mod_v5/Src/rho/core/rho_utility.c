@@ -127,13 +127,9 @@ void InitializePredictionRhoUtility( prediction_t * r, index_t l )
 
 void InitializeDensityMapRhoUtility( density_map_t * dmap, index_t len, index_t centroid )
 {
-    size_t size = sizeof(density_t)*len;
-    dmap->map = (density_t*)malloc(size);
-    dmap->background = (density_t*)malloc(size);
-    dmap->filtered = (density_t*)malloc(size);
+    size_t size = sizeof(dmap_t)*len;
     memset(dmap->map, 0, size);
     memset(dmap->background, 0, size);
-    memset(dmap->filtered, 0, size);
     dmap->length = len;
     dmap->max[0] = 0;
     dmap->max[1] = 0;

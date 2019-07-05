@@ -166,9 +166,8 @@ byte_t
 /* Rho Structures* */
 typedef struct
 {
-    density_t      *map,
+    dmap_t         *map,
                    *background,
-                   *filtered,
                     max[2];
     index_t         length,
     centroid;
@@ -205,7 +204,7 @@ typedef struct
 {
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-    region_t          Regions[MAX_BLOBS];
+    region_t        Regions[MAX_BLOBS];
     uint8_t         RegionsOrder[MAX_BLOBS],
                     NumRegions;
     floating_t      NuRegions,
@@ -234,7 +233,7 @@ typedef struct
 typedef struct
 {
     density_2d_t left, right;       /* Direction density values */
-    index_t pixels, rows;
+    address_t last_addr;
 } section_process_t;
 
 typedef struct
@@ -375,6 +374,7 @@ typedef detection_ring_buffer_t detection_map_t;
 
 typedef struct
 {
+    density_map_pair_t  DensityMapPair;
     index_t
         Width,
         Height,
@@ -408,7 +408,6 @@ typedef struct
         PreviousThreshFilterValue,
         Thresh;
     rho_tune_t          Tune;
-    density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;

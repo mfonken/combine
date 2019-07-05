@@ -12,7 +12,7 @@
 // #define __CHECK_FRAME_FLAG__
 
 //__attribute__((naked))
-inline void CaptureRow(
+void CaptureRow(
                             register byte_t * capture_address,   // capture buffer index
                             register index_t * thresh_address,    // address of thresh buffer
                             const register byte_t thresh_value,
@@ -44,13 +44,13 @@ inline void CaptureRow(
     (
     "capture:                                                           \n\t"
 #ifdef __CHECK_FRAME_FLAG__
-        "ldrb    %0, [%7]    ; Load flag byte                           \n\t"
-        "cmp     %0, #1      ; Check if set                             \n\t"
-        "bge     end         ; End if set                               \n\t"
+        "ldrb    %0, [%7]    ; Load row end flag byte                   \n\t"
+        "cmp     %0, #1      ; Check if end is reached (set)            \n\t"
+        "bge     end         ; If so, end                               \n\t"
 #endif
         "add     %2, %2, %1  ; Increment capture index by sub_sample    \n\t"
         "cmp     %2, %3      ; Check if capture reached max width       \n\t"
-        "bge     end         ; If so end                                \n\t"
+        "bge     end         ; If so,end                                \n\t"
 
         "ldrb    %0, [%2]    ; Load byte at capture index into RO       \n\t"
         "cmp     %0, %4      ; Compare with threshold value             \n\t"
@@ -59,7 +59,7 @@ inline void CaptureRow(
         "sub     %0, %2, %5  ; Subtract capture buffer start from index \n\t"
         "strh    %0, [%6]    ; Store offset word at thresh index        \n\t"
         "add     %6, %6, #2  ; Increment thresh index by word           \n\t"
-        "b       capture    ; Branch back to next capture               \n"
+        "b       capture     ; Branch back to next capture              \n"
     "end:                                                               \n"
         ::
         "r"(working_register),  // %0
@@ -96,83 +96,87 @@ void CaptureFrame( void )
     } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
 }
 
-inline section_process_t ProcessFrameSection( const address_t t_start, register const address_t t_end, register index_t rows, register index_t y_max )
+section_process_t ProcessFrameSection( const address_t t_start, const index_t rows )
 {
-    register uint32_t working_register = 0, calc_register = 0;
-    register density_2d_t Q_left = 0, Q_right = 0, Q_total = 0, Q_prev = 0;
-    register index_t
-        t_value = 0,
-       *t_addr = (index_t*)t_start,
-        row = 0,
-        Cx = RhoSystem.Variables.Utility.Cx,
-       *Dx = RhoSystem.Variables.Utility.DensityMapPair.x.map,
-       *Dy = RhoSystem.Variables.Utility.DensityMapPair.y.map,
-       *Dx_end = (address)( (uint23_t)Dx + y_max );
+    register uint32_t
+        value_register      = 0,
+        calc_register       = 0,
+        t_addr              = (uint32_t)t_start,
+        t_last              = (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex;
+        Cx                  = (uint32_t)RhoSystem.Variables.Utility.Cx,
+        Dy                  = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.y.map,
+        Dx_i                = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.x.map,
+        Dx_end              = (uint23_t)Dx + (uint32_t)rows,
+        Q_total             = 0,
+        Q_prev              = 0,
+        Q_left              = 0,
+        Q_right             = 0,
+
 #ifndef __ASSEMBLY_RHO__
-    while( (uint32_t)t_addr < (uint32_t)t_end )
+    while( t_addr < t_end )
     {
-        t_value = *t_addr++;
-        if(t_value == Y_DEL)
+        value_register = *(address_t)t_addr++;
+        if(value_register < CAPTURE_BUFFER_WIDTH)
         {
-            Q_total = Q_left + Q_right;
-            RhoSystem.Variables.Utility.DensityMapPair.x.map[rows++] = Q_total - Q_prev;
-            Q_prev = Q_total;
-            if( rows > y_max ) break;
-        }
-        else if( t_value < RhoSystem.Variables.Utility.Cx )
-        {
-            Q_left++;
-            RhoSystem.Variables.Utility.DensityMapPair.y.map[t_value]++;
+            if( value_register < Cx )
+                Q_left++;
+            else
+                Q_right++;
+            ((address_t)Dy)[value_register]++;
         }
         else
         {
-            Q_right++;
-            RhoSystem.Variables.Utility.DensityMapPair.y.map[t_value]++;
+            Q_total = Q_left + Q_right;
+            *(((address_t)Dx_i)++) = Q_total - Q_prev;
+            Q_prev = Q_total;
+            if( Dx_i >= Dx_end ) break;
         }
     }
 #else
     __asm volatile
     (
     "loop_process:                                                      \n\t"
-        "ldrh    %0, [%1], #2   ; Load next threshold buffer            \n\t"
-        "cmp     %0, #"CAPTURE_BUFFER_WIDTH" ; Is value outside or equal frame width    \n\t"
-        "bge     row_end        ; Go to end row                         \n\t"
+        "ldrh    %0, [%2], #2   ; Load next threshold buffer            \n\t"
+        "cmp     %0, #"STR(CBW)"; Is value outside or equal frame width \n\t"
+        "bge     row_end        ; Go to end row                         \n"
     "left_value:                                                        \n\t"
-        "cmp     %0, %2         ; If value is right (greater) x centroid\n\t"
+        "cmp     %0, %4         ; If value is right (greater) x centroid\n\t"
         "bgt     right_value    ; Branch to right quadrant updated      \n\t"
-        "add     %9, %9, #1     ; Increment left quadrant               \n\t"
-        "b       row_update     ; Branch to row map update              \n\t"
+        "add     %10, %10, #1   ; Increment left quadrant               \n\t"
+        "b       row_update     ; Branch to row map update              \n"
     "right_value:                                                       \n\t"
-        "add     %10, %10, #1   ; Increment right quadrant              \n\t"
+        "add     %11, %11, #1   ; Increment right quadrant              \n"
     "row_update:                                                        \n\t"
-        "ldrh    %5, [%4, %0]   ; Load word at row map                  \n\t"
-        "add     %5, %5, #1     ; Increment row map value               \n\t"
-        "strh    %5, [%4, %0]   ; Store incremented value               \n\t"
-        "b       loop_process   ; Loop back to start next values        \n\t"
+        "ldrb    %1, [%5, %0]   ; Load word at row map                  \n\t"
+        "add     %1, %1, #1     ; Increment row map value               \n\t"
+        "strb    %1, [%5, %0]   ; Store incremented value               \n\t"
+        "b       loop_process   ; Loop back to start next values        \n"
     "row_end:                                                           \n\t"
-        "add     %7, %9, %10    ; Add left and right quadrants to total \n\t"
-        "sub     %5, %7, %8     ; Calculate active pixels in row        \n\t"
-        "strh    %5, [%3, #2]!  ; Store at next column address          \n\t"
-        "cmp     %5, %6         ; Check if all rows are processed       \n\t"
-        "mov     %8, %9         ; Move current total px to previous     \n\t"
-        "blt     loop_process   ; Loop back to start next values        \n\t"
+        "add     %8, %10, %11   ; Add left and right quadrants to total \n\t"
+        "uqsub16 %1, %8, %9     ; Calculate active pixels in row        \n\t"
+        "strb    %1, [%6], #1   ; Store at next column address          \n\t"
+        "cmp     %6, %7         ; Check if all rows are processed       \n\t"
+        "mov     %9, %10        ; Move current total px to previous     \n\t"
+        "cmp     %2, %3         ; Check for end of threshold buffer     \n\t"
+        "bge     end            ; If so, end                            \n\t"
+        "blt     loop_process   ; Loop back to start next values        \n"
     "end:                       ; End if all rows are processed         \n"
         ::
-        "r"(working_register),  // %0
-        "r"(t_addr),            // %1
-        "r"(Cx),                // %2
-        "r"(Dx_i),              // %3
-        "r"(Dy),                // %4
-        "r"(calc_register),     // %5
-        "r"(rows)               // %6
-        "r"(Q_total),           // %7
-        "r"(Q_prev),            // %8
-        "r"(Q_left),            // %9
-        "r"(Q_right),           // %10
+        "r"(value_register),    // %0
+        "r"(calc_register),     // %1
+        "r"(t_addr),            // %2
+        "r"(t_last)             // %3
+        "r"(Cx),                // %4
+        "r"(Dy),                // %5
+        "r"(Dx_i),              // %6
+        "r"(Dx_end)             // %7
+        "r"(Q_total),           // %8
+        "r"(Q_prev),            // %9
+        "r"(Q_left),            // %10
+        "r"(Q_right),           // %11
     );
 #endif
-    index_t pixels = t_addr - (index_t *)t_start;
-    return (section_process_t){ Q_left, Q_right, pixels, rows };
+    return (section_process_t){ Q_left, Q_right, (address_t)t_addr };
 }
 
 void ActivateBackgrounding( void )
@@ -216,12 +220,8 @@ void ProcessFrame()
     address_t t_addr = (address_t)RhoSystem.Variables.Buffers.Thresh;
     section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
     ProcessedTopSectionData = ProcessFrameSection( t_addr,
-                                                   RhoSystem.Variables.Addresses.ThreshIndex,
-                                                   0,
                                                    RhoSystem.Variables.Utility.Cy );
-    ProcessedBtmSectionData = ProcessFrameSection( (address_t)((uint32_t)t_addr + (uint32_t)ProcessedTopSectionData.pixels),
-                                                   RhoSystem.Variables.Addresses.ThreshIndex,
-                                                   ProcessedTopSectionData.rows,
+    ProcessedBtmSectionData = ProcessFrameSection( ProcessedTopSectionData.last_addr,
                                                    RhoSystem.Variables.Utility.Height );
 
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedTopSectionData.left;

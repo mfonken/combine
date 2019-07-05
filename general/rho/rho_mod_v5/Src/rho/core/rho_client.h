@@ -23,7 +23,7 @@ void CaptureRow( register byte_t *,
                       const register address_t,
                       const register address_t );
 void CaptureFrame( void );
-section_process_t ProcessFrameSection( const address_t, register const address_t, register index_t, register index_t );
+section_process_t ProcessFrameSection( const address_t, const index_t );
 void ActivateBackgrounding( void );
 void DeactivateBackgrounding( void );
 void FilterPixelCount( index_t *, index_t );
@@ -52,7 +52,7 @@ typedef struct
   uint32_t
   CameraPort,                     /* Parallel port register to camera */
   HostTxPort;                     /* Output channel to host */
-  
+
 address_t
   CaptureEnd,                     /* Effective end address for capture buffer */
   CaptureMax,                     /* Actual end address for capture buffer */
@@ -125,6 +125,16 @@ static rho_system_t RhoSystem =
 {
     { /* VARIABLES */
         { /* Utility */
+            { /* Density map pair */
+                { /* Dy */
+                    FOREGROUND_DENSITY_MAP_Y,
+                    BACKGROUND_DENSITY_MAP_Y
+                },
+                { /* Dx */
+                    FOREGROUND_DENSITY_MAP_X,
+                    BACKGROUND_DENSITY_MAP_X
+                }
+            },
             CAPTURE_WIDTH,
             CAPTURE_HEIGHT,
             CAPTURE_SUB_SAMPLE,
