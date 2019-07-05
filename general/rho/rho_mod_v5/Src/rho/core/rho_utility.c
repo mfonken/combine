@@ -28,12 +28,12 @@ void CalculateRegionScoreRhoUtility( region_t * b, density_t total_density, byte
 }
 
 /* Generic centroid and mass calculator */
-density_2d_t CalculateCentroidRhoUtility( density_t * map, index_t l, index_t * C, register density_t thresh )
+density_2d_t CalculateCentroidRhoUtility( dmap_t * map, index_t l, index_t * C, register density_t thresh )
 {
     floating_t avg = 0, mavg = 0, cnt = 0, tot = 0;
     for( index_t i = 0; i < l; i++ )
     {
-        density_t c = map[i];
+        dmap_t c = map[i];
         if( c > thresh )
         {
             /* Note only fraction m1/m0 is needed so either average method works*/

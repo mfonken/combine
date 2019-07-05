@@ -33,8 +33,7 @@
 //#ifndef USE_INTERRUPT_MODEL
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
-#define CBW                     CAPTURE_BUFFER_WIDTH
-#define CBH                     CAPTURE_BUFFER_HEIGHT
+#define CWL                     80
 #ifdef DYNAMIC_BUFFER
 #define CAPTURE_BUFFER_SIZE     CAPTURE_BUFFER_WIDTH    //*CAPTURE_BUFFER_HEIGHT
 #else

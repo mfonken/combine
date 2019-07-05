@@ -3,12 +3,13 @@
 /***************************************************************************************/
 /*                                    Printers                                         */
 /***************************************************************************************/
-/*
-void print( const uint8_t * Buf )
+
+inline void print( char * Buf )
 {
-  HAL_UART_Transmit( this_uart, (uint8_t *)Buf, strlen((const char *)Buf), UART_TIMEOUT );
+  TransmitToHost( (uint8_t *)Buf, strlen((const char *)Buf) );
 }
 
+/*
 void drawDensityMap( density_t * a, int l )
 {
     for( int i = 0; i < l; i++ )

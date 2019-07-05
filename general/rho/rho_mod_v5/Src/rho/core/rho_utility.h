@@ -20,9 +20,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+  static dmap_t FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+              FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
+              BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+              BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
+  
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
-    density_2d_t CalculateCentroidRhoUtility( density_t *, index_t, index_t *, density_t );
+    density_2d_t CalculateCentroidRhoUtility( dmap_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
     
@@ -119,7 +124,7 @@ extern "C" {
     {
         void (*CumulateMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
         void (*CalculateRegionScore)( region_t *, density_t, byte_t );
-        density_2d_t (*CalculateCentroid)( density_t *, index_t, index_t *, density_t );
+        density_2d_t (*CalculateCentroid)( dmap_t *, index_t, index_t *, density_t );
         void (*PrintPacket)( packet_t *, index_t );
         void (*GenerateBackground)( rho_core_t * );
         void (*GeneratePacket)( rho_core_t * );

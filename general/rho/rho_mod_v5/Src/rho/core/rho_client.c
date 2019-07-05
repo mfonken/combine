@@ -12,14 +12,13 @@
 // #define __CHECK_FRAME_FLAG__
 
 //__attribute__((naked))
-void CaptureRow(
-                            register byte_t * capture_address,   // capture buffer index
-                            register index_t * thresh_address,    // address of thresh buffer
-                            const register byte_t thresh_value,
-                            const register byte_t sub_sample,
-                            const register address_t capture_end,
-                            const register address_t capture_buffer,
-                            const register address_t flag_address )
+void CaptureRow( register byte_t * capture_address,   // capture buffer index
+                 register index_t * thresh_address,    // address of thresh buffer
+                 const register byte_t thresh_value,
+                 const register byte_t sub_sample,
+                 const register address_t capture_end,
+                 const register address_t capture_buffer,
+                 const register address_t flag_address )
 {
     register uint32_t working_register = 0;
 #ifndef __ASSEMBLY_RHO__
@@ -102,15 +101,15 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
         value_register      = 0,
         calc_register       = 0,
         t_addr              = (uint32_t)t_start,
-        t_last              = (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex;
+        t_last              = (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex,
         Cx                  = (uint32_t)RhoSystem.Variables.Utility.Cx,
         Dy                  = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.y.map,
         Dx_i                = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.x.map,
-        Dx_end              = (uint23_t)Dx + (uint32_t)rows,
+        Dx_end              = Dx_i + (uint32_t)rows,
         Q_total             = 0,
         Q_prev              = 0,
         Q_left              = 0,
-        Q_right             = 0,
+        Q_right             = 0;
 
 #ifndef __ASSEMBLY_RHO__
     while( t_addr < t_end )
@@ -137,7 +136,7 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
     (
     "loop_process:                                                      \n\t"
         "ldrh    %0, [%2], #2   ; Load next threshold buffer            \n\t"
-        "cmp     %0, #"STR(CBW)"; Is value outside or equal frame width \n\t"
+        "cmp     %0, #"STR(CWL)"; Is value outside or equal frame width \n\t"
         "bge     row_end        ; Go to end row                         \n"
     "left_value:                                                        \n\t"
         "cmp     %0, %4         ; If value is right (greater) x centroid\n\t"
@@ -173,7 +172,7 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
         "r"(Q_total),           // %8
         "r"(Q_prev),            // %9
         "r"(Q_left),            // %10
-        "r"(Q_right),           // %11
+        "r"(Q_right)            // %11
     );
 #endif
     return (section_process_t){ Q_left, Q_right, (address_t)t_addr };

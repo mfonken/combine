@@ -3,7 +3,7 @@
 
 #include "main.h"
 #include "OV9712_regs.h"
-#include "platform.h"
+#include "printers.h"
 
 typedef struct
 {

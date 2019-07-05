@@ -12,7 +12,7 @@
 #ifdef __OV9712__
 #include "OV9712.h"
 #else
-#include "platform.h"
+#include "printers.h"
 #endif
 
 #include <stdbool.h>
@@ -37,11 +37,6 @@ typedef uint8_t         capture_t;
 #define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
 #define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
 #define dmap_t_max          ( (sizeof(dmap_t)       << 3 ) - 1 )
-
-static dmap_t FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-              FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
-              BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-              BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
 
 // #define USE_INTERRUPT_MODEL
 
@@ -153,4 +148,7 @@ enum LogLevel
 #define ZDIV_LNUM               ( 1 << 10 )
 #define ZDIV(X,Y)               ( ( Y == 0 ) ? ( X == 0 ? 0 : ZDIV_LNUM ) : X / Y )
 
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+                                
 #endif /* rho_global_h */

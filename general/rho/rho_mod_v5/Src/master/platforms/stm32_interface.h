@@ -22,7 +22,7 @@
 #define STM_InterruptHandler HAL_GPIO_EXTI_Callback
 #define STM_UartCompleted HAL_UART_TxCpltCallback
 
-static address_t _dma_destination = null;
+static uint32_t _dma_destination = NULL;
 
 /***************************************************************************************/
 /*                              Function Definitions                                   */

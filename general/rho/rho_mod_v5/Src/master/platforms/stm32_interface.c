@@ -8,7 +8,7 @@
 
 #include "stm32_interface.h"
 #include "main.h"
-#include "platform.h"
+#include "printers.h"
 
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
@@ -47,7 +47,7 @@ inline void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_st
   __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
   __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, (uint32_t)init_state);
-    _dma_destination = dst;
+  _dma_destination = dst;
 }
 inline void STM_PauseDMA( void )
 {
@@ -59,8 +59,8 @@ inline void STM_ResumeDMA( void )
 }
 inline void STM_ResetDMA( void )
 {
-    if(_dma_destination != null)
-        Master.Utilities.Timer_Primary->hdma[TIM2_DMA_ID]->Instance->CMAR = _dma_destination;
+    if(_dma_destination != NULL)
+        Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CMAR = _dma_destination;
 }
 
 inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )

@@ -30,6 +30,19 @@ typedef enum
   NUM_SYSTEM_STATES
 } system_state_enum;
 
+static const char * system_state_enum_strings[] = 
+{
+  "INITIALIZING",
+  "CONNECTING_TO_HOST",
+  "CONFIGURING",
+  "READY",
+  "ACTIVE",
+  "IDLE",
+  "RECONFIGURING",
+  "ERROR_STATE",
+  "UNKNOWN"
+};
+
 typedef struct
 {
   system_state_enum

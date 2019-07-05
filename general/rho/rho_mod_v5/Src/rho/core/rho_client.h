@@ -69,7 +69,7 @@ capture_t
     *Capture;                       /* Raw capture buffer for DMA */
 index_t
     *Thresh;                        /* Threshold processing buffer */
-density_t
+dmap_t
     *DensityY,                      /* Processed density X array */
     *DensityX;                      /* Processed density Y array */
 density_2d_t
