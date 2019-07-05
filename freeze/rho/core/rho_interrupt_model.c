@@ -3,7 +3,7 @@
 //  tau+
 //
 //  Created by Matthew Fonken on 3/31/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #include "rho_interrupt_model.h"
@@ -85,10 +85,10 @@ void RIM_FRAME_START( void )
     RhoVariables.ram.QT         = 0;
     RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.C_FRAME_MAX;
     
-    memset(RhoVariables.ram.C_FRAME, 0, sizeof(*RhoVariables.ram.C_FRAME)*RhoVariables.global.C_FRAME_MAX);
-    memset(RhoVariables.ram.Dy, 0, sizeof(*RhoVariables.ram.Dy) * RhoVariables.global.W);
-    memset(RhoVariables.ram.Dx, 0, sizeof(*RhoVariables.ram.Dx) * RhoVariables.global.H);
-    memset(RhoVariables.ram.Q,  0, sizeof(*RhoVariables.ram.Q) * 4);
+    memset(RhoVariables.ram.C_FRAME, 0, sizeof(char)*RhoVariables.global.C_FRAME_MAX);
+    memset(RhoVariables.ram.Dy, 0, sizeof(dmap_t) * RhoVariables.global.W);
+    memset(RhoVariables.ram.Dx, 0, sizeof(dmap_t) * RhoVariables.global.H);
+    memset(RhoVariables.ram.Q,  0, sizeof(density_2d_t) * 4);
     
     RhoVariables.registers.Cx   = *RhoVariables.ram.CX_ADDR;
     RhoVariables.registers.Cy   = *RhoVariables.ram.CY_ADDR;
@@ -126,13 +126,11 @@ void RIM_LOOP_THREAD( void * mutex )
 {
     pthread_mutex_t * m = (pthread_mutex_t *)mutex;
     index_t rx = 0, ry = 0;
-    RhoVariables.global.counter = 0;
     while( RhoVariables.registers.rd != RhoVariables.ram.C_FRAME_END
           && pthread_mutex_trylock(m)
           )
     {
-        RhoVariables.global.counter++;
-        if( RhoVariables.registers.rd < RhoVariables.registers.wr )
+        while( RhoVariables.registers.rd < RhoVariables.registers.wr )
         {
             rx = *(RhoVariables.registers.rd++);
             
@@ -167,7 +165,7 @@ void RIM_LOOP_THREAD( void * mutex )
 #define RPC(X) if(X&0xf0)
 #define RPCB(X,Y,N) {RPC(X){Q##Y++;N[x]++;}}
 
-void RIM_PERFORM_RHO_FUNCTION( cimage_t image )
+void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
 {
     if(!RhoVariables.connected) return;
     index_t w = image.width, h = image.height;

@@ -3,7 +3,7 @@
 //  rho_client
 //
 //  Created by Matthew Fonken on 10/21/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #ifndef rho_pid_h
@@ -12,15 +12,12 @@
 #include <string.h>
 #include "rho_global.h"
 #include "rho_config.h"
-#include "timestamp.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
-#define PID_ERROR_DECAY 0.9
-    
-    typedef double floating_t;
+//    typedef double floating_t;
     
     typedef struct
     {
@@ -29,9 +26,9 @@ extern "C" {
     
     typedef struct
     {
-        rho_pid_gain_t
+      rho_pid_gain_t
         Gain;
-        floating_t
+      floating_t
         Pv,
         Iv,
         Dv,

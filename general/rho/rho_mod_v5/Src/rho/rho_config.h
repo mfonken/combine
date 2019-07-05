@@ -18,15 +18,22 @@
 /***************************************************************************************/
 /*                               CAPTUE PARAMETERS                                     */
 /***************************************************************************************/
+
 /* Camera Config */
 #define RHO_WIDTH               1280
 #define RHO_HEIGHT              800
 
 /* Capture Config */
 //#define DYNAMIC_BUFFER
+#ifdef USE_INTERRUPT_MODEL
+#define CAPTURE_WIDTH           700
+#define CAPTURE_HEIGHT          700
+#else
 #define CAPTURE_DIV             4
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
+#endif
+
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define CAPTURE_SUB_SAMPLE      2
 
@@ -61,24 +68,24 @@
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20
 
-#define MAX_BLOB_HEIGHT     200
+#define MAX_REGION_HEIGHT     200
 #define RHO_GAP_MAX 10
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
 #define BACKGROUNDING_PERIOD   10000 // Frames
 
-#define EXPECTED_NUM_BLOBS  2
-#define MAX_BLOBS           4
-#define MIN_BLOB_DENSITY    2
-#define MAX_BLOB_SCORE      10
-#define BLOB_SCORE_FACTOR   0.5
-#define MAX_NU_BLOBS        NUM_STATE_GROUPS+1
-#define MAX_OBSERVATIONS    1 << 4
+#define EXPECTED_NUM_REGIONS  2
+#define MAX_REGIONS           4
+#define MIN_REGION_DENSITY    2
+#define MAX_REGION_SCORE      10
+#define REGION_SCORE_FACTOR   0.5
+#define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
+//#define MAX_OBSERVATIONS    1 << 4
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
-#define MAX_TRACKING_FILTERS MAX_BLOBS
+#define MAX_TRACKING_FILTERS MAX_REGIONS
 #define MIN_TRACKING_KALMAN_SCORE 0.02
 #define MAX_TRACKING_MATCH_DIFFERNCE 500
 #define TRACKING_MATCH_TRUST 0.4

@@ -17,8 +17,8 @@
 extern "C" {
 #endif
 
-double timestamp( void );
-bool istimedout( double, double );
+double TIMESTAMP( void );
+bool ISTIMEDOUT( double, double );
     
 #ifdef __cplusplus
 }

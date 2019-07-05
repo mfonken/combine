@@ -1,4 +1,5 @@
 #include "rho_kalman.h"
+#include "timestamp.h"
 
 /** SOURCE: http://preview.tinyurl.com/9djhrem */
 
@@ -101,7 +102,7 @@ bool IsRhoKalmanExpired( rho_kalman_t * k )
 
 inline floating_t ScoreRhoKalman( rho_kalman_t * k )
 {
-    floating_t score = k->K[0];//, age = ( timestamp() - k->origin );
+    floating_t score = k->K[0];//, age = ( TIMESTAMP() - k->origin );
     if(k->flag) score = 0.;
 //    else if( age < KALMAN_MATURATION ) score = 1.;
     k->score = score;

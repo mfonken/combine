@@ -39,7 +39,9 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     pthread_mutex_init(&c_mutex, NULL);
     
     RhoCore.Initialize(&core, width, height);
+#ifdef __PSM__
     PSMFunctions.Initialize( &core.PredictiveStateModel );
+#endif
     backgrounding_event = false;
     
     RhoInterrupts.FRAME_INIT();
@@ -62,7 +64,7 @@ void Rho::Perform( cimage_t & img, GlobalPacket * p )
 }
 
 /* Interrupt (Simulated Hardware-Driven) Density map generator */
-void Rho::Generate_Density_Map_Using_Interrupt_Model( cimage_t image, bool backgrounding )
+void Rho::Generate_Density_Map_Using_Interrupt_Model( const cimage_t image, bool backgrounding )
 {
     if( backgrounding )
     {
@@ -73,7 +75,7 @@ void Rho::Generate_Density_Map_Using_Interrupt_Model( cimage_t image, bool backg
         RhoVariables.ram.Q       =  core.Qb;
     }
     
-    RIM_PERFORM_RHO_FUNCTION( image );
+    RhoInterrupts.RHO_FUNCTION( image );
     
     if( backgrounding )
     {

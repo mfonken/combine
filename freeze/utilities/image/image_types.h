@@ -9,7 +9,7 @@
 #ifndef image_types_h
 #define image_types_h
 
-typedef unsigned char   pixel_base_t;
+typedef unsigned char pixel_base_t;
 typedef struct
 {
     int width, height;

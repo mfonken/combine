@@ -131,7 +131,7 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )
         if( curr <= MAX_SINGLE_CONFIDENCE )
             sys->probabilities.map[c][_.i] = curr;
     }
-    floating_t state_change_rate = timestamp() - sys->stability.state.timestamp;
+    floating_t state_change_rate = TIMESTAMP() - sys->stability.state.timestamp;
     RhoKalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
 }
 
@@ -149,7 +149,7 @@ void UpdateFSMState( fsm_system_t * sys )
         RhoKalman.Reset( &sys->stability.state, 0. );
 //        FSMFunctions.Map.ResetState( &sys->probabilities, sys->prev );
         
-        floating_t system_change_rate = timestamp() - sys->stability.system.timestamp;
+        floating_t system_change_rate = TIMESTAMP() - sys->stability.system.timestamp;
         RhoKalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
     }
 }

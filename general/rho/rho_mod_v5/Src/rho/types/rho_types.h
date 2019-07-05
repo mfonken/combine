@@ -9,6 +9,7 @@
 #ifndef rho_c_types_h
 #define rho_c_types_h
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "rho_config.h"
@@ -137,19 +138,6 @@ typedef struct
 
 typedef struct
 {
-    index_t density;
-    uint8_t thresh,
-            label;
-} observation_t;
-
-typedef struct
-{
-    observation_t observations[MAX_OBSERVATIONS];
-    uint8_t length;
-} observation_list_t;
-
-typedef struct
-{
 density_t
     max,
     den;
@@ -204,8 +192,8 @@ typedef struct
 {
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-    region_t        Regions[MAX_BLOBS];
-    uint8_t         RegionsOrder[MAX_BLOBS],
+    region_t        Regions[MAX_REGIONS];
+    uint8_t         RegionsOrder[MAX_REGIONS],
                     NumRegions;
     floating_t      NuRegions,
                     Primary,
@@ -242,17 +230,20 @@ typedef struct
   void (*Pause)(void);
   void (*Resume)(void);
   void (*Reset)(void);
-} rho_platform_dma_interface_functions;
+} platform_dma_interface_functions;
 
 typedef struct
 {
   uint8_t (*Transmit)( byte_t *, index_t);
 } rho_platform_uart_interace_functions;
 
+#ifndef USE_INTERRUPT_MODEL
+#error "test"
 typedef struct
 {
   void (*Activate)( camera_application_flags * );
 } rho_platform_flag_interace_functions;
+#endif
 
 typedef struct
 {
@@ -307,6 +298,7 @@ typedef struct
       cden,
       tden, /* Target density */
       fden, /* Filtered density */
+      fden1, /* Initial filtered density before retries */
       total_density,
       filtered_density;
     bool
@@ -412,14 +404,16 @@ typedef struct
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
-#ifdef __PSM__
+
     psm_t               PredictiveStateModel;
-#else
+#ifndef __PSM__
     fsm_system_t        StateMachine;
 #endif
     packet_t            Packet;
 
-//    index_t             cframe[C_FRAME_SIZE];
+#ifdef USE_INTERRUPT_MODEL
+    uint8_t             cframe[C_FRAME_SIZE];
+#endif
 } rho_core_t;
 
 #endif /* rho_c_types_h */

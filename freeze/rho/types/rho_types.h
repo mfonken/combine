@@ -3,20 +3,24 @@
 //  tau+
 //
 //  Created by Matthew Fonken on 4/22/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #ifndef rho_c_types_h
 #define rho_c_types_h
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "rho_config.h"
 #include "rho_kalman.h"
 #include "rho_pid.h"
-#include "rho_global.h"
 
+#ifdef __PSM__
 #include "psm.h"
+#else
+#include "fsm.h"
+#endif
 
 /* Packet Generation Settings */
 #define YES 1
@@ -117,17 +121,6 @@ address_t
 
 typedef struct
 {
-flag_t
-  Active,
-  IRQ,
-  Frame,
-  Row,
-  Backgrounding,
-  UARTBusy;
-} rho_system_flags_variables;
-
-typedef struct
-{
 byte_t
     ID,
     includes;
@@ -156,14 +149,13 @@ floating_t
     scr;
 byte_t
     tracking_id;
-} blob_t;
+} region_t;
 
 /* Rho Structures* */
 typedef struct
 {
-    density_t      *map,
+    dmap_t         *map,
                    *background,
-                   *filtered,
                     max[2];
     index_t         length,
     centroid;
@@ -200,12 +192,13 @@ typedef struct
 {
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-    blob_t          Blobs[MAX_BLOBS];
-    uint8_t         BlobsOrder[MAX_BLOBS],
-                    NumBlobs;
-    floating_t      NuBlobs,
+    region_t        Regions[MAX_REGIONS];
+    uint8_t         RegionsOrder[MAX_REGIONS],
+                    NumRegions;
+    floating_t      NuRegions,
                     Primary,
-                    Secondary;
+                    Secondary,
+                    AverageDensity;
     density_t       PreviousPeak[2],
                     PreviousCentroid;
     density_2d_t    PreviousDensity[2],
@@ -219,12 +212,16 @@ typedef struct
 {
     prediction_t    x,y;
     prediction_probabilities Probabilities;
+
+    floating_t      NuRegions,
+                    BestConfidence,
+                    AverageDensity;
 } prediction_pair_t;
 
 typedef struct
 {
-    index_t pixels, rows;           /* Process location variables */
     density_2d_t left, right;       /* Direction density values */
+    address_t last_addr;
 } section_process_t;
 
 typedef struct
@@ -235,28 +232,23 @@ typedef struct
   void (*Reset)(void);
 } platform_dma_interface_functions;
 
-typedef struct 
+typedef struct
 {
   uint8_t (*Transmit)( byte_t *, index_t);
-} platform_uart_interace_functions;
+} rho_platform_uart_interace_functions;
 
-typedef struct 
+#ifndef USE_INTERRUPT_MODEL
+#error "test"
+typedef struct
 {
-  void (*Activate)( rho_system_flags_variables *);
-} platform_flag_interace_functions;
-
-typedef struct 
-{
-  uint32_t (*Now)( void );
-} platform_time_interace_functions;
+  void (*Activate)( camera_application_flags * );
+} rho_platform_flag_interace_functions;
+#endif
 
 typedef struct
 {
-  platform_dma_interface_functions DMA;
-  platform_uart_interace_functions Usart;
-  platform_flag_interace_functions Flags;
-  platform_time_interace_functions Time;
-} platform_interface_functions;
+  uint32_t (*Now)( void );
+} rho_platform_time_interace_functions;
 
 typedef struct
 {
@@ -265,7 +257,7 @@ typedef struct
     yl[3];
     density_2d_t
     area[9];
-    
+
     density_2d_t a, b, c, d, l, l_, p, q, x, y;
 } redistribution_variables;
 extern const density_redistribution_lookup_t rlookup;
@@ -282,43 +274,43 @@ typedef struct
 typedef struct
 {
     index_t
-    len,
-    range[3],
-    cyc,
-    cyc_,
-    gapc,
-    width,
-    blbf,            /* Blob fill */
-    x,               /* Generic index */
-    start,
-    end,
-    assumed_blobs;
+      len,
+      range[3],
+      cyc,
+      cyc_,
+      gapc,
+      width,
+      blbf,            /* Region fill */
+      x,               /* Generic index */
+      start,
+      end;
     density_t
-    fpeak,
-    fpeak_2,
-    fbandl,
-    c1,
-    c2,
-    b,
-    rcal_c; /* Recalculation counter */
-    variance_t
-    fvar;
+      fpeak,
+      fpeak_2,
+      fbandl,
+      c,
+      b,
+      rcal_c; /* Recalculation counter */
+      variance_t
+      fvar;
     density_2d_t
-    cmax,
-    cden,
-    tden, /* Target density */
-    fden, /* Filtered density */
-    total_density,
-    filtered_density;
+      cmax,
+      cden,
+      tden, /* Target density */
+      fden, /* Filtered density */
+      fden1, /* Initial filtered density before retries */
+      total_density,
+      filtered_density;
     bool
-    has,
-    rcal; /* Recalculate */
+      has,
+      rcal; /* Recalculate */
     floating_t
-    avgc,
-    cavg,   /* cumulative average */
-    mavg,   /* moment average */
-    chaos,
-    target_density;
+      avgc,
+      cavg,   /* cumulative average */
+      mavg,   /* moment average */
+      chaos,
+      target_density,
+      assumed_regions;
 } rho_detection_variables;
 
 typedef struct
@@ -374,9 +366,12 @@ typedef detection_ring_buffer_t detection_map_t;
 
 typedef struct
 {
+    density_map_pair_t  DensityMapPair;
     index_t
         Width,
         Height,
+        Subsample,
+        RowsLeft,
         Px,
         Py,
         Sx,
@@ -405,15 +400,20 @@ typedef struct
         PreviousThreshFilterValue,
         Thresh;
     rho_tune_t          Tune;
-    density_map_pair_t  DensityMapPair;
     prediction_pair_t   PredictionPair;
     rho_pid_t           ThreshFilter;
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
+
     psm_t               PredictiveStateModel;
+#ifndef __PSM__
+    fsm_system_t        StateMachine;
+#endif
     packet_t            Packet;
-    
-    index_t             cframe[C_FRAME_SIZE];
+
+#ifdef USE_INTERRUPT_MODEL
+    uint8_t             cframe[C_FRAME_SIZE];
+#endif
 } rho_core_t;
 
 #endif /* rho_c_types_h */

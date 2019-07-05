@@ -27,8 +27,8 @@ static FILE * detection_map_file;
 void InitializeDetectionMap( detection_map_t *, uint16_t );
 uint8_t GetDetectionMapFirstIndex( detection_map_t * );
 void IncrementDetectionMapIndex( detection_map_t * );
-void AddBlobToPredictionMap( detection_map_t *, uint8_t, index_t, uint8_t );
-void AddBlobSetToPredictionMap( detection_map_t *, prediction_pair_t *, uint8_t );
+void AddRegionToPredictionMap( detection_map_t *, uint8_t, index_t, uint8_t );
+void AddRegionSetToPredictionMap( detection_map_t *, prediction_pair_t *, uint8_t );
 
 typedef struct
 {
@@ -44,8 +44,8 @@ static detection_map_function DetectionMapFunctions =
     .Init = InitializeDetectionMap,
     .FirstIndex = GetDetectionMapFirstIndex,
     .Increment = IncrementDetectionMapIndex,
-    .Add = AddBlobToPredictionMap,
-    .AddSet = AddBlobSetToPredictionMap
+    .Add = AddRegionToPredictionMap,
+    .AddSet = AddRegionSetToPredictionMap
 };
 
 #endif /* detection_map_h */

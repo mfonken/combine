@@ -37,7 +37,7 @@ void IncrementDetectionMapIndex( detection_map_t * map )
         map->fill = DETECTION_BUFFER_MASK;
 }
 
-void AddBlobToPredictionMap( detection_map_t * map, uint8_t thresh, index_t density, uint8_t tracking_id )
+void AddRegionToPredictionMap( detection_map_t * map, uint8_t thresh, index_t density, uint8_t tracking_id )
 {
     detection_element_t e = { thresh, density, tracking_id };
     map->buffer[map->index] = e;
@@ -52,7 +52,7 @@ void AddBlobToPredictionMap( detection_map_t * map, uint8_t thresh, index_t dens
 #endif
 }
 
-void AddBlobSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, uint8_t thresh )
+void AddRegionSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, uint8_t thresh )
 {
     uint8_t p = 0, i;
 
@@ -61,8 +61,8 @@ void AddBlobSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, u
     {
         for( i = 0; i < pair[p]->ObservationList.length; i++ )
         {
-//            io = pair[p]->BlobsOrder[i];
-//            blob_t * b = &pair[p]->Blobs[io];
+//            io = pair[p]->RegionsOrder[i];
+//            region_t * b = &pair[p]->Regions[io];
 //            double estimated_density = (double)b->den + (double)*pair[p]->PreviousPeak;
 ////            double A = (double)(b->den<<8), B = (double)MAX_DENSITY;
 //            uint8_t byteDensity = estimated_density;//(uint8_t)ZDIV( A, B );

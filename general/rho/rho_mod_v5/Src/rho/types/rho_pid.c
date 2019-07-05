@@ -7,6 +7,7 @@
 //
 
 #include "rho_pid.h"
+#include "timestamp.h"
 
 void RhoPIDInitialize( rho_pid_t * PID, rho_pid_gain_t K )
 {

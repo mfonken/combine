@@ -9,9 +9,6 @@
 #ifndef tau_utility_hpp
 #define tau_utility_hpp
 
-/// FIND PLACE FOR THIS
-#define DEFAULT_THRESH 100
-
 #define AVERAGE_COUNT 10
 
 #include <stdio.h>

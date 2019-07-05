@@ -12,7 +12,9 @@
 #ifdef __OV9712__
 #include "OV9712.h"
 #else
+#ifdef __PRINTERS__
 #include "printers.h"
+#endif
 #endif
 
 #include <stdbool.h>
@@ -30,7 +32,11 @@ typedef uint32_t        density_2d_t;
 typedef floating_t      timestamp_t;
 typedef uint8_t         capture_t;
 
-//uint32_t(**timestamp)(void);
+#if defined __linux || defined __APPLE__
+typedef void *          address_t;
+#else
+typedef uint32_t        address_t;
+#endif
 
 #define byte_t_max          ( (sizeof(byte_t)       << 3 ) - 1 )
 #define index_t_max         ( (sizeof(index_t)      << 3 ) - 1 )
@@ -39,8 +45,7 @@ typedef uint8_t         capture_t;
 #define dmap_t_max          ( (sizeof(dmap_t)       << 3 ) - 1 )
 
 // #define USE_INTERRUPT_MODEL
-
-//#define ALLOW_NEGATIVE_REDISTRIBUTION
+// #define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #ifndef LOG_LEVEL
 #define LOG_LEVEL
@@ -55,8 +60,8 @@ enum LogLevel
 };
 #endif
 
-//#define RHO_DEBUG               DEBUG_2
-//#define RHO_DEBUG_2             DEBUG_1
+#define RHO_DEBUG               DEBUG_2
+#define RHO_DEBUG_2             DEBUG_1
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 

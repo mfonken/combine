@@ -42,6 +42,7 @@ extern "C" {
         void (*ROW_INT)(     void );
         void (*PCLK_INT)(    void );
         void (*LOOP_THREAD)( void * );
+        void (*RHO_FUNCTION)( const cimage_t );
     };
     static const rho_interrupts RhoInterrupts =
     {
@@ -52,6 +53,7 @@ extern "C" {
         .ROW_INT     = RIM_ROW_INT,
         .PCLK_INT    = RIM_PCLK_INT,
         .LOOP_THREAD = RIM_LOOP_THREAD,
+        .RHO_FUNCTION = RIM_PERFORM_RHO_FUNCTION
     };
     
     typedef struct
@@ -74,7 +76,8 @@ extern "C" {
         x,
         p,
         Cx,
-        Cy,
+        Cy;
+        pixel_base_t
         *wr,
         *rd;
         density_t
@@ -86,9 +89,10 @@ extern "C" {
     
     typedef struct
     {
-        density_t
+        dmap_t
         *Dx,
-        *Dy,
+        *Dy;
+        density_t
         *THRESH_ADDR;
         density_2d_t
         *Q,
@@ -98,11 +102,10 @@ extern "C" {
         index_t
         y,
         *CX_ADDR,
-        *CY_ADDR,
-        *C_FRAME,
-        *C_FRAME_END;
-        
+        *CY_ADDR;
         pixel_base_t
+        *C_FRAME,
+        *C_FRAME_END,
         *CAM_PORT;
     } rho_sram_variables;
     
@@ -113,6 +116,7 @@ extern "C" {
         rho_register_variables  registers;
         rho_sram_variables      ram;
     } rho_variables;
+    
     extern rho_variables RhoVariables;
     
 #ifdef __cplusplus

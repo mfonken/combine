@@ -24,7 +24,7 @@ public:
     
     Rho( int, int );
     void Perform( cimage_t&, GlobalPacket * );
-    void Generate_Density_Map_Using_Interrupt_Model( cimage_t, bool );
+    void Generate_Density_Map_Using_Interrupt_Model( const cimage_t, bool );
 };
 
 #endif /* rho_wrapper_hpp */

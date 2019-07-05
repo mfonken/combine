@@ -14,16 +14,18 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "rho_interrupt_model.h"
 #include "rho_structure.h"
 #include "rho_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  static dmap_t FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-              FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
-              BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-              BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
+  static dmap_t
+        FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+        FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
+        BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
+        BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
   
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );

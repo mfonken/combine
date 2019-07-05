@@ -68,15 +68,15 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0))
     file.open(X_DIM_FILENAME);
     // Header
     file << "#";
-    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    for(int i = 0; i < /*MAX_REGIONS*/4; i++)
     {
-        string blob_id = "B" + to_string(i);
-        file << "," << "Den(" << blob_id << ")";
-        file << "," << "Wth(" << blob_id << ")";
-        file << "," << "Loc(" << blob_id << ")";
-        file << "," << "Max(" << blob_id << ")";
-        file << "," << "Scr(" << blob_id << ")";
-        file << "," << "Flt(" << blob_id << ")";
+        string region_id = "B" + to_string(i);
+        file << "," << "Den(" << region_id << ")";
+        file << "," << "Wth(" << region_id << ")";
+        file << "," << "Loc(" << region_id << ")";
+        file << "," << "Max(" << region_id << ")";
+        file << "," << "Scr(" << region_id << ")";
+        file << "," << "Flt(" << region_id << ")";
     }
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
@@ -94,15 +94,15 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0))
     file.open(Y_DIM_FILENAME);
     // Header
     file << "#";
-    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    for(int i = 0; i < /*MAX_REGIONS*/4; i++)
     {
-        string blob_id = "B" + to_string(i);
-        file << "," << "Den(" << blob_id << ")";
-        file << "," << "Wth(" << blob_id << ")";
-        file << "," << "Loc(" << blob_id << ")";
-        file << "," << "Max(" << blob_id << ")";
-        file << "," << "Scr(" << blob_id << ")";
-        file << "," << "Flt(" << blob_id << ")";
+        string region_id = "B" + to_string(i);
+        file << "," << "Den(" << region_id << ")";
+        file << "," << "Wth(" << region_id << ")";
+        file << "," << "Loc(" << region_id << ")";
+        file << "," << "Max(" << region_id << ")";
+        file << "," << "Scr(" << region_id << ")";
+        file << "," << "Flt(" << region_id << ")";
     }
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
@@ -390,17 +390,17 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     //    putText(M, "B", Point(B.x, B.y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,150,55), 3);
     
     
-    // Draw blobs
-    for( int i = 0; i < rho.core.PredictionPair.y.NumBlobs; i++ )
+    // Draw regions
+    for( int i = 0; i < rho.core.PredictionPair.y.NumRegions; i++ )
     {
-        int o = rho.core.PredictionPair.y.BlobsOrder[i];
-        int v = rho.core.PredictionPair.y.Blobs[o].loc;
+        int o = rho.core.PredictionPair.y.RegionsOrder[i];
+        int v = rho.core.PredictionPair.y.Regions[o].loc;
         line(M, Point(v,0),Point(v,h), bluish);
     }
-    for( int i = 0; i < rho.core.PredictionPair.x.NumBlobs; i++ )
+    for( int i = 0; i < rho.core.PredictionPair.x.NumRegions; i++ )
     {
-        int o = rho.core.PredictionPair.x.BlobsOrder[i];
-        int v = rho.core.PredictionPair.x.Blobs[o].loc;
+        int o = rho.core.PredictionPair.x.RegionsOrder[i];
+        int v = rho.core.PredictionPair.x.Regions[o].loc;
         line(M, Point(0,v),Point(w,v), bluish);
     }
     
@@ -428,7 +428,7 @@ void TauDrawer::DrawDensityMaps(Mat& M)
         int mX = rho.core.DensityMapPair.x.max[1-i], mY = rho.core.DensityMapPair.y.max[1-i];
         if(!mX) mX = 1;
         if(!mY) mY = 1;
-        density_t *dX = rho.core.DensityMapPair.x.map, *dY = rho.core.DensityMapPair.y.map;
+        dmap_t *dX = rho.core.DensityMapPair.x.map, *dY = rho.core.DensityMapPair.y.map;
         
         for(; y < rangey[i]; y++ )
         {
@@ -543,8 +543,8 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     memcpy(C_kumaraswamy, rho.core.PredictionPair.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
     floating_t
     state_P[NUM_STATES] = { 0. },
-    x_nu = rho.core.PredictionPair.x.NuBlobs,
-    y_nu = rho.core.PredictionPair.y.NuBlobs;
+    x_nu = rho.core.PredictionPair.x.NuRegions,
+    y_nu = rho.core.PredictionPair.y.NuRegions;
     state_t state = rho.core.PredictiveStateModel.hmm.A.state;
     for(int i = 0; i < NUM_STATES; i++)
         state_P[i] = rho.core.PredictiveStateModel.hmm.A.probabilities.map[i][state];
@@ -805,9 +805,9 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     pDut[pX] = map.kalmans[0].value;
     pDlt[pX] = map.kalmans[1].value;
     
-    blob_t blobs[MAX_BLOBS];
-    for(int i = 0; i < MAX_BLOBS; i++)
-        memcpy(&blobs[i], &prediction.Blobs[prediction.BlobsOrder[i]], sizeof(blob_t));
+    region_t regions[MAX_REGIONS];
+    for(int i = 0; i < MAX_REGIONS; i++)
+        memcpy(&regions[i], &prediction.Regions[prediction.RegionsOrder[i]], sizeof(region_t));
     
     
 #define MATCH_DATA_WIDTH 3
@@ -815,9 +815,9 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
 #define MATCH_DECODE(X,i) ((1 << MATCH_DATA_WIDTH)-1) & X >> (i*MATCH_DATA_WIDTH)
     
     int num_tracks = 0;
-    for(int i = 0; i < MAX_BLOBS; i++)
+    for(int i = 0; i < MAX_REGIONS; i++)
     {
-        blob_t curr = blobs[i];
+        region_t curr = regions[i];
         if(curr.den > 0 && curr.den < 2000)
             num_tracks++;
     }
@@ -853,9 +853,9 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     ofstream file(filename, ofstream::out | ofstream::app);
     /* Write to file */
     file << iteration++;
-    for(int i = 0; i < /*MAX_BLOBS*/4; i++)
+    for(int i = 0; i < /*MAX_REGIONS*/4; i++)
     {
-        blob_t curr = blobs[i];
+        region_t curr = regions[i];
         file << "," << curr.den << "," << curr.wth << "," << curr.loc << "," << curr.max << "," << curr.scr << "," << tracking_filters_order[i];
     }
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
@@ -892,7 +892,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
 #define MCH_SPLIT 0.1
 #define PK_SPLIT 0.4
     
-    /* Blobs */
+    /* Regions */
 #define BL_WIDTH RD_INNER_WIDTH
 #define BL_HEIGHT (RD_SCALED_HEIGHT(BL_SPLIT))
 #define BL_MAX_NUM 4
@@ -906,10 +906,10 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     // Bounds
     rectangle(mat, BL_ORIGIN, BL_END, RD_LINE_COLOR);
     
-    // Blobs
+    // Regions
     for(int i = 0, y = BL_ORIGIN.y+RD_SPACE; i < BL_MAX_NUM; i++, y += (BL_IND_HEIGHT+RD_SPACE))
     {
-        blob_t curr = blobs[i];
+        region_t curr = regions[i];
         
         Scalar c = RD_LINE_COLOR;
         if(curr.den > 2000)
@@ -931,7 +931,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         int x_offset[2] = {RD_SPACE, RD_SPACE+80};
         int y_offset[3] = {RD_SPACE, RD_SPACE+18, RD_SPACE+36};
         
-        // Blob text
+        // Region text
         putText(mat, "Den: " + to_string(curr.den), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "Wth: " + to_string(curr.wth), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "Loc: " + to_string(curr.loc), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);

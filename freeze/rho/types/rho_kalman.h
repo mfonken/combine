@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "rho_global.h"
-#include "timestamp.h"
-//#include <sys/time.h>
 
 #define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001
@@ -53,7 +51,7 @@ extern "C" {
         max_value;
     } rho_kalman_t;
     
-//    floating_t timestamp(void);
+//    floating_t TIMESTAMP(void);
     void  InitializeRhoKalman( rho_kalman_t *, floating_t, floating_t, index_t, index_t, rho_kalman_uncertainty_c );
     void       ResetRhoKalman( rho_kalman_t *, floating_t );
     void     PredictRhoKalman( rho_kalman_t *, floating_t );

@@ -3,10 +3,11 @@
 //  rho_client
 //
 //  Created by Matthew Fonken on 10/28/18.
-//  Copyright © 2018 Marbl. All rights reserved.
+//  Copyright © 2019 Marbl. All rights reserved.
 //
 
 #include "rho_pid.h"
+#include "timestamp.h"
 
 void RhoPIDInitialize( rho_pid_t * PID, rho_pid_gain_t K )
 {
@@ -26,7 +27,7 @@ void RhoPIDInitialize( rho_pid_t * PID, rho_pid_gain_t K )
         PID->Gain.Ki = K.Ki;
         PID->Gain.Kd = K.Kd;
     }
-    PID->Timestamp = timestamp();
+    PID->Timestamp = TIMESTAMP();
 }
 
 void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
@@ -35,7 +36,7 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
     
     PID->Pv = PID->Error * PID->Gain.Kp;
     
-    PID->Dt = timestamp() - PID->Timestamp;
+    PID->Dt = TIMESTAMP() - PID->Timestamp;
     PID->TotalError += PID->Error * PID->Dt;
     PID->Iv = PID->Gain.Ki * PID->TotalError;
     
@@ -49,11 +50,11 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
     
     PID->PrevError = PID->Error;
 
-    PID->TotalError *= PID_ERROR_DECAY;
+    PID->TotalError *= 0.9;
 }
 
 void RhoPIDPrint( rho_pid_t * PID )
 {
-    printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
-           PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
+    //printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
+           //PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
 }

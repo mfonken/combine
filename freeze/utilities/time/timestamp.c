@@ -8,14 +8,14 @@
 
 #include "timestamp.h"
 
-double timestamp(void)
+double TIMESTAMP(void)
 {
     struct timeval stamp;
     gettimeofday(&stamp, NULL);
     return stamp.tv_sec + stamp.tv_usec/1000000.0;
 }
 
-bool istimedout( double check, double time_out )
+bool ISTIMEDOUT( double check, double time_out )
 {
-    return ( timestamp() - check ) > time_out;
+    return ( TIMESTAMP() - check ) > time_out;
 }

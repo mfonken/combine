@@ -1,4 +1,5 @@
 #include "rho_kalman.h"
+#include "timestamp.h"
 
 /** SOURCE: http://preview.tinyurl.com/9djhrem */
 
@@ -9,11 +10,12 @@ void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t
     k->uncertainty.bias    = uncertainty.bias;
     k->uncertainty.sensor  = uncertainty.sensor;
     
-    k->origin    = timestamp();
+    k->origin    = TIMESTAMP();
     k->timestamp = k->origin;
     
     k->min_value = minv;
     k->max_value = maxv;
+    
     
     ResetRhoKalman(k, v);
 }
@@ -34,17 +36,17 @@ void ResetRhoKalman( rho_kalman_t * k, floating_t v )
     k->variance    = 0;
     k->flag        = 0;
     k->score       = 0;
-    k->origin      = timestamp();
+    k->origin      = TIMESTAMP();
 }
 
 void PredictRhoKalman( rho_kalman_t * k, floating_t rate_new )
 {
-    floating_t delta_time = timestamp() - k->timestamp;
+    floating_t delta_time = TIMESTAMP() - k->timestamp;
     
     /* Quick expiration check */
     if(delta_time > k->lifespan)
     {
-        k->timestamp = timestamp();
+        k->timestamp = TIMESTAMP();
         return;
     }
     k->velocity   = k->value - k->prev;
@@ -79,7 +81,7 @@ void UpdateRhoKalman( rho_kalman_t * k, floating_t value_new )
     k->P[1][0]   -= k->K[1] * k->P[0][0];
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
-    k->timestamp  = timestamp();
+    k->timestamp  = TIMESTAMP();
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
     LOG_KALMAN("Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
@@ -95,12 +97,12 @@ floating_t StepRhoKalman( rho_kalman_t * k, floating_t value_new, floating_t rat
 
 bool IsRhoKalmanExpired( rho_kalman_t * k )
 {
-    return ((timestamp() - k->timestamp) > k->lifespan);
+    return ((TIMESTAMP() - k->timestamp) > k->lifespan);
 }
 
 inline floating_t ScoreRhoKalman( rho_kalman_t * k )
 {
-    floating_t score = k->K[0];//, age = ( timestamp() - k->origin );
+    floating_t score = k->K[0];//, age = ( TIMESTAMP() - k->origin );
     if(k->flag) score = 0.;
 //    else if( age < KALMAN_MATURATION ) score = 1.;
     k->score = score;

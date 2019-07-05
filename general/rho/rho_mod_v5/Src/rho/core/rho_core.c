@@ -21,6 +21,11 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Prediction Structures */
     RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
     RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
+    
+#ifdef USE_INTERRUPT_MODEL
+    /* Frame Conversion Model Connection */
+    RhoInterrupts.INIT_FROM_CORE( core );
+#endif
 }
 
 void PerformRhoCore( rho_core_t * core, bool background_event )
@@ -39,8 +44,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.UpdatePredictions( core );
         LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-       LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
-       RhoCore.GeneratePacket( core );
+//       LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
+//       RhoCore.GeneratePacket( core );
     }
 }
 
