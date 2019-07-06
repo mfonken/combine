@@ -19,6 +19,8 @@
 /*                               CAPTUE PARAMETERS                                     */
 /***************************************************************************************/
 
+#define IS_RGGB_ELIMINATE_G     true
+
 /* Camera Config */
 #define RHO_WIDTH               1280
 #define RHO_HEIGHT              800
@@ -35,7 +37,13 @@
 #endif
 
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
-#define CAPTURE_SUB_SAMPLE      2
+#define CAPTURE_SUB_SAMPLE_BASE 2
+
+#if IS_RGGB_ELIMINATE_G == true
+#define CAPTURE_SUB_SAMPLE      (CAPTURE_SUB_SAMPLE_BASE * 2)
+#else
+#define CAPTURE_SUB_SAMPLE      CAPTURE_SUB_SAMPLE_BASE
+#endif
 
 //#ifndef USE_INTERRUPT_MODEL
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH

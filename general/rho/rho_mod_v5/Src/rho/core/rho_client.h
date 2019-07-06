@@ -137,7 +137,7 @@ static rho_system_t RhoSystem =
             },
             CAPTURE_WIDTH,
             CAPTURE_HEIGHT,
-            CAPTURE_SUB_SAMPLE,
+            CAPTURE_SUB_SAMPLE
         },
         { 0 },/* Addresses */
         { 0 },/* Flags */

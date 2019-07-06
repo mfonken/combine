@@ -78,10 +78,11 @@ void CaptureFrame( void )
     /* Reset buffer indeces */
     RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
     RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
-    while(RhoSystem.Variables.Flags->Row);
+    bool evenRowToggle = false;
+    while(!RhoSystem.Variables.Flags->Row);
     do
     {
-        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)RhoSystem.Variables.Buffers.Capture;
+        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint8_t)RhoSystem.Variables.Buffers.Capture + (uint8_t)evenRowToggle);
         CaptureRow(
             (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
             (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
@@ -92,6 +93,7 @@ void CaptureFrame( void )
             (address_t)RhoSystem.Variables.Flags->Row );
         if(--RhoSystem.Variables.Utility.RowsLeft <= 0) break;
         *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
+        oddRowToggle = !oddRowToggle;
     } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
 }
 
