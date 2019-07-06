@@ -1,6 +1,7 @@
 #include "rho_kalman.h"
+#ifndef TIMESTAMP
 #include "timestamp.h"
-
+#endif
 /** SOURCE: http://preview.tinyurl.com/9djhrem */
 
 void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t minv, index_t maxv, rho_kalman_uncertainty_c uncertainty )

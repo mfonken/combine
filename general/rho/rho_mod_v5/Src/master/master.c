@@ -37,6 +37,10 @@ static void ExitInitialization( void )
   {
     MasterFunctions.Run();
   }
+  else
+  {
+    PlatformFunctions.Wait(250);
+  }
 }
 
 static inline void ApplicationCore( void )
@@ -61,7 +65,10 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t 
   Master.IOs.I2C_Primary = i2c;
   Master.IOs.USART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
-
+  
+   if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
+    Error_Handler();
+  
   MasterFunctions.Init();
 }
 

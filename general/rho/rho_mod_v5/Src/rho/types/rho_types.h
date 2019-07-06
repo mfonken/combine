@@ -26,6 +26,8 @@
 #define YES 1
 #define NO  0
 
+#define MAX_OBSERVATIONS        (1 << 3) // Length of history
+
 #define PACKET_HEADER_SIZE (sizeof(packet_header_t));
 #define PACKET_HEADER_ID    0xab
 
@@ -190,6 +192,20 @@ typedef struct
 
 typedef struct
 {
+    index_t density;
+    uint8_t thresh,
+            label;
+} observation_t;
+
+typedef struct
+{
+    observation_t observations[MAX_OBSERVATIONS];
+    uint8_t length;
+} observation_list_t;
+    
+
+typedef struct
+{
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
     region_t        Regions[MAX_REGIONS];
@@ -238,7 +254,6 @@ typedef struct
 } rho_platform_uart_interace_functions;
 
 #ifndef USE_INTERRUPT_MODEL
-#error "test"
 typedef struct
 {
   void (*Activate)( camera_application_flags * );
@@ -405,7 +420,7 @@ typedef struct
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
 
-    psm_t               PredictiveStateModel;
+//    psm_t               PredictiveStateModel;
 #ifndef __PSM__
     fsm_system_t        StateMachine;
 #endif

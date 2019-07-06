@@ -14,7 +14,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifdef USE_INTERRUPT_MODEL
 #include "rho_interrupt_model.h"
+#endif
+
 #include "rho_structure.h"
 #include "rho_types.h"
 

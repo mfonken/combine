@@ -40,27 +40,28 @@ void STM_InterruptDisable( void )
     HAL_NVIC_DisableIRQ(EXTI1_IRQn);
 }
 
-inline void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
-{
-  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID], src, dst, size) != HAL_OK)
-    Error_Handler();
-  __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
-  __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
-  TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, (uint32_t)init_state);
-  _dma_destination = dst;
-}
 inline void STM_PauseDMA( void )
 {
+  __HAL_TIM_DISABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, TIM_CCx_DISABLE);
 }
 inline void STM_ResumeDMA( void )
 {
+  __HAL_TIM_ENABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
   TIM_CCxChannelCmd(Master.Utilities.Timer_Primary->Instance, RHO_TIM_CHANNEL, TIM_CCx_ENABLE);
 }
 inline void STM_ResetDMA( void )
 {
     if(_dma_destination != NULL)
         Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CMAR = _dma_destination;
+}
+void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
+{
+//  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID], src, dst, size) != HAL_OK)
+//    Error_Handler();
+  __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
+  if(init_state) STM_ResumeDMA();
+  _dma_destination = dst;
 }
 
 inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )

@@ -91,7 +91,7 @@ void CaptureFrame( void )
             (address_t)RhoSystem.Variables.Buffers.Capture,
             (address_t)RhoSystem.Variables.Flags->Row );
         if(--RhoSystem.Variables.Utility.RowsLeft <= 0) break;
-        *(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
+        *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
     } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
 }
 
@@ -274,7 +274,7 @@ void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
 
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
-  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
+//  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
 
 #ifdef DYNAMIC_BUFFER
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture[CAPTURE_WIDTH];

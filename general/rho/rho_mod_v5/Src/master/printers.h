@@ -19,7 +19,7 @@ enum LogLevel
 };
 #endif
 
-#define CORE_LOG_LEVEL          DEBUG_1
+#define CORE_LOG_LEVEL          ALWAYS
 
 #ifndef LOG
 #define LOG(L,...)              if(L >= CORE_LOG_LEVEL) \
