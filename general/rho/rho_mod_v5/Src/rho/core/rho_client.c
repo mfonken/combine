@@ -82,7 +82,7 @@ void CaptureFrame( void )
     while(!RhoSystem.Variables.Flags->Row);
     do
     {
-        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint8_t)RhoSystem.Variables.Buffers.Capture + (uint8_t)evenRowToggle);
+        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)evenRowToggle);
         CaptureRow(
             (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
             (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
@@ -93,7 +93,7 @@ void CaptureFrame( void )
             (address_t)RhoSystem.Variables.Flags->Row );
         if(--RhoSystem.Variables.Utility.RowsLeft <= 0) break;
         *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
-        oddRowToggle = !oddRowToggle;
+        evenRowToggle = !evenRowToggle;
     } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
 }
 
@@ -252,6 +252,7 @@ void PerformRhoSystemProcess( void )
 void ActivateRhoSystem( void  )
 {
     RhoSystem.Variables.Flags->Active = true;
+    RhoSystem.Variables.Flags->IRQ = true;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
@@ -259,12 +260,13 @@ void DeactivateRhoSystem( void )
 {
     // TODO: zero period
     RhoSystem.Variables.Flags->Active = false;
+    RhoSystem.Variables.Flags->IRQ = false;
     RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 inline void TransmitRhoSystemPacket( void )
 {
-    RhoSystem.Functions.Platform.Host.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
+    //RhoSystem.Functions.Platform.Host.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
 }
 /***************************************************************************************/
 /*                                  Initializers                                       */

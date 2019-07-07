@@ -191,10 +191,10 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* EXTI0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 2);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
   /* EXTI1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 
@@ -350,10 +350,10 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
   /* DMA2_Channel6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
 
 }

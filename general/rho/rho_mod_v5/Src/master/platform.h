@@ -199,7 +199,7 @@ typedef struct
 /***************************************************************************************/
 
 /* Global platform */
-static platform_t Platform;
+extern platform_t Platform;
 
 static platform_interface_functions PlatformFunctions =
 {

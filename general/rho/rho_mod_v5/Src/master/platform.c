@@ -1,5 +1,7 @@
 #include "platform.h"
 
+platform_t Platform;
+
 void InitPlatform( platform_t * platform, protocol_t host_communication_protocol, generic_handle_t host_communication_handle )
 {
   *platform = (platform_t){ host_communication_protocol, host_communication_handle };
