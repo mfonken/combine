@@ -1346,13 +1346,16 @@
         <group>
             <name>OV9712</name>
             <file>
-                <name>$PROJ_DIR$\..\Src\master\OV9712.c</name>
+                <name>$PROJ_DIR$\..\Src\master\OV9712\OV9712.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Src\master\OV9712.h</name>
+                <name>$PROJ_DIR$\..\Src\master\OV9712\OV9712.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\Src\master\OV9712_regs.h</name>
+                <name>$PROJ_DIR$\..\Src\master\OV9712\OV9712_calc.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\master\OV9712\OV9712_regs.h</name>
             </file>
         </group>
         <group>

@@ -42,6 +42,7 @@ void            STM_SetPortMode( GPIO_TypeDef * port, uint16_t pin, uint8_t type
 void            STM_WritePin( GPIO_TypeDef * port, uint16_t pin, uint8_t state );
 uint32_t        STM_Timestamp( void );
 void            STM_Wait( uint32_t );
+uint32_t        STM_SysClockFreq(void);
 
 #endif
 

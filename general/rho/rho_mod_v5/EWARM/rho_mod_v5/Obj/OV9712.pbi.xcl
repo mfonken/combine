@@ -1,9 +1,9 @@
-"C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master\OV9712.c"
+"C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master\OV9712\OV9712.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -I
-C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master
+C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master\OV9712
 -I
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\EWARM/../Inc
 -I
@@ -26,6 +26,8 @@ C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\E
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\EWARM\..\Src\rho\psm
 -I
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\EWARM\..\Src\master\platforms
+-I
+C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\EWARM\..\Src\master\OV9712
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\arm\inc
 -I
@@ -52,6 +54,8 @@ C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\S
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\rho\psm
 -I
 C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master\platforms
+-I
+C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v5\Src\master\OV9712
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0

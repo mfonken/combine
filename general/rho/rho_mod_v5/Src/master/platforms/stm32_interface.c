@@ -31,13 +31,13 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 }
 void STM_InterruptEnable( void )
 {
-    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+//    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+//    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 }
 void STM_InterruptDisable( void )
 {
-    HAL_NVIC_DisableIRQ(EXTI0_IRQn);
-    HAL_NVIC_DisableIRQ(EXTI1_IRQn);
+//    HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+//    HAL_NVIC_DisableIRQ(EXTI1_IRQn);
 }
 
 inline void STM_PauseDMA( void )
@@ -108,4 +108,9 @@ inline uint32_t STM_Timestamp(void)
 inline void STM_Wait( uint32_t nTime )
 {
   HAL_Delay( nTime );
+}
+
+inline uint32_t STM_SysClockFreq(void)
+{
+  return HAL_RCC_GetSysClockFreq();
 }

@@ -16,11 +16,11 @@
 #define USE_RGGB_G_SKIP
 
 /// TODO: Get actual CORE_RATE
-#define CORE_RATE                   80000000
+#define CORE_RATE                   PlatformFunctions.Clock.SysClockFreq()
 
 #define SUBSAMPLE_APPLICATION       3
 #define PERCENT_ACTIVE_APPLICATION  0.34
-#define DEFAULT_FRAME_APPLICATION   24
+#define DEFAULT_FRAME_APPLICATION   10//24
 
 #ifdef USE_RGGB_G_SKIP
 #define SUBSAMPLE_BASE              2
@@ -112,14 +112,14 @@
 
 #define ELEMENTS_TO_PROCESS         ( TOTAL_PIXELS + FRAME_HEIGHT )
 #define PROCESS_AVG_CYCLES          ( ( (double)PROCESS_ALL_CYCLES * (double)ELEMENTS_TO_PROCESS ) \
-                                    + ( (double)PROCESS_PIXEL_CYCLES * (double)TOTAL_PIXELS ) \
-                                    + ( (double)FRAME_HEIGHT * (double)PROCESS_ROW_CYCLES ) )
+                                      + ( (double)PROCESS_PIXEL_CYCLES * (double)TOTAL_PIXELS ) \
+                                      + ( (double)FRAME_HEIGHT * (double)PROCESS_ROW_CYCLES ) )
 #define PROCESS_AVG_DUR_SEC         ( (double)PROCESS_AVG_CYCLES / (double)CORE_RATE )
 #define TOTAL_PROCESS_DUR_SEC       ( (double)TOTAL_CAPTURES_DUR_SEC + (double)PROCESS_AVG_DUR_SEC )
 #define MID_FRAME_SLACK             ( (double)MID_FRAME_DUR_SEC + (double)MID_ROWS_DUR_SEC - (double)TOTAL_PROCESS_DUR_SEC )
 #define FRAME_BURNS                 fabs( (double)MID_FRAME_SLACK / (double)FRAME_DUR_SEC )
 #define ACTUAL_FRAME_RATE           ( MID_FRAME_SLACK >= 0. ? _frameRate \
-: _frameRate / (double)( (uint32_t)(FRAME_BURNS) + 2 ) )
+                                      : _frameRate / (double)( (uint32_t)(FRAME_BURNS) + 2 ) )
 
 #define THRESH_BUFFER_MAX_LENGTH    55000
 
@@ -129,18 +129,18 @@
 #define DENSITY_MAP_X_LENGTH        (uint32_t)( FRAME_HEIGHT + BUFFER_END_PADDING )
 #define DENSITY_MAP_Y_LENGTH        (uint32_t)( FRAME_WIDTH(DEFAULT_SUBSAMPLE) + BUFFER_END_PADDING )
 
-#define    CAMERA_WIDTH_F                FRAME_WIDTH_BASE
-#define CAMERA_HEIGHT_F                FRAME_HEIGHT
-#define CAMERA_WIDTH_MSB             ( ( CAMERA_WIDTH_F  >> 3 ) & 0xff )
+#define CAMERA_WIDTH_F              FRAME_WIDTH_BASE
+#define CAMERA_HEIGHT_F             FRAME_HEIGHT
+#define CAMERA_WIDTH_MSB            ( ( CAMERA_WIDTH_F  >> 3 ) & 0xff )
 #define CAMERA_WIDTH_LSB            ( CAMERA_WIDTH_F  & 0x07 )
-#define CAMERA_HEIGHT_MSB            ( ( CAMERA_HEIGHT_F >> 2 ) & 0xff )
-#define CAMERA_HEIGHT_LSB            ( CAMERA_HEIGHT_F & 0x03 )
-#define REG57_V                        (uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
-#define REG58_V                        (uint8_t)CAMERA_HEIGHT_MSB
-#define REG59_V                        (uint8_t)CAMERA_WIDTH_MSB
+#define CAMERA_HEIGHT_MSB           ( ( CAMERA_HEIGHT_F >> 2 ) & 0xff )
+#define CAMERA_HEIGHT_LSB           ( CAMERA_HEIGHT_F & 0x03 )
+#define REG57_V                     (uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
+#define REG58_V                     (uint8_t)CAMERA_HEIGHT_MSB
+#define REG59_V                     (uint8_t)CAMERA_WIDTH_MSB
 
-#define    CAMERA_WIDTH_R                ( ( ( REG57_V >> 3 ) & 0x07 ) | (REG59_V << 3))
-#define    CAMERA_HEIGHT_R                ( ( REG57_V & 0x03 ) | (REG58_V << 2))
+#define CAMERA_WIDTH_R              ( ( ( REG57_V >> 3 ) & 0x07 ) | (REG59_V << 3))
+#define CAMERA_HEIGHT_R             ( ( REG57_V & 0x03 ) | (REG58_V << 2))
 
 #define REG5C_DEFAULT               0x59 //6a
 #define REG5D_DEFAULT               0xc4 //f4

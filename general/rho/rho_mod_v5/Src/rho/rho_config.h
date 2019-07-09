@@ -37,15 +37,8 @@
 #endif
 
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
-#define CAPTURE_SUB_SAMPLE_BASE 2
+#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
 
-#if IS_RGGB_ELIMINATE_G == true
-#define CAPTURE_SUB_SAMPLE      (CAPTURE_SUB_SAMPLE_BASE * 2)
-#else
-#define CAPTURE_SUB_SAMPLE      CAPTURE_SUB_SAMPLE_BASE
-#endif
-
-//#ifndef USE_INTERRUPT_MODEL
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
 #define CWL                     80
@@ -53,9 +46,8 @@
 
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
-#define THRESH_BUFFER_MAX       ((index_t)(sizeof(index_t)*(index_t)(THRESH_BUFFER_SIZE-CAPTURE_HEIGHT)))
+#define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
 #define DEFAULT_THRESH          0xfa
-#endif
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1

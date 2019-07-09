@@ -94,6 +94,9 @@ void Error_Handler(void);
 #define CAM_EN_GPIO_Port GPIOA
 #define PCLK_Pin GPIO_PIN_3
 #define PCLK_GPIO_Port GPIOB
+#define NCS_Pin GPIO_PIN_4
+#define NCS_GPIO_Port GPIOB
+#define NCS_EXTI_IRQn EXTI4_IRQn
 #define UCK_Pin GPIO_PIN_5
 #define UCK_GPIO_Port GPIOB
 #define UTX_Pin GPIO_PIN_6

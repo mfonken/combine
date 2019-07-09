@@ -168,7 +168,8 @@ typedef struct
 typedef struct
 {
   uint32_t (*Now)( void );
-} platform_interface_time_functions;
+  uint32_t (*SysClockFreq)(void);
+} platform_interface_clock_functions;
 
 typedef struct
 {
@@ -190,7 +191,7 @@ typedef struct
   platform_interface_uart_functions      USART;
   platform_interface_i2c_functions       I2C;
   platform_interface_gpio_functions      GPIO;
-  platform_interface_time_functions      Time;
+  platform_interface_clock_functions     Clock;
   platform_interface_host_functions      Host;
 } platform_interface_functions;
 
@@ -232,7 +233,8 @@ static platform_interface_functions PlatformFunctions =
   .GPIO.SetPortMode     = SetPortMode,
   .GPIO.Write           = WritePin,
 
-  .Time.Now             = PLATFORM_SPECIFIC(Timestamp),
+  .Clock.Now            = PLATFORM_SPECIFIC(Timestamp),
+  .Clock.SysClockFreq   = PLATFORM_SPECIFIC(SysClockFreq),
 
   .Host.Transmit        = TransmitToHost,
   .Host.Receive         = ReceiveFromHost,

@@ -56,7 +56,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 extern TIM_HandleTypeDef htim2;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern USART_HandleTypeDef husart1;
@@ -229,17 +228,17 @@ void EXTI1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel7 global interrupt.
+  * @brief This function handles EXTI line4 interrupt.
   */
-void DMA1_Channel7_IRQHandler(void)
+void EXTI4_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
 
-  /* USER CODE END DMA1_Channel7_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_tim2_ch2_ch4);
-  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
 
-  /* USER CODE END DMA1_Channel7_IRQn 1 */
+  /* USER CODE END EXTI4_IRQn 1 */
 }
 
 /**

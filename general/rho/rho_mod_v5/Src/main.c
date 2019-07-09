@@ -45,7 +45,6 @@
 I2C_HandleTypeDef hi2c1;
 
 TIM_HandleTypeDef htim2;
-DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 
 USART_HandleTypeDef husart1;
 DMA_HandleTypeDef hdma_usart1_tx;
@@ -110,7 +109,7 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  MasterFunctions.Connect( &hi2c1, &htim2, &husart1 );
+  MasterFunctions.Connect( &hi2c1, NULL/*&htim2*/, &husart1 );
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -190,12 +189,18 @@ void SystemClock_Config(void)
   */
 static void MX_NVIC_Init(void)
 {
-  /* EXTI0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 2);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
   /* EXTI1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+  /* EXTI0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 2);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 2, 1);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* DMA2_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 2, 2);
+  HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
 }
 
 /**
@@ -346,15 +351,6 @@ static void MX_DMA_Init(void)
 {
   /* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 2, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
-  /* DMA2_Channel6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 2, 2);
-  HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
 
 }
 
@@ -383,10 +379,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : VSYNC_Pin HREF_Pin */
-  GPIO_InitStruct.Pin = VSYNC_Pin|HREF_Pin;
+  /*Configure GPIO pins : VSYNC_Pin HREF_Pin NCS_Pin */
+  GPIO_InitStruct.Pin = VSYNC_Pin|HREF_Pin|NCS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : MCLK_Pin */
@@ -411,11 +407,9 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(CAM_EN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PB4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
 }
 
