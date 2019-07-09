@@ -2,6 +2,7 @@
 #define OV9712_h
 
 #include "main.h"
+#include "OV9712_calc.h"
 #include "OV9712_regs.h"
 #include "printers.h"
 
@@ -17,9 +18,8 @@ typedef struct
 
 typedef struct
 {
-  uint8_t
-    ADDR;
-  I2C_Handle_t * CAM_I2C_PORT;
+  uint8_t         ADDR;
+  I2C_Handle_t  * CAM_I2C_PORT;
   OV9712_pins_t * Pins;
 } OV9712_t;
 

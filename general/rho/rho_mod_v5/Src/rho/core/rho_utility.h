@@ -25,17 +25,17 @@
 extern "C" {
 #endif
   static dmap_t
-        FOREGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-        FOREGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT],
-        BACKGROUND_DENSITY_MAP_Y[CAPTURE_WIDTH],
-        BACKGROUND_DENSITY_MAP_X[CAPTURE_HEIGHT];
-  
+        FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_LENGTH],
+        FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_X_LENGTH],
+        BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_LENGTH],
+        BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_X_LENGTH];
+
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
     density_2d_t CalculateCentroidRhoUtility( dmap_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
-    
+
     void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
     void InitializeFiltersRhoUtility( rho_core_t * );
     void InitializePredictionRhoUtility( prediction_t *, index_t );
