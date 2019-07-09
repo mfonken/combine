@@ -9,7 +9,12 @@ typedef struct
   uint8_t Value;
 } register_t;
 
-typedef volatile bool   flag_t;
+typedef volatile bool flag_t;
+typedef struct
+{
+    flag_t Flag;
+    void (*Callback)(void);
+} callback_t;
 typedef struct
 {
 flag_t
@@ -18,7 +23,10 @@ flag_t
   Frame,
   Row,
   Backgrounding,
-  UARTBusy;
+  UARTBusy,
+  EvenRowToggle;
+callback_t
+  Capture;
 } camera_application_flags;
 
 //typedef uint32_t *      address_t;

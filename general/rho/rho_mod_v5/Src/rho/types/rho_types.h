@@ -202,7 +202,7 @@ typedef struct
     observation_t observations[MAX_OBSERVATIONS];
     uint8_t length;
 } observation_list_t;
-    
+
 
 typedef struct
 {
@@ -237,7 +237,7 @@ typedef struct
 typedef struct
 {
     density_2d_t left, right;       /* Direction density values */
-    address_t last_addr;
+    bool complete;
 } section_process_t;
 
 typedef struct

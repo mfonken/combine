@@ -8,8 +8,121 @@
 
 #include "rho_client.h"
 
+
  #define __ASSEMBLY_RHO__
 // #define __CHECK_FRAME_FLAG__
+
+rho_system_t RhoSystem =
+{
+    { /* VARIABLES */
+        { /* Utility */
+            { /* Density map pair */
+                { /* Dy */
+                    FOREGROUND_DENSITY_MAP_Y,
+                    BACKGROUND_DENSITY_MAP_Y
+                },
+                { /* Dx */
+                    FOREGROUND_DENSITY_MAP_X,
+                    BACKGROUND_DENSITY_MAP_X
+                }
+            },
+            CAPTURE_WIDTH,
+            CAPTURE_HEIGHT,
+            CAPTURE_SUB_SAMPLE
+        },
+        { 0 },/* Addresses */
+        { 0 },/* Flags */
+        { /* Buffers */
+            _capture_buffer_internal,
+            _thresh_buffer_internal
+        }
+    },
+    { /* FUNCTIONS */
+        { /* Perform */
+            .Initialize         = InitializeRhoSystem,
+            .FrameCapture       = ProcessRhoSystemFrameCapture,
+            .CoreProcess        = PerformRhoSystemProcess,
+            .ConnectToInterface = ConnectRhoSystemPlatformInterface,
+            .TransmitPacket     = TransmitRhoSystemPacket,
+            .Activate           = ActivateRhoSystem,
+            .Deactivate         = DeactivateRhoSystem
+        },
+        { 0 }, /* Platform */
+        { /* Memory */
+            .Zero               = ZeroRhoSystemMemory
+        }
+    }
+};
+
+/* Main application process */
+void PerformRhoSystemProcess( void )
+{
+    if( RhoSystem.Variables.Flags->Active == false ) return;
+    RhoSystem.Functions.Perform.FrameCapture();
+//    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
+//    RhoSystem.Functions.Perform.TransmitPacket();
+}
+
+void ProcessRhoSystemFrameCapture( void )
+{
+    RhoSystem.Functions.Memory.Zero();
+    RhoSystem.Functions.Platform.Interrupt.Enable();
+    CaptureAndProcessFrame();
+    RhoSystem.Functions.Platform.Interrupt.Disable();
+}
+
+void CaptureAndProcessFrame( void )
+{
+    #ifdef __ENABLE_BACKGROUNDING__
+        /* Check for pixel drop event */
+        if( HasPixelCountDrop() ) ActivateBackgrounding();
+        else DeactivateBackgrounding();
+    #endif
+
+    /* Reset buffer indeces */
+    RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
+    RhoSystem.Variables.Addresses.CaptureIndex = RhoSystem.Variables.Addresses.ThreshIndex;
+    RhoSystem.Variables.Flags->EvenRowToggle = false;
+
+    while(!RhoSystem.Variables.Flags->Row);
+    EnableCaptureCallback();
+
+    /* Manually start First Row Capture */
+    CaptureRowHandler();
+
+    section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
+    do{ ProcessedTopSectionData = ProcessFrameSection( RhoSystem.Variables.Utility.Cy );
+    } while( !ProcessedTopSectionData.complete );
+    do{ ProcessedBtmSectionData = ProcessFrameSection( RhoSystem.Variables.Utility.Height );
+    } while( !ProcessedBtmSectionData.complete );
+
+    DisableCaptureCallback();
+
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedTopSectionData.left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = ProcessedTopSectionData.right;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = ProcessedBtmSectionData.left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedBtmSectionData.right;
+}
+
+void CaptureRowHandler( void )
+{
+    RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
+    CaptureRow(
+        (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
+        (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
+        (byte_t)RhoSystem.Variables.Utility.Thresh,
+        (byte_t)RhoSystem.Variables.Utility.Subsample,
+        (address_t)RhoSystem.Variables.Addresses.CaptureEnd,
+        (address_t)RhoSystem.Variables.Buffers.Capture,
+        (address_t)RhoSystem.Variables.Flags->Row );
+    if( ( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
+        || ( --RhoSystem.Variables.Utility.RowsLeft <= 0 ))
+        DisableCaptureCallback();
+
+    *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
+    RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
+}
 
 //__attribute__((naked))
 void CaptureRow( register byte_t * capture_address,   // capture buffer index
@@ -73,36 +186,12 @@ void CaptureRow( register byte_t * capture_address,   // capture buffer index
 #endif
 }
 
-void CaptureFrame( void )
-{
-    /* Reset buffer indeces */
-    RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
-    RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
-    bool evenRowToggle = false;
-    while(!RhoSystem.Variables.Flags->Row);
-    do
-    {
-        RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)evenRowToggle);
-        CaptureRow(
-            (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
-            (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
-            (byte_t)RhoSystem.Variables.Utility.Thresh,
-            (byte_t)RhoSystem.Variables.Utility.Subsample,
-            (address_t)RhoSystem.Variables.Addresses.CaptureEnd,
-            (address_t)RhoSystem.Variables.Buffers.Capture,
-            (address_t)RhoSystem.Variables.Flags->Row );
-        if(--RhoSystem.Variables.Utility.RowsLeft <= 0) break;
-        *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
-        evenRowToggle = !evenRowToggle;
-    } while( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax );
-}
-
-section_process_t ProcessFrameSection( const address_t t_start, const index_t rows )
+section_process_t ProcessFrameSection( const index_t rows )
 {
     register uint32_t
         value_register      = 0,
         calc_register       = 0,
-        t_addr              = (uint32_t)t_start,
+        t_addr              = (uint32_t)RhoSystem.Variables.Addresses.CaptureIndex,
         t_last              = (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex,
         Cx                  = (uint32_t)RhoSystem.Variables.Utility.Cx,
         Dy                  = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.y.map,
@@ -113,8 +202,10 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
         Q_left              = 0,
         Q_right             = 0;
 
+    bool complete = false;
+
 #ifndef __ASSEMBLY_RHO__
-    while( t_addr < t_end )
+    while( t_addr <= t_end )
     {
         value_register = *(address_t)t_addr++;
         if(value_register < CAPTURE_BUFFER_WIDTH)
@@ -130,7 +221,11 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
             Q_total = Q_left + Q_right;
             *(((address_t)Dx_i)++) = Q_total - Q_prev;
             Q_prev = Q_total;
-            if( Dx_i >= Dx_end ) break;
+            if( Dx_i >= Dx_end )
+            {
+                complete = true;
+                break;
+            }
         }
     }
 #else
@@ -177,7 +272,7 @@ section_process_t ProcessFrameSection( const address_t t_start, const index_t ro
         "r"(Q_right)            // %11
     );
 #endif
-    return (section_process_t){ Q_left, Q_right, (address_t)t_addr };
+    return (section_process_t){ Q_left, Q_right, complete };
 }
 
 void ActivateBackgrounding( void )
@@ -210,45 +305,6 @@ inline bool HasPixelCountDrop( void )
     return ( *PixelCount < FactoredOldCount );
 }
 
-void ProcessFrame()
-{
-#ifdef __ENABLE_BACKGROUNDING__
-    /* Check for pixel drop event */
-    if( HasPixelCountDrop() ) ActivateBackgrounding();
-    else DeactivateBackgrounding();
-#endif
-
-    address_t t_addr = (address_t)RhoSystem.Variables.Buffers.Thresh;
-    section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
-    ProcessedTopSectionData = ProcessFrameSection( t_addr,
-                                                   RhoSystem.Variables.Utility.Cy );
-    ProcessedBtmSectionData = ProcessFrameSection( ProcessedTopSectionData.last_addr,
-                                                   RhoSystem.Variables.Utility.Height );
-
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedTopSectionData.left;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = ProcessedTopSectionData.right;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = ProcessedBtmSectionData.left;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedBtmSectionData.right;
-}
-
-void ProcessRhoSystemFrameCapture( void )
-{
-    RhoSystem.Functions.Memory.Zero();
-    RhoSystem.Functions.Platform.Interrupt.Enable();
-    CaptureFrame();
-    RhoSystem.Functions.Platform.Interrupt.Disable();
-    ProcessFrame();
-}
-
-/* Main application process */
-void PerformRhoSystemProcess( void )
-{
-    if( RhoSystem.Variables.Flags->Active == false ) return;
-    RhoSystem.Functions.Perform.FrameCapture();
-//    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
-//    RhoSystem.Functions.Perform.TransmitPacket();
-}
-
 void ActivateRhoSystem( void  )
 {
     RhoSystem.Variables.Flags->Active = true;
@@ -273,28 +329,31 @@ inline void TransmitRhoSystemPacket( void )
 /***************************************************************************************/
 void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
 {
-    /* Connect global rho timestamp */
-    DeactivateBackgrounding();
-
+    /* Connect camera/hardware connection */
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
-//  RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
+    RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
 
-#ifdef DYNAMIC_BUFFER
-    RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture[CAPTURE_WIDTH];
-#else
+    /* Connect capture and processing buffers */
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture;
-#endif
     RhoSystem.Variables.Addresses.CaptureMax  = (address_t)RhoSystem.Variables.Buffers.Capture[THRESH_BUFFER_SIZE];
     RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh[THRESH_BUFFER_MAX];
     RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
 
+    /* Initialize beacon */
     RhoSystem.Variables.Buffers.BeaconPacket  = malloc( sizeof( packet_t ) );
     RhoSystem.Variables.Buffers.BeaconPacket->header.ID = BEACON_PACKET_ID;
     RhoSystem.Variables.Buffers.BeaconPacket->header.includes = BEACON_DEFAULT_PERIOD;
 
+    /* Initialize Rho Core */
     RhoSystem.Functions.Memory.Zero();
     RhoCore.Initialize( &RhoSystem.Variables.Utility, CAPTURE_WIDTH, CAPTURE_HEIGHT );
+
+    /* Connect caputre callback */
+    RhoSystem.Variables.Flags->Capture.Callback = RhoSystem.Functions.Perform.CaptureCallback;
+
+    /* Start with backgrounding disabled */
+    DeactivateBackgrounding();
 }
 
 void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_interface, camera_application_flags * flags )

@@ -15,6 +15,10 @@
 /************************************************************************
  *                      Global Function Prototypes                      *
  ***********************************************************************/
+void PerformRhoSystemProcess( void );
+void ProcessRhoSystemFrameCapture( void );
+void CaptureAndProcessFrame( void );
+void CaptureRowHandler( void );
 void CaptureRow( register byte_t *,
                       register index_t *,
                       const register byte_t,
@@ -22,21 +26,20 @@ void CaptureRow( register byte_t *,
                       const register address_t,
                       const register address_t,
                       const register address_t );
-void CaptureFrame( void );
-section_process_t ProcessFrameSection( const address_t, const index_t );
+section_process_t ProcessFrameSection( const index_t );
 void ActivateBackgrounding( void );
 void DeactivateBackgrounding( void );
 void FilterPixelCount( index_t *, index_t );
 bool HasPixelCountDrop( void );
-void ProcessFrame( void );
-void ProcessRhoSystemFrameCapture( void );
-void PerformRhoSystemProcess( void );
 void ActivateRhoSystem( void );
 void DeactivateRhoSystem( void );
 void InitializeRhoSystem( uint32_t, uint32_t );
 void ZeroRhoSystemMemory( void );
 void ConnectRhoSystemPlatformInterface( platform_interface_functions *, camera_application_flags * );
 void TransmitRhoSystemPacket( void );
+
+static inline void EnableCaptureCallback(  void ) { RhoSystem.Variables.Flags->Capture.Flag  = 1; }
+static inline void DisableCaptureCallback( void ) { RhoSystem.Variables.Flags->Capture.Flag  = 0; }
 
 /************************************************************************
  *                      Global Buffers                                  *
@@ -60,7 +63,8 @@ address_t
   ThreshMax,                      /* Shared address of threshold value */
   PixelCount,                     /* Shared address of pixel count value */
   CaptureIndex,                   /* Address capture buffer is processed */
-  ThreshIndex;                   /* Address threshold buffer is filled */
+  ThreshIndex,                    /* Address threshold buffer is filled */
+  ProcessIndex;                   /* Address threhold buffer is processed */
 } rho_system_address_variables;
 
 typedef struct
@@ -121,55 +125,6 @@ typedef struct
     rho_system_functions Functions;
 } rho_system_t;
 
-static rho_system_t RhoSystem =
-{
-    { /* VARIABLES */
-        { /* Utility */
-            { /* Density map pair */
-                { /* Dy */
-                    FOREGROUND_DENSITY_MAP_Y,
-                    BACKGROUND_DENSITY_MAP_Y
-                },
-                { /* Dx */
-                    FOREGROUND_DENSITY_MAP_X,
-                    BACKGROUND_DENSITY_MAP_X
-                }
-            },
-            CAPTURE_WIDTH,
-            CAPTURE_HEIGHT,
-            CAPTURE_SUB_SAMPLE
-        },
-        { 0 },/* Addresses */
-        { 0 },/* Flags */
-        { /* Buffers */
-            _capture_buffer_internal,
-            _thresh_buffer_internal
-        }
-    },
-    { /* FUNCTIONS */
-        { /* Perform */
-            .Initialize         = InitializeRhoSystem,
-            .FrameCapture       = ProcessRhoSystemFrameCapture,
-            .CoreProcess        = PerformRhoSystemProcess,
-            .ConnectToInterface = ConnectRhoSystemPlatformInterface,
-            .TransmitPacket     = TransmitRhoSystemPacket,
-            .Activate           = ActivateRhoSystem,
-            .Deactivate         = DeactivateRhoSystem
-        },
-        { 0 }, /* Platform */
-        { /* Memory */
-            .Zero               = ZeroRhoSystemMemory
-        }
-    }
-};
-
-static inline void   enable(         void ) { RhoSystem.Variables.Flags->Active  = 1; }
-static inline void   disable(        void ) { RhoSystem.Variables.Flags->Active  = 0; }
-static inline void   irqEnable(      void ) { RhoSystem.Variables.Flags->IRQ     = 1; }
-static inline void   irqDisable(     void ) { RhoSystem.Variables.Flags->IRQ     = 0; }
-static inline void   rowFlagSet(     void ) { RhoSystem.Variables.Flags->Row     = 1; }
-static inline void   rowFlagReset(   void ) { RhoSystem.Variables.Flags->Row     = 0; }
-static inline void   frameFlagSet(   void ) { RhoSystem.Variables.Flags->Frame   = 1; }
-static inline void   frameFlagReset( void ) { RhoSystem.Variables.Flags->Frame   = 0; }
+extern rho_system_t RhoSystem;
 
 #endif /* rho_client_h */

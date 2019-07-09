@@ -26,7 +26,6 @@
 #define RHO_HEIGHT              800
 
 /* Capture Config */
-//#define DYNAMIC_BUFFER
 #ifdef USE_INTERRUPT_MODEL
 #define CAPTURE_WIDTH           700
 #define CAPTURE_HEIGHT          700
