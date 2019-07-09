@@ -16,11 +16,11 @@
 #define USE_RGGB_G_SKIP
 
 /// TODO: Get actual CORE_RATE
-#define CORE_RATE                   PlatformFunctions.Clock.SysClockFreq()
+#define CORE_RATE                   48000000//PlatformFunctions.Clock.SysClockFreq()
 
 #define SUBSAMPLE_APPLICATION       3
 #define PERCENT_ACTIVE_APPLICATION  0.34
-#define DEFAULT_FRAME_APPLICATION   10//24
+#define DEFAULT_FRAME_APPLICATION   30//10//24
 
 #ifdef USE_RGGB_G_SKIP
 #define SUBSAMPLE_BASE              2
@@ -142,18 +142,33 @@
 #define CAMERA_WIDTH_R              ( ( ( REG57_V >> 3 ) & 0x07 ) | (REG59_V << 3))
 #define CAMERA_HEIGHT_R             ( ( REG57_V & 0x03 ) | (REG58_V << 2))
 
-#define REG5C_DEFAULT               0x59 //6a
-#define REG5D_DEFAULT               0xc4 //f4
-#define REG11_DEFAULT               0x00
+//#define CALCULATE_CLOCK_FROM_REGISTER_DEFAULTS
+#ifdef CALCULATE_CLOCK_FROM_REGISTER_DEFAULTS
+#define BIT_INDEX_LOOKUP(X)         ( ( X & 0x02 ) ? ( ( X & 0x01 ) ? 0x04 : 0x02 ) : 0x01 )
+#define REG5C_DEFAULT               0x6a                                     /* default is 0x59 */
+#define REG5D_DEFAULT               0xc4                                     /* default is 0xc4 */
+#define REG11_DEFAULT               0x00                                     /* default is 0x00 */
+#define PLL_PRE_DIVIDER             BIT_INDEX_LOOKUP( ( ( REG5C_DEFAULT >> 5 ) & 0x03 ) )
+#define PLL_MULTIPLIER              ( REG5C_DEFAULT & 0x1f )
+#define PLL_DIVIDER                 ( ( REG5D_DEFAULT >> 2 ) & 0x03 )
+#define CLK_DIVIDER                 REG11_DEFAULT
+#else
+#define REVERSE_BIT_LOOKUP(X)       ( ( X == 0x04 ) ? 0x03 : ( ( X == 0x02 ) ? 0x02 : 0x01 ) )
+#define PLL_PRE_DIVIDER             0x04 /* REG5C[6:5]: 1= /1, 2= /2, or 3= /4, default is 0x02 */
+#define PLL_MULTIPLIER              0x19 /* REG5C[4:0]: 32- 0-31,               default is 0x19 */
+#define PLL_DIVIDER                 0x01 /* REG5D[3:2]: 0-3 +1,                 default is 0x01 */
+#define CLK_DIVIDER                 0x00 /* REG11[5:0]: 0-63,                   default is 0x00 */
+#define PLL_BYPASS                  (uint8_t)true /* true(1)/false(0)           default is true */
+#define DRIVE_CAPABILITY            (uint8_t)0x03 /* 0-3 +1,                    default is 0x00 */
+#define REG5C_V                     (uint8_t)( ( ( REVERSE_BIT_LOOKUP(PLL_PRE_DIVIDER) & 0x03 ) << 5 ) | ( PLL_MULTIPLIER & 0x1f ) )
+#define REG5D_V                     (uint8_t)( ( 1 << 7 ) | ( ( PLL_BYPASS & 0x01 ) << 6 ) | ( ( DRIVE_CAPABILITY & 0x03 ) << 4 ) | ( ( PLL_DIVIDER & 0x03 ) << 2 ) )
+#endif
 
-#define PLL_PRE_DIVIDER             ( ( REG5C_DEFAULT >> 5 ) & 0x03 ) // REG5C[6:5]
-#define PLL_MULTIPLIER              ( REG5C_DEFAULT & 0x1f )          // REG5C[4:0]
-#define PLL_DIVIDER                 ( ( REG5D_DEFAULT >> 2 ) & 0x03 ) // REG5D[3:2]
-#define CLK_DIVIDER                 REG11_DEFAULT                     // REG11[5:0]
-
-#define SYSCLK                      10000000 /// Design clock order
-#define XCLK(X)                     (uint32_t)( ( ( 2. * (double)SYSCLK * (double)PLL_PRE_DIVIDER * (double)( PLL_DIVIDER + 1 ) * (double)( CLK_DIVIDER + 1 ) ) ) / (double)( 32 - PLL_MULTIPLIER ) )
-#define OCLK(X)                     (uint32_t)( ( (double)XCLK(X) / (double)PLL_PRE_DIVIDER ) * (double)( 32 - PLL_MULTIPLIER ) )
+#define MAX_XCLK_RATE               27000000
+#define BASE_SYS_SCALE              ( (double)MAX_XCLK_RATE / (double)MAX_FRAME_RATE )
+#define XCLK(X)                     (uint32_t)( (double)X * BASE_SYS_SCALE )
+#define CLK2(X)                     (uint32_t)( PLL_BYPASS ? 0 : ( (double)XCLK(X) / (double)PLL_PRE_DIVIDER ) * (double)( 32 - PLL_MULTIPLIER ) )
+#define SYSCLK(X)                   (uint32_t)( PLL_BYPASS ? (double)XCLK(X) : CLK2(X) / ( (double)( PLL_DIVIDER + 1) * ( 2. * (double)( CLK_DIVIDER + 1 ) ) ) )
 
 static uint8_t _subSample           = DEFAULT_SUBSAMPLE;
 static double _percentActive        = DEFAULT_PERCENT_ACTIVE;
