@@ -18,7 +18,7 @@
 void PerformRhoSystemProcess( void );
 void ProcessRhoSystemFrameCapture( void );
 void CaptureAndProcessFrame( void );
-void CaptureRowHandler( void );
+void CaptureRowCallback( void );
 void CaptureRow( register byte_t *,
                       register index_t *,
                       const register byte_t,
@@ -37,9 +37,6 @@ void InitializeRhoSystem( uint32_t, uint32_t );
 void ZeroRhoSystemMemory( void );
 void ConnectRhoSystemPlatformInterface( platform_interface_functions *, camera_application_flags * );
 void TransmitRhoSystemPacket( void );
-
-static inline void EnableCaptureCallback(  void ) { RhoSystem.Variables.Flags->Capture.Flag  = 1; }
-static inline void DisableCaptureCallback( void ) { RhoSystem.Variables.Flags->Capture.Flag  = 0; }
 
 /************************************************************************
  *                      Global Buffers                                  *
@@ -96,6 +93,7 @@ typedef struct
 typedef struct
 {
     void (*Initialize)( uint32_t, uint32_t );
+    void (*CaptureRowCallback)( void );
     void (*FrameCapture)( void );
     void (*CoreProcess)( void );
     void (*ConnectToInterface)( platform_interface_functions *, camera_application_flags * );
@@ -126,5 +124,8 @@ typedef struct
 } rho_system_t;
 
 extern rho_system_t RhoSystem;
+
+static inline void EnableCaptureCallback(  void ) { RhoSystem.Variables.Flags->Capture.Flag  = 1; }
+static inline void DisableCaptureCallback( void ) { RhoSystem.Variables.Flags->Capture.Flag  = 0; }
 
 #endif /* rho_client_h */

@@ -23,9 +23,9 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
         Platform.CameraFlags.Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin );
         /* Row capture is callback connected on HREF=HIGH */
         if( Platform.CameraFlags.Row
-         && Platform.CameraPort.Capture.Flag
-         && Platform.CameraPort.Capture.Callback != NULL )
-            Platform.CameraPort.Capture.Callback();
+         && Platform.CameraFlags.Capture.Flag
+         && Platform.CameraFlags.Capture.Callback != NULL )
+            Platform.CameraFlags.Capture.Callback();
         break;
     default:
         return;

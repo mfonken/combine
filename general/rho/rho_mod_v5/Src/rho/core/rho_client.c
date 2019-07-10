@@ -40,6 +40,7 @@ rho_system_t RhoSystem =
     { /* FUNCTIONS */
         { /* Perform */
             .Initialize         = InitializeRhoSystem,
+            .CaptureRowCallback = CaptureRowCallback,
             .FrameCapture       = ProcessRhoSystemFrameCapture,
             .CoreProcess        = PerformRhoSystemProcess,
             .ConnectToInterface = ConnectRhoSystemPlatformInterface,
@@ -89,7 +90,7 @@ void CaptureAndProcessFrame( void )
     EnableCaptureCallback();
 
     /* Manually start First Row Capture */
-    CaptureRowHandler();
+    CaptureRowCallback();
 
     section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
     do{ ProcessedTopSectionData = ProcessFrameSection( RhoSystem.Variables.Utility.Cy );
@@ -105,7 +106,7 @@ void CaptureAndProcessFrame( void )
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedBtmSectionData.right;
 }
 
-void CaptureRowHandler( void )
+void CaptureRowCallback( void )
 {
     RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
     CaptureRow(
@@ -350,7 +351,7 @@ void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
     RhoCore.Initialize( &RhoSystem.Variables.Utility, CAPTURE_WIDTH, CAPTURE_HEIGHT );
 
     /* Connect caputre callback */
-    RhoSystem.Variables.Flags->Capture.Callback = RhoSystem.Functions.Perform.CaptureCallback;
+    RhoSystem.Variables.Flags->Capture.Callback = RhoSystem.Functions.Perform.CaptureRowCallback;
 
     /* Start with backgrounding disabled */
     DeactivateBackgrounding();

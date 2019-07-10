@@ -66,7 +66,7 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t 
   Master.IOs.USART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
 
-#error "Verify the DMA can be started with extern'd rhosystem in RhoClient"
+#warning "Verify the DMA can be started with extern'd rhosystem in RhoClient"
    // if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
    //  Error_Handler();
 
