@@ -1,11 +1,16 @@
-//
-//  rho_utility.c
-//  Created by Matthew Fonken on 2/7/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_utility.c
+ *  Group: Rho Core
+ ***********************************************************************/
 
+/************************************************************************
+ *                             Includes                                 *
+ ***********************************************************************/
 #include "rho_utility.h"
 
+/************************************************************************
+ *                       Function Definitions                           *
+ ***********************************************************************/
 void CumulateMomentsRhoUtility( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
 #ifdef __USE_RUNNING_AVERAGE__
@@ -96,7 +101,7 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
 
     core->Thresh = (double)(MAX_THRESH - MIN_THRESH) / 2.;
     core->ThreshByte = (byte_t)core->Thresh;
-    
+
     core->DensityMapPair.x.map          = FOREGROUND_DENSITY_MAP_X;
     core->DensityMapPair.x.background   = BACKGROUND_DENSITY_MAP_X;
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;

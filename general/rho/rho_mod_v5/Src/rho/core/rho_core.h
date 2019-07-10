@@ -1,20 +1,23 @@
-//
-//  rho_core.h
-//  pcr
-//
-//  Created by Matthew Fonken on 1/3/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_core.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_core_h
 #define rho_core_h
 
+/************************************************************************
+ *                          Includes                                    *
+ ***********************************************************************/
 #include "rho_utility.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
+/************************************************************************
+ *                       Function Declarations                          *
+ ***********************************************************************/
     void InitializeRhoCore(             rho_core_t *, index_t, index_t );
     void PerformRhoCore(                rho_core_t *, bool );
     void DetectRhoCorePairs(            rho_core_t * );
@@ -23,7 +26,7 @@ extern "C" {
     void UpdateRhoCorePredictions(      rho_core_t * );
     void UpdateRhoCoreThreshold(        rho_core_t * );
     void GenerateRhoCorePacket(         rho_core_t * );
-    
+
     typedef struct
     {
         void (*Initialize)(             rho_core_t *, index_t, index_t );
@@ -37,18 +40,8 @@ extern "C" {
     } rho_core_functions;
 
     /* Rho global functions */
-    static const rho_core_functions RhoCore =
-    {
-        .Initialize = InitializeRhoCore,
-        .Perform = PerformRhoCore,
-        .DetectPairs = DetectRhoCorePairs,
-        .Detect = DetectRhoCore,
-        .UpdatePrediction = UpdateRhoCorePrediction,
-        .UpdatePredictions = UpdateRhoCorePredictions,
-        .UpdateThreshold = UpdateRhoCoreThreshold,
-        .GeneratePacket = GenerateRhoCorePacket
-    };
-    
+    extern const rho_core_functions RhoCore;
+
 #ifdef __cplusplus
 }
 #endif

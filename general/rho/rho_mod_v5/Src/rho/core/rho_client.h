@@ -1,14 +1,14 @@
-//
-//  rho_client.h
-//  rho_client
-//
-//  Created by Matthew Fonken on 9/19/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_client.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_client_h
 #define rho_client_h
 
+/************************************************************************
+ *                             Includes                                 *
+ ***********************************************************************/
 #include <stdio.h>
 #include "rho_core.h"
 

@@ -1,17 +1,22 @@
-//
-//  rho_client.c
-//  rho_client
-//
-//  Created by Matthew Fonken on 9/19/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_client.c
+ *  Group: Rho Core
+ ***********************************************************************/
 
+/************************************************************************
+ *                             Includes                                 *
+ ***********************************************************************/
 #include "rho_client.h"
 
-
+/************************************************************************
+ *                        Local Configuration                           *
+ ***********************************************************************/
  #define __ASSEMBLY_RHO__
 // #define __CHECK_FRAME_FLAG__
 
+/************************************************************************
+ *                          Local Instance                              *
+ ***********************************************************************/
 rho_system_t RhoSystem =
 {
     { /* VARIABLES */
@@ -55,6 +60,9 @@ rho_system_t RhoSystem =
     }
 };
 
+/************************************************************************
+ *                      Functions Declarations                          *
+ ***********************************************************************/
 /* Main application process */
 void PerformRhoSystemProcess( void )
 {
@@ -74,11 +82,11 @@ void ProcessRhoSystemFrameCapture( void )
 
 void CaptureAndProcessFrame( void )
 {
-    #ifdef __ENABLE_BACKGROUNDING__
-        /* Check for pixel drop event */
-        if( HasPixelCountDrop() ) ActivateBackgrounding();
-        else DeactivateBackgrounding();
-    #endif
+#ifdef __ENABLE_BACKGROUNDING__
+    /* Check for pixel drop event */
+    if( HasPixelCountDrop() ) ActivateBackgrounding();
+    else DeactivateBackgrounding();
+#endif
 
     /* Reset buffer indeces */
     RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
@@ -86,10 +94,8 @@ void CaptureAndProcessFrame( void )
     RhoSystem.Variables.Addresses.CaptureIndex = RhoSystem.Variables.Addresses.ThreshIndex;
     RhoSystem.Variables.Flags->EvenRowToggle = false;
 
-    while(!RhoSystem.Variables.Flags->Row);
-    EnableCaptureCallback();
-
     /* Manually start First Row Capture */
+    while(!RhoSystem.Variables.Flags->Row);
     CaptureRowCallback();
 
     section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
@@ -108,6 +114,7 @@ void CaptureAndProcessFrame( void )
 
 void CaptureRowCallback( void )
 {
+    DisableCaptureCallback();
     RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
     CaptureRow(
         (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
@@ -117,12 +124,13 @@ void CaptureRowCallback( void )
         (address_t)RhoSystem.Variables.Addresses.CaptureEnd,
         (address_t)RhoSystem.Variables.Buffers.Capture,
         (address_t)RhoSystem.Variables.Flags->Row );
-    if( ( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
-        || ( --RhoSystem.Variables.Utility.RowsLeft <= 0 ))
-        DisableCaptureCallback();
-
-    *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
+        *(index_t *)(RhoSystem.Variables.Addresses.ThreshIndex++) = Y_DEL;
     RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
+
+    /* Only re-enable capture if buffers are not full and there is more to process */
+    if( ( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
+        && ( --RhoSystem.Variables.Utility.RowsLeft > 0 ))
+        EnableCaptureCallback();
 }
 
 //__attribute__((naked))

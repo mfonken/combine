@@ -1,9 +1,7 @@
-//
-//  rho_config.h
-//
-//  Created by Matthew Fonken on 9/19/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_config.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_config_h
 #define rho_config_h

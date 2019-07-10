@@ -6,11 +6,17 @@
 #ifndef _OV9712_H    /* Guard against multiple inclusion */
 #define _OV9712_H
 
-#include <stdint.h>	 
+/************************************************************************
+ *                           Includes                                   *
+ ***********************************************************************/
+#include <stdint.h>
 
+/************************************************************************
+ *                        OV9712 Registers                              *
+ ***********************************************************************/
 #define OV9712_ADDR     0x60
 
-//<editor-fold defaultstate="collapsed" desc="OV9712 Registers">  
+//<editor-fold defaultstate="collapsed" desc="OV9712 Registers">
 #define GAIN		 	0x00
 #define BLUE		 	0x01
 #define RED     	    0x02

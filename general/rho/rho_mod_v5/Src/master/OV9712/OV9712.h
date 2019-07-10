@@ -1,11 +1,17 @@
 #ifndef OV9712_h
 #define OV9712_h
 
+/************************************************************************
+ *                             Includes                      *
+ ***********************************************************************/
 #include "main.h"
 #include "OV9712_calc.h"
 #include "OV9712_regs.h"
 #include "printers.h"
 
+/************************************************************************
+ *                             Local Types                              *
+ ***********************************************************************/
 typedef struct
 {
   /* Pins */
@@ -23,6 +29,9 @@ typedef struct
   OV9712_pins_t * Pins;
 } OV9712_t;
 
+/************************************************************************
+ *                             Local Functions                              *
+ ***********************************************************************/
 void OV9712_Init( OV9712_t *, I2C_Handle_t *, OV9712_pins_t * );
 void OV9712_Write( OV9712_t *, uint8_t, uint8_t );
 void OV9712_Enable( OV9712_t * );
@@ -36,7 +45,6 @@ typedef struct
   void (*Disable)(  OV9712_t * );
 } OV9712_functions;
 
-
 static OV9712_functions OV9712_Functions =
 {
   .Init = OV9712_Init,
@@ -45,6 +53,9 @@ static OV9712_functions OV9712_Functions =
   .Disable = OV9712_Disable
 };
 
+/************************************************************************
+ *                       Local Instances                                *
+ ***********************************************************************/
 static OV9712_pins_t Default_OV9712_Pins =
 {
   { CAM_EN_GPIO_Port,   CAM_EN_Pin }, // ENABLE

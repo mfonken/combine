@@ -1,13 +1,33 @@
-//
-//  rho_core.c
-//  Created by Matthew Fonken on 2/7/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
-
+/************************************************************************
+ *  File: rho_core.h
+ *  Group: Rho Core
+ ***********************************************************************/
+ 
+/************************************************************************
+ *                          Includes                                    *
+ ***********************************************************************/
 #include "rho_core.h"
 
+/************************************************************************
+ *                       Local Instance                                 *
+ ***********************************************************************/
+static const rho_core_functions RhoCore =
+{
+    .Initialize = InitializeRhoCore,
+    .Perform = PerformRhoCore,
+    .DetectPairs = DetectRhoCorePairs,
+    .Detect = DetectRhoCore,
+    .UpdatePrediction = UpdateRhoCorePrediction,
+    .UpdatePredictions = UpdateRhoCorePredictions,
+    .UpdateThreshold = UpdateRhoCoreThreshold,
+    .GeneratePacket = GenerateRhoCorePacket
+};
+
+/************************************************************************
+ *                      Functions Declarations                          *
+ ***********************************************************************/
 void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
-{ 
+{
     /* Generic Data */
     RhoUtility.Initialize.Data( core, width, height );
 
@@ -21,7 +41,7 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Prediction Structures */
     RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
     RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
-    
+
 #ifdef USE_INTERRUPT_MODEL
     /* Frame Conversion Model Connection */
     RhoInterrupts.INIT_FROM_CORE( core );

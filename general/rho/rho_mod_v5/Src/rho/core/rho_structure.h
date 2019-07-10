@@ -1,10 +1,7 @@
-//
-//  rho_structure.h
-//  rho_client
-//
-//  Created by Matthew Fonken on 12/12/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_structure.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_structure_h
 #define rho_structure_h

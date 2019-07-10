@@ -1,6 +1,14 @@
+/************************************************************************
+ *  File: global_types.h
+ *  Group: PCR Core
+ ***********************************************************************/
+
 #ifndef global_types_h
 #define global_types_h
 
+/***************************************************************************************/
+/*                                    Includes                                         */
+/***************************************************************************************/
 #include "resources.h"
 
 typedef struct
@@ -29,7 +37,7 @@ callback_t
   Capture;
 } camera_application_flags;
 
-//typedef uint32_t *      address_t;
-typedef uint32_t *      generic_handle_t;
+//typedef uint32_t * address_t;
+typedef uint32_t * generic_handle_t;
 
 #endif /* global_types_h */

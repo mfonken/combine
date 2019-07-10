@@ -1,10 +1,7 @@
-//
-//  rho_interrupt.h
-//  tau+
-//
-//  Created by Matthew Fonken on 3/31/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_interrupt_model.h
+ *  Group: Tau+
+ ***********************************************************************/
 
 #ifndef rho_interrupt_model_h
 #define rho_interrupt_model_h
@@ -20,10 +17,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
     void RIM_PERFORM_RHO_C( cimage_t );
     void RIM_PERFORM_RHO_FUNCTION( cimage_t );
-    
+
     void RIM_INIT_FROM_CORE( rho_core_t * );
     void RIM_FRAME_INIT(  void );
     void RIM_FRAME_START( void );
@@ -31,7 +28,7 @@ extern "C" {
     void RIM_ROW_INT(     void );
     void RIM_PCLK_INT(    void );
     void RIM_LOOP_THREAD( void * );
-    
+
     typedef struct rho_interrupts rho_interrupts;
     struct rho_interrupts
     {
@@ -55,7 +52,7 @@ extern "C" {
         .LOOP_THREAD = RIM_LOOP_THREAD,
         .RHO_FUNCTION = RIM_PERFORM_RHO_FUNCTION
     };
-    
+
     typedef struct
     {
         uint32_t
@@ -65,11 +62,11 @@ extern "C" {
         y_delimiter,
         W,
         H;
-        
+
         pthread_t       loop_thread;
         pthread_mutex_t rho_int_mutex;
     } rho_global_variables;
-    
+
     typedef struct
     {
         index_t
@@ -86,7 +83,7 @@ extern "C" {
         QS,
         PTOG;
     } rho_register_variables;
-    
+
     typedef struct
     {
         dmap_t
@@ -108,7 +105,7 @@ extern "C" {
         *C_FRAME_END,
         *CAM_PORT;
     } rho_sram_variables;
-    
+
     typedef struct
     {
         bool connected;
@@ -116,13 +113,12 @@ extern "C" {
         rho_register_variables  registers;
         rho_sram_variables      ram;
     } rho_variables;
-    
+
     extern rho_variables RhoVariables;
-    
+
 #ifdef __cplusplus
 }
 #endif
 
 
 #endif /* rho_interrupt_h */
-

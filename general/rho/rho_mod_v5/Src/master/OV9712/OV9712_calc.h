@@ -9,12 +9,21 @@
 #ifndef OV9712_calc_h
 #define OV9712_calc_h
 
+/************************************************************************
+ *                             Includes                                 *
+ ***********************************************************************/
 #include <stdio.h>
 #include <math.h>
 
+/************************************************************************
+ *                             Settings                                 *
+ ***********************************************************************/
 //#define OV9712_1280x800_CONFIG
 #define USE_RGGB_G_SKIP
 
+/************************************************************************
+ *                      Application Configuration                       *
+ ***********************************************************************/
 /// TODO: Get actual CORE_RATE
 #define CORE_RATE                   48000000//PlatformFunctions.Clock.SysClockFreq()
 
@@ -22,6 +31,9 @@
 #define PERCENT_ACTIVE_APPLICATION  0.34
 #define DEFAULT_FRAME_APPLICATION   30//10//24
 
+/************************************************************************
+ *                        Derived Configuration                         *
+ ***********************************************************************/
 #ifdef USE_RGGB_G_SKIP
 #define SUBSAMPLE_BASE              2
 #else
@@ -37,11 +49,14 @@
 #define BASE_FRAME_SCALE            ( (double)MAX_PCLK_RATE / (double)MAX_FRAME_RATE )
 #define PCLK(X)                     ( (double)X * BASE_FRAME_SCALE )
 
+/************************************************************************
+ *                      OV9712 Datasheet Values                         *
+ * See https://datasheet.lcsc.com/szlcsc/OmniVision-Technologies-OV09712-V28A-1D_C11171.pdf *
+ ***********************************************************************/
 #ifdef OV9712_1280x800_CONFIG
 #define FRAME_WIDTH_BASE            1280
 #define FRAME_HEIGHT                800
 
-/* See https://datasheet.lcsc.com/szlcsc/OmniVision-Technologies-OV09712-V28A-1D_C11171.pdf */
 #define VSYNC_HIGH_TP               33584
 #define VSYNC_LOW_TP                1364080
 #define VSYNC_TOTAL_TP              1397664
@@ -70,6 +85,9 @@
 
 #endif
 
+/************************************************************************
+ *                        Derived OV9712 Values                         *
+ ***********************************************************************/
 #define FRAME_WIDTH(S)              ( (double)FRAME_WIDTH_BASE / (double)S )
 
 #define VSYNC_HIGH                  VSYNC_HIGH_TP           * TP_TO_PCLK
@@ -92,13 +110,18 @@
 #define ACTIVE_PIXELS               ( (uint32_t)( (double)TOTAL_PIXELS * _percentActive ) )
 #define INACTIVE_PIXELS             ( (uint32_t)( (double)TOTAL_PIXELS * ( 1 - _percentActive ) ) )
 
-/* CYCLES */
+/************************************************************************
+ *                              Rho Cycles                              *
+ ***********************************************************************/
 #define CAPTURE_ACTIVE_CYCLES       11
 #define CAPTURE_INACTIVE_CYCLES     6
 #define PROCESS_ALL_CYCLES          4
 #define PROCESS_PIXEL_CYCLES        9
 #define PROCESS_ROW_CYCLES          9
 
+/************************************************************************
+ *                      Derived Rho Values                              *
+ ***********************************************************************/
 #define ACTIVE_CAPTURE_DUR_SEC      ( (double)CAPTURE_ACTIVE_CYCLES / (double)CORE_RATE )
 #define INACTIVE_CAPTURE_DUR_SEC    ( (double)CAPTURE_INACTIVE_CYCLES / (double)CORE_RATE )
 #define TOTAL_CAPTURE_DUR_SEC       ( (double)ACTIVE_CAPTURE_DUR_SEC + (double)INACTIVE_CAPTURE_DUR_SEC )
@@ -121,6 +144,9 @@
 #define ACTUAL_FRAME_RATE           ( MID_FRAME_SLACK >= 0. ? _frameRate \
                                       : _frameRate / (double)( (uint32_t)(FRAME_BURNS) + 2 ) )
 
+/************************************************************************
+ *                      Buffer Parameters                               *
+ ***********************************************************************/
 #define THRESH_BUFFER_MAX_LENGTH    55000
 
 #define BUFFER_END_PADDING          2
@@ -129,6 +155,9 @@
 #define DENSITY_MAP_X_LENGTH        (uint32_t)( FRAME_HEIGHT + BUFFER_END_PADDING )
 #define DENSITY_MAP_Y_LENGTH        (uint32_t)( FRAME_WIDTH(DEFAULT_SUBSAMPLE) + BUFFER_END_PADDING )
 
+/************************************************************************
+ *                 OV9712 Registers & Parameters                        *
+ ***********************************************************************/
 #define CAMERA_WIDTH_F              FRAME_WIDTH_BASE
 #define CAMERA_HEIGHT_F             FRAME_HEIGHT
 #define CAMERA_WIDTH_MSB            ( ( CAMERA_WIDTH_F  >> 3 ) & 0xff )
@@ -170,6 +199,9 @@
 #define CLK2(X)                     (uint32_t)( PLL_BYPASS ? 0 : ( (double)XCLK(X) / (double)PLL_PRE_DIVIDER ) * (double)( 32 - PLL_MULTIPLIER ) )
 #define SYSCLK(X)                   (uint32_t)( PLL_BYPASS ? (double)XCLK(X) : CLK2(X) / ( (double)( PLL_DIVIDER + 1) * ( 2. * (double)( CLK_DIVIDER + 1 ) ) ) )
 
+/************************************************************************
+ *                       Dynamic Calculation                            *
+ ***********************************************************************/
 static uint8_t _subSample           = DEFAULT_SUBSAMPLE;
 static double _percentActive        = DEFAULT_PERCENT_ACTIVE;
 static double _frameRate            = DEFAULT_FRAME_RATE;

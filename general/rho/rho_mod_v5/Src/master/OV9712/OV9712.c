@@ -1,5 +1,11 @@
+/************************************************************************
+ *                             Includes                      *
+ ***********************************************************************/
 #include "OV9712.h"
 
+/************************************************************************
+ *                       Local Configuration                            *
+ ***********************************************************************/
 static register_t OV9712_regs[] =
 {
   {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
@@ -29,6 +35,9 @@ static register_t OV9712_regs[] =
   {ENDR}
 };
 
+/************************************************************************
+ *                      Local Function Definitions                      *
+ ***********************************************************************/
 void OV9712_Init( OV9712_t * ov9712, I2C_Handle_t * i2c_port, OV9712_pins_t * pins )
 {
   ov9712->CAM_I2C_PORT = i2c_port;
@@ -68,6 +77,10 @@ static void OV9712_Disable( OV9712_t * ov9712 )
   PlatformFunctions.GPIO.SetPortMode( &ov9712->Pins->MASTER_CLOCK, GPIO_MODE_INPUT);
 }
 
+/************************************************************************
+ *                       Dummy Configuration                            *
+ ***********************************************************************/
+#ifdef DUMMY
 register_t dummy[] =
 {
   /* Clock Selection */
@@ -199,3 +212,4 @@ register_t dummy[] =
 
   {ENDR}
 };
+#endif

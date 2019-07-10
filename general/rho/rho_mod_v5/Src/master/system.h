@@ -1,3 +1,8 @@
+/************************************************************************
+ *  File: system.h
+ *  Group: PCR Core
+ ***********************************************************************/
+
 #ifndef system_h
 #define system_h
 
@@ -30,7 +35,7 @@ typedef enum
   NUM_SYSTEM_STATES
 } system_state_enum;
 
-static const char * system_state_enum_strings[] = 
+static const char * system_state_enum_strings[] =
 {
   "INITIALIZING",
   "CONNECTING_TO_HOST",

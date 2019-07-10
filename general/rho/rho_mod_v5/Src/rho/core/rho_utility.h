@@ -1,14 +1,14 @@
-//
-//  rho_utility.h
-//  tau+
-//
-//  Created by Matthew Fonken on 2/7/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_utility.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_utility_h
 #define rho_utility_h
 
+/************************************************************************
+ *                             Includes                                 *
+ ***********************************************************************/
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -24,12 +24,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/************************************************************************
+ *                          Static Buffers                              *
+ ***********************************************************************/
   static dmap_t
         FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_LENGTH],
         FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_X_LENGTH],
         BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_LENGTH],
         BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_X_LENGTH];
 
+/************************************************************************
+ *                       Function Declarations                          *
+ ***********************************************************************/
     void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
     density_2d_t CalculateCentroidRhoUtility( dmap_t *, index_t, index_t *, density_t );
@@ -140,6 +146,9 @@ extern "C" {
         rho_utility_calculate_functions Calculate;
     } rho_utility_functions;
 
+/************************************************************************
+ *                         Local Instance                               *
+ ***********************************************************************/
     static const rho_utility_functions RhoUtility =
     {
         .CumulateMoments = CumulateMomentsRhoUtility,

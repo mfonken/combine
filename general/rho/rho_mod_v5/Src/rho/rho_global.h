@@ -1,10 +1,7 @@
-//
-//  rho_global.h
-//  rho_client
-//
-//  Created by Matthew Fonken on 10/22/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: rho_global.h
+ *  Group: Rho Core
+ ***********************************************************************/
 
 #ifndef rho_global_h
 #define rho_global_h
@@ -155,5 +152,5 @@ enum LogLevel
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
-                                
+
 #endif /* rho_global_h */
