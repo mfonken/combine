@@ -238,7 +238,6 @@ typedef struct
 } rho_platform_uart_interace_functions;
 
 #ifndef USE_INTERRUPT_MODEL
-#error "test"
 typedef struct
 {
   void (*Activate)( camera_application_flags * );

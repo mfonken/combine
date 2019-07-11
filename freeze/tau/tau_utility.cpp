@@ -36,8 +36,10 @@ Tau::Tau( const char * name, int width, int height, std::string f, int num, std:
 :
 rho(width, height),
 name(name), width(width), height(height),
-utility(n, f, num, width, height),
-rho_drawer(&rho.core.PredictiveStateModel)
+utility(n, f, num, width, height)
+#ifdef __PSM__
+,rho_drawer(&rho.core.PredictiveStateModel)
+#endif
 {
     utility.init();
     cimageInit(image, width, height);
@@ -83,8 +85,9 @@ void Tau::trigger( void )
         cma(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
-    
+#ifdef __PSM__
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
+#endif
 //    rho.core.Thresh-=1; ///TEST
     rho.core.ThreshByte = (byte_t)rho.core.Thresh;
     if(!(rho.core.ThreshByte % THRESH_FRAME_PRINT_STEP))

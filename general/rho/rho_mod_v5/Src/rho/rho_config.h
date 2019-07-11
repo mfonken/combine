@@ -38,8 +38,10 @@
 
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
-#define CWL                     80
+#define CWL                     80 // CAPTURE_BUFFER_WIDTH
 #define CAPTURE_BUFFER_SIZE     CAPTURE_BUFFER_LENGTH
+
+#define SS                      6 // DEFAULT_SUBSAMPLE
 
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH

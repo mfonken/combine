@@ -50,7 +50,7 @@ static std::string pto_string(const T a_value, const int n = 6)
     return out.str();
 }
 
-
+#ifdef __PSM__
 class RhoDrawer
 {
     uint16_t counter = 0;
@@ -64,6 +64,6 @@ public:
     
     Mat& GetDetectionMapFrame() {return detection_map_frame;}
 };
-
+#endif
 
 #endif /* rho_drawer_xprm_hpp */

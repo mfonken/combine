@@ -198,8 +198,9 @@ Mat& TauDrawer::GetDensitiesFrame(Mat &M)
     putText(M, to_string(Qf[3]), Point(w-insetb_-RHO_MAPS_INSET, h-inseta_+36), FONT_HERSHEY_PLAIN, fontsize_, fontcolorc_, 4);
     
     putText(M, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
+#ifdef __PSM__
     putText(M, "State: " + string(stateString(rho.core.PredictiveStateModel.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
-    
+#endif
     putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
     line(M, Point(rho.core.Cx, rho.core.Cy), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
     putText(M, "X (" + to_string(rho.core.Cx) + ", " + to_string(rho.core.Cy) + ")", Point(rho.core.Cx-9, rho.core.Cy+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
@@ -545,9 +546,11 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     state_P[NUM_STATES] = { 0. },
     x_nu = rho.core.PredictionPair.x.NuRegions,
     y_nu = rho.core.PredictionPair.y.NuRegions;
+#ifdef __PSM__
     state_t state = rho.core.PredictiveStateModel.hmm.A.state;
     for(int i = 0; i < NUM_STATES; i++)
         state_P[i] = rho.core.PredictiveStateModel.hmm.A.probabilities.map[i][state];
+#endif
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
     pid_data[pid_data_x] = rho.core.TargetFilter.value;
@@ -658,12 +661,14 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
         int state_i = 2 + i*2;
         string state_n = "U" + to_string(i);
         Scalar c(RF_COLOR_B);
+#ifdef __PSM__
         if(state_i-1 == state)
         {
             state_i--;
             state_n = "S" + to_string(i);
             c = RF_COLOR_A;
         }
+#endif
         int r = ST_RADIUS*state_P[state_i];
         putText(mat, state_n, Point(x, ST_BAR_Y+2*RF_SPACE), RF_FONT, RF_TEXT_SM, c);
         circle(mat, Point(x+width/2-RF_SPACE,ST_BAR_Y+ST_BAR_MAX/2), r, c, FILLED);

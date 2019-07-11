@@ -26,7 +26,7 @@ using namespace std;
 
 #define IMAGE_TICKS                     31
 
-#define TITLE_STRING                    "PCR Alpha v0.85 xprm"
+#define TITLE_STRING                    "PCR Alpha v0.9 xprm"
 #define GROUP_NAME                      "gradient"
 #define FILE_NAME                       "complex_1"
 #define FILE_TYPE                       ".png"
@@ -43,9 +43,9 @@ using namespace std;
 #define THRESH_FRAME_PRINT_STEP         30
 
 /* GLOBAL SETUP */
-//#define HAS_CAMERA
+#define HAS_CAMERA
 //#define HAS_IMU
-#define HAS_FILE
+//#define HAS_FILE
 //#define HAS_GENERATOR
 
 #ifdef AUTOMATION_RUN
@@ -57,19 +57,20 @@ using namespace std;
 #endif
 
 /* IMAGE PROCESSING */
-#define FRAME_IMAGE_ROOT                "/Users/matthew/Desktop/PersonalResources/TestImages/"
-#define FRAME_SAVE_ROOT                 "/Users/matthew/Desktop/PCRImages/"
+#define FILE_ROOT                       "/Users/matthew/Desktop/"
+#define FRAME_IMAGE_ROOT                FILE_ROOT "PersonalResources/TestImages/"
+#define FRAME_SAVE_ROOT                 FILE_ROOT "PCRImages/"
 
 #define sleep(X) usleep(X*1E6)
 #define KEY_DELAY 1E3/MAIN_FPS
 
-#define FILENAME                        "/Users/matthew/Desktop/p_data.csv"
-#define X_DIM_FILENAME                  "/Users/matthew/Desktop/x_data.csv"
-#define Y_DIM_FILENAME                  "/Users/matthew/Desktop/y_data.csv"
+#define FILENAME                        FILE_ROOT "p_data.csv"
+#define X_DIM_FILENAME                  FILE_ROOT "x_data.csv"
+#define Y_DIM_FILENAME                  FILE_ROOT "y_data.csv"
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
-#define PERF_FILENAME                   "/Users/matthew/Desktop/psm_perf/perf_data.csv"
+#define PERF_FILENAME                   FILE_ROOT "psm_perf/perf_data.csv"
 
 #define DASHBOARD_WIDTH                 10000
 #define DASHBOARD_HEIGHT                FRAME_HEIGHT

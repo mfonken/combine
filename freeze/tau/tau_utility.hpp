@@ -56,7 +56,9 @@ public:
     GlobalPacket        packet;
     pthread_mutex_t     predictions_mutex,
                       * utility_mutex;
+#ifdef __PSM__
     RhoDrawer           rho_drawer;
+#endif
 };
 
 #endif /* tau_utility_hpp */

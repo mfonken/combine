@@ -20,7 +20,6 @@ image(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
 #ifdef HAS_CAMERA
 ,cam(CAMERA_ID)
-,image(Size(width, height), CV_8UC3, Scalar(0,0,0))
 #endif
 {
     has_file = false;
@@ -133,6 +132,7 @@ void ImageUtility::InitCamera()
     if (!cam.isOpened())
     {
         LOG_IU(DEBUG_2, "Could not open or find camera.\n");
+        while(1);
         return;
     }
     cam.read(image);

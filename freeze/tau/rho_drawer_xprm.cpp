@@ -5,6 +5,7 @@
 //  Created by Matthew Fonken on 2/5/19.
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
+#ifdef __PSM__
 
 #include "rho_drawer_xprm.hpp"
 
@@ -61,6 +62,7 @@ void RhoDrawer::DrawDetectionMap( detection_map_t * map )
 }
 void RhoDrawer::PostProcess(psm_t * psm)
 {
+#ifdef __PSM__
     gaussian2d_t gaus;
     double angle;
     for( int j = 0; j < psm->gmm.num_clusters; j++)
@@ -133,4 +135,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
         /*****************/
         //        psm->state_bands.band[0].
     }
+#endif
 }
+
+#endif
