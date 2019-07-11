@@ -24,6 +24,8 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
+extern DMA_HandleTypeDef hdma_tim2_ch2_ch4;
+
 extern DMA_HandleTypeDef hdma_usart1_tx;
 
 /* Private typedef -----------------------------------------------------------*/
@@ -175,9 +177,27 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
     HAL_GPIO_Init(PCLK_GPIO_Port, &GPIO_InitStruct);
 
-    /* TIM2 interrupt Init */
-    HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(TIM2_IRQn);
+    /* TIM2 DMA Init */
+    /* TIM2_CH2_CH4 Init */
+    hdma_tim2_ch2_ch4.Instance = DMA1_Channel7;
+    hdma_tim2_ch2_ch4.Init.Request = DMA_REQUEST_4;
+    hdma_tim2_ch2_ch4.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_tim2_ch2_ch4.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_tim2_ch2_ch4.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_tim2_ch2_ch4.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_tim2_ch2_ch4.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_tim2_ch2_ch4.Init.Mode = DMA_CIRCULAR;
+    hdma_tim2_ch2_ch4.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    if (HAL_DMA_Init(&hdma_tim2_ch2_ch4) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Several peripheral DMA handle pointers point to the same DMA handle.
+     Be aware that there is only one channel to perform all the requested DMAs. */
+    __HAL_LINKDMA(htim_base,hdma[TIM_DMA_ID_CC2],hdma_tim2_ch2_ch4);
+    __HAL_LINKDMA(htim_base,hdma[TIM_DMA_ID_CC4],hdma_tim2_ch2_ch4);
+
   /* USER CODE BEGIN TIM2_MspInit 1 */
 
   /* USER CODE END TIM2_MspInit 1 */
@@ -206,8 +226,9 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
     */
     HAL_GPIO_DeInit(PCLK_GPIO_Port, PCLK_Pin);
 
-    /* TIM2 interrupt DeInit */
-    HAL_NVIC_DisableIRQ(TIM2_IRQn);
+    /* TIM2 DMA DeInit */
+    HAL_DMA_DeInit(htim_base->hdma[TIM_DMA_ID_CC2]);
+    HAL_DMA_DeInit(htim_base->hdma[TIM_DMA_ID_CC4]);
   /* USER CODE BEGIN TIM2_MspDeInit 1 */
 
   /* USER CODE END TIM2_MspDeInit 1 */

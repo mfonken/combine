@@ -13,6 +13,8 @@
  ***********************************************************************/
  #define __ASSEMBLY_RHO__
 // #define __CHECK_FRAME_FLAG__
+   
+volatile uint32_t capture_buffer;
 
 /************************************************************************
  *                          Local Instance                              *
@@ -93,7 +95,8 @@ void CaptureAndProcessFrame( void )
     RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
     RhoSystem.Variables.Addresses.CaptureIndex = RhoSystem.Variables.Addresses.ThreshIndex;
     RhoSystem.Variables.Flags->EvenRowToggle = false;
-
+    
+    capture_buffer = (uint32_t)RhoSystem.Variables.Buffers.Capture;
     /* Manually start First Row Capture */
     while(!RhoSystem.Variables.Flags->Row);
     CaptureRowCallback();
@@ -341,8 +344,8 @@ void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
     /* Connect camera/hardware connection */
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
-    RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, false );
-
+    RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
+    while(1);
     /* Connect capture and processing buffers */
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture;
     RhoSystem.Variables.Addresses.CaptureMax  = (address_t)RhoSystem.Variables.Buffers.Capture[THRESH_BUFFER_SIZE];

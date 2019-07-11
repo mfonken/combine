@@ -11,7 +11,7 @@
 /************************************************************************
  *                       Local Instance                                 *
  ***********************************************************************/
-static const rho_core_functions RhoCore =
+const rho_core_functions RhoCore =
 {
     .Initialize = InitializeRhoCore,
     .Perform = PerformRhoCore,

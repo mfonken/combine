@@ -68,11 +68,12 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t 
   Master.IOs.I2C_Primary = i2c;
   Master.IOs.USART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
-
-#warning "Verify the DMA can be started with extern'd rhosystem in RhoClient"
-   // if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
-   //  Error_Handler();
-
+  
+    for(uint8_t i = 0; i < 0x0a; i++) RhoSystem.Variables.Buffers.Capture[i] = i;
+#warning "TODO: Figure out better capure DMA initializer"
+  if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
+    Error_Handler();
+  
   MasterFunctions.Init();
 }
 

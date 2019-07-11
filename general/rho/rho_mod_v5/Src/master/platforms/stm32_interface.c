@@ -39,13 +39,15 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 }
 void STM_InterruptEnable( void )
 {
-//    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-//    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+  STM_ResumeDMA();
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 void STM_InterruptDisable( void )
 {
-//    HAL_NVIC_DisableIRQ(EXTI0_IRQn);
-//    HAL_NVIC_DisableIRQ(EXTI1_IRQn);
+  STM_PauseDMA();
+  HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+  HAL_NVIC_DisableIRQ(EXTI4_IRQn);
 }
 
 inline void STM_PauseDMA( void )

@@ -23,6 +23,6 @@ typedef struct
   master_utilities_t Utilities;
 } master_t;
 
-static master_t Master;
+extern master_t Master;
 
 #endif
