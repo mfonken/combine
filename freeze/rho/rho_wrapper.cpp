@@ -33,12 +33,12 @@ Rho::Rho( int width, int height ) : width(width), height(height)
         l = sizeof(hidden_markov_model_t),
         m = sizeof(fsm_system_t),
         n = sizeof(psm_t);
-        LOG_RHO(ALWAYS, "\tgmm-%luB\thmm: %luB\tfsm: %luB\tpsm: %luB\n",k,l,m,n);
+        LOG_RHO(ALWAYS, "\tgmm: %luB\thmm: %luB\tfsm: %luB\tpsm: %luB\n",k,l,m,n);
 #else
         ;
 #endif
-    LOG_RHO(ALWAYS, "\tSizes: Frame-%.3fkB RedVar-%luB SelVars-%luB PredVars-%luB Rho-%lukB > Tot-%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
-    LOG_RHO(ALWAYS, "\tdenmapp-%luB\tpredmap: %luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
+    LOG_RHO(ALWAYS, "\tSizes> Frame:%.3fkB RedVar:%luB SelVars:%luB PredVars:%luB Rho:%lukB > Tot:%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
+    LOG_RHO(ALWAYS, "\tdenmapp:%luB\tpredmap:%luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
     

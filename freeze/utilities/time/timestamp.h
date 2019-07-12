@@ -13,15 +13,7 @@
 #include <stdbool.h>
 #include <sys/time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 double TIMESTAMP( void );
 bool ISTIMEDOUT( double, double );
-    
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* timestamp_h */

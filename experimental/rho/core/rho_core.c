@@ -58,12 +58,13 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
     else
     {
+        LOG(RHO_DEBUG, "\n");
         LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
         LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
-        RhoCore.UpdateThreshold( core );
+//        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
+//        RhoCore.UpdateThreshold( core );
 //       LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
 //       RhoCore.GeneratePacket( core );
     }
@@ -93,8 +94,8 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
-    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
-    RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
+//    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
+//    RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
     LOG_RHO(RHO_DEBUG_2, "Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 

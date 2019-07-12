@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "rho_config.h"
-#include "rho_kalman.h"
-#include "rho_pid.h"
 
 #ifdef __PSM__
 #include "psm.h"
@@ -22,11 +19,17 @@
 #include "fsm.h"
 #endif
 
+#include "rho_config.h"
+#include "rho_kalman.h"
+#include "rho_pid.h"
+
 /* Packet Generation Settings */
 #define YES 1
 #define NO  0
 
+#ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 3) // Length of history
+#endif
 
 #define PACKET_HEADER_SIZE (sizeof(packet_header_t));
 #define PACKET_HEADER_ID    0xab
@@ -189,20 +192,6 @@ typedef struct
     floating_t  P[NUM_STATES],
                 confidence;
 } prediction_probabilities;
-
-typedef struct
-{
-    index_t density;
-    uint8_t thresh,
-            label;
-} observation_t;
-
-typedef struct
-{
-    observation_t observations[MAX_OBSERVATIONS];
-    uint8_t length;
-} observation_list_t;
-
 
 typedef struct
 {

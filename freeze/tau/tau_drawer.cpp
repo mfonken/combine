@@ -729,8 +729,6 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
         if(curr_target > PID_MAX_BOUND) PID_MAX_BOUND = curr_target;
         if(curr_target < PID_MIN_BOUND) PID_MIN_BOUND = curr_target;
     }
-//    PID_MAX_BOUND += 0.2;
-    PID_DIFF = PID_MAX_BOUND - PID_MIN_BOUND;
 
 #define SCALE(X) BOUND((X-PID_MIN_BOUND/100.)*100./PID_DIFF*(PID_HEIGHT-PID_TICK_SPACING)+1, 1, PID_HEIGHT)
     // Graph

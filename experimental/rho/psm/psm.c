@@ -177,7 +177,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
             if( processed_clusters & m ) continue;
-            if( model->gmm.cluster[i]->gaussian_in.mean.a > WIDTH ) continue;
+            if( model->gmm.cluster[i]->gaussian_in.mean.a > CAPTURE_WIDTH ) continue;
             check_boundary = model->gmm.cluster[i]->max_y;
             if( check_boundary > min_boundary )
             {

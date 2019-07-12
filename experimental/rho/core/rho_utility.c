@@ -193,7 +193,6 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
                 RhoUtility.Detect.CalculateChaos( _, r );
                 RhoUtility.Detect.ScoreRegions( _, d, r );
                 if(_->rcal_c == 0) _->fden1 = _->fden;
-                LOG(DEBUG_2, "Regions: %d\n", _->blbf);
             } while( _->rcal && ++_->rcal_c < MAX_RHO_RECALCULATION_LEVEL );
 
             RhoUtility.Detect.SortRegions( _, r );
@@ -203,6 +202,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
         r->PreviousDensity[_->cyc] = _->fden1;
         d->max[_->cyc] = _->cmax;
     }
+    LOG(RHO_DEBUG, "Regions: %d\n", _->blbf);
 }
 
 void PredictPeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
@@ -232,7 +232,7 @@ inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t *
     _->fden = 0;
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c, d->map, _->b, d->background)
     {
-        RhoUtility.Detect.SubtractBackground( _ );
+//        RhoUtility.Detect.SubtractBackground( _ );
         RhoUtility.Detect.Region( _, d, r );
     }
 } /* Detect regions - END */
@@ -260,14 +260,14 @@ inline void DetectRegionRhoUtility( rho_detection_variables *_, density_map_t * 
     /* Check if CMA value is in band */
     if( _->c > _->fbandl )
     {
+        /* Update max */
+        if(_->c > _->cmax) _->cmax = _->c;
+        
         /* De-offset valid values */
         _->c -= _->fbandl;
 
         /* Process new values into region */
         RhoUtility.CumulateMoments( (floating_t)_->c, (floating_t)_->x, &_->cavg, &_->mavg, &_->avgc );
-
-        /* Update max */
-        if(_->c > _->cmax) _->cmax = _->c;
 
         /* Increment width */
         _->width++;
@@ -316,6 +316,8 @@ void CalculateChaosRhoUtility( rho_detection_variables *_, prediction_t * r )
     _->chaos = (floating_t)r->PreviousDensity[_->cyc] / (floating_t)_->fden;
     /* Assume no recalculations are needed */
     _->rcal = false;
+    
+    LOG_RHO(RHO_DEBUG, "chaos:%.4f\n", _->chaos);
 }
 
 void ScoreRegionsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
@@ -403,6 +405,14 @@ void SortRegionsRhoUtility( rho_detection_variables *_, prediction_t * r )
         r->RegionsOrder[best_index] = i;
 
         r->Regions[i].srt = true;
+        LOG(RHO_DEBUG, "R%d:{%d,%d,%d,%d} = %.4f\n",
+            i,
+            curr->max,
+            curr->den,
+            curr->loc,
+            curr->wth,
+            curr->scr
+            );
     }
     for(; i < MAX_REGIONS; i++ )
     {
@@ -429,7 +439,7 @@ void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *_, prediction
 void PredictTrackingFiltersRhoUtility( prediction_t * r )
 {
     index_t valid_tracks = RhoUtility.Predict.CalculateValidTracks( r );
-    LOG_RHO( DEBUG_0, "Found %d valid/active tracking filter\n", valid_tracks);
+    LOG_RHO( RHO_DEBUG, "Found %d valid/active tracking filter(s)\n", valid_tracks);
 
     /* Declare essential variables */
     floating_t aa, bb, ab, ba, total_difference = 0., average_difference = 0.;
@@ -531,14 +541,14 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
     /* Activate new filters */
     for( ; n < r->NumRegions && n < MAX_REGIONS; n++ )
     {
-        LOG_RHO( DEBUG_0, "Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[n], n );
+        LOG_RHO( RHO_DEBUG, "Activating filter at index %d[%d]\n", r->TrackingFiltersOrder[n], n );
         RhoKalman.Step( &r->TrackingFilters[r->TrackingFiltersOrder[n]], r->Regions[r->RegionsOrder[n]].loc, 0. );
     }
 
     /* Punish unused ones */
     for( ; m < MAX_TRACKING_FILTERS; m++ )
     {
-        LOG_RHO( DEBUG_0, "Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[m], m );
+        LOG_RHO( RHO_DEBUG, "Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[m], m );
         RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[m]]);
     }
 
@@ -716,7 +726,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     floating_t TotalPixels = (floating_t)core->Width * (floating_t)core->Height;
 #ifdef __PSM__
-    LOG_RHO(ALWAYS, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
+    LOG_RHO(RHO_DEBUG, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
 #else
     switch(core->StateMachine.state)
@@ -749,7 +759,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             break;
     }
     RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
-    LOG_RHO(ALWAYS, "TCF:%.4f | TFV:%.4f\n", core->TargetCoverageFactor, core->ThreshFilter.Value);
+    LOG_RHO(RHO_DEBUG, "TCF:%.4f | TFV:%.4f\n", core->TargetCoverageFactor, core->ThreshFilter.Value);
     core->Tune.state = core->ThreshFilter.Value;
 }
 
@@ -792,7 +802,7 @@ void RedistributeDensitiesRhoUtility( rho_core_t * core )
         }
     };
 
-    LOG_RHO(DEBUG_0, "Redistributing densities.\n");
+    LOG_RHO(RHO_DEBUG, "Redistributing densities.\n");
     redistribution_variables _ =
     {
         { core->Bx, abs(core->Cx-core->Bx), core->Width - core->Cx  },

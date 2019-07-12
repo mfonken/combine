@@ -351,6 +351,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 34001A4B220A92990060DC03;
 			productRefGroup = 34001A55220A92990060DC03 /* Products */;
@@ -443,6 +444,7 @@
 					"$(inherited)",
 					__USE_RUNNING_AVERAGE__,
 					USE_INTERRUPT_MODEL,
+					__PCR__,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

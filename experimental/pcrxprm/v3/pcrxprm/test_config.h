@@ -28,7 +28,7 @@ using namespace std;
 
 #define TITLE_STRING                    "PCR Alpha v0.9 xprm"
 #define GROUP_NAME                      "gradient"
-#define FILE_NAME                       "complex_1"
+#define FILE_NAME                       "double_circle_fade"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 
@@ -43,9 +43,9 @@ using namespace std;
 #define THRESH_FRAME_PRINT_STEP         30
 
 /* GLOBAL SETUP */
-#define HAS_CAMERA
+//#define HAS_CAMERA
 //#define HAS_IMU
-//#define HAS_FILE
+#define HAS_FILE
 //#define HAS_GENERATOR
 
 #ifdef AUTOMATION_RUN

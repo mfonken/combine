@@ -99,18 +99,18 @@
 		347841F0220A979900BC9698 /* detection_map.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = detection_map.c; path = /Users/matthew/Desktop/marbl/Techincal/combine/freeze/rho/xprm/detection_map.c; sourceTree = "<absolute>"; };
 		347841F9220AA44500BC9698 /* rho_drawer_xprm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rho_drawer_xprm.cpp; sourceTree = "<group>"; };
 		347841FA220AA44500BC9698 /* rho_drawer_xprm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rho_drawer_xprm.hpp; sourceTree = "<group>"; };
-		34D03E70222F92340057F73C /* control_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = control_types.h; path = ../../../experimental/statecontrol/control_types.h; sourceTree = "<group>"; };
-		34D03E71222F92340057F73C /* control_structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = control_structures.h; path = ../../../experimental/statecontrol/control_structures.h; sourceTree = "<group>"; };
-		34D03E72222F92350057F73C /* hmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hmm.c; path = ../../../experimental/statecontrol/hmm.c; sourceTree = "<group>"; };
-		34D03E73222F92350057F73C /* hmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hmm.h; path = ../../../experimental/statecontrol/hmm.h; sourceTree = "<group>"; };
-		34D03E74222F92350057F73C /* psm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psm.c; path = ../../../experimental/statecontrol/psm.c; sourceTree = "<group>"; };
-		34D03E75222F92350057F73C /* fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fsm.h; path = ../../../experimental/statecontrol/fsm.h; sourceTree = "<group>"; };
-		34D03E76222F92350057F73C /* gmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gmm.c; path = ../../../experimental/statecontrol/gmm.c; sourceTree = "<group>"; };
-		34D03E77222F92350057F73C /* psm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = psm.h; path = ../../../experimental/statecontrol/psm.h; sourceTree = "<group>"; };
-		34D03E78222F92350057F73C /* fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fsm.c; path = ../../../experimental/statecontrol/fsm.c; sourceTree = "<group>"; };
-		34D03E79222F92350057F73C /* kumaraswamy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kumaraswamy.h; path = ../../../experimental/statecontrol/kumaraswamy.h; sourceTree = "<group>"; };
-		34D03E7A222F92350057F73C /* fsm_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fsm_support.h; path = ../../../experimental/statecontrol/fsm_support.h; sourceTree = "<group>"; };
-		34D03E7B222F92350057F73C /* gmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gmm.h; path = ../../../experimental/statecontrol/gmm.h; sourceTree = "<group>"; };
+		34D03E70222F92340057F73C /* control_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = control_types.h; sourceTree = "<group>"; };
+		34D03E71222F92340057F73C /* control_structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = control_structures.h; sourceTree = "<group>"; };
+		34D03E72222F92350057F73C /* hmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hmm.c; sourceTree = "<group>"; };
+		34D03E73222F92350057F73C /* hmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hmm.h; sourceTree = "<group>"; };
+		34D03E74222F92350057F73C /* psm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = psm.c; sourceTree = "<group>"; };
+		34D03E75222F92350057F73C /* fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fsm.h; sourceTree = "<group>"; };
+		34D03E76222F92350057F73C /* gmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gmm.c; sourceTree = "<group>"; };
+		34D03E77222F92350057F73C /* psm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = psm.h; sourceTree = "<group>"; };
+		34D03E78222F92350057F73C /* fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fsm.c; sourceTree = "<group>"; };
+		34D03E79222F92350057F73C /* kumaraswamy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kumaraswamy.h; sourceTree = "<group>"; };
+		34D03E7A222F92350057F73C /* fsm_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fsm_support.h; sourceTree = "<group>"; };
+		34D03E7B222F92350057F73C /* gmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gmm.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -185,7 +185,8 @@
 				34D03E77222F92350057F73C /* psm.h */,
 				34D03E74222F92350057F73C /* psm.c */,
 			);
-			path = state_control;
+			name = state_control;
+			path = ../../general/statecontrol;
 			sourceTree = "<group>";
 		};
 		34001A66220A92B50060DC03 /* types */ = {

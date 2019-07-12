@@ -8,9 +8,6 @@
 
 #include "rho_global.h"
 
-#define __PCR__
-//#define __PSM__
-
 //#define SPOOF_STATE_BANDS
 
 /***************************************************************************************/
@@ -54,7 +51,7 @@
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
 #define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
-#define DEFAULT_THRESH          0xfa
+#define DEFAULT_THRESH          170//250
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
@@ -85,7 +82,7 @@
 #define MAX_REGION_SCORE      10
 #define REGION_SCORE_FACTOR   0.5
 #define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
-//#define MAX_OBSERVATIONS    1 << 4
+#define MAX_OBSERVATIONS      1 << 4
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
@@ -129,7 +126,7 @@
 #define RHO_TARGET_LS       5.
 #define RHO_TARGET_VU       0.001
 #define RHO_TARGET_BU       0.05
-#define RHO_TARGET_SU       0.0001
+#define RHO_TARGET_SU       0.1
 #define DEFAULT_TARGET_UNCERTAINTY \
 (rho_kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 

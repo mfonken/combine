@@ -57,7 +57,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     
     ReportLabel( &cluster->labels, observation->label );
     
-    cluster->timestamp = timestamp();
+    cluster->timestamp = TIMESTAMP();
 }
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
@@ -192,7 +192,7 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
     {
         gaussian_mixture_cluster_t * cluster = model->cluster[i];
         if( cluster->score < MIN_CLUSTER_SCORE
-           || istimedout( cluster->timestamp, MAX_CLUSTER_LIFETIME )
+           || ISTIMEDOUT( cluster->timestamp, MAX_CLUSTER_LIFETIME )
            || isnan(cluster->log_gaussian_norm_factor))
             GMMFunctions.Model.RemoveCluster( model, i );
     }

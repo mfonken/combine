@@ -32,15 +32,6 @@
 
 using namespace cv;
 
-static double GetCovarianceAngle( mat2x2 * covariance )
-{
-    double a = covariance->a, b = covariance->b, d = covariance->d,
-    a_minus_d = a - d,
-    radius = sqrt( a_minus_d * a_minus_d + 4. * b * b ),
-    lambda = a_minus_d + radius;
-    return atan2( -2 * b, a - lambda ) * 180 / M_PI;
-}
-
 template <typename T>
 static std::string pto_string(const T a_value, const int n = 6)
 {
@@ -51,6 +42,16 @@ static std::string pto_string(const T a_value, const int n = 6)
 }
 
 #ifdef __PSM__
+
+static double GetCovarianceAngle( mat2x2 * covariance )
+{
+    double a = covariance->a, b = covariance->b, d = covariance->d,
+    a_minus_d = a - d,
+    radius = sqrt( a_minus_d * a_minus_d + 4. * b * b ),
+    lambda = a_minus_d + radius;
+    return atan2( -2 * b, a - lambda ) * 180 / M_PI;
+}
+
 class RhoDrawer
 {
     uint16_t counter = 0;
