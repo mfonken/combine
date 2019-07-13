@@ -58,7 +58,7 @@ enum LogLevel
 #endif
 
 #define RHO_DEBUG               DEBUG_2
-#define RHO_DEBUG_2             DEBUG_0
+#define RHO_DEBUG_2             DEBUG_2
 //#define KALMAN_DEBUG
 //#define PACKET_DEBUG
 
@@ -67,8 +67,8 @@ enum LogLevel
 
 //#define HMM_DEBUG               ALWAYS
 //#define GMM_DEBUG               DEBUG_2
-//#define FSM_DEBUG               ALWAYS
-//#define FSM_DEBUG_2             DEBUG_2
+#define FSM_DEBUG               ALWAYS
+#define FSM_DEBUG_2             DEBUG_2
 
 #define TEST_LOG_LEVEL          RHO_DEBUG
 

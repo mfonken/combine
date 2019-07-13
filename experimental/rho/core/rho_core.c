@@ -63,8 +63,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.DetectPairs( core );
         LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-//        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
-//        RhoCore.UpdateThreshold( core );
+        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
+        RhoCore.UpdateThreshold( core );
 //       LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
 //       RhoCore.GeneratePacket( core );
     }
@@ -94,13 +94,14 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
-//    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
-//    RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
+    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
+    RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
     LOG_RHO(RHO_DEBUG_2, "Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 
     /* Calculate accumulated filtered percentage from both axes */
     core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
+    core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
@@ -122,11 +123,15 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
 
     RhoUtility.Predict.GenerateObservationLists( core );
+    
 #ifdef __PSM__
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
 #else
-
+    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
+    double state_intervals[NUM_STATE_GROUPS];
+    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
+    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
 
     prediction_predict_variables _;

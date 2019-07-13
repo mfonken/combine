@@ -7,6 +7,8 @@
 //
 // Description: Predictive State Model
 
+#ifdef __PSM__
+
 #ifndef psm_h
 #define psm_h
 
@@ -66,3 +68,5 @@ static const psm_functions_t PSMFunctions =
 #endif
 
 #endif /* psm_h */
+
+#endif

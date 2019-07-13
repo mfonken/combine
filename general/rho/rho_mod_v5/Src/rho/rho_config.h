@@ -8,9 +8,6 @@
 
 #include "rho_global.h"
 
-#define __PCR__
-//#define __PSM__
-
 //#define SPOOF_STATE_BANDS
 
 /***************************************************************************************/
@@ -36,6 +33,14 @@
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
 
+#if defined __linux || defined __APPLE__
+#define DENSITY_MAP_X_SIZE       CAPTURE_WIDTH
+#define DENSITY_MAP_Y_SIZE       CAPTURE_HEIGHT
+#else
+#define DENSITY_MAP_X_SIZE       DENSITY_MAP_X_LENGTH
+#define DENSITY_MAP_Y_SIZE       DENSITY_MAP_Y_LENGTH
+#endif
+
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
 #define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
 #define CWL                     80 // CAPTURE_BUFFER_WIDTH
@@ -46,7 +51,7 @@
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
 #define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
-#define DEFAULT_THRESH          0xfa
+#define DEFAULT_THRESH          170//250
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
@@ -64,12 +69,12 @@
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20
 
-#define MAX_REGION_HEIGHT     200
-#define RHO_GAP_MAX 10
+#define MAX_REGION_HEIGHT   200
+#define RHO_GAP_MAX         10
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
-#define BACKGROUNDING_PERIOD   10000 // Frames
+#define BACKGROUNDING_PERIOD   100000 // Frames
 
 #define EXPECTED_NUM_REGIONS  2
 #define MAX_REGIONS           4
@@ -77,7 +82,7 @@
 #define MAX_REGION_SCORE      10
 #define REGION_SCORE_FACTOR   0.5
 #define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
-//#define MAX_OBSERVATIONS    1 << 4
+#define MAX_OBSERVATIONS      1 << 4
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
@@ -121,7 +126,7 @@
 #define RHO_TARGET_LS       5.
 #define RHO_TARGET_VU       0.001
 #define RHO_TARGET_BU       0.05
-#define RHO_TARGET_SU       0.0001
+#define RHO_TARGET_SU       0.1
 #define DEFAULT_TARGET_UNCERTAINTY \
 (rho_kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 
@@ -142,10 +147,12 @@
 #define DEFAULT_DERIVATIVE_FACTOR   0.001
 #define DEFAULT_PID_GAIN (rho_pid_gain_t){ DEFAULT_PROPORTIONAL_FACTOR, DEFAULT_INTEGRAL_FACTOR, DEFAULT_DERIVATIVE_FACTOR, 0., 0. }
 
-#define MIN_STATE_CONFIDENCE    0.5
+#define MIN_STATE_CONFIDENCE    0.01 //0.5
 #define BACKGROUND_PERCENT_MIN  0.02
 #define BACKGROUND_COVERAGE_MIN ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
+
+#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
 
 #endif /* rho_config_h */

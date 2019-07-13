@@ -219,7 +219,7 @@ typedef struct
     prediction_probabilities Probabilities;
 
     floating_t      NuRegions,
-                    BestConfidence,
+//                    BestConfidence,
                     AverageDensity;
 } prediction_pair_t;
 
@@ -412,6 +412,7 @@ typedef struct
 #ifdef __PSM__
     psm_t               PredictiveStateModel;
 #else
+    kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;
 #endif
     packet_t            Packet;

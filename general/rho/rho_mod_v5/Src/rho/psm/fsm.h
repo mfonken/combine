@@ -50,11 +50,11 @@ extern "C" {
     
     typedef struct
     {
-        void (*InitializeMap)(       fsm_map_t * );
-        void (*NormalizeMap)(        fsm_map_t * );
-        void (*NormalizeState)(      fsm_map_t *, uint8_t );
-        void (*ResetState)(          fsm_map_t *, uint8_t );
-        void (*Print)(               fsm_map_t *, state_t s );
+        void (*Initialize)(     fsm_map_t * );
+        void (*Normalize)(      fsm_map_t * );
+        void (*NormalizeState)( fsm_map_t *, uint8_t );
+        void (*ResetState)(     fsm_map_t *, uint8_t );
+        void (*Print)(          fsm_map_t *, state_t s );
     } fsm_map_functions_t;
     
     typedef struct
@@ -86,8 +86,8 @@ extern "C" {
     static const fsm_functions_t FSMFunctions =
     {
         { /* Map functions */
-            .InitializeMap          = InitializeFSMMap,
-            .NormalizeMap           = NormalizeFSMMap,
+            .Initialize             = InitializeFSMMap,
+            .Normalize              = NormalizeFSMMap,
             .NormalizeState         = NormalizeFSMState,
             .ResetState             = ResetFSMState,
             .Print                  = PrintFSMMap

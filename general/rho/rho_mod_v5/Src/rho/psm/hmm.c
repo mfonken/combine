@@ -6,6 +6,7 @@
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
 
+#ifdef __PSM__
 #include "hmm.h"
 
 //#define NORMALIZE_BY_STATE
@@ -215,3 +216,5 @@ void PrintObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
         LOG_HMM_BARE(HMM_DEBUG, " = %.3f\n", row_s);
     }
 }
+
+#endif

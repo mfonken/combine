@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "rho_config.h"
-#include "rho_kalman.h"
-#include "rho_pid.h"
 
 #ifdef __PSM__
 #include "psm.h"
@@ -22,11 +19,17 @@
 #include "fsm.h"
 #endif
 
+#include "rho_config.h"
+#include "rho_kalman.h"
+#include "rho_pid.h"
+
 /* Packet Generation Settings */
 #define YES 1
 #define NO  0
 
+#ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 3) // Length of history
+#endif
 
 #define PACKET_HEADER_SIZE (sizeof(packet_header_t));
 #define PACKET_HEADER_ID    0xab
@@ -192,20 +195,6 @@ typedef struct
 
 typedef struct
 {
-    index_t density;
-    uint8_t thresh,
-            label;
-} observation_t;
-
-typedef struct
-{
-    observation_t observations[MAX_OBSERVATIONS];
-    uint8_t length;
-} observation_list_t;
-
-
-typedef struct
-{
     rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
     region_t        Regions[MAX_REGIONS];
@@ -230,7 +219,7 @@ typedef struct
     prediction_probabilities Probabilities;
 
     floating_t      NuRegions,
-                    BestConfidence,
+//                    BestConfidence,
                     AverageDensity;
 } prediction_pair_t;
 
@@ -420,8 +409,10 @@ typedef struct
     rho_kalman_t        TargetFilter;
     detection_map_t     DetectionMap;
 
-//    psm_t               PredictiveStateModel;
-#ifndef __PSM__
+#ifdef __PSM__
+    psm_t               PredictiveStateModel;
+#else
+    kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;
 #endif
     packet_t            Packet;

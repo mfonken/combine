@@ -58,6 +58,7 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
     else
     {
+        LOG(RHO_DEBUG, "\n");
         LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
         LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
@@ -100,6 +101,7 @@ void DetectRhoCorePairs( rho_core_t * core )
 
     /* Calculate accumulated filtered percentage from both axes */
     core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
+    core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
@@ -121,11 +123,15 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
 
     RhoUtility.Predict.GenerateObservationLists( core );
+    
 #ifdef __PSM__
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
 #else
-
+    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
+    double state_intervals[NUM_STATE_GROUPS];
+    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
+    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
 
     prediction_predict_variables _;

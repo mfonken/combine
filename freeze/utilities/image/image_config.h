@@ -19,7 +19,7 @@
 //#define GREYSCALE
 
 #define THRESH_IMAGE
-//#define ROTATE_IMAGE
+#define ROTATE_IMAGE
 
 #define OBJECT_BRIGHTNESS 220
 #define NOISE_BRIGHTNESS 150

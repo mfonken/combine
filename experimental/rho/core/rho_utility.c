@@ -106,6 +106,11 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     core->DensityMapPair.x.background   = BACKGROUND_DENSITY_MAP_X;
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;
     core->DensityMapPair.y.background   = BACKGROUND_DENSITY_MAP_Y;
+    
+#ifndef __PSM__
+    KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1 );
+    FSMFunctions.Sys.Initialize( &core->StateMachine, CHAOTIC );
+#endif
 }
 
 void InitializeFiltersRhoUtility( rho_core_t * core )
@@ -232,7 +237,7 @@ inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t *
     _->fden = 0;
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c, d->map, _->b, d->background)
     {
-//        RhoUtility.Detect.SubtractBackground( _ );
+        RhoUtility.Detect.SubtractBackground( _ );
         RhoUtility.Detect.Region( _, d, r );
     }
 } /* Detect regions - END */
@@ -244,12 +249,12 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_
         _->tden += _->c;
 
         // Subtract background
-        _->c -= _->b;
-
-        /* Punish values above the filter peak */
-        if( ( _->c > _->fpeak )
-           && ( _->fpeak_2 > _->c ) )
-            _->c = _->fpeak_2 - _->c;
+//        _->c -= _->b;
+//
+//        /* Punish values above the filter peak */
+//        if( ( _->c > _->fpeak )
+//           && ( _->fpeak_2 > _->c ) )
+//            _->c = _->fpeak_2 - _->c;
     }
     else
         _->c = 0;
@@ -317,7 +322,7 @@ void CalculateChaosRhoUtility( rho_detection_variables *_, prediction_t * r )
     /* Assume no recalculations are needed */
     _->rcal = false;
     
-    LOG_RHO(RHO_DEBUG, "chaos:%.4f\n", _->chaos);
+//    LOG_RHO(RHO_DEBUG, "chaos:%.4f\n", _->chaos);
 }
 
 void ScoreRegionsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
@@ -521,6 +526,9 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
             }
 
             m++; n++;
+            
+            LOG_RHO(RHO_DEBUG, "Updating %d: %.4f\n", fAi, filterA->value);
+            LOG_RHO(RHO_DEBUG, "Updating %d: %.4f\n", fBi, filterB->value);
         }
 
         /* Account for odd number of and spare regions */
@@ -548,7 +556,7 @@ void PredictTrackingFiltersRhoUtility( prediction_t * r )
     /* Punish unused ones */
     for( ; m < MAX_TRACKING_FILTERS; m++ )
     {
-        LOG_RHO( RHO_DEBUG, "Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[m], m );
+//        LOG_RHO( RHO_DEBUG, "Punishing filter at index %d[%d]\n", r->TrackingFiltersOrder[m], m );
         RhoKalman.Punish(&r->TrackingFilters[r->TrackingFiltersOrder[m]]);
     }
 
@@ -724,7 +732,7 @@ void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * core )
 void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     core->TargetCoverageFactor = core->TargetFilter.value;
-    floating_t TotalPixels = (floating_t)core->Width * (floating_t)core->Height;
+    floating_t TotalPixels = (floating_t)TOTAL_RHO_PIXELS;
 #ifdef __PSM__
     LOG_RHO(RHO_DEBUG, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
@@ -744,9 +752,8 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             if( core->PredictiveStateModel.best_confidence > MIN_STATE_CONFIDENCE )
                 core->TargetCoverageFactor = ZDIV( core->PredictiveStateModel.proposed_nu * core->PredictiveStateModel.proposed_avg_den, TotalPixels );
 #else
-            if( core->PredictionPair.BestConfidence > MIN_STATE_CONFIDENCE )
+            if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
             {
-                core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
                 core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
                 core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity, TotalPixels );
             }

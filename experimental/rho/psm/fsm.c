@@ -16,7 +16,7 @@ static inline void reset_loop_variables( state_global_t * _, uint8_t l )
 
 void InitializeFSMMap( fsm_map_t * bm )
 {
-    LOG_FSM(FSM_DEBUG, "Initializeializing State Machine.\n");
+    LOG_FSM(FSM_DEBUG, "Initializing State Machine.\n");
     reset_loop_variables( &_, NUM_STATES );
     bm->length = NUM_STATES;
     for( ; _.i < _.l; _.i++ )
@@ -69,7 +69,7 @@ void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
     RhoKalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     RhoKalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
     
-    FSMFunctions.Map.InitializeMap( &sys->probabilities );
+    FSMFunctions.Map.Initialize( &sys->probabilities );
 }
 
 void DecayInactiveFSMSystem( fsm_system_t * sys )
@@ -113,6 +113,9 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
     FSMFunctions.Sys.UpdateState( sys );
 //    FSMFunctions.Sys.DecayInactive( sys );
     PrintFSMMap( &sys->probabilities, sys->state );
+    
+    sys->stability.system.timestamp = TIMESTAMP();
+    sys->stability.state.timestamp = TIMESTAMP();
 }
 
 void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )

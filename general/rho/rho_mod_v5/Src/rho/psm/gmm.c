@@ -5,7 +5,7 @@
 //  Created by Matthew Fonken on 2/9/19.
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
-
+#ifdef __PSM__
 #include "gmm.h"
 
 void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
@@ -57,7 +57,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     
     ReportLabel( &cluster->labels, observation->label );
     
-    cluster->timestamp = timestamp();
+    cluster->timestamp = TIMESTAMP();
 }
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
@@ -192,7 +192,7 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
     {
         gaussian_mixture_cluster_t * cluster = model->cluster[i];
         if( cluster->score < MIN_CLUSTER_SCORE
-           || istimedout( cluster->timestamp, MAX_CLUSTER_LIFETIME )
+           || ISTIMEDOUT( cluster->timestamp, MAX_CLUSTER_LIFETIME )
            || isnan(cluster->log_gaussian_norm_factor))
             GMMFunctions.Model.RemoveCluster( model, i );
     }
@@ -237,3 +237,5 @@ void RemovClusterFromGaussianMixtureModel( gaussian_mixture_model_t * model, uin
     // Replace pointer to be removed by the last pointer
     model->cluster[index] = model->cluster[--model->num_clusters];
 }
+
+#endif

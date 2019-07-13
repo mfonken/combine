@@ -6,6 +6,9 @@
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
 
+
+#ifdef __PSM__
+
 #include "psm.h"
 
 void InitializePSM( psm_t * model )
@@ -72,7 +75,6 @@ void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
 
 void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu )
 {
-#ifdef __PSM__
     /* Report tracking observations & update state band knowledge  */
     if( observation_list->length > 0 )
     {
@@ -104,10 +106,6 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
     
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
-#else
-//    floating_t bands[NUM_STATE_GROUPS] = { 0 };
-//    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, bands, &model->state_bands );
-#endif
 }
 
 void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
@@ -179,7 +177,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
             if( processed_clusters & m ) continue;
-            if( model->gmm.cluster[i]->gaussian_in.mean.a > WIDTH ) continue;
+            if( model->gmm.cluster[i]->gaussian_in.mean.a > CAPTURE_WIDTH ) continue;
             check_boundary = model->gmm.cluster[i]->max_y;
             if( check_boundary > min_boundary )
             {
@@ -322,3 +320,5 @@ void GenerateProposalsPSM( psm_t * model )
     model->proposed_secondary_id = cluster->secondary_id;
     model->proposed_nu = GetNumberOfValidLabels( &cluster->labels );
 }
+
+#endif
