@@ -16,15 +16,15 @@
 
 #define IS_RGGB_ELIMINATE_G     true
 
-/* Camera Config */
-#define RHO_WIDTH               1280
-#define RHO_HEIGHT              800
-
 /* Capture Config */
 #ifdef USE_INTERRUPT_MODEL
 #define CAPTURE_WIDTH           700
 #define CAPTURE_HEIGHT          700
 #else
+/* Camera Config */
+#define RHO_WIDTH               1280
+#define RHO_HEIGHT              800
+
 #define CAPTURE_DIV             4
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
@@ -64,7 +64,7 @@
 /***************************************************************************************/
 #define THRESH_STEP_MAX     5
 #define THRESH_MIN          1
-#define THRESH_MAX          254
+#define THRESH_MAX          250
 
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20
@@ -102,7 +102,7 @@
 #define FRAME_QUADRANT_BTM_LEFT_INDEX   2
 #define FRAME_QUADRANT_BTM_RIGHT_INDEX  3
 
-#define TOTAL_RHO_PIXELS    ( RHO_WIDTH * RHO_HEIGHT )
+#define TOTAL_RHO_PIXELS    ( CAPTURE_WIDTH * CAPTURE_HEIGHT )
 
 
 /***************************************************************************************/

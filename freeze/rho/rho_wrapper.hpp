@@ -23,7 +23,7 @@ public:
     bool                backgrounding_event;
     
     Rho( int, int );
-    void Perform( cimage_t&, GlobalPacket * );
+    double Perform( cimage_t&, GlobalPacket * );
     void Generate_Density_Map_Using_Interrupt_Model( const cimage_t, bool );
 };
 

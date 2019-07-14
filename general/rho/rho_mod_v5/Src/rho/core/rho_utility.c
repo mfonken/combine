@@ -207,7 +207,7 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
         r->PreviousDensity[_->cyc] = _->fden1;
         d->max[_->cyc] = _->cmax;
     }
-    LOG(RHO_DEBUG, "Regions: %d\n", _->blbf);
+    LOG_RHO(RHO_DEBUG, "Regions: %d\n", _->blbf);
 }
 
 void PredictPeakFilterRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
@@ -233,11 +233,17 @@ inline bool CalculateBandLowerBoundRhoUtility( rho_detection_variables *_ )
 
 inline void DetectRegionsRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 { /* Detect regions - START */
-    _->tden = 0;
-    _->fden = 0;
+    
+    if( !_->rcal )
+    {
+        _->tden = 0;
+        _->fden = 0;
+    }
+
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->c, d->map, _->b, d->background)
     {
-        RhoUtility.Detect.SubtractBackground( _ );
+        if( !_->rcal )
+            RhoUtility.Detect.SubtractBackground( _ );
         RhoUtility.Detect.Region( _, d, r );
     }
 } /* Detect regions - END */
@@ -410,7 +416,7 @@ void SortRegionsRhoUtility( rho_detection_variables *_, prediction_t * r )
         r->RegionsOrder[best_index] = i;
 
         r->Regions[i].srt = true;
-        LOG(RHO_DEBUG, "R%d:{%d,%d,%d,%d} = %.4f\n",
+        LOG_RHO(RHO_DEBUG, "R%d:{%d,%d,%d,%d} = %.4f\n",
             i,
             curr->max,
             curr->den,
@@ -580,9 +586,7 @@ void SortTrackingFiltersRhoUtility( prediction_t * r )
     index_t i, io, j, jo, best_index = 0;
     /* Score all filters */
     for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
-    {
         RhoKalman.Score( &r->TrackingFilters[i] );
-    }
 
     /* Swap sort - Cycle through found regions */
     for( i = 0; i < MAX_TRACKING_FILTERS; i++)
@@ -728,11 +732,11 @@ void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * core )
     }
     core->Tune.background = background_tune_factor;
 }
-
+    
 void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     core->TargetCoverageFactor = core->TargetFilter.value;
-    floating_t TotalPixels = (floating_t)TOTAL_RHO_PIXELS;
+    core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
 #ifdef __PSM__
     LOG_RHO(RHO_DEBUG, "Current State: %s\n", stateString(core->PredictiveStateModel.current_state));
     switch(core->PredictiveStateModel.current_state)
@@ -745,22 +749,11 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             RhoKalman.Reset( &core->DensityMapPair.x.kalmans[1], core->PredictionPair.x.PreviousPeak[1] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[0], core->PredictionPair.y.PreviousPeak[0] );
             RhoKalman.Reset( &core->DensityMapPair.y.kalmans[1], core->PredictionPair.y.PreviousPeak[1] );
+        case TARGET_POPULATED:
+            RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );
         case OVER_POPULATED:
         case UNDER_POPULATED:
-        case TARGET_POPULATED:
-#ifdef __PSM__
-            if( core->PredictiveStateModel.best_confidence > MIN_STATE_CONFIDENCE )
-                core->TargetCoverageFactor = ZDIV( core->PredictiveStateModel.proposed_nu * core->PredictiveStateModel.proposed_avg_den, TotalPixels );
-#else
-            if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
-            {
-                core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
-                core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity, TotalPixels );
-            }
-#endif
-            else
-                core->TargetCoverageFactor = ZDIV( core->TotalCoverage, TotalPixels );
-            RhoKalman.Step( &core->TargetFilter, core->FilteredPercentage, 0. );
+            RhoUtility.Calculate.TargetCoverageFactor( core );
             break;
         default:
             break;
@@ -770,10 +763,25 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->Tune.state = core->ThreshFilter.Value;
 }
 
-void CalculateTargetTuneFactor( rho_core_t * core )
+void CalculateTargetTuneFactorRhoUtility( rho_core_t * core )
 {
     core->Tune.target = TARGET_TUNE_FACTOR * ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
 }
+    
+void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core )
+{
+    floating_t TotalPixels = (floating_t)TOTAL_RHO_PIXELS;
+#ifdef __PSM__
+    if( core->PredictiveStateModel.best_confidence > MIN_STATE_CONFIDENCE )
+        core->TargetCoverageFactor = ZDIV( core->PredictiveStateModel.proposed_nu * core->PredictiveStateModel.proposed_avg_den, TotalPixels );
+#else
+    if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
+        core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity, TotalPixels );
+#endif
+    else
+        core->TargetCoverageFactor = ZDIV( core->TotalCoverage, TotalPixels );
+}
+
 
 /* Perform density redistribution from combining current frame and background */
 void RedistributeDensitiesRhoUtility( rho_core_t * core )

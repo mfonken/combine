@@ -51,20 +51,26 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     RhoInterrupts.FRAME_INIT();
 }
 
-void Rho::Perform( cimage_t & img, GlobalPacket * p )
+double Rho::Perform( cimage_t & img, GlobalPacket * p )
 {
     pthread_mutex_lock(&c_mutex);
     pthread_mutex_lock(&density_map_pair_mutex);
     
     /* Core Rho Functions */
     Generate_Density_Map_Using_Interrupt_Model( img, backgrounding_event );
+    struct timeval a,b;
+    gettimeofday( &a, NULL);
     RhoCore.Perform( &core, backgrounding_event );
+    gettimeofday( &b, NULL);
+
     /* * * * * * * * * * */
     
     pthread_mutex_unlock(&density_map_pair_mutex);
     memcpy((byte_t *)p, (byte_t*)&core.Packet, sizeof(packet_t));
     backgrounding_event = false; // Generate background always and only once
     pthread_mutex_unlock(&c_mutex);
+    
+    return timeDiff(a,b);
 }
 
 /* Interrupt (Simulated Hardware-Driven) Density map generator */

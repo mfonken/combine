@@ -103,6 +103,7 @@ std::string Tau::serialize( void )
 
 double Tau::perform( cimage_t &img )
 {
+    double p = 0;
     struct timeval a,b;
     gettimeofday( &a, NULL);
     if( ++tick >= BACKGROUNDING_PERIOD )
@@ -115,7 +116,7 @@ double Tau::perform( cimage_t &img )
         
 //        LOG_RHO(DEBUG_1, "Background ready.\n");
         rho.backgrounding_event = true;
-        rho.Perform( img, &packet );
+        p = rho.Perform( img, &packet );
         utility.background_ready = false;
         tick = 0;
         
@@ -123,7 +124,7 @@ double Tau::perform( cimage_t &img )
     }
     else
     {
-        rho.Perform( img, &packet );
+        p = rho.Perform( img, &packet );
         updateThresh();
         updatePrediction();
     }
@@ -134,7 +135,8 @@ double Tau::perform( cimage_t &img )
     current_accuracy = sqrt(Cx*Cx + Cy*Cy);
     
     printPacket(&packet, 4);
-    return timeDiff(a,b);
+//    return timeDiff(a,b);
+    return p;
 }
 
 void Tau::updateThresh()

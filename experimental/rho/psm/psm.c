@@ -153,9 +153,9 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     floating_t spoof_deviation = 40.;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
-        curr = spoof_bands[i] * HEIGHT;
+        curr = spoof_bands[i] * CAPTURE_HEIGHT;
         center = ( curr + prev ) / 2;
-        band_list->band[NUM_STATE_GROUPS - 1 - i] = (band_t){ curr, prev, spoof_deviation, (vec2){ (1 - spoof_bands[i]) * WIDTH, center } };
+        band_list->band[NUM_STATE_GROUPS - 1 - i] = (band_t){ curr, prev, spoof_deviation, (vec2){ (1 - spoof_bands[i]) * CAPTURE_WIDTH, center } };
         prev = curr;
     }
     return;

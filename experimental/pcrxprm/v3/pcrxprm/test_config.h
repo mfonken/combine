@@ -12,23 +12,23 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        15
-#define TAU_FPS         10
+#define MAIN_FPS        100
+#define TAU_FPS         100
 #define COMBINE_FPS     0
 
-//#define AUTOMATION_RUN
-#define AUTOMATION_SIZES        { /*50, 250, 500, 750, 1000, 1250, 1500, 1750,*/ 2000 }
-#define AUTOMATION_INSTRUCTIONS { 's', 's', 's', 's', 's' }
+#define AUTOMATION_RUN
+#define AUTOMATION_SIZES        { /*50, 250, 500, 750, 1000, 1250, 1500,*/ 1750, 2000 }
+#define AUTOMATION_INSTRUCTIONS { 's', 's', 's' }
 #define AUTOMATION_END_AFTER_INSTRUCTIONS
 
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     31
+#define IMAGE_TICKS                     200//31
 
 #define TITLE_STRING                    "PCR Alpha v0.9 xprm"
 #define GROUP_NAME                      "gradient"
-#define FILE_NAME                       "double_circle_fade"
+#define FILE_NAME                       "gradient_centralized"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 
@@ -64,9 +64,9 @@ using namespace std;
 #define sleep(X) usleep(X*1E6)
 #define KEY_DELAY 1E3/MAIN_FPS
 
-#define FILENAME                        FILE_ROOT "p_data.csv"
-#define X_DIM_FILENAME                  FILE_ROOT "x_data.csv"
-#define Y_DIM_FILENAME                  FILE_ROOT "y_data.csv"
+#define FILENAME                        FILE_ROOT "psm_perf/p_data.csv"
+#define X_DIM_FILENAME                  FILE_ROOT "psm_perf/x_data.csv"
+#define Y_DIM_FILENAME                  FILE_ROOT "psm_perf/y_data.csv"
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)

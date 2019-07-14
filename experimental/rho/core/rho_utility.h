@@ -74,7 +74,8 @@ extern "C" {
     void CalculateTuneRhoUtility( rho_core_t * );
     void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * );
     void CalculateStateTuneFactorRhoUtility( rho_core_t * );
-    void CalculateTargetTuneFactor( rho_core_t * );
+    void CalculateTargetTuneFactorRhoUtility( rho_core_t * );
+    void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core );
 
     void GeneratePacketRhoUtility( rho_core_t * );
 
@@ -129,6 +130,7 @@ extern "C" {
         void (*BackgroundTuneFactor)( rho_core_t * );
         void (*StateTuneFactor)( rho_core_t * );
         void (*TargetTuneFactor)( rho_core_t * );
+        void (*TargetCoverageFactor)( rho_core_t * );
     } rho_utility_calculate_functions;
 
     typedef struct
@@ -190,7 +192,8 @@ extern "C" {
         .Calculate.Tune = CalculateTuneRhoUtility,
         .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,
         .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
-        .Calculate.TargetTuneFactor = CalculateTargetTuneFactor
+        .Calculate.TargetTuneFactor = CalculateTargetTuneFactorRhoUtility,
+        .Calculate.TargetCoverageFactor = CalculateTargetCoverageFactorRhoUtility
     };
 
 #ifdef __cplusplus

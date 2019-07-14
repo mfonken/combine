@@ -8,6 +8,10 @@
  ***********************************************************************/
 #include "rho_core.h"
 
+#ifdef USE_DETECTION_MAP
+#include "detection_map.h"
+#endif
+
 /************************************************************************
  *                       Local Instance                                 *
  ***********************************************************************/
@@ -33,7 +37,12 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 
     /* Filters */
     RhoUtility.Initialize.Filters( core );
-
+    
+#ifdef USE_DETECTION_MAP
+    /* Detection map */
+    DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
+#endif
+    
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
@@ -58,7 +67,7 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
     else
     {
-        LOG(RHO_DEBUG, "\n");
+        LOG_RHO(RHO_DEBUG, "\n");
         LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
         LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
@@ -77,7 +86,7 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     RhoUtility.Reset.Detect( &_, d, r );
     core->TotalCoverage = 0;
     core->FilteredCoverage = 0;
-    _.target_density = core->TargetFilter.value * TOTAL_RHO_PIXELS;
+    _.target_density = core->TargetFilter.value * (floating_t)TOTAL_RHO_PIXELS;
 
     /* Perform detect */
     LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
@@ -122,6 +131,10 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     LOG_RHO(RHO_DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
 
+#ifdef USE_DETECTION_MAP
+    DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
+#endif
+    
     RhoUtility.Predict.GenerateObservationLists( core );
     
 #ifdef __PSM__

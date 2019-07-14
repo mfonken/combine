@@ -21,7 +21,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
         if(local_frame.data != nullptr)
         {
 //          imshow("Thresh Frame", tau.utility.outframe);
-          imshow(TITLE_STRING, local_frame);
+//          imshow(TITLE_STRING, local_frame);
 //          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
 //          imshow("Rho Frame", local_frame);
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
@@ -65,7 +65,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
                 printf("Tau averaged %fms and error %.3fpx for %d iterations\n", tau.avg*1000, tau.accuracy, tau.count);
                 
                 file.open(PERF_FILENAME, ofstream::app | ofstream::out);
-                file << width << "," << tau.avg*1000 << "," << tau.count << endl;
+                file << width << "," << tau.avg*1000 << "," << tau.count << "," << tau.accuracy << endl;
                 file.close();
                 break;
             case 'p':
