@@ -25,11 +25,11 @@
  *                      Application Configuration                       *
  ***********************************************************************/
 /// TODO: Get actual CORE_RATE
-#define CORE_RATE                   48000000//PlatformFunctions.Clock.SysClockFreq()
+#define CORE_RATE                   PlatformFunctions.Clock.SysClockFreq()
 
-#define SUBSAMPLE_APPLICATION       3
-#define PERCENT_ACTIVE_APPLICATION  0.34
-#define DEFAULT_FRAME_APPLICATION   30//10//24
+#define SUBSAMPLE_APPLICATION       2
+#define PERCENT_ACTIVE_APPLICATION  0.20
+#define DEFAULT_FRAME_APPLICATION   20
 
 /************************************************************************
  *                        Derived Configuration                         *
