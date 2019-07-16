@@ -56,7 +56,7 @@
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
 #define C_FRAME_SIZE            ((int)(MAX_COVERAGE * FRAME_SIZE))
-#define Y_DEL                   0xaaaa
+#define Y_DEL                   0xabcd
 
 
 /***************************************************************************************/
