@@ -306,7 +306,6 @@ typedef struct
       total_density,
       filtered_density;
     bool
-      has,
       rcal; /* Recalculate */
     floating_t
       avgc,

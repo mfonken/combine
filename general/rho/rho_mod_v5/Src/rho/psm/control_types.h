@@ -65,8 +65,7 @@ extern "C" {
     } stability_t;
 
 #ifdef __PSM__
-    //#define NUM_STATES              10
-#define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
+#define NUM_OBSERVATION_SYMBOLS 5
 #ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #endif
@@ -92,22 +91,7 @@ extern "C" {
 #define ALPHA 0.00001//0.0025
 #define BETA 1
 
-//#define MAX_DISTANCE 10000.f
-//#define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-//#define MAX_CLUSTERS 10
-//#define MAX_ERROR 20
-//#define INITIAL _VARIANCE 1
-//#define INV_INITIAL_VARIANCE (1/INITIAL_VARIANCE)
-//#define MIN_MAHALANOBIS_DISTANCE_SQ 1.386f
-//#define MAX_MAHALANOBIS_SQ_FOR_UPDATE 1000.f
-//#define SMALL_VALUE_ERROR_OFFSET 1e-4f
-//#define VALID_CLUSTER_STD_DEV 2.
-//#define MIN_CLUSTER_SCORE 1e-3f
-//#define FALLBACK_MAX_ERROR 1e-2f
-
-#define MAX_INPUT_COVARIANCE 200/// Change to dynamic
-
-
+#define MAX_INPUT_COVARIANCE 200/// TODO: Change to dynamic
 
 #define MAX_LABELS 10
 #define LABEL_MOVING_AVERAGE_MAX_HISTORY 10

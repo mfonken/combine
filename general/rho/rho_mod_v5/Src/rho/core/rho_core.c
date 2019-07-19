@@ -141,8 +141,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
 #else
-    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
-    double state_intervals[NUM_STATE_GROUPS];
+    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS, state_intervals[NUM_STATE_GROUPS];
     KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
     FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif

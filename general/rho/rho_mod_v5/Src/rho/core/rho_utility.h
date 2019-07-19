@@ -60,7 +60,7 @@ extern "C" {
     bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
     void DetectRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void DetectRegionRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * );
+    void PrepareDetectionRhoUtility( rho_detection_variables * );
     void CalculateChaosRhoUtility( rho_detection_variables *, prediction_t * );
     void ScoreRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void SortRegionsRhoUtility( rho_detection_variables *, prediction_t * );
@@ -117,7 +117,7 @@ extern "C" {
         bool (*LowerBound)( rho_detection_variables * );
         void (*Regions)( rho_detection_variables *, density_map_t *, prediction_t *);
         void (*Region)( rho_detection_variables *, density_map_t *, prediction_t * );
-        void (*SubtractBackground)( rho_detection_variables *);
+        void (*Prepare)( rho_detection_variables *);
         void (*CalculateChaos)( rho_detection_variables *, prediction_t * );
         void (*ScoreRegions)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*SortRegions)( rho_detection_variables *, prediction_t * );
@@ -183,7 +183,7 @@ extern "C" {
         .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
         .Detect.Regions = DetectRegionsRhoUtility,
         .Detect.Region = DetectRegionRhoUtility,
-        .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,
+        .Detect.Prepare = PrepareDetectionRhoUtility,
         .Detect.CalculateChaos = CalculateChaosRhoUtility,
         .Detect.ScoreRegions = ScoreRegionsRhoUtility,
         .Detect.SortRegions = SortRegionsRhoUtility,
