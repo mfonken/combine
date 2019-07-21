@@ -77,6 +77,8 @@ void Error_Handler(void);
 #define VSYNC_Pin GPIO_PIN_0
 #define VSYNC_GPIO_Port GPIOB
 #define VSYNC_EXTI_IRQn EXTI0_IRQn
+#define HREF_Pin GPIO_PIN_1
+#define HREF_GPIO_Port GPIOB
 #define MCLK_Pin GPIO_PIN_8
 #define MCLK_GPIO_Port GPIOA
 #define SIOC_Pin GPIO_PIN_9
@@ -91,9 +93,8 @@ void Error_Handler(void);
 #define CAM_EN_GPIO_Port GPIOA
 #define PCLK_Pin GPIO_PIN_3
 #define PCLK_GPIO_Port GPIOB
-#define HREF_Pin GPIO_PIN_4
-#define HREF_GPIO_Port GPIOB
-#define HREF_EXTI_IRQn EXTI4_IRQn
+#define LED_Pin GPIO_PIN_4
+#define LED_GPIO_Port GPIOB
 #define UCK_Pin GPIO_PIN_5
 #define UCK_GPIO_Port GPIOB
 #define UTX_Pin GPIO_PIN_6
