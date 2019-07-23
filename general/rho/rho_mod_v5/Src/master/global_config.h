@@ -7,7 +7,7 @@
 
 /* Global configurations */
 #define HOST_COMMUNICATION_PROTOCOL     USART_PROTOCOL_TYPE
-#define HOST_DEFAULT_CHANNEL            USART_Primary
+#define HOST_DEFAULT_CHANNEL            UART_Primary
 
 #define CAMERA_COMMUNICATION_PROTOCOL   I2C_PROTOCOL_TYPE
 #define CAMERA_COMMUNICATION_CHANNEL    I2C_Primary
@@ -40,8 +40,8 @@
 #define TIMER_Handle_t  TIM_HandleTypeDef
 #define I2C_Handle_t    I2C_HandleTypeDef
 //#define SPI_Handle_t    SPI_HandleTypeDef
-#define USART_Handle_t  USART_HandleTypeDef
-//#define USB_Handle_t    USB_HandleTypeDef
+#define UART_Handle_t   UART_HandleTypeDef
+#define USB_Handle_t    PCD_HandleTypeDef
 #endif /* __STM32__ */
 
 

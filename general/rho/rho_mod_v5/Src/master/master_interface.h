@@ -9,7 +9,8 @@
 typedef struct
 {
   I2C_Handle_t * I2C_Primary;
-  USART_Handle_t * USART_Primary;
+  UART_Handle_t * UART_Primary;
+//  USB_Handle_t * USB_Primary;
 } master_ios_t;
 
 typedef struct

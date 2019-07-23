@@ -43,7 +43,7 @@ typedef enum
   I2C_PROTOCOL_TYPE,
 //  SPI_PROTOCOL_TYPE,
   USART_PROTOCOL_TYPE,
-//  USB_PROTOCOL_TYPE
+  USB_PROTOCOL_TYPE
 } protocol_t;
 
 typedef struct
@@ -103,7 +103,7 @@ void InitPlatform( platform_t *, protocol_t, generic_handle_t );
 
 #ifdef __RHO__
 ///* Application interfaces */
-//static void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart );
+//static void InitRhoInterface( TIMER_Handle_t * timer, UART_Handle_t * usart );
 //
 //inline uint8_t   TransmitPacket( packet_t * );
 //inline uint16_t  ReceivePacket( packet_t * );
@@ -131,7 +131,7 @@ platform_status_enum PerformHostCommand( host_command_type_enum, platform_wait_p
 //
 //typedef struct
 //{
-//  void (*Init)( TIMER_Handle_t *, USART_Handle_t * );
+//  void (*Init)( TIMER_Handle_t *, UART_Handle_t * );
 //  void (*ActivateFlags)( rho_system_flags variables * );
 //  rho_interface_packet_functions Packet;
 //} rho_interface_functions;
@@ -154,9 +154,9 @@ typedef struct
 
 typedef struct
 {
-  uint8_t (*Transmit)( USART_Handle_t *, uint8_t *, uint16_t );
-  uint16_t (*Receive)( USART_Handle_t *, uint8_t * );
-  bool (*Completed)( USART_Handle_t * );
+  uint8_t (*Transmit)( UART_Handle_t *, uint8_t *, uint16_t );
+  uint16_t (*Receive)( UART_Handle_t *, uint8_t * );
+  bool (*Completed)( UART_Handle_t * );
 } platform_interface_uart_functions;
 
 typedef struct
@@ -230,7 +230,7 @@ static platform_interface_functions PlatformFunctions =
 
   .USART.Transmit       = PLATFORM_SPECIFIC(UartTxDMA),
   .USART.Receive        = PLATFORM_SPECIFIC(UartRxDMA),
-  .USART.Completed      = PLATFORM_SPECIFIC(UartCompleted),
+//  .USART.Completed      = PLATFORM_SPECIFIC(UartCompleted),
 
   .I2C.Transmit         = PLATFORM_SPECIFIC(I2CMasterTx),
 

@@ -9,7 +9,7 @@
 /***************************************************************************************/
 /*                              Function Definitions                                   */
 /***************************************************************************************/
-void Master_Connect( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
+void Master_Connect( I2C_Handle_t *, TIMER_Handle_t *, UART_Handle_t * );
 void Master_Init( void );
 void Master_Run( void );
 
@@ -18,7 +18,7 @@ void Master_Run( void );
 /***************************************************************************************/
 typedef struct
 {
-  void (*Connect)( I2C_Handle_t *, TIMER_Handle_t *, USART_Handle_t * );
+  void (*Connect)( I2C_Handle_t *, TIMER_Handle_t *, UART_Handle_t * );
   void (*Init)( void );
   void (*Run)( void );
 } master_functions_t;

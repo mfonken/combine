@@ -19,12 +19,12 @@ enum LogLevel
 };
 #endif
 
-#define CORE_LOG_LEVEL          ALWAYS
+#define CORE_LOG_LEVEL          DEBUG_2
 
 #ifndef LOG
 #define LOG(L,...)              if(L >= CORE_LOG_LEVEL) \
                                 {  for(uint8_t i=L;i<ALWAYS;i++) \
-                                print("\t"); sprintf(str_buf, __VA_ARGS__); print(str_buf); }
+                                print("\t"); sprintf(str_buf, __VA_ARGS__); print(str_buf); print(ENDL); }
 #define LOG_BARE(L,...)         if(L >= CORE_LOG_LEVEL) \
                                 { sprintf(str_buf, __VA_ARGS__); print(str_buf); }
 #endif

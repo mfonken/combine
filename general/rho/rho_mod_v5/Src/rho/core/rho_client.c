@@ -98,7 +98,7 @@ void CaptureAndProcessFrame( void )
 
     capture_buffer = (uint32_t)RhoSystem.Variables.Buffers.Capture;
     /* Manually start First Row Capture */
-    //while(!RhoSystem.Variables.Flags->Row);
+    while(!RhoSystem.Variables.Flags->Row);
     CaptureRowCallback();
 
     section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;

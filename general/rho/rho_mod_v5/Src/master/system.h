@@ -76,7 +76,7 @@ typedef struct
 static system_t System =
 {
   { THIS_ID },
-  INITIALIZING, // State
+  IDLE, // State
 };
 
 /***************************************************************************************/

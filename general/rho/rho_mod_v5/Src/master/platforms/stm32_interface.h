@@ -16,8 +16,6 @@
 
 #include "master_interface.h"
 
-static master_t Master;
-
 /***************************************************************************************/
 /*                                  Macro Definitions                                  */
 /***************************************************************************************/
@@ -36,9 +34,9 @@ void            STM_InitDMA( uint32_t, uint32_t, uint16_t, bool );
 void            STM_PauseDMA( void );
 void            STM_ResumeDMA( void );
 void            STM_ResetDMA( void );
-uint8_t         STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length );
-uint16_t        STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer );
-bool            STM_UartCompleted( USART_Handle_t *huart );
+uint8_t         STM_UartTxDMA( UART_Handle_t * huart, uint8_t * buffer, uint16_t length );
+uint16_t        STM_UartRxDMA( UART_Handle_t * huart, uint8_t * buffer );
+//bool            STM_UartCompleted( UART_Handle_t *huart );
 void            STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout );
 void            STM_SetPortMode( GPIO_TypeDef * port, uint16_t pin, uint8_t type );
 void            STM_WritePin( GPIO_TypeDef * port, uint16_t pin, uint8_t state );

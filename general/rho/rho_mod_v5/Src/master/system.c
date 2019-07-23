@@ -22,7 +22,7 @@ system_state_t * GetStateSystem( system_t * system )
 void SetStateSystem( system_t * system, system_state_enum new_state )
 {
   if( system->state != new_state )
-    LOG(STATE_DEBUG, "Entering %s\n", system_state_enum_strings[new_state]);
+    LOG(STATE_DEBUG, "Entering %s", system_state_enum_strings[new_state]);
   system->state = new_state;
 }
 

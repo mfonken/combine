@@ -79,16 +79,13 @@ void Error_Handler(void);
 #define VSYNC_EXTI_IRQn EXTI0_IRQn
 #define HREF_Pin GPIO_PIN_1
 #define HREF_GPIO_Port GPIOB
+#define HREF_EXTI_IRQn EXTI1_IRQn
 #define MCLK_Pin GPIO_PIN_8
 #define MCLK_GPIO_Port GPIOA
 #define SIOC_Pin GPIO_PIN_9
 #define SIOC_GPIO_Port GPIOA
 #define SIOD_Pin GPIO_PIN_10
 #define SIOD_GPIO_Port GPIOA
-#define PWDN_Pin GPIO_PIN_11
-#define PWDN_GPIO_Port GPIOA
-#define EN_1V5_Pin GPIO_PIN_12
-#define EN_1V5_GPIO_Port GPIOA
 #define CAM_EN_Pin GPIO_PIN_15
 #define CAM_EN_GPIO_Port GPIOA
 #define PCLK_Pin GPIO_PIN_3

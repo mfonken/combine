@@ -13,6 +13,8 @@
 #include "main.h"
 #include "printers.h"
 
+master_t Master;
+
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
 #ifdef __RHO__
@@ -74,23 +76,23 @@ void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
   _dma_destination = dst;
 }
 
-inline uint8_t STM_UartTxDMA( USART_Handle_t * huart, uint8_t * buffer, uint16_t length )
+inline uint8_t STM_UartTxDMA( UART_Handle_t * huart, uint8_t * buffer, uint16_t length )
 {
-  return HAL_USART_Transmit_DMA( Master.IOs.USART_Primary, buffer, length );
+  return HAL_UART_Transmit( Master.IOs.UART_Primary, buffer, length, UART_TIMEOUT ); //HAL_UART_Transmit_DMA
 }
 
-inline uint16_t STM_UartRxDMA( USART_Handle_t * huart, uint8_t * buffer )
+inline uint16_t STM_UartRxDMA( UART_Handle_t * huart, uint8_t * buffer )
 {
   ///TODO: Actually implement
   return 1;
 }
-inline bool STM_UartCompleted( USART_Handle_t * huart )
-{
-#ifdef __RHO__
-  Platform.CameraFlags.UARTBusy = 0;
-#endif
-  return false;
-}
+//inline bool STM_UartCompleted( UART_Handle_t * huart )
+//{
+//#ifdef __RHO__
+//  Platform.CameraFlags.UARTBusy = 0;
+//#endif
+//  return false;
+//}
 
 inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
 {

@@ -53,7 +53,7 @@ density_2d_t CalculateCentroidRhoUtility( dmap_t * map, index_t l, index_t * C, 
 inline void PrintPacketRhoUtility( packet_t * p, index_t l )
 {
 #ifdef PACKET_DEBUG
-    LOG_PACKET(DEBUG_0,"Packet Size - %lubytes\n", sizeof(packet_t));
+    LOG_PACKET(DEBUG_0,"Packet Size - %lubytes" ENDL, sizeof(packet_t));
     for(int i = 0; i < sizeof(packet_t); )
     {
         LOG_PACKET(DEBUG_0,"(%02d)", i);
@@ -848,12 +848,12 @@ void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
     if(core->PredictionPair.x.NumRegions > 0)
     {
-        LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:\n");
+        LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:");
         RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->ThreshByte );
     }
     if(core->PredictionPair.y.NumRegions > 0)
     {
-        LOG_RHO(RHO_DEBUG_2, "Creating observation list for Y:\n");
+        LOG_RHO(RHO_DEBUG_2, "Creating observation list for Y:");
         RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->ThreshByte );
     }
 }

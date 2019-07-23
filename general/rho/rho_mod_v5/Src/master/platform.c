@@ -72,10 +72,12 @@ platform_status_enum PerformHostCommand(
 uint8_t TransmitToHost( uint8_t * buffer, uint16_t length )
 {
 #if HOST_COMMUNICATION_PROTOCOL == USART
-  return PlatformFunctions.USART.Transmit( (USART_Handle_t *)Platform.HostHandle, buffer, length );
+  return PlatformFunctions.USART.Transmit( (UART_Handle_t *)Platform.HostHandle, buffer, length );
 #elif HOST_COMMUNICATION_PROTOCOL == I2C
   PlatformFunctions.I2C.Transmit( (I2C_Handle_t *)Platform.HostHandle, HOST_ADDRESS, buffer, length );
   return 1;
+#elif HOST_COMMUNICATION_PROTOCOL == USB
+  return CDC_Transmit_FS(buffer, length);
 #else
 #error "Invalid host communication protocol!"
 #endif
@@ -83,7 +85,7 @@ uint8_t TransmitToHost( uint8_t * buffer, uint16_t length )
 uint16_t ReceiveFromHost( uint8_t * buffer )
 {
   #if HOST_COMMUNICATION_PROTOCOL == USART
-    return PlatformFunctions.USART.Receive( (USART_Handle_t *)Platform.HostHandle, buffer );
+    return PlatformFunctions.USART.Receive( (UART_Handle_t *)Platform.HostHandle, buffer );
   #elif HOST_COMMUNICATION_PROTOCOL == I2C
     PlatformFunctions.I2C.Receive( (I2C_Handle_t *)Platform.HostHandle, HOST_ADDRESS, data, len );
     return 1;
@@ -93,7 +95,7 @@ uint16_t ReceiveFromHost( uint8_t * buffer )
 }
 
 #ifdef __RHO__
-void InitRhoInterface( TIMER_Handle_t * timer, USART_Handle_t * usart )
+void InitRhoInterface( TIMER_Handle_t * timer, UART_Handle_t * usart )
 {
 }
 

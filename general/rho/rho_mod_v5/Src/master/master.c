@@ -63,10 +63,10 @@ static void ErrorStateHandler( void )
 /***************************************************************************************/
 /*                                Master Initialize                                    */
 /***************************************************************************************/
-void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, USART_Handle_t * usart )
+void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t * usart )
 {
   Master.IOs.I2C_Primary = i2c;
-  Master.IOs.USART_Primary = usart;
+  Master.IOs.UART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
   
 #warning "TODO: Figure out better capure DMA initializer"
