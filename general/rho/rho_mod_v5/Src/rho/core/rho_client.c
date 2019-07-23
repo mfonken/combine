@@ -12,7 +12,6 @@
  *                        Local Configuration                           *
  ***********************************************************************/
  #define __ASSEMBLY_RHO__
-// #define __CHECK_FRAME_FLAG__
 
 volatile uint32_t capture_buffer;
 
@@ -126,7 +125,7 @@ void CaptureRowCallback( void )
       RhoSystem.Variables.Addresses.CaptureEnd++;
     }
     RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
-    
+
     CaptureRow(
         (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
         (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
@@ -158,10 +157,6 @@ void CaptureRow( register byte_t * capture_address,   // capture buffer index
 #ifndef __ASSEMBLY_RHO__
     while( 1 )
     {
-#ifdef __CHECK_FRAME_FLAG__
-        working_register = *flag_address;
-        if( working_register ) return;
-#endif
         capture_address += sub_sample;
         if((uint32_t)capture_address >= (uint32_t)capture_end) return;
 
@@ -176,11 +171,6 @@ void CaptureRow( register byte_t * capture_address,   // capture buffer index
     __asm volatile
     (
     "capture:                                                              \n\t"
-#ifdef __CHECK_FRAME_FLAG__
-        "ldrb    %0, [%7]       ; Load row end flag byte                   \n\t"
-        "cmp     %0, #1         ; Check if end is reached (set)            \n\t"
-        "bge     end            ; If so, end                               \n\t"
-#endif
         "add     %2, %2, %1     ; Increment capture index by sub_sample    \n\t"
         "cmp     %2, %3         ; Check if capture reached max width       \n\t"
         "bge     end            ; If so,end                                \n\t"
@@ -225,7 +215,7 @@ section_process_t ProcessFrameSection( const index_t rows )
     bool complete = false;
 
 #ifndef __ASSEMBLY_RHO__
-    while( t_addr <= t_end )
+    while( t_addr <= t_last )
     {
         value_register = *(address_t)t_addr++;
         if(value_register < CAPTURE_BUFFER_WIDTH)
@@ -386,5 +376,5 @@ void ConnectRhoSystemPlatformInterface( platform_interface_functions * platform_
 void ZeroRhoSystemMemory( void )
 {
     memset( RhoSystem.Variables.Buffers.Thresh,   0, sizeof(index_t)   * THRESH_BUFFER_SIZE );
-    memset( RhoSystem.Variables.Buffers.Quadrant, 0, sizeof(density_t) * 4                  );
+    memset( RhoSystem.Variables.Buffers.Quadrant, 0, sizeof(density_t) * NUM_QUADRANTS      );
 }

@@ -28,19 +28,12 @@ enum LogLevel
 #define LOG_BARE(L,...)         if(L >= CORE_LOG_LEVEL) \
                                 { sprintf(str_buf, __VA_ARGS__); print(str_buf); }
 #endif
-                                
+
 #define STATE_DEBUG             DEBUG_2
 
 void print( char * Buf );
-//void drawDensityMap( density_t * a, int l );
-//void dprintBuffers( void );
-//void dprintCapture( void );
-//void dprint( uint8_t * scrAddr, uint16_t len );
-//void printBuffers( uint32_t s );
-//void printAddress( const char * s, uint32_t addr );
-//void printAddresses( void );
-//void printCapture( void );
-//void printBuffer( index_t * a, int l );
-//void printPredictionPair( prediction_pair_t * pr );
+void DrawDensityMap( density_t * a, int l );
+void PrintAddress( const char * s, uint32_t addr );
+void PrintBuffer( index_t * a, int l );
 
 #endif
