@@ -268,9 +268,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
     HAL_I2CEx_EnableFastModePlus(I2C_FASTMODEPLUS_PB7);
 
-    /* USART1 interrupt Init */
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
 
   /* USER CODE END USART1_MspInit 1 */

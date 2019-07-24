@@ -12,45 +12,35 @@ inline void print( char * Buf )
 #define MAX_PRINT_INDEX 10
 #define DENSITY_PRINT_SMOOTH_THRESH 2
 #define DENSITY_PRINT_SHARP_THRESH 10
-void DrawDensityMap( density_t * a, uint32_t l )
+void DrawDensityMap( uint8_t * a, int32_t l )
 {
-    density_t curr, prev;
-    int diff;
-    while( l-- >= 0 )
+    uint8_t curr, prev = 0;
+    int32_t diff = 0;
+    for( uint32_t i = 0; i < l; i++ )
     {
-        curr = a[l];
-        sprintf((char *)hex, "%4d[%2d]", curr, i);
-        print( hex );
+        curr = a[i];
+        sprintf(str_buf, "%3d:", i);
+        print( str_buf );
         if( curr > MAX_PRINT_INDEX ) curr = MAX_PRINT_INDEX;
-        diff = (int)curr - (int)prev;
-
-
+        diff = (int32_t)curr - (int32_t)prev;
+        
         if( diff > DENSITY_PRINT_SHARP_THRESH || diff < -DENSITY_PRINT_SHARP_THRESH )
             for( ; curr > 0; curr--) print("-");
         else
             for( ; curr > 0; curr--) print( " " );
 
-        if( diff > DENSITY_PRINT_SMOOTH_THRESH ) print( "\\\r\n" );
-        else if( diff < -DENSITY_PRINT_SMOOTH_THRESH ) print( "/\r\n" );
-        else print( "|\r\n" );
-        prev = curr
+        print( "|\r\n" );
+        prev = curr;
     }
 }
 
-void PrintAddress( const char * s, uint32_t addr )
+void PrintBuffer( uint8_t * a, int32_t l )
 {
-    sprintf((char *)hex, "%s: %8x\r\n", s, addr);
-    print( hex );
-}
-
-void PrintBuffer( index_t * a, int l )
-{
-    uint32_t blocks = 1 + ( ( PRINT_BUFFER_LEN - 1 ) / l), i;
+    int32_t blocks = 1 + ( ( l - 1 ) / PRINT_BUFFER_LEN ), i, j = 0;
     while( blocks-- >= 0 )
     {
-        for( i = 0; i < PRINT_BUFFER_LEN && l-- >= 0; i++ )
-            str_buf[i] = a[l] > 255 ? 255 : a[l];
-        TransmitToHost( str_buf, i );
+        for( i = 0; i < PRINT_BUFFER_LEN && j < l; i++, j++ )
+            str_buf[i] = a[j] > 255 ? 255 : a[j];
+        TransmitToHost( (uint8_t *)str_buf, i );
     }
-    print(UNIVERSAL_DELIMITER);
 }

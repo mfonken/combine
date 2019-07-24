@@ -1,6 +1,7 @@
 #ifndef printers_h
 #define printers_h
 
+#include "resources.h"
 #include "platform.h"
 
 #define PRINT_BUFFER_LEN ( 1 << 8 )
@@ -32,8 +33,7 @@ enum LogLevel
 #define STATE_DEBUG             DEBUG_2
 
 void print( char * Buf );
-void DrawDensityMap( density_t * a, int l );
-void PrintAddress( const char * s, uint32_t addr );
-void PrintBuffer( index_t * a, int l );
+void DrawDensityMap( uint8_t * a, int32_t l );
+void PrintWordBuffer( uint16_t * a, int32_t l );
 
 #endif

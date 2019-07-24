@@ -6,6 +6,7 @@
 #ifndef rho_config_h
 #define rho_config_h
 
+#include "rho_support.h"
 #include "rho_global.h"
 
 //#define SPOOF_STATE_BANDS

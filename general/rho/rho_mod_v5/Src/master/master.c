@@ -78,6 +78,17 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t *
 
 void Master_Init( void )
 {
+  dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
+  SpoofDensityMap( x, CAPTURE_WIDTH );
+  SpoofDensityMap( y, CAPTURE_HEIGHT );
+  uint16_t del = UNIVERSAL_DELIMITER;
+  print((char *)&del);
+  PrintBuffer( x, CAPTURE_WIDTH );
+  PrintBuffer( y, CAPTURE_HEIGHT );
+  print((char *)&del);
+  //DrawDensityMap( map, CAPTURE_WIDTH );
+  
+  while(1);
   /* Initialize state manager */
   SystemFunctions.Init( &System, &global_states_list );
 
