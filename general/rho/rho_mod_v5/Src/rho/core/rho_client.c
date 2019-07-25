@@ -93,6 +93,9 @@ void CaptureAndProcessFrame( void )
     RhoSystem.Variables.Addresses.ThreshIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
     RhoSystem.Variables.Utility.RowsLeft = (index_t)RhoSystem.Variables.Utility.Height;
     RhoSystem.Variables.Addresses.CaptureIndex = RhoSystem.Variables.Addresses.ThreshIndex;
+    
+    RhoSystem.Variables.Addresses.ProcessIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Addresses.DensityMapGenIndex = (address_t)RhoSystem.Variables.Utility.DensityMapPair.x.map;
     RhoSystem.Variables.Flags->EvenRowToggle = false;
 
     capture_buffer = (uint32_t)RhoSystem.Variables.Buffers.Capture;
@@ -100,18 +103,30 @@ void CaptureAndProcessFrame( void )
     while(!RhoSystem.Variables.Flags->Row);
     CaptureRowCallback();
 
-    section_process_t ProcessedTopSectionData, ProcessedBtmSectionData;
-    do{ ProcessedTopSectionData = ProcessFrameSection( RhoSystem.Variables.Utility.Cy );
-    } while( !ProcessedTopSectionData.complete );
-    do{ ProcessedBtmSectionData = ProcessFrameSection( RhoSystem.Variables.Utility.Height );
-    } while( !ProcessedBtmSectionData.complete );
+    uint32_t Left = 0, Right = 0, Fill = 0, Complete = 0;
+    do{
+      while( ProcessingBufferHasUpdate() != true );
+      AcknowledgeProcessingBufferUpdate();
+      ProcessFrameSection( RhoSystem.Variables.Utility.Cy, &Left, &Right, &Fill, &Complete );
+      RhoSystem.Variables.Addresses.ProcessIndex = Fill;
+      RhoSystem.Variables.Addresses.DensityMapGenIndex += 1;
+      EnableCaptureCallback();
+    } while( Complete != true );
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = Left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = Right;
+    Left = 0; Right = 0; Fill = 0; Complete = 0;
+    do{ 
+      while( ProcessingBufferHasUpdate() != true );
+      AcknowledgeProcessingBufferUpdate();
+      ProcessFrameSection( RhoSystem.Variables.Utility.Height, &Left, &Right, &Fill, &Complete );
+      RhoSystem.Variables.Addresses.ProcessIndex = Fill;
+      RhoSystem.Variables.Addresses.DensityMapGenIndex += 1;
+      EnableCaptureCallback();
+    } while( Complete != true );
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = Left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = Right;
 
     DisableCaptureCallback();
-
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedTopSectionData.left;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = ProcessedTopSectionData.right;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = ProcessedBtmSectionData.left;
-    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedBtmSectionData.right;
 }
 
 void CaptureRowCallback( void )
@@ -119,6 +134,7 @@ void CaptureRowCallback( void )
     DisableCaptureCallback();
     RhoSystem.Variables.Utility.Thresh = 0x05;
     RhoSystem.Variables.Utility.Subsample = 0x01;
+//    RhoSystem.Variables.Addresses.CaptureEnd = RhoSystem.Functions.Platform.DMA.GetFillAddr();
     for(uint8_t i = 0; i < 0x0a; i++)
     {
       RhoSystem.Variables.Buffers.Capture[i] = i;
@@ -126,7 +142,7 @@ void CaptureRowCallback( void )
     }
     RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
 
-    CaptureRow(
+    RhoSystem.Variables.Addresses.ThreshIndex = CaptureRow(
         (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
         (index_t *)RhoSystem.Variables.Addresses.ThreshIndex,
         (byte_t)RhoSystem.Variables.Utility.Thresh,
@@ -136,16 +152,19 @@ void CaptureRowCallback( void )
         (address_t)RhoSystem.Variables.Flags->Row );
     *(index_t *)RhoSystem.Variables.Addresses.ThreshIndex = Y_DEL;
     RhoSystem.Variables.Addresses.ThreshIndex += 2;
+    RhoSystem.Variables.Utility.RowsLeft--;
     RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
 
     /* Only re-enable capture if buffers are not full and there is more to process */
     if( ( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
-        && ( --RhoSystem.Variables.Utility.RowsLeft > 0 ))
+        && ( RhoSystem.Variables.Utility.RowsLeft > 0 ))
         EnableCaptureCallback();
+    
+    ReportProcessingBufferUpdate();
 }
 
 //__attribute__((naked))
-void CaptureRow( register byte_t * capture_address,   // capture buffer index
+address_t CaptureRow( register byte_t * capture_address,   // capture buffer index
                  register index_t * thresh_address,    // address of thresh buffer
                  const register byte_t thresh_value,
                  const register byte_t sub_sample,
@@ -171,13 +190,12 @@ void CaptureRow( register byte_t * capture_address,   // capture buffer index
     __asm volatile
     (
     "capture:                                                              \n\t"
+        "ldrb    %0, [%2]       ; Load byte at capture index into RO       \n\t"
         "add     %2, %2, %1     ; Increment capture index by sub_sample    \n\t"
         "cmp     %2, %3         ; Check if capture reached max width       \n\t"
-        "bge     end            ; If so,end                                \n\t"
-
-        "ldrb    %0, [%2]       ; Load byte at capture index into RO       \n\t"
+        "bgt     end            ; If so,end                                \n\t"
         "cmp     %0, %4         ; Compare with threshold value             \n\t"
-        "blt     capture        ; If less than, continue to next capture   \n\t"
+        "ble     capture        ; If less than, continue to next capture   \n\t"
 
         "sub     %0, %2, %5     ; Subtract capture buffer start from index \n\t"
         "strh    %0, [%6], #2   ; Store offset word at thresh index        \n\t"
@@ -194,25 +212,24 @@ void CaptureRow( register byte_t * capture_address,   // capture buffer index
         "r"(flag_address)       // %7
     );
 #endif
+    return (address_t)thresh_address;
 }
 
-section_process_t ProcessFrameSection( const index_t rows )
+void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right, uint32_t * fill, uint32_t * complete )
 {
     register uint32_t
         value_register      = 0,
         calc_register       = 0,
-        t_addr              = (uint32_t)RhoSystem.Variables.Buffers.Thresh,
+        t_addr              = (uint32_t)RhoSystem.Variables.Addresses.ProcessIndex,
         t_last              = (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex,
         Cx                  = (uint32_t)RhoSystem.Variables.Utility.Cx,
         Dy                  = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.y.map,
-        Dx_i                = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.x.map,
-        Dx_end              = Dx_i + (uint32_t)rows,
+        Dx_i                = (uint32_t)RhoSystem.Variables.Addresses.DensityMapGenIndex,
+        Dx_end              = (uint32_t)RhoSystem.Variables.Utility.DensityMapPair.x.map + (uint32_t)rows,
         Q_total             = 0,
         Q_prev              = 0,
         Q_left              = 0,
         Q_right             = 0;
-
-    bool complete = false;
 
 #ifndef __ASSEMBLY_RHO__
     while( t_addr <= t_last )
@@ -263,7 +280,7 @@ section_process_t ProcessFrameSection( const index_t rows )
         "strb    %1, [%6], #1   ; Store at next column address          \n\t"
         "cmp     %6, %7         ; Check if all rows are processed       \n\t"
         "bge     end            ; If so, end                            \n\t"
-        "mov     %9, %10        ; Move current total px to previous     \n\t"
+        "mov     %9, %8         ; Move current total px to previous     \n\t"
         "cmp     %2, %3         ; Check for end of threshold buffer     \n\t"
         "bge     end            ; If so, end                            \n\t"
         "blt     loop_process   ; Loop back to start next values        \n"
@@ -276,14 +293,17 @@ section_process_t ProcessFrameSection( const index_t rows )
         "r"(Cx),                // %4
         "r"(Dy),                // %5
         "r"(Dx_i),              // %6
-        "r"(Dx_end)             // %7
+        "r"(Dx_end),            // %7
         "r"(Q_total),           // %8
         "r"(Q_prev),            // %9
         "r"(Q_left),            // %10
         "r"(Q_right)            // %11
     );
 #endif
-    return (section_process_t){ Q_left, Q_right, complete };
+    *complete = !!( Dx_i >= Dx_end );
+    *left = Q_left;
+    *right = Q_right;
+    *fill = t_addr;
 }
 
 void ActivateBackgrounding( void )
@@ -343,13 +363,15 @@ void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
     /* Connect camera/hardware connection */
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
-    RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
+    //RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
 
     /* Connect capture and processing buffers */
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture;
     RhoSystem.Variables.Addresses.CaptureMax  = (address_t)&RhoSystem.Variables.Buffers.Capture[THRESH_BUFFER_SIZE];
     RhoSystem.Variables.Addresses.ThreshMax   = (address_t)RhoSystem.Variables.Buffers.Thresh[THRESH_BUFFER_MAX];
     RhoSystem.Variables.Addresses.ThreshEnd   = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Addresses.ProcessIndex = (address_t)RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Addresses.DensityMapGenIndex = (address_t)RhoSystem.Variables.Utility.DensityMapPair.x.map;
 
     /* Initialize beacon */
     RhoSystem.Variables.Buffers.BeaconPacket  = malloc( sizeof( packet_t ) );

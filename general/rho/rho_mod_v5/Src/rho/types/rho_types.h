@@ -225,8 +225,9 @@ typedef struct
 
 typedef struct
 {
-    density_2d_t left, right;       /* Direction density values */
-    bool complete;
+    density_2d_t Left, Right;       /* Direction density values */
+    uint32_t Fill;
+    uint8_t Complete;
 } section_process_t;
 
 typedef struct

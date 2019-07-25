@@ -150,6 +150,7 @@ typedef struct
   void (*Pause)( void );
   void (*Resume)( void );
   void (*Reset)( void );
+  uint32_t (*GetFillAddr)( void );
 } platform_interface_dma_functions;
 
 typedef struct
@@ -227,6 +228,7 @@ static platform_interface_functions PlatformFunctions =
   .DMA.Pause            = PLATFORM_SPECIFIC(PauseDMA),
   .DMA.Resume           = PLATFORM_SPECIFIC(ResumeDMA),
   .DMA.Reset            = PLATFORM_SPECIFIC(ResetDMA),
+  .DMA.GetFillAddr      = PLATFORM_SPECIFIC(GetDMAFillAddress),
 
   .USART.Transmit       = PLATFORM_SPECIFIC(UartTxDMA),
   .USART.Receive        = PLATFORM_SPECIFIC(UartRxDMA),

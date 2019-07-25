@@ -40,6 +40,15 @@ void DrawDensityMap( uint8_t * a, int32_t l )
     }
 }
 
+void PrintDensityMaps( uint8_t * x, int32_t lx, uint8_t * y, int32_t ly )
+{
+  uint16_t del = UNIVERSAL_DELIMITER;
+  print((char *)&del);
+  PrintBuffer( x, lx );
+  PrintBuffer( y, ly );
+  print((char *)&del);
+}
+
 void PrintBuffer( uint8_t * a, int32_t l )
 {
     int32_t blocks = 1 + ( ( l - 1 ) / PRINT_BUFFER_LEN ), i, j = 0;

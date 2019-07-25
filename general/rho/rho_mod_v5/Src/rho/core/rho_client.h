@@ -19,14 +19,14 @@ void PerformRhoSystemProcess( void );
 void ProcessRhoSystemFrameCapture( void );
 void CaptureAndProcessFrame( void );
 void CaptureRowCallback( void );
-void CaptureRow( register byte_t *,
+address_t CaptureRow( register byte_t *,
                       register index_t *,
                       const register byte_t,
                       const register byte_t,
                       const register address_t,
                       const register address_t,
                       const register address_t );
-section_process_t ProcessFrameSection( const index_t );
+void ProcessFrameSection( const index_t, uint32_t *, uint32_t *, uint32_t *, uint32_t * );
 void ActivateBackgrounding( void );
 void DeactivateBackgrounding( void );
 void FilterPixelCount( index_t *, index_t );
@@ -61,7 +61,8 @@ address_t
   PixelCount,                     /* Shared address of pixel count value */
   CaptureIndex,                   /* Address capture buffer is processed */
   ThreshIndex,                    /* Address threshold buffer is filled */
-  ProcessIndex;                   /* Address threhold buffer is processed */
+  ProcessIndex,                   /* Address threhold buffer is processed */
+  DensityMapGenIndex;             /* Address density map has been generated */
 } rho_system_address_variables;
 
 typedef struct
@@ -127,5 +128,8 @@ extern rho_system_t RhoSystem;
 
 static inline void EnableCaptureCallback(  void ) { RhoSystem.Variables.Flags->Capture.Flag  = 1; }
 static inline void DisableCaptureCallback( void ) { RhoSystem.Variables.Flags->Capture.Flag  = 0; }
+static inline void ReportProcessingBufferUpdate(  void ) { RhoSystem.Variables.Flags->BufferUpdate  = 1; }
+static inline void AcknowledgeProcessingBufferUpdate( void ) { RhoSystem.Variables.Flags->BufferUpdate  = 0; }
+static inline bool ProcessingBufferHasUpdate( void ) { return RhoSystem.Variables.Flags->BufferUpdate; }
 
 #endif /* rho_client_h */

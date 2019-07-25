@@ -17,8 +17,8 @@ typedef struct
   /* Pins */
   GPIO_t
     ENABLE,
-    LOW_VOLTAGE,
-    POWER_DOWN,
+//    LOW_VOLTAGE,
+//    POWER_DOWN,
     MASTER_CLOCK;
 } OV9712_pins_t;
 

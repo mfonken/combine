@@ -74,6 +74,12 @@ void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
   __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
   if(init_state) STM_ResumeDMA();
   _dma_destination = dst;
+  _dma_size = size;
+}
+
+uint32_t STM_GetDMAFillAddress( void )
+{
+  return _dma_destination + ( (int32_t)_dma_size - (int32_t)Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CNDTR );
 }
 
 inline uint8_t STM_UartTxDMA( UART_Handle_t * huart, uint8_t * buffer, uint16_t length )

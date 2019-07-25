@@ -32,7 +32,8 @@ flag_t
   Row,
   Backgrounding,
   UARTBusy,
-  EvenRowToggle;
+  EvenRowToggle,
+  BufferUpdate;
 callback_t
   Capture;
 } camera_application_flags;
