@@ -9,9 +9,9 @@ inline void print( char * Buf )
   TransmitToHost( (uint8_t *)Buf, strlen((const char *)Buf) );
 }
 
-#define MAX_PRINT_INDEX 10
-#define DENSITY_PRINT_SMOOTH_THRESH 2
-#define DENSITY_PRINT_SHARP_THRESH 10
+#define MAX_PRINT_INDEX 40
+#define DENSITY_PRINT_SMOOTH_THRESH 1
+#define DENSITY_PRINT_SHARP_THRESH 4
 void DrawDensityMap( uint8_t * a, int32_t l )
 {
     uint8_t curr, prev = 0;
@@ -20,17 +20,23 @@ void DrawDensityMap( uint8_t * a, int32_t l )
     {
         curr = a[i];
         sprintf(str_buf, "%3d:", i);
-        print( str_buf );
+        printf( str_buf );
         if( curr > MAX_PRINT_INDEX ) curr = MAX_PRINT_INDEX;
         diff = (int32_t)curr - (int32_t)prev;
-        
-        if( diff > DENSITY_PRINT_SHARP_THRESH || diff < -DENSITY_PRINT_SHARP_THRESH )
-            for( ; curr > 0; curr--) print("-");
-        else
-            for( ; curr > 0; curr--) print( " " );
-
-        print( "|\r\n" );
+        vert = fmin(curr, prev);
         prev = curr;
+
+        for( ; vert > 0; vert--) print(" ");
+        int d = abs(diff), a = 2;
+        if(diff > 0) for( ; d > 1; d--) print("'");
+        else for( ; d > 2; d--) print("_");
+        if( diff > DENSITY_PRINT_SMOOTH_THRESH )
+            print("\\");
+        else if( diff < -DENSITY_PRINT_SMOOTH_THRESH )
+            print("/");
+        else
+            print("|");
+        print(ENDL);
     }
 }
 
