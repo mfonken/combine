@@ -60,6 +60,11 @@ static void ErrorStateHandler( void )
     ///TODO: Implement handler method for unexpected entry of error state
 }
 
+uint8_t     HAL_GPIO_ReadPort(GPIO_TypeDef* GPIOx)
+{
+  return GPIOx->IDR;
+}
+
 /***************************************************************************************/
 /*                                Master Initialize                                    */
 /***************************************************************************************/
@@ -70,23 +75,34 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t *
   Master.Utilities.Timer_Primary = timer;
   
 #warning "TODO: Figure out better capure DMA initializer"
-  if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
-    Error_Handler();
+//  if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
+//    Error_Handler();
   
+  while(1)
+  {
+    sprintf(str_buf, "\r\n:0x%02x", GPIOB->IDR & 0x00ff );
+    print(str_buf);
+//    sprintf(str_buf, "\r\nCamera Value: 0x%8x", CAMERA_PORT & 0x00ff);
+//    print(str_buf);
+//    sprintf(str_buf, "\r\nCapture Value: 0x%8x", *(uint32_t *)RhoSystem.Variables.Buffers.Capture & 0x00ff);
+//    print(str_buf);
+    STM_Wait(1000);
+  }
   MasterFunctions.Init();
 }
 
 void Master_Init( void )
-{
+{ 
   dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
   SpoofDensityMap( x, CAPTURE_WIDTH );
   SpoofDensityMap( y, CAPTURE_HEIGHT );
-  uint16_t del = UNIVERSAL_DELIMITER;
-  print((char *)&del);
-  PrintBuffer( x, CAPTURE_WIDTH );
-  PrintBuffer( y, CAPTURE_HEIGHT );
-  print((char *)&del);
-  //DrawDensityMap( map, CAPTURE_WIDTH );
+  DrawDensityMap( x, CAPTURE_WIDTH );
+//  DrawDensityMap( y, CAPTURE_HEIGHT );
+//  uint16_t del = UNIVERSAL_DELIMITER;
+//  print((char *)&del);
+//  PrintBuffer( x, CAPTURE_WIDTH );
+//  PrintBuffer( y, CAPTURE_HEIGHT );
+//  print((char *)&del);
   
   while(1);
   /* Initialize state manager */

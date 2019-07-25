@@ -15,15 +15,15 @@ inline void print( char * Buf )
 void DrawDensityMap( uint8_t * a, int32_t l )
 {
     uint8_t curr, prev = 0;
-    int32_t diff = 0;
+    int32_t diff = 0, vert = 0;
     for( uint32_t i = 0; i < l; i++ )
     {
         curr = a[i];
         sprintf(str_buf, "%3d:", i);
-        printf( str_buf );
+        print( str_buf );
         if( curr > MAX_PRINT_INDEX ) curr = MAX_PRINT_INDEX;
         diff = (int32_t)curr - (int32_t)prev;
-        vert = fmin(curr, prev);
+        vert = curr < prev ? curr : prev;
         prev = curr;
 
         for( ; vert > 0; vert--) print(" ");

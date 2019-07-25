@@ -1243,6 +1243,15 @@
         <name>$PROJ_DIR$/../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$/../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pcd.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pcd_ex.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_usb.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal.c</name>
       </file>
       <file>
