@@ -75,19 +75,8 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t *
   Master.Utilities.Timer_Primary = timer;
   
 #warning "TODO: Figure out better capure DMA initializer"
-//  if(HAL_DMA_Start_IT(timer->hdma[RHO_TIM_DMA_ID], (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE) != HAL_OK)
-//    Error_Handler();
+  STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
   
-  while(1)
-  {
-    sprintf(str_buf, "\r\n:0x%02x", GPIOB->IDR & 0x00ff );
-    print(str_buf);
-//    sprintf(str_buf, "\r\nCamera Value: 0x%8x", CAMERA_PORT & 0x00ff);
-//    print(str_buf);
-//    sprintf(str_buf, "\r\nCapture Value: 0x%8x", *(uint32_t *)RhoSystem.Variables.Buffers.Capture & 0x00ff);
-//    print(str_buf);
-    STM_Wait(1000);
-  }
   MasterFunctions.Init();
 }
 

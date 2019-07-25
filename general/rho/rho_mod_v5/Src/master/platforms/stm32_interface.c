@@ -69,8 +69,8 @@ inline void STM_ResetDMA( void )
 }
 void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
 {
-//  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID], src, dst, size) != HAL_OK)
-//    Error_Handler();
+  if(HAL_DMA_Start_IT(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID], src, dst, size) != HAL_OK)
+    Error_Handler();
   __HAL_TIM_ENABLE_DMA(Master.Utilities.Timer_Primary, RHO_TIM_DMA_CC);
   if(init_state) STM_ResumeDMA();
   _dma_destination = dst;
