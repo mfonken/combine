@@ -21,8 +21,8 @@
 #define HOST_COMMAND_WAIT_TIME      5000
 #define HOST_COMMAND_RETRY_TIME     1000
 
+/* STM-Specific configurations */
 #ifdef __STM32__
-
 #include "stm32l4xx_it.h"
 #include "stm32l4xx_hal.h"
 #define _PLATFORM_ STM
@@ -39,7 +39,7 @@
 #define GPIO_Port_t     GPIO_TypeDef
 #define TIMER_Handle_t  TIM_HandleTypeDef
 #define I2C_Handle_t    I2C_HandleTypeDef
-//#define SPI_Handle_t    SPI_HandleTypeDef
+#define SPI_Handle_t    SPI_HandleTypeDef
 #define UART_Handle_t   UART_HandleTypeDef
 #define USB_Handle_t    PCD_HandleTypeDef
 #endif /* __STM32__ */

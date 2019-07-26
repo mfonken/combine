@@ -7,19 +7,31 @@
 /***************************************************************************************/
 /*                                  Core Routines                                      */
 /***************************************************************************************/
+/* INITIALIZING State Routine */
 static void InitializePlatform( void )
 {
-  PlatformFunctions.Init( &Platform, HOST_COMMUNICATION_PROTOCOL, (generic_handle_t)Master.IOs.HOST_DEFAULT_CHANNEL );
+    dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
+    SpoofDensityMap( x, CAPTURE_WIDTH );
+    SpoofDensityMap( y, CAPTURE_HEIGHT );
+    DrawDensityMap( x, CAPTURE_WIDTH );
+    DrawDensityMap( y, CAPTURE_HEIGHT );
+    PrintDensityMaps( x, CAPTURE_WIDTH, y, CAPTURE_HEIGHT );
+
+    PlatformFunctions.Init( &Platform, HOST_COMMUNICATION_PROTOCOL, (generic_handle_t)Master.IOs.HOST_DEFAULT_CHANNEL );
 }
 
+/* CONNECTING_TO_HOST State Routine */
 static void ConnectToHost( void )
 {
+#ifdef PERFORM_HOST_PING_FOR_INIT
   while( PlatformFunctions.Host.Command( PING_HOST, NEEDED ) != OK )
   {
     PlatformFunctions.Wait( HOST_COMMAND_WAIT_TIME );
   }
+#endif
 }
 
+/* CONFIGURING State Routine */
 static void ConfigureApplication( void )
 {
 #ifdef __OV9712__
@@ -31,21 +43,19 @@ static void ConfigureApplication( void )
 #endif
 }
 
+/* READY State Routine */
 static void ExitInitialization( void )
 {
 #ifdef __RHO__
   RhoSystem.Functions.Perform.Activate();
 #endif
   if( SystemFunctions.State.IsIn( &System, READY ) )
-  {
     MasterFunctions.Run();
-  }
   else
-  {
     PlatformFunctions.Wait(250);
-  }
 }
 
+/* ACTIVE State Routine */
 static inline void ApplicationCore( void )
 {
 #ifdef __RHO__
@@ -55,14 +65,16 @@ static inline void ApplicationCore( void )
 #endif
 }
 
-static void ErrorStateHandler( void )
+/* SYS_ERROR State Routine */
+static void SystemError( void )
 {
-    ///TODO: Implement handler method for unexpected entry of error state
-}
-
-uint8_t     HAL_GPIO_ReadPort(GPIO_TypeDef* GPIOx)
-{
-  return GPIOx->IDR;
+    LOG( ALWAYS, "System error! Resetting in" );
+    for( byte_t i = 3 ; i > 0; i-- )
+    {
+        LOG_BARE( ALWAYS, " %d", i );
+        PlatformFunctions.Wait(1000);
+    }
+    PlatformFunctions.Reset();
 }
 
 /***************************************************************************************/
@@ -71,24 +83,17 @@ uint8_t     HAL_GPIO_ReadPort(GPIO_TypeDef* GPIOx)
 void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t * usart )
 {
   Master.IOs.I2C_Primary = i2c;
-  Master.IOs.UART_Primary = usart;
   Master.Utilities.Timer_Primary = timer;
-  
+  Master.IOs.UART_Primary = usart;
+
 #warning "TODO: Figure out better capure DMA initializer"
   STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
-  
+
   MasterFunctions.Init();
 }
 
 void Master_Init( void )
-{ 
-  dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
-  SpoofDensityMap( x, CAPTURE_WIDTH );
-  SpoofDensityMap( y, CAPTURE_HEIGHT );
-//  DrawDensityMap( x, CAPTURE_WIDTH );
-//  DrawDensityMap( y, CAPTURE_HEIGHT );
-//  PrintDensityMaps( x, CAPTURE_WIDTH, y, CAPTURE_HEIGHT );
-  
+{
   /* Initialize state manager */
   SystemFunctions.Init( &System, &global_states_list );
 
@@ -96,7 +101,7 @@ void Master_Init( void )
   SystemFunctions.State.Enter( &System, INITIALIZING );
 
   /* Connect to host, this is critical for finishing initialization hence endless loop */
-  //SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
+  SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
 
   /* Configure application items */
   SystemFunctions.State.Enter( &System, CONFIGURING );

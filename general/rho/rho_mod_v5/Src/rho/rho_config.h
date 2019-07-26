@@ -48,6 +48,9 @@
 #define CAPTURE_BUFFER_SIZE     CAPTURE_BUFFER_LENGTH
 
 #define SS                      6 /// literal of DEFAULT_SUBSAMPLE
+#define CBW                     1 /// literal capture buffer unit length i.e. sizeof(capture_t)
+#define TBW                     2 /// literal threshold buffer unit length i.e. sizeof(index_t)
+#define DMW                     1 /// literal density projection buffer unit length i.e. sizeof(dmap_t)
 
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH

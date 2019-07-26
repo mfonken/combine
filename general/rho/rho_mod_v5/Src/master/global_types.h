@@ -38,7 +38,6 @@ callback_t
   Capture;
 } camera_application_flags;
 
-//typedef uint32_t * address_t;
 typedef uint32_t * generic_handle_t;
 
 #endif /* global_types_h */

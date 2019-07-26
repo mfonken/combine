@@ -5,7 +5,6 @@ void InitSystem(
   system_states_list_t * state_list )
 {
   system->state_list = state_list;
-//  system.state_list = states;
   SystemFunctions.State.Set( system, system->state );
 }
 

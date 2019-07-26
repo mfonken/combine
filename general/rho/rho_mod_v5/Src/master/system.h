@@ -31,7 +31,7 @@ typedef enum
   ACTIVE,
   IDLE,
   RECONFIGURING,
-  ERROR_STATE,
+  SYS_ERROR,
   NUM_SYSTEM_STATES
 } system_state_enum;
 
@@ -44,7 +44,7 @@ static const char * system_state_enum_strings[] =
   "ACTIVE",
   "IDLE",
   "RECONFIGURING",
-  "ERROR_STATE",
+  "SYS_ERROR",
   "UNKNOWN"
 };
 
@@ -76,7 +76,7 @@ typedef struct
 static system_t System =
 {
   { THIS_ID },
-  IDLE, // State
+  IDLE,
 };
 
 /***************************************************************************************/

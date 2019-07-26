@@ -101,14 +101,6 @@ typedef struct
 /***************************************************************************************/
 void InitPlatform( platform_t *, protocol_t, generic_handle_t );
 
-#ifdef __RHO__
-///* Application interfaces */
-//static void InitRhoInterface( TIMER_Handle_t * timer, UART_Handle_t * usart );
-//
-//inline uint8_t   TransmitPacket( packet_t * );
-//inline uint16_t  ReceivePacket( packet_t * );
-#endif
-
 /*** Custom platform interfaces ***/
 /* GPIO */
 inline void SetPortMode(GPIO_t *, uint16_t );
@@ -122,21 +114,6 @@ platform_status_enum PerformHostCommand( host_command_type_enum, platform_wait_p
 /***************************************************************************************/
 /*                               Function Structures                                   */
 /***************************************************************************************/
-#ifdef __RHO__
-//typedef struct
-//{
-//  uint8_t (*Transmit)( packet_t * );
-//  uint8_t (*Receive)( packet_t * );
-//} rho_interface_packet_functions;
-//
-//typedef struct
-//{
-//  void (*Init)( TIMER_Handle_t *, UART_Handle_t * );
-//  void (*ActivateFlags)( rho_system_flags variables * );
-//  rho_interface_packet_functions Packet;
-//} rho_interface_functions;
-#endif
-
 typedef struct
 {
   void (*Handler)( uint16_t );
@@ -167,7 +144,8 @@ typedef struct
 
 typedef struct
 {
-  void (*SetPortMode)(GPIO_t *, uint16_t );
+  void (*SetPortMode)( GPIO_t *, uint16_t );
+  uint8_t (*ReadPort)( GPIO_t * );
   void (*Write)( GPIO_t *, uint16_t );
 } platform_interface_gpio_functions;
 
@@ -211,14 +189,7 @@ static platform_interface_functions PlatformFunctions =
 {
   .Init                 = InitPlatform,
   .Wait                 = PLATFORM_SPECIFIC(Wait),
-
-#ifdef __RHO__
-//  .Rho.Init             = InitRhoInterface,
-//  .Rho.ActivateFlags    = ActivateFlagsRhoInterface,
-//
-//  .Rho.Packet.Transmit  = TransmitPacket,
-//  .Rho.Packet.Receive   = ReceivePacket,
-#endif
+  .Reset                = PLATOFRM_SPECIFIC(Reset),
 
   .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),
   .Interrupt.Enable     = PLATFORM_SPECIFIC(InterruptEnable),
@@ -237,6 +208,7 @@ static platform_interface_functions PlatformFunctions =
   .I2C.Transmit         = PLATFORM_SPECIFIC(I2CMasterTx),
 
   .GPIO.SetPortMode     = SetPortMode,
+  .GPIO.ReadPort        = PLATFORM_SPECIFIC(ReadPort),
   .GPIO.Write           = WritePin,
 
   .Clock.Now            = PLATFORM_SPECIFIC(Timestamp),

@@ -38,7 +38,7 @@ void ConnectToHost( void );
 void ConfigureApplication( void );
 void ExitInitialization( void );
 inline void ApplicationCore( void );
-void ErrorStateHandler( void );
+void SystemError( void );
 
 /***************************************************************************************/
 /*                                Core State List                                      */
@@ -50,7 +50,7 @@ static system_states_list_t global_states_list =
   { CONFIGURING,        READY,              ConfigureApplication  },
   { READY,              ACTIVE,             ExitInitialization    },
   { ACTIVE,             IDLE,               ApplicationCore       },
-  { ERROR_STATE,        IDLE,               ErrorStateHandler     }
+  { SYS_ERROR,          IDLE,               SystemError           }
 };
 
 #endif

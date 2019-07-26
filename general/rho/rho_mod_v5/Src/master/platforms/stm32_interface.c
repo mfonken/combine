@@ -7,16 +7,23 @@
 //
 
 /************************************************************************
- *                             Includes                      *
+ *                             Includes                                 *
  ***********************************************************************/
 #include "stm32_interface.h"
 #include "main.h"
 #include "printers.h"
 
+/************************************************************************
+ *                             Master Instance                          *
+ ***********************************************************************/
 master_t Master;
 
+/************************************************************************
+ *                           Interrupt Handlers                         *
+ ***********************************************************************/
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
+    /* Applicaiton Specific */
 #ifdef __RHO__
   if(!Platform.CameraFlags.IRQ) return;
   switch(GPIO_Pin)
@@ -35,7 +42,6 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
     default:
         return;
   }
-
   if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame ) STM_ResetDMA();
 #endif
 }
@@ -52,6 +58,9 @@ void STM_InterruptDisable( void )
   HAL_NVIC_DisableIRQ(EXTI4_IRQn);
 }
 
+/************************************************************************
+ *                              DMA Handlers                            *
+ ***********************************************************************/
 inline void STM_PauseDMA( void )
 {
   __HAL_TIM_DISABLE_IT(Master.Utilities.Timer_Primary, RHO_TIM_IT_CC);
@@ -76,12 +85,14 @@ void STM_InitDMA( uint32_t src, uint32_t dst, uint16_t size, bool init_state )
   _dma_destination = dst;
   _dma_size = size;
 }
-
 uint32_t STM_GetDMAFillAddress( void )
 {
   return _dma_destination + ( (int32_t)_dma_size - (int32_t)Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CNDTR );
 }
 
+/************************************************************************
+ *                             UART Handlers                            *
+ ***********************************************************************/
 inline uint8_t STM_UartTxDMA( UART_Handle_t * huart, uint8_t * buffer, uint16_t length )
 {
   return HAL_UART_Transmit( Master.IOs.UART_Primary, buffer, length, UART_TIMEOUT ); //HAL_UART_Transmit_DMA
@@ -100,11 +111,17 @@ inline uint16_t STM_UartRxDMA( UART_Handle_t * huart, uint8_t * buffer )
 //  return false;
 //}
 
+/************************************************************************
+ *                              I2C Handlers                            *
+ ***********************************************************************/
 inline void STM_I2CMasterTx( I2C_Handle_t * hi2c, uint16_t addr, uint8_t * buffer, uint16_t length, uint32_t timeout )
 {
   HAL_I2C_Master_Transmit( hi2c, addr, buffer, length, timeout);
 }
 
+/************************************************************************
+ *                             GPIO Handlers                            *
+ ***********************************************************************/
 inline void STM_SetPortMode( GPIO_TypeDef * port, uint16_t pin, uint8_t mode )
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -112,23 +129,35 @@ inline void STM_SetPortMode( GPIO_TypeDef * port, uint16_t pin, uint8_t mode )
   GPIO_InitStruct.Mode = mode;
   HAL_GPIO_Init( (GPIO_TypeDef *)port, &GPIO_InitStruct );
 }
-
+inline uint8_t STM_ReadPort( GPIO_TypeDef * port )
+{
+    return port->IDR;
+}
 inline void STM_WritePin( GPIO_TypeDef * port, uint16_t pin, uint8_t state )
 {
   HAL_GPIO_WritePin( port, pin, (GPIO_PinState)state);
 }
 
+/************************************************************************
+ *                             Time Handlers                            *
+ ***********************************************************************/
 inline uint32_t STM_Timestamp(void)
 {
   return HAL_GetTick();
 }
-
 inline void STM_Wait( uint32_t nTime )
 {
   HAL_Delay( nTime );
 }
-
 inline uint32_t STM_SysClockFreq(void)
 {
   return HAL_RCC_GetSysClockFreq();
+}
+
+/************************************************************************
+ *                            System Handlers                           *
+ ***********************************************************************/
+void STM_Reset( void )
+{
+    NVIC_SystemReset();
 }
