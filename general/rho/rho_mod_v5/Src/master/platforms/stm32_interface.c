@@ -42,7 +42,14 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
     default:
         return;
   }
-  if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame ) STM_ResetDMA();
+  if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame ) 
+  {    
+//    LOG(ALWAYS, "0x%08x", Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CNDTR );
+    HAL_DMA_Abort(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]);
+    STM_InitDMA( (uint32_t)&CAMERA_PORT, _dma_destination, _dma_size, true );
+//    LOG(ALWAYS, "0x%08x", Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CNDTR );
+//    LOG(ALWAYS, ENDL);
+  }
 #endif
 }
 void STM_InterruptEnable( void )

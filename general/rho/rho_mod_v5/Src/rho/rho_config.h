@@ -23,12 +23,11 @@
 #define CAPTURE_HEIGHT          700
 #else
 /* Camera Config */
-#define RHO_WIDTH               1280
-#define RHO_HEIGHT              800
+//#define RHO_WIDTH               1280
+//#define RHO_HEIGHT              800
 
-#define CAPTURE_DIV             4
-#define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
-#define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
+#define CAPTURE_WIDTH           CAMERA_WIDTH_F
+#define CAPTURE_HEIGHT          CAMERA_HEIGHT_F
 #endif
 
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)

@@ -170,7 +170,7 @@ typedef struct
 
 typedef struct
 {
-    density_map_t x,y;
+    density_map_t x, y;
 } density_map_pair_t;
 
 typedef struct

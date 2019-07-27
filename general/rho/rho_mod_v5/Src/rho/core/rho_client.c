@@ -12,7 +12,7 @@
  *                        Local Configuration                           *
  ***********************************************************************/
  #define __ASSEMBLY_RHO__
- #define SPOOF_PROCESS_BUFFER
+// #define SPOOF_PROCESS_BUFFER
 
 /************************************************************************
  *                          Local Instance                              *
@@ -22,11 +22,11 @@ rho_system_t RhoSystem =
     { /* VARIABLES */
         { /* Utility */
             { /* Density map pair */
-                { /* Dy */
+                { /* Dx */
                     FOREGROUND_DENSITY_MAP_Y,
                     BACKGROUND_DENSITY_MAP_Y
                 },
-                { /* Dx */
+                { /* Dy */
                     FOREGROUND_DENSITY_MAP_X,
                     BACKGROUND_DENSITY_MAP_X
                 }
@@ -78,6 +78,9 @@ void ProcessRhoSystemFrameCapture( void )
     RhoSystem.Functions.Platform.Interrupt.Enable();
     CaptureAndProcessFrame();
     RhoSystem.Functions.Platform.Interrupt.Disable();
+//    DrawDensityMap( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH );
+//    DrawDensityMap( RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
+    PrintDensityMaps( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH, RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
 }
 
 void CaptureAndProcessFrame( void )
@@ -98,18 +101,20 @@ void CaptureAndProcessFrame( void )
     RhoSystem.Variables.Flags->EvenRowToggle = false;
 
     /* Manually start First Row Capture */
+    while(!RhoSystem.Variables.Flags->Frame);
     while(!RhoSystem.Variables.Flags->Row);
     CaptureRowCallback();
 
-    uint32_t TopLeft = 0, TopRight = 0, BtmLefft = 0, BtmRight = 0;
-    ProcessFrameSectionControl( &TopLeft, &TopRight );
-    ProcessFrameSectionControl( &BtmLeft, &BtmRight );
+    uint32_t TopLeft = 0, TopRight = 0, BtmLeft = 0, BtmRight = 0;
+    ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
+    ProcessFrameSectionControl( RhoSystem.Variables.Utility.Height, &BtmLeft, &BtmRight );
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = TopLeft;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = TopRight;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = BtmLeft;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = BtmRight;
 
     DisableCaptureCallback();
+    while(RhoSystem.Variables.Flags->Frame);
 }
 
 /* Capture Row Callback
@@ -118,15 +123,17 @@ void CaptureAndProcessFrame( void )
 void CaptureRowCallback( void )
 {
     DisableCaptureCallback();
+#ifdef SPOOF_PROCESS_BUFFER
     RhoSystem.Variables.Utility.Thresh = 0x05;
     RhoSystem.Variables.Utility.Subsample = 0x01;
-#ifdef SPOOF_PROCESS_BUFFER
     for(uint8_t i = 0; i < 0x0a; i++)
     {
       RhoSystem.Variables.Buffers.Capture[i] = i;
       RhoSystem.Variables.Addresses.CaptureEnd++;
   }
 #else
+    RhoSystem.Variables.Utility.Thresh = 0xef;
+    RhoSystem.Variables.Utility.Subsample = 0x01;
    RhoSystem.Variables.Addresses.CaptureEnd = RhoSystem.Functions.Platform.DMA.GetFillAddr();
 #endif
 
@@ -143,7 +150,7 @@ void CaptureRowCallback( void )
     *(index_t *)RhoSystem.Variables.Addresses.ThreshIndex = Y_DEL;
     RhoSystem.Variables.Addresses.ThreshIndex += TBW;
     RhoSystem.Variables.Utility.RowsLeft--;
-    RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
+//    RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
 
     /* Only re-enable capture if buffers are not full and there is more to process */
     if( ( (uint32_t)RhoSystem.Variables.Addresses.ThreshIndex < (uint32_t)RhoSystem.Variables.Addresses.ThreshMax )
@@ -203,6 +210,19 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
     );
 #endif
     return (address_t)thresh_address;
+}
+void ProcessFrameSectionControl( const index_t rows, uint32_t * left, uint32_t * right )
+{
+    uint32_t Left = 0, Right = 0, Fill = 0, Complete = 0;
+    do{
+      while( ProcessingBufferHasUpdate() != true );
+      AcknowledgeProcessingBufferUpdate();
+      ProcessFrameSection( rows, &Left, &Right, &Fill, &Complete );
+      RhoSystem.Variables.Addresses.ProcessIndex = Fill;
+      RhoSystem.Variables.Addresses.DensityMapGenIndex += CBW;
+      *left += Left; *right += Right;
+      EnableCaptureCallback();
+    } while( Complete != true );
 }
 
 void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right, uint32_t * fill, uint32_t * complete )
@@ -292,19 +312,6 @@ void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right,
     *left = Q_left;
     *right = Q_right;
     *fill = t_addr;
-}
-
-void ProcessFrameSectionControl( uint32_t * left, uint32_t * right )
-{
-    int32_t Fill = 0, Complete = 0;
-    do{
-      while( ProcessingBufferHasUpdate() != true );
-      AcknowledgeProcessingBufferUpdate();
-      ProcessFrameSection( RhoSystem.Variables.Utility.Cy, left, right, &Fill, &Complete );
-      RhoSystem.Variables.Addresses.ProcessIndex = Fill;
-      RhoSystem.Variables.Addresses.DensityMapGenIndex += CBW;
-      EnableCaptureCallback();
-    } while( Complete != true );
 }
 
 void ActivateBackgrounding( void )
@@ -402,4 +409,6 @@ void ZeroRhoSystemMemory( void )
 {
     memset( RhoSystem.Variables.Buffers.Thresh,   0, sizeof(index_t)   * THRESH_BUFFER_SIZE );
     memset( RhoSystem.Variables.Buffers.Quadrant, 0, sizeof(density_t) * NUM_QUADRANTS      );
+    memset( RhoSystem.Variables.Utility.DensityMapPair.x.map, 0, sizeof(dmap_t) * CAPTURE_HEIGHT );
+    memset( RhoSystem.Variables.Utility.DensityMapPair.y.map, 0, sizeof(dmap_t) * CAPTURE_WIDTH  );
 }

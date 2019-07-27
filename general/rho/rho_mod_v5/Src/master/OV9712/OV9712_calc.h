@@ -27,7 +27,7 @@
 /// TODO: Get actual CORE_RATE
 #define CORE_RATE                   PlatformFunctions.Clock.SysClockFreq()
 
-#define SUBSAMPLE_APPLICATION       2
+#define SUBSAMPLE_APPLICATION       1
 #define PERCENT_ACTIVE_APPLICATION  0.20
 #define DEFAULT_FRAME_APPLICATION   20
 
@@ -158,8 +158,8 @@
 /************************************************************************
  *                 OV9712 Registers & Parameters                        *
  ***********************************************************************/
-#define CAMERA_WIDTH_F              FRAME_WIDTH_BASE
-#define CAMERA_HEIGHT_F             FRAME_HEIGHT
+#define CAMERA_WIDTH_F              (FRAME_WIDTH_BASE >> 2 )
+#define CAMERA_HEIGHT_F             (FRAME_HEIGHT >> 2)
 #define CAMERA_WIDTH_MSB            ( ( CAMERA_WIDTH_F  >> 3 ) & 0xff )
 #define CAMERA_WIDTH_LSB            ( CAMERA_WIDTH_F  & 0x07 )
 #define CAMERA_HEIGHT_MSB           ( ( CAMERA_HEIGHT_F >> 2 ) & 0xff )

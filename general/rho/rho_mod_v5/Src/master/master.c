@@ -10,12 +10,12 @@
 /* INITIALIZING State Routine */
 static void InitializePlatform( void )
 {
-    dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
-    SpoofDensityMap( x, CAPTURE_WIDTH );
-    SpoofDensityMap( y, CAPTURE_HEIGHT );
-    DrawDensityMap( x, CAPTURE_WIDTH );
-    DrawDensityMap( y, CAPTURE_HEIGHT );
-    PrintDensityMaps( x, CAPTURE_WIDTH, y, CAPTURE_HEIGHT );
+//    dmap_t x[CAPTURE_WIDTH] = { 0 }, y[CAPTURE_HEIGHT] = { 0 };
+//    SpoofDensityMap( x, CAPTURE_WIDTH );
+//    SpoofDensityMap( y, CAPTURE_HEIGHT );
+//    DrawDensityMap( x, CAPTURE_WIDTH );
+//    DrawDensityMap( y, CAPTURE_HEIGHT );
+//    PrintDensityMaps( x, CAPTURE_WIDTH, y, CAPTURE_HEIGHT );
 
     PlatformFunctions.Init( &Platform, HOST_COMMUNICATION_PROTOCOL, (generic_handle_t)Master.IOs.HOST_DEFAULT_CHANNEL );
 }

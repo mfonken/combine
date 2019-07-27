@@ -26,6 +26,7 @@ address_t CaptureRow( register byte_t *,
                       const register address_t,
                       const register address_t,
                       const register address_t );
+void ProcessFrameSectionControl( const index_t, uint32_t * left, uint32_t * right );
 void ProcessFrameSection( const index_t, uint32_t *, uint32_t *, uint32_t *, uint32_t * );
 void ActivateBackgrounding( void );
 void DeactivateBackgrounding( void );

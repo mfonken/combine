@@ -47,7 +47,7 @@ system_state_t * GetStateFromListSystem( system_t * system, system_state_enum st
     system_state_t * state_type;
     /* Cycle state list to find specified state.
         If not found, return is ERROR_STATE */
-    for( uint8_t i = 0; i < ERROR_STATE; i++ )
+    for( uint8_t i = 0; i < SYS_ERROR; i++ )
     {
         state_type = &(*system->state_list)[i];
         if( state_type->state == state ) break;

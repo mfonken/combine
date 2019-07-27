@@ -145,7 +145,7 @@ typedef struct
 typedef struct
 {
   void (*SetPortMode)( GPIO_t *, uint16_t );
-  uint8_t (*ReadPort)( GPIO_t * );
+  uint8_t (*ReadPort)( GPIO_Port_t * );
   void (*Write)( GPIO_t *, uint16_t );
 } platform_interface_gpio_functions;
 
@@ -166,10 +166,7 @@ typedef struct
 {
   void (*Init)( platform_t *, protocol_t, generic_handle_t );
   void (*Wait)( uint32_t );
-#ifdef __RHO__
-//  rho_interface_functions                Rho;
-//  platform_interface_packet_functions    Packet;
-#endif
+  void (*Reset)( void );
   platform_interface_interrupt_functions Interrupt;
   platform_interface_dma_functions       DMA;
   platform_interface_uart_functions      USART;
@@ -189,7 +186,7 @@ static platform_interface_functions PlatformFunctions =
 {
   .Init                 = InitPlatform,
   .Wait                 = PLATFORM_SPECIFIC(Wait),
-  .Reset                = PLATOFRM_SPECIFIC(Reset),
+  .Reset                = PLATFORM_SPECIFIC(Reset),
 
   .Interrupt.Handler    = PLATFORM_SPECIFIC(InterruptHandler),
   .Interrupt.Enable     = PLATFORM_SPECIFIC(InterruptEnable),
