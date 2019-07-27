@@ -32,13 +32,15 @@ void DrawDensityMap( uint8_t * a, int32_t l )
         prev = curr;
 
         for( ; vert > 0; vert--) print(" ");
-        int d = abs(diff), a = 2;
-        if(diff > 0) for( ; d > 1; d--) print("'");
+        int d = abs(diff);
+        if(diff > 0) for( ; d > 1; d--) print("¯");
         else for( ; d > 2; d--) print("_");
         if( diff > DENSITY_PRINT_SMOOTH_THRESH )
             print("\\");
         else if( diff < -DENSITY_PRINT_SMOOTH_THRESH )
             print("/");
+        else if( curr == MAX_PRINT_INDEX)
+            print(">");
         else
             print("|");
         print(ENDL);

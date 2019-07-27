@@ -102,8 +102,7 @@ void CaptureAndProcessFrame( void )
 
     /* Manually start First Row Capture */
     while(!RhoSystem.Variables.Flags->Frame);
-    while(!RhoSystem.Variables.Flags->Row);
-    CaptureRowCallback();
+    EnableCaptureCallback();
 
     uint32_t TopLeft = 0, TopRight = 0, BtmLeft = 0, BtmRight = 0;
     ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
