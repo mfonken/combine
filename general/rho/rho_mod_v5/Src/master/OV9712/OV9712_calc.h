@@ -18,8 +18,8 @@
 /************************************************************************
  *                             Settings                                 *
  ***********************************************************************/
-//#define OV9712_1280x800_CONFIG
-//#define USE_RGGB_G_SKIP
+#define OV9712_1280x800_CONFIG
+#define USE_RGGB_G_SKIP
 
 /************************************************************************
  *                      Application Configuration                       *
@@ -58,7 +58,7 @@
 #define DEFAULT_HOFFSET             0x131
 #define DEFAULT_VOFFSET             0x6
 
-./* Color bar settings */
+/* Color bar settings */
 #define ENABLE_COLOR_BAR            false
 #define COLOR_BAR_SOLID             0x0
 #define COLOR_BAR_FADE              0x1
@@ -178,8 +178,11 @@
 /************************************************************************
  *                 OV9712 Registers & Parameters                        *
  ***********************************************************************/
-#define CAMERA_DSP_WIDTH_F          FRAME_WIDTH_BASE
-#define CAMERA_DSP_HEIGHT_F         FRAME_HEIGHT
+#define CAMERA_WIDTH_F              FRAME_WIDTH_BASE
+#define CAMERA_HEIGHT_F             FRAME_HEIGHT
+
+#define CAMERA_DSP_WIDTH_F          CAMERA_WIDTH_F
+#define CAMERA_DSP_HEIGHT_F         CAMERA_HEIGHT_F
 #define CAMERA_DSP_WIDTH_MSB        ( ( CAMERA_DSP_WIDTH_F  >> 3 ) & 0xff )
 #define CAMERA_DSP_WIDTH_LSB        ( CAMERA_DSP_WIDTH_F  & 0x07 )
 #define CAMERA_DSP_HEIGHT_MSB       ( ( CAMERA_DSP_HEIGHT_F >> 2 ) & 0xff )
@@ -189,8 +192,8 @@
 #define REG59_V                     (uint8_t)CAMERA_DSP_WIDTH_MSB
 
 #define CAMERA_SENSOR_HORZ_PAD      16
-#define CAMERA_SENSOR_WIDTH         ( FRAME_WIDTH_BASE + CAMERA_SENSOR_HORZ_PAD )
-#define CAMERA_SENSOR_HEIGHT        FRAME_HEIGHT
+#define CAMERA_SENSOR_WIDTH         ( CAMERA_WIDTH_F + CAMERA_SENSOR_HORZ_PAD )
+#define CAMERA_SENSOR_HEIGHT        CAMERA_HEIGHT_F
 #define CAMERA_SENSOR_AHSIZE_LSB    ( CAMERA_SENSOR_WIDTH & 0x07 )
 #define CAMERA_SENSOR_AHSIZE_MSB    ( ( CAMERA_SENSOR_WIDTH  >> 3 ) & 0xff )
 #define CAMERA_SENSOR_AVSIZE_LSB    ( CAMERA_SENSOR_HEIGHT & 0x03 )
@@ -207,7 +210,7 @@
 #define AVSIZE_V                    CAMERA_SENSOR_AVSIZE_MSB
 
 #define DSP_CTRL_1_SMPH_MEAN_EN     ( CAPTURE_DIV > 0 ? 1 : 0)
-#define DSP_CTRL_1_V                ( ( DSP_CTRL_1_SMPH_MEAN_EN << 7 ) | ( ENABLE_COLOR_BAR  << 3 ) | ( COLOR_BAR_STYLE & 0x3 ) )
+#define DSP_CTRL_1_V                ( ( DSP_CTRL_1_SMPH_MEAN_EN << 7 ) | ( ENABLE_COLOR_BAR  << 3 ) | ( ENABLE_COLOR_BAR ? COLOR_BAR_STYLE & 0x3 : 0 ) )
 
 #define CAMERA_WIDTH_R              ( ( ( REG57_V >> 3 ) & 0x07 ) | (REG59_V << 3))
 #define CAMERA_HEIGHT_R             ( ( REG57_V & 0x03 ) | (REG58_V << 2))

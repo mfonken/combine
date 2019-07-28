@@ -15,9 +15,9 @@ static register_t OV9712_regs[] =
     {REG57,		 REG57_V},
     {REG58,		 REG58_V},
     {REG59,		 REG59_V},
-#ifndef OV9712_1280x800_CONFIG
+//#ifndef OV9712_1280x800_CONFIG
     {LENC_CTRL_23, 0x05}, // [2]V_skip|[0]H_skip - Normal image output(b0) or Sub-sampling output(b1)
-#endif
+//#endif
     {AHSIZE,     AHSIZE_V},
     {AVSIZE,     AVSIZE_V},
     {REG32,      REG32_V},
