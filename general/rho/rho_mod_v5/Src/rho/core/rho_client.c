@@ -105,7 +105,7 @@ void CaptureAndProcessFrame( void )
     EnableCaptureCallback();
 
     uint32_t TopLeft = 0, TopRight = 0, BtmLeft = 0, BtmRight = 0;
-    ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
+    //ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
     ProcessFrameSectionControl( RhoSystem.Variables.Utility.Height, &BtmLeft, &BtmRight );
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = TopLeft;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = TopRight;
@@ -193,7 +193,7 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
         "cmp     %0, %4         ; Compare with threshold value             \n\t"
         "ble     capture        ; If less than, continue to next capture   \n\t"
 
-        "sub     %0, %2, %5     ; Subtract capture buffer start from index \n\t"
+        "uqsub16 %0, %2, %5     ; Subtract capture buffer start from index \n\t"
         "strh    %0, [%6], #"STR(TBW)"; Store offset word at thresh index  \n\t"
         "b       capture        ; Branch back to next capture              \n"
     "end:                                                                  \n"

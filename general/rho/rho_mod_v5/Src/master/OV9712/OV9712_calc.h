@@ -19,7 +19,7 @@
  *                             Settings                                 *
  ***********************************************************************/
 //#define OV9712_1280x800_CONFIG
-#define USE_RGGB_G_SKIP
+//#define USE_RGGB_G_SKIP
 
 /************************************************************************
  *                      Application Configuration                       *
@@ -70,7 +70,7 @@
 
 #else
 #define FRAME_WIDTH_BASE            640
-#define FRAME_HEIGHT                400
+#define FRAME_HEIGHT                200
 
 #define VSYNC_HIGH_TP               9944
 #define VSYNC_LOW_TP                688888
