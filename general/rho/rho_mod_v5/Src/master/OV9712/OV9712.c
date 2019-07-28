@@ -8,31 +8,25 @@
  ***********************************************************************/
 static register_t OV9712_regs[] =
 {
-  {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
-  {REG5C,	REG5C_V}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
-//  {REG5D,     	REG5D_V}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
+    {DVP_CTRL_00,	0xb0}, // [7:6]VSYNC - vsync_old(b00), vsync_new(b01), or vsync3(b10)|[5]pclk_gate_en|[4]vsync_gate|[3]vsync3_w_sel|[2]pclk reverse|[1]href reverse|[0]vsync reverse
+    {REG5C,	REG5C_V}, // [6:5]PLL Pre-divider - /1(b0x), /2(b10), or /4(b11)|[4:0]Pll-multiplier CLK2=CLK1 x (32-[4:0])
+//    {REG5D,     	REG5D_V}, // [5:4]Output drive capability - 1x(b00), 2x(b01), 3x(b10), or 4x(b11)
 
-  {REG57,		 REG57_V},
-  {REG58,		 REG58_V},
-  {REG59,		 REG59_V},
+    {REG57,		 REG57_V},
+    {REG58,		 REG58_V},
+    {REG59,		 REG59_V},
+#ifndef OV9712_1280x800_CONFIG
+    {LENC_CTRL_23, 0x05}, // [2]V_skip|[0]H_skip - Normal image output(b0) or Sub-sampling output(b1)
+#endif
+    {AHSIZE,     AHSIZE_V},
+    {AVSIZE,     AVSIZE_V},
+    {REG32,      REG32_V},
+    {HSTART,     HSTART_V},
+    {REG03,      REG03_V},
+    {VSTART, 	 VSTART_V},
 
-  //{REG58,				(0xc8)},//0x19}, // DSP Output Vertical Size MSBs
-  //{REG59,				(0xa0/40)},//0x08}, // DSP Output Horizontal Size MSBs
-  //{LENC_CTRL_23, 0x05}, // [2]V_skip|[0]H_skip - Normal image output(b0) or Sub-sampling output(b1)
-
-  /*
-  {COM7,        0x42}, // [1]Color bar with pixel overlay
-  {DSP_CTRL_1,	0x2a}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
-
-  {HSTART, 			0x13},
-  {AHSIZE, 			0x51},
-  //{REG32, 			0x00},
-
-  {VSTART, 			0x00},
-  {AVSIZE, 			0x64},
-  {REG03, 			0x01},
-  */
-  {ENDR}
+    {DSP_CTRL_1, DSP_CTRL_1_V}, // [7]SMPH Mean enable|[3]Color bar without pixel overlay|[1:0]Patterns
+    {ENDR}
 };
 
 /************************************************************************
@@ -199,7 +193,7 @@ register_t dummy[] =
   {DVP_CTRL_06,		0x00}, // [7]blk_tog|[6]vsync_width_sel|[5:3]h2v delay|[2:0]v2h delay
   {DVP_CTRL_07,		0x80}, // vsync_width_l
   {DVP_CTRL_08,		0x24}, // [7:6]vsync_width_h|[5:4]sof2h delay offset|[3]ddr_phase|[2]Test pattern 10bit(b0) or 8bit(b1)[1:0]No pattern(b00), 1,2,4,8,?(b01), or 1,1,2,2,?(b10)
-  {DVP_CTRL_09,         0xa6}, // [7]sof_rst_en,[6:5]chg_sel for recalculating DVP timing for HSYNC mode|[4]hsync_en|[3]hsync_dvp_en|[2]hsync_1st_en|[1:0]snr(b00), reg(b01), or auto(b10)
+  {DVP_CTRL_09,     0xa6}, // [7]sof_rst_en,[6:5]chg_sel for recalculating DVP timing for HSYNC mode|[4]hsync_en|[3]hsync_dvp_en|[2]hsync_1st_en|[1:0]snr(b00), reg(b01), or auto(b10)
   {DVP_CTRL_0a,		0x40}, // [7:4]FIFO buffer size|[3:0]dmy_line_nu
   {DVP_CTRL_0b,		0x00}, // eof2v delay[23:16]
   {DVP_CTRL_0c,		0x01}, // eof2v delay[15:8]

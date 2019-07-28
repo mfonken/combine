@@ -31,6 +31,8 @@
 #define PERCENT_ACTIVE_APPLICATION  0.20
 #define DEFAULT_FRAME_APPLICATION   20
 
+#define CAPTURE_DIV                 1
+
 /************************************************************************
  *                        Derived Configuration                         *
  ***********************************************************************/
@@ -53,10 +55,25 @@
  *                      OV9712 Datasheet Values                         *
  * See https://datasheet.lcsc.com/szlcsc/OmniVision-Technologies-OV09712-V28A-1D_C11171.pdf *
  ***********************************************************************/
-#ifdef OV9712_1280x800_CONFIG
-#define FRAME_WIDTH_BASE            1280
-#define FRAME_HEIGHT                800
+#define DEFAULT_HOFFSET             0x131
+#define DEFAULT_VOFFSET             0x6
 
+./* Color bar settings */
+#define ENABLE_COLOR_BAR            false
+#define COLOR_BAR_SOLID             0x0
+#define COLOR_BAR_FADE              0x1
+#define COLOR_BAR                   0x2
+#define COLOR_BAR_STYLE             COLOR_BAR
+
+#ifdef OV9712_1280x800_CONFIG
+#define FRAME_WIDTH_BASE_PRE_DIV    1280
+#define FRAME_HEIGHT_PRE_DIV        800
+#define FRAME_WIDTH_BASE            ( CAPTURE_DIV == 0 ? FRAME_WIDTH_BASE_PRE_DIV : ( FRAME_WIDTH_BASE_PRE_DIV >> CAPTURE_DIV ) )
+#define FRAME_HEIGHT                ( CAPTURE_DIV == 0 ? FRAME_HEIGHT_PRE_DIV : ( FRAME_HEIGHT_PRE_DIV >> CAPTURE_DIV ) )
+#define FRAME_HSTART                ( ( ( FRAME_WIDTH_BASE_PRE_DIV >> 1 ) - ( FRAME_WIDTH_BASE >> 1 ) ) + DEFAULT_HOFFSET )
+#define FRAME_VSTART                ( ( ( FRAME_HEIGHT_PRE_DIV >> 1 ) - ( FRAME_HEIGHT     >> 1 ) ) + DEFAULT_VOFFSET )
+
+/* See https://datasheet.lcsc.com/szlcsc/OmniVision-Technologies-OV09712-V28A-1D_C11171.pdf */
 #define VSYNC_HIGH_TP               33584
 #define VSYNC_LOW_TP                1364080
 #define VSYNC_TOTAL_TP              1397664
@@ -69,8 +86,12 @@
 #define TP_TO_PCLK                  1
 
 #else
-#define FRAME_WIDTH_BASE            640
-#define FRAME_HEIGHT                200
+#define FRAME_WIDTH_BASE_PRE_DIV    640
+#define FRAME_HEIGHT_PRE_DIV        400
+#define FRAME_WIDTH_BASE            ( CAPTURE_DIV == 0 ? FRAME_WIDTH_BASE_PRE_DIV : ( FRAME_WIDTH_BASE_PRE_DIV >> CAPTURE_DIV ) )
+#define FRAME_HEIGHT                ( CAPTURE_DIV == 0 ? FRAME_HEIGHT_PRE_DIV : ( FRAME_HEIGHT_PRE_DIV >> CAPTURE_DIV ) )
+#define FRAME_HSTART                ( ( ( FRAME_WIDTH_BASE_PRE_DIV >> 1 ) - ( FRAME_WIDTH_BASE >> 1 ) ) + DEFAULT_HOFFSET )
+#define FRAME_VSTART                ( ( ( FRAME_HEIGHT_PRE_DIV >> 1 ) - ( FRAME_HEIGHT     >> 1 ) ) + DEFAULT_VOFFSET )
 
 #define VSYNC_HIGH_TP               9944
 #define VSYNC_LOW_TP                688888
@@ -82,7 +103,6 @@
 #define ROW_END_TO_FRAME_END_TP     256
 #define ROW_END_TO_ROW_START_TP     24040
 #define TP_TO_PCLK                  2
-
 #endif
 
 /************************************************************************
@@ -158,15 +178,36 @@
 /************************************************************************
  *                 OV9712 Registers & Parameters                        *
  ***********************************************************************/
-#define CAMERA_WIDTH_F              (FRAME_WIDTH_BASE >> 2 )
-#define CAMERA_HEIGHT_F             (FRAME_HEIGHT >> 2)
-#define CAMERA_WIDTH_MSB            ( ( CAMERA_WIDTH_F  >> 3 ) & 0xff )
-#define CAMERA_WIDTH_LSB            ( CAMERA_WIDTH_F  & 0x07 )
-#define CAMERA_HEIGHT_MSB           ( ( CAMERA_HEIGHT_F >> 2 ) & 0xff )
-#define CAMERA_HEIGHT_LSB           ( CAMERA_HEIGHT_F & 0x03 )
-#define REG57_V                     (uint8_t)((CAMERA_WIDTH_LSB << 2) | CAMERA_HEIGHT_LSB)
-#define REG58_V                     (uint8_t)CAMERA_HEIGHT_MSB
-#define REG59_V                     (uint8_t)CAMERA_WIDTH_MSB
+#define CAMERA_DSP_WIDTH_F          FRAME_WIDTH_BASE
+#define CAMERA_DSP_HEIGHT_F         FRAME_HEIGHT
+#define CAMERA_DSP_WIDTH_MSB        ( ( CAMERA_DSP_WIDTH_F  >> 3 ) & 0xff )
+#define CAMERA_DSP_WIDTH_LSB        ( CAMERA_DSP_WIDTH_F  & 0x07 )
+#define CAMERA_DSP_HEIGHT_MSB       ( ( CAMERA_DSP_HEIGHT_F >> 2 ) & 0xff )
+#define CAMERA_DSP_HEIGHT_LSB       ( CAMERA_DSP_HEIGHT_F & 0x03 )
+#define REG57_V                     (uint8_t)( ( CAMERA_DSP_WIDTH_LSB << 2 ) | CAMERA_DSP_HEIGHT_LSB )
+#define REG58_V                     (uint8_t)CAMERA_DSP_HEIGHT_MSB
+#define REG59_V                     (uint8_t)CAMERA_DSP_WIDTH_MSB
+
+#define CAMERA_SENSOR_HORZ_PAD      16
+#define CAMERA_SENSOR_WIDTH         ( FRAME_WIDTH_BASE + CAMERA_SENSOR_HORZ_PAD )
+#define CAMERA_SENSOR_HEIGHT        FRAME_HEIGHT
+#define CAMERA_SENSOR_AHSIZE_LSB    ( CAMERA_SENSOR_WIDTH & 0x07 )
+#define CAMERA_SENSOR_AHSIZE_MSB    ( ( CAMERA_SENSOR_WIDTH  >> 3 ) & 0xff )
+#define CAMERA_SENSOR_AVSIZE_LSB    ( CAMERA_SENSOR_HEIGHT & 0x03 )
+#define CAMERA_SENSOR_AVSIZE_MSB    ( ( CAMERA_SENSOR_HEIGHT >> 2 ) & 0xff )
+#define CAMERA_SENSOR_HSTART_LSB    ( FRAME_HSTART & 0x07 )
+#define CAMERA_SENSOR_HSTART_MSB    ( ( FRAME_HSTART >> 3 ) & 0xff )
+#define CAMERA_SENSOR_VSTART_LSB    ( FRAME_VSTART & 0x03 )
+#define CAMERA_SENSOR_VSTART_MSB    ( ( FRAME_VSTART >> 2 ) & 0xff )
+#define REG32_V                     ( ( CAMERA_SENSOR_AHSIZE_LSB << 3 ) | CAMERA_SENSOR_HSTART_LSB )
+#define REG03_V                     ( ( CAMERA_SENSOR_AVSIZE_LSB << 2 ) | CAMERA_SENSOR_VSTART_LSB )
+#define HSTART_V                    CAMERA_SENSOR_HSTART_MSB
+#define VSTART_V                    CAMERA_SENSOR_VSTART_MSB
+#define AHSIZE_V                    CAMERA_SENSOR_AHSIZE_MSB
+#define AVSIZE_V                    CAMERA_SENSOR_AVSIZE_MSB
+
+#define DSP_CTRL_1_SMPH_MEAN_EN     ( CAPTURE_DIV > 0 ? 1 : 0)
+#define DSP_CTRL_1_V                ( ( DSP_CTRL_1_SMPH_MEAN_EN << 7 ) | ( ENABLE_COLOR_BAR  << 3 ) | ( COLOR_BAR_STYLE & 0x3 ) )
 
 #define CAMERA_WIDTH_R              ( ( ( REG57_V >> 3 ) & 0x07 ) | (REG59_V << 3))
 #define CAMERA_HEIGHT_R             ( ( REG57_V & 0x03 ) | (REG58_V << 2))
