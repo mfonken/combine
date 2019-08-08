@@ -14,6 +14,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     env.resume();
     Mat local_frame;
     
+    struct timeval a,b;
     int instruction_index = 0;
     while(1)
     {
@@ -58,14 +59,21 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
                 sleep(0.01);
                 tau.avg = 0;
                 tau.count = 0;
+                tau.stddev_sum = 0;
                 env.start();
+                gettimeofday( &a, NULL);
                 sleep(10);
+                gettimeofday( &b, NULL);
                 env.pause();
+                tau.stddev = sqrt( tau.stddev_sum / (double)(tau.count));
                 //                printf("%d\n", tau.count);
-                printf("Tau averaged %fms and error %.3fpx for %d iterations\n", tau.avg*1000, tau.accuracy, tau.count);
+                
+                char buf[128];
+                sprintf(buf, "PCR (Seg. Only),%d,%d,%lf,%f,%f,%f\n", width, tau.count, timeDiff(a,b), tau.avg * 1000., tau.accuracy / (double)width * 100., tau.stddev / (double)width * 100.);
+                printf("%s", buf);
                 
                 file.open(PERF_FILENAME, ofstream::app | ofstream::out);
-                file << width << "," << tau.avg*1000 << "," << tau.count << "," << tau.accuracy << endl;
+                file << string(buf);
                 file.close();
                 break;
             case 'p':
@@ -81,6 +89,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 int main(int argc, const char * argv[])
 {
 #ifdef AUTOMATION_RUN
+//    ofstream file(PERF_FILENAME);
+//    file << "Algorithm,Dimension(px),Iterations,Total Time(s),Avg. Time(ms), Avg. Diff.(%), Std. Dev. Diff. (%)\n";
+//    file.close();
 #ifdef AUTOMATION_INSTRUCTIONS
     char instructions[] = AUTOMATION_INSTRUCTIONS;
     int num_instructions = sizeof(instructions)/sizeof(instructions[0]);

@@ -1,10 +1,7 @@
-//
-//  hmm.h
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/10/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: hmm.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifdef __PSM__
 
@@ -42,7 +39,7 @@ static const hidden_markov_model_function_t HMMFunctions =
     .BaumWelchGammaSolve        = BaumWelchGammaSolveHiddenMarkovModel,
     .PrintObservationMatrix     = PrintObservationMatrixHiddenMarkovModel
 };
-    
+
 #ifdef __cplusplus
 }
 #endif

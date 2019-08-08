@@ -1,10 +1,7 @@
-//
-//  stm32_interface.c
-//  rho_client
-//
-//  created by matthew fonken on 9/22/18.
-//  copyright © 2018 marbl. all rights reserved.
-//
+/************************************************************************
+ *  File: stm32_interface.c
+ *  Group: Rho Hardware Interface
+ ***********************************************************************/
 
 /************************************************************************
  *                             Includes                                 *
@@ -42,8 +39,8 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
     default:
         return;
   }
-  if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame ) 
-  {    
+  if(!Platform.CameraFlags.Row || Platform.CameraFlags.Frame )
+  {
 //    LOG(ALWAYS, "0x%08x", Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]->Instance->CNDTR );
     HAL_DMA_Abort(Master.Utilities.Timer_Primary->hdma[RHO_TIM_DMA_ID]);
     STM_InitDMA( (uint32_t)&CAMERA_PORT, _dma_destination, _dma_size, true );

@@ -1,10 +1,7 @@
-//
-//  gmm.h
-//  GaussianMixtureModel
-//
-//  Created by Matthew Fonken on 2/9/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: gmm.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifdef __PSM__
 
@@ -14,7 +11,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include "fsm.h"
 
 /* Cluster functions */
@@ -77,7 +74,7 @@ static gaussian_mixture_functions GMMFunctions =
     .Cluster.ContributeToOutput     = ContributeToOutputOfGaussianMixtureCluster,
     .Cluster.UpdateLimits           = UpdateLimitsOfGaussianMixtureCluster,
     .Cluster.Weigh                  = WeighGaussianMixtureCluster,
-    
+
     .Model.Initialize               = InitializeGaussianMixtureModel,
     .Model.GetScoreSumOfClusters    = GetScoreSumOfClustersInGaussianMixtureModel,
     .Model.GetOutputAndBestDistance = GetOutputAndBestDistanceOfGaussianMixtureModel,
@@ -91,7 +88,7 @@ static gaussian_mixture_functions GMMFunctions =
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif /* gmm_h */
 
 #endif

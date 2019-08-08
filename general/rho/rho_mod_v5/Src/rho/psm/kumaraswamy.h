@@ -1,10 +1,7 @@
-//
-//  kumaraswamy.h
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/11/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: kumaraswamy.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifndef kumaraswamy_h
 #define kumaraswamy_h
@@ -16,7 +13,7 @@ extern "C" {
 #include "control_types.h"
 
 #define STATE_KUMARASWAMY_INTERVALS { 0.2, 0.4, 0.65, 1.0 }
-    
+
 #define KUMARASWAMY_PDF(X,A,B) ( A * B * pow( x, ( A - 1 ) ) * pow( 1 - pow( x, A ), B - 1 ) )
 #define KUMARASWAMY_CDF(X,A,B) ( 1 - pow( 1 - pow( X, A ), B) )
 
@@ -68,7 +65,7 @@ static const kumaraswamy_functions_t KumaraswamyFunctions =
     .PerformCDF = PerformKumaraswamyCDF,
     .GetVector = GetKumaraswamyVector
 };
-    
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,10 +1,7 @@
-//
-//  control_structures.h
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/11/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: control_structures.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifndef control_structures_h
 #define control_structures_h
@@ -12,9 +9,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include "kumaraswamy.h"
-    
+
     /* System self-diagnostic state control type */
     typedef struct
     {
@@ -49,7 +46,7 @@ extern "C" {
         primary_id,
         secondary_id;
     } gaussian_mixture_cluster_t;
-    
+
     typedef struct
     {
         gaussian_mixture_cluster_t *
@@ -73,14 +70,14 @@ extern "C" {
         double gamma[NUM_STATES];
         uint8_t num_observation_symbols;
     } observation_matrix_t;
-    
+
     typedef double state_expectation_element_t[NUM_STATES][NUM_STATES];
     typedef state_expectation_element_t state_expectation_matrix_t[NUM_OBSERVATION_SYMBOLS][NUM_OBSERVATION_SYMBOLS];
-    
+
 #define MAX_VAL_INDEX NUM_STATES
     typedef double expectation_element_t[NUM_STATES+1];
     typedef expectation_element_t expectation_matrix_t[NUM_OBSERVATION_SYMBOLS];
-    
+
 #define GAMMA_VALUE_INDEX 1
 #define GAMMAA
     typedef double gamma_element_t[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
@@ -89,7 +86,7 @@ extern "C" {
         gamma_element_t cumulative_value;
         double maximum[NUM_OBSERVATION_SYMBOLS];
     } gamma_matrix_t;
-    
+
     typedef struct
     {
         double                  p[NUM_STATES];       // Initial probabilities
@@ -98,7 +95,7 @@ extern "C" {
         observation_buffer_t    O;                   // Observation sequence
         state_expectation_matrix_t Es;               // State expectation matrix
         gamma_matrix_t          G;                   // Gamma expectation matrix
-        
+
         uint8_t
         T, // Number of observations
         N, // Number of states
@@ -109,7 +106,7 @@ extern "C" {
         best_confidence;
     } hidden_markov_model_t;
 #endif
-    
+
     typedef struct
     { /* Predictive State Model */
 #ifdef __PSM__
@@ -138,7 +135,7 @@ extern "C" {
         best_cluster_weight,
         state_intervals[NUM_STATE_GROUPS];
     } psm_t;
-    
+
 #ifdef __cplusplus
 }
 #endif

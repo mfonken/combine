@@ -1,10 +1,7 @@
-//
-//  fsm.hpp
-//  tau+
-//
-//  Created by Matthew Fonken on 2/8/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: fsm.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifndef fsm_h
 #define fsm_h
@@ -22,7 +19,7 @@ extern "C" {
     /***************************************************************************************/
 #define STATE_DECAY                     0.95
 #define STATE_PUNISH                    0.025
-    
+
 #define FSM_LIFESPAN                    10.
 #define FSM_STATE_LIFESPAN              3.
 #define FSM_STABILITY_VALUE_UNCERTAINTY 0.04
@@ -33,9 +30,9 @@ extern "C" {
 #define FSM_STATE_BIAS_UNCERTAINTY      0.1
 #define FSM_STATE_INPUT_UNCERTAINTY     0.4
 #define FSM_STATE_UNCERTAINTY           (rho_kalman_uncertainty_c){ FSM_STATE_VALUE_UNCERTAINTY, FSM_STATE_BIAS_UNCERTAINTY, FSM_STATE_INPUT_UNCERTAINTY }
-    
+
     /***************************************************************************************/
-    
+
     /** Goals **
      *  - Column is current state
      *  - Row is next state
@@ -44,10 +41,10 @@ extern "C" {
      *  - All probabilities are <= 1.0 (100%) and...
      *  - ...all row probabilities add to <= 1.0 (100%)
      */
-    
+
     /* Tau states */
 #define loop_variables_t loop_variables_uint8_t
-    
+
     typedef struct
     {
         void (*Initialize)(     fsm_map_t * );
@@ -56,7 +53,7 @@ extern "C" {
         void (*ResetState)(     fsm_map_t *, uint8_t );
         void (*Print)(          fsm_map_t *, state_t s );
     } fsm_map_functions_t;
-    
+
     typedef struct
     {
         void (*Initialize)(          fsm_system_t *, state_t   );
@@ -65,13 +62,13 @@ extern "C" {
         void (*UpdateState)(         fsm_system_t *            );
         void (*Update)(              fsm_system_t *, double[4] );
     } fsm_system_functions_t;
-    
+
     typedef struct
     {
         fsm_map_functions_t    Map;
         fsm_system_functions_t Sys;
     } fsm_functions_t;
-    
+
     void InitializeFSMMap(        fsm_map_t *                  );
     void NormalizeFSMMap(         fsm_map_t *                  );
     void NormalizeFSMState(       fsm_map_t *,       uint8_t   );
@@ -82,7 +79,7 @@ extern "C" {
     void UpdateFSMSystem(         fsm_system_t *,    double[4] );
     void UpdateFSMProbabilities(  fsm_system_t *,    double[4] );
     void UpdateFSMState(          fsm_system_t *               );
-    
+
     static const fsm_functions_t FSMFunctions =
     {
         { /* Map functions */
@@ -100,11 +97,11 @@ extern "C" {
             .UpdateState            = UpdateFSMState
         }
     };
-    
+
     static inline void copymax(double * a, double * b) { if(*a>*b)*b=*a;else*a=*b; }
-    
+
 #define define_loop_variable_template_struct(T, N)struct { T l, i, j; double u, v;}N;
-    
+
 #ifdef __cplusplus
 }
 #endif

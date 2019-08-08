@@ -40,10 +40,12 @@ public:
     void updatePrediction();
     
     int                 count,
-                        accuracy_count;
+                        accuracy_count,
+                        stddev_sum;
     double              avg,
                         accuracy,
-                        current_accuracy;
+                        current_accuracy,
+                        stddev;
     
     kpoint_t            A, B;
     cimage_t            image;

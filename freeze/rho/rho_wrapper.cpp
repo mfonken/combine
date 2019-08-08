@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define DO_NOT_TIME_ACQUISITION
+
 //using namespace cv;
 
 Rho::Rho( int width, int height ) : width(width), height(height)
@@ -57,9 +59,12 @@ double Rho::Perform( cimage_t & img, GlobalPacket * p )
     pthread_mutex_lock(&density_map_pair_mutex);
     
     /* Core Rho Functions */
-    Generate_Density_Map_Using_Interrupt_Model( img, backgrounding_event );
     struct timeval a,b;
     gettimeofday( &a, NULL);
+    Generate_Density_Map_Using_Interrupt_Model( img, backgrounding_event );
+#ifdef DO_NOT_TIME_ACQUISITION
+    gettimeofday( &a, NULL);
+#endif
     RhoCore.Perform( &core, backgrounding_event );
     gettimeofday( &b, NULL);
 

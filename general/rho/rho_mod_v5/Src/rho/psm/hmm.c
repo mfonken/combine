@@ -1,10 +1,7 @@
-//
-//  hmm.c
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/10/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: hmm.c
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifdef __PSM__
 #include "hmm.h"
@@ -20,39 +17,39 @@ void InitializeHiddenMarkovModel( hidden_markov_model_t * model, observation_sym
     model->T = 0;
     model->N = NUM_STATE_GROUPS;
     model->M = NUM_OBSERVATION_SYMBOLS;
-    
+
     model->O.prev = initial_observation;
 
     /* Initialize each observation set as Kumarawwamy distribution */
     kumaraswamy_t kumaraswamy;
     KumaraswamyFunctions.Initialize( &kumaraswamy, NUM_STATE_GROUPS );
     double alpha_step = 1. ;/// kumaraswamy.beta;
-    
+
     double x = alpha_step, observation_alpha[NUM_OBSERVATION_SYMBOLS] = { 0. }, bands[NUM_STATE_GROUPS], intervals[NUM_STATE_GROUPS];
     for( uint8_t i = 0.; i < NUM_OBSERVATION_SYMBOLS; i++, x += alpha_step )
         observation_alpha[i] = x;
-        
+
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
         bands[i] = (double)(i+1)/(double)(NUM_STATE_GROUPS);
-    
+
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
         KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i], intervals, bands, NUM_STATE_GROUPS);
         memcpy( model->A.probabilities.map[i], intervals, sizeof(double) * NUM_STATE_GROUPS );
     }
-    
+
     kumaraswamy.beta = NUM_OBSERVATION_SYMBOLS;
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
     {
         KumaraswamyFunctions.GetVector( &kumaraswamy, observation_alpha[i], intervals, bands, NUM_STATE_GROUPS);
         memcpy( model->B.expected[i], intervals, sizeof(double) * NUM_STATE_GROUPS );
     }
-    
+
     /* Set equal initial probabilities */
     double v = 1./(double)NUM_STATE_GROUPS;
     for(uint8_t i = 0; i < NUM_STATE_GROUPS; i++)
         model->p[i] = v;
-    
+
     HMMFunctions.PrintObservationMatrix( model );
 }
 
@@ -99,7 +96,7 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
         {
             row_sum += model->G.cumulative_value[j][i];
         }
-        
+
         if( row_sum != 0. )
         {
             for( uint8_t i = 0; i < NUM_STATES; i++ )
@@ -109,7 +106,7 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
             }
         }
     }
-    
+
     for( uint8_t j = 0; j < NUM_STATES; j++ )
     {
         LOG_HMM(HMM_DEBUG, "%s ", stateString(j));
@@ -175,7 +172,7 @@ void BaumWelchGammaSolveHiddenMarkovModel( hidden_markov_model_t * model )
                 if( curr > curr_max )
                     curr_max = curr;
             }
-            
+
             // Assume k comes from i
             for( uint8_t j = 0; j < NUM_STATES; j++ )
             {
@@ -189,15 +186,15 @@ void BaumWelchGammaSolveHiddenMarkovModel( hidden_markov_model_t * model )
             model->G.cumulative_value[k][i] += prev_max;
         }
         model->G.cumulative_value[l][i] += curr_max;
-        
+
         SET_MAX(observation_max, curr_max);
     }
-    
+
     /* Update gamma expectation maximums */
     if( diff )
         model->G.maximum[k] += observation_max;
     model->G.maximum[l] += observation_max;
-    
+
     LOG_HMM_BARE(HMM_DEBUG, "\n");
 }
 

@@ -1,10 +1,7 @@
-//
-//  OV9712_calc.h
-//  OV9712_autotest
-//
-//  Created by Matthew Fonken on 7/7/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: OV9712_calc.h
+ *  Group: OV9712 Firmware
+ ***********************************************************************/
 
 #ifndef OV9712_calc_h
 #define OV9712_calc_h

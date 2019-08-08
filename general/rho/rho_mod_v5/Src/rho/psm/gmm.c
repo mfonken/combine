@@ -1,10 +1,8 @@
-//
-//  gmm.c
-//  GaussianMixtureModel
-//
-//  Created by Matthew Fonken on 2/9/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: gmm.c
+ *  Group: PSM Core
+ ***********************************************************************/
+
 #ifdef __PSM__
 #include "gmm.h"
 
@@ -15,18 +13,18 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
     cluster->gaussian_in.mean.b = observation->thresh;
     cluster->gaussian_out.mean.a = output->a;
     cluster->gaussian_out.mean.b = output->b;
-    
+
     memset( &cluster->gaussian_out.covariance, 0, sizeof(mat2x2) );
     cluster->gaussian_in.covariance = (mat2x2){ INITIAL_VARIANCE, 0, 0, INITIAL_VARIANCE };
     cluster->inv_covariance_in = (mat2x2){ INV_INITIAL_VARIANCE, 0, 0, INV_INITIAL_VARIANCE };
     cluster->score = 1.;
-    
+
     memset( &cluster->labels, 0, sizeof(cluster->labels) );
     cluster->labels.average[observation->label] = 1;
     cluster->labels.count[observation->label]++;
-    
+
     GetMat2x2LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
-    
+
     GMMFunctions.Cluster.UpdateNormal( cluster );
 }
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
@@ -38,25 +36,25 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
         return;
     double score_weight = ALPHA * safe_exp( -BETA * cluster->mahalanobis_sq );
     cluster->score += score_weight * ( cluster->probability_condition_input - cluster->score );
-    
+
     double weight = ALPHA * cluster->probability_condition_input;
-    
+
     vec2 delta_mean_in = WeightedIncreaseMean( (vec2 *)observation, &cluster->gaussian_in, weight );
     vec2 delta_mean_out = WeightedIncreaseMean( output, &cluster->gaussian_out, weight );
-    
+
     LOG_GMM(GMM_DEBUG, "m_mean: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
-    
+
     UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
     UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
-    
+
     GetMat2x2LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
     getMat2x2Inverse( &cluster->gaussian_in.covariance, &cluster->inv_covariance_in );
-    
+
     GMMFunctions.Cluster.UpdateNormal( cluster );
     GMMFunctions.Cluster.UpdateLimits( cluster );
-    
+
     ReportLabel( &cluster->labels, observation->label );
-    
+
     cluster->timestamp = TIMESTAMP();
 }
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
@@ -93,7 +91,7 @@ void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cl
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
     vec2 inv_covariance_delta = { 0 };
     mat2x2DotVec2(&cluster->inv_covariance_in, &input_delta, &inv_covariance_delta);
-    
+
     vec2 input_covariance, pre_condition = { 0 }, pre_output;
     mat2x2 cov_out_T = { cluster->gaussian_out.covariance.a, cluster->gaussian_out.covariance.c,
                          cluster->gaussian_out.covariance.b, cluster->gaussian_out.covariance.d };
@@ -217,11 +215,11 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     vec2 observation_vec = (vec2){ (double)observation->density, (double)observation->thresh };
     double total_probability = GMMFunctions.Model.GetScoreSumOfClusters( model, &observation_vec );
     double best_distance = GMMFunctions.Model.GetOutputAndBestDistance( model, total_probability, &observation_vec, &output);
-    
+
     vec2 min_max_delta;
     vec2SubVec2( &model->max_out, &model->min_out, &min_max_delta );
     double max_error = GMMFunctions.Model.GetMaxError( model, &output, value, &min_max_delta );
-    
+
     GMMFunctions.Model.Update( model, observation, value );
     LOG_GMM(GMM_DEBUG, "Max error: %.2f\n", max_error);
     /* Add cluster if error or distance is to high for a cluster match */

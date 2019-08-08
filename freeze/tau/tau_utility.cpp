@@ -81,7 +81,9 @@ void Tau::trigger( void )
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
     {
+        double pacc = accuracy;
         cma(p, &avg, ++count);
+        stddev_sum += pacc;
         cma(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }

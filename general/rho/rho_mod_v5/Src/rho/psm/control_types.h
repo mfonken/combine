@@ -1,9 +1,7 @@
-//
-//  control_type.h
-//
-//  Created by Matthew Fonken on 2/10/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: control_structures.c
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifndef control_types_h
 #define control_types_h
@@ -101,20 +99,20 @@ extern "C" {
 #define BOUNDARY_START(X)   !!(X<0)
 #define BOUNDARY_END(X)     !!(X>0)
 #endif
-    
+
     typedef struct
     {
         index_t density;
         uint8_t thresh,
         label;
     } observation_t;
-    
+
     typedef struct
     {
         observation_t observations[MAX_OBSERVATIONS];
         uint8_t length;
     } observation_list_t;
-    
+
     typedef struct
     {
         double a,b,c,d;
@@ -224,7 +222,7 @@ extern "C" {
         return mahalanobis_distance_squared;
     }
 #endif
-    
+
     typedef enum
     {
         UNKNOWN_SYMBOL = -1,
@@ -234,7 +232,7 @@ extern "C" {
         THREE_SYMBOL,
         MANY_SYMBOL
     } observation_symbol_t;
-    
+
     /* FSM state tree with fsm base */
     typedef struct
     {
@@ -278,13 +276,13 @@ extern "C" {
         vec2
         true_center;
     } band_t;
-    
+
     typedef struct
     {
         uint8_t length;
         band_t band[NUM_STATES];
     } band_list_t;
-    
+
 #ifdef __PSM__
     static gaussian1d_t getGaussian1dFrom2dY( gaussian2d_t * a )
     {
@@ -493,7 +491,7 @@ extern "C" {
         return num_std_devs;
     }
 #endif
-    
+
     static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
     {
         return ( ( a * w ) + ( b * ( 1 - w ) ) );

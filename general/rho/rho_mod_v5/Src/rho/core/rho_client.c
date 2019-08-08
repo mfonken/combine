@@ -205,7 +205,6 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
         "r"(thresh_value),      // %4
         "r"(capture_buffer),    // %5
         "r"(thresh_address),    // %6
-        "r"(flag_address)       // %7
     );
 #endif
     return (address_t)thresh_address;

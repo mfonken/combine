@@ -1,10 +1,7 @@
-//
-//  stm32_interface.h
-//  rho_client
-//
-//  Created by Matthew Fonken on 9/22/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: stm32_interface.h
+ *  Group: Rho Hardware Interface
+ ***********************************************************************/
 
 #ifdef __STM32__
 

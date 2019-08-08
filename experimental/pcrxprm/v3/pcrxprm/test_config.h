@@ -17,8 +17,8 @@ using namespace std;
 #define COMBINE_FPS     0
 
 #define AUTOMATION_RUN
-#define AUTOMATION_SIZES        { /*50, 250, 500, 750, 1000, 1250, 1500,*/ 1750, 2000 }
-#define AUTOMATION_INSTRUCTIONS { 's', 's', 's' }
+#define AUTOMATION_SIZES        { /*100, 250, 500, 750, 1000, 1250,*/ 1500, 1750, 2000 }
+#define AUTOMATION_INSTRUCTIONS { 's' };//, 's', 's' }
 #define AUTOMATION_END_AFTER_INSTRUCTIONS
 
 #define IMAGE_SET 0
@@ -27,8 +27,10 @@ using namespace std;
 #define IMAGE_TICKS                     200//31
 
 #define TITLE_STRING                    "PCR Alpha v0.9 xprm"
-#define GROUP_NAME                      "gradient"
-#define FILE_NAME                       "gradient_centralized"
+//#define GROUP_NAME                      "gradient"
+//#define FILE_NAME                       "gradient_centralized"
+#define GROUP_NAME                      "/frames/small"
+#define FILE_NAME                       "/1"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 

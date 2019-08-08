@@ -1,11 +1,7 @@
-//
-//  psm.h
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/12/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
-// Description: Predictive State Model
+/************************************************************************
+ *  File: psm.h
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #ifdef __PSM__
 
@@ -23,7 +19,7 @@ extern "C" {
 //// TEMP LOCATION
 //#define HEIGHT 700
 //#define WIDTH HEIGHT
-    
+
 void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_list_t * );
 void UpdateStateIntervalsPSM(           psm_t *, double );
@@ -62,7 +58,7 @@ static const psm_functions_t PSMFunctions =
     .GetCurrentBand             = GetCurrentBandPSM,
     .GenerateProposals          = GenerateProposalsPSM,
 };
-    
+
 #ifdef __cplusplus
 }
 #endif

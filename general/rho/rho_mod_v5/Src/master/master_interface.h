@@ -1,3 +1,8 @@
+/************************************************************************
+ *  File: master_interface.h
+ *  Group: Rho Core
+ ***********************************************************************/
+
 #ifndef master_interface_h
 #define master_interface_h
 

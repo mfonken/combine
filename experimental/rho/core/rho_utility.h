@@ -28,10 +28,10 @@ extern "C" {
  *                          Static Buffers                              *
  ***********************************************************************/
   static dmap_t
-        FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_SIZE],
-        FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_X_SIZE],
-        BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_SIZE],
-        BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_X_SIZE];
+    FOREGROUND_DENSITY_MAP_Y[2000],//DENSITY_MAP_Y_SIZE],
+        FOREGROUND_DENSITY_MAP_X[2000],//DENSITY_MAP_X_SIZE],
+        BACKGROUND_DENSITY_MAP_Y[2000],//DENSITY_MAP_Y_SIZE],
+    BACKGROUND_DENSITY_MAP_X[2000];//DENSITY_MAP_X_SIZE];
 
 /************************************************************************
  *                       Function Declarations                          *

@@ -1,10 +1,7 @@
-//
-//  psm.c
-//  hmmtest
-//
-//  Created by Matthew Fonken on 2/12/19.
-//  Copyright © 2019 Matthew Fonken. All rights reserved.
-//
+/************************************************************************
+ *  File: psm.c
+ *  Group: PSM Core
+ ***********************************************************************/
 
 
 #ifdef __PSM__
@@ -17,7 +14,7 @@ void InitializePSM( psm_t * model )
     HMMFunctions.Initialize( &model->hmm, MANY_SYMBOL );
     KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1 );
     model->state_bands.length = NUM_STATE_GROUPS;
-    
+
 #ifdef __PSM__
     floating_t default_bands_intervals[] = STATE_KUMARASWAMY_INTERVALS;
     floating_t prev_boundary = 0., vertical_center = 0;
@@ -46,7 +43,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     }
 //    model->current_observation = observation_list->length;
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
-    
+
     if( observation_list->length > 0 )
         model->previous_thresh = observation_list->observations[0].thresh;
     // Analyse value
@@ -64,7 +61,7 @@ void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
     }
     LOG_PSM_BARE(PSM_DEBUG, "\n");
     KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, observation_set, NUM_STATE_GROUPS );
-    
+
     LOG_PSM(PSM_DEBUG, "Update:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
@@ -83,27 +80,27 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
             model->current_observation = MANY_SYMBOL;
         PSMFunctions.ReportObservations( model, observation_list );
     }
-    
+
     /* Calculate current observation and update observation matrix */
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    
+
     ///TODO: Compare model->observation_state with hmm recommendation
-    
+
     /* Update state path prediction to best cluster */
     HMMFunctions.BaumWelchGammaSolve( &model->hmm );
     HMMFunctions.UpdateObservationMatrix( &model->hmm );
-    
+
 //    if(count++ % 10 == 0)
     {
         /* Update state bands */
         PSMFunctions.UpdateStateIntervals( model, nu );
-        
+
         /* Update states/transition matrix */
         FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
         model->current_state = model->hmm.A.state;
     }
-    
+
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
 }
@@ -163,7 +160,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     uint32_t processed_clusters = { 0 };
     for( uint8_t i = 0; i < model->gmm.num_clusters; i++ )
         GMMFunctions.Cluster.UpdateLimits( model->gmm.cluster[i] );
-    
+
     gaussian2d_t band_gaussian = { 0 };
     band_list->band[0].lower_boundary = 0;
     /// NOTE: Minimum boundary has greatest y
@@ -185,7 +182,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
                 min_id = i;
             }
         }
-        
+
         /* Check if new cluster has new label(s) */
         uint32_t current_label_vector = GetValidLabels( &model->gmm.cluster[min_id]->labels );
         uint32_t check = current_label_vector & ~running_label_vector;
@@ -194,7 +191,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
             uint32_t new_label_vector = running_label_vector | current_label_vector;
             /* If new update skipped bands, if any */
             current_band_id = CountSet(new_label_vector);
-            
+
             for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
             {
                 PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
@@ -217,10 +214,10 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
                 num_clusters_in_band++;
             }
         }
-        
+
         LOG_PSM(PSM_DEBUG_2, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
-        
-        
+
+
         if( !num_to_process )
         { /* Always update band on last cluster */
             PSMFunctions.UpdateStateBand( band_list, current_band_id, num_clusters_in_band, &band_gaussian );
@@ -231,7 +228,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     for( uint8_t i = current_band_id+1; i < band_list->length; i++ )
         PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
     band_list->band[band_list->length-1].upper_boundary = 0;
-    
+
     if(band_list->length > 0)
     {
         LOG_PSM(PSM_DEBUG, "State bands: \n");
@@ -246,7 +243,7 @@ uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, 
 {
     uint8_t best_observation_id = 0;
     floating_t best_observation_weight = 0.;
-    
+
     /* Determine target observation band */
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
     {
@@ -301,19 +298,19 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
 void GenerateProposalsPSM( psm_t * model )
 {
     if( !model->gmm.num_clusters ) return;
-    
+
     /* Update current state */
     model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
     PSMFunctions.UpdateBestCluster( model, &model->state_bands );
-    
+
     if( model->best_cluster_id >= model->gmm.num_clusters
        || model->best_cluster_id < 0) return;
-    
+
     /* Update predictions */
     vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
     model->proposed_avg_den = proposed_center->a;
     model->proposed_thresh = proposed_center->b;
-    
+
     /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];
     model->proposed_primary_id = cluster->primary_id;

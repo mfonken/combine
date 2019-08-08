@@ -1,10 +1,7 @@
-//
-//  fsm.cpp
-//  Finite State Machine
-//
-//  Created by Matthew Fonken on 2/8/18.
-//  Copyright © 2019 Marbl. All rights reserved.
-//
+/************************************************************************
+ *  File: fsm.c
+ *  Group: PSM Core
+ ***********************************************************************/
 
 #include "fsm.h"
 
@@ -65,10 +62,10 @@ void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
     sys->prev                 = UNKNOWN_STATE;
     sys->next                 = UNKNOWN_STATE;
     sys->selection_index      = 0;
-    
+
     RhoKalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     RhoKalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
-    
+
     FSMFunctions.Map.Initialize( &sys->probabilities );
 }
 
@@ -91,12 +88,12 @@ void DecayInactiveFSMSystem( fsm_system_t * sys )
 void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
 {
     reset_loop_variables( &_, NUM_STATES );
-    
+
     FSMFunctions.Sys.UpdateProbabilities( sys, p );
     FSMFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
-    
+
     state_t next = sys->state;
-    
+
     /* Find most probable next state */
     for( ; _.i < _.l; _.i++ )
     {
@@ -107,13 +104,13 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
             next = (state_t)_.i;
         }
     }
-    
+
     sys->next = next;
-    
+
     FSMFunctions.Sys.UpdateState( sys );
 //    FSMFunctions.Sys.DecayInactive( sys );
     PrintFSMMap( &sys->probabilities, sys->state );
-    
+
     sys->stability.system.timestamp = TIMESTAMP();
     sys->stability.state.timestamp = TIMESTAMP();
 }
@@ -148,10 +145,10 @@ void UpdateFSMState( fsm_system_t * sys )
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;
-        
+
         RhoKalman.Reset( &sys->stability.state, 0. );
 //        FSMFunctions.Map.ResetState( &sys->probabilities, sys->prev );
-        
+
         floating_t system_change_rate = TIMESTAMP() - sys->stability.system.timestamp;
         RhoKalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
     }

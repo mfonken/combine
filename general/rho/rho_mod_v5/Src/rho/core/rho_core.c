@@ -2,7 +2,7 @@
  *  File: rho_core.h
  *  Group: Rho Core
  ***********************************************************************/
- 
+
 /************************************************************************
  *                          Includes                                    *
  ***********************************************************************/
@@ -37,12 +37,12 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 
     /* Filters */
     RhoUtility.Initialize.Filters( core );
-    
+
 #ifdef USE_DETECTION_MAP
     /* Detection map */
     DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
 #endif
-    
+
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
@@ -134,9 +134,9 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 #ifdef USE_DETECTION_MAP
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
 #endif
-    
+
     RhoUtility.Predict.GenerateObservationLists( core );
-    
+
 #ifdef __PSM__
      PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions ); /// TODO: Generalize to be dimensionless
 //    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
