@@ -14,7 +14,7 @@ using namespace std;
 
 #define MAIN_FPS        100
 #define TAU_FPS         100
-#define COMBINE_FPS     0
+#define COMBINE_FPS     100
 
 //#define AUTOMATION_RUN
 #define AUTOMATION_SIZES        { /*100, 250, 500, 750, 1000, 1250,*/ 1500, 1750, 2000 }

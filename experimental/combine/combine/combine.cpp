@@ -8,12 +8,12 @@
 
 #include "combine.hpp"
 
-Combine::Combine(const char * n, Tau * t, int width, int height )
+Combine::Combine(const char * n, Tau * t )
 {
     this->tau = t;
     this->name = n;
-    this->width = width;
-    this->height = height;
+    this->width = t->width;
+    this->height = t->height;
 }
 
 string Combine::serialize()
@@ -28,7 +28,7 @@ string Combine::serialize()
     p[1] = kin.values.position[1] * SCALE;
     p[2] = kin.values.position[2] * SCALE;
 
-    sprintf(kin_packet, "f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", r[0], r[1], r[2], p[0], p[1], -p[2] );
+    sprintf(kin_packet, "f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", r[0], r[1], r[2], p[0], p[1], p[2] );
     return string(kin_packet);
 }
 
@@ -43,6 +43,10 @@ void Combine::init()
 
 void Combine::trigger()
 {
+    pthread_mutex_lock( &tau->predictions_mutex );
+    kpoint_t A = (kpoint_t){tau->A.x, tau->A.y}, B = (kpoint_t){tau->B.x, tau->B.y};
+    pthread_mutex_unlock( &tau->predictions_mutex );
+    
     IMUFunctions.update.orientation( &imu );
     ang3_t e = { imu.pitch * DEG_TO_RAD, imu.roll * DEG_TO_RAD, imu.yaw * DEG_TO_RAD },
            g = { imu.gyro[0], imu.gyro[1], imu.gyro[2] };
@@ -50,5 +54,5 @@ void Combine::trigger()
 
     vec3_t n;
     KineticFunctions.Nongrav( &kin, &n );
-    KineticFunctions.UpdatePosition( &kin, &n, (kpoint_t){tau->B.x, tau->B.y}, (kpoint_t){tau->A.x, tau->A.y} );
+    KineticFunctions.UpdatePosition( &kin, &n, B, A );
 }

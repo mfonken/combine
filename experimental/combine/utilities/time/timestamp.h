@@ -9,11 +9,19 @@
 #ifndef timestamp_h
 #define timestamp_h
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/time.h>
 
 double TIMESTAMP( void );
 bool ISTIMEDOUT( double, double );
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* timestamp_h */

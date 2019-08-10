@@ -16,8 +16,8 @@ int strength_slider = 28, zoom_slider = 11, max_strength = 100, max_zoom = 20;
 
 void quickUnfisheye(Mat I, Mat O)
 {
-    cvCreateTrackbar( "Strength", "Original", &strength_slider, max_strength );
-    cvCreateTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    createTrackbar( "Strength", "Original", &strength_slider, max_strength );
+    createTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
     strength = (double) strength_slider / 10;
     zoom = (double) zoom_slider / 10;
     
@@ -39,14 +39,14 @@ void quickUnfisheye(Mat I, Mat O)
                 O.at<Vec3b>(y,x) = I.at<Vec3b>(y_,x_);
         }
     }
-    putText(O, "Strength: " + std::to_string(strength), cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
-    putText(O, "Zoom: " + std::to_string(zoom), cvPoint(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+    putText(O, "Strength: " + std::to_string(strength), Point(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
+    putText(O, "Zoom: " + std::to_string(zoom), Point(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
 }
 
 void unfisheye(Mat I, Mat O)
 {
-    cvCreateTrackbar( "Strength", "Original", &strength_slider, max_strength );
-    cvCreateTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    createTrackbar( "Strength", "Original", &strength_slider, max_strength );
+    createTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
     
     strength = (double) strength_slider / 10;
     zoom = (double) zoom_slider / 10;
@@ -102,14 +102,14 @@ void unfisheye(Mat I, Mat O)
     }
 #endif
 #endif
-    putText(O, "Strength: " + std::to_string(strength), cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
-    putText(O, "Zoom: " + std::to_string(zoom), cvPoint(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+    putText(O, "Strength: " + std::to_string(strength), Point(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
+    putText(O, "Zoom: " + std::to_string(zoom), Point(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
 }
 
 void invfisheye(Mat I, Mat O)
 {
-    cvCreateTrackbar( "Strength", "Original", &strength_slider, max_strength );
-    cvCreateTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    createTrackbar( "Strength", "Original", &strength_slider, max_strength );
+    createTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
     
     strength = (double) strength_slider / 10;
     zoom = (double) zoom_slider / 10;
@@ -134,8 +134,8 @@ void invfisheye(Mat I, Mat O)
                 O.at<Vec3b>(y_,x_) = I.at<Vec3b>(y,x);
         }
     }
-    putText(O, "Strength: " + std::to_string(strength), cvPoint(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
-    putText(O, "Zoom: " + std::to_string(zoom), cvPoint(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200,200,250), 1, CV_AA);
+    putText(O, "Strength: " + std::to_string(strength), Point(30,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
+    putText(O, "Zoom: " + std::to_string(zoom), Point(30,48), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(200,200,250), 1);
 }
 
 void invfisheye(Point2f * p, int w, int h, double s, double z)

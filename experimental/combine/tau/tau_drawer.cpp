@@ -380,10 +380,8 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         }
     }
     
-    pthread_mutex_lock(&predictions_mutex);
     Point2f a(packet.px, packet.py),
     b(packet.sx, packet.sy);
-    pthread_mutex_unlock(&predictions_mutex);
     
     line(M, Point(0,Bx),Point(w,Bx), greenish);
     line(M, Point(By,0),Point(By,h), greenish);

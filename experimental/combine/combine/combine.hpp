@@ -29,7 +29,7 @@ public:
     virtual void trigger( void );
     virtual string serialize( void );
     
-    Combine(const char *, Tau *, int, int);
+    Combine(const char *, Tau * );
     
 private:
     int         width,

@@ -18,23 +18,22 @@ SerialWriter::SerialWriter( SerialWriter_TYPE type )
 
 SerialWriter::SerialWriter( SerialWriter_TYPE type, const char * data )
 {
-    SerialWriter_STATUS ret;
     this->type = type;
     switch(type)
     {
         default:
         case USB:
-            ret = initUSB(data);
+            status = initUSB(data);
             break;
         case BLUETOOTH:
-            ret = initBluetooth(data);
+            status = initBluetooth(data);
             break;
         case SFILE:
-            ret = initFile(data);
+            status = initFile(data);
             break;
     }
 #ifdef UTILITY_VERBOSE
-    switch(ret)
+    switch(status)
     {
         case HANDSHAKE_SUCCEEDED:
             printf("Handshake success.\n");
@@ -82,10 +81,6 @@ SerialWriter_STATUS SerialWriter::init( char * port, char * port_alt,const  char
     return handshake(handshake_id);
 }
 
-SerialWriter_STATUS SerialWriter::handshake(const  char * id )
-{
-    return handshake(id, DEFAULT_HANDSHAKE_DELAY, DEFAULT_HANDSHAKE_ATTEMPTS);
-}
 SerialWriter_STATUS SerialWriter::handshake(const  char * id, int delay, int attempts )
 {
     if( !channel.initialized ) return INITIALIZATION_FAILED;

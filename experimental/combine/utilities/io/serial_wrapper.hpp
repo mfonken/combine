@@ -15,6 +15,8 @@
 #include "file_writer.hpp"
 #include "sercom.h"
 
+#define UTILITY_VERBOSE
+
 #define DEFAULT_HANDSHAKE_DELAY     1000000
 #define DEFAULT_HANDSHAKE_ATTEMPTS  3
 #define DEFAULT_HANDSHAKE_ID        "ab\r\n"
@@ -42,6 +44,7 @@ class SerialWriter
     SerialWriter_TYPE type;
     SERCOM_Channel channel;
     FileWriter writer;
+    SerialWriter_STATUS status;
     
 public:
     SerialWriter();
@@ -51,8 +54,7 @@ public:
     SerialWriter_STATUS initBluetooth(const char *);
     SerialWriter_STATUS initFile(const char *);
     SerialWriter_STATUS init(char *, char *, const char *);
-    SerialWriter_STATUS handshake( const char * );
-    SerialWriter_STATUS handshake( const char *, int, int );
+    SerialWriter_STATUS handshake(const  char * id, int delay = DEFAULT_HANDSHAKE_DELAY, int attempts = DEFAULT_HANDSHAKE_ATTEMPTS );
     
     int isInitialized();
     void write(std::string);

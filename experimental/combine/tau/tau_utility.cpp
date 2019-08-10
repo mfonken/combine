@@ -120,6 +120,7 @@ void Tau::updateThresh()
 
 void Tau::updatePrediction()
 {
+    pthread_mutex_lock(&predictions_mutex);
     Point2f a(packet.py, packet.px),
             b(packet.sy, packet.sx);
     
@@ -130,6 +131,7 @@ void Tau::updatePrediction()
 #endif
     A = { a.x, a.y };
     B = { b.x, b.y };
+    pthread_mutex_unlock(&predictions_mutex);
 }
 
 void Tau::printPacket( GlobalPacket * p, int l )

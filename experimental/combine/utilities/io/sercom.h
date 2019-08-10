@@ -30,9 +30,7 @@ extern "C" {
 #define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem14221"
 #define DEFAULT_SERCOM_PORT_LEN sizeof(DEFAULT_SERCOM_PORT)
 
-  
-typedef struct SERCOM_Channel SERCOM_Channel;
-struct SERCOM_Channel
+typedef struct
 {
     int filestream;
     const char *port;
@@ -41,7 +39,7 @@ struct SERCOM_Channel
     int bits;
     struct termios options;
     bool initialized;
-};
+} SERCOM_Channel;
     
 int Init_SERCOM_Default( void );
 int Init_SERCOM( SERCOM_Channel * sc );

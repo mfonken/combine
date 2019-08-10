@@ -141,45 +141,4 @@ typedef struct
     ap;
 } GlobalPacket;
 
-/* RHO */
-/*
-class DensityMap
-{
-public:
-    int *           map;
-    int *           fil;
-    int             length;
-    int             max;
-    double          variance;
-    rho_kalman_t    kalman;
-};
-
-class DensityMapPair
-{
-public:
-    DensityMap   x;
-    DensityMap   y;
-    
-    DensityMapPair( int, int );
-};
-
-class PeakList
-{
-public:
-    int     length;
-    int*    map;
-    int*    den;
-    int*    max;
-};
-
-class PeakListPair
-{
-public:
-    PeakList x;
-    PeakList y;
-    
-    PeakListPair();
-};
- */
-
 #endif /* tau_structures_hpp */

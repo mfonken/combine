@@ -1,4 +1,5 @@
 #include "combine_master.h"
+#include "timestamp.h"
 
 #ifdef AUTOMATION_INSTRUCTIONS
 FileWriter performanceFile(PERF_FILENAME);
@@ -12,6 +13,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 #endif
                   );
     Environment env(&tau, TAU_FPS);
+    Combine combine("Combine", &tau );
+    SerialWriter comm(BLUETOOTH, FILENAME);
+    env.addTest(&combine, &comm, COMBINE_FPS);
     
     env.start();
     env.pause();
@@ -74,8 +78,6 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
                 gettimeofday( &b, NULL);
                 env.pause();
                 tau.stddev = sqrt( tau.stddev_sum / (double)(tau.count));
-                //                printf("%d\n", tau.count);
-                
                 char buf[128];
                 sprintf(buf, "PCR (Seg. Only),%d,%d,%lf,%f,%f,%f\n", width, tau.count, timeDiff(a,b), tau.avg * 1000., tau.accuracy / (double)width * 100., tau.stddev / (double)width * 100.);
                 printf("%s", buf);
@@ -84,7 +86,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
             case 'p':
                 struct timeval tp;
                 gettimeofday(&tp, NULL);
-                long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000; //get current timestamp in milliseconds
+                long int ms = TIMESTAMP();
                 imwrite(FRAME_SAVE_ROOT + to_string(ms) + ".png", local_frame);
                 break;
         }
