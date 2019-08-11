@@ -29,7 +29,6 @@ Rho::Rho( int width, int height ) : width(width), height(height)
 #endif
     backgrounding_event = false;
     
-    RhoInterrupts.FRAME_INIT();
     printSizes();
 }
 

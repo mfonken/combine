@@ -57,6 +57,6 @@ void RhoPIDUpdate( rho_pid_t * PID, floating_t actual, floating_t target )
 
 void RhoPIDPrint( rho_pid_t * PID )
 {
-    //printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
-           //PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
+    printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
+           PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
 }

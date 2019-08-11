@@ -8,7 +8,20 @@
 
 #include "statistics.h"
 
-void cma( double new_val, double *avg, int num )
+void CumulateMomentsStatistics( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
-    *avg+=(new_val-*avg)/(double)(num+1);
+#ifdef __USE_RUNNING_AVERAGE__
+    floating_t n_=1/(++(*n));
+    *m0+=((v-*m0)*n_);
+    *m1+=(((v*i)-*m1)*n_);
+#else
+    ++(*n);
+    *m0+=v;
+    *m1+=v*i;
+#endif
+}
+
+void CumulativeMovingAverageStatistics( floating_t new_val, floating_t *avg, int num )
+{
+    *avg+=(new_val-*avg)/(floating_t)(num+1);
 }

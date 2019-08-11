@@ -17,8 +17,6 @@
 extern "C" {
 #endif
     
-//    typedef double floating_t;
-    
     typedef struct
     {
         floating_t Kp, Ki, Kd, Ku, Pu;

@@ -11,19 +11,6 @@
 /************************************************************************
  *                       Function Definitions                           *
  ***********************************************************************/
-void CumulateMomentsRhoUtility( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
-{
-#ifdef __USE_RUNNING_AVERAGE__
-    floating_t n_=1/(++(*n));
-    *m0+=((v-*m0)*n_);
-    *m1+=(((v*i)-*m1)*n_);
-#else
-    ++(*n);
-    *m0+=v;
-    *m1+=v*i;
-#endif
-}
-
 void CalculateRegionScoreRhoUtility( region_t * b, density_t total_density, byte_t peak )
 {
     floating_t
@@ -155,27 +142,26 @@ void InitializeDensityMapRhoUtility( density_map_t * dmap, index_t len, index_t 
 
 void ResetForDetectRhoUtility( rho_detection_variables *_, density_map_t * d, prediction_t * r )
 {
-    memset(_, 0, sizeof(rho_detection_variables));
+    memset( _, 0, sizeof(rho_detection_variables) );
 
-    _->len = d->length;
-    _->range[0] = d->length;
-    _->range[1] = d->centroid;
-    _->range[2] = 0;
+    _->len          = d->length;
+    _->range[0]     = d->length;
+    _->range[1]     = d->centroid;
+    _->range[2]     = 0;
 
     memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
     memset( &r->Probabilities, 0, sizeof(floating_t)*NUM_STATES );
 
-    r->NuRegions = 0;
+    r->NuRegions    = 0;
     r->TotalDensity = 0;
-    r->NumRegions = 0;
+    r->NumRegions   = 0;
 
-    index_t i;
-    for( i = 0; i < MAX_REGIONS; i++ )
+    for( index_t i = 0; i < MAX_REGIONS; i++ )
     {
-        memset(&r->Regions[i], 0, sizeof(region_t));
+        memset( &r->Regions[i], 0, sizeof(region_t) );
         r->RegionsOrder[i] = i;
     }
-    for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
+    for( index_t i = 0; i < MAX_TRACKING_FILTERS; i++ )
     {
         r->TrackingFiltersOrder[i] = i;
     }
@@ -185,9 +171,9 @@ void PerformDetectRhoUtility( rho_detection_variables *_, density_map_t * d, pre
 {
     DUAL_FILTER_CYCLE(_->cyc)
     {
-        _->cmax = 0;
-        _->start = _->range[_->cyc];
-        _->end = _->range[_->cyc_];
+        _->cmax     = 0;
+        _->start    = _->range[_->cyc];
+        _->end      = _->range[_->cyc_];
 
         RhoUtility.Predict.PeakFilter( _, d, r );
         if( RhoUtility.Detect.LowerBound( _ ) )
@@ -253,14 +239,16 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables *_
     if( _->c > _->b )
     {
         _->tden += _->c;
+        
+#ifdef USE_BACKGROUNDING
+        /* Subtract background */
+        _->c -= _->b;
 
-        // Subtract background
-//        _->c -= _->b;
-//
-//        /* Punish values above the filter peak */
-//        if( ( _->c > _->fpeak )
-//           && ( _->fpeak_2 > _->c ) )
-//            _->c = _->fpeak_2 - _->c;
+        /* Punish values above the filter peak */
+        if( ( _->c > _->fpeak )
+           && ( _->fpeak_2 > _->c ) )
+            _->c = _->fpeak_2 - _->c;
+#endif
     }
     else
         _->c = 0;

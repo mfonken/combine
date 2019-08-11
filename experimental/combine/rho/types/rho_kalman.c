@@ -17,7 +17,6 @@ void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t
     k->min_value = minv;
     k->max_value = maxv;
     
-    
     ResetRhoKalman(k, v);
 }
 
@@ -103,9 +102,8 @@ bool IsRhoKalmanExpired( rho_kalman_t * k )
 
 inline floating_t ScoreRhoKalman( rho_kalman_t * k )
 {
-    floating_t score = k->K[0];//, age = ( TIMESTAMP() - k->origin );
+    floating_t score = k->K[0];
     if(k->flag) score = 0.;
-//    else if( age < KALMAN_MATURATION ) score = 1.;
     k->score = score;
     return score;
 }
@@ -114,5 +112,5 @@ void PunishRhoKalman( rho_kalman_t * k )
 {
     k->K[0] *= KALMAN_PUNISH_FACTOR;
     if( ScoreRhoKalman(k) < MIN_KALMAN_GAIN )
-        ResetRhoKalman(k, 0);//k->value);
+        ResetRhoKalman(k, 0);
 }

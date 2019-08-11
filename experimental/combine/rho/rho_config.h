@@ -16,11 +16,6 @@
 
 #define IS_RGGB_ELIMINATE_G     true
 
-/* Capture Config */
-#ifdef USE_INTERRUPT_MODEL
-#define CAPTURE_WIDTH           700
-#define CAPTURE_HEIGHT          700
-#else
 /* Camera Config */
 #define RHO_WIDTH               1280
 #define RHO_HEIGHT              800
@@ -28,7 +23,6 @@
 #define CAPTURE_DIV             4
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
-#endif
 
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 #define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION

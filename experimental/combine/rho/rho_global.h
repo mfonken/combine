@@ -41,7 +41,8 @@ typedef uint32_t        address_t;
 #define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
 #define dmap_t_max          ( (sizeof(dmap_t)       << 3 ) - 1 )
 
- #define USE_INTERRUPT_MODEL
+#define USE_DECOUPLING
+#define USE_BACKGROUNDING
 // #define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #ifndef LOG_LEVEL
@@ -147,8 +148,10 @@ enum LogLevel
 #define DISTANCE_SQ(X,Y)        ( SQUARE(X) + SQUARE(Y) )
 #define INRANGE(X,Y,T)          ( abs( X - Y ) < T )
 
+#ifndef ZDIV
 #define ZDIV_LNUM               ( 1 << 10 )
 #define ZDIV(X,Y)               ( ( Y == 0 ) ? ( X == 0 ? 0 : ZDIV_LNUM ) : X / Y )
+#endif
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)

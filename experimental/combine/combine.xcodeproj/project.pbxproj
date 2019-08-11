@@ -323,10 +323,7 @@
 				340196A122FE780600F152CC /* tau_utility.cpp */,
 				340196A322FE780600F152CC /* tau_structures.hpp */,
 				3401969B22FE780600F152CC /* tau_structures.cpp */,
-				3401969F22FE780600F152CC /* tau_drawer.hpp */,
-				3401969D22FE780600F152CC /* tau_drawer.cpp */,
-				340196A022FE780600F152CC /* rho_drawer_xprm.hpp */,
-				3401969E22FE780600F152CC /* rho_drawer_xprm.cpp */,
+				34C84DD72300AC500070FEB3 /* drawers */,
 			);
 			path = tau;
 			sourceTree = SOURCE_ROOT;
@@ -383,6 +380,17 @@
 				340196F122FE81E500F152CC /* quaternion.c */,
 			);
 			path = qmath;
+			sourceTree = "<group>";
+		};
+		34C84DD72300AC500070FEB3 /* drawers */ = {
+			isa = PBXGroup;
+			children = (
+				3401969F22FE780600F152CC /* tau_drawer.hpp */,
+				3401969D22FE780600F152CC /* tau_drawer.cpp */,
+				340196A022FE780600F152CC /* rho_drawer_xprm.hpp */,
+				3401969E22FE780600F152CC /* rho_drawer_xprm.cpp */,
+			);
+			path = drawers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

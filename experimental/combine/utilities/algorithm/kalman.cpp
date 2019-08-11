@@ -4,7 +4,7 @@
 
 //#define TIMELESS
 
-double now()
+floating_t now()
 {
     struct timeval stamp;
     gettimeofday(&stamp, NULL);
@@ -15,15 +15,15 @@ KalmanFilter::KalmanFilter() : KalmanFilter(0.)
 {
 }
 
-KalmanFilter::KalmanFilter( double v ) : KalmanFilter(v, DEFAULT_LS, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
+KalmanFilter::KalmanFilter( floating_t v ) : KalmanFilter(v, DEFAULT_LS, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
 {
 }
 
-KalmanFilter::KalmanFilter( double v, double ls ) : KalmanFilter(v, ls, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
+KalmanFilter::KalmanFilter( floating_t v, floating_t ls ) : KalmanFilter(v, ls, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
 {
 }
 
-KalmanFilter::KalmanFilter( double v, double ls, double v_u, double b_u, double s_u )
+KalmanFilter::KalmanFilter( floating_t v, floating_t ls, floating_t v_u, floating_t b_u, floating_t s_u )
 {
     K[0]        = 0;
     K[1]        = 0;
@@ -45,12 +45,12 @@ KalmanFilter::KalmanFilter( double v, double ls, double v_u, double b_u, double 
     uncertainty.sensor  = s_u;
 }
 
-void KalmanFilter::update( double value_new, double rate_new )
+void KalmanFilter::update( floating_t value_new, floating_t rate_new )
 {
 #ifdef TIMELESS
-    //    double delta_time = 0.25;
+    //    floating_t delta_time = 0.25;
 #else
-    double delta_time = now() - timestamp;
+    floating_t delta_time = now() - timestamp;
     
     /* Quick expiration check */
     if(delta_time > lifespan)
@@ -65,16 +65,16 @@ void KalmanFilter::update( double value_new, double rate_new )
     rate       = rate_new - bias;
     value     += delta_time * rate;
     
-    double dt_P_1_1 = delta_time * P[1][1];
+    floating_t dt_P_1_1 = delta_time * P[1][1];
     P[0][0] +=   delta_time * ( dt_P_1_1 - P[0][1] - P[1][0] + uncertainty.value );
     P[0][1] -=   dt_P_1_1;
     P[1][0] -=   dt_P_1_1;
     P[1][1] +=   uncertainty.bias * delta_time;
     
-    double S_   = 1 / ( P[0][0] + uncertainty.sensor );
+    floating_t S_   = 1 / ( P[0][0] + uncertainty.sensor );
     K[0]       = P[0][0] * S_;
     K[1]       = P[1][0] * S_;
-    double delta_value = value_new - value;
+    floating_t delta_value = value_new - value;
     value     += K[0] * delta_value;
     bias      += K[1] * delta_value;
     

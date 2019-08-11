@@ -14,8 +14,10 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "rho_global.h"
 
-void cma( double, double *, int );
+void CumulateMomentsStatistics( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
+void CumulativeMovingAverageStatistics( floating_t, floating_t *, int );
     
 #ifdef __cplusplus
 }

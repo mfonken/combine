@@ -55,9 +55,9 @@ void Tau::trigger( void )
     if(count < MAX_COUNT)
     {
         double pacc = accuracy;
-        cma(p, &avg, ++count);
+        CumulativeMovingAverageStatistics(p, &avg, ++count);
         stddev_sum += pacc;
-        cma(current_accuracy, &accuracy, ++accuracy_count);
+        CumulativeMovingAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
 #ifdef __PSM__

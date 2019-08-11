@@ -242,7 +242,7 @@ typedef struct
   uint8_t (*Transmit)( byte_t *, index_t);
 } rho_platform_uart_interace_functions;
 
-#ifndef USE_INTERRUPT_MODEL
+#ifndef USE_DECOUPLING
 typedef struct
 {
   void (*Activate)( camera_application_flags * );
@@ -417,7 +417,7 @@ typedef struct
 #endif
     packet_t            Packet;
 
-#ifdef USE_INTERRUPT_MODEL
+#ifdef USE_DECOUPLING
     uint8_t             cframe[C_FRAME_SIZE];
 #endif
 } rho_core_t;

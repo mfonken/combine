@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <sys/time.h>
 #include <math.h>
+#include "rho_global.h"
 
 #define DEFAULT_LS      5
 #define DEFAULT_VU      0.001
@@ -19,20 +20,20 @@
 /** Kalman Uncertainties */
 typedef struct
 {
-    double value;
-    double bias;
-    double sensor;
+    floating_t value;
+    floating_t bias;
+    floating_t sensor;
 } kalman_uncertainty_t;
 
-double now(void);
+floating_t now(void);
 
 /** Kalman class */
 class KalmanFilter
 {
 public:
-    double lifespan;
+    floating_t lifespan;
     
-    double      K[2],
+    floating_t      K[2],
                 P[2][2],
                 rate,
                 bias,
@@ -44,10 +45,10 @@ public:
     kalman_uncertainty_t uncertainty;
     
     KalmanFilter();
-    KalmanFilter( double );
-    KalmanFilter( double, double );
-    KalmanFilter( double, double, double, double, double );
-    void update( double, double );
+    KalmanFilter( floating_t );
+    KalmanFilter( floating_t, floating_t );
+    KalmanFilter( floating_t, floating_t, floating_t, floating_t, floating_t );
+    void update( floating_t, floating_t );
     void copyTo(KalmanFilter *);
     std::string toString();
     int  isExpired();

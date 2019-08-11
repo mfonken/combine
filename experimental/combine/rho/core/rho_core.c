@@ -38,11 +38,6 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     /* Filters */
     RhoUtility.Initialize.Filters( core );
     
-#ifdef USE_DETECTION_MAP
-    /* Detection map */
-    DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
-#endif
-    
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Cy );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Cx  );
@@ -51,7 +46,11 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
     RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
 
-#ifdef USE_INTERRUPT_MODEL
+#ifdef USE_DETECTION_MAP
+    /* Detection map */
+    DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
+#endif
+#ifdef USE_DECOUPLING
     /* Frame Conversion Model Connection */
     RhoInterrupts.INIT_FROM_CORE( core );
 #endif
@@ -97,8 +96,8 @@ void DetectRhoCore( rho_core_t * core, density_map_t * d, prediction_t * r )
     RhoUtility.Detect.CalculateFrameStatistics( &_, r );
 
     /* Update core */
-    core->TotalCoverage += _.tden;
-    core->FilteredCoverage += _.fden;
+    core->TotalCoverage     += _.tden;
+    core->FilteredCoverage  += _.fden;
 }
 
 void DetectRhoCorePairs( rho_core_t * core )

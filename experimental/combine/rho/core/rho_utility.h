@@ -14,10 +14,11 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "statistics.h"
 #include "rho_structure.h"
 #include "rho_types.h"
 
-#ifdef USE_INTERRUPT_MODEL
+#ifdef USE_DECOUPLING
 #include "rho_deco.h"
 #endif
 
@@ -28,15 +29,21 @@ extern "C" {
  *                          Static Buffers                              *
  ***********************************************************************/
   static dmap_t
-    FOREGROUND_DENSITY_MAP_Y[2000],//DENSITY_MAP_Y_SIZE],
-        FOREGROUND_DENSITY_MAP_X[2000],//DENSITY_MAP_X_SIZE],
-        BACKGROUND_DENSITY_MAP_Y[2000],//DENSITY_MAP_Y_SIZE],
-    BACKGROUND_DENSITY_MAP_X[2000];//DENSITY_MAP_X_SIZE];
+#ifdef AUTOMATION_RUN
+    FOREGROUND_DENSITY_MAP_Y[2000],
+    FOREGROUND_DENSITY_MAP_X[2000],
+    BACKGROUND_DENSITY_MAP_Y[2000],
+    BACKGROUND_DENSITY_MAP_X[2000];
+#else
+    FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_SIZE],
+    FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_X_SIZE],
+    BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_Y_SIZE],
+    BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_X_SIZE];
+#endif
 
 /************************************************************************
  *                       Function Declarations                          *
  ***********************************************************************/
-    void CumulateMomentsRhoUtility( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
     void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
     density_2d_t CalculateCentroidRhoUtility( dmap_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
@@ -153,7 +160,7 @@ extern "C" {
  ***********************************************************************/
     static const rho_utility_functions RhoUtility =
     {
-        .CumulateMoments = CumulateMomentsRhoUtility,
+        .CumulateMoments = CumulateMomentsStatistics,
         .CalculateRegionScore = CalculateRegionScoreRhoUtility,
         .CalculateCentroid = CalculateCentroidRhoUtility,
         .PrintPacket = PrintPacketRhoUtility,

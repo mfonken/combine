@@ -29,7 +29,6 @@ extern "C" {
     struct rho_interrupts
     {
         void (*INIT_FROM_CORE)( rho_core_t * );
-        void (*FRAME_INIT)(  void );
         void (*FRAME_START)( void );
         void (*FRAME_END)(   void );
         void (*RHO_FUNCTION)( const cimage_t );
@@ -37,7 +36,6 @@ extern "C" {
     static const rho_interrupts RhoInterrupts =
     {
         .INIT_FROM_CORE = RIM_INIT_FROM_CORE,
-        .FRAME_INIT  = RIM_FRAME_INIT,
         .FRAME_START = RIM_FRAME_START,
         .FRAME_END   = RIM_FRAME_END,
         .RHO_FUNCTION = RIM_PERFORM_RHO_FUNCTION
@@ -52,9 +50,6 @@ extern "C" {
         y_delimiter,
         W,
         H;
-
-        pthread_t       loop_thread;
-        pthread_mutex_t rho_int_mutex;
     } rho_global_variables;
 
     typedef struct
@@ -92,8 +87,7 @@ extern "C" {
         *CY_ADDR;
         pixel_base_t
         *C_FRAME,
-        *C_FRAME_END,
-        *CAM_PORT;
+        *C_FRAME_END;
     } rho_sram_variables;
 
     typedef struct
