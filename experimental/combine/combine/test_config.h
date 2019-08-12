@@ -16,6 +16,12 @@ using namespace std;
 #define TAU_FPS         100
 #define COMBINE_FPS     100
 
+/* GLOBAL SETUP */
+//#define HAS_CAMERA
+//#define HAS_IMU
+#define HAS_FILE
+//#define HAS_GENERATOR
+
 //#define AUTOMATION_RUN
 #define AUTOMATION_SIZES        { /*100, 250, 500, 750, 1000, 1250,*/ 1500, 1750, 2000 }
 #define AUTOMATION_INSTRUCTIONS { 's' };//, 's', 's' }
@@ -41,12 +47,6 @@ using namespace std;
 #endif
 
 #define THRESH_FRAME_PRINT_STEP         30
-
-/* GLOBAL SETUP */
-//#define HAS_CAMERA
-//#define HAS_IMU
-#define HAS_FILE
-//#define HAS_GENERATOR
 
 #ifdef AUTOMATION_RUN
 #define FRAME_WIDTH                     50

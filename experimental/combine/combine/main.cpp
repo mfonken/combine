@@ -9,9 +9,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 {
     TauDrawer tau("Tau", width, height
 #ifndef HAS_CAMERA
-                  , FRAME_IMAGE_IMAGE_SOURCE_PATH, FRAME_IMAGE_SOURCE_NUM_FRAMES
+      , FRAME_IMAGE_IMAGE_SOURCE_PATH, FRAME_IMAGE_SOURCE_NUM_FRAMES
 #endif
-                  );
+      );
     Environment env(&tau, TAU_FPS);
     Combine combine("Combine", &tau );
     SerialWriter comm(BLUETOOTH, FILENAME);
