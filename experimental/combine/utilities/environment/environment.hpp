@@ -22,11 +22,13 @@
 #include "serial_wrapper.hpp"
 
 #ifndef LOG
-#define LOG(L,...) printf(__VA_ARGS__)
+#define LOG(...) printf(__VA_ARGS__)
 #endif
 
+#define ENV_DEBUG
+
 #ifdef ENV_DEBUG
-#define LOG_ENV(L,...) LOG(L, "<Environment> " __VA_ARGS__)
+#define LOG_ENV(...) LOG("<Environment> " __VA_ARGS__)
 #else
 #define LOG_ENV(...)
 #endif
@@ -48,12 +50,17 @@ static inline long getTime( struct timeval tv )
 
 class TestInterface
 {
-public:
+protected:
     int id;
     const char * name;
-    virtual void  init( void ) = 0;
-    virtual void  trigger( void ) = 0;
-    virtual string serialize( void ) = 0;
+public:
+    virtual void    Init( void ) = 0;
+    virtual void    Trigger( void ) = 0;
+    virtual string  Serialize( void ) = 0;
+    
+    TestInterface(int id, const char * name ) : id(id), name(name) {}
+    int             GetId( void ) { return id; }
+    const char *    GetName( void ) { return name; }
 };
 
 typedef enum
@@ -87,11 +94,11 @@ private:
 public:
     
     EventList();
-    int add( pthread_mutex_t*, TestInterface*, SerialWriter*, int );
-    int validIndex(int, int);
-    Event * get(int);
-    int remove(int);
-    int length();
+    int         Add( pthread_mutex_t*, TestInterface*, SerialWriter*, int );
+    int         ValidIndex(int, int);
+    Event *     Get(int);
+    int         Remove(int);
+    int         Length();
 };
 
 class Environment
@@ -110,12 +117,12 @@ public:
     Environment( TestInterface*, SerialWriter*, int );
     ~Environment();
     
-    void addTest( TestInterface*, int );
-    void addTest( TestInterface*, SerialWriter*, int );
+    void AddTest( TestInterface*, int );
+    void AddTest( TestInterface*, SerialWriter*, int );
     
-    void start();
-    void pause();
-    void resume();
+    void Start();
+    void Pause();
+    void Resume();
 };
 
 #endif /* environment_hpp */

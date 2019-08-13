@@ -46,6 +46,7 @@ using namespace std;
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   31
 #endif
 
+//#define PRINT_TUNING_STAGES
 #define THRESH_FRAME_PRINT_STEP         30
 
 #ifdef AUTOMATION_RUN

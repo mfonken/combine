@@ -12,7 +12,8 @@ using namespace cv;
 using namespace std;
 
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height) :
-num_frames(num), size(width, height), name(n), subdir(f),
+TestInterface(3, n.c_str()),
+num_frames(num), size(width, height), subdir(f),
 frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
@@ -57,7 +58,7 @@ preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
     background_ready = false;
 }
 
-void ImageUtility::init()
+void ImageUtility::Init()
 {
     has_file
 #ifdef HAS_FILE
@@ -79,14 +80,14 @@ void ImageUtility::init()
 #endif
     
     LOG_IU(DEBUG_2, "Initializing Image Utility: ");
-    if(has_file) initFile();
-    if(has_camera) initCamera();
-    if(has_generator) initGenerator();
+    if(has_file) InitFile();
+    if(has_camera) InitCamera();
+    if(has_generator) InitGenerator();
 }
 
 ImageUtility::~ImageUtility() {}
 
-void ImageUtility::initFile()
+void ImageUtility::InitFile()
 {
     counter = 0;
     file = IMAGE_ROOT;
@@ -121,7 +122,7 @@ void ImageUtility::initFile()
     live = true;
 }
 
-void ImageUtility::initCamera()
+void ImageUtility::InitCamera()
 {
     counter = 0;
     
@@ -148,29 +149,29 @@ void ImageUtility::initCamera()
     live = true;
 }
 
-void ImageUtility::initGenerator()
+void ImageUtility::InitGenerator()
 {
 }
 
-void ImageUtility::requestBackground()
+void ImageUtility::RequestBackground()
 {
     background_request = true;
     background_ready = false;
 }
 
-void ImageUtility::trigger()
+void ImageUtility::Trigger()
 {
     preoutframe = {0};
     if(!single_frame)
         ++counter;
     if(has_file)
-        preoutframe = getNextImage();
+        preoutframe = GetNextImage();
     else if(has_camera)
-        preoutframe = getNextFrame();
+        preoutframe = GetNextFrame();
     else preoutframe = { 0 };
     
     if(has_generator)
-        generateImage(preoutframe);
+        GenerateImage(preoutframe);
     
     if( background_request )
     {
@@ -204,12 +205,12 @@ void ImageUtility::trigger()
 #endif
 }
 
-std::string ImageUtility::serialize()
+std::string ImageUtility::Serialize()
 {
     return this->name;
 }
 
-int ImageUtility::loop(char c)
+int ImageUtility::Loop(char c)
 {
     switch(c)
     {
@@ -226,13 +227,13 @@ int ImageUtility::loop(char c)
         default:
             return 0;
     }
-    if( has_file ) preoutframe = getImage();
-    if( has_camera ) preoutframe = getNextFrame();
+    if( has_file ) preoutframe = GetImage();
+    if( has_camera ) preoutframe = GetNextFrame();
     
     return 1;
 }
 
-Mat ImageUtility::getNextImage()
+Mat ImageUtility::GetNextImage()
 {
     if(!live) return(image);
     
@@ -240,10 +241,10 @@ Mat ImageUtility::getNextImage()
     {
         counter %= path_num_ticks;
     }
-    return getImage();
+    return GetImage();
 }
 
-Mat ImageUtility::getImage()
+Mat ImageUtility::GetImage()
 {
     if(subdir.find(".png") == string::npos )
         file = subdir + to_string( counter%(num_frames+1) ) + ".png";
@@ -258,7 +259,7 @@ Mat ImageUtility::getImage()
     return image;
 }
 
-Mat ImageUtility::getNextFrame()
+Mat ImageUtility::GetNextFrame()
 {
     cam >> image;
     
@@ -281,7 +282,7 @@ Mat ImageUtility::getNextFrame()
     return image;
 }
 
-void ImageUtility::drawOutframe()
+void ImageUtility::DrawOutframe()
 {
     putText(outframe, "A", Point(bea[1].x, bea[1].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,55,255), 3);
     putText(outframe, "B", Point(bea[0].x, bea[0].y), FONT_HERSHEY_PLAIN, 2, Vec3b(0,255,55), 3);
@@ -297,12 +298,12 @@ void ImageUtility::drawOutframe()
 #endif
 }
 
-bool ImageUtility::isLive()
+bool ImageUtility::IsLive()
 {
     return live;
 }
 
-void drawPosition(double x, double y, double z)
+void DrawPosition(double x, double y, double z)
 {
     int width = 800, act_width = 600, height = 600, step = 50;
     Mat P(height, width, CV_8UC3, Scalar(0,0,0));
@@ -337,7 +338,7 @@ void drawPosition(double x, double y, double z)
     //    imshow("Position", P);
 }
 
-void ImageUtility::generateImage(Mat& M)
+void ImageUtility::GenerateImage(Mat& M)
 {
     path_tick = counter % path_num_ticks;
     if( !has_file && !has_camera ) frame = {0};

@@ -13,14 +13,16 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 #endif
       );
     Environment env(&tau, TAU_FPS);
+#ifdef HAS_IMU
     Combine combine("Combine", &tau );
     SerialWriter comm(BLUETOOTH, FILENAME);
-    env.addTest(&combine, &comm, COMBINE_FPS);
+    env.AddTest(&combine, &comm, COMBINE_FPS);
+#endif
     
-    env.start();
-    env.pause();
+    env.Start();
+    env.Pause();
     sleep(0.1);
-    env.resume();
+    env.Resume();
     Mat local_frame;
     
     struct timeval a,b;
@@ -56,30 +58,30 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
         switch(c)
         {
             case ' ':
-                if(env.status != LIVE) env.resume();
-                else env.pause();
+                if(env.status != LIVE) env.Resume();
+                else env.Pause();
                 break;
             default:
-                if(tau.utility.loop(c))
+                if(tau.utility.Loop(c))
                 {
-                    tau.utility.trigger();
-                    tau.trigger();
+                    tau.utility.Trigger();
+                    tau.Trigger();
                 }
                 break;
             case 's':
-                env.pause();
+                env.Pause();
                 sleep(0.01);
                 tau.avg = 0;
                 tau.count = 0;
                 tau.stddev_sum = 0;
-                env.start();
+                env.Start();
                 gettimeofday( &a, NULL);
                 sleep(10);
                 gettimeofday( &b, NULL);
-                env.pause();
+                env.Pause();
                 tau.stddev = sqrt( tau.stddev_sum / (double)(tau.count));
                 char buf[128];
-                sprintf(buf, "PCR (Seg. Only),%d,%d,%lf,%f,%f,%f\n", width, tau.count, timeDiff(a,b), tau.avg * 1000., tau.accuracy / (double)width * 100., tau.stddev / (double)width * 100.);
+                sprintf(buf, "PCR,%d,%d,%lf,%f,%f,%f\n", width, tau.count, timeDiff(a,b), tau.avg * 1000., tau.accuracy / (double)width * 100., tau.stddev / (double)width * 100.);
                 printf("%s", buf);
                 performanceFile.trigger(string(buf), ofstream::app);
                 break;

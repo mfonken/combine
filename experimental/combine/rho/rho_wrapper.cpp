@@ -25,14 +25,15 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     
     RhoCore.Initialize(&core, width, height);
 #ifdef __PSM__
-    PSMFunctions.Initialize( &core.PredictiveStateModel );
+    PSMFunctions.Initialize( &core.PredictiveStateModelPair.x );
+    PSMFunctions.Initialize( &core.PredictiveStateModelPair.y );
 #endif
     backgrounding_event = false;
     
-    printSizes();
+    PrintSizes();
 }
 
-double Rho::perform( cimage_t & img, GlobalPacket * p )
+double Rho::Perform( cimage_t & img, GlobalPacket * p )
 {
     pthread_mutex_lock(&c_mutex);
     pthread_mutex_lock(&density_map_pair_mutex);
@@ -40,7 +41,7 @@ double Rho::perform( cimage_t & img, GlobalPacket * p )
     /* Core Rho Functions */
     struct timeval a,b;
     gettimeofday( &a, NULL);
-    decouple( img, backgrounding_event );
+    Decouple( img, backgrounding_event );
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
@@ -58,7 +59,7 @@ double Rho::perform( cimage_t & img, GlobalPacket * p )
 }
 
 /* Interrupt (Simulated Hardware-Driven) Density map generator */
-void Rho::decouple( const cimage_t image, bool backgrounding )
+void Rho::Decouple( const cimage_t image, bool backgrounding )
 {
     if( backgrounding )
     {
@@ -83,7 +84,7 @@ void Rho::decouple( const cimage_t image, bool backgrounding )
     }
 }
 
-void Rho::printSizes( void )
+void Rho::PrintSizes( void )
 {
     size_t
     aa = CAPTURE_WIDTH + CAPTURE_HEIGHT,

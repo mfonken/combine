@@ -137,8 +137,8 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoUtility.Predict.GenerateObservationLists( core );
     
 #ifdef __PSM__
-     PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions ); /// TODO: Generalize to be dimensionless
-//    PSMFunctions.Update( &core->PredictiveStateModel, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
+    /* Process both dimensions' predictive state */
+    RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
 #else
     floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
     double state_intervals[NUM_STATE_GROUPS];

@@ -9,7 +9,8 @@
 #ifndef tau_utility_hpp
 #define tau_utility_hpp
 
-#define AVERAGE_COUNT 10
+#define MAX_COUNT               1000
+#define AVERAGE_COUNT           10
 
 #include <stdio.h>
 #include <stdint.h>
@@ -21,25 +22,22 @@
 #include "rho_wrapper.hpp"
 #include "statistics.h"
 
-#define MAX_COUNT               1000
 
 class Tau : public TestInterface
 {
 public:
-    int id;
-    const char * name;
-    virtual void init( void );
-    virtual void trigger( void );
-    virtual std::string serialize( void );
+    void        Init( void );
+    void        Trigger( void );
+    std::string Serialize( void );
     
     Tau( const char * name, int width, int height, std::string f = "", int num = 0, std::string n = "ImageUtility" );
     virtual ~Tau();
     
-    double perform( cv::Mat );
-    double perform( cimage_t & );
-    void updateThresh( void );
-    void updatePrediction( void );
-    void printPacket( GlobalPacket *, int );
+    double      Perform( cv::Mat );
+    double      Perform( cimage_t & );
+    void        UpdateThresh( void );
+    void        UpdatePrediction( void );
+    void        PrintPacket( GlobalPacket *, int );
     
     int                 count,
                         accuracy_count,
@@ -48,13 +46,12 @@ public:
                         accuracy,
                         current_accuracy,
                         stddev;
+    int                 tick,
+                        width,
+                        height;
     
     point2d_t           A, B;
     cimage_t            image;
-    int                 thresh,
-                        tick,
-                        width,
-                        height;
     ImageUtility        utility;
     Rho                 rho;
     GlobalPacket        packet;

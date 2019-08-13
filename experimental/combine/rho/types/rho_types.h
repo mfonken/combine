@@ -225,6 +225,16 @@ typedef struct
 
 typedef struct
 {
+    psm_t x,y;
+    uint8_t current_state;
+    double
+        best_confidence,
+        proposed_nu,
+        proposed_avg_den;
+} psm_pair_t;
+
+typedef struct
+{
     density_2d_t left, right;       /* Direction density values */
     bool complete;
 } section_process_t;
@@ -410,7 +420,7 @@ typedef struct
     detection_map_t     DetectionMap;
 
 #ifdef __PSM__
-    psm_t               PredictiveStateModel;
+    psm_pair_t          PredictiveStateModelPair;
 #else
     kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;

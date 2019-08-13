@@ -23,11 +23,9 @@
 class Combine : public TestInterface
 {
 public:
-    int id;
-    const char * name;
-    virtual void init( void );
-    virtual void trigger( void );
-    virtual string serialize( void );
+    void Init( void );
+    void Trigger( void );
+    string Serialize( void );
     
     Combine(const char *, Tau * );
     

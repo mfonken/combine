@@ -9,6 +9,8 @@
 #include "combine.hpp"
 
 Combine::Combine(const char * n, Tau * t )
+:
+TestInterface(2, n)
 {
     this->tau = t;
     this->name = n;
@@ -16,7 +18,7 @@ Combine::Combine(const char * n, Tau * t )
     this->height = t->height;
 }
 
-string Combine::serialize()
+string Combine::Serialize()
 {  
     char kin_packet[MAX_BUFFER];
     
@@ -32,7 +34,7 @@ string Combine::serialize()
     return string(kin_packet);
 }
 
-void Combine::init()
+void Combine::Init()
 {
     printf("Initializing IMU Utility.\n");
     IMUFunctions.init( &imu );
@@ -41,7 +43,7 @@ void Combine::init()
     KineticFunctions.Init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
 }
 
-void Combine::trigger()
+void Combine::Trigger()
 {
     pthread_mutex_lock( &tau->predictions_mutex );
     kpoint_t A = (kpoint_t){tau->A.x, tau->A.y}, B = (kpoint_t){tau->B.x, tau->B.y};

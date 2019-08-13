@@ -24,9 +24,9 @@ public:
     bool                backgrounding_event;
     
     Rho( int, int );
-    double perform( cimage_t&, GlobalPacket * );
-    void decouple( const cimage_t, bool );
-    void printSizes( void );
+    double Perform( cimage_t&, GlobalPacket * );
+    void Decouple( const cimage_t, bool );
+    void PrintSizes( void );
 };
 
 #endif /* rho_wrapper_hpp */

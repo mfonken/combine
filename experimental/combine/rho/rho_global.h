@@ -137,6 +137,7 @@ enum LogLevel
 #define MAX(A,B)                ( ( A > B ) ? A : B )
 #endif
 
+#define AVG2(A,B)               ( ( A + B ) / 2. )
 #define SWAP(A,B)               { typeof(A) temp = A; A = B; B = temp; }
 
 #define BOUNDU(X,MAX)           ( ( X > MAX ) ? MAX : X )         // Bound in upper range

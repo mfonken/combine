@@ -67,17 +67,18 @@ void drawPosition(double x, double y, double z);
 class ImageUtility : public TestInterface
 {
 public:
-    int id;
-    std::string name;
-    virtual void init( void );
-    virtual void trigger( void );
-    virtual string serialize( void );
+    void Init( void );
+    void Trigger( void );
+    string Serialize( void );
     
     static ImageUtility& Instance();
     
-    void initFile();
-    void initCamera();
-    void initGenerator();
+    ImageUtility( std::string, std::string f, int num, int width, int height);
+    virtual ~ImageUtility();
+    
+    void InitFile();
+    void InitCamera();
+    void InitGenerator();
     
     VideoCapture cam;
     Mat outframe, preoutframe, frame, image, preimage;
@@ -87,17 +88,15 @@ public:
                     outimage_mutex,
                     tau_cross_mutex,
                     self_mutex;
-    ImageUtility( std::string, std::string f, int num, int width, int height);
-    virtual ~ImageUtility();
     
-    void requestBackground();
-    Mat getNextImage();
-    Mat getImage();
-    int loop(char c);
-    Mat getNextFrame();
-    bool isLive();
-    void drawOutframe();
-    void generateImage(Mat&);
+    void RequestBackground();
+    Mat GetNextImage();
+    Mat GetImage();
+    int Loop(char c);
+    Mat GetNextFrame();
+    bool IsLive();
+    void DrawOutframe();
+    void GenerateImage(Mat&);
     
     int Cx, Cy, pCx, pCy;
     point2d_t bea[2];

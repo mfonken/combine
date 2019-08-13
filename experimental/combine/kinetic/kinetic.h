@@ -129,9 +129,9 @@ typedef struct
     void  (*DefaultInit)(kinetic_t * );
     void  (*Init)( kinetic_t *, int, int, double, double);
     void  (*UpdateRotation)( kinetic_t *, ang3_t *, ang3_t * );
-    void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t , kpoint_t );
+    void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t, kpoint_t );
     
-    void (*MinorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );
+    void (*MinorAngles)( kinetic_t *, kpoint_t, kpoint_t );
     void (*Quaternions)( kinetic_t * );
     void (*MajorAngles)( kinetic_t * );
     int  (*Chi)( kinetic_t * );

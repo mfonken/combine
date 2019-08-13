@@ -12,14 +12,15 @@ using namespace cv;
 
 Tau::Tau( const char * name, int width, int height, std::string f, int num, std::string n )
 :
+TestInterface(1, name),
 rho(width, height),
-name(name), width(width), height(height),
+width(width), height(height),
 utility(n, f, num, width, height)
 #ifdef __PSM__
-,rho_drawer(&rho.core.PredictiveStateModel)
+,rho_drawer(&rho.core.PredictiveStateModelPair.x)
 #endif
 {
-    utility.init();
+    utility.Init();
     cimageInit(image, width, height);
     
     A = {(double)width/2., (double)height/2.};
@@ -30,7 +31,7 @@ utility(n, f, num, width, height)
 
 Tau::~Tau() {}
 
-void Tau::init( void )
+void Tau::Init( void )
 {
     rho.core.Thresh = DEFAULT_THRESH;
     count = 0;
@@ -42,13 +43,13 @@ void Tau::init( void )
     utility.generator_active = true;
 }
 
-void Tau::trigger( void )
+void Tau::Trigger( void )
 {
     double p = 0.;
 
     pthread_mutex_lock(&utility.outframe_mutex);
-    utility.trigger();
-    p = perform( utility.outimage );
+    utility.Trigger();
+    p = Perform( utility.outimage );
     pthread_mutex_unlock(&utility.outframe_mutex);
     
     LOG_TAU("Tau perform: %.3fs\n", p);
@@ -60,39 +61,42 @@ void Tau::trigger( void )
         CumulativeMovingAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
+    //    rho.core.Thresh-=1; ///TEST
+    rho.core.ThreshByte = (byte_t)rho.core.Thresh;
+    
 #ifdef __PSM__
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
 #endif
-//    rho.core.Thresh-=1; ///TEST
-    rho.core.ThreshByte = (byte_t)rho.core.Thresh;
+#ifdef PRINT_TUNING_STAGES
     if(!(rho.core.ThreshByte % THRESH_FRAME_PRINT_STEP))
     {
         imwrite(FRAME_SAVE_ROOT + string("thresh_frame_") + to_string(rho.core.ThreshByte) + string(".png"), utility.outframe);
     }
+#endif
 }
 
-std::string Tau::serialize( void )
+std::string Tau::Serialize( void )
 {
     return "";
 }
 
-double Tau::perform( cimage_t &img )
+double Tau::Perform( cimage_t &img )
 {
     bool background_event = !!( ++tick >= BACKGROUNDING_PERIOD );
     
     if( background_event )
     {
-        utility.requestBackground();
+        utility.RequestBackground();
         LOG_TAU(DEBUG_2, "Waiting for utility to generate background...\n");
         
         while(!utility.background_ready)
-            utility.trigger();
+            utility.Trigger();
         
         LOG_RHO(DEBUG_2, "Background ready.\n");
         rho.backgrounding_event = true;
     }
     
-    double p = rho.perform( img, &packet );
+    double p = rho.Perform( img, &packet );
     
     if( background_event )
     {
@@ -101,24 +105,24 @@ double Tau::perform( cimage_t &img )
     }
     else
     {
-        updateThresh();
-        updatePrediction();
+        UpdateThresh();
+        UpdatePrediction();
     }
     
     double Cx = utility.pCx-rho.core.Cx,
     Cy = utility.pCy-rho.core.Cy;
     current_accuracy = sqrt(Cx*Cx + Cy*Cy);
     
-    printPacket(&packet, 4);
+    PrintPacket(&packet, 4);
     return p;
 }
 
-void Tau::updateThresh()
+void Tau::UpdateThresh()
 {
     utility.thresh = rho.core.Thresh;
 }
 
-void Tau::updatePrediction()
+void Tau::UpdatePrediction()
 {
     pthread_mutex_lock(&predictions_mutex);
     Point2f a(packet.py, packet.px),
@@ -134,7 +138,7 @@ void Tau::updatePrediction()
     pthread_mutex_unlock(&predictions_mutex);
 }
 
-void Tau::printPacket( GlobalPacket * p, int l )
+void Tau::PrintPacket( GlobalPacket * p, int l )
 {
 #ifdef TAU_DEBUG
     printf("Packet Size > %lubytes\n", sizeof(GlobalPacket));

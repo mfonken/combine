@@ -602,6 +602,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				OTHER_LDFLAGS = (

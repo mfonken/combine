@@ -199,7 +199,7 @@ Mat& TauDrawer::GetDensitiesFrame(Mat &M)
     
     putText(M, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
 #ifdef __PSM__
-    putText(M, "State: " + string(stateString(rho.core.PredictiveStateModel.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
+    putText(M, "State: " + string(stateString(rho.core.PredictiveStateModelPair.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
 #endif
     putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
     line(M, Point(rho.core.Cx, rho.core.Cy), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
@@ -545,9 +545,9 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     x_nu = rho.core.PredictionPair.x.NuRegions,
     y_nu = rho.core.PredictionPair.y.NuRegions;
 #ifdef __PSM__
-    state_t state = rho.core.PredictiveStateModel.hmm.A.state;
+    state_t state = rho.core.PredictiveStateModelPair.x.hmm.A.state;
     for(int i = 0; i < NUM_STATES; i++)
-        state_P[i] = rho.core.PredictiveStateModel.hmm.A.probabilities.map[i][state];
+        state_P[i] = rho.core.PredictiveStateModelPair.x.hmm.A.probabilities.map[i][state];
 #endif
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;

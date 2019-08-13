@@ -88,6 +88,7 @@ extern "C" {
 
     void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, uint8_t );
     void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * );
+    void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * );
 
     typedef struct
     {
@@ -115,7 +116,8 @@ extern "C" {
         void (*RedistributeDensities)(  rho_core_t * );
         void (*UpdateCorePredictionData)( prediction_predict_variables *, rho_core_t * );
         void (*GenerateObservationList)( prediction_t *, uint8_t );
-        void (*GenerateObservationLists)( rho_core_t * core );
+        void (*GenerateObservationLists)( rho_core_t * );
+        void (*UpdatePredictiveStateModelPair)(rho_core_t * );
     } rho_utility_predict_functions;
 
     typedef struct
@@ -185,6 +187,7 @@ extern "C" {
         .Predict.UpdateCorePredictionData = UpdateCorePredictionDataRhoUtility,
         .Predict.GenerateObservationList = GenerateObservationListFromPredictionsRhoUtility,
         .Predict.GenerateObservationLists = GenerateObservationListsFromPredictionsRhoUtility,
+        .Predict.UpdatePredictiveStateModelPair = UpdatePredictiveStateModelPairRhoUtility,
 
         .Detect.Perform = PerformDetectRhoUtility,
         .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,

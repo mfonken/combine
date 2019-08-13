@@ -69,7 +69,7 @@ static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
     Quaternion.fromEuler( &k->e, &k->qd );
 }
 
-static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
+static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint_t B )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );

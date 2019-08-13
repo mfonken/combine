@@ -14,21 +14,21 @@ Environment::Environment( TestInterface * test, SerialWriter * sercom, int rate 
 {
     LOG_ENV("Initializing Test Environment.\n");
     if (pthread_mutex_init(&lock, NULL) != 0) {LOG_ENV("\n mutex init failed\n");}
-    if(events.add( &lock, test, sercom, rate ))
-        test->init();
+    if(events.Add( &lock, test, sercom, rate ))
+        test->Init();
     status = INITIALIZED;
 }
 
-void Environment::addTest( TestInterface * test, int rate)
+void Environment::AddTest( TestInterface * test, int rate)
 {
-    if(events.add( &lock, test, NULL, rate ))
-        test->init();
+    if(events.Add( &lock, test, NULL, rate ))
+        test->Init();
 }
 
-void Environment::addTest( TestInterface* test, SerialWriter* sercom, int rate)
+void Environment::AddTest( TestInterface* test, SerialWriter* sercom, int rate)
 {
-    if(events.add( &lock, test, sercom, rate ))
-        test->init();
+    if(events.Add( &lock, test, sercom, rate ))
+        test->Init();
 }
 
 Environment::~Environment()
@@ -36,25 +36,25 @@ Environment::~Environment()
     pthread_mutex_destroy(&lock);
 }
 
-void Environment::start()
+void Environment::Start()
 {
-    resume();
+    Resume();
 }
 
-void Environment::pause()
+void Environment::Pause()
 {
     LOG_ENV("Pausing environment\n");
     pthread_mutex_unlock(&lock);
     status = PAUSED;
 }
 
-void Environment::resume()
+void Environment::Resume()
 {
     LOG_ENV("Resuming environment\n");
     pthread_mutex_lock(&lock);
-    for( int i = 0; i < events.length(); i++ )
+    for( int i = 0; i < events.Length(); i++ )
     {
-        Event * e = events.get(i);
+        Event * e = events.Get(i);
         pthread_create(&thread, NULL, &e->worker, (void*)e);
     }
     status = LIVE;
@@ -77,7 +77,7 @@ Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * serc
 void * Event::worker( void * data )
 {
     Event e = *(Event*)data;
-//    const char * n = e.test->name;
+    const char * n = e.test->GetName();
     if( e.mutex == NULL)
     {
         LOG_ENV("ALERT: Event %s has no mutex!\n", n);
@@ -97,16 +97,16 @@ void * Event::worker( void * data )
     {
         end_time = getTime(time) + sl;
     
-        e.test->trigger();
+        e.test->Trigger();
         if(e.sercom != NULL)
-            e.sercom->write(e.test->serialize());
+            e.sercom->write(e.test->Serialize());
         
         e.id++;
         
         while( (curr_time = getTime(time)) < end_time );
     }
     pthread_mutex_unlock(e.mutex);
-    LOG_ENV("Event %s has triggered %d times\n", e.test->name, e.id);
+    LOG_ENV("Event \"%s\" has triggered %d times\n", e.test->GetName(), e.id);
     return NULL;
 }
 
@@ -120,10 +120,10 @@ EventList::EventList()
     }
 }
 
-int EventList::add( pthread_mutex_t* mutex, TestInterface* test, SerialWriter* sercom, int rate )
+int EventList::Add( pthread_mutex_t* mutex, TestInterface* test, SerialWriter* sercom, int rate )
 {
-    if( !validIndex(this->index, MAX_EVENTS-1) ) return 0;
-    Event * e = get(this->index++);
+    if( !ValidIndex(this->index, MAX_EVENTS-1) ) return 0;
+    Event * e = Get(this->index++);
     if(e == NULL) return 0;
     e->id = this->index-1;
     e->mutex = mutex;
@@ -134,27 +134,27 @@ int EventList::add( pthread_mutex_t* mutex, TestInterface* test, SerialWriter* s
     return 1;
 }
 
-int EventList::validIndex( int i, int m )
+int EventList::ValidIndex( int i, int m )
 {
     if( i >= m || i < 0 ) return 0;
     return 1;
 }
 
-Event * EventList::get(int i)
+Event * EventList::Get(int i)
 {
-    if( !validIndex(i, index) ) return NULL;
+    if( !ValidIndex(i, index) ) return NULL;
     return list[i];
 }
-int EventList::remove(int i)
+int EventList::Remove(int i)
 {
-    if( !validIndex(i, index)  ) return 0;
+    if( !ValidIndex(i, index)  ) return 0;
     for(; i < index-1; i++)
         list[i] = list[i+1];
     index--;
     return 1;
 }
 
-int EventList::length()
+int EventList::Length()
 {
     return index;
 }
