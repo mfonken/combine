@@ -49,16 +49,17 @@ public:
     int                 tick,
                         width,
                         height;
-    
-    point2d_t           A, B;
-    cimage_t            image;
     ImageUtility        utility;
     Rho                 rho;
     GlobalPacket        packet;
+    point2d_t           A, B;
+    cimage_t            image;
     pthread_mutex_t     predictions_mutex,
                       * utility_mutex;
+#ifdef RHO_DRAWER
 #ifdef __PSM__
     RhoDrawer           rho_drawer;
+#endif
 #endif
 };
 

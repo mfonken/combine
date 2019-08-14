@@ -16,8 +16,8 @@ void RIM_INIT_FROM_CORE( rho_core_t * core )
     RhoVariables.ram.Dx      =  core->DensityMapPair.x.map;
     RhoVariables.ram.Dy      =  core->DensityMapPair.y.map;
     RhoVariables.ram.Q       =  core->Q;
-    RhoVariables.ram.CX_ADDR = &core->Cx;
-    RhoVariables.ram.CY_ADDR = &core->Cy;
+    RhoVariables.ram.CX_ADDR = &core->Centroid.x;
+    RhoVariables.ram.CY_ADDR = &core->Centroid.y;
     RhoVariables.ram.C_FRAME =  core->cframe;
     RhoVariables.ram.THRESH_ADDR = (density_t *)&core->ThreshByte;
 
@@ -43,8 +43,8 @@ void RIM_FRAME_START( void )
     RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.C_FRAME_MAX;
 
 //    memset(RhoVariables.ram.C_FRAME, 0, sizeof(char)*RhoVariables.global.C_FRAME_MAX);
-    memset(RhoVariables.ram.Dy, 0, sizeof(dmap_t) * RhoVariables.global.W);
-    memset(RhoVariables.ram.Dx, 0, sizeof(dmap_t) * RhoVariables.global.H);
+    memset(RhoVariables.ram.Dy, 0, sizeof(density_map_t) * RhoVariables.global.W);
+    memset(RhoVariables.ram.Dx, 0, sizeof(density_map_t) * RhoVariables.global.H);
     memset(RhoVariables.ram.Q,  0, sizeof(density_2d_t) * 4);
 
     RhoVariables.registers.Cx   = *RhoVariables.ram.CX_ADDR;

@@ -143,15 +143,20 @@ typedef struct
 
 typedef struct
 {
+    index_t x,y;
+} index_pair_t;
+
+typedef struct
+{
 density_t
-    max,
-    den;
+    maximum,
+    density;
 index_t
-    loc,
-    wth,
-    srt;
+    location,
+    width,
+    sort;
 floating_t
-    scr;
+    score;
 byte_t
     tracking_id;
 } region_t;
@@ -159,13 +164,17 @@ byte_t
 /* Rho Structures* */
 typedef struct
 {
-    dmap_t         *map,
-                   *background,
-                    max[2];
-    index_t         length,
-    centroid;
-    bool            has_background;
-    rho_kalman_t    kalmans[2];
+    density_map_unit_t
+        *map,
+        *background,
+        max[2];
+    index_t
+        length,
+        centroid;
+    bool
+        has_background;
+    rho_kalman_t
+        kalmans[2];
 } density_map_t;
 
 typedef struct
@@ -266,12 +275,8 @@ typedef struct
 
 typedef struct
 {
-    index_t
-    xl[3],
-    yl[3];
-    density_2d_t
-    area[9];
-
+    index_t xl[3], yl[3];
+    density_2d_t area[9];
     density_2d_t a, b, c, d, l, l_, p, q, x, y;
 } redistribution_variables;
 extern const density_redistribution_lookup_t rlookup;
@@ -279,10 +284,10 @@ extern const density_redistribution_lookup_t rlookup;
 typedef struct
 {
     floating_t
-    background,
-    state,
-    target,
-    proposed;
+        background,
+        state,
+        target,
+        proposed;
 } rho_tune_t;
 
 typedef struct
@@ -290,38 +295,36 @@ typedef struct
     index_t
       len,
       range[3],
-      cyc,
-      cyc_,
-      gapc,
+      cycle,
+      cycle_,
+      gap_counter,
       width,
-      blbf,            /* Region fill */
+      region_total,            /* Region fill */
       x,               /* Generic index */
       start,
       end;
     density_t
-      fpeak,
-      fpeak_2,
-      fbandl,
-      c,
-      b,
-      rcal_c; /* Recalculation counter */
-      variance_t
-      fvar;
+      filter_peak,
+      filter_peak_2,
+      filter_band_lower,
+      curr,
+      background_curr,
+      recalculation_counter;
+    variance_t
+      filter_variance;
     density_2d_t
-      cmax,
-      cden,
-      tden, /* Target density */
-      fden, /* Filtered density */
-      fden1, /* Initial filtered density before retries */
+      maximum,
+      current_density,
       total_density,
-      filtered_density;
+      filtered_density,
+      first_filtered_density; /* Initial filtered density before retries */
     bool
-      has,
-      rcal; /* Recalculate */
+      has_region,
+      recalculate;
     floating_t
-      avgc,
-      cavg,   /* cumulative average */
-      mavg,   /* moment average */
+      average_counter,
+      average_curr,   /* cumulative average */
+      average_moment,   /* moment average */
       chaos,
       target_density,
       assumed_regions;
@@ -329,28 +332,18 @@ typedef struct
 
 typedef struct
 {
-    index_t
-    Ax,
-    Ay,
-    Bx,
-    By,
-    Cx,
-    Cy;
-    int8_t qcheck;
+    index_pair_t
+        Primary,
+        Secondary,
+        Centroid;
+    int8_t quadrant_check;
 } prediction_predict_variables;
 
 typedef struct
 {
     packet_t *packet;
-    address_t pdPtr,
-    llPtr,
-    *alPtr;
-    byte_t
-    includes,
-    i,
-    j,
-    l,
-    t;
+    address_t pdPtr, llPtr, *alPtr;
+    byte_t includes, i, j, l, t;
 } packet_generation_variables;
 
 #define DETECTION_BUFFER_SIZE ( 1 << 8 )
@@ -359,20 +352,14 @@ typedef struct
 
 typedef struct
 {
-    uint8_t
-    thresh;
-    index_t
-    density;
-    uint8_t
-    tracking_id;
+    uint8_t thresh;
+    index_t density;
+    uint8_t tracking_id;
 } detection_element_t;
 
 typedef struct
 {
-    uint16_t index,
-            fill,
-            length,
-            first;
+    uint16_t index, fill, length, first;
     detection_element_t buffer[DETECTION_BUFFER_SIZE];
 } detection_ring_buffer_t;
 
@@ -385,23 +372,18 @@ typedef struct
         Width,
         Height,
         Subsample,
-        RowsLeft,
-        Px,
-        Py,
-        Sx,
-        Sy,
-        Cx,
-        Cy,
-        Bx,
-        By;
+        RowsLeft;
+    index_pair_t
+        Primary,
+        Secondary,
+        Centroid,
+        BackgroundCentroid;
+//        Px, Py, Sx, Sy, Cx, Cy, Bx, By;
     byte_t
         ThreshByte,
         BackgroundCounter;
     density_2d_t
-        Q[4],
-        Qb[4],
-        Qf[4],
-        QbT,
+        Q[4], Qb[4], Qf[4], QbT,
         TotalCoverage,
         FilteredCoverage,
         TargetCoverage,

@@ -5,6 +5,7 @@
 //  Created by Matthew Fonken on 2/5/19.
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
+#ifdef RHO_DRAWER
 #ifdef __PSM__
 
 #include "rho_drawer_xprm.hpp"
@@ -138,4 +139,5 @@ void RhoDrawer::PostProcess(psm_t * psm)
 #endif
 }
 
+#endif
 #endif

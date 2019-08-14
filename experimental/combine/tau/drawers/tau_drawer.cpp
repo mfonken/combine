@@ -202,10 +202,10 @@ Mat& TauDrawer::GetDensitiesFrame(Mat &M)
     putText(M, "State: " + string(stateString(rho.core.PredictiveStateModelPair.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
 #endif
     putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
-    line(M, Point(rho.core.Cx, rho.core.Cy), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
-    putText(M, "X (" + to_string(rho.core.Cx) + ", " + to_string(rho.core.Cy) + ")", Point(rho.core.Cx-9, rho.core.Cy+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
-    putText(M, "o", Point(rho.core.Px-9, rho.core.Py+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
-    putText(M, "o", Point(rho.core.Sx-9, rho.core.Sy+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
+    line(M, Point(rho.core.Centroid.x, rho.core.Centroid.y), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
+    putText(M, "X (" + to_string(rho.core.Centroid.x) + ", " + to_string(rho.core.Centroid.y) + ")", Point(rho.core.Centroid.x-9, rho.core.Centroid.y+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
+    putText(M, "o", Point(rho.core.Primary.x-9, rho.core.Primary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
+    putText(M, "o", Point(rho.core.Secondary.x-9, rho.core.Secondary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
     
     double dnow = now();
     rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH*2), Point(W,H), Scalar(0,0,0), FILLED);
@@ -228,10 +228,10 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     int u, v, w = width, h = height;
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
-    rangex[3] = { w, (int)rho.core.Cx, 0 },
-    rangey[3] = { h, (int)rho.core.Cy, 0 },
-    Bx = rho.core.Bx,
-    By = rho.core.By;
+    rangex[3] = { w, (int)rho.core.Centroid.x, 0 },
+    rangey[3] = { h, (int)rho.core.Centroid.y, 0 },
+    Bx = rho.core.Secondary.x,
+    By = rho.core.Secondary.y;
     line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
     line(M, Point(0,rangey[1]),   Point(W,rangey[1]), redish);
     
@@ -393,13 +393,13 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     for( int i = 0; i < rho.core.PredictionPair.y.NumRegions; i++ )
     {
         int o = rho.core.PredictionPair.y.RegionsOrder[i];
-        int v = rho.core.PredictionPair.y.Regions[o].loc;
+        int v = rho.core.PredictionPair.y.Regions[o].location;
         line(M, Point(v,0),Point(v,h), bluish);
     }
     for( int i = 0; i < rho.core.PredictionPair.x.NumRegions; i++ )
     {
         int o = rho.core.PredictionPair.x.RegionsOrder[i];
-        int v = rho.core.PredictionPair.x.Regions[o].loc;
+        int v = rho.core.PredictionPair.x.Regions[o].location;
         line(M, Point(0,v),Point(w,v), bluish);
     }
     
@@ -421,13 +421,13 @@ void TauDrawer::DrawDensityGraph(Mat &M)
 void TauDrawer::DrawDensityMaps(Mat& M)
 {
     Vec3b c(0,0,0);
-    int x = 0, y = 0, rangex[2] = { (int)rho.core.Cx, w }, rangey[2] = { (int)rho.core.Cy, h };
+    int x = 0, y = 0, rangex[2] = { (int)rho.core.Centroid.x, w }, rangey[2] = { (int)rho.core.Centroid.y, h };
     for( int i = 0; i < 2; i++ )
     {
         int mX = rho.core.DensityMapPair.x.max[1-i], mY = rho.core.DensityMapPair.y.max[1-i];
         if(!mX) mX = 1;
         if(!mY) mY = 1;
-        dmap_t *dX = rho.core.DensityMapPair.x.map, *dY = rho.core.DensityMapPair.y.map;
+        density_map_unit_t *dX = rho.core.DensityMapPair.x.map, *dY = rho.core.DensityMapPair.y.map;
         
         for(; y < rangey[i]; y++ )
         {
@@ -819,7 +819,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     for(int i = 0; i < MAX_REGIONS; i++)
     {
         region_t curr = regions[i];
-        if(curr.den > 0 && curr.den < 2000)
+        if(curr.density > 0 && curr.density < 2000)
             num_tracks++;
     }
     
@@ -857,7 +857,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     for(int i = 0; i < /*MAX_REGIONS*/4; i++)
     {
         region_t curr = regions[i];
-        file << "," << curr.den << "," << curr.wth << "," << curr.loc << "," << curr.max << "," << curr.scr << "," << tracking_filters_order[i];
+        file << "," << curr.density << "," << curr.width << "," << curr.location << "," << curr.maximum << "," << curr.score << "," << tracking_filters_order[i];
     }
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
@@ -913,17 +913,17 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         region_t curr = regions[i];
         
         Scalar c = RD_LINE_COLOR;
-        if(curr.den > 2000)
+        if(curr.density > 2000)
             c = blackish;
         rectangle(mat, Point(BL_ORIGIN.x+RD_SPACE, y), Point(BL_ORIGIN.x+BL_WIDTH-RD_SPACE, y+BL_IND_HEIGHT), c);
         
-        if(curr.den > 2000) continue;
+        if(curr.density > 2000) continue;
         
         putText(mat, to_string(i)+":"+to_string(tracking_filters_order[i]), Point(BL_ORIGIN.x+RD_TEXT_SM_OFFSET/2+3,y+RD_TEXT_SM_OFFSET-3), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         
-        if(curr.den > 0)
+        if(curr.density > 0)
         {
-            int r = BOUNDU(BL_RADIUS_SCALE*curr.den/(2*M_PI),BL_MAX_RADIUS);
+            int r = BOUNDU(BL_RADIUS_SCALE*curr.density/(2*M_PI),BL_MAX_RADIUS);
             circle(mat, Point(BL_ORIGIN.x+BL_MAX_RADIUS, y+BL_IND_HEIGHT/2), r, redish);
         }
         Point textOrigin(BL_ORIGIN.x+BL_MAX_RADIUS*2-RD_SPACE, y+RD_SPACE);
@@ -933,12 +933,12 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         int y_offset[3] = {RD_SPACE, RD_SPACE+18, RD_SPACE+36};
         
         // Region text
-        putText(mat, "Den: " + to_string(curr.den), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Wth: " + to_string(curr.wth), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Loc: " + to_string(curr.loc), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Max: " + to_string(curr.max), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Den: " + to_string(curr.density), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Wth: " + to_string(curr.width), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Loc: " + to_string(curr.location), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Max: " + to_string(curr.maximum), Point(textOrigin.x+x_offset[1], textOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         
-        putText(mat, "Score: " + to_stringn(curr.scr,3), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Score: " + to_stringn(curr.score,3), Point(textOrigin.x+x_offset[0], textOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         
         
         // Matching text & tracking filters

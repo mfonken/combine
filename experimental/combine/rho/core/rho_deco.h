@@ -71,23 +71,23 @@ extern "C" {
 
     typedef struct
     {
-        dmap_t
-        *Dx,
-        *Dy;
+        density_map_unit_t
+            *Dx,
+            *Dy;
         density_t
-        *THRESH_ADDR;
+            *THRESH_ADDR;
         density_2d_t
-        *Q,
-        QT,
-        QN,
-        QN_;
+            *Q,
+            QT,
+            QN,
+            QN_;
         index_t
-        y,
-        *CX_ADDR,
-        *CY_ADDR;
+            y,
+            *CX_ADDR,
+            *CY_ADDR;
         pixel_base_t
-        *C_FRAME,
-        *C_FRAME_END;
+            *C_FRAME,
+            *C_FRAME_END;
     } rho_sram_variables;
 
     typedef struct

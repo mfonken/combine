@@ -25,8 +25,8 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     
     RhoCore.Initialize(&core, width, height);
 #ifdef __PSM__
-    PSMFunctions.Initialize( &core.PredictiveStateModelPair.x );
-    PSMFunctions.Initialize( &core.PredictiveStateModelPair.y );
+    PSMFunctions.Initialize( &core.Primary.redictiveStateModelPair.x );
+    PSMFunctions.Initialize( &core.Primary.redictiveStateModelPair.y );
 #endif
     backgrounding_event = false;
     
@@ -65,8 +65,8 @@ void Rho::Decouple( const cimage_t image, bool backgrounding )
     {
         RhoVariables.ram.Dx      =  core.DensityMapPair.x.background;
         RhoVariables.ram.Dy      =  core.DensityMapPair.y.background;
-        RhoVariables.ram.CX_ADDR = &core.By;
-        RhoVariables.ram.CY_ADDR = &core.Bx;
+        RhoVariables.ram.CX_ADDR = &core.Secondary.y;
+        RhoVariables.ram.CY_ADDR = &core.Secondary.x;
         RhoVariables.ram.Q       =  core.Qb;
     }
     
@@ -76,8 +76,8 @@ void Rho::Decouple( const cimage_t image, bool backgrounding )
     {
         RhoVariables.ram.Dx      =  core.DensityMapPair.x.map;
         RhoVariables.ram.Dy      =  core.DensityMapPair.y.map;
-        RhoVariables.ram.CX_ADDR = &core.Cx;
-        RhoVariables.ram.CY_ADDR = &core.Cy;
+        RhoVariables.ram.CX_ADDR = &core.Centroid.x;
+        RhoVariables.ram.CY_ADDR = &core.Centroid.y;
         RhoVariables.ram.Q       =  core.Q;
         core.DensityMapPair.x.has_background = true;
         core.DensityMapPair.y.has_background = true;
@@ -107,5 +107,5 @@ void Rho::PrintSizes( void )
     ;
 #endif
     LOG_RHO(ALWAYS, "\tSizes> Frame:%.3fkB RedVar:%luB SelVars:%luB PredVars:%luB Rho:%lukB > Tot:%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
-    LOG_RHO(ALWAYS, "\tdenmapp:%luB\tpredmap:%luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
+    LOG_RHO(ALWAYS, "\target_densitymapp:%luB\tpredensity_map:%luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
 }

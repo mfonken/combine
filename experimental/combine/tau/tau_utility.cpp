@@ -16,8 +16,10 @@ TestInterface(1, name),
 rho(width, height),
 width(width), height(height),
 utility(n, f, num, width, height)
+#ifdef RHO_DRAWER
 #ifdef __PSM__
-,rho_drawer(&rho.core.PredictiveStateModelPair.x)
+,rho_drawer(&rho.core.Primary.redictiveStateModelPair.x)
+#endif
 #endif
 {
     utility.Init();
@@ -109,9 +111,9 @@ double Tau::Perform( cimage_t &img )
         UpdatePrediction();
     }
     
-    double Cx = utility.pCx-rho.core.Cx,
-    Cy = utility.pCy-rho.core.Cy;
-    current_accuracy = sqrt(Cx*Cx + Cy*Cy);
+    double Cx = utility.pCx-rho.core.Centroid.x,
+    Cy = utility.pCy-rho.core.Centroid.y;
+    current_accuracy = sqrt( DISTANCE_SQ( Cx, Cy ) );
     
     PrintPacket(&packet, 4);
     return p;

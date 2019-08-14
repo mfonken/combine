@@ -28,7 +28,7 @@ extern "C" {
 /************************************************************************
  *                          Static Buffers                              *
  ***********************************************************************/
-  static dmap_t
+  static density_map_unit_t
 #ifdef AUTOMATION_RUN
     FOREGROUND_DENSITY_MAP_Y[2000],
     FOREGROUND_DENSITY_MAP_X[2000],
@@ -44,18 +44,14 @@ extern "C" {
 /************************************************************************
  *                       Function Declarations                          *
  ***********************************************************************/
-    void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
-    density_2d_t CalculateCentroidRhoUtility( dmap_t *, index_t, index_t *, density_t );
-    void PrintPacketRhoUtility( packet_t *, index_t );
-    void GenerateBackgroundRhoUtility( rho_core_t * );
-
     void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
     void InitializeFiltersRhoUtility( rho_core_t * );
     void InitializePredictionRhoUtility( prediction_t *, index_t );
     void InitializeDensityMapRhoUtility( density_map_t *, index_t, index_t );
 
     void ResetForDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_t, index_t );
+    void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
+    void ResetDensityMapPairKalmansRhoUtility( rho_core_t * );
 
     void PredictPeakFilterRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void PredictTrackingFiltersRhoUtility( prediction_t * );
@@ -84,6 +80,10 @@ extern "C" {
     void CalculateTargetTuneFactorRhoUtility( rho_core_t * );
     void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core );
 
+    void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
+    density_2d_t CalculateCentroidRhoUtility( density_map_unit_t *, index_t, index_t *, density_t );
+    void PrintPacketRhoUtility( packet_t *, index_t );
+    void GenerateBackgroundRhoUtility( rho_core_t * );
     void GeneratePacketRhoUtility( rho_core_t * );
 
     void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, uint8_t );
@@ -101,7 +101,8 @@ extern "C" {
     typedef struct
     {
         void (*Detect)( rho_detection_variables *, density_map_t *, prediction_t * );
-        void (*Prediction)( prediction_predict_variables *, prediction_pair_t *, index_t, index_t );
+        void (*Prediction)( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
+        void (*DensityMapPairKalmans)( rho_core_t * );
     } rho_utility_reset_functions;
 
     typedef struct
@@ -146,7 +147,7 @@ extern "C" {
     {
         void (*CumulateMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
         void (*CalculateRegionScore)( region_t *, density_t, byte_t );
-        density_2d_t (*CalculateCentroid)( dmap_t *, index_t, index_t *, density_t );
+        density_2d_t (*CalculateCentroid)( density_map_unit_t *, index_t, index_t *, density_t );
         void (*PrintPacket)( packet_t *, index_t );
         void (*GenerateBackground)( rho_core_t * );
         void (*GeneratePacket)( rho_core_t * );
@@ -167,6 +168,7 @@ extern "C" {
         .CalculateCentroid = CalculateCentroidRhoUtility,
         .PrintPacket = PrintPacketRhoUtility,
         .GeneratePacket = GeneratePacketRhoUtility,
+        .GenerateBackground = GenerateBackgroundRhoUtility,
 
         .Initialize.Data = InitializeDataRhoUtility,
         .Initialize.Filters = InitializeFiltersRhoUtility,
@@ -175,6 +177,7 @@ extern "C" {
 
         .Reset.Detect = ResetForDetectRhoUtility,
         .Reset.Prediction = ResetForPredictionRhoUtility,
+        .Reset.DensityMapPairKalmans = ResetDensityMapPairKalmansRhoUtility,
 
         .Predict.PeakFilter = PredictPeakFilterRhoUtility,
         .Predict.TrackingFilters = PredictTrackingFiltersRhoUtility,

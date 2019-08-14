@@ -9,6 +9,9 @@
 #ifndef rho_drawer_xprm_hpp
 #define rho_drawer_xprm_hpp
 
+#ifdef RHO_DRAWER
+#ifdef __PSM__
+
 #include "rho_master.h"
 #include "opencv_master.h"
 #include <string.h>
@@ -66,5 +69,6 @@ public:
     Mat& GetDetectionMapFrame() {return detection_map_frame;}
 };
 #endif
-
+#endif
+#endif
 #endif /* rho_drawer_xprm_hpp */
