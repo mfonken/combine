@@ -74,43 +74,40 @@ void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
     RhoVariables.ram.QT = 0;
     density_2d_t Q0 = 0, Q1 = 0, Q2 = 0, Q3 = 0, QT = 0, QP = 0;
     uint8_t THRESH = RhoVariables.registers.THRESH;
-//    for(; y < RhoVariables.registers.Cy; y++ )
-//    {
-//        for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )
-//        {
-//            if(image.pixels[p] > THRESH)
-//            {
-//                Q0++;
-//                RhoVariables.ram.Dy[x]++;
-//            }
-//        }
-//        for( ; x <  w; x++, p++ )
-//        {
-//            if(image.pixels[p] > THRESH)
-//            {
-//                Q1++;
-//                RhoVariables.ram.Dy[x]++;
-//            }
-//        }
-//        QT = Q0 + Q1;
-//        RhoVariables.ram.Dx[y] = QT - QP;
-//        QP = QT;
-//    }
+    for(; y < RhoVariables.registers.Cy; y++ )
+    {
+        for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )
+        {
+            if(image.pixels[p] > THRESH)
+            {
+                Q0++;
+                RhoVariables.ram.Dy[x]++;
+            }
+        }
+        for( ; x <  w; x++, p++ )
+        {
+            if(image.pixels[p] > THRESH)
+            {
+                Q1++;
+                RhoVariables.ram.Dy[x]++;
+            }
+        }
+        QT = Q0 + Q1;
+        RhoVariables.ram.Dx[y] = QT - QP;
+        QP = QT;
+    }
     for( QP = 0; y < h; y++ )
     {
-        x = 0;
-//        for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )
-//        {
-//            if(image.pixels[p] > THRESH)
-//            {
-//                Q2++;
-//                RhoVariables.ram.Dy[x]++;
-//            }
-//        }
+        for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )
+        {
+            if(image.pixels[p] > THRESH)
+            {
+                Q2++;
+                RhoVariables.ram.Dy[x]++;
+            }
+        }
         for( ; x < w; x++, p++ )
         {
-//            int xa = p % w, ya = (p - xa) / w;
-//            printf("x:%c y:%c\n", (x==xa?'o':'x'), (y==ya?'o':'x'));
             if(image.pixels[p] > THRESH)
             {
                 Q3++;
@@ -131,17 +128,4 @@ void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
     LOG_RHO(DEBUG_0, "Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
     LOG_RHO(DEBUG_0, "# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
     LOG_RHO(DEBUG_0, ">>>frame density is %d<<<\n", RhoVariables.ram.QT);
-    
-//    uint8_t c = 0;
-//    y = 0;
-//    printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n");
-//    while(y < h)
-//    {
-//        printf("%3d:", y);
-//        c = BOUNDU(RhoVariables.ram.Dx[y],10);
-//        while(c-->0) printf(" ");
-//        printf("|\n");
-//        y+=3;
-//    }
-//    printf("\n");
 }
