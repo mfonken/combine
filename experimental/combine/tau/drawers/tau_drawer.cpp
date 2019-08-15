@@ -161,8 +161,7 @@ TauDrawer::~TauDrawer()
 
 Mat TauDrawer::DrawAll(void)
 {
-    Mat spare(Size(W + PROBABILITIES_FRAME_WIDTH + 2*DETECTION_FRAME_WIDTH, H ), CV_8UC3, Scalar(0,0,0));
-    frame = spare;
+    utility.outframe.copyTo(frame);
     GetDensitiesFrame(frame);
     DrawRhoFrame(frame);
     DrawRhoDetection(X_DIMENSION, frame);
@@ -171,8 +170,9 @@ Mat TauDrawer::DrawAll(void)
     return frame;
 }
 
-Mat& TauDrawer::GetDensitiesFrame(Mat &M)
+void TauDrawer::GetDensitiesFrame( Mat& M )
 {
+    if(utility.outframe.data == nullptr) return;
     pthread_mutex_lock(&drawer_mutex);
     utility.outframe.copyTo(M);
     DrawDensityGraph(M);
@@ -219,8 +219,6 @@ Mat& TauDrawer::GetDensitiesFrame(Mat &M)
     putText(M, to_string((int)accuracy), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH*3/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(100,150,0));
     putText(M, to_string(frame_rate), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(0,100,150));
     pthread_mutex_unlock(&drawer_mutex);
-    
-    return frame;
 }
 
 void TauDrawer::DrawDensityGraph(Mat &M)

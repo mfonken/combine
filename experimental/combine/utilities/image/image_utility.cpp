@@ -14,7 +14,7 @@ using namespace std;
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height) :
 TestInterface(3, n.c_str()),
 num_frames(num), size(width, height), subdir(f),
-frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+//frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 image(Size(width, height), CV_8UC3, Scalar(0,0,0)),
@@ -26,7 +26,7 @@ preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
     has_file = false;
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
-    if(num_frames) LOG_IU(DEBUG_2, "Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
+    if(num_frames) LOG_IU("Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
 #endif
 //#ifdef HAS_GENERATOR
 //    LOG_IU(DEBUG_2, "Initialized with generator and dimensions %dx%d\n", width, height);
@@ -79,7 +79,7 @@ void ImageUtility::Init()
     = false;
 #endif
     
-    LOG_IU(DEBUG_2, "Initializing Image Utility: ");
+    LOG_IU("Initializing Image Utility: ");
     if(has_file) InitFile();
     if(has_camera) InitCamera();
     if(has_generator) InitGenerator();
@@ -98,7 +98,7 @@ void ImageUtility::InitFile()
         subdir = file;
         if(num_frames > 0)
         {
-            LOG_IU(DEBUG_2, "With %d %dx%d frames.\n", num_frames, size.width, size.height);
+            LOG_IU("With %d %dx%d frames.\n", num_frames, size.width, size.height);
             counter = 1;
             
             file.append(to_string(counter%num_frames+1) );
@@ -106,16 +106,16 @@ void ImageUtility::InitFile()
         }
         else
         {
-            LOG_IU(DEBUG_2, "With a single %dx%d frame.\n", size.width, size.height);
+            LOG_IU("With a single %dx%d frame.\n", size.width, size.height);
             file.append(".bmp");
         }
     }
-    LOG_IU(DEBUG_2, "\tOpening file: %s\n", file.c_str());
+    LOG_IU("\tOpening file: %s\n", file.c_str());
     
     image = imread(file, IMREAD_COLOR );
     if( image.empty() )                      // Check for invalid input
     {
-        LOG_IU(DEBUG_2, "Could not open or find the image.\n");
+        LOG_IU("Could not open or find the image.\n");
         return;
     }
     
@@ -132,13 +132,13 @@ void ImageUtility::InitCamera()
     
     if (!cam.isOpened())
     {
-        LOG_IU(DEBUG_2, "Could not open or find camera.\n");
+        LOG_IU("Could not open or find camera.\n");
         while(1);
         return;
     }
     cam.read(image);
     
-    LOG_IU(DEBUG_2, "Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CV_CAP_PROP_FPS));
+    LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CAP_PROP_FPS));
     
 #ifdef GREYSCALE
     Mat grey;
@@ -248,11 +248,11 @@ Mat ImageUtility::GetImage()
 {
     if(subdir.find(".png") == string::npos )
         file = subdir + to_string( counter%(num_frames+1) ) + ".png";
-    LOG_IU(DEBUG_2, "Opening file: %s\n", file.c_str());
+    LOG_IU("Opening file: %s\n", file.c_str());
     preimage = imread( file, IMREAD_COLOR );
     if( preimage.empty() )                      // Check for invalid input
     {
-        LOG_IU(DEBUG_2, "Could not open or find the image.\n");
+        LOG_IU("Could not open or find the image.\n");
         return image;
     }
     resize(preimage,image,size);

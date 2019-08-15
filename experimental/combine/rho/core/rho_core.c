@@ -59,7 +59,7 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 void PerformRhoCore( rho_core_t * core, bool background_event )
 {
     if(background_event)
-        RhoUtility.GenerateBackground( core );
+        RhoUtility.Generate.Background( core );
     else
     {
         LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
@@ -153,6 +153,6 @@ void UpdateRhoCoreThreshold( rho_core_t * core )
 
 void GenerateRhoCorePacket( rho_core_t * core )
 {
-    RhoUtility.GeneratePacket( core );
-    RhoUtility.PrintPacket( &core->Packet, DEFAULT_PACKET_LENGTH );
+    RhoUtility.Generate.Packet( core );
+    RhoUtility.Print.Packet( &core->Packet, DEFAULT_PACKET_LENGTH );
 }

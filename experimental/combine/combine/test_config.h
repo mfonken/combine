@@ -30,19 +30,19 @@ using namespace std;
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     200//31
+#define IMAGE_TICKS                     31
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
-#define GROUP_NAME                      "/frames/small"
-#define FILE_NAME                       "/1"
+#define GROUP_NAME                      "/frames/small/"
+#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
-#define TYPE                            IMAGE_SINGLE//IMAGE_SET
+#define TYPE                            IMAGE_SET//IMAGE_SINGLE
 
 #if TYPE == IMAGE_SINGLE
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME FILE_TYPE
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   IMAGE_TICKS
 #elif TYPE == IMAGE_SET
-#define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME "/"
+#define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   31
 #endif
 

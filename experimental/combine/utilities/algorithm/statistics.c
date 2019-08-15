@@ -8,7 +8,7 @@
 
 #include "statistics.h"
 
-void CumulateMomentsStatistics( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
+void GenerateCumulativeMomentsStatistics( floating_t v, floating_t i, floating_t *m0, floating_t *m1, floating_t *n )
 {
 #ifdef __USE_RUNNING_AVERAGE__
     floating_t n_=1/(++(*n));

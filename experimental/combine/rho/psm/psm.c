@@ -44,12 +44,11 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
         value = (vec2){ observation->density, observation->thresh };
         GMMFunctions.Model.AddValue( &model->gmm, observation, &value );
     }
-//    model->current_observation = observation_list->length;
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
     
     if( observation_list->length > 0 )
         model->previous_thresh = observation_list->observations[0].thresh;
-    // Analyse value
+    /// TODO: Analyze value
 }
 
 void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
@@ -114,13 +113,9 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
     if( c == 0 )
     { /* If no gaussian for band, zero state info */
         if( !i )
-        {
             band_list->band[i] = (band_t){ THRESH_MAX, THRESH_MAX,  0., (vec2){ 0., 0. } };
-        }
         else
-        {
             memcpy( &band_list->band[i], &band_list->band[i-1], sizeof(band_t) );
-        }
     }
     else if( c == -1 )
     {
@@ -137,10 +132,8 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
         band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
         band_list->band[i].true_center = band_gaussian->mean;
         band_list->band[i].variance = band_gaussian->covariance.d;
-        if(i)
-        {
+        if( i )
             band_list->band[i-1].upper_boundary = band_list->band[i].lower_boundary;
-        }
     }
 }
 
@@ -219,7 +212,6 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         }
         
         LOG_PSM(PSM_DEBUG_2, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
-        
         
         if( !num_to_process )
         { /* Always update band on last cluster */

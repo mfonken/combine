@@ -82,7 +82,7 @@ void InitializePredictionRhoUtility( prediction_t * prediction, index_t length )
 
 void InitializeDensityMapRhoUtility( density_map_t * density_map, index_t length, index_t centroid )
 {
-    size_t size = sizeof(density_map_t)*length;
+    size_t size = sizeof(density_map_unit_t)*length;
     memset(density_map->map, 0, size);
     memset(density_map->background, 0, size);
     density_map->length = length;
@@ -225,7 +225,7 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
         _->curr -= _->filter_band_lower;
 
         /* Process new values into region */
-        RhoUtility.CumulateMoments( (floating_t)_->curr, (floating_t)_->x, &_->average_curr, &_->average_moment, &_->average_counter );
+        RhoUtility.Generate.CumulativeMoments( (floating_t)_->curr, (floating_t)_->x, &_->average_curr, &_->average_moment, &_->average_counter );
 
         /* Increment width */
         _->width++;
@@ -292,7 +292,7 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
             region_t * curr = &prediction->Regions[j];
 
             /* Score current region */
-            RhoUtility.CalculateRegionScore( curr, _->filtered_density, _->maximum );
+            RhoUtility.Generate.RegionScore( curr, _->filtered_density, _->maximum );
 
             /* predictionecalculate regions with chaos */
             if(curr->score > _->chaos)
@@ -365,8 +365,8 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
         prediction->Regions[i].sort = true;
         LOG_RHO(RHO_DEBUG, "R%d:{%d,%d,%d,%d} = %.4f\n",
             i,
-            curr->max,
-            curr->den,
+            curr->maximum,
+            curr->density,
             curr->location,
             curr->width,
             curr->score
@@ -517,10 +517,8 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
     if( updated )
     {
         average_difference = total_difference / (floating_t)updated;
-        if( average_difference < MAX_TRACKING_MATCH_DIFFERNCE )
-            prediction->Probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERNCE ) );
-        else
-            prediction->Probabilities.confidence = 0.;
+        if( average_difference > MAX_TRACKING_MATCH_DIFFERNCE ) prediction->Probabilities.confidence = 0.;
+        else prediction->Probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERNCE ) );
     }
 
     RhoUtility.Predict.SortFilters( prediction );
@@ -563,9 +561,7 @@ void SortTrackingFiltersRhoUtility( prediction_t * prediction )
     }
 
     for( i = 0; i < MAX_TRACKING_FILTERS; i++ )
-    {
         prediction->TrackingFilters[i].sorted = false;
-    }
 }
 
 index_t CalculateValidTracksRhoUtility( prediction_t * prediction )
@@ -579,7 +575,6 @@ index_t CalculateValidTracksRhoUtility( prediction_t * prediction )
         floating_t score = RhoKalman.Score( curr );
         if( RhoKalman.IsExpired(curr)
            || ( score < MIN_TRACKING_KALMAN_SCORE ) ) break;
-
         RhoKalman.Predict(curr, curr->velocity);
         curr->valid = true;
         valid_tracks++;
@@ -804,7 +799,7 @@ void RedistributeDensitiesRhoUtility( rho_core_t * core )
     }
 }
 
-void CalculateRegionScoreRhoUtility( region_t * region, density_t total_density, byte_t peak )
+void GenerateRegionScoreRhoUtility( region_t * region, density_t total_density, byte_t peak )
 {
     floating_t
         delta_d = ( (floating_t)region->density / (floating_t)total_density) - 0.5,
@@ -813,7 +808,7 @@ void CalculateRegionScoreRhoUtility( region_t * region, density_t total_density,
 }
 
 /* Generic centroid and mass calculator */
-density_2d_t CalculateCentroidRhoUtility( density_map_unit_t * density_map, index_t length, index_t * centroid, register density_t thresh )
+density_2d_t GenerateCentroidRhoUtility( density_map_unit_t * density_map, index_t length, index_t * centroid, register density_t thresh )
 {
     floating_t avg = 0, average_moment = 0, count = 0, total = 0;
     for( index_t i = 0; i < length; i++ )
@@ -822,7 +817,7 @@ density_2d_t CalculateCentroidRhoUtility( density_map_unit_t * density_map, inde
         if( curr > thresh )
         {
             /* Note only fraction m1/m0 is needed so either average method works*/
-            RhoUtility.CumulateMoments((floating_t)curr, (floating_t)i, &avg, &average_moment, &count);
+            RhoUtility.Generate.CumulativeMoments((floating_t)curr, (floating_t)i, &avg, &average_moment, &count);
             total += curr;
         }
     }
@@ -853,8 +848,8 @@ void PrintPacketRhoUtility( packet_t * packet, index_t length )
     
 void GenerateBackgroundRhoUtility( rho_core_t * core )
 {
-    density_2d_t xt = RhoUtility.CalculateCentroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Secondary.x, BACKGROUND_CENTROID_CALC_THRESH );
-    density_2d_t yt = RhoUtility.CalculateCentroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->Secondary.y, BACKGROUND_CENTROID_CALC_THRESH );
+    density_2d_t xt = RhoUtility.Generate.Centroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Secondary.x, BACKGROUND_CENTROID_CALC_THRESH );
+    density_2d_t yt = RhoUtility.Generate.Centroid( core->DensityMapPair.y.background, core->DensityMapPair.y.length, &core->Secondary.y, BACKGROUND_CENTROID_CALC_THRESH );
     core->QbT = MAX(xt, yt);
 }
 
@@ -885,8 +880,6 @@ void GeneratePacketRhoUtility( rho_core_t * core )
         _.includes >>= 1;
         if((_.t=!_.t )) ++_.llPtr;
     }
-
-    RhoUtility.PrintPacket( &core->Packet, 3 );
 }
 
 void GenerateObservationListFromPredictionsRhoUtility( prediction_t * prediction, uint8_t thresh )

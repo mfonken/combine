@@ -23,7 +23,7 @@ typedef uint8_t         byte_t;
 typedef uint16_t        index_t;
 typedef uint16_t        density_t;
 typedef int16_t         sdensity_t;
-typedef uint8_t         density_map_unit_t;
+typedef uint16_t        density_map_unit_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
 typedef floating_t      timestamp_t;
@@ -35,11 +35,11 @@ typedef void *          address_t;
 typedef uint32_t        address_t;
 #endif
 
-#define byte_t_max          ( (sizeof(byte_t)       << 3 ) - 1 )
-#define index_t_max         ( (sizeof(index_t)      << 3 ) - 1 )
-#define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
-#define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
-#define density_map_t_max          ( (sizeof(density_map_t)       << 3 ) - 1 )
+#define byte_t_max              ( (sizeof(byte_t)       << 3 ) - 1 )
+#define index_t_max             ( (sizeof(index_t)      << 3 ) - 1 )
+#define density_t_max           ( (sizeof(density_t)    << 3 ) - 1 )
+#define density_2d_t_max        ( (sizeof(density_2d_t) << 3 ) - 1 )
+#define density_map_unit_t_max  ( (sizeof(density_map_unit_t) << 3 ) - 1 )
 
 #define USE_DECOUPLING
 #define USE_BACKGROUNDING

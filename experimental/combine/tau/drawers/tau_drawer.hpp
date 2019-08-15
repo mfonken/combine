@@ -59,7 +59,7 @@ public:
     TauDrawer( const char * name, int width, int height, std::string f = "", int num = 0 );
     virtual ~TauDrawer();
     Mat DrawAll(void);
-    Mat& GetDensitiesFrame(Mat&);
+    void GetDensitiesFrame(Mat&);
     void DrawDensityGraph(Mat&);
     void DrawDensityMaps(Mat&);
     void DrawRhoProbabilities(Mat&);

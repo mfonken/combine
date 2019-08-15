@@ -23,22 +23,19 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     env.Pause();
     sleep(0.1);
     env.Resume();
-    Mat local_frame;
     
     struct timeval a,b;
     int instruction_index = 0;
+    Mat local_frame(tau.utility.outframe.size(), CV_8UC3, Scalar(0));
     while(1)
     {
-        local_frame = tau.GetDensitiesFrame(tau.frame);
-        if(local_frame.data != nullptr)
-        {
-            //          imshow("Thresh Frame", tau.utility.outframe);
-            //          imshow(TITLE_STRING, local_frame);
-            //          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
-            //          imshow("Rho Frame", local_frame);
-            //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
-            //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
-        }
+        if(local_frame.data == nullptr) continue;
+        tau.GetDensitiesFrame(local_frame);
+        imshow("Thresh Frame", local_frame);
+//          imshow(TITLE_STRING, local_frame);
+//          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
+//          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
+//          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         
         
         char c = waitKey(KEY_DELAY);

@@ -17,8 +17,8 @@
 #define IS_RGGB_ELIMINATE_G     true
 
 /* Camera Config */
-#define RHO_WIDTH               1280
-#define RHO_HEIGHT              800
+#define RHO_WIDTH               700
+#define RHO_HEIGHT              700
 
 #define CAPTURE_DIV             4
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
@@ -28,8 +28,13 @@
 #define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
 
 #if defined __linux || defined __APPLE__
+#ifdef HAS_CAMERA
 #define DENSITY_MAP_X_SIZE       CAPTURE_WIDTH
 #define DENSITY_MAP_Y_SIZE       CAPTURE_HEIGHT
+#else
+#define DENSITY_MAP_X_SIZE       RHO_WIDTH
+#define DENSITY_MAP_Y_SIZE       RHO_HEIGHT
+#endif
 #else
 #define DENSITY_MAP_X_SIZE       DENSITY_MAP_X_LENGTH
 #define DENSITY_MAP_Y_SIZE       DENSITY_MAP_Y_LENGTH

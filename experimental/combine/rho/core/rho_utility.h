@@ -80,8 +80,8 @@ extern "C" {
     void CalculateTargetTuneFactorRhoUtility( rho_core_t * );
     void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core );
 
-    void CalculateRegionScoreRhoUtility( region_t *, density_t, byte_t );
-    density_2d_t CalculateCentroidRhoUtility( density_map_unit_t *, index_t, index_t *, density_t );
+    void GenerateRegionScoreRhoUtility( region_t *, density_t, byte_t );
+    density_2d_t GenerateCentroidRhoUtility( density_map_unit_t *, index_t, index_t *, density_t );
     void PrintPacketRhoUtility( packet_t *, index_t );
     void GenerateBackgroundRhoUtility( rho_core_t * );
     void GeneratePacketRhoUtility( rho_core_t * );
@@ -142,20 +142,30 @@ extern "C" {
         void (*TargetTuneFactor)( rho_core_t * );
         void (*TargetCoverageFactor)( rho_core_t * );
     } rho_utility_calculate_functions;
+    
+    typedef struct
+    {
+        void (*CumulativeMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
+        void (*RegionScore)( region_t *, density_t, byte_t );
+        density_2d_t (*Centroid)( density_map_unit_t *, index_t, index_t *, density_t );
+        void (*Background)( rho_core_t * );
+        void (*Packet)( rho_core_t * );
+    } rho_utility_generate_functions;
+    
+    typedef struct
+    {
+        void (*Packet)( packet_t *, index_t );
+    } rho_utility_print_functions;
 
     typedef struct
     {
-        void (*CumulateMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
-        void (*CalculateRegionScore)( region_t *, density_t, byte_t );
-        density_2d_t (*CalculateCentroid)( density_map_unit_t *, index_t, index_t *, density_t );
-        void (*PrintPacket)( packet_t *, index_t );
-        void (*GenerateBackground)( rho_core_t * );
-        void (*GeneratePacket)( rho_core_t * );
         rho_utility_initializer_functions Initialize;
         rho_utility_reset_functions Reset;
         rho_utility_predict_functions Predict;
         rho_utility_detect_functions Detect;
         rho_utility_calculate_functions Calculate;
+        rho_utility_generate_functions Generate;
+        rho_utility_print_functions Print;
     } rho_utility_functions;
 
 /************************************************************************
@@ -163,13 +173,6 @@ extern "C" {
  ***********************************************************************/
     static const rho_utility_functions RhoUtility =
     {
-        .CumulateMoments = CumulateMomentsStatistics,
-        .CalculateRegionScore = CalculateRegionScoreRhoUtility,
-        .CalculateCentroid = CalculateCentroidRhoUtility,
-        .PrintPacket = PrintPacketRhoUtility,
-        .GeneratePacket = GeneratePacketRhoUtility,
-        .GenerateBackground = GenerateBackgroundRhoUtility,
-
         .Initialize.Data = InitializeDataRhoUtility,
         .Initialize.Filters = InitializeFiltersRhoUtility,
         .Initialize.Prediction = InitializePredictionRhoUtility,
@@ -206,7 +209,15 @@ extern "C" {
         .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,
         .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
         .Calculate.TargetTuneFactor = CalculateTargetTuneFactorRhoUtility,
-        .Calculate.TargetCoverageFactor = CalculateTargetCoverageFactorRhoUtility
+        .Calculate.TargetCoverageFactor = CalculateTargetCoverageFactorRhoUtility,
+        
+        .Generate.CumulativeMoments = GenerateCumulativeMomentsStatistics,
+        .Generate.RegionScore = GenerateRegionScoreRhoUtility,
+        .Generate.Centroid = GenerateCentroidRhoUtility,
+        .Generate.Packet = GeneratePacketRhoUtility,
+        .Generate.Background = GenerateBackgroundRhoUtility,
+        
+        .Print.Packet = PrintPacketRhoUtility,
     };
 
 #ifdef __cplusplus
