@@ -41,7 +41,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
     {
         observation_t * observation = &observation_list->observations[i];
-        value = (vec2){ observation->density, observation->thresh };
+        value = (vec2){ (double)observation->density, (double)observation->thresh };
         GMMFunctions.Model.AddValue( &model->gmm, observation, &value );
     }
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
@@ -49,6 +49,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     if( observation_list->length > 0 )
         model->previous_thresh = observation_list->observations[0].thresh;
     /// TODO: Analyze value
+//    printf("a:%p\n", &model->gmm);
 }
 
 void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )

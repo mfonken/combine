@@ -543,9 +543,9 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     x_nu = rho.core.PredictionPair.x.NuRegions,
     y_nu = rho.core.PredictionPair.y.NuRegions;
 #ifdef __PSM__
-    state_t state = rho.core.PredictiveStateModelPair.x.hmm.A.state;
+    state_t state = rho.core.PredictiveStateModelPair.y.hmm.A.state;
     for(int i = 0; i < NUM_STATES; i++)
-        state_P[i] = rho.core.PredictiveStateModelPair.x.hmm.A.probabilities.map[i][state];
+        state_P[i] = rho.core.PredictiveStateModelPair.y.hmm.A.probabilities.map[i][state];
 #endif
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;

@@ -17,9 +17,9 @@ using namespace std;
 #define COMBINE_FPS     100
 
 /* GLOBAL SETUP */
-//#define HAS_CAMERA
+#define HAS_CAMERA
 //#define HAS_IMU
-#define HAS_FILE
+//#define HAS_FILE
 //#define HAS_GENERATOR
 
 //#define AUTOMATION_RUN
@@ -33,10 +33,12 @@ using namespace std;
 #define IMAGE_TICKS                     31
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
-#define GROUP_NAME                      "/frames/small/"
-#define FILE_NAME                       "1"
+#define GROUP_NAME                      "/gradient/"
+#define FILE_NAME                       "gradient_centralized"
+//#define GROUP_NAME                      "/frames/small/"
+//#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
-#define TYPE                            IMAGE_SET//IMAGE_SINGLE
+#define TYPE                            IMAGE_SINGLE//IMAGE_SET
 
 #if TYPE == IMAGE_SINGLE
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME FILE_TYPE
@@ -53,8 +55,13 @@ using namespace std;
 #define FRAME_WIDTH                     50
 #define FRAME_HEIGHT                    FRAME_WIDTH
 #else
+#ifdef HAS_CAMERA
+#define FRAME_WIDTH                     1280
+#define FRAME_HEIGHT                    720
+#else
 #define FRAME_WIDTH                     700
 #define FRAME_HEIGHT                    FRAME_WIDTH
+#endif
 #endif
 
 /* IMAGE PROCESSING */

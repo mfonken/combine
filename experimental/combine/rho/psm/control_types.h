@@ -76,38 +76,23 @@ extern "C" {
 #define MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC 8
 #define MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC ( MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC * MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC )
 
-#define MAX_CLUSTER_LIFETIME 15 // sec
+#define MAX_CLUSTER_LIFETIME 5.//15. // sec
 #define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
 #define MAX_CLUSTERS 25
 #define MAX_ERROR 0.2
-#define INITIAL_VARIANCE 50//150.
+#define INITIAL_VARIANCE 50.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
-#define MAX_MAHALANOBIS_SQ 9
+#define MAX_MAHALANOBIS_SQ 15//9
 #define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
 #define VALID_CLUSTER_STD_DEV 0.25
 #define MIN_CLUSTER_SCORE 0.05
 #define FALLBACK_MAX_ERROR 1e-2f
-#define ALPHA 0.00001//0.0025
+#define ALPHA 0.00001
 #define BETA 1
 
-//#define MAX_DISTANCE 10000.f
-//#define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
-//#define MAX_CLUSTERS 10
-//#define MAX_ERROR 20
-//#define INITIAL _VARIANCE 1
-//#define INV_INITIAL_VARIANCE (1/INITIAL_VARIANCE)
-//#define MIN_MAHALANOBIS_DISTANCE_SQ 1.386f
-//#define MAX_MAHALANOBIS_SQ_FOR_UPDATE 1000.f
-//#define SMALL_VALUE_ERROR_OFFSET 1e-4f
-//#define VALID_CLUSTER_STD_DEV 2.
-//#define MIN_CLUSTER_SCORE 1e-3f
-//#define FALLBACK_MAX_ERROR 1e-2f
-
 #define MAX_INPUT_COVARIANCE 200/// Change to dynamic
-
-
 
 #define MAX_LABELS 10
 #define LABEL_MOVING_AVERAGE_MAX_HISTORY 10
@@ -121,8 +106,8 @@ extern "C" {
     typedef struct
     {
         index_t density;
-        uint8_t thresh,
-        label;
+        uint8_t thresh;
+        uint8_t label;
     } observation_t;
     
     typedef struct

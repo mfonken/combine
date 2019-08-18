@@ -18,7 +18,7 @@ width(width), height(height),
 utility(n, f, num, width, height)
 #ifdef RHO_DRAWER
 #ifdef __PSM__
-,rho_drawer(&rho.core.Primary.redictiveStateModelPair.x)
+,rho_drawer(&rho.core.PredictiveStateModelPair.y)
 #endif
 #endif
 {

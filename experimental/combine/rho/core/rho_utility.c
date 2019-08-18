@@ -904,11 +904,11 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * prediction
     
 void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
-    if(core->PredictionPair.x.NumRegions > 0)
-    {
-        LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:\n");
-        RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->ThreshByte );
-    }
+//    if(core->PredictionPair.x.NumRegions > 0)
+//    {
+//        LOG_RHO(RHO_DEBUG_2, "Creating observation list for X:\n");
+//        RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.x, core->ThreshByte );
+//    }
     if(core->PredictionPair.y.NumRegions > 0)
     {
         LOG_RHO(RHO_DEBUG_2, "Creating observation list for Y:\n");
@@ -919,7 +919,7 @@ void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
 {
 #ifdef __PSM__
-    PSMFunctions.Update( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions );
+//    PSMFunctions.Update( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions );
     PSMFunctions.Update( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
     core->PredictiveStateModelPair.current_state = MAX( core->PredictiveStateModelPair.x.current_state, core->PredictiveStateModelPair.y.current_state );
     core->PredictiveStateModelPair.best_confidence = AVG2( core->PredictiveStateModelPair.x.best_confidence, core->PredictiveStateModelPair.y.best_confidence );

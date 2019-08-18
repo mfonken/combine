@@ -29,7 +29,7 @@ static void cimageFromMat( cv::Mat &mat, cimage_t& img )
         for(int x = 0; x < w; x++, p++ )
         {
             cv::Vec3b c = mat.at<cv::Vec3b>(y,x);
-            img.pixels[p] = pixelDist(c);
+            img.pixels[p] = c[2];
         }
     }
 }

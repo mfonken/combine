@@ -7,6 +7,7 @@
 //
 #ifdef __PSM__
 #include "gmm.h"
+#include "timestamp.h"
 
 void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
@@ -232,7 +233,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
         GMMFunctions.Model.AddCluster( model, observation, value );
 }
 
-void RemovClusterFromGaussianMixtureModel( gaussian_mixture_model_t * model, uint16_t index )
+void RemoveClusterFromGaussianMixtureModel( gaussian_mixture_model_t * model, uint16_t index )
 {
     // Replace pointer to be removed by the last pointer
     model->cluster[index] = model->cluster[--model->num_clusters];

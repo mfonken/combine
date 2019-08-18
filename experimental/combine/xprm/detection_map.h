@@ -20,7 +20,7 @@
 #define DETECTION_MAP_DESCRIPTOR DETECTION_MAP_NAME "_psm_off"
 #endif
 
-#define SHAKE_INJECTION 10
+#define SHAKE_INJECTION 0//10
 
 static FILE * detection_map_file;
 
@@ -28,7 +28,7 @@ void InitializeDetectionMap( detection_map_t *, uint16_t );
 uint8_t GetDetectionMapFirstIndex( detection_map_t * );
 void IncrementDetectionMapIndex( detection_map_t * );
 void AddRegionToPredictionMap( detection_map_t *, uint8_t, index_t, uint8_t );
-void AddRegionSetToPredictionMap( detection_map_t *, prediction_pair_t *, uint8_t );
+void AddRegionSetToPredictionMap( detection_map_t *, prediction_pair_t * );
 
 typedef struct
 {
@@ -36,7 +36,7 @@ typedef struct
     uint8_t (*FirstIndex)( detection_map_t * );
     void (*Increment)( detection_map_t * );
     void (*Add)( detection_map_t *, uint8_t, index_t, uint8_t );
-    void (*AddSet)( detection_map_t *, prediction_pair_t *, uint8_t );
+    void (*AddSet)( detection_map_t *, prediction_pair_t * );
 } detection_map_function;
 
 static detection_map_function DetectionMapFunctions =

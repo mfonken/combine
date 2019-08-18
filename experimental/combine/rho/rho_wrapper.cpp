@@ -25,8 +25,8 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     
     RhoCore.Initialize(&core, width, height);
 #ifdef __PSM__
-    PSMFunctions.Initialize( &core.Primary.redictiveStateModelPair.x );
-    PSMFunctions.Initialize( &core.Primary.redictiveStateModelPair.y );
+    PSMFunctions.Initialize( &core.PredictiveStateModelPair.x );
+    PSMFunctions.Initialize( &core.PredictiveStateModelPair.y );
 #endif
     backgrounding_event = false;
     

@@ -121,12 +121,12 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     LOG_RHO(RHO_DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
-
-#ifdef USE_DETECTION_MAP
-    DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair, core->ThreshByte );
-#endif
     
     RhoUtility.Predict.GenerateObservationLists( core );
+
+#ifdef USE_DETECTION_MAP
+    DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair );
+#endif
     
 #ifdef __PSM__
     /* Process both dimensions' predictive state */

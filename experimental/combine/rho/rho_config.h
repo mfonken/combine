@@ -9,6 +9,8 @@
 #include "rho_global.h"
 
 //#define SPOOF_STATE_BANDS
+#define USE_DETECTION_MAP
+#define RHO_DRAWER
 
 /***************************************************************************************/
 /*                               CAPTUE PARAMETERS                                     */
@@ -17,8 +19,8 @@
 #define IS_RGGB_ELIMINATE_G     true
 
 /* Camera Config */
-#define RHO_WIDTH               700
-#define RHO_HEIGHT              700
+#define RHO_WIDTH               1920
+#define RHO_HEIGHT              1080
 
 #define CAPTURE_DIV             4
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
@@ -68,7 +70,7 @@
 #define MIN_VARIANCE        3
 #define MAX_VARIANCE        20
 
-#define MAX_REGION_HEIGHT   200
+#define MAX_REGION_HEIGHT   700//200
 #define RHO_GAP_MAX         10
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
@@ -155,7 +157,7 @@
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
-#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
+//#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
 
 #define DEFAULT_PACKET_LENGTH       3
 

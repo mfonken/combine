@@ -52,7 +52,7 @@ void AddRegionToPredictionMap( detection_map_t * map, uint8_t thresh, index_t de
 #endif
 }
 
-void AddRegionSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp, uint8_t thresh )
+void AddRegionSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp )
 {
     uint8_t p = 0, i;
 
@@ -61,16 +61,10 @@ void AddRegionSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp,
     {
         for( i = 0; i < pair[p]->ObservationList.length; i++ )
         {
-//            io = pair[p]->RegionsOrder[i];
-//            region_t * b = &pair[p]->Regions[io];
-//            double estimated_density = (double)b->den + (double)*pair[p]->PreviousPeak;
-////            double A = (double)(b->den<<8), B = (double)MAX_DENSITY;
-//            uint8_t byteDensity = estimated_density;//(uint8_t)ZDIV( A, B );
-//            byteDensity = (uint8_t)BOUND((int)byteDensity+ar, 0, 255);
-//            thresh = (uint8_t)BOUND((int)thresh+br, 0, 255);
             observation_t * o = &pair[p]->ObservationList.observations[i];
             
-            int ar = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION, br = rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
+            int ar = SHAKE_INJECTION==0?0:rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
+            int br = SHAKE_INJECTION==0?0:rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
             DetectionMapFunctions.Add( map, o->thresh + ar, o->density + br, o->label);
         }
     }

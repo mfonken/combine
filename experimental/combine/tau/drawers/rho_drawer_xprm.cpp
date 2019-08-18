@@ -5,10 +5,11 @@
 //  Created by Matthew Fonken on 2/5/19.
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
-#ifdef RHO_DRAWER
+//#ifdef RHO_DRAWER
 #ifdef __PSM__
 
 #include "rho_drawer_xprm.hpp"
+#include "timestamp.h"
 
 //#define PRINT_DETECTION_MAP
 
@@ -28,8 +29,7 @@ Vec3b rblack = {0,0,0};
 
 RhoDrawer::RhoDrawer(psm_t * model)
 : detection_map_frame(Size(DETECTION_MAP_FRAME_OWIDTH, DETECTION_MAP_FRAME_OHEIGHT), CV_8UC3, Scalar(0,0,0)),
-psm(model)
-{}
+psm(model) {}
 
 void RhoDrawer::DrawDetectionMap( detection_map_t * map )
 {
@@ -66,6 +66,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
 #ifdef __PSM__
     gaussian2d_t gaus;
     double angle;
+//    printf("b:%p\n", &psm->gmm);
     for( int j = 0; j < psm->gmm.num_clusters; j++)
     {
         gaus = (*psm->gmm.cluster[j]).gaussian_in;
@@ -77,7 +78,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
         center.y = ((double)center.y / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET*2;
         double cs = pow(gaus.combinations+1,sqrt(M_PI)); // Combination scale
         Size size = Size(fabs(gaus.covariance.a*COV_SCALE*cs), fabs(gaus.covariance.d*COV_SCALE*cs));
-        if(size.width <= 0 || size.height <= 0) continue;
+        if(size.width <= 0 || size.height <= 0 ) continue;
          ellipse(detection_map_frame, center, size, angle, 0, 360, Vec3b{(uint8_t)b,0,(uint8_t)r}, 1, 5, 0);
         label_manager_t &labels = (*psm->gmm.cluster[j]).labels;
         for(int i = 0, offset = -12; i < NUM_LABELS_TO_SHOW; i++, offset+=12)
@@ -110,7 +111,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
         
         rectangle(detection_map_frame, Point(0, l+DETECTION_MAP_INSET), Point(DETECTION_MAP_INSET, u+DETECTION_MAP_INSET), c, FILLED);
         rectangle(detection_map_frame, Point(DETECTION_MAP_FRAME_IWIDTH+DETECTION_MAP_INSET, l+DETECTION_MAP_INSET), Point(DETECTION_MAP_FRAME_IWIDTH+DETECTION_MAP_INSET*2, u+DETECTION_MAP_INSET), c, FILLED);
-        putText(detection_map_frame, std::to_string(i), Point(DETECTION_MAP_INSET+12, l+DETECTION_MAP_INSET-4), FONT_HERSHEY_PLAIN, 1, c, 2);
+        putText(detection_map_frame, std::to_string(i), Point(DETECTION_MAP_INSET+6, l+DETECTION_MAP_INSET-4), FONT_HERSHEY_PLAIN, 2, c, 2);
         
         /*****************/
         if(band->variance > 0)
@@ -140,4 +141,4 @@ void RhoDrawer::PostProcess(psm_t * psm)
 }
 
 #endif
-#endif
+//#endif

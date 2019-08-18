@@ -346,9 +346,9 @@ typedef struct
     byte_t includes, i, j, l, t;
 } packet_generation_variables;
 
-#define DETECTION_BUFFER_SIZE ( 1 << 8 )
+#define DETECTION_BUFFER_SIZE ( 1 << 9 )
 #define DETECTION_BUFFER_MASK ( DETECTION_BUFFER_SIZE - 1 )
-#define MAX_DENSITY           ( 1 << 8 )
+#define MAX_DENSITY           ( 1 << 9 )
 
 typedef struct
 {

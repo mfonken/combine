@@ -14,7 +14,7 @@ using namespace std;
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height) :
 TestInterface(3, n.c_str()),
 num_frames(num), size(width, height), subdir(f),
-//frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
+frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 image(Size(width, height), CV_8UC3, Scalar(0,0,0)),
@@ -126,9 +126,9 @@ void ImageUtility::InitCamera()
 {
     counter = 0;
     
-    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
-    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
-    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
+//    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
+//    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
+//    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
     
     if (!cam.isOpened())
     {
@@ -136,7 +136,7 @@ void ImageUtility::InitCamera()
         while(1);
         return;
     }
-    cam.read(image);
+    cam >> image;
     
     LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CAP_PROP_FPS));
     

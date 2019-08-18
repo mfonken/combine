@@ -37,6 +37,7 @@
 		340196F622FE81E500F152CC /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 340196EF22FE81E500F152CC /* point.c */; };
 		340196F722FE81E500F152CC /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 340196F122FE81E500F152CC /* quaternion.c */; };
 		340196FA22FF57E500F152CC /* statistics.c in Sources */ = {isa = PBXBuildFile; fileRef = 340196F922FF57E500F152CC /* statistics.c */; };
+		342A10082308F41F008928F6 /* Info.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 342A10072308F406008928F6 /* Info.plist */; };
 		3455398B22FF62F200DDE874 /* combine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3455398922FF62F200DDE874 /* combine.cpp */; };
 		349A5D8D22FF85E200060F4C /* unfisheye.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 349A5D8C22FF85E100060F4C /* unfisheye.cpp */; };
 /* End PBXBuildFile section */
@@ -44,12 +45,13 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		3401964622FE77E300F152CC /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				342A10082308F41F008928F6 /* Info.plist in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -133,6 +135,7 @@
 		340196F122FE81E500F152CC /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		340196F822FF57E500F152CC /* statistics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = statistics.h; sourceTree = "<group>"; };
 		340196F922FF57E500F152CC /* statistics.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = statistics.c; sourceTree = "<group>"; };
+		342A10072308F406008928F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3455398822FF62F200DDE874 /* combine_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = combine_master.h; sourceTree = "<group>"; };
 		3455398922FF62F200DDE874 /* combine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = combine.cpp; sourceTree = "<group>"; };
 		3455398A22FF62F200DDE874 /* combine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = combine.hpp; sourceTree = "<group>"; };
@@ -172,6 +175,7 @@
 			children = (
 				340196C022FE78F300F152CC /* test_config.h */,
 				3401964B22FE77E300F152CC /* main.cpp */,
+				342A10072308F406008928F6 /* Info.plist */,
 				3455398822FF62F200DDE874 /* combine_master.h */,
 				3455398A22FF62F200DDE874 /* combine.hpp */,
 				3455398922FF62F200DDE874 /* combine.cpp */,
@@ -605,13 +609,15 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					__PSM__,
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
+				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";
 				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				OTHER_LDFLAGS = (
-					"-I/usr/local/Cellar/opencv/4.0.1/include/opencv4/opencv2",
-					"-I/usr/local/Cellar/opencv/4.0.1/include",
-					"-L/usr/local/Cellar/opencv/4.0.1/lib",
+					"-I/usr/local/Cellar/opencv/4.1.0_2/include/opencv4/opencv2",
+					"-I/usr/local/Cellar/opencv/4.1.0_2/include",
+					"-L/usr/local/Cellar/opencv/4.1.0_2/lib",
 					"-lopencv_stitching",
 					"-lopencv_superres",
 					"-lopencv_videostab",
@@ -652,7 +658,7 @@
 					"-lopencv_objdetect",
 					"-lopencv_xphoto",
 					"-lopencv_imgproc",
-					"-lopencv_core\n\n",
+					"-lopencv_core",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -663,11 +669,12 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
+				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";
 				LIBRARY_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				OTHER_LDFLAGS = (
-					"-I/usr/local/Cellar/opencv/4.0.1/include/opencv4/opencv2",
-					"-I/usr/local/Cellar/opencv/4.0.1/include",
-					"-L/usr/local/Cellar/opencv/4.0.1/lib",
+					"-I/usr/local/Cellar/opencv/4.1.0_2/include/opencv4/opencv2",
+					"-I/usr/local/Cellar/opencv/4.1.0_2/include",
+					"-L/usr/local/Cellar/opencv/4.1.0_2/lib",
 					"-lopencv_stitching",
 					"-lopencv_superres",
 					"-lopencv_videostab",
@@ -708,7 +715,7 @@
 					"-lopencv_objdetect",
 					"-lopencv_xphoto",
 					"-lopencv_imgproc",
-					"-lopencv_core\n\n",
+					"-lopencv_core",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
