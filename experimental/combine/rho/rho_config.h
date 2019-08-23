@@ -157,7 +157,9 @@
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
-//#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
+#ifndef __PSM__
+#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
+#endif
 
 #define DEFAULT_PACKET_LENGTH       3
 

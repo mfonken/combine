@@ -609,7 +609,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					__PSM__,
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

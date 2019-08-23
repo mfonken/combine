@@ -633,8 +633,8 @@ void CombineAxisProbabilitesRhoUtility( prediction_pair_t * prediction )
 
 void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_core_t * core )
 {
-    _->Centroid.x = BOUNDU((index_t)(_->Primary.x + _->Secondary.x) >> 1, core->Width );
-    _->Centroid.y = BOUNDU((index_t)(_->Primary.y + _->Secondary.y) >> 1, core->Height);
+    _->Centroid.x = RhoUtility.Calculate.PredictionCenter( _->Primary.x, _->Secondary.x, core->Height);
+    _->Centroid.y = RhoUtility.Calculate.PredictionCenter( _->Primary.y, _->Secondary.y, core->Height);
 
     LOG_RHO(RHO_DEBUG, "Centroid.x>%d | Centroid.y>%d\n", _->Centroid.x, _->Centroid.y);
 
@@ -647,6 +647,13 @@ void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_c
     core->DensityMapPair.x.centroid         = _->Centroid.y;
     core->PredictionPair.y.PreviousCentroid = _->Centroid.x;
     core->PredictionPair.x.PreviousCentroid = _->Centroid.y;
+}
+    
+index_t CalculatePredictionCenterRhoUtility( index_t primary, index_t secondary, index_t width )
+{
+    index_t sum = primary + secondary;
+    if( primary == 0 || secondary == 0 ) return sum;
+    else return BOUNDU(sum >> 1, width );
 }
 
 void CalculateTuneRhoUtility( rho_core_t * core )

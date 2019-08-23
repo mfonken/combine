@@ -74,6 +74,7 @@ extern "C" {
     void CombineAxisProbabilitesRhoUtility( prediction_pair_t * );
     void UpdateCorePredictionDataRhoUtility( prediction_predict_variables *, rho_core_t * );
 
+    index_t CalculatePredictionCenterRhoUtility( index_t, index_t, index_t );
     void CalculateTuneRhoUtility( rho_core_t * );
     void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * );
     void CalculateStateTuneFactorRhoUtility( rho_core_t * );
@@ -136,6 +137,7 @@ extern "C" {
 
     typedef struct
     {
+        index_t (*PredictionCenter)( index_t, index_t, index_t );
         void (*Tune)( rho_core_t * );
         void (*BackgroundTuneFactor)( rho_core_t * );
         void (*StateTuneFactor)( rho_core_t * );
@@ -205,6 +207,7 @@ extern "C" {
         .Detect.SortRegions = SortRegionsRhoUtility,
         .Detect.CalculateFrameStatistics = CalculatedFrameStatisticsRhoUtility,
 
+        .Calculate.PredictionCenter = CalculatePredictionCenterRhoUtility,
         .Calculate.Tune = CalculateTuneRhoUtility,
         .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,
         .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
