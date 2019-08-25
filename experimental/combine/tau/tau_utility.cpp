@@ -121,7 +121,7 @@ double Tau::Perform( cimage_t &img )
 
 void Tau::UpdateThresh()
 {
-    utility.thresh = rho.core.Thresh;
+    utility.thresh = rho.core.ThreshByte;
 }
 
 void Tau::UpdatePrediction()

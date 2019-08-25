@@ -22,7 +22,19 @@ void InitializeRhoKalman( rho_kalman_t * k, floating_t v, floating_t ls, index_t
 
 void ResetRhoKalman( rho_kalman_t * k, floating_t v )
 {
-    memset( k, 0, sizeof(rho_kalman_t) );
+    k->K[0]        = 0;
+    k->K[1]        = 0;
+    k->P[0][0]     = 0;
+    k->P[0][1]     = 0;
+    k->P[1][0]     = 0;
+    k->P[1][1]     = 0;
+    k->rate        = 0;
+    k->bias        = 0;
+    k->prev        = 0;
+    k->velocity    = 0;
+    k->variance    = 0;
+    k->flag        = 0;
+    k->score       = 0;
     k->value       = v;
     k->origin      = TIMESTAMP();
 }

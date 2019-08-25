@@ -17,9 +17,9 @@ using namespace std;
 #define COMBINE_FPS     100
 
 /* GLOBAL SETUP */
-#define HAS_CAMERA
+//#define HAS_CAMERA
 //#define HAS_IMU
-//#define HAS_FILE
+#define HAS_FILE
 //#define HAS_GENERATOR
 
 //#define AUTOMATION_RUN
@@ -30,7 +30,7 @@ using namespace std;
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     31
+#define IMAGE_TICKS                     1//31
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"

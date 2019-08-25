@@ -280,7 +280,7 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
     /* Assume no recalculations are needed */
     _->recalculate = false;
     
-    /* predictioneturn on empty frames */
+    /* Return on empty frames */
     if(_->filtered_density > 0 )
     {
         /* Cycle regions */
