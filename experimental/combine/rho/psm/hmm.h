@@ -16,6 +16,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+//#define HMM_NORMALIZE_BY_STATE
 
 #include "gmm.h"
 

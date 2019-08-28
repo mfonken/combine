@@ -48,8 +48,8 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     
     if( observation_list->length > 0 )
         model->previous_thresh = observation_list->observations[0].thresh;
+    
     /// TODO: Analyze value
-//    printf("a:%p\n", &model->gmm);
 }
 
 void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
@@ -94,15 +94,12 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
     HMMFunctions.BaumWelchGammaSolve( &model->hmm );
     HMMFunctions.UpdateObservationMatrix( &model->hmm );
     
-//    if(count++ % 10 == 0)
-    {
-        /* Update state bands */
-        PSMFunctions.UpdateStateIntervals( model, nu );
-        
-        /* Update states/transition matrix */
-        FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
-        model->current_state = model->hmm.A.state;
-    }
+    /* Update state bands */
+    PSMFunctions.UpdateStateIntervals( model, nu );
+    
+    /* Update states/transition matrix */
+    FSMFunctions.Sys.Update( &model->hmm.A, model->state_intervals );
+    model->current_state = model->hmm.A.state;
     
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );

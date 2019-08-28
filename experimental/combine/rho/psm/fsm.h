@@ -16,10 +16,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+   
     /***************************************************************************************/
     /*                          DEFINITIONS & MACROS                                       */
     /***************************************************************************************/
+//#define FSM_DECAY_INACTIVE
+    
 #define STATE_DECAY                     0.95
 #define STATE_PUNISH                    0.025
     
@@ -44,17 +46,26 @@ extern "C" {
      *  - All probabilities are <= 1.0 (100%) and...
      *  - ...all row probabilities add to <= 1.0 (100%)
      */
+
     
-    /* Tau states */
-#define loop_variables_t loop_variables_uint8_t
+    void InitializeFSMMap(          fsm_map_t *                  );
+    void ResetFSMState(             fsm_map_t *,       uint8_t   );
+    void NormalizeFSMMap(           fsm_map_t *                  );
+    uint8_t NormalizeFSMState(      fsm_map_t *,       uint8_t   );
+    void PrintFSMMap(               fsm_map_t *,       state_t   );
+    void InitializeFSMSystem(       fsm_system_t *,    state_t   );
+    void DecayInactiveFSMSystem(    fsm_system_t *               );
+    void UpdateFSMSystem(           fsm_system_t *,    double[4] );
+    void UpdateFSMProbabilities(    fsm_system_t *,    double[4] );
+    void UpdateFSMState(            fsm_system_t *               );
     
     typedef struct
     {
-        void (*Initialize)(     fsm_map_t * );
-        void (*Normalize)(      fsm_map_t * );
-        void (*NormalizeState)( fsm_map_t *, uint8_t );
-        void (*ResetState)(     fsm_map_t *, uint8_t );
-        void (*Print)(          fsm_map_t *, state_t s );
+        void (*Initialize)(         fsm_map_t * );
+        void (*ResetState)(         fsm_map_t *, uint8_t );
+        void (*Normalize)(          fsm_map_t * );
+        uint8_t (*NormalizeState)(  fsm_map_t *, uint8_t );
+        void (*Print)(              fsm_map_t *, state_t s );
     } fsm_map_functions_t;
     
     typedef struct
@@ -71,17 +82,6 @@ extern "C" {
         fsm_map_functions_t    Map;
         fsm_system_functions_t Sys;
     } fsm_functions_t;
-    
-    void InitializeFSMMap(        fsm_map_t *                  );
-    void NormalizeFSMMap(         fsm_map_t *                  );
-    void NormalizeFSMState(       fsm_map_t *,       uint8_t   );
-    void ResetFSMState(           fsm_map_t *,       uint8_t   );
-    void PrintFSMMap(             fsm_map_t *,       state_t   );
-    void InitializeFSMSystem(     fsm_system_t *,    state_t   );
-    void DecayInactiveFSMSystem(  fsm_system_t *               );
-    void UpdateFSMSystem(         fsm_system_t *,    double[4] );
-    void UpdateFSMProbabilities(  fsm_system_t *,    double[4] );
-    void UpdateFSMState(          fsm_system_t *               );
     
     static const fsm_functions_t FSMFunctions =
     {
@@ -102,8 +102,6 @@ extern "C" {
     };
     
     static inline void copymax(double * a, double * b) { if(*a>*b)*b=*a;else*a=*b; }
-    
-#define define_loop_variable_template_struct(T, N)struct { T l, i, j; double u, v;}N;
     
 #ifdef __cplusplus
 }

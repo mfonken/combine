@@ -33,8 +33,8 @@ using namespace std;
 #define IMAGE_TICKS                     1//31
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
-#define GROUP_NAME                      "/gradient/"
-#define FILE_NAME                       "gradient_centralized"
+#define GROUP_NAME                      "/band/"
+#define FILE_NAME                       "overlap_1"
 //#define GROUP_NAME                      "/frames/small/"
 //#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
@@ -59,8 +59,8 @@ using namespace std;
 #define FRAME_WIDTH                     1280
 #define FRAME_HEIGHT                    720
 #else
-#define FRAME_WIDTH                     700
-#define FRAME_HEIGHT                    FRAME_WIDTH
+#define FRAME_WIDTH                     2500
+#define FRAME_HEIGHT                    1000//FRAME_WIDTH
 #endif
 #endif
 

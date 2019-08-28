@@ -30,11 +30,12 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
     
     GMMFunctions.Cluster.UpdateNormal( cluster );
 }
+
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
     if (isnan(cluster->log_gaussian_norm_factor))
         return;
-//    LOG_GMM(GMM_DEBUG, "m_maha: %.2f\n", cluster->mahalanobis_sq);
+    LOG_GMM(GMM_DEBUG, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
     double score_weight = ALPHA * safe_exp( -BETA * cluster->mahalanobis_sq );
@@ -45,7 +46,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     vec2 delta_mean_in = WeightedIncreaseMean( (vec2 *)observation, &cluster->gaussian_in, weight );
     vec2 delta_mean_out = WeightedIncreaseMean( output, &cluster->gaussian_out, weight );
     
-    LOG_GMM(GMM_DEBUG, "m_mean: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
+    LOG_GMM(GMM_DEBUG, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
     UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
     UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
@@ -60,34 +61,30 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     
     cluster->timestamp = TIMESTAMP();
 }
+
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
     vec2 input_delta = { 0 };
     vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
     cluster->mahalanobis_sq = CalculateMahalanobisDistanceSquared( &cluster->inv_covariance_in, &input_delta);
-    if(cluster->mahalanobis_sq < 1)
-    {
-        //printf("#");
-    }
     cluster->probability_of_in = safe_exp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
+
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
-    LOG_GMM(GMM_DEBUG, "m_norm: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
+    LOG_GMM(GMM_DEBUG, "LLT in: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
     double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d,
     norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
     LOG_GMM(GMM_DEBUG, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
-    if(isnan(norm_factor))
-    {
-        //printf("!");
-    }
 }
+
 void UpdateInputProbabilityOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, double total_probability )
 {
     cluster->probability_condition_input = total_probability > MIN_TOTAL_MIXTURE_PROBABILITY
     ? ZDIV( cluster->probability_of_in, total_probability ) : 0.f;
 }
+
 void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input, vec2 * output )
 {
     vec2 input_delta;
@@ -103,12 +100,14 @@ void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cl
     scalarMulVec2( cluster->probability_condition_input, &pre_condition, &pre_output );
     vec2AddVec2( output, &pre_output, output);
 }
+
 void UpdateLimitsOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
     double radius_y = cluster->gaussian_in.covariance.d * VALID_CLUSTER_STD_DEV;
     cluster->max_y = cluster->gaussian_in.mean.b + radius_y;
     cluster->min_y = cluster->gaussian_in.mean.b - radius_y;
 }
+
 void WeighGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
     /* Find best two label contributes */
@@ -138,6 +137,7 @@ void InitializeGaussianMixtureModel( gaussian_mixture_model_t * model )
     for( uint16_t i = 0; i < MAX_CLUSTERS; i++ )
         model->cluster[i] = &(model->cluster_mem[i]);
 }
+
 double GetScoreSumOfClustersInGaussianMixtureModel( gaussian_mixture_model_t * model, vec2 * input )
 {
     double score_sum = 0;
@@ -150,6 +150,7 @@ double GetScoreSumOfClustersInGaussianMixtureModel( gaussian_mixture_model_t * m
     }
     return score_sum;
 }
+
 double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t * model, double total_probability, vec2 * input, vec2 * output )
 {
     double best_match_distance = MAX_DISTANCE;
@@ -165,6 +166,7 @@ double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t 
     }
     return best_match_distance;
 }
+
 double GetMaxErrorOfGaussianMixtureModel( gaussian_mixture_model_t * model, vec2 * output, vec2 * value, vec2 * min_max_delta )
 {
     vec2 output_delta;
@@ -173,6 +175,7 @@ double GetMaxErrorOfGaussianMixtureModel( gaussian_mixture_model_t * model, vec2
     b_error = fabs( ZDIV( output_delta.b, min_max_delta->b ) );
     return MAX( a_error, b_error );
 }
+
 void AddClusterToGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
 {
     uint16_t i = 0;
@@ -181,6 +184,7 @@ void AddClusterToGaussianMixtureModel( gaussian_mixture_model_t * model, observa
     GMMFunctions.Cluster.Initialize( model->cluster[i], observation, value );
     model->num_clusters++;
 }
+
 void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
 {
     gaussian_mixture_cluster_t * cluster;
@@ -198,6 +202,7 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
             GMMFunctions.Model.RemoveCluster( model, i );
     }
 }
+
 void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
 {
     if( !model->num_clusters )
@@ -225,6 +230,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     
     GMMFunctions.Model.Update( model, observation, value );
     LOG_GMM(GMM_DEBUG, "Max error: %.2f\n", max_error);
+    
     /* Add cluster if error or distance is to high for a cluster match */
     if( model->num_clusters < MAX_CLUSTERS
        && ( !model->num_clusters
@@ -235,7 +241,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
 
 void RemoveClusterFromGaussianMixtureModel( gaussian_mixture_model_t * model, uint16_t index )
 {
-    // Replace pointer to be removed by the last pointer
+    /* Replace pointer to be removed by the last pointer */
     model->cluster[index] = model->cluster[--model->num_clusters];
 }
 

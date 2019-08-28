@@ -9,8 +9,6 @@
 #ifdef __PSM__
 #include "hmm.h"
 
-//#define NORMALIZE_BY_STATE
-
 static const char * observation_strings[] = { "O0", "O1", "O2", "O3", "OM" };
 
 void InitializeHiddenMarkovModel( hidden_markov_model_t * model, observation_symbol_t initial_observation )
@@ -26,7 +24,7 @@ void InitializeHiddenMarkovModel( hidden_markov_model_t * model, observation_sym
     /* Initialize each observation set as Kumarawwamy distribution */
     kumaraswamy_t kumaraswamy;
     KumaraswamyFunctions.Initialize( &kumaraswamy, NUM_STATE_GROUPS );
-    double alpha_step = 1. ;/// kumaraswamy.beta;
+    double alpha_step = 1.;
     
     double x = alpha_step, observation_alpha[NUM_OBSERVATION_SYMBOLS] = { 0. }, bands[NUM_STATE_GROUPS], intervals[NUM_STATE_GROUPS];
     for( uint8_t i = 0.; i < NUM_OBSERVATION_SYMBOLS; i++, x += alpha_step )
@@ -64,7 +62,7 @@ void UpdateObservationMatrixHiddenMarkovModel(  hidden_markov_model_t * model )
     for( uint8_t i = 0; i < NUM_OBSERVATION_SYMBOLS; i++ )
         LOG_HMM_BARE(HMM_DEBUG, "  %s    ", observation_strings[i]);
     LOG_HMM_BARE(HMM_DEBUG, "\n");
-#ifdef NORMALIZE_BY_STATE
+#ifdef HMM_NORMALIZE_BY_STATE
       /* Normalize by state */
     for( uint8_t j = 0; j < NUM_STATES; j++ )
     {
@@ -168,18 +166,18 @@ void BaumWelchGammaSolveHiddenMarkovModel( hidden_markov_model_t * model )
             curr_max = diag;
         else
         {
-            // Assume l comes from i
+            /* Assume current observation l comes from state i */
             for( uint8_t j = 0; j < NUM_STATES; j++ )
             {
-                curr = ForwardBackward( model, k, l, j, i );// model->Es[k][l][j][i];
+                curr = ForwardBackward( model, k, l, j, i );
                 if( curr > curr_max )
                     curr_max = curr;
             }
             
-            // Assume k comes from i
+            /* Assume previous observation k comes from state i */
             for( uint8_t j = 0; j < NUM_STATES; j++ )
             {
-                curr = ForwardBackward( model, k, l, i, j );// model->Es[k][l][i][j];
+                curr = ForwardBackward( model, k, l, i, j );
                 if( curr > prev_max )
                     prev_max = curr;
             }

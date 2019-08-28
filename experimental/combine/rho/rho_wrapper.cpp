@@ -45,7 +45,7 @@ double Rho::Perform( cimage_t & img, GlobalPacket * p )
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
-    RhoCore.Perform( &core, backgrounding_event );
+//    RhoCore.Perform( &core, backgrounding_event );
     gettimeofday( &b, NULL);
 
     /* * * * * * * * * * */

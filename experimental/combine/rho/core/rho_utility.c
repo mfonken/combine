@@ -72,7 +72,7 @@ void InitializePredictionRhoUtility( prediction_t * prediction, index_t length )
         RhoKalman.Initialize( &prediction->TrackingFilters[i], 0., RHO_PREDICTION_LS, 0, length, DEFAULT_PREDICTION_UNCERTAINTY );
         prediction->TrackingFiltersOrder[i] = i;
     }
-    /* predictionegions */
+    /* Regions */
     for(uint8_t i = 0; i < MAX_REGIONS; i++)
     {
         memset(&prediction->Regions[i], 0, sizeof(region_t));
@@ -294,27 +294,27 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
             /* Score current region */
             RhoUtility.Generate.RegionScore( curr, _->filtered_density, _->maximum );
 
-            /* predictionecalculate regions with chaos */
+            /* Recalculate regions with chaos */
             if(curr->score > _->chaos)
             {
-                /* predictionecalculate around chaotic region */
+                /* Recalculate around chaotic region */
                 _->recalculate = true;
 
-                /* predictionemove this index */
+                /* Remove this index */
                 prediction->RegionsOrder[i] = MAX_REGIONS;
 
                 /* Get centroid peak and update filter peak double */
-                sdensity_t cpeak = (sdensity_t)density_map->map[curr->location];
-                _->filter_peak_2 = cpeak << 1;
+                sdensity_t current_peak = (sdensity_t)density_map->map[curr->location];
+                _->filter_peak_2 = current_peak << 1;
 
-                /* predictionaise lower band half of region centroid to band center when below */
-                if( cpeak < _->filter_peak)
-                    _->filter_band_lower += abs( (sdensity_t)_->filter_peak - cpeak) >> 1;
+                /* When below band center, raise lower band half of region centroid */
+                if( current_peak < _->filter_peak)
+                    _->filter_band_lower += abs( (sdensity_t)_->filter_band_lower - current_peak) >> 1;
 
                 /* Otherwise raise to centroid peak */
-                else _->filter_band_lower = cpeak;
+                else _->filter_band_lower = current_peak;
 
-                /* predictionecalculate _->cycle width */
+                /* Recalculate _->cycle width */
                 index_t half_region_width = curr->width >> 1;
                 if(curr->location - half_region_width > _->range[_->cycle_])
                     _->end = curr->location - half_region_width;
@@ -409,12 +409,12 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
         for( ; n < ( prediction->NumRegions - 1 ); n++ )
         { /* Update tracking filters in pairs following determinant */
 
-            /* predictionetreive current region pair */
+            /* Retreive current region pair */
             region_t
             *regionA = &prediction->Regions[prediction->RegionsOrder[n]],
             *regionB = &prediction->Regions[prediction->RegionsOrder[n+1]];
 
-            /* predictionetreive tracking filters pair */
+            /* Retreive tracking filters pair */
             byte_t
             fAi = prediction->TrackingFiltersOrder[m],
             fBi = prediction->TrackingFiltersOrder[m+1];
