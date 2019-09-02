@@ -240,7 +240,7 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         bool pT = 1;
 //        bool first = 1;
         /* Kalman Values */
-        rho_kalman_t yk = rho.core.DensityMapPair.x.kalmans[i], xk = rho.core.DensityMapPair.y.kalmans[i];
+        kalman_filter_t yk = rho.core.DensityMapPair.x.kalmans[i], xk = rho.core.DensityMapPair.y.kalmans[i];
         int mYv = rho.core.DensityMapPair.x.kalmans[i].variance, mXv = rho.core.DensityMapPair.y.kalmans[i].variance;
        
         int m = OP_ALIGN((xk.value/DENSITY_SCALE),h), n = OP_ALIGN((yk.value/DENSITY_SCALE),w);
@@ -543,9 +543,10 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     x_nu = rho.core.PredictionPair.x.NuRegions,
     y_nu = rho.core.PredictionPair.y.NuRegions;
 #ifdef __PSM__
-    state_t state = rho.core.PredictiveStateModelPair.y.hmm.A.state;
-    for(int i = 0; i < NUM_STATES; i++)
-        state_P[i] = rho.core.PredictiveStateModelPair.y.hmm.A.probabilities.map[i][state];
+//    state_t state = rho.core.PredictiveStateModelPair.y.hmm.A.state;
+//    for(int i = 0; i < NUM_STATES; i++)
+//        state_P[i] = rho.core.PredictiveStateModelPair.y.hmm.A.probabilities.map[i][state];
+    state_t state = UNKNOWN_STATE;
 #endif
     
     floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
@@ -823,7 +824,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     /* Gather data */
     int match_value = 0;
-    rho_kalman_t tracking_filters[MAX_TRACKING_FILTERS];
+    kalman_filter_t tracking_filters[MAX_TRACKING_FILTERS];
     int tracking_filters_order[MAX_TRACKING_FILTERS] = {0};
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
@@ -831,7 +832,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         {
             int c = prediction.TrackingFiltersOrder[i];
             MATCH_ENCODE(match_value, i, c);
-            memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(rho_kalman_t));
+            memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(kalman_filter_t));
             tracking_filters_order[i] = c;
         }
         else
@@ -859,7 +860,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     }
     for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
     {
-        rho_kalman_t curr = tracking_filters[i];
+        kalman_filter_t curr = tracking_filters[i];
         file << "," << curr.bias << "," << curr.K[0] << "," << curr.K[1] << "," << curr.value << "," << curr.velocity << "," << curr.score;
     }
     file << "," << c_percent << ","  << pDl[pX] << "," << pDlt[pX] << "," << pDlv[pX] << "," << pDu[pX] << "," << pDut[pX] << "," << pDuv[pX];
@@ -943,7 +944,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
         Point matchOrigin(textOrigin.x+180, textOrigin.y);
         line(mat, matchOrigin, Point(matchOrigin.x, y+BL_IND_HEIGHT-RD_SPACE), RD_LINE_COLOR);
         
-        rho_kalman_t kalman = tracking_filters[tracking_filters_order[i]];
+        kalman_filter_t kalman = tracking_filters[tracking_filters_order[i]];
         putText(mat, "Bi: " + to_stringn(kalman.bias,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "K0: " + to_stringn(kalman.K[0],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "Vl: " + to_stringn(kalman.value,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);

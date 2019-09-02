@@ -45,7 +45,7 @@ double Rho::Perform( cimage_t & img, GlobalPacket * p )
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
-//    RhoCore.Perform( &core, backgrounding_event );
+    RhoCore.Perform( &core, backgrounding_event );
     gettimeofday( &b, NULL);
 
     /* * * * * * * * * * */
@@ -95,8 +95,8 @@ void Rho::PrintSizes( void )
     e = a + b + c + d,
     f = sizeof(density_map_pair_t),
     g = sizeof(prediction_pair_t),
-    h = sizeof(rho_pid_t),
-    j = sizeof(rho_kalman_t)
+    h = sizeof(pid_filter_t),
+    j = sizeof(kalman_filter_t)
 #ifdef __PSM__
     ,k = sizeof(gaussian_mixture_model_t),
     l = sizeof(hidden_markov_model_t),

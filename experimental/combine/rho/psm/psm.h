@@ -24,6 +24,13 @@ extern "C" {
 //#define HEIGHT 700
 //#define WIDTH HEIGHT
     
+#ifdef __RHO__
+#define PSM_OBSERVATION_MAX THRESH_MAX
+#else
+#define PSM_OBSERVATION_MAX (1<<7)
+#endif
+    
+
 void InitializePSM(                     psm_t * );
 void ReportObservationsPSM(             psm_t *, observation_list_t * );
 void UpdateStateIntervalsPSM(           psm_t *, double );

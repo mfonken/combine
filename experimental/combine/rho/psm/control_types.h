@@ -18,8 +18,12 @@ extern "C" {
 #include <math.h>
 #include <string.h>
 
-#include "rho_kalman.h"
+#ifdef __RHO__
 #include "rho_config.h"
+#endif
+    
+#include "kalman.h"
+#include "pid.h"
 
 #ifndef ZDIV
 #define ZDIV_LNUM 1 << 10
@@ -41,7 +45,7 @@ extern "C" {
 #define MIN_THRESH 0
 #define THRESH_RANGE (MAX_THRESH - MIN_THRESH)
 
-#define MAX_SINGLE_CONFIDENCE 0.9
+#define MAX_SINGLE_CONFIDENCE 1
 
 #define TARGET_STATE TARGET_POPULATED
 
@@ -59,18 +63,19 @@ extern "C" {
     /* Stability tracking for selec tions */
     typedef struct
     {
-        rho_kalman_t
+        kalman_filter_t
             state,
             system;
     } stability_t;
 
 #ifdef __PSM__
     //#define NUM_STATES              10
-#define NUM_OBSERVATION_SYMBOLS 5 // Should be max number of clusters in GMM
+#define NUM_OBSERVATION_SYMBOLS 2//5 // Should be max number of clusters in GMM
 #ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #endif
 #define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
+#define HMM_UPDATE_DELTA 1.0
 
 #define MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC 3
 #define MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC 8
@@ -230,9 +235,9 @@ extern "C" {
     {
         UNKNOWN_SYMBOL = -1,
         ZERO_SYMBOL,
-        ONE_SYMBOL,
-        TWO_SYMBOL,
-        THREE_SYMBOL,
+//        ONE_SYMBOL,
+//        TWO_SYMBOL,
+//        THREE_SYMBOL,
         MANY_SYMBOL
     } observation_symbol_t;
     
@@ -469,22 +474,51 @@ extern "C" {
 
     typedef struct
     {
-        observation_symbol_t
-        data[MAX_OBSERVATIONS],
-        next, first, last, curr, prev;
+        uint8_t
+        data[MAX_OBSERVATIONS], length;
+        struct { uint8_t next, first, last; } index;
+        struct { uint8_t curr, prev; } value;
     } observation_buffer_t;
-
-    static uint8_t AddToObservationBuffer( observation_buffer_t * buffer, observation_symbol_t v )
+    
+    static uint8_t PushToObservationBuffer( observation_buffer_t * buffer, uint8_t v )
     {
-        buffer->prev = buffer->curr;
-        buffer->curr = v;
-        buffer->last = buffer->next;
-        uint8_t next_index = (uint8_t)buffer->next + 1;
-        buffer->data[next_index] = v;
-        buffer->next = (observation_symbol_t)( next_index & MAX_OBSERVATION_MASK );
-        if(buffer->next == buffer->first)
-            buffer->first = (observation_symbol_t)( ( (uint8_t)buffer->next + 1 ) & MAX_OBSERVATION_MASK );
-        return buffer->last;
+        buffer->value.prev = buffer->value.curr;
+        buffer->value.curr = v;
+        
+        buffer->data[buffer->index.next] = buffer->value.curr;
+        buffer->index.next = ( ( buffer->index.next + 1 ) & MAX_OBSERVATION_MASK );
+        
+        if( buffer->index.next == buffer->index.first )
+        { // Update first if looped (filled)
+            buffer->index.last = buffer->index.next;
+            buffer->index.first = ( ( buffer->index.next + 1 ) & MAX_OBSERVATION_MASK );
+        }
+        else
+        {
+            buffer->length++;
+        }
+        return buffer->index.last;
+    }
+    static uint8_t PullFromObservationBuffer( observation_buffer_t * buffer )
+    {
+        if( buffer->index.next == buffer->index.first ) return -1;
+        buffer->index.first = ( ( buffer->index.first + 1 ) & MAX_OBSERVATION_MASK );
+        buffer->length--;
+        return buffer->data[buffer->index.first];
+    }
+    static uint8_t GetLengthObservationBuffer( observation_buffer_t * buffer )
+    {
+        uint8_t l = buffer->index.next - buffer->index.first;
+        if( !l ) l = MAX_OBSERVATIONS;
+        buffer->length = l;
+        return l;
+    }
+    static uint8_t GetIndexObservationBuffer( observation_buffer_t * buffer, uint8_t i )
+    {
+        uint8_t l = buffer->length;// GetLengthObservationBuffer( buffer );
+        if( i > l ) return -1;
+        uint8_t io = ( ( buffer->index.first + i ) & MAX_OBSERVATION_MASK );
+        return buffer->data[io];
     }
 
     static floating_t NumStdDevsFromYMean( gaussian2d_t * gaussian, floating_t check_value )

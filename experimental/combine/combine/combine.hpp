@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <string>
 
-#include "kinetic_master.h"
+//#include "kinetic_master.h"
 #include "utility_master.h"
 #include "environment_master.h"
 #include "tau_master.h"
@@ -33,8 +33,12 @@ private:
     int         width,
                 height;
     Tau       * tau;
+#ifdef __KIN__
     kinetic_t   kin;
+#endif
+#ifdef __IMU__
     imu_t       imu;
+#endif
 };
 
 #endif /* combine_hpp */

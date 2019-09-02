@@ -22,7 +22,7 @@ extern "C" {
         state_t         prev;
         state_t         next;
         uint8_t         selection_index;
-        stability_t     stability;
+//        stability_t     stability;
         fsm_map_t       probabilities;
     } fsm_system_t;
 #ifdef __PSM__

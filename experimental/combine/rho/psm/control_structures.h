@@ -66,47 +66,20 @@ extern "C" {
         cluster_mem[MAX_CLUSTERS];
     } gaussian_mixture_model_t;
 
-    typedef struct
-    {
-        double expected[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
-        double best[NUM_OBSERVATION_SYMBOLS];
-        double gamma[NUM_STATES];
-        uint8_t num_observation_symbols;
-    } observation_matrix_t;
-    
-    typedef double state_expectation_element_t[NUM_STATES][NUM_STATES];
-    typedef state_expectation_element_t state_expectation_matrix_t[NUM_OBSERVATION_SYMBOLS][NUM_OBSERVATION_SYMBOLS];
-    
-#define MAX_VAL_INDEX NUM_STATES
-    typedef double expectation_element_t[NUM_STATES+1];
-    typedef expectation_element_t expectation_matrix_t[NUM_OBSERVATION_SYMBOLS];
-    
-#define GAMMA_VALUE_INDEX 1
-#define GAMMAA
-    typedef double gamma_element_t[NUM_OBSERVATION_SYMBOLS][NUM_STATES];
-    typedef struct
-    {
-        gamma_element_t cumulative_value;
-        double maximum[NUM_OBSERVATION_SYMBOLS];
-    } gamma_matrix_t;
+    typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
+    typedef double observation_matrix_t[NUM_STATES][NUM_OBSERVATION_SYMBOLS];
+    typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
     
     typedef struct
     {
-        double                  p[NUM_STATES];       // Initial probabilities
-        fsm_system_t            A;                   // Transition matrix
+        transition_matrix_t     A;                   // Transition matrix
         observation_matrix_t    B;                   // Observation matrix
         observation_buffer_t    O;                   // Observation sequence
-        state_expectation_matrix_t Es;               // State expectation matrix
-        gamma_matrix_t          G;                   // Gamma expectation matrix
-        
-        uint8_t
-        T, // Number of observations
-        N, // Number of states
-        M; // Number of observation symbols
-        uint8_t
-        best_state;
-        double
-        best_confidence;
+        double                  pi[NUM_STATES];      // Initial state probabilities
+        state_sequence_matrix   alpha;               // Forward solve vector
+        state_sequence_matrix   beta;                // Backward solve vector
+        state_sequence_matrix   gamma;               // Gamma solve vector
+        state_sequence_matrix   xi[NUM_STATES];      // Xi solve matrix
     } hidden_markov_model_t;
 #endif
     

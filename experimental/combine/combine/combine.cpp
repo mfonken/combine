@@ -19,7 +19,8 @@ TestInterface(2, n)
 }
 
 string Combine::Serialize()
-{  
+{
+#ifdef __KIN__
     char kin_packet[MAX_BUFFER];
     
     double r[3], p[3];
@@ -32,19 +33,28 @@ string Combine::Serialize()
 
     sprintf(kin_packet, "f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", r[0], r[1], r[2], p[0], p[1], p[2] );
     return string(kin_packet);
+#else
+    return "";
+#endif
 }
 
 void Combine::Init()
 {
+#ifdef __IMU__
     printf("Initializing IMU Utility.\n");
     IMUFunctions.init( &imu );
+#endif
 
+#ifdef __KIN__
     printf("Initializing Kinetic Utility.\n");
     KineticFunctions.Init( &kin, width, height, FOCAL_LENGTH, D_FIXED );
+#endif
 }
 
 void Combine::Trigger()
 {
+#ifdef __IMU__
+#ifdef __KIN__
     pthread_mutex_lock( &tau->predictions_mutex );
     kpoint_t A = (kpoint_t){tau->A.x, tau->A.y}, B = (kpoint_t){tau->B.x, tau->B.y};
     pthread_mutex_unlock( &tau->predictions_mutex );
@@ -57,4 +67,6 @@ void Combine::Trigger()
     vec3_t n;
     KineticFunctions.Nongrav( &kin, &n );
     KineticFunctions.UpdatePosition( &kin, &n, B, A );
+#endif
+#endif
 }

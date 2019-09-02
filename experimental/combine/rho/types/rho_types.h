@@ -20,8 +20,8 @@
 #endif
 
 #include "rho_config.h"
-#include "rho_kalman.h"
-#include "rho_pid.h"
+#include "kalman.h"
+#include "pid.h"
 
 /* Packet Generation Settings */
 #define YES 1
@@ -173,7 +173,7 @@ typedef struct
         centroid;
     bool
         has_background;
-    rho_kalman_t
+    kalman_filter_t
         kalmans[2];
 } density_map_t;
 
@@ -204,7 +204,7 @@ typedef struct
 
 typedef struct
 {
-    rho_kalman_t    TrackingFilters[MAX_TRACKING_FILTERS];
+    kalman_filter_t    TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
     region_t        Regions[MAX_REGIONS];
     uint8_t         RegionsOrder[MAX_REGIONS],
@@ -397,8 +397,8 @@ typedef struct
         Thresh;
     rho_tune_t          Tune;
     prediction_pair_t   PredictionPair;
-    rho_pid_t           ThreshFilter;
-    rho_kalman_t        TargetFilter;
+    pid_filter_t        ThreshFilter;
+    kalman_filter_t     TargetFilter;
     detection_map_t     DetectionMap;
 
 #ifdef __PSM__

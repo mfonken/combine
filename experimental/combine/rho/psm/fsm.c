@@ -64,8 +64,8 @@ void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
     sys->next                 = UNKNOWN_STATE;
     sys->selection_index      = 0;
     
-    RhoKalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
-    RhoKalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
+    Kalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
+    Kalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
     
     FSMFunctions.Map.Initialize( &sys->probabilities );
 }
@@ -116,7 +116,7 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )
             sys->probabilities.map[c][i] = curr;
     }
     floating_t state_change_rate = TIMESTAMP() - sys->stability.state.timestamp;
-    RhoKalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
+    Kalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
 }
 
 void UpdateFSMState( fsm_system_t * sys )
@@ -130,10 +130,10 @@ void UpdateFSMState( fsm_system_t * sys )
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;
         
-        RhoKalman.Reset( &sys->stability.state, 0. );
+        Kalman.Reset( &sys->stability.state, 0. );
         
         floating_t system_change_rate = TIMESTAMP() - sys->stability.system.timestamp;
-        RhoKalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
+        Kalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
         
 #ifdef FSM_DECAY_INACTIVE
         FSMFunctions.Sys.DecayInactive( sys );

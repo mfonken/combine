@@ -15,7 +15,6 @@
 #include <string>
 #include <sstream>
 
-//#include "rho_kalman.h"
 #include "kalman.hpp"
 
 #ifndef LOG
