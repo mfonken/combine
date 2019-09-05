@@ -125,7 +125,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
                 variance = ( variance / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
                 double inner = ZDIV( upper, variance );
                 double exponent = -0.5 * inner * inner;
-                double x = variance_scale * safe_exp(exponent);
+                double x = variance_scale * SafeExp(exponent);
                 x = MAX(0, x);
                 x = MIN(DETECTION_MAP_FRAME_IWIDTH, x);
                 Point p(DETECTION_MAP_FRAME_IWIDTH + DETECTION_MAP_INSET - x, DETECTION_MAP_INSET+y);

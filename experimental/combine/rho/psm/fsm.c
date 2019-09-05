@@ -8,51 +8,50 @@
 
 #include "fsm.h"
 
-void InitializeFSMMap( fsm_map_t * fsm )
+void InitializeFSMMap( transition_matrix_t * P )
 {
     LOG_FSM(FSM_DEBUG, "Initializing State Machine.\n");
-    fsm->length = NUM_STATES;
     for(uint8_t i = 0; i < NUM_STATES; i++ )
-        FSMFunctions.Map.ResetState( fsm, i );
+        FSMFunctions.Map.ResetState( P, i );
 }
 
-void ResetFSMState( fsm_map_t * fsm, uint8_t i )
+void ResetFSMState( transition_matrix_t * P, uint8_t i )
 {
-    for( uint8_t j = 0; j < fsm->length; j++ )
-        fsm->map[i][j] = 0.0;
-    fsm->map[i][i] = 1.0;
+    for( uint8_t j = 0; j < NUM_STATES; j++ )
+        (*P)[i][j] = 0.0;
+    (*P)[i][i] = 1.0;
 }
 
-void NormalizeFSMMap( fsm_map_t * fsm )
+void NormalizeFSMMap( transition_matrix_t * P )
 {
-    for( uint8_t i = 0; i < fsm->length; i++ )
-        FSMFunctions.Map.NormalizeState( fsm, i );
+    for( uint8_t i = 0; i < NUM_STATES; i++ )
+        FSMFunctions.Map.NormalizeState( P, i );
 }
 
-uint8_t NormalizeFSMState( fsm_map_t * fsm, uint8_t i )
+uint8_t NormalizeFSMState( transition_matrix_t * P, uint8_t i )
 {
     uint8_t max_index = i, j;
     double total = 0, invtotal, curr, max = 0;
-    for( j = 0; j < fsm->length; j++ )
+    for( j = 0; j < NUM_STATES; j++ )
     {
-        curr = fsm->map[i][j];
+        curr = (*P)[i][j];
         if( curr >= 0. )
             total += curr;
     }
     if(total)
     {
         invtotal = ZDIV( 1., total );
-        for( j = 0; j < fsm->length; j++ )
+        for( j = 0; j < NUM_STATES; j++ )
         {
-            fsm->map[i][j] *= invtotal;
-            if( fsm->map[i][j] > max )
+            (*P)[i][j] *= invtotal;
+            if( (*P)[i][j] > max )
             {
-                max = fsm->map[i][j];
+                max = (*P)[i][j];
                 max_index = j;
             }
         }
     }
-    else fsm->map[i][i] = 1.0;
+    else (*P)[i][i] = 1.0;
     
     return max_index;
 }
@@ -67,7 +66,7 @@ void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
     Kalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     Kalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
     
-    FSMFunctions.Map.Initialize( &sys->probabilities );
+    FSMFunctions.Map.Initialize( sys->P );
 }
 
 void DecayInactiveFSMSystem( fsm_system_t * sys )
@@ -79,8 +78,8 @@ void DecayInactiveFSMSystem( fsm_system_t * sys )
         uint8_t state_distance = abs( i - c );
         for( j = 0; j < NUM_STATES; j++ ) // Punish based on relevance(distance) from current state
         {
-            sys->probabilities.map[i][j] -= STATE_PUNISH * state_distance;
-            if( sys->probabilities.map[i][j] < 0 ) sys->probabilities.map[i][j] = 0.;
+            (*sys->P)[i][j] -= STATE_PUNISH * state_distance;
+            if( (*sys->P)[i][j] < 0 ) (*sys->P)[i][j] = 0.;
         }
     }
 }
@@ -90,10 +89,10 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
     FSMFunctions.Sys.UpdateProbabilities( sys, p );
     
     /* Normalize state and find most probable next state */
-    sys->next = (state_t)FSMFunctions.Map.NormalizeState( &sys->probabilities, sys->state );
+    sys->next = (state_t)FSMFunctions.Map.NormalizeState( sys->P, sys->state );
     
     FSMFunctions.Sys.UpdateState( sys );
-    PrintFSMMap( &sys->probabilities, sys->state );
+    PrintFSMMap( sys->P, sys->state );
     
     sys->stability.system.timestamp = TIMESTAMP();
     sys->stability.state.timestamp = TIMESTAMP();
@@ -111,9 +110,9 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
         LOG_FSM(FSM_DEBUG, "Updating %s by %.2f.\n", stateString(i), p[i]);
-        curr = WeightedAverage( sys->probabilities.map[c][i], p[i], ( sys->stability.state.value + 1 ) / 2 );
+        curr = WeightedAverage( (*sys->P)[c][i], p[i], ( sys->stability.state.value + 1 ) / 2 );
         if( curr <= MAX_SINGLE_CONFIDENCE )
-            sys->probabilities.map[c][i] = curr;
+            (*sys->P)[c][i] = curr;
     }
     floating_t state_change_rate = TIMESTAMP() - sys->stability.state.timestamp;
     Kalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
@@ -133,7 +132,7 @@ void UpdateFSMState( fsm_system_t * sys )
         Kalman.Reset( &sys->stability.state, 0. );
         
         floating_t system_change_rate = TIMESTAMP() - sys->stability.system.timestamp;
-        Kalman.Step( &sys->stability.system, sys->probabilities.map[sys->state][sys->state], system_change_rate );
+        Kalman.Step( &sys->stability.system, (*sys->P)[sys->state][sys->state], system_change_rate );
         
 #ifdef FSM_DECAY_INACTIVE
         FSMFunctions.Sys.DecayInactive( sys );
@@ -141,18 +140,18 @@ void UpdateFSMState( fsm_system_t * sys )
     }
 }
 
-void PrintFSMMap( fsm_map_t * fsm, state_t s )
+void PrintFSMMap( transition_matrix_t * P, state_t s )
 {
 #ifdef FSM_DEBUG
     LOG_FSM(FSM_DEBUG_2, "\t\t\t  ");
-    for( uint8_t i = 0; i < fsm->length; i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)i), i);
+    for( uint8_t i = 0; i < NUM_STATES; i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)i), i);
     LOG_FSM_BARE(FSM_DEBUG_2, "\n");
-    for( uint8_t i = 0, j; i < fsm->length; i++ )
+    for( uint8_t i = 0, j; i < NUM_STATES; i++ )
     {
         LOG_FSM(FSM_DEBUG_2, " %s-[%d]", stateString((uint8_t)i), i);
-        for( j = 0; j < fsm->length; j++ )
+        for( j = 0; j < NUM_STATES; j++ )
         {
-            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c", ((j==(uint8_t)s)?'|':' '), fsm->map[j][i], ((j==(uint8_t)s)?'|':' '));
+            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c", ((j==(uint8_t)s)?'|':' '), (*P)[j][i], ((j==(uint8_t)s)?'|':' '));
         }
         LOG_FSM_BARE(FSM_DEBUG_2, "\n");
     }

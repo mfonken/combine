@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "fsm_support.h"
+#include "control_structures.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +21,15 @@ extern "C" {
     /*                          DEFINITIONS & MACROS                                       */
     /***************************************************************************************/
 //#define FSM_DECAY_INACTIVE
+    
+    static inline uint8_t stateToSelection(uint8_t s) {return ((uint8_t)((s+1)/2) - 1);};
+    static inline const char *stateString(int8_t s)
+    {
+        s++;
+        static const char *strings[] = { "UN", "UP", "TP", "OP", "CH" };
+        return strings[(uint8_t)s];
+    }
+    
     
 #define STATE_DECAY                     0.95
 #define STATE_PUNISH                    0.025
@@ -48,11 +57,11 @@ extern "C" {
      */
 
     
-    void InitializeFSMMap(          fsm_map_t *                  );
-    void ResetFSMState(             fsm_map_t *,       uint8_t   );
-    void NormalizeFSMMap(           fsm_map_t *                  );
-    uint8_t NormalizeFSMState(      fsm_map_t *,       uint8_t   );
-    void PrintFSMMap(               fsm_map_t *,       state_t   );
+    void InitializeFSMMap(          transition_matrix_t *                  );
+    void ResetFSMState(             transition_matrix_t *,       uint8_t   );
+    void NormalizeFSMMap(           transition_matrix_t *                  );
+    uint8_t NormalizeFSMState(      transition_matrix_t *,       uint8_t   );
+    void PrintFSMMap(               transition_matrix_t *,       state_t   );
     void InitializeFSMSystem(       fsm_system_t *,    state_t   );
     void DecayInactiveFSMSystem(    fsm_system_t *               );
     void UpdateFSMSystem(           fsm_system_t *,    double[4] );
@@ -61,11 +70,11 @@ extern "C" {
     
     typedef struct
     {
-        void (*Initialize)(         fsm_map_t * );
-        void (*ResetState)(         fsm_map_t *, uint8_t );
-        void (*Normalize)(          fsm_map_t * );
-        uint8_t (*NormalizeState)(  fsm_map_t *, uint8_t );
-        void (*Print)(              fsm_map_t *, state_t s );
+        void (*Initialize)(         transition_matrix_t * );
+        void (*ResetState)(         transition_matrix_t *, uint8_t );
+        void (*Normalize)(          transition_matrix_t * );
+        uint8_t (*NormalizeState)(  transition_matrix_t *, uint8_t );
+        void (*Print)(              transition_matrix_t *, state_t s );
     } fsm_map_functions_t;
     
     typedef struct

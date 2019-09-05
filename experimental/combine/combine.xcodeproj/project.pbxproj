@@ -34,6 +34,7 @@
 		3493AA8D231A066200159CD5 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 3493AA89231A066200159CD5 /* kalman.c */; };
 		3493AA8E231A066200159CD5 /* pid.c in Sources */ = {isa = PBXBuildFile; fileRef = 3493AA8A231A066200159CD5 /* pid.c */; };
 		349A5D8D22FF85E200060F4C /* unfisheye.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 349A5D8C22FF85E100060F4C /* unfisheye.cpp */; };
+		34BE23A1231F24B800911DEA /* matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = 34BE23A0231F24B800911DEA /* matvec.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -89,7 +90,6 @@
 		3401969022FE780600F152CC /* gmm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gmm.h; sourceTree = "<group>"; };
 		3401969122FE780600F152CC /* kumaraswamy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kumaraswamy.h; sourceTree = "<group>"; };
 		3401969222FE780600F152CC /* psm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = psm.c; sourceTree = "<group>"; };
-		3401969322FE780600F152CC /* fsm_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fsm_support.h; sourceTree = "<group>"; };
 		3401969422FE780600F152CC /* control_structures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = control_structures.h; sourceTree = "<group>"; };
 		3401969522FE780600F152CC /* fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fsm.c; sourceTree = "<group>"; };
 		3401969622FE780600F152CC /* hmm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hmm.c; sourceTree = "<group>"; };
@@ -121,6 +121,8 @@
 		3493AA8C231A066200159CD5 /* kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kalman.h; sourceTree = "<group>"; };
 		349A5D8B22FF85E100060F4C /* unfisheye.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = unfisheye.hpp; sourceTree = "<group>"; };
 		349A5D8C22FF85E100060F4C /* unfisheye.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unfisheye.cpp; sourceTree = "<group>"; };
+		34BE239F231F24B800911DEA /* matvec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = matvec.h; sourceTree = "<group>"; };
+		34BE23A0231F24B800911DEA /* matvec.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = matvec.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +198,8 @@
 		3401965E22FE780600F152CC /* algorithm */ = {
 			isa = PBXGroup;
 			children = (
+				34BE239F231F24B800911DEA /* matvec.h */,
+				34BE23A0231F24B800911DEA /* matvec.c */,
 				3401966322FE780600F152CC /* kalman.hpp */,
 				3401966122FE780600F152CC /* kalman.cpp */,
 				340196F822FF57E500F152CC /* statistics.h */,
@@ -285,7 +289,6 @@
 				3401968C22FE780600F152CC /* control_types.h */,
 				3401969122FE780600F152CC /* kumaraswamy.h */,
 				3401969422FE780600F152CC /* control_structures.h */,
-				3401969322FE780600F152CC /* fsm_support.h */,
 				3401968D22FE780600F152CC /* fsm.h */,
 				3401969522FE780600F152CC /* fsm.c */,
 				3401969022FE780600F152CC /* gmm.h */,
@@ -388,6 +391,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				340196BA22FE780600F152CC /* hmm.c in Sources */,
+				34BE23A1231F24B800911DEA /* matvec.c in Sources */,
 				340196B822FE780600F152CC /* psm.c in Sources */,
 				340196B722FE780600F152CC /* gmm.c in Sources */,
 				340196BB22FE780600F152CC /* tau_structures.cpp in Sources */,

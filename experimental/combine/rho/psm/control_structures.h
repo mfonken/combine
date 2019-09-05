@@ -14,17 +14,7 @@ extern "C" {
 #endif
     
 #include "kumaraswamy.h"
-    
-    /* System self-diagnostic state control type */
-    typedef struct
-    {
-        state_t         state;
-        state_t         prev;
-        state_t         next;
-        uint8_t         selection_index;
-        stability_t     stability;
-        fsm_map_t       probabilities;
-    } fsm_system_t;
+
 #ifdef __PSM__
     typedef struct
     {
@@ -66,8 +56,18 @@ extern "C" {
         cluster_mem[MAX_CLUSTERS];
     } gaussian_mixture_model_t;
 
+#define HMM_GAUSSIAN_EMISSIONS
+#define HMM_2D_EMISSIONS
+    
+#ifdef HMM_2D_EMISSIONS
+    typedef vec2         hmm_observation_t;
+    typedef gaussian2d_t emission_t;
+#else
+    typedef double       hmm_observation_t;
+    typedef gaussian1d_t emission_t;
+#endif
     typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
-    typedef double observation_matrix_t[NUM_STATES][NUM_OBSERVATION_SYMBOLS];
+    typedef emission_t observation_matrix_t[NUM_STATES];
     typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
     
     typedef struct
@@ -80,14 +80,36 @@ extern "C" {
         state_sequence_matrix   beta;                // Backward solve vector
         state_sequence_matrix   gamma;               // Gamma solve vector
         state_sequence_matrix   xi[NUM_STATES];      // Xi solve matrix
+        double                  P;                   // Latest probability
     } hidden_markov_model_t;
+    
+    static floating_t GetProbabilityFromEmission( emission_t * e, hmm_observation_t v )
+    {
+#ifdef HMM_2D_EMISSIONS
+        return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2 *)&v );
+#else
+        return getProbabilityFromGaussian1d( (gaussian1d_t *)e, (double)v );
 #endif
+    }
+#endif
+    
+    /* System self-diagnostic state control type */
+    typedef struct
+    {
+        state_t         state;
+        state_t         prev;
+        state_t         next;
+        uint8_t         selection_index;
+        stability_t     stability;
+        transition_matrix_t *P;
+    } fsm_system_t;
     
     typedef struct
     { /* Predictive State Model */
 #ifdef __PSM__
         gaussian_mixture_model_t gmm;
         hidden_markov_model_t hmm;
+        fsm_system_t fsm;
 #endif
         kumaraswamy_t kumaraswamy;
         band_list_t state_bands;
@@ -104,7 +126,7 @@ extern "C" {
         observation_state;
         state_t
         current_state;
-        observation_symbol_t
+        vec2
         current_observation;
         double
         best_confidence,

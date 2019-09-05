@@ -26,7 +26,7 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
     cluster->labels.average[observation->label] = 1;
     cluster->labels.count[observation->label]++;
     
-    GetMat2x2LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
+    MatVec.Mat2x2.LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
     
     GMMFunctions.Cluster.UpdateNormal( cluster );
 }
@@ -38,21 +38,21 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     LOG_GMM(GMM_DEBUG, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
-    double score_weight = ALPHA * safe_exp( -BETA * cluster->mahalanobis_sq );
+    double score_weight = ALPHA * SafeExp( -BETA * cluster->mahalanobis_sq );
     cluster->score += score_weight * ( cluster->probability_condition_input - cluster->score );
     
     double weight = ALPHA * cluster->probability_condition_input;
     
-    vec2 delta_mean_in = WeightedIncreaseMean( (vec2 *)observation, &cluster->gaussian_in, weight );
-    vec2 delta_mean_out = WeightedIncreaseMean( output, &cluster->gaussian_out, weight );
+    vec2 delta_mean_in = MatVec.Gaussian2D.WeightedMeanUpdate( (vec2 *)observation, &cluster->gaussian_in, weight );
+    vec2 delta_mean_out = MatVec.Gaussian2D.WeightedMeanUpdate( output, &cluster->gaussian_out, weight );
     
     LOG_GMM(GMM_DEBUG, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
-    UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
-    UpdateGaussianWithWeight( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
+    MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
+    MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
     
-    GetMat2x2LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
-    getMat2x2Inverse( &cluster->gaussian_in.covariance, &cluster->inv_covariance_in );
+    MatVec.Mat2x2.LLT( &cluster->gaussian_in.covariance, &cluster->llt_in );
+    MatVec.Mat2x2.Inverse( &cluster->gaussian_in.covariance, &cluster->inv_covariance_in );
     
     GMMFunctions.Cluster.UpdateNormal( cluster );
     GMMFunctions.Cluster.UpdateLimits( cluster );
@@ -65,16 +65,16 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
     vec2 input_delta = { 0 };
-    vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
-    cluster->mahalanobis_sq = CalculateMahalanobisDistanceSquared( &cluster->inv_covariance_in, &input_delta);
-    cluster->probability_of_in = safe_exp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
+    MatVec.Vec2.Subtract(input, &cluster->gaussian_in.mean, &input_delta);
+    cluster->mahalanobis_sq = BOUNDU( MatVec.Gaussian2D.Covariance.MahalanobisSq( &cluster->inv_covariance_in, &input_delta), MAX_DISTANCE );
+    cluster->probability_of_in = SafeExp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
 
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
     LOG_GMM(GMM_DEBUG, "LLT in: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
     double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d,
-    norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
+        norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
     LOG_GMM(GMM_DEBUG, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
 }
@@ -88,17 +88,17 @@ void UpdateInputProbabilityOfGaussianMixtureCluster( gaussian_mixture_cluster_t 
 void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input, vec2 * output )
 {
     vec2 input_delta;
-    vec2SubVec2(input, &cluster->gaussian_in.mean, &input_delta);
+    MatVec.Vec2.Subtract(input, &cluster->gaussian_in.mean, &input_delta);
     vec2 inv_covariance_delta = { 0 };
-    mat2x2DotVec2(&cluster->inv_covariance_in, &input_delta, &inv_covariance_delta);
+    MatVec.Mat2x2.DotVec2(&cluster->inv_covariance_in, &input_delta, &inv_covariance_delta);
     
     vec2 input_covariance, pre_condition = { 0 }, pre_output;
     mat2x2 cov_out_T = { cluster->gaussian_out.covariance.a, cluster->gaussian_out.covariance.c,
                          cluster->gaussian_out.covariance.b, cluster->gaussian_out.covariance.d };
-    mat2x2DotVec2( &cov_out_T, &inv_covariance_delta, &input_covariance );
-    vec2AddVec2( &cluster->gaussian_out.mean, &input_covariance, &pre_condition);
-    scalarMulVec2( cluster->probability_condition_input, &pre_condition, &pre_output );
-    vec2AddVec2( output, &pre_output, output);
+    MatVec.Mat2x2.DotVec2( &cov_out_T, &inv_covariance_delta, &input_covariance );
+    MatVec.Vec2.Add( &cluster->gaussian_out.mean, &input_covariance, &pre_condition);
+    MatVec.Vec2.ScalarMultiply( cluster->probability_condition_input, &pre_condition, &pre_output );
+    MatVec.Vec2.Add( output, &pre_output, output);
 }
 
 void UpdateLimitsOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
@@ -111,10 +111,10 @@ void UpdateLimitsOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster 
 void WeighGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
     /* Find best two label contributes */
-    double first = cluster->labels.average[0], second = 0.;
-    for( uint8_t i = 1; i < MAX_LABELS; i++ )
+    double first = cluster->labels.average[0], second = 0., check;
+    for( uint8_t i = 1; i < cluster->labels.num_valid; i++ )
     {
-        double check = cluster->labels.average[i];
+        check = cluster->labels.average[i];
         if( check > first )
         {
             second = first;
@@ -170,7 +170,7 @@ double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t 
 double GetMaxErrorOfGaussianMixtureModel( gaussian_mixture_model_t * model, vec2 * output, vec2 * value, vec2 * min_max_delta )
 {
     vec2 output_delta;
-    vec2SubVec2( value, output, &output_delta );
+    MatVec.Vec2.Subtract( value, output, &output_delta );
     double a_error = fabs( ZDIV( output_delta.a, min_max_delta->a ) ),
     b_error = fabs( ZDIV( output_delta.b, min_max_delta->b ) );
     return MAX( a_error, b_error );
@@ -225,7 +225,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     double best_distance = GMMFunctions.Model.GetOutputAndBestDistance( model, total_probability, &observation_vec, &output);
     
     vec2 min_max_delta;
-    vec2SubVec2( &model->max_out, &model->min_out, &min_max_delta );
+    MatVec.Vec2.Subtract( &model->max_out, &model->min_out, &min_max_delta );
     double max_error = GMMFunctions.Model.GetMaxError( model, &output, value, &min_max_delta );
     
     GMMFunctions.Model.Update( model, observation, value );

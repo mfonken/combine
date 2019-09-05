@@ -718,16 +718,15 @@ void CalculateTargetTuneFactorRhoUtility( rho_core_t * core )
     
 void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core )
 {
-    floating_t TotalPixels = (floating_t)TOTAL_RHO_PIXELS;
 #ifdef __PSM__
     if( core->PredictiveStateModelPair.best_confidence > MIN_STATE_CONFIDENCE )
-        core->TargetCoverageFactor = ZDIV( core->PredictiveStateModelPair.proposed_nu * core->PredictiveStateModelPair.proposed_avg_den, TotalPixels );
+        core->TargetCoverageFactor = core->PredictiveStateModelPair.proposed_nu * core->PredictiveStateModelPair.proposed_avg_den / (floating_t)TOTAL_RHO_PIXELS;
 #else
     if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
-        core->TargetCoverageFactor = ZDIV( core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity, TotalPixels );
+        core->TargetCoverageFactor = core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity / (floating_t)TOTAL_RHO_PIXELS;
 #endif
     else
-        core->TargetCoverageFactor = ZDIV( core->TotalCoverage, TotalPixels );
+        core->TargetCoverageFactor = core->TotalCoverage / (floating_t)TOTAL_RHO_PIXELS;
 }
 
 
@@ -926,8 +925,8 @@ void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
 {
 #ifdef __PSM__
-//    PSMFunctions.Update( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions );
-    PSMFunctions.Update( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions );
+//    PSMFunctions.Update( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions, core->ThreshByte );
+    PSMFunctions.Update( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions, core->ThreshByte );
     core->PredictiveStateModelPair.current_state = MAX( core->PredictiveStateModelPair.x.current_state, core->PredictiveStateModelPair.y.current_state );
     core->PredictiveStateModelPair.best_confidence = AVG2( core->PredictiveStateModelPair.x.best_confidence, core->PredictiveStateModelPair.y.best_confidence );
     core->PredictiveStateModelPair.proposed_nu = MAX( core->PredictiveStateModelPair.x.proposed_nu, core->PredictiveStateModelPair.y.proposed_nu );

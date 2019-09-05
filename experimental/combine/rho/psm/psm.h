@@ -32,12 +32,12 @@ extern "C" {
     
 
 void InitializePSM(                     psm_t * );
-void ReportObservationsPSM(             psm_t *, observation_list_t * );
-void UpdateStateIntervalsPSM(           psm_t *, double );
-void UpdatePSM(                         psm_t *, observation_list_t *, double );
+void ReportObservationsPSM(             psm_t *, observation_list_t *, floating_t, uint8_t );
+void UpdateStateIntervalsPSM(           psm_t *, floating_t );
+void UpdatePSM(                         psm_t *, observation_list_t *, floating_t, uint8_t );
 void UpdateStateBandPSM(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
 void DiscoverStateBandsPSM(             psm_t *, band_list_t * );
-uint8_t FindMostLikelyHiddenStatePSM(   psm_t *, uint8_t, double * );
+uint8_t FindMostLikelyHiddenStatePSM(   psm_t *, uint8_t, floating_t * );
 void UpdateBestClusterPSM(              psm_t *, band_list_t * );
 uint8_t GetCurrentBandPSM(              psm_t *, band_list_t * );
 void GenerateProposalsPSM(              psm_t * );
@@ -45,12 +45,12 @@ void GenerateProposalsPSM(              psm_t * );
 typedef struct
 {
     void (*Initialize)(                     psm_t * );
-    void (*ReportObservations)(             psm_t *, observation_list_t * );
-    void (*UpdateStateIntervals)(           psm_t *, double );
-    void (*Update)(                         psm_t *, observation_list_t *, double nu );
+    void (*ReportObservations)(             psm_t *, observation_list_t *, floating_t, uint8_t );
+    void (*UpdateStateIntervals)(           psm_t *, floating_t );
+    void (*Update)(                         psm_t *, observation_list_t *, floating_t, uint8_t );
     void (*UpdateStateBand)(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
     void (*DiscoverStateBands)(             psm_t *, band_list_t * );
-    uint8_t (*FindMostLikelyHiddenState)(   psm_t *, uint8_t, double * );
+    uint8_t (*FindMostLikelyHiddenState)(   psm_t *, uint8_t, floating_t * );
     void (*UpdateBestCluster)(              psm_t *, band_list_t * );
     uint8_t (*GetCurrentBand)(              psm_t *, band_list_t * );
     void (*GenerateProposals)(              psm_t * );
