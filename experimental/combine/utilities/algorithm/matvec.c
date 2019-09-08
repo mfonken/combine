@@ -194,6 +194,7 @@ void UpdateGaussianWithWeightGaussian2d( vec2 * A, vec2 * B, gaussian2d_t * gaus
     
     MatVec.Gaussian2D.Covariance.Limit( &gaussian->covariance );
 }
+
 vec2 WeightedMeanUpdateGaussian2d( vec2 * new_val, gaussian2d_t * gaussian, floating_t weight )
 {
     vec2 delta_mean, weighted_mean;
@@ -211,6 +212,7 @@ floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 * inv_covariance, vec2 *
     mahalanobis_distance_squared = MatVec.Vec2.Dot(delta, &inv_covariance_delta );
     return mahalanobis_distance_squared;
 }
+
 bool LimitCovarianceGaussian2d( mat2x2 * covariance )
 {
     bool limited = false;

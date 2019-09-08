@@ -108,6 +108,17 @@ extern "C" {
 #define BOUNDARY_END(X)     !!(X>0)
 #endif
     
+#define HMM_GAUSSIAN_EMISSIONS
+#define HMM_2D_EMISSIONS
+    
+#ifdef HMM_2D_EMISSIONS
+    typedef vec2         hmm_observation_t;
+    typedef gaussian2d_t emission_t;
+#else
+    typedef double       hmm_observation_t;
+    typedef gaussian1d_t emission_t;
+#endif
+    
     typedef struct
     {
         index_t density;
@@ -233,12 +244,12 @@ extern "C" {
     typedef struct
     {
         uint8_t length;
-        vec2 data[MAX_OBSERVATIONS];
+        hmm_observation_t data[MAX_OBSERVATIONS];
         struct { uint8_t next, first, last; } index;
-        struct { vec2 curr, prev; } value;
+        struct { hmm_observation_t curr, prev; } value;
     } observation_buffer_t;
     
-    static uint8_t PushToObservationBuffer( observation_buffer_t * buffer, vec2 v )
+    static uint8_t PushToObservationBuffer( observation_buffer_t * buffer, hmm_observation_t v )
     {
         buffer->value.prev = buffer->value.curr;
         buffer->value.curr = v;
@@ -257,9 +268,14 @@ extern "C" {
         }
         return buffer->index.last;
     }
-    static vec2 PullFromObservationBuffer( observation_buffer_t * buffer )
+    static hmm_observation_t PullFromObservationBuffer( observation_buffer_t * buffer )
     {
-        if( buffer->index.next == buffer->index.first ) return (vec2){ -1, -1 };
+        if( buffer->index.next == buffer->index.first ) return
+#ifdef HMM_2D_EMISSIONS
+            (vec2){ -1, -1 };
+#else
+        -1;
+#endif
         buffer->index.first = ( ( buffer->index.first + 1 ) & MAX_OBSERVATION_MASK );
         buffer->length--;
         return buffer->data[buffer->index.first];
@@ -271,14 +287,19 @@ extern "C" {
         buffer->length = l;
         return l;
     }
-    static vec2 GetIndexObservationBuffer( observation_buffer_t * buffer, uint8_t i )
+    static hmm_observation_t GetIndexObservationBuffer( observation_buffer_t * buffer, uint8_t i )
     {
         uint8_t l = buffer->length;// GetLengthObservationBuffer( buffer );
-        if( i > l ) return (vec2){ -1, -1 };
+        if( i > l ) return
+#ifdef HMM_2D_EMISSIONS
+            (vec2){ -1, -1 };
+#else
+        -1;
+#endif
         uint8_t io = ( ( buffer->index.first + i ) & MAX_OBSERVATION_MASK );
         return buffer->data[io];
     }
-
+    
     static floating_t NumStdDevsFromYMean( gaussian2d_t * gaussian, floating_t check_value )
     {
         floating_t diff = fabs( gaussian->mean.b - check_value );

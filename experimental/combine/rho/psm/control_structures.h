@@ -55,27 +55,18 @@ extern "C" {
         gaussian_mixture_cluster_t
         cluster_mem[MAX_CLUSTERS];
     } gaussian_mixture_model_t;
-
-#define HMM_GAUSSIAN_EMISSIONS
-#define HMM_2D_EMISSIONS
     
-#ifdef HMM_2D_EMISSIONS
-    typedef vec2         hmm_observation_t;
-    typedef gaussian2d_t emission_t;
-#else
-    typedef double       hmm_observation_t;
-    typedef gaussian1d_t emission_t;
-#endif
     typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
     typedef emission_t observation_matrix_t[NUM_STATES];
     typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
+    typedef double state_vector_t[NUM_STATES];
     
     typedef struct
     {
         transition_matrix_t     A;                   // Transition matrix
         observation_matrix_t    B;                   // Observation matrix
         observation_buffer_t    O;                   // Observation sequence
-        double                  pi[NUM_STATES];      // Initial state probabilities
+        state_vector_t          pi;                  // Initial state probabilities
         state_sequence_matrix   alpha;               // Forward solve vector
         state_sequence_matrix   beta;                // Backward solve vector
         state_sequence_matrix   gamma;               // Gamma solve vector
@@ -88,7 +79,7 @@ extern "C" {
 #ifdef HMM_2D_EMISSIONS
         return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2 *)&v );
 #else
-        return getProbabilityFromGaussian1d( (gaussian1d_t *)e, (double)v );
+        return MatVec.Gaussian1D.Probability( (gaussian1d_t *)e, (double)v );
 #endif
     }
 #endif
