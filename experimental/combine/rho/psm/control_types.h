@@ -75,7 +75,7 @@ extern "C" {
 #ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #endif
-#define MAX_OBSERVATION_MASK    (MAX_OBSERVATIONS-1)
+#define MAX_OBSERVATION_MASK    ((MAX_OBSERVATIONS)-1)
 #define HMM_UPDATE_DELTA 1.0
 
 #define MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC 3
@@ -109,7 +109,9 @@ extern "C" {
 #endif
     
 #define HMM_GAUSSIAN_EMISSIONS
+#ifdef USE_2D_OBSERVATIONS
 #define HMM_2D_EMISSIONS
+#endif
     
 #ifdef HMM_2D_EMISSIONS
     typedef vec2         hmm_observation_t;

@@ -2,7 +2,7 @@
 #ifndef TIMESTAMP
 #include "timestamp.h"
 #endif
-/** SOURCE: http://preview.tinyurl.com/9djhrem */
+/*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
 void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, index_t minv, index_t maxv, kalman_uncertainty_c uncertainty )
 {
@@ -64,7 +64,7 @@ void PredictKalman( kalman_filter_t * k, floating_t rate_new )
     k->P[1][0]   -= dt_P_1_1;
     k->P[1][1]   += k->uncertainty.bias * delta_time;
     
-    LOG_KALMAN("Prediction - Value:%.2f Rate:%.2f Velocity:%.2f\n", k->value, k->rate, k->velocity);
+    LOG_KALMAN(KALMAN_DEBUG_2, "Prediction - Value:%.2f Rate:%.2f Velocity:%.2f\n", k->value, k->rate, k->velocity);
 }
 
 void UpdateKalman( kalman_filter_t * k, floating_t value_new )
@@ -84,12 +84,12 @@ void UpdateKalman( kalman_filter_t * k, floating_t value_new )
     k->timestamp  = TIMESTAMP();
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
-    LOG_KALMAN("Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
+    LOG_KALMAN(KALMAN_DEBUG_2, "Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
 };
 
 floating_t StepKalman( kalman_filter_t * k, floating_t value_new, floating_t rate_new )
 {
-    LOG_KALMAN("Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);
+    LOG_KALMAN(KALMAN_DEBUG_2, "Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);
     PredictKalman(k, rate_new);
     UpdateKalman(k, value_new);
     return k->value;
@@ -113,4 +113,13 @@ void PunishKalman( kalman_filter_t * k )
     k->K[0] *= KALMAN_PUNISH_FACTOR;
     if( ScoreKalman(k) < MIN_KALMAN_GAIN )
         ResetKalman(k, 0);
+}
+
+void PrintKalman( kalman_filter_t * k )
+{
+    LOG_KALMAN(KALMAN_DEBUG, "Val: %.4f | Rate: %.4f{%.4f}\n", k->value, k->rate, k->velocity);
+    LOG_KALMAN(KALMAN_DEBUG, "Bias: %.4f | Var: %.4f\n", k->bias, k->variance);
+    LOG_KALMAN(KALMAN_DEBUG, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
+    LOG_KALMAN(KALMAN_DEBUG, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
+    LOG_KALMAN(KALMAN_DEBUG, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);
 }

@@ -26,17 +26,16 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     
     struct timeval a,b;
     int instruction_index = 0;
-    Mat local_frame(tau.utility.outframe.size(), CV_8UC3, Scalar(0));
+    Mat local_frame(tau.frame.size(), CV_8UC3, Scalar(0));
     cimage_t img;
     cimageInit(img, width, height);
     
     while(1)
     {
         if(local_frame.data == nullptr) continue;
-        tau.GetDensitiesFrame(local_frame);
-        imshow("Thresh Frame", local_frame);
-//          imshow(TITLE_STRING, local_frame);
-//          imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
+            tau.GetDensitiesFrame(local_frame);
+            imshow(TITLE_STRING, local_frame);
+            imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         

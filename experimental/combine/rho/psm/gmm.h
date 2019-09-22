@@ -28,7 +28,7 @@ void UpdateLimitsOfGaussianMixtureCluster(             gaussian_mixture_cluster_
 void WeighGaussianMixtureCluster(                      gaussian_mixture_cluster_t * );
 
 /* Model functions */
-void InitializeGaussianMixtureModel(                   gaussian_mixture_model_t * );
+void InitializeGaussianMixtureModel(                   gaussian_mixture_model_t *, const char * );
 double GetScoreSumOfClustersInGaussianMixtureModel(    gaussian_mixture_model_t *, vec2 * );
 double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t *, double, vec2 *, vec2 * );
 double GetMaxErrorOfGaussianMixtureModel(              gaussian_mixture_model_t *, vec2 *, vec2 *, vec2 * );
@@ -51,7 +51,7 @@ typedef struct
 
 typedef struct
 {
-    void   (*Initialize)(               gaussian_mixture_model_t * );
+    void   (*Initialize)(               gaussian_mixture_model_t *, const char * );
     double (*GetScoreSumOfClusters)(    gaussian_mixture_model_t *, vec2 * );
     double (*GetOutputAndBestDistance)( gaussian_mixture_model_t *, double, vec2 *, vec2 * );
     double (*GetMaxError)(              gaussian_mixture_model_t *, vec2 *, vec2 *, vec2 * );

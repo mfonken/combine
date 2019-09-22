@@ -1,20 +1,23 @@
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File: rho_core.h
  *  Group: Rho Core
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
  
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                          Includes                                    *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include "rho_core.h"
 
 #ifdef USE_DETECTION_MAP
 #include "detection_map.h"
 #endif
 
-/************************************************************************
+static const char * X_INSTANCE_NAME = "X";
+static const char * Y_INSTANCE_NAME = "Y";
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                       Local Instance                                 *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 const rho_core_functions RhoCore =
 {
     .Initialize         = InitializeRhoCore,
@@ -27,9 +30,9 @@ const rho_core_functions RhoCore =
     .GeneratePacket     = GenerateRhoCorePacket
 };
 
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                      Functions Declarations                          *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 {
     /* Generic Data */
@@ -39,12 +42,12 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     RhoUtility.Initialize.Filters( core );
     
     /* Density Data */
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, height, core->Centroid.y );
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, width, core->Centroid.x  );
+    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, X_INSTANCE_NAME, height, core->Centroid.y );
+    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, Y_INSTANCE_NAME, width, core->Centroid.x  );
 
     /* Prediction Structures */
-    RhoUtility.Initialize.Prediction( &core->PredictionPair.x, core->Height );
-    RhoUtility.Initialize.Prediction( &core->PredictionPair.y, core->Width  );
+    RhoUtility.Initialize.Prediction( &core->PredictionPair.x, X_INSTANCE_NAME, core->Height );
+    RhoUtility.Initialize.Prediction( &core->PredictionPair.y, Y_INSTANCE_NAME, core->Width  );
 
 #ifdef USE_DETECTION_MAP
     /* Detection map */
@@ -53,6 +56,10 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 #ifdef USE_DECOUPLING
     /* Frame Conversion Model Connection */
     RhoInterrupts.INIT_FROM_CORE( core );
+#endif
+#ifdef __PSM__
+    PSMFunctions.Initialize( &core->PredictiveStateModelPair.x, X_INSTANCE_NAME );
+    PSMFunctions.Initialize( &core->PredictiveStateModelPair.y, Y_INSTANCE_NAME );
 #endif
 }
 
@@ -68,14 +75,16 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoCore.UpdatePredictions( core );
         LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-       LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
-       RhoCore.GeneratePacket( core );
+//        LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
+//        RhoCore.GeneratePacket( core );
     }
 }
 
 /* Calculate and process data in variance band from density filter to generate predictions */
 void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t * prediction )
 {
+    LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );
+    
     rho_detection_variables _;
     RhoUtility.Reset.Detect( &_, density_map, prediction );
     core->TotalCoverage = 0;
@@ -91,25 +100,25 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
     RhoUtility.Detect.CalculateFrameStatistics( &_, prediction );
 
     /* Update core */
-    core->TotalCoverage     += _.target_density;
+    core->TotalCoverage     += _.total_density;// target_density;
     core->FilteredCoverage  += _.filtered_density;
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
-    LOG_RHO(RHO_DEBUG_2, "Detecting X Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
-    LOG_RHO(RHO_DEBUG_2, "Detecting Y Map:\n");
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 
     /* Calculate accumulated filtered percentage from both axes */
-    core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)core->TotalCoverage );
+//    core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );//core->TotalCoverage );
+    core->TotalPercentage = ZDIV( (floating_t)core->TotalCoverage, (floating_t)TOTAL_RHO_PIXELS );
     core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
 void UpdateRhoCorePrediction( prediction_t * prediction )
 {
+    LOG_RHO(RHO_DEBUG_2,"Updating %s Map:\n", prediction->Name);
     /* Step predictions of all Kalmans */
     RhoUtility.Predict.TrackingFilters( prediction );
     RhoUtility.Predict.TrackingProbabilities( prediction );
@@ -117,9 +126,7 @@ void UpdateRhoCorePrediction( prediction_t * prediction )
 
 void UpdateRhoCorePredictions( rho_core_t * core )
 {
-    LOG_RHO(RHO_DEBUG_2,"Updating X Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
-    LOG_RHO(RHO_DEBUG_2,"Updating Y Map:\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
     RhoUtility.Predict.GenerateObservationLists( core );

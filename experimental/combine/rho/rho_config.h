@@ -1,7 +1,7 @@
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File: rho_config.h
  *  Group: Rho Core
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef rho_config_h
 #define rho_config_h
@@ -12,9 +12,9 @@
 #define USE_DETECTION_MAP
 #define RHO_DRAWER
 
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                               CAPTUE PARAMETERS                                     */
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #define IS_RGGB_ELIMINATE_G     true
 
@@ -59,10 +59,11 @@
 #define C_FRAME_SIZE            ((int)(MAX_COVERAGE * FRAME_SIZE))
 #define Y_DEL                   0xaaaa
 
+//#define USE_STATIC_BACKGROUNDING    
 
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                                RHO PARAMETERS                                       */
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #define THRESH_STEP_MAX     5
 #define THRESH_MIN          1
 #define THRESH_MAX          250
@@ -83,7 +84,7 @@
 #define MAX_REGION_SCORE      10
 #define REGION_SCORE_FACTOR   0.5
 #define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
-#define MAX_OBSERVATIONS      1 << 4
+#define MAX_OBSERVATIONS      (1 << 4)
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
@@ -106,14 +107,14 @@
 #define TOTAL_RHO_PIXELS    ( CAPTURE_WIDTH * CAPTURE_HEIGHT )
 
 
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                              FILTER PARAMETERS                                      */
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
-#define RHO_DEFAULT_LS      5.
-#define RHO_DEFAULT_VU      0.001
-#define RHO_DEFAULT_BU      0.001
-#define RHO_DEFAULT_SU      0.01
+#define RHO_DEFAULT_LS      5.      // Lifespan
+#define RHO_DEFAULT_VU      0.5     // Value uncertainty
+#define RHO_DEFAULT_BU      0.5   // Bias uncertainty
+#define RHO_DEFAULT_SU      0.01   // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
@@ -148,8 +149,30 @@
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
-#ifndef __PSM__
-#define SPOOF_STATE_BANDS { 0.2, 0.5, 0.75, 1.0 }
+#ifdef __PSM__
+#define USE_2D_OBSERVATIONS
+
+#define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.5, 0.75, 1.0 }
+#ifdef USE_2D_OBSERVATIONS
+#define DEFAULT_OBSERVATION_LIST \
+{ \
+    { { 0.5, 225 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 1.0, 175 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 2.0, 100 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 4.0, 40 },  { 0.5, 0., 0., 10. }, 0. } \
+}
+#else
+#define DEFAULT_OBSERVATION_LIST \
+{ \
+    { 0.5, 0.5 }, \
+    { 1.0, 0.5 }, \
+    { 2.0, 0.5 }, \
+    { 4.0, 0.5 } \
+}
+#endif
+#define DEFAULT_STATE_VECTOR        { 0.25, 0.5, 0.2, 0.05 }
+#else
+#define SPOOF_STATE_BANDS           { 0.2, 0.5, 0.75, 1.0 }
 #endif
 
 #define DEFAULT_PACKET_LENGTH       3

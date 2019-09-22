@@ -113,7 +113,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
         rectangle(detection_map_frame, Point(DETECTION_MAP_FRAME_IWIDTH+DETECTION_MAP_INSET, l+DETECTION_MAP_INSET), Point(DETECTION_MAP_FRAME_IWIDTH+DETECTION_MAP_INSET*2, u+DETECTION_MAP_INSET), c, FILLED);
         putText(detection_map_frame, std::to_string(i), Point(DETECTION_MAP_INSET+6, l+DETECTION_MAP_INSET-4), FONT_HERSHEY_PLAIN, 2, c, 2);
         
-        /*****************/
+        /*~~~~~~~~~~~~~~~*/
         if(band->variance > 0)
         {
             double prev_x = 0, variance_scale = 100;//ZDIV( 1, band->variance * M_PI * 2 );
@@ -134,7 +134,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
                 prev_x = p.x;
             }
         }
-        /*****************/
+        /*~~~~~~~~~~~~~~~*/
         //        psm->state_bands.band[0].
     }
 #endif

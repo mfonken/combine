@@ -181,9 +181,10 @@ void ImageUtility::Trigger()
     }
     
 #ifdef THRESH_IMAGE
+    pthread_mutex_lock(&outframe_mutex);
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
 #ifdef ROTATE_IMAGE
-    double angle = 360 * (double)counter / (double)num_frames;
+    double angle = 360. * (double)counter / (double)path_num_ticks;
     Point2f center(outframe.cols/2.0, outframe.rows/2.0);
     Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
     Rect2f bbox = cv::RotatedRect(Point2f(), outframe.size(), angle).boundingRect2f();
@@ -196,10 +197,8 @@ void ImageUtility::Trigger()
     if(outframe.cols == 0)
         printf("");
 #endif
-#endif
-
-#ifdef THRESH_IMAGE
     cimageFromMat(outframe, outimage);
+    pthread_mutex_unlock(&outframe_mutex);
 #else
     cimageFromMat(preoutframe, outimage);
 #endif

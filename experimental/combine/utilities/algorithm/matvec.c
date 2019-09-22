@@ -133,14 +133,14 @@ void Mat2x2LLT( mat2x2 * mat, mat2x2 * llt )
 //    b->mean = a->mean;
 //    b->std_dev = a->std_dev;
 //}
-//floating_t ProbabilityFromGaussian1d( gaussian1d_t * a, floating_t v )
-//{
-//    floating_t two_std_dev = 2. * a->std_dev,
-//    diff = ( v - a->mean ),
-//    e = SafeExp( - ( diff * diff ) / two_std_dev ),
-//    f = sqrt( M_PI * two_std_dev );
-//    return ( e / f );
-//}
+floating_t ProbabilityFromGaussian1d( gaussian1d_t * a, floating_t v )
+{
+    floating_t two_std_dev = 2. * a->std_dev,
+    diff = ( v - a->mean ),
+    e = SafeExp( - ( diff * diff ) / two_std_dev ),
+    f = sqrt( M_PI * two_std_dev );
+    return ( e / f );
+}
 
 /* Gaussian2D Functions */
 void MulGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
@@ -164,6 +164,7 @@ floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2 * v )
 {
     floating_t two_pi = 2. * M_PI, mahalanobis_sq, e, f,
     cov_det = MatVec.Mat2x2.Determinant( &a->covariance );
+    if(cov_det == 0) return 0;
     vec2 mean_diff;
     mat2x2 cov_inv;
     

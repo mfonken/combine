@@ -1,7 +1,7 @@
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File: rho_global.h
  *  Group: Rho Core
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef rho_global_h
 #define rho_global_h
@@ -58,20 +58,26 @@ enum LogLevel
 };
 #endif
 
-//#define RHO_DEBUG               DEBUG_2
-//#define RHO_DEBUG_2             DEBUG_2
-//#define KALMAN_DEBUG
-//#define PACKET_DEBUG
+#define RHO_DEBUG               DEBUG_2
+#define RHO_DEBUG_2             DEBUG_1
+#define RHO_DEBUG_INIT          DEBUG_1
 
-#define PSM_DEBUG               DEBUG_2
-#define PSM_DEBUG_2             DEBUG_2
+#define KALMAN_DEBUG            RHO_DEBUG
+#define KALMAN_DEBUG_2          RHO_DEBUG_2
+//#define PACKET_DEBUG            RHO_DEBUG
+//#define PACKET_DEBUG_2          RHO_DEBUG_2
 
-//#define HMM_DEBUG               ALWAYS
-//#define GMM_DEBUG               DEBUG_2
-#define FSM_DEBUG               DEBUG_2
-#define FSM_DEBUG_2             DEBUG_2
+#define PSM_DEBUG               RHO_DEBUG
+#define PSM_DEBUG_2             RHO_DEBUG_2
+#define PSM_DEBUG_UPDATE        RHO_DEBUG_2
 
-#define TEST_LOG_LEVEL          OFF//DEBUG_2
+#define HMM_DEBUG               PSM_DEBUG
+//#define GMM_DEBUG               PSM_DEBUG
+//#define GMM_DEBUG_2             PSM_DEBUG_2
+#define FSM_DEBUG               PSM_DEBUG_2
+#define FSM_DEBUG_2             PSM_DEBUG_2
+
+#define TEST_LOG_LEVEL          DEBUG_2
 
 #ifndef LOG
 #define LOG(L,...)              if(L >= TEST_LOG_LEVEL) \

@@ -12,6 +12,8 @@
 void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
     if(cluster == NULL) return;
+    LOG_GMM(GMM_DEBUG, "Initializing cluster %p\n", cluster);
+    
     cluster->gaussian_in.mean.a = observation->density;
     cluster->gaussian_in.mean.b = observation->thresh;
     cluster->gaussian_out.mean.a = output->a;
@@ -35,7 +37,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
 {
     if (isnan(cluster->log_gaussian_norm_factor))
         return;
-    LOG_GMM(GMM_DEBUG, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
+    LOG_GMM(GMM_DEBUG_2, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
     double score_weight = ALPHA * SafeExp( -BETA * cluster->mahalanobis_sq );
@@ -46,7 +48,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     vec2 delta_mean_in = MatVec.Gaussian2D.WeightedMeanUpdate( (vec2 *)observation, &cluster->gaussian_in, weight );
     vec2 delta_mean_out = MatVec.Gaussian2D.WeightedMeanUpdate( output, &cluster->gaussian_out, weight );
     
-    LOG_GMM(GMM_DEBUG, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
+    LOG_GMM(GMM_DEBUG_2, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
     MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
     MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
@@ -72,10 +74,13 @@ void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec
 
 void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
 {
-    LOG_GMM(GMM_DEBUG, "LLT in: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
-    double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d,
-        norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
-    LOG_GMM(GMM_DEBUG, " %.2f %.2f\n", cholesky_dms, norm_factor);
+    LOG_GMM(GMM_DEBUG_2, "LLT in: [%.2f %.2f | %.2f %.2f]", cluster->llt_in.a, cluster->llt_in.b, cluster->llt_in.c, cluster->llt_in.d);
+    
+#ifdef GMM_DEBUG_2
+    double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d;
+#endif
+    double norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
+    LOG_GMM(GMM_DEBUG_2, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
 }
 
@@ -131,9 +136,11 @@ void WeighGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster )
     cluster->secondary_id = second;
 }
 
-void InitializeGaussianMixtureModel( gaussian_mixture_model_t * model )
+void InitializeGaussianMixtureModel( gaussian_mixture_model_t * model, const char * name )
 {
     memset( model, 0, sizeof(gaussian_mixture_model_t) );
+    model->name = name;
+    LOG_GMM(GMM_DEBUG, "Initializing %s GMM\n", model->name);
     for( uint16_t i = 0; i < MAX_CLUSTERS; i++ )
         model->cluster[i] = &(model->cluster_mem[i]);
 }
@@ -221,6 +228,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     }
     vec2 output = { 0., 0. };
     vec2 observation_vec = (vec2){ (double)observation->density, (double)observation->thresh };
+    
     double total_probability = GMMFunctions.Model.GetScoreSumOfClusters( model, &observation_vec );
     double best_distance = GMMFunctions.Model.GetOutputAndBestDistance( model, total_probability, &observation_vec, &output);
     
@@ -229,7 +237,7 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
     double max_error = GMMFunctions.Model.GetMaxError( model, &output, value, &min_max_delta );
     
     GMMFunctions.Model.Update( model, observation, value );
-    LOG_GMM(GMM_DEBUG, "Max error: %.2f\n", max_error);
+    LOG_GMM(GMM_DEBUG_2, "Max error: %.2f\n", max_error);
     
     /* Add cluster if error or distance is to high for a cluster match */
     if( model->num_clusters < MAX_CLUSTERS

@@ -23,7 +23,7 @@ Vec3b blue     (255,   0,   0);
 Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
 
 TauDrawer::TauDrawer( const char * name, int width, int height, std::string f, int num )
-: Tau(name, width, height, f, num), frame(Size(width,  height), CV_8UC3, Scalar(0,0,0)), //probabilities(Size(800, 200), CV_8UC3, Scalar(245,245,245)),
+: Tau(name, width, height, f, num), frame(Size(width + SIDEBAR_WIDTH,  height + SIDEBAR_WIDTH), CV_8UC3, Scalar(0,0,0)),
 rho_frame(Size(PROBABILITIES_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0)),
 rho_detection_x(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0)),
 rho_detection_y(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0))
@@ -33,11 +33,8 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0))
 #endif
 {
     LOG_TAU("Initializing Tau Drawer.\n");
-    w = frame.cols; h = frame.rows;
+    w = width; h = height;
     W = w + SIDEBAR_WIDTH; H = h + SIDEBAR_WIDTH;
-    Mat N(H, W, CV_8UC3, Scalar(0));
-    utility.outframe.copyTo(N(Rect(0,0,w,h)));
-    frame = N;
     pid_data_x = 0; x_match_data_x = 0; y_match_data_x = 0; x_peak_data_x = 0; y_peak_data_x = 0; frame_i = 0; x_detection_i = 0; y_detection_i = 0;
     pid_data = new floating_t[width];
     pid_data_target = new floating_t[width];
@@ -174,7 +171,9 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
 {
     if(utility.outframe.data == nullptr) return;
     pthread_mutex_lock(&drawer_mutex);
-    utility.outframe.copyTo(M);
+    pthread_mutex_lock(&utility.outframe_mutex);
+    utility.outframe.copyTo(M(Rect(0, 0, w, h)));
+    pthread_mutex_unlock(&utility.outframe_mutex);
     DrawDensityGraph(M);
     DrawDensityMaps(M);
     
@@ -487,7 +486,7 @@ Vec3b TauDrawer::densityColor( int v )
     if(v < 0 ) v = 0;
     int h, s;
     h = v * 120 / 255;
-    s = abs(v - (255/2));
+    s = abs(v - (127));
     Vec3b hsv(h,s,220), ret(0,0,0);
     ret = hsv2bgr(hsv);
     return ret;

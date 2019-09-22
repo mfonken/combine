@@ -19,37 +19,39 @@ extern "C" {
     
 #include "gmm.h"
     
-    void InitializeHMM(     hidden_markov_model_t *, transition_matrix_t *, observation_matrix_t *, state_vector_t * );
+    void InitializeHMM(     hidden_markov_model_t *, const char * );
+    void InitializeTransitionMatrixHMM( hidden_markov_model_t * );
     uint8_t ReportObservationToHMM( hidden_markov_model_t *, hmm_observation_t );
-    void BaumWelchSolveHMM( hidden_markov_model_t *, double );
+    void BaumWelchSolveHMM( hidden_markov_model_t *, floating_t );
     void PrintHMM(          hidden_markov_model_t * );
-    double UpdateAllHMM(    hidden_markov_model_t * );
+    floating_t UpdateAllHMM(    hidden_markov_model_t * );
     void UpdateAlphaHMM(    hidden_markov_model_t * );
     void UpdateBetaHMM(     hidden_markov_model_t * );
     void UpdateGammaHMM(    hidden_markov_model_t * );
     void UpdateXiHMM(       hidden_markov_model_t * );
-    double UpdateProbabilityHMM( hidden_markov_model_t * );
+    floating_t UpdateProbabilityHMM( hidden_markov_model_t * );
     void UpdateInitialProbabilitiesHMM( hidden_markov_model_t * );
     void UpdateTransitionProbabilitiesHMM( hidden_markov_model_t * );
     void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * );
     
     typedef struct
     {
-        double (*All)(      hidden_markov_model_t * );
+        floating_t (*All)(  hidden_markov_model_t * );
         void (*Alpha)(      hidden_markov_model_t * );
         void (*Beta)(       hidden_markov_model_t * );
         void (*Gamma)(      hidden_markov_model_t * );
         void (*Xi)(         hidden_markov_model_t * );
-        double (*Probability)( hidden_markov_model_t * );
+        floating_t (*Probability)( hidden_markov_model_t * );
         void (*Pi)(         hidden_markov_model_t * );
         void (*A)(          hidden_markov_model_t * );
         void (*B)(          hidden_markov_model_t * );
     } hidden_markov_model_update_functions;
     typedef struct
     {
-        void   (*Initialize)(         hidden_markov_model_t *, transition_matrix_t *, observation_matrix_t *, state_vector_t * );
+        void   (*Initialize)(         hidden_markov_model_t *, const char * );
+        void   (*InitializeTransitionMatrix)( hidden_markov_model_t * );
         uint8_t (*ReportObservation)( hidden_markov_model_t *, hmm_observation_t );
-        void   (*BaumWelchSolve)(     hidden_markov_model_t *, double );
+        void   (*BaumWelchSolve)(     hidden_markov_model_t *, floating_t );
         void   (*Print)(              hidden_markov_model_t * );
         hidden_markov_model_update_functions Update;
     } hidden_markov_model_functions_t;
@@ -57,6 +59,7 @@ extern "C" {
     static const hidden_markov_model_functions_t HMMFunctions =
     {
         .Initialize = InitializeHMM,
+        .InitializeTransitionMatrix = InitializeTransitionMatrixHMM,
         .ReportObservation = ReportObservationToHMM,
         .BaumWelchSolve = BaumWelchSolveHMM,
         .Print = PrintHMM,

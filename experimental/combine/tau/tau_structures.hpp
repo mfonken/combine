@@ -31,7 +31,6 @@
 #define ABS(X)      ((X>=0)?X:-X)
 
 #define GTTHR(X,Y,T)    X>=(Y+T)
-//#define INRANGE(X,Y,T)  (X>(Y-T)&&X<(Y+T))
 
 #define MAX_PERSISTENCE ( 1 << 7 ) - 1 // MAX OF SIGNED BYTE
 

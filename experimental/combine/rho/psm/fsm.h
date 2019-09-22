@@ -17,9 +17,9 @@
 extern "C" {
 #endif
    
-    /***************************************************************************************/
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     /*                          DEFINITIONS & MACROS                                       */
-    /***************************************************************************************/
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 //#define FSM_DECAY_INACTIVE
     
     static inline uint8_t stateToSelection(uint8_t s) {return ((uint8_t)((s+1)/2) - 1);};
@@ -45,9 +45,9 @@ extern "C" {
 #define FSM_STATE_INPUT_UNCERTAINTY     0.4
 #define FSM_STATE_UNCERTAINTY           (kalman_uncertainty_c){ FSM_STATE_VALUE_UNCERTAINTY, FSM_STATE_BIAS_UNCERTAINTY, FSM_STATE_INPUT_UNCERTAINTY }
     
-    /***************************************************************************************/
+    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     
-    /** Goals **
+    /*~ Goals ~~
      *  - Column is current state
      *  - Row is next state
      *  - Diagonal is probability of remaining in state, should tend to be most probable
@@ -57,33 +57,34 @@ extern "C" {
      */
 
     
-    void InitializeFSMMap(          transition_matrix_t *                  );
-    void ResetFSMState(             transition_matrix_t *,       uint8_t   );
-    void NormalizeFSMMap(           transition_matrix_t *                  );
-    uint8_t NormalizeFSMState(      transition_matrix_t *,       uint8_t   );
-    void PrintFSMMap(               transition_matrix_t *,       state_t   );
-    void InitializeFSMSystem(       fsm_system_t *,    state_t   );
-    void DecayInactiveFSMSystem(    fsm_system_t *               );
-    void UpdateFSMSystem(           fsm_system_t *,    double[4] );
-    void UpdateFSMProbabilities(    fsm_system_t *,    double[4] );
-    void UpdateFSMState(            fsm_system_t *               );
+    void InitializeFSMMap(          transition_matrix_t *                 );
+    void ResetFSMState(             transition_matrix_t *,       uint8_t  );
+    void NormalizeFSMMap(           transition_matrix_t *                 );
+    uint8_t NormalizeFSMState(      transition_matrix_t *,       uint8_t  );
+
+    void InitializeFSMSystem(       fsm_system_t *, const char *, state_t );
+    void DecayInactiveFSMSystem(    fsm_system_t *                        );
+    void UpdateFSMSystem(           fsm_system_t *,    double[NUM_STATES] );
+    void UpdateFSMProbabilities(    fsm_system_t *,    double[NUM_STATES] );
+    void UpdateFSMState(            fsm_system_t *                        );
+    void PrintFSMSys(               fsm_system_t *                        );
     
     typedef struct
     {
-        void (*Initialize)(         transition_matrix_t * );
+        void (*Initialize)(         transition_matrix_t *);
         void (*ResetState)(         transition_matrix_t *, uint8_t );
         void (*Normalize)(          transition_matrix_t * );
         uint8_t (*NormalizeState)(  transition_matrix_t *, uint8_t );
-        void (*Print)(              transition_matrix_t *, state_t s );
     } fsm_map_functions_t;
     
     typedef struct
     {
-        void (*Initialize)(          fsm_system_t *, state_t   );
-        void (*DecayInactive)(       fsm_system_t *            );
-        void (*UpdateProbabilities)( fsm_system_t *, double[4] );
-        void (*UpdateState)(         fsm_system_t *            );
-        void (*Update)(              fsm_system_t *, double[4] );
+        void (*Initialize)(          fsm_system_t *, const char * , state_t );
+        void (*DecayInactive)(       fsm_system_t *                         );
+        void (*UpdateProbabilities)( fsm_system_t *, double[NUM_STATES]     );
+        void (*UpdateState)(         fsm_system_t *                         );
+        void (*Update)(              fsm_system_t *, double[NUM_STATES]     );
+        void (*Print)(               fsm_system_t *                         );
     } fsm_system_functions_t;
     
     typedef struct
@@ -98,19 +99,17 @@ extern "C" {
             .Initialize             = InitializeFSMMap,
             .Normalize              = NormalizeFSMMap,
             .NormalizeState         = NormalizeFSMState,
-            .ResetState             = ResetFSMState,
-            .Print                  = PrintFSMMap
+            .ResetState             = ResetFSMState
         },
         { /* System functions */
             .Initialize             = InitializeFSMSystem,
             .DecayInactive          = DecayInactiveFSMSystem,
             .Update                 = UpdateFSMSystem,
             .UpdateProbabilities    = UpdateFSMProbabilities,
-            .UpdateState            = UpdateFSMState
+            .UpdateState            = UpdateFSMState,
+            .Print                  = PrintFSMSys
         }
     };
-    
-    static inline void copymax(double * a, double * b) { if(*a>*b)*b=*a;else*a=*b; }
     
 #ifdef __cplusplus
 }

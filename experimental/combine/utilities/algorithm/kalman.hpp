@@ -17,7 +17,7 @@
 #define DEFAULT_BU      0.5
 #define DEFAULT_SU      0.7
 
-/** Kalman Uncertainties */
+/*~ Kalman Uncertainties */
 typedef struct
 {
     floating_t value;
@@ -27,7 +27,7 @@ typedef struct
 
 floating_t now(void);
 
-/** Kalman class */
+/*~ Kalman class */
 class KalmanFilter
 {
 public:
@@ -54,8 +54,4 @@ public:
     int  isExpired();
 };
 
-
-
-
 #endif /* kalman_h */
-

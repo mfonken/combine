@@ -49,10 +49,10 @@ void Tau::Trigger( void )
 {
     double p = 0.;
 
-    pthread_mutex_lock(&utility.outframe_mutex);
+//    pthread_mutex_lock(&utility.outframe_mutex);
     utility.Trigger();
     p = Perform( utility.outimage );
-    pthread_mutex_unlock(&utility.outframe_mutex);
+//    pthread_mutex_unlock(&utility.outframe_mutex);
     
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)

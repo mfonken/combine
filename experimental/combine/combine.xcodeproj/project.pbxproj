@@ -155,9 +155,9 @@
 		3401964A22FE77E300F152CC /* combine */ = {
 			isa = PBXGroup;
 			children = (
+				342A10072308F406008928F6 /* Info.plist */,
 				340196C022FE78F300F152CC /* test_config.h */,
 				3401964B22FE77E300F152CC /* main.cpp */,
-				342A10072308F406008928F6 /* Info.plist */,
 				3455398822FF62F200DDE874 /* combine_master.h */,
 				3455398A22FF62F200DDE874 /* combine.hpp */,
 				3455398922FF62F200DDE874 /* combine.cpp */,

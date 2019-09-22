@@ -16,7 +16,7 @@
 extern "C" {
 #endif
     
-    /** Kalman Uncertainties */
+    /*~ Kalman Uncertainties */
     typedef struct
     {
         floating_t value;
@@ -24,7 +24,7 @@ extern "C" {
         floating_t sensor;
     } kalman_uncertainty_c;
     
-    /** Kalman structure */
+    /*~ Kalman structure */
     typedef struct
     {
         floating_t
@@ -59,6 +59,7 @@ extern "C" {
     bool   IsKalmanExpired( kalman_filter_t * );
     floating_t ScoreKalman( kalman_filter_t * );
     void      PunishKalman( kalman_filter_t * );
+    void       PrintKalman( kalman_filter_t * );
     
     struct kalman {
         void (*  Initialize)( kalman_filter_t *, floating_t, floating_t, index_t, index_t, kalman_uncertainty_c );
@@ -69,6 +70,7 @@ extern "C" {
         bool (*  IsExpired)( kalman_filter_t * );
         floating_t (*Score)( kalman_filter_t * );
         void (*     Punish)( kalman_filter_t * );
+        void (*      Print)( kalman_filter_t * );
     };
     
     static const struct kalman Kalman =
@@ -80,7 +82,8 @@ extern "C" {
         .Step = StepKalman,
         .IsExpired = IsKalmanExpired,
         .Score = ScoreKalman,
-        .Punish = PunishKalman
+        .Punish = PunishKalman,
+        .Print = PrintKalman
     };
     
 #ifdef __cplusplus

@@ -10,7 +10,6 @@
 
 void InitializeFSMMap( transition_matrix_t * P )
 {
-    LOG_FSM(FSM_DEBUG, "Initializing State Machine.\n");
     for(uint8_t i = 0; i < NUM_STATES; i++ )
         FSMFunctions.Map.ResetState( P, i );
 }
@@ -56,12 +55,13 @@ uint8_t NormalizeFSMState( transition_matrix_t * P, uint8_t i )
     return max_index;
 }
 
-void InitializeFSMSystem( fsm_system_t * sys, state_t initial_state )
+void InitializeFSMSystem( fsm_system_t * sys, const char * name, state_t initial_state )
 {
-    sys->state                = initial_state;
-    sys->prev                 = UNKNOWN_STATE;
-    sys->next                 = UNKNOWN_STATE;
-    sys->selection_index      = 0;
+    sys->name               = name;
+    sys->state              = initial_state;
+    sys->prev               = UNKNOWN_STATE;
+    sys->next               = UNKNOWN_STATE;
+    sys->selection_index    = 0;
     
     Kalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     Kalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
@@ -84,7 +84,7 @@ void DecayInactiveFSMSystem( fsm_system_t * sys )
     }
 }
 
-void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
+void UpdateFSMSystem( fsm_system_t * sys, double p[NUM_STATES] )
 {
     FSMFunctions.Sys.UpdateProbabilities( sys, p );
     
@@ -92,13 +92,13 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[4] )
     sys->next = (state_t)FSMFunctions.Map.NormalizeState( sys->P, sys->state );
     
     FSMFunctions.Sys.UpdateState( sys );
-    PrintFSMMap( sys->P, sys->state );
+    FSMFunctions.Sys.Print(       sys );
     
     sys->stability.system.timestamp = TIMESTAMP();
     sys->stability.state.timestamp = TIMESTAMP();
 }
 
-void UpdateFSMProbabilities( fsm_system_t * sys, double p[4] )
+void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
 {
     state_t c = sys->state;
 
@@ -140,10 +140,11 @@ void UpdateFSMState( fsm_system_t * sys )
     }
 }
 
-void PrintFSMMap( transition_matrix_t * P, state_t s )
+void PrintFSMSys( fsm_system_t * sys )
 {
 #ifdef FSM_DEBUG
-    LOG_FSM(FSM_DEBUG_2, "\t\t\t  ");
+    LOG_FSM(FSM_DEBUG_2, "%s:\n", sys->name );
+    LOG_FSM(FSM_DEBUG_2, "t+1  t->" );// "\t\t\t  ");
     for( uint8_t i = 0; i < NUM_STATES; i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)i), i);
     LOG_FSM_BARE(FSM_DEBUG_2, "\n");
     for( uint8_t i = 0, j; i < NUM_STATES; i++ )
@@ -151,7 +152,8 @@ void PrintFSMMap( transition_matrix_t * P, state_t s )
         LOG_FSM(FSM_DEBUG_2, " %s-[%d]", stateString((uint8_t)i), i);
         for( j = 0; j < NUM_STATES; j++ )
         {
-            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c", ((j==(uint8_t)s)?'|':' '), (*P)[j][i], ((j==(uint8_t)s)?'|':' '));
+            char c = ((j==(uint8_t)sys->state)?'|':' ');
+            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c", c, (*sys->P)[j][i], c);
         }
         LOG_FSM_BARE(FSM_DEBUG_2, "\n");
     }

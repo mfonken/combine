@@ -54,6 +54,7 @@ extern "C" {
         min_out;
         gaussian_mixture_cluster_t
         cluster_mem[MAX_CLUSTERS];
+        const char * name;                // Instance name
     } gaussian_mixture_model_t;
     
     typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
@@ -72,6 +73,8 @@ extern "C" {
         state_sequence_matrix   gamma;               // Gamma solve vector
         state_sequence_matrix   xi[NUM_STATES];      // Xi solve matrix
         double                  P;                   // Latest probability
+        kumaraswamy_t           k_dist;              // Kumaraswamy distribution
+        const char *            name;                // Instance name
     } hidden_markov_model_t;
     
     static floating_t GetProbabilityFromEmission( emission_t * e, hmm_observation_t v )
@@ -79,7 +82,7 @@ extern "C" {
 #ifdef HMM_2D_EMISSIONS
         return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2 *)&v );
 #else
-        return MatVec.Gaussian1D.Probability( (gaussian1d_t *)e, (double)v );
+        return MatVec.Gaussian1D.Probability( (gaussian1d_t *)e, (floating_t)v );
 #endif
     }
 #endif
@@ -93,6 +96,7 @@ extern "C" {
         uint8_t         selection_index;
         stability_t     stability;
         transition_matrix_t *P;
+        const char *    name;                // Instance name
     } fsm_system_t;
     
     typedef struct
@@ -102,7 +106,7 @@ extern "C" {
         hidden_markov_model_t hmm;
         fsm_system_t fsm;
 #endif
-        kumaraswamy_t kumaraswamy;
+//        kumaraswamy_t kumaraswamy;
         band_list_t state_bands;
         double
         previous_thresh,
@@ -117,12 +121,13 @@ extern "C" {
         observation_state;
         state_t
         current_state;
-        vec2
+        hmm_observation_t
         current_observation;
         double
         best_confidence,
         best_cluster_weight,
         state_intervals[NUM_STATE_GROUPS];
+        const char * name;                // Instance name
     } psm_t;
     
 #ifdef __cplusplus

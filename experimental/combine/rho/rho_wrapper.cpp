@@ -24,10 +24,6 @@ Rho::Rho( int width, int height ) : width(width), height(height)
     pthread_mutex_init(&c_mutex, NULL);
     
     RhoCore.Initialize(&core, width, height);
-#ifdef __PSM__
-    PSMFunctions.Initialize( &core.PredictiveStateModelPair.x );
-    PSMFunctions.Initialize( &core.PredictiveStateModelPair.y );
-#endif
     backgrounding_event = false;
     
     PrintSizes();
@@ -102,10 +98,10 @@ void Rho::PrintSizes( void )
     l = sizeof(hidden_markov_model_t),
     m = sizeof(fsm_system_t),
     n = sizeof(psm_t);
-    LOG_RHO(ALWAYS, "\tgmm: %luB\thmm: %luB\tfsm: %luB\tpsm: %luB\n",k,l,m,n);
+    LOG_RHO(RHO_DEBUG_INIT, "\tgmm: %luB\thmm: %luB\tfsm: %luB\tpsm: %luB\n",k,l,m,n);
 #else
     ;
 #endif
-    LOG_RHO(ALWAYS, "\tSizes> Frame:%.3fkB RedVar:%luB SelVars:%luB PredVars:%luB Rho:%lukB > Tot:%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
-    LOG_RHO(ALWAYS, "\target_densitymapp:%luB\tpredensity_map:%luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
+    LOG_RHO(RHO_DEBUG_INIT, "\tSizes> Frame:%.3fkB RedVar:%luB SelVars:%luB PredVars:%luB Rho:%lukB > Tot:%.3fkB\n", ((double)aa)/1024, a, b, c, d>>10, ((double)e)/1024);
+    LOG_RHO(RHO_DEBUG_INIT, "\target_densitymapp:%luB\tpredensity_map:%luB\tpid: %luB\trkal: %luB\n",f,g,h,j);
 }

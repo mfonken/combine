@@ -19,15 +19,18 @@ extern "C" {
     
 #define KUMARASWAMY_PDF(X,A,B) ( A * B * pow( x, ( A - 1 ) ) * pow( 1 - pow( x, A ), B - 1 ) )
 #define KUMARASWAMY_CDF(X,A,B) ( 1 - pow( 1 - pow( X, A ), B) )
+#define KUMARASWAMY_NUM_BANDS   4
 
 typedef struct
 {
     double alpha, beta;
+    double bands[KUMARASWAMY_NUM_BANDS];
 } kumaraswamy_t;
 
-static void InitializeKumaraswamy( kumaraswamy_t * k, double beta )
+static void InitializeKumaraswamy( kumaraswamy_t * k, double beta, double * bands )
 {
     k->beta = beta;
+    memcpy( &k->bands, bands, sizeof(double[KUMARASWAMY_NUM_BANDS]) );
 }
 
 static inline double PerformKumaraswamyCDF( kumaraswamy_t * k, double x )
@@ -35,18 +38,15 @@ static inline double PerformKumaraswamyCDF( kumaraswamy_t * k, double x )
     return KUMARASWAMY_CDF( x, k->alpha, k->beta );
 }
 
-static void GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * interval, double * band_list, uint8_t num_bands ) // boundaries are between 0 to 1
+static void GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * interval )
 {
     k->alpha = alpha;
     double curr_CDF, prev_CDF = 0.;
-    for( uint8_t i = 0; i < num_bands; i++ )
+    for( uint8_t i = 0; i < KUMARASWAMY_NUM_BANDS; i++ )
     {
-        curr_CDF = PerformKumaraswamyCDF( k, band_list[i] );
+        curr_CDF = PerformKumaraswamyCDF( k, k->bands[i] );
         if( curr_CDF < prev_CDF )
-        {
-            curr_CDF = prev_CDF;
             interval[i] = 0.;
-        }
         else
         {
             interval[i] = curr_CDF - prev_CDF;
@@ -57,9 +57,9 @@ static void GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * inte
 
 typedef struct
 {
-    void (*Initialize)( kumaraswamy_t *, double );
+    void (*Initialize)( kumaraswamy_t *, double, double * );
     double(*PerformCDF)( kumaraswamy_t *, double );
-    void (*GetVector)( kumaraswamy_t *, double, double *, double *, uint8_t );
+    void (*GetVector)( kumaraswamy_t *, double, double * );
 } kumaraswamy_functions_t;
 
 static const kumaraswamy_functions_t KumaraswamyFunctions =

@@ -1,14 +1,14 @@
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File: rho_utility.h
  *  Group: Rho Core
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef rho_utility_h
 #define rho_utility_h
 
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                             Includes                                 *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,9 +25,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                          Static Buffers                              *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
   static density_map_unit_t
 #ifdef AUTOMATION_RUN
     FOREGROUND_DENSITY_MAP_Y[2000],
@@ -41,13 +41,13 @@ extern "C" {
     BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_X_SIZE];
 #endif
 
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                       Function Declarations                          *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
     void InitializeFiltersRhoUtility( rho_core_t * );
-    void InitializePredictionRhoUtility( prediction_t *, index_t );
-    void InitializeDensityMapRhoUtility( density_map_t *, index_t, index_t );
+    void InitializePredictionRhoUtility( prediction_t *, const char *, index_t );
+    void InitializeDensityMapRhoUtility( density_map_t *, const char *, index_t, index_t );
 
     void ResetForDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
@@ -95,8 +95,8 @@ extern "C" {
     {
         void (*Data)( rho_core_t *, index_t, index_t );
         void (*Filters)( rho_core_t * );
-        void (*Prediction)( prediction_t *, index_t );
-        void (*DensityMap)( density_map_t *, index_t, index_t );
+        void (*Prediction)( prediction_t *, const char *, index_t );
+        void (*DensityMap)( density_map_t *, const char *, index_t, index_t );
     } rho_utility_initializer_functions;
 
     typedef struct
@@ -170,9 +170,9 @@ extern "C" {
         rho_utility_print_functions Print;
     } rho_utility_functions;
 
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                         Local Instance                               *
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     static const rho_utility_functions RhoUtility =
     {
         .Initialize.Data = InitializeDataRhoUtility,

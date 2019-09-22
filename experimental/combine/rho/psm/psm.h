@@ -31,7 +31,7 @@ extern "C" {
 #endif
     
     
-    void InitializePSM(                     psm_t *, transition_matrix_t *, observation_matrix_t *, state_vector_t * );
+    void InitializePSM(                     psm_t *, const char * );
     void ReportObservationsPSM(             psm_t *, observation_list_t *, floating_t, uint8_t );
     void UpdateStateIntervalsPSM(           psm_t *, floating_t );
     void UpdatePSM(                         psm_t *, observation_list_t *, floating_t, uint8_t );
@@ -44,7 +44,7 @@ extern "C" {
     
     typedef struct
     {
-        void (*Initialize)(                     psm_t *, transition_matrix_t *, observation_matrix_t *, state_vector_t * );
+        void (*Initialize)(                     psm_t *, const char * );
         void (*ReportObservations)(             psm_t *, observation_list_t *, floating_t, uint8_t );
         void (*UpdateStateIntervals)(           psm_t *, floating_t );
         void (*Update)(                         psm_t *, observation_list_t *, floating_t, uint8_t );

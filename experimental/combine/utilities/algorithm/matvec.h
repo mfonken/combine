@@ -71,7 +71,7 @@ void Mat2x2LLT( mat2x2 *, mat2x2 * );
 void MulGaussian1d( gaussian1d_t *, gaussian1d_t *, gaussian1d_t * );
 void DivGaussian1d( gaussian1d_t *, gaussian1d_t *, gaussian1d_t * );
 void CopyGaussian1d( gaussian1d_t *, gaussian1d_t * );
-floating_t ProbabilityFromGaussian1d( gaussian1d_t *, floating_t v );
+floating_t ProbabilityFromGaussian1d( gaussian1d_t *, floating_t );
 
 void MulGaussian2d( gaussian2d_t *, gaussian2d_t *, gaussian2d_t * );
 floating_t ProbabilityFromGaussian2d( gaussian2d_t *, vec2 * );
@@ -105,7 +105,7 @@ typedef struct
     void (*Multiply)( gaussian1d_t *, gaussian1d_t *, gaussian1d_t * );
     void (*Divide)( gaussian1d_t *, gaussian1d_t *, gaussian1d_t * );
     void (*Copy)( gaussian1d_t *, gaussian1d_t * );
-    void (*Probability)( gaussian1d_t *, floating_t );
+    floating_t (*Probability)( gaussian1d_t *, floating_t );
 } gaussian1d_functions;
 
 typedef struct
@@ -126,7 +126,7 @@ typedef struct
 {
     vec2_functions Vec2;
     mat2x2_functions Mat2x2;
-//    gaussian1d_functions Gaussian1D;
+    gaussian1d_functions Gaussian1D;
     gaussian2d_functions Gaussian2D;
 } matvec_functions;
 
@@ -149,6 +149,7 @@ static const matvec_functions MatVec =
     //    .Gaussian1D.Multiply = MulGaussian1d,
     //    .Gaussian1D.Divide = DivGaussian1d,
     //    .Gaussian1D.Copy = CopyGaussian1d,
+    .Gaussian1D.Probability = ProbabilityFromGaussian1d,
     
     .Gaussian2D.Multiply = MulGaussian2d,
     .Gaussian2D.Probability = ProbabilityFromGaussian2d,

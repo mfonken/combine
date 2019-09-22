@@ -10,12 +10,12 @@
 
 #include "psm.h"
 
-void InitializePSM( psm_t * model, transition_matrix_t * A, observation_matrix_t * B, state_vector_t * pi )
+void InitializePSM( psm_t * model, const char * name )
 {
-    GMMFunctions.Model.Initialize( &model->gmm );
-    HMMFunctions.Initialize( &model->hmm, A, B, pi );
+    model->name = (char *)name;
+    GMMFunctions.Model.Initialize( &model->gmm, name );
+    HMMFunctions.Initialize( &model->hmm, name );
     model->fsm.P = &model->hmm.A;
-    KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1 );
     model->state_bands.length = NUM_STATE_GROUPS;
     
 #ifdef __PSM__
@@ -33,7 +33,7 @@ void InitializePSM( psm_t * model, transition_matrix_t * A, observation_matrix_t
     memset( model->state_bands.band, 0, sizeof(model->state_bands.band) );
 #endif
 }
-
+static int c = 0;
 void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
 #ifdef HMM_2D_EMISSIONS
@@ -47,6 +47,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     vec2 value = { 0 };
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
     {
+        c++;
         observation_t * observation = &observation_list->observations[i];
         value = (vec2){ (double)observation->density, (double)observation->thresh };
         GMMFunctions.Model.AddValue( &model->gmm, observation, &value );
@@ -61,22 +62,24 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
 void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
 {
     floating_t observation_set[NUM_STATE_GROUPS], cumulative = 0., current = 0.;
-    LOG_PSM(PSM_DEBUG, "Hidden:");
+    LOG_PSM(PSM_DEBUG_UPDATE, "Hidden:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
         current = GetProbabilityFromEmission( &model->hmm.B[i], model->current_observation );
         cumulative += current;
         observation_set[i] = cumulative;
-        LOG_PSM_BARE(PSM_DEBUG, "[%.4f]", current);
+        LOG_PSM_BARE(PSM_DEBUG_UPDATE, "[%.4f]", current);
     }
-    LOG_PSM_BARE(PSM_DEBUG, "\n");
-    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, observation_set, NUM_STATE_GROUPS );
+//    LOG_PSM_BARE(PSM_DEBUG, "\n");
+//    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, observation_set, NUM_STATE_GROUPS );
     
-    LOG_PSM(PSM_DEBUG, "Update:");
+    LOG_PSM(PSM_DEBUG_UPDATE, "Update:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
-        LOG_PSM_BARE(PSM_DEBUG, "[%.4f]", model->state_intervals[i]);
-    LOG_PSM_BARE(PSM_DEBUG, "\n");
+        LOG_PSM_BARE(PSM_DEBUG_UPDATE, "[%.4f]", model->state_intervals[i]);
+    LOG_PSM_BARE(PSM_DEBUG_UPDATE, "\n");
 }
+
+static uint8_t counter = 0;
 
 void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
@@ -91,17 +94,21 @@ void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t
     ///TODO: Compare model->observation_state with hmm recommendation
     
     /* Update state path prediction to best cluster */
-    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
+    int ch = counter++ % MAX_OBSERVATIONS;
+    if(counter > 1 && !ch)
+    {
+        HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
     
-    /* Update state bands */
-    PSMFunctions.UpdateStateIntervals( model, nu );
-    
-    /* Update states/transition matrix */
-    FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
-    model->current_state = model->fsm.state;
-    
-    /* Generate proposals to complete update */
-    PSMFunctions.GenerateProposals( model );
+        /* Update state bands */
+        PSMFunctions.UpdateStateIntervals( model, nu );
+
+        /* Update states/transition matrix */
+        FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
+        model->current_state = model->fsm.state;
+
+        /* Generate proposals to complete update */
+        PSMFunctions.GenerateProposals( model );
+    }
 }
 
 void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
@@ -223,10 +230,10 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     
     if(band_list->length > 0)
     {
-        LOG_PSM(PSM_DEBUG, "State bands: \n");
+        LOG_PSM(PSM_DEBUG_UPDATE, "State bands: \n");
         for( uint8_t i = 0; i < band_list->length; i++ )
-            LOG_PSM(PSM_DEBUG, " %d: (%.3f %.3f)  C<%.3f %.3f>[%.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
-        LOG_PSM(PSM_DEBUG, "\n");
+            LOG_PSM(PSM_DEBUG_UPDATE, " %2d: (%7.3f %7.3f)  C<%7.3f %7.3f>[%7.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
+        LOG_PSM(PSM_DEBUG_UPDATE, "\n");
     }
 #endif
 }

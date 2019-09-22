@@ -1,14 +1,14 @@
-/************************************************************************
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File: rho_types.c
  *  Group: Rho Core
- ***********************************************************************/
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef rho_c_types_h
 #define rho_c_types_h
 
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                                    Includes                                         */
-/***************************************************************************************/
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -175,6 +175,8 @@ typedef struct
         has_background;
     kalman_filter_t
         kalmans[2];
+    const char *
+        name;
 } density_map_t;
 
 typedef struct
@@ -220,6 +222,7 @@ typedef struct
                     FilterDensity[2];
     observation_list_t ObservationList;
     prediction_probabilities Probabilities;
+    const char *    Name;
 } prediction_t;
 
 typedef struct
@@ -346,7 +349,7 @@ typedef struct
     byte_t includes, i, j, l, t;
 } packet_generation_variables;
 
-#define DETECTION_BUFFER_SIZE ( 1 << 9 )
+#define DETECTION_BUFFER_SIZE ( 1 << 5 )
 #define DETECTION_BUFFER_MASK ( DETECTION_BUFFER_SIZE - 1 )
 #define MAX_DENSITY           ( 1 << 9 )
 
@@ -389,6 +392,7 @@ typedef struct
         TargetCoverage,
         BackgroundPeriod;
     floating_t
+        TotalPercentage,
         FilteredPercentage,
         TargetCoverageFactor,
         CoverageFactor,

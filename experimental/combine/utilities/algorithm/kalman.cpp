@@ -1,6 +1,6 @@
 #include "kalman.hpp"
 
-/** SOURCE: http://preview.tinyurl.com/9djhrem */
+/*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
 //#define TIMELESS
 
@@ -11,18 +11,9 @@ floating_t now()
     return stamp.tv_sec + stamp.tv_usec/1000000.0;
 }
 
-KalmanFilter::KalmanFilter() : KalmanFilter(0.)
-{
-}
-
-KalmanFilter::KalmanFilter( floating_t v ) : KalmanFilter(v, DEFAULT_LS, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
-{
-}
-
-KalmanFilter::KalmanFilter( floating_t v, floating_t ls ) : KalmanFilter(v, ls, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU)
-{
-}
-
+KalmanFilter::KalmanFilter() : KalmanFilter(0.) {}
+KalmanFilter::KalmanFilter( floating_t v ) : KalmanFilter(v, DEFAULT_LS, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU) {}
+KalmanFilter::KalmanFilter( floating_t v, floating_t ls ) : KalmanFilter(v, ls, DEFAULT_VU, DEFAULT_BU, DEFAULT_SU) {}
 KalmanFilter::KalmanFilter( floating_t v, floating_t ls, floating_t v_u, floating_t b_u, floating_t s_u )
 {
     K[0]        = 0;
