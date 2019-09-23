@@ -187,7 +187,7 @@ void UpdateGaussianWithWeightGaussian2d( vec2 * A, vec2 * B, gaussian2d_t * gaus
     mat2x2 covariance_delta_factor, unweighted_covariance_factor =
     { delta_mean_a_a, delta_mean_a_b, delta_mean_a_b, delta_mean_b_b };
     
-    //        printf("m_covf: <%.2f %.2f> [%.2f %.2f | %.2f %.2f]\n", A->a, A->b, unweighted_covariance_factor.a, unweighted_covariance_factor.b, unweighted_covariance_factor.c, unweighted_covariance_factor.d);
+    //printf("m_covf: <%.2f %.2f> [%.2f %.2f | %.2f %.2f]\n", A->a, A->b, unweighted_covariance_factor.a, unweighted_covariance_factor.b, unweighted_covariance_factor.c, unweighted_covariance_factor.d);
     
     MatVec.Mat2x2.Subtract( &unweighted_covariance_factor, &gaussian->covariance, &covariance_delta_factor );
     MatVec.Mat2x2.ScalarMultiply( weight, &covariance_delta_factor, &covariance_delta_factor );

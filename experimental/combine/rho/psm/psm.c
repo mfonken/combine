@@ -204,18 +204,18 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         }
         else
         { /* Otherwise cumulate current gaussian into band gaussian */
-            LOG_PSM(PSM_DEBUG_2, "bcy: %.4f vs min: %d | stddevs: %.4f\n", band_gaussian.covariance.d, MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC, NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b ));
+            LOG_PSM(PSM_DEBUG_UPDATE, "bcy: %.4f vs min: %d | stddevs: %.4f\n", band_gaussian.covariance.d, MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC, NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b ));
             if( band_gaussian.covariance.d < MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC
                || NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b )
                < MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC )
             {
-                LOG_PSM(PSM_DEBUG_2, "Combining cluster %d\n", min_id);
+                LOG_PSM(PSM_DEBUG_UPDATE, "Combining cluster %d\n", min_id);
                 MatVec.Gaussian2D.Multiply( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
                 num_clusters_in_band++;
             }
         }
         
-        LOG_PSM(PSM_DEBUG_2, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
+        LOG_PSM(PSM_DEBUG_UPDATE, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
         
         if( !num_to_process )
         { /* Always update band on last cluster */

@@ -35,6 +35,7 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
 
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2 * output )
 {
+    LOG_GMM(GMM_DEBUG_2, "Log gaussian norm factor: %.2f\n", cluster->log_gaussian_norm_factor);
     if (isnan(cluster->log_gaussian_norm_factor))
         return;
     LOG_GMM(GMM_DEBUG_2, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
@@ -62,12 +63,15 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     ReportLabel( &cluster->labels, observation->label );
     
     cluster->timestamp = TIMESTAMP();
+    
+//    MatVec.Mat2x2.ScalarMultiply( 0.9999, &cluster->gaussian_in.covariance, &cluster->gaussian_in.covariance );
 }
 
 void GetScoreOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, vec2 * input)
 {
     vec2 input_delta = { 0 };
     MatVec.Vec2.Subtract(input, &cluster->gaussian_in.mean, &input_delta);
+    LOG_GMM(GMM_DEBUG_2, "Input delta 2: <%7.3f, %7.3f>\n", input_delta.a, input_delta.b);
     cluster->mahalanobis_sq = BOUNDU( MatVec.Gaussian2D.Covariance.MahalanobisSq( &cluster->inv_covariance_in, &input_delta), MAX_DISTANCE );
     cluster->probability_of_in = SafeExp( cluster->log_gaussian_norm_factor - 0.5 * cluster->mahalanobis_sq );
 }
@@ -80,7 +84,7 @@ void UpdateNormalOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster 
     double cholesky_dms = cluster->llt_in.a * cluster->llt_in.d;
 #endif
     double norm_factor = -log( 2 * M_PI * sqrt( cluster->llt_in.a ) * sqrt( cluster->llt_in.d ) );
-    LOG_GMM(GMM_DEBUG_2, " %.2f %.2f\n", cholesky_dms, norm_factor);
+    LOG_GMM_BARE(GMM_DEBUG_2, " %.2f %.2f\n", cholesky_dms, norm_factor);
     cluster->log_gaussian_norm_factor = norm_factor;
 }
 
@@ -94,6 +98,7 @@ void ContributeToOutputOfGaussianMixtureCluster( gaussian_mixture_cluster_t * cl
 {
     vec2 input_delta;
     MatVec.Vec2.Subtract(input, &cluster->gaussian_in.mean, &input_delta);
+    LOG_GMM(GMM_DEBUG_2, "Input delta 1: <%7.3f, %7.3f>\n", input_delta.a, input_delta.b);
     vec2 inv_covariance_delta = { 0 };
     MatVec.Mat2x2.DotVec2(&cluster->inv_covariance_in, &input_delta, &inv_covariance_delta);
     
@@ -178,6 +183,7 @@ double GetMaxErrorOfGaussianMixtureModel( gaussian_mixture_model_t * model, vec2
 {
     vec2 output_delta;
     MatVec.Vec2.Subtract( value, output, &output_delta );
+    LOG_GMM(GMM_DEBUG_2, "Output delta: <%7.3f, %7.3f>\n", output_delta.a, output_delta.b);
     double a_error = fabs( ZDIV( output_delta.a, min_max_delta->a ) ),
     b_error = fabs( ZDIV( output_delta.b, min_max_delta->b ) );
     return MAX( a_error, b_error );
@@ -195,6 +201,7 @@ void AddClusterToGaussianMixtureModel( gaussian_mixture_model_t * model, observa
 void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
 {
     gaussian_mixture_cluster_t * cluster;
+    LOG_GMM(GMM_DEBUG_CLUSTERS, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
     for( uint8_t i = 0; i < model->num_clusters; i++ )
     {
         cluster = model->cluster[i];
@@ -205,9 +212,15 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
         gaussian_mixture_cluster_t * cluster = model->cluster[i];
         if( cluster->score < MIN_CLUSTER_SCORE
            || ISTIMEDOUT( cluster->timestamp, MAX_CLUSTER_LIFETIME )
-           || isnan(cluster->log_gaussian_norm_factor))
+           || isnan(cluster->log_gaussian_norm_factor) )
             GMMFunctions.Model.RemoveCluster( model, i );
     }
+    for( uint8_t i = 0; i < model->num_clusters; i++ )
+    {
+        cluster = model->cluster[i];
+        LOG_GMM(GMM_DEBUG_CLUSTERS, "%d: µ<%6.3f, %7.3f> ∑[%6.3f, %6.3f; %6.3f, %6.3f] : weight:%5.3f score:%5.3f\n", i, cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b, cluster->gaussian_in.covariance.a, cluster->gaussian_in.covariance.b, cluster->gaussian_in.covariance.c, cluster->gaussian_in.covariance.d, cluster->weight, cluster->score);
+    }
+    LOG_GMM(GMM_DEBUG_CLUSTERS, "\n");
 }
 
 void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2 * value )
@@ -249,8 +262,12 @@ void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observati
 
 void RemoveClusterFromGaussianMixtureModel( gaussian_mixture_model_t * model, uint16_t index )
 {
-    /* Replace pointer to be removed by the last pointer */
-    model->cluster[index] = model->cluster[--model->num_clusters];
+    model->num_clusters--;
+    
+    /* Swap pointer to cluster being removed with the point to the last cluster */
+    gaussian_mixture_cluster_t * remove_cluster = model->cluster[index];
+    model->cluster[index] = model->cluster[model->num_clusters];
+    model->cluster[model->num_clusters] = remove_cluster;
 }
 
 #endif

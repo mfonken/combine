@@ -52,7 +52,7 @@
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
 #define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
-#define DEFAULT_THRESH          170//250
+#define DEFAULT_THRESH          1// 170//250
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1

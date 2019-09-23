@@ -20,7 +20,7 @@
 #define DETECTION_MAP_DESCRIPTOR DETECTION_MAP_NAME "_psm_off"
 #endif
 
-#define SHAKE_INJECTION 0//10
+#define SHAKE_INJECTION 5//40
 
 static FILE * detection_map_file;
 

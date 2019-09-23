@@ -71,9 +71,11 @@ enum LogLevel
 #define PSM_DEBUG_2             RHO_DEBUG_2
 #define PSM_DEBUG_UPDATE        RHO_DEBUG_2
 
-#define HMM_DEBUG               PSM_DEBUG
-//#define GMM_DEBUG               PSM_DEBUG
-//#define GMM_DEBUG_2             PSM_DEBUG_2
+//#define HMM_DEBUG               PSM_DEBUG
+#define GMM_DEBUG               PSM_DEBUG
+#define GMM_DEBUG_2             PSM_DEBUG
+#define GMM_DEBUG_CLUSTERS      PSM_DEBUG
+
 #define FSM_DEBUG               PSM_DEBUG_2
 #define FSM_DEBUG_2             PSM_DEBUG_2
 

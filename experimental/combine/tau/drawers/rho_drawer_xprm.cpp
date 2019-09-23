@@ -67,6 +67,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
     gaussian2d_t gaus;
     double angle;
 //    printf("b:%p\n", &psm->gmm);
+    putText(detection_map_frame, std::to_string(psm->gmm.num_clusters), Point(DETECTION_MAP_FRAME_IWIDTH-32, DETECTION_MAP_INSET+32), FONT_HERSHEY_PLAIN, 2, rwhite, 2);
     for( int j = 0; j < psm->gmm.num_clusters; j++)
     {
         gaus = (*psm->gmm.cluster[j]).gaussian_in;

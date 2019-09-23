@@ -12,8 +12,8 @@
 using namespace cv;
 using namespace std;
 
-#define MAIN_FPS        60
-#define TAU_FPS         60
+#define MAIN_FPS        10//60
+#define TAU_FPS         10//60
 #define COMBINE_FPS     100
 
 /* GLOBAL SETUP */
@@ -36,7 +36,7 @@ using namespace std;
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 //#define GROUP_NAME                      "/gradient/"
-//#define FILE_NAME                       "gradient_cnetralized"
+//#define FILE_NAME                       "gradient_centralized"
 #define GROUP_NAME                      "/frames/small/"
 #define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
