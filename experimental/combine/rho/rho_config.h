@@ -9,7 +9,7 @@
 #include "rho_global.h"
 
 //#define SPOOF_STATE_BANDS
-#define USE_DETECTION_MAP
+//#define USE_DETECTION_MAP
 #define RHO_DRAWER
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -76,7 +76,10 @@
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
-#define BACKGROUNDING_PERIOD   100000 // Frames
+#ifdef __PSM__
+#define PSM_UPDATE_PERIOD     3.
+#endif
+#define BACKGROUNDING_PERIOD  100000 // Frames
 
 #define EXPECTED_NUM_REGIONS  2
 #define MAX_REGIONS           4
@@ -112,9 +115,9 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
 #define RHO_DEFAULT_LS      5.      // Lifespan
-#define RHO_DEFAULT_VU      0.5     // Value uncertainty
-#define RHO_DEFAULT_BU      0.5   // Bias uncertainty
-#define RHO_DEFAULT_SU      0.01   // Sensor uncertainty
+#define RHO_DEFAULT_VU      0.05     // Value uncertainty
+#define RHO_DEFAULT_BU      0.001     // Bias uncertainty
+#define RHO_DEFAULT_SU      0.1   // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
@@ -126,9 +129,9 @@
 (kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 
 #define RHO_TARGET_LS       5.
-#define RHO_TARGET_VU       0.001
-#define RHO_TARGET_BU       0.05
-#define RHO_TARGET_SU       0.1
+#define RHO_TARGET_VU       0.5
+#define RHO_TARGET_BU       0.5
+#define RHO_TARGET_SU       0.001
 #define DEFAULT_TARGET_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 #define RHO_TARGET_FILTER_MAX   1.

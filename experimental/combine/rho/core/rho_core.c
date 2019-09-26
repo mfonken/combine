@@ -11,6 +11,9 @@
 #ifdef USE_DETECTION_MAP
 #include "detection_map.h"
 #endif
+#ifndef TIMESTAMP
+#include "timestamp.h"
+#endif
 
 static const char * X_INSTANCE_NAME = "X";
 static const char * Y_INSTANCE_NAME = "Y";
@@ -129,20 +132,25 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
-    RhoUtility.Predict.GenerateObservationLists( core );
+    RhoUtility.Predict.ReportObservationLists( core );
 
 #ifdef USE_DETECTION_MAP
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair );
 #endif
     
 #ifdef __PSM__
-    /* Process both dimensions' predictive state */
-    RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
+    if( ISTIMEDOUT( core->Timestamp, PSM_UPDATE_PERIOD ) )
+    {
+        printf("update...\n");
+        /* Process both dimensions' predictive state */
+        RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
+        core->Timestamp = TIMESTAMP();
+    }
 #else
-    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
-    double state_intervals[NUM_STATE_GROUPS];
-    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
-    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
+//    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
+//    double state_intervals[NUM_STATE_GROUPS];
+//    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
+//    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
 
     prediction_predict_variables _;

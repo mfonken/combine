@@ -115,6 +115,7 @@
 		3455398822FF62F200DDE874 /* combine_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = combine_master.h; sourceTree = "<group>"; };
 		3455398922FF62F200DDE874 /* combine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = combine.cpp; sourceTree = "<group>"; };
 		3455398A22FF62F200DDE874 /* combine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = combine.hpp; sourceTree = "<group>"; };
+		347F6681233C590E000578BD /* rho_packet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_packet.h; sourceTree = "<group>"; };
 		3493AA89231A066200159CD5 /* kalman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kalman.c; sourceTree = "<group>"; };
 		3493AA8A231A066200159CD5 /* pid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pid.c; sourceTree = "<group>"; };
 		3493AA8B231A066200159CD5 /* pid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pid.h; sourceTree = "<group>"; };
@@ -250,6 +251,7 @@
 				3401969822FE780600F152CC /* rho_master.h */,
 				3401968922FE780600F152CC /* rho_config.h */,
 				3401969722FE780600F152CC /* rho_global.h */,
+				347F6681233C590E000578BD /* rho_packet.h */,
 				3401967922FE780600F152CC /* types */,
 				3401968A22FE780600F152CC /* psm */,
 				3401967F22FE780600F152CC /* core */,

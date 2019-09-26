@@ -45,6 +45,8 @@ void Tau::Init( void )
     utility.generator_active = true;
 }
 
+static bool up = true;
+static int sweep_speed = 5;
 void Tau::Trigger( void )
 {
     double p = 0.;
@@ -63,7 +65,8 @@ void Tau::Trigger( void )
         CumulativeMovingAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
-    rho.core.Thresh += 1; ///TEST
+    if(( up && rho.core.Thresh > 225 ) || (!up && rho.core.Thresh < 10)) up = !up;
+    rho.core.Thresh += sweep_speed*(up?1:-1); ///TEST
     rho.core.ThreshByte = (byte_t)rho.core.Thresh;
     
 #ifdef __PSM__

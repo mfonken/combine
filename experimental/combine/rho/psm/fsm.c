@@ -66,7 +66,8 @@ void InitializeFSMSystem( fsm_system_t * sys, const char * name, state_t initial
     Kalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     Kalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
     
-    FSMFunctions.Map.Initialize( sys->P );
+    if( sys->P != NULL )
+        FSMFunctions.Map.Initialize( sys->P );
 }
 
 void DecayInactiveFSMSystem( fsm_system_t * sys )
@@ -103,7 +104,7 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
     state_t c = sys->state;
 
 #ifdef FSM_DEBUG
-    LOG_FSM( FSM_DEBUG, "Probabilies are [0]%.2f [1]%.2f [2]%.2f [3]%.2f.\n", p[0], p[1], p[2], p[3]);
+    LOG_FSM( FSM_DEBUG, "%s: Update probabilities are [%5.3f, %5.3f, %5.3f, %5.3f].\n", sys->name, p[0], p[1], p[2], p[3]);
     LOG_FSM( FSM_DEBUG, "State %s has stability %.4f\n", stateString(c), sys->stability.state.value );
 #endif
     floating_t curr = 0;
@@ -121,10 +122,11 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
 void UpdateFSMState( fsm_system_t * sys )
 {
     /* State change */
-    if(sys->next != UNKNOWN_STATE )
+
+    LOG_FSM(FSM_DEBUG, "~~~ State is %s ~~~\n", stateString(sys->next));
+    if( sys->next != sys->state && sys->next != UNKNOWN_STATE )
     {
         LOG_FSM(FSM_DEBUG, "Updating state from %s to %s\n", stateString((int)sys->state), stateString((int)sys->next));
-        if(sys->next != sys->state) {LOG_FSM(FSM_DEBUG, "~~~ State is %s ~~~\n", stateString(sys->next));}
         sys->prev   = sys->state;
         sys->state  = sys->next;
         sys->next   = UNKNOWN_STATE;

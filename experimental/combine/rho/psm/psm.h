@@ -33,8 +33,8 @@ extern "C" {
     
     void InitializePSM(                     psm_t *, const char * );
     void ReportObservationsPSM(             psm_t *, observation_list_t *, floating_t, uint8_t );
-    void UpdateStateIntervalsPSM(           psm_t *, floating_t );
-    void UpdatePSM(                         psm_t *, observation_list_t *, floating_t, uint8_t );
+    void UpdateStateIntervalsPSM(           psm_t * );//, floating_t );
+    void UpdatePSM(                         psm_t * );//, observation_list_t *, floating_t, uint8_t );
     void UpdateStateBandPSM(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
     void DiscoverStateBandsPSM(             psm_t *, band_list_t * );
     uint8_t FindMostLikelyHiddenStatePSM(   psm_t *, uint8_t, floating_t * );
@@ -46,8 +46,8 @@ extern "C" {
     {
         void (*Initialize)(                     psm_t *, const char * );
         void (*ReportObservations)(             psm_t *, observation_list_t *, floating_t, uint8_t );
-        void (*UpdateStateIntervals)(           psm_t *, floating_t );
-        void (*Update)(                         psm_t *, observation_list_t *, floating_t, uint8_t );
+        void (*UpdateStateIntervals)(           psm_t * );//, floating_t );
+        void (*Update)(                         psm_t * );//, observation_list_t *, floating_t, uint8_t );
         void (*UpdateStateBand)(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
         void (*DiscoverStateBands)(             psm_t *, band_list_t * );
         uint8_t (*FindMostLikelyHiddenState)(   psm_t *, uint8_t, floating_t * );

@@ -30,15 +30,15 @@ using namespace std;
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     360//31
+#define IMAGE_TICKS                     360
 #define THRESH_IMAGE
-#define ROTATE_IMAGE
+//#define ROTATE_IMAGE
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
-//#define GROUP_NAME                      "/gradient/"
-//#define FILE_NAME                       "gradient_centralized"
-#define GROUP_NAME                      "/frames/small/"
-#define FILE_NAME                       "1"
+#define GROUP_NAME                      "/gradient/"
+#define FILE_NAME                       "double_circle_fade"//"gradient_centralized"
+//#define GROUP_NAME                      "/frames/small/"
+//#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
 #define TYPE                            IMAGE_SINGLE//IMAGE_SET
 
@@ -47,7 +47,7 @@ using namespace std;
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   IMAGE_TICKS
 #elif TYPE == IMAGE_SET
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME
-#define FRAME_IMAGE_SOURCE_NUM_FRAMES   31
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES   26//31
 #endif
 
 //#define PRINT_TUNING_STAGES

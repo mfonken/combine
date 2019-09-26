@@ -89,6 +89,7 @@ extern "C" {
 
     void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, uint8_t );
     void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * );
+    void ReportObservationListsFromPredictionsRhoUtility( rho_core_t * );
     void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * );
 
     typedef struct
@@ -119,6 +120,7 @@ extern "C" {
         void (*UpdateCorePredictionData)( prediction_predict_variables *, rho_core_t * );
         void (*GenerateObservationList)( prediction_t *, uint8_t );
         void (*GenerateObservationLists)( rho_core_t * );
+        void (*ReportObservationLists)( rho_core_t * );
         void (*UpdatePredictiveStateModelPair)(rho_core_t * );
     } rho_utility_predict_functions;
 
@@ -195,6 +197,8 @@ extern "C" {
         .Predict.UpdateCorePredictionData = UpdateCorePredictionDataRhoUtility,
         .Predict.GenerateObservationList = GenerateObservationListFromPredictionsRhoUtility,
         .Predict.GenerateObservationLists = GenerateObservationListsFromPredictionsRhoUtility,
+        .Predict.ReportObservationLists = ReportObservationListsFromPredictionsRhoUtility,
+        
         .Predict.UpdatePredictiveStateModelPair = UpdatePredictiveStateModelPairRhoUtility,
 
         .Detect.Perform = PerformDetectRhoUtility,

@@ -164,7 +164,7 @@ floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2 * v )
 {
     floating_t two_pi = 2. * M_PI, mahalanobis_sq, e, f,
     cov_det = MatVec.Mat2x2.Determinant( &a->covariance );
-    if(cov_det == 0) return 0;
+    if(fabs(cov_det) < SMALL_VALUE_ERROR_OFFSET) return 0;
     vec2 mean_diff;
     mat2x2 cov_inv;
     
@@ -172,6 +172,7 @@ floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2 * v )
     MatVec.Mat2x2.Inverse( &a->covariance, &cov_inv );
     mahalanobis_sq = MatVec.Gaussian2D.Covariance.MahalanobisSq( &cov_inv, &mean_diff );
     e = SafeExp( -0.5 * mahalanobis_sq );
+    
     f = sqrt( two_pi * cov_det );
     return ( e / f );
 }

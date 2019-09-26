@@ -15,8 +15,8 @@
             timestampString = "590462706.149743"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "672"
-            endingLineNumber = "672"
+            startingLineNumber = "674"
+            endingLineNumber = "674"
             landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
             landmarkType = "9">
          </BreakpointContent>
@@ -66,8 +66,8 @@
             timestampString = "590462706.150207"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "719"
-            endingLineNumber = "719"
+            startingLineNumber = "722"
+            endingLineNumber = "722"
             landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
             landmarkType = "9">
          </BreakpointContent>
@@ -86,38 +86,6 @@
             startingLineNumber = "25"
             endingLineNumber = "25"
             landmarkName = "ResetRhoKalman()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "86F41D7B-ADC1-4353-BE0D-6F48CB25F40F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/core/rho_core.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
-            landmarkName = "UpdateRhoCorePredictions(core)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "B56D4E8C-AE6C-4994-B107-7B7AF56ABDCA"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/core/rho_core.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
-            landmarkName = "UpdateRhoCorePredictions(core)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -195,8 +163,8 @@
             filePath = "rho/core/rho_utility.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "701"
-            endingLineNumber = "701"
+            startingLineNumber = "704"
+            endingLineNumber = "704"
             landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
             landmarkType = "9">
             <Locations>
@@ -236,22 +204,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "70F54301-FF84-4096-9B68-E75CF9FF5715"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/psm/psm.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
-            landmarkName = "UpdatePSM(model, observation_list, nu, thresh)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "B85B1362-09C1-4A6D-B702-13D700A3AFDC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -259,25 +211,9 @@
             filePath = "rho/psm/hmm.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "168"
-            endingLineNumber = "168"
+            startingLineNumber = "173"
+            endingLineNumber = "173"
             landmarkName = "UpdateProbabilityHMM(model)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "4804C5CE-5A50-4275-9127-8CC3A0DB4F72"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/core/rho_core.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "132"
-            endingLineNumber = "132"
-            landmarkName = "UpdateRhoCorePredictions(core)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -300,22 +236,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8F96436E-7E5E-4EB5-9697-93365035B726"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/psm/psm.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "296"
-            endingLineNumber = "296"
-            landmarkName = "GenerateProposalsPSM(model)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "6499A28F-245A-4EB7-B7FB-9600848C2670"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -323,25 +243,9 @@
             filePath = "rho/psm/psm.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
             landmarkName = "ReportObservationsPSM(model, observation_list, nu, thresh)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D493E924-BF67-40DE-84D1-02FF18B6F04A"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/psm/psm.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "267"
-            endingLineNumber = "267"
-            landmarkName = "UpdateBestClusterPSM(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -355,25 +259,9 @@
             filePath = "rho/psm/hmm.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "348"
-            endingLineNumber = "348"
+            startingLineNumber = "353"
+            endingLineNumber = "353"
             landmarkName = "PrintHMM(model)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "218B8A62-929F-436B-90D1-48B6C790FF86"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/psm/hmm.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
-            landmarkName = "UpdateBetaHMM(model)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -387,8 +275,8 @@
             filePath = "rho/psm/psm.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "162"
-            endingLineNumber = "162"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
             landmarkName = "DiscoverStateBandsPSM(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
@@ -403,25 +291,9 @@
             filePath = "rho/psm/psm.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
+            startingLineNumber = "109"
+            endingLineNumber = "109"
             landmarkName = "UpdateStateBandPSM(band_list, i, c, band_gaussian)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "55B8E74D-9927-46F0-9554-E2F19765D592"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "utilities/algorithm/matvec.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "150"
-            endingLineNumber = "150"
-            landmarkName = "MulGaussian2d(a, b, c)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

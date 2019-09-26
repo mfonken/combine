@@ -51,6 +51,8 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1 );
     FSMFunctions.Sys.Initialize( &core->StateMachine, CHAOTIC );
 #endif
+    
+    core->Timestamp = TIMESTAMP();
 }
 
 void InitializeFiltersRhoUtility( rho_core_t * core )
@@ -697,8 +699,9 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
 #ifdef __PSM__
-    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
-    LOG_RHO(RHO_DEBUG_2, "Filtered|Total %%: %.3f|%.3f\n", core->FilteredPercentage, core->TotalPercentage);
+//    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
+    core->TargetFilter.value = core->TotalPercentage;
+    LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.3f|%.3f\n", core->FilteredPercentage, core->TotalPercentage);
 //    Kalman.Print( &core->TargetFilter );
     switch(-1)
     
@@ -932,11 +935,19 @@ void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
         RhoUtility.Predict.GenerateObservationList( &core->PredictionPair.y, core->ThreshByte );
 }
 
+void ReportObservationListsFromPredictionsRhoUtility( rho_core_t * core )
+{
+    RhoUtility.Predict.GenerateObservationLists( core );
+    
+    PSMFunctions.ReportObservations( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions, core->ThreshByte );
+    PSMFunctions.ReportObservations( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions, core->ThreshByte );
+}
+    
 void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
 {
 #ifdef __PSM__
-    PSMFunctions.Update( &core->PredictiveStateModelPair.x, &core->PredictionPair.x.ObservationList, core->PredictionPair.x.NuRegions, core->ThreshByte );
-    PSMFunctions.Update( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions, core->ThreshByte );
+    PSMFunctions.Update( &core->PredictiveStateModelPair.x );
+    PSMFunctions.Update( &core->PredictiveStateModelPair.y );
     core->PredictiveStateModelPair.current_state = MAX( core->PredictiveStateModelPair.x.current_state, core->PredictiveStateModelPair.y.current_state );
     core->PredictiveStateModelPair.best_confidence = AVG2( core->PredictiveStateModelPair.x.best_confidence, core->PredictiveStateModelPair.y.best_confidence );
     core->PredictiveStateModelPair.proposed_nu = MAX( core->PredictiveStateModelPair.x.proposed_nu, core->PredictiveStateModelPair.y.proposed_nu );

@@ -13,6 +13,7 @@
 void InitializePSM( psm_t * model, const char * name )
 {
     model->name = (char *)name;
+    FSMFunctions.Sys.Initialize( &model->fsm, name, UNDER_POPULATED );
     GMMFunctions.Model.Initialize( &model->gmm, name );
     HMMFunctions.Initialize( &model->hmm, name );
     model->fsm.P = &model->hmm.A;
@@ -36,6 +37,9 @@ void InitializePSM( psm_t * model, const char * name )
 static int c = 0;
 void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
+    /* Report tracking observations & update state band knowledge  */
+    if( observation_list->length == 0 ) return;
+    
 #ifdef HMM_2D_EMISSIONS
     model->current_observation = (vec2){ nu, thresh };
 #else
@@ -59,7 +63,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     /// TODO: Analyze value
 }
 
-void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
+void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
 {
     floating_t observation_set[NUM_STATE_GROUPS], cumulative = 0., current = 0.;
     LOG_PSM(PSM_DEBUG_UPDATE, "Hidden:");
@@ -79,36 +83,25 @@ void UpdateStateIntervalsPSM( psm_t * model, floating_t nu )
     LOG_PSM_BARE(PSM_DEBUG_UPDATE, "\n");
 }
 
-static uint8_t counter = 0;
-
-void UpdatePSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
+void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
-    /* Report tracking observations & update state band knowledge  */
-    if( observation_list->length > 0 )
-        PSMFunctions.ReportObservations( model, observation_list, nu, thresh );
-    
+    /* Update state path prediction to best cluster */
+    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
+    return;
     /* Calculate current observation and update observation matrix */
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
-    
     ///TODO: Compare model->observation_state with hmm recommendation
     
-    /* Update state path prediction to best cluster */
-    int ch = counter++ % MAX_OBSERVATIONS;
-    if(counter > 1 && !ch)
-    {
-        HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
-    
-        /* Update state bands */
-        PSMFunctions.UpdateStateIntervals( model, nu );
+    /* Update state bands */
+    PSMFunctions.UpdateStateIntervals( model );//, nu );
 
-        /* Update states/transition matrix */
-        FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
-        model->current_state = model->fsm.state;
+    /* Update states/transition matrix */
+    FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
+    model->current_state = model->fsm.state;
 
-        /* Generate proposals to complete update */
-        PSMFunctions.GenerateProposals( model );
-    }
+    /* Generate proposals to complete update */
+    PSMFunctions.GenerateProposals( model );
 }
 
 void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )

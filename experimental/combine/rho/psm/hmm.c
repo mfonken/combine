@@ -35,6 +35,11 @@ void InitializeTransitionMatrixHMM( hidden_markov_model_t * model )
 
 uint8_t ReportObservationToHMM( hidden_markov_model_t * model, hmm_observation_t o )
 {
+#ifdef HMM_2D_EMISSIONS
+    LOG_HMM(HMM_REPORT, "Reporting: {%.4f, %.4f} - [%d]\n", o.a, o.b, model->O.index.next);
+#else
+    LOG_HMM(HMM_REPORT, "Reporting %.4f - [%d]\n", o, model->O.index.next);
+#endif
     return PushToObservationBuffer( &model->O, o );
 }
 
@@ -105,8 +110,6 @@ void UpdateBetaHMM(hidden_markov_model_t * model )
                 sum += model->beta[t + 1][j] * model->A[i][j] * p;
             }
             model->beta[t][i] = SOFTEN( sum );
-            if(isinf(model->beta[t][i]) || isnan(model->beta[t][i]))
-                printf("#");
         }
     }
 }
@@ -283,6 +286,7 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
         }
 #ifdef HMM_2D_EMISSIONS
         MatVec.Mat2x2.ScalarMultiply( gamma_sum, &cov_sum, &model->B[i].covariance );
+        MatVec.Gaussian2D.Covariance.Limit( &model->B[i].covariance );
 #else
         model->B[i].std_dev = SOFTEN( ZDIV( sum, gamma_sum ) );
 #endif
