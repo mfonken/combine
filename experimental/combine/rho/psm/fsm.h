@@ -62,7 +62,7 @@ extern "C" {
     void NormalizeFSMMap(           transition_matrix_t *                 );
     uint8_t NormalizeFSMState(      transition_matrix_t *,       uint8_t  );
 
-    void InitializeFSMSystem(       fsm_system_t *, const char *, state_t );
+    void InitializeFSMSystem(       fsm_system_t *, const char *, transition_matrix_t *, state_t );
     void DecayInactiveFSMSystem(    fsm_system_t *                        );
     void UpdateFSMSystem(           fsm_system_t *,    double[NUM_STATES] );
     void UpdateFSMProbabilities(    fsm_system_t *,    double[NUM_STATES] );
@@ -79,7 +79,7 @@ extern "C" {
     
     typedef struct
     {
-        void (*Initialize)(          fsm_system_t *, const char * , state_t );
+        void (*Initialize)(          fsm_system_t *, const char * , transition_matrix_t *, state_t );
         void (*DecayInactive)(       fsm_system_t *                         );
         void (*UpdateProbabilities)( fsm_system_t *, double[NUM_STATES]     );
         void (*UpdateState)(         fsm_system_t *                         );

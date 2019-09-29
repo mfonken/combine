@@ -234,3 +234,12 @@ bool LimitCovarianceGaussian2d( mat2x2 * covariance )
     }
     return limited;
 }
+
+floating_t CovarianceAngleGaussian2d( mat2x2 * covariance )
+{
+    floating_t a = covariance->a, b = covariance->b, d = covariance->d,
+    a_minus_d = a - d,
+    radius = sqrt( a_minus_d * a_minus_d + 4. * b * b ),
+    lambda = a_minus_d + radius;
+    return atan2( -2 * b, a - lambda ) * 180 / M_PI;
+}

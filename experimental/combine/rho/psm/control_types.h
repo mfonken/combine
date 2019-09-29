@@ -82,14 +82,14 @@ extern "C" {
 #define MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC 8
 #define MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC ( MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC * MIN_STD_DEV_SPAN_TO_REJECT_FOR_BAND_CALC )
 
-#define MAX_CLUSTER_LIFETIME 3.//15. // sec
+#define MAX_CLUSTER_LIFETIME 10. // sec
 #define MAX_DISTANCE 1000.f
 #define MIN_TOTAL_MIXTURE_PROBABILITY 1e-15f
 #define MAX_CLUSTERS 25
 #define MAX_ERROR 0.2
 #define INITIAL_VARIANCE 50.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
-#define MAX_MAHALANOBIS_SQ 25//9
+#define MAX_MAHALANOBIS_SQ 9//25
 #define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ
 #define VALID_CLUSTER_STD_DEV 0.25
 #define MIN_CLUSTER_SCORE 0.5
@@ -102,7 +102,7 @@ extern "C" {
 #define MAX_LABELS 10
 #define LABEL_MOVING_AVERAGE_MAX_HISTORY 10
 #define NULL_LABEL 0xff
-#define MIN_LABEL_CONTRIBUTION 0.1
+#define MIN_LABEL_CONTRIBUTION 0.15
 
 #define BOUNDARY_START(X)   !!(X<0)
 #define BOUNDARY_END(X)     !!(X>0)
@@ -167,6 +167,7 @@ extern "C" {
         band_t band[NUM_STATES];
     } band_list_t;
 
+#ifdef __PSM__
     typedef struct
     {
         double value;
@@ -309,11 +310,6 @@ extern "C" {
         return num_std_devs;
     }
     
-    static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
-    {
-        return ( ( a * w ) + ( b * ( 1 - w ) ) );
-    }
-    
     static floating_t MeanXAtGaussianYOffset( gaussian2d_t * gaussian, floating_t y_offset )
     { /* See - https://courses.cs.washington.edu/courses/cse590b/02wi/eig2x2.cpp
        * and http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
@@ -325,6 +321,11 @@ extern "C" {
         lambda = a_minus_d + radius;
         return y_offset * ZDIV( -2 * b, a - lambda );
     }
+#endif
+    static floating_t WeightedAverage( floating_t a, floating_t b, floating_t w )
+   {
+       return ( ( a * w ) + ( b * ( 1 - w ) ) );
+   }
 
 #ifdef __cplusplus
 }

@@ -46,7 +46,7 @@ void Tau::Init( void )
 }
 
 static bool up = true;
-static int sweep_speed = 5;
+static int sweep_speed = 3;
 void Tau::Trigger( void )
 {
     double p = 0.;
@@ -65,12 +65,12 @@ void Tau::Trigger( void )
         CumulativeMovingAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
-    if(( up && rho.core.Thresh > 225 ) || (!up && rho.core.Thresh < 10)) up = !up;
-    rho.core.Thresh += sweep_speed*(up?1:-1); ///TEST
+//    if(( up && rho.core.Thresh > 225 ) || (!up && rho.core.Thresh < 10)) up = !up;
+//    rho.core.Thresh += sweep_speed*(up?1:-1); ///TEST
     rho.core.ThreshByte = (byte_t)rho.core.Thresh;
     
 #ifdef __PSM__
-    rho_drawer.DrawDetectionMap( &rho.core.DetectionMap );
+    rho_drawer.DrawDetectionMap( &rho.core.DetectionMap, rho.core.ThreshByte );
 #endif
 #ifdef PRINT_TUNING_STAGES
     if(!(rho.core.ThreshByte % THRESH_FRAME_PRINT_STEP))
@@ -97,7 +97,7 @@ double Tau::Perform( cimage_t &img )
         while(!utility.background_ready)
             utility.Trigger();
         
-        LOG_RHO(DEBUG_2, "Background ready.\n");
+//        LOG_RHO(DEBUG_2, "Background ready.\n");
         rho.backgrounding_event = true;
     }
     

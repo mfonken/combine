@@ -141,16 +141,15 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 #ifdef __PSM__
     if( ISTIMEDOUT( core->Timestamp, PSM_UPDATE_PERIOD ) )
     {
-        printf("update...\n");
+        LOG_PSM(PSM_DEBUG, "Updating PSM\n");
         /* Process both dimensions' predictive state */
         RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
         core->Timestamp = TIMESTAMP();
     }
 #else
-//    floating_t bands[NUM_STATE_GROUPS] = SPOOF_STATE_BANDS;
-//    double state_intervals[NUM_STATE_GROUPS];
-//    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals, bands, NUM_STATE_GROUPS );
-//    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
+    double state_intervals[NUM_STATE_GROUPS];
+    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
+    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
 
     prediction_predict_variables _;

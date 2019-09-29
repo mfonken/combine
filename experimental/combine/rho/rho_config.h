@@ -9,7 +9,7 @@
 #include "rho_global.h"
 
 //#define SPOOF_STATE_BANDS
-//#define USE_DETECTION_MAP
+#define USE_DETECTION_MAP
 #define RHO_DRAWER
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -18,16 +18,23 @@
 
 #define IS_RGGB_ELIMINATE_G     true
 
+#ifdef HAS_CAMERA
 /* Camera Config */
 #define RHO_WIDTH               1920
 #define RHO_HEIGHT              1080
 
 #define CAPTURE_DIV             4
+
+#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
+#else
+#define CAPTURE_DIV             0
+#define RHO_WIDTH               FRAME_WIDTH
+#define RHO_HEIGHT              FRAME_HEIGHT
+#endif
+
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
-
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
-#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
 
 #if defined __linux || defined __APPLE__
 #ifdef HAS_CAMERA
@@ -68,8 +75,8 @@
 #define THRESH_MIN          1
 #define THRESH_MAX          250
 
-#define MIN_VARIANCE        3
-#define MAX_VARIANCE        20
+#define MIN_VARIANCE        1
+#define MAX_VARIANCE        100
 
 #define MAX_REGION_HEIGHT   700//200
 #define RHO_GAP_MAX         10
@@ -114,10 +121,15 @@
 /*                              FILTER PARAMETERS                                      */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
+#define RHO_K_TARGET        0.4
+#define RHO_VARIANCE_NORMAL 50.
+#define RHO_VARIANCE_SCALE  10.
+#define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
+
 #define RHO_DEFAULT_LS      5.      // Lifespan
-#define RHO_DEFAULT_VU      0.05     // Value uncertainty
-#define RHO_DEFAULT_BU      0.001     // Bias uncertainty
-#define RHO_DEFAULT_SU      0.1   // Sensor uncertainty
+#define RHO_DEFAULT_VU      0.075   // Value uncertainty
+#define RHO_DEFAULT_BU      0.001   // Bias uncertainty
+#define RHO_DEFAULT_SU      0.01     // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
@@ -129,20 +141,13 @@
 (kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 
 #define RHO_TARGET_LS       5.
-#define RHO_TARGET_VU       0.5
-#define RHO_TARGET_BU       0.5
-#define RHO_TARGET_SU       0.001
+#define RHO_TARGET_VU       0.005
+#define RHO_TARGET_BU       0.005
+#define RHO_TARGET_SU       0.2
 #define DEFAULT_TARGET_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
-#define RHO_TARGET_FILTER_MAX   1.
-
-//#define RHO_SQRT_HEIGHT     sqrt(CAPTURE_HEIGHT)
-//#define RHO_DIM_INFLUENCE   0.1
-//#define RHO_K_TARGET_IND    0.3
-#define RHO_K_TARGET        10.//0.12//RHO_K_TARGET_IND+(10/RHO_SQRT_HEIGHT*RHO_DIM_INFLUENCE)
-#define RHO_VARIANCE_NORMAL 20.//RHO_SQRT_HEIGHT/5.0
-#define RHO_VARIANCE_SCALE  10.//RHO_SQRT_HEIGHT/3.0//1.32
-#define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
+#define RHO_TARGET_FILTER_MAX   0.5
+#define RHO_TARGET_FILTER_MIN   0.003
 
 #define MIN_STATE_CONFIDENCE        0.01 //0.5
 #define BACKGROUND_PERCENT_MIN      0.02

@@ -4,7 +4,7 @@
 #endif
 /*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
-void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, index_t minv, index_t maxv, kalman_uncertainty_c uncertainty )
+void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floating_t minv, floating_t maxv, kalman_uncertainty_c uncertainty )
 {
     k->lifespan    = ls;
     k->uncertainty.value   = uncertainty.value;
@@ -117,7 +117,7 @@ void PunishKalman( kalman_filter_t * k )
 
 void PrintKalman( kalman_filter_t * k )
 {
-    LOG_KALMAN(KALMAN_DEBUG, "Val: %.4f | Rate: %.4f{%.4f}\n", k->value, k->rate, k->velocity);
+    LOG_KALMAN(KALMAN_DEBUG, "Val: %.4f | Rate: %.4f | Vel:%.4f\n", k->value, k->rate, k->velocity);
     LOG_KALMAN(KALMAN_DEBUG, "Bias: %.4f | Var: %.4f\n", k->bias, k->variance);
     LOG_KALMAN(KALMAN_DEBUG, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
     LOG_KALMAN(KALMAN_DEBUG, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);

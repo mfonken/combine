@@ -13,6 +13,8 @@
 
 //#define PRINT_DETECTION_MAP
 
+#define SCALE_THRESH(T) (DETECTION_MAP_FRAME_OHEIGHT - (( 1 - (double)T / MAX_DETECTION_MAP_THRESH_VALUE) * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET)
+
 Vec3b rcolors[] =
 {
     {255, 0, 0},
@@ -25,13 +27,14 @@ Vec3b rcolors[] =
 
 uint8_t NUM_COLORS = sizeof(rcolors)/sizeof(rcolors[0]);
 Vec3b rwhite = {255,255,255};
+Vec3b rgray = {100,100,100};
 Vec3b rblack = {0,0,0};
 
 RhoDrawer::RhoDrawer(psm_t * model)
 : detection_map_frame(Size(DETECTION_MAP_FRAME_OWIDTH, DETECTION_MAP_FRAME_OHEIGHT), CV_8UC3, Scalar(0,0,0)),
 psm(model) {}
 
-void RhoDrawer::DrawDetectionMap( detection_map_t * map )
+void RhoDrawer::DrawDetectionMap( detection_map_t * map, uint8_t thresh )
 {
     if(++counter == DETECTION_MAP_INTERVAL)
     {
@@ -52,13 +55,16 @@ void RhoDrawer::DrawDetectionMap( detection_map_t * map )
             printf(" - [%2d](%3d, %3d, %d)\n", c, e->thresh, e->density, e->tracking_id);
 #endif
             int x = ((double)e->density / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
-            int y = DETECTION_MAP_FRAME_OHEIGHT - (( 1 - (double)e->thresh / MAX_DETECTION_MAP_THRESH_VALUE) * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
+            int y = SCALE_THRESH(e->thresh);
             
             Vec3b color = rwhite;
             if( e->tracking_id < NUM_COLORS) color = rcolors[e->tracking_id];
             circle(detection_map_frame, Point(x,y), DETECTION_ELEMENT_RADIUS, color, FILLED);
         }
         PostProcess(psm);
+        
+        int y = SCALE_THRESH(thresh);
+        line(detection_map_frame, Point(0, y), Point(DETECTION_MAP_FRAME_IWIDTH, y), rgray);
     }
 }
 void RhoDrawer::PostProcess(psm_t * psm)
@@ -71,7 +77,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
     for( int j = 0; j < psm->gmm.num_clusters; j++)
     {
         gaus = (*psm->gmm.cluster[j]).gaussian_in;
-        angle = GetCovarianceAngle( &gaus.covariance );
+        angle = MatVec.Gaussian2D.Covariance.Angle( &gaus.covariance );
         int b = 255-j*5, r =j*5;
         if( b<0) b=0; if( r>255) r=255;
         Point center = Point(gaus.mean.a+DETECTION_MAP_INSET, gaus.mean.b+DETECTION_MAP_INSET);

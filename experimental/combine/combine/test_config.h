@@ -9,11 +9,8 @@
 #ifndef test_config_h
 #define test_config_h
 
-using namespace cv;
-using namespace std;
-
-#define MAIN_FPS        10//60
-#define TAU_FPS         10//60
+#define MAIN_FPS        60
+#define TAU_FPS         60
 #define COMBINE_FPS     100
 
 /* GLOBAL SETUP */
@@ -32,20 +29,20 @@ using namespace std;
 
 #define IMAGE_TICKS                     360
 #define THRESH_IMAGE
-//#define ROTATE_IMAGE
+#define ROTATE_IMAGE
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"
-#define FILE_NAME                       "double_circle_fade"//"gradient_centralized"
+#define FILE_NAME                       "gradient_centralized"//"double_circle_fade"
 //#define GROUP_NAME                      "/frames/small/"
 //#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
-#define TYPE                            IMAGE_SINGLE//IMAGE_SET
+#define IMAGE_TYPE                      IMAGE_SINGLE//IMAGE_SET
 
-#if TYPE == IMAGE_SINGLE
+#if IMAGE_TYPE == IMAGE_SINGLE
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME "/" FILE_NAME FILE_TYPE
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   IMAGE_TICKS
-#elif TYPE == IMAGE_SET
+#elif IMAGE_TYPE == IMAGE_SET
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   26//31
 #endif
@@ -71,7 +68,7 @@ using namespace std;
 #define FRAME_IMAGE_ROOT                FILE_ROOT "PersonalResources/TestImages/"
 #define FRAME_SAVE_ROOT                 FILE_ROOT "PCRImages/"
 
-#define sleep(X) usleep(X*1E6)
+//#define sleep(X) usleep(X*1E6)
 #define KEY_DELAY 1E3/MAIN_FPS
 
 #define FILENAME                        FILE_ROOT "psm_perf/p_data.csv"

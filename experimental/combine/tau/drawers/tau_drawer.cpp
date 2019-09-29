@@ -307,12 +307,12 @@ void TauDrawer::DrawDensityGraph(Mat &M)
                 int under = RANGE(ndm + abs(ndm-v),w);
                 int over  = RANGE(ndm - abs(ndm-v),w);
                 
-//                M.at<Vec3b>(y2,under)   = bluish;
-//                M.at<Vec3b>(y2,over)   = redish;
-//                M.at<Vec3b>(y2, u) = greenish;
-                line(M, Point(underprev,y2), Point(under,y2-1), bluish);
-                line(M, Point(overprev,y2), Point(over,y2-1), redish);
-                line(M, Point(uprev,y2), Point(u,y2-1), greenish);
+                M.at<Vec3b>(y2,under)   = bluish;
+                M.at<Vec3b>(y2,over)   = redish;
+                M.at<Vec3b>(y2, u) = greenish;
+//                line(M, Point(underprev,y2), Point(under,y2-1), bluish);
+//                line(M, Point(overprev,y2), Point(over,y2-1), redish);
+//                line(M, Point(uprev,y2), Point(u,y2-1), greenish);
                 
                 underprev = under;
                 overprev = over;
@@ -338,7 +338,7 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         {
             u = INR(OP_ALIGN((fY[x2]/DENSITY_SCALE),h),h);
             v = INR(OP_ALIGN((dY[x2]/DENSITY_SCALE),h),h);
-            
+
             if(v>mdm)
             {
 //                M.at<Vec3b>(v,x2) = white;
@@ -351,23 +351,23 @@ void TauDrawer::DrawDensityGraph(Mat &M)
             {
                 int under = RANGE(mdm + abs(mdm-v),h);
                 int over = RANGE(mdm - abs(mdm-v),h);
-                
-//                M.at<Vec3b>(under,x2) = bluish;
-//                M.at<Vec3b>(over,x2) = redish;
-//                M.at<Vec3b>(u, x2) = greenish;
 
-                line(M, Point(x2,underprev), Point(x2-1,under), bluish);
-                line(M, Point(x2,overprev), Point(x2-1,over), redish);
-                line(M, Point(x2,uprev), Point(x2-1,u), greenish);
-                
+                M.at<Vec3b>(under,x2) = bluish;
+                M.at<Vec3b>(over,x2) = redish;
+                M.at<Vec3b>(u, x2) = greenish;
+
+//                line(M, Point(x2,underprev), Point(x2-1,under), bluish);
+//                line(M, Point(x2,overprev), Point(x2-1,over), redish);
+//                line(M, Point(x2,uprev), Point(x2-1,u), greenish);
+
 //                line(M, Point(x2,under), Point(x2,h), white);
 //                line(M, Point(x2,under), Point(x2,over), bluish);
-                
-                
+
+
                 underprev = under;
                 overprev = over;
             }
-            
+
             vprev = v;
             uprev = u;
 #ifdef DRAW_RHO_MAPS

@@ -37,6 +37,8 @@ extern "C" {
         velocity,
         variance,
         lifespan,
+        min_value,
+        max_value,
         timestamp,
         origin,
         score;
@@ -46,12 +48,9 @@ extern "C" {
         sorted,
         valid,
         flag;
-        index_t
-        min_value,
-        max_value;
     } kalman_filter_t;
     
-    void  InitializeKalman( kalman_filter_t *, floating_t, floating_t, index_t, index_t, kalman_uncertainty_c );
+    void  InitializeKalman( kalman_filter_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
     void       ResetKalman( kalman_filter_t *, floating_t );
     void     PredictKalman( kalman_filter_t *, floating_t );
     void      UpdateKalman( kalman_filter_t *, floating_t );
@@ -62,7 +61,7 @@ extern "C" {
     void       PrintKalman( kalman_filter_t * );
     
     struct kalman {
-        void (*  Initialize)( kalman_filter_t *, floating_t, floating_t, index_t, index_t, kalman_uncertainty_c );
+        void (*  Initialize)( kalman_filter_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
         void (*      Reset)( kalman_filter_t *, floating_t );
         void (*    Predict)( kalman_filter_t *, floating_t );
         void (*     Update)( kalman_filter_t *, floating_t );

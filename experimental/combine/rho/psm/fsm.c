@@ -55,13 +55,14 @@ uint8_t NormalizeFSMState( transition_matrix_t * P, uint8_t i )
     return max_index;
 }
 
-void InitializeFSMSystem( fsm_system_t * sys, const char * name, state_t initial_state )
+void InitializeFSMSystem( fsm_system_t * sys, const char * name, transition_matrix_t * P, state_t initial_state )
 {
     sys->name               = name;
     sys->state              = initial_state;
     sys->prev               = UNKNOWN_STATE;
     sys->next               = UNKNOWN_STATE;
     sys->selection_index    = 0;
+    sys->P                  = P;
     
     Kalman.Initialize( &sys->stability.system, 0., FSM_LIFESPAN, 0., 1., FSM_STABLIITY_UNCERTAINTY );
     Kalman.Initialize( &sys->stability.state, 0., FSM_STATE_LIFESPAN, 0., 1., FSM_STATE_UNCERTAINTY );
@@ -103,14 +104,13 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
 {
     state_t c = sys->state;
 
-#ifdef FSM_DEBUG
-    LOG_FSM( FSM_DEBUG, "%s: Update probabilities are [%5.3f, %5.3f, %5.3f, %5.3f].\n", sys->name, p[0], p[1], p[2], p[3]);
-    LOG_FSM( FSM_DEBUG, "State %s has stability %.4f\n", stateString(c), sys->stability.state.value );
-#endif
+    LOG_FSM( FSM_DEBUG_UPDATE, "%s: Update probabilities are [%5.3f, %5.3f, %5.3f, %5.3f].\n", sys->name, p[0], p[1], p[2], p[3]);
+    LOG_FSM( FSM_DEBUG_UPDATE, "State %s has stability %.4f\n", stateString(c), sys->stability.state.value );
+
     floating_t curr = 0;
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
-        LOG_FSM(FSM_DEBUG, "Updating %s by %.2f.\n", stateString(i), p[i]);
+        LOG_FSM(FSM_DEBUG_UPDATE, "Updating %s by %.2f.\n", stateString(i), p[i]);
         curr = WeightedAverage( (*sys->P)[c][i], p[i], ( sys->stability.state.value + 1 ) / 2 );
         if( curr <= MAX_SINGLE_CONFIDENCE )
             (*sys->P)[c][i] = curr;
@@ -144,21 +144,21 @@ void UpdateFSMState( fsm_system_t * sys )
 
 void PrintFSMSys( fsm_system_t * sys )
 {
-#ifdef FSM_DEBUG
-    LOG_FSM(FSM_DEBUG_2, "%s:\n", sys->name );
-    LOG_FSM(FSM_DEBUG_2, "t+1  t->" );// "\t\t\t  ");
-    for( uint8_t i = 0; i < NUM_STATES; i++ ) LOG_FSM_BARE(FSM_DEBUG_2, "%s-[%d]\t  ", stateString((uint8_t)i), i);
-    LOG_FSM_BARE(FSM_DEBUG_2, "\n");
+#ifdef FSM_DEBUG_PRINT
+    LOG_FSM(FSM_DEBUG_PRINT, "%s:\n", sys->name );
+    LOG_FSM(FSM_DEBUG_PRINT, "t+1  t->" );// "\t\t\t  ");
+    for( uint8_t i = 0; i < NUM_STATES; i++ ) LOG_FSM_BARE(FSM_DEBUG_PRINT, "%s-[%d]\t  ", stateString((uint8_t)i), i);
+    LOG_FSM_BARE(FSM_DEBUG_PRINT, "\n");
     for( uint8_t i = 0, j; i < NUM_STATES; i++ )
     {
-        LOG_FSM(FSM_DEBUG_2, " %s-[%d]", stateString((uint8_t)i), i);
+        LOG_FSM(FSM_DEBUG_PRINT, " %s-[%d]", stateString((uint8_t)i), i);
         for( j = 0; j < NUM_STATES; j++ )
         {
             char c = ((j==(uint8_t)sys->state)?'|':' ');
-            LOG_FSM_BARE(FSM_DEBUG_2, "\t%c[%.5f]%c", c, (*sys->P)[j][i], c);
+            LOG_FSM_BARE(FSM_DEBUG_PRINT, "\t%c[%.5f]%c", c, (*sys->P)[j][i], c);
         }
-        LOG_FSM_BARE(FSM_DEBUG_2, "\n");
+        LOG_FSM_BARE(FSM_DEBUG_PRINT, "\n");
     }
-    LOG_FSM_BARE(FSM_DEBUG_2, "\n");
+    LOG_FSM_BARE(FSM_DEBUG_PRINT, "\n");
 #endif
 }

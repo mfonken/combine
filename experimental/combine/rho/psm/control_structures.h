@@ -15,6 +15,11 @@ extern "C" {
     
 #include "kumaraswamy.h"
 
+typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
+typedef emission_t observation_matrix_t[NUM_STATES];
+typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
+typedef double state_vector_t[NUM_STATES];
+
 #ifdef __PSM__
     typedef struct
     {
@@ -56,11 +61,6 @@ extern "C" {
         cluster_mem[MAX_CLUSTERS];
         const char * name;                // Instance name
     } gaussian_mixture_model_t;
-    
-    typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
-    typedef emission_t observation_matrix_t[NUM_STATES];
-    typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
-    typedef double state_vector_t[NUM_STATES];
     
     typedef struct
     {

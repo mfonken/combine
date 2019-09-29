@@ -294,6 +294,7 @@ typedef struct
 #ifdef __PSM__
     psm_pair_t          PredictiveStateModelPair;
 #else
+    transition_matrix_t StateTransitions;
     kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;
 #endif

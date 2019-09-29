@@ -542,8 +542,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					__RHO__,
-					__PSM__,
-					"DEBUG=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";

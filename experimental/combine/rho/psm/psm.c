@@ -13,10 +13,9 @@
 void InitializePSM( psm_t * model, const char * name )
 {
     model->name = (char *)name;
-    FSMFunctions.Sys.Initialize( &model->fsm, name, UNDER_POPULATED );
+    FSMFunctions.Sys.Initialize( &model->fsm, name, &model->hmm.A, UNDER_POPULATED );
     GMMFunctions.Model.Initialize( &model->gmm, name );
     HMMFunctions.Initialize( &model->hmm, name );
-    model->fsm.P = &model->hmm.A;
     model->state_bands.length = NUM_STATE_GROUPS;
     
 #ifdef __PSM__
@@ -87,7 +86,7 @@ void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floati
 {
     /* Update state path prediction to best cluster */
     HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
-    return;
+//    return;
     /* Calculate current observation and update observation matrix */
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
@@ -139,7 +138,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 #ifdef SPOOF_STATE_BANDS
     band_list->length = NUM_STATE_GROUPS;
     floating_t prev = 0, curr, center;
-    floating_t spoof_bands[] = { 0.25, 0.5, 0.75, 1. };
+    floating_t spoof_bands[] = { 0.20, 0.5, 0.75, 1. };
     floating_t spoof_deviation = 40.;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {

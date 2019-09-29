@@ -52,7 +52,7 @@ floating_t UpdateAllHMM( hidden_markov_model_t * model )
     floating_t new_P = HMMFunctions.Update.Probability( model ),
     delta_P = model->P - new_P;
     model->P = new_P;
-    LOG_HMM(HMM_DEBUG, "Update %s probability ∆: %.4f\n", model->name, delta_P);
+//    LOG_HMM(HMM_DEBUG, "Update %s probability ∆: %.4f\n", model->name, delta_P);
     return delta_P;
 }
 
@@ -214,9 +214,7 @@ void UpdateTransitionProbabilitiesHMM( hidden_markov_model_t * model )
             sum += curr;
         }
         if( sum == 0 )
-        {
             model->A[i][i] = SOFTEN( 1. );
-        }
         /// TODO: Add better failure case (maybe with Beta(or K) distribution)
     }
 }

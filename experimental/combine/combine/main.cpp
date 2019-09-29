@@ -36,7 +36,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
             tau.GetDensitiesFrame(local_frame);
             imshow(TITLE_STRING, local_frame);
 #ifdef USE_DETECTION_MAP
+#ifdef __PSM__
             imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
+#endif
 #endif
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));

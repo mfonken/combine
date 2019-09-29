@@ -79,6 +79,7 @@ void UpdateGaussianWithWeightGaussian2d( vec2 *, vec2 *, gaussian2d_t *, floatin
 vec2 WeightedMeanUpdateGaussian2d( vec2 *, gaussian2d_t *, floating_t );
 floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 *, vec2 * );
 bool LimitCovarianceGaussian2d( mat2x2 * );
+floating_t CovarianceAngleGaussian2d( mat2x2 * );
 
 typedef struct
 {
@@ -112,6 +113,7 @@ typedef struct
 {
     floating_t (*MahalanobisSq)( mat2x2 *, vec2 * );
     bool (*Limit)( mat2x2 * );
+    floating_t (*Angle)( mat2x2 * );
 } covariance_functions;
 typedef struct
 {
@@ -156,7 +158,8 @@ static const matvec_functions MatVec =
     .Gaussian2D.WeightedUpdate = UpdateGaussianWithWeightGaussian2d,
     .Gaussian2D.WeightedMeanUpdate = WeightedMeanUpdateGaussian2d,
     .Gaussian2D.Covariance.MahalanobisSq = MahalanobisDistanceSquaredGaussian2d,
-    .Gaussian2D.Covariance.Limit = LimitCovarianceGaussian2d
+    .Gaussian2D.Covariance.Limit = LimitCovarianceGaussian2d,
+    .Gaussian2D.Covariance.Angle = CovarianceAngleGaussian2d
 };
 
 #endif /* matvec_h */

@@ -45,16 +45,6 @@ static std::string pto_string(const T a_value, const int n = 6)
 }
 
 #ifdef __PSM__
-
-static double GetCovarianceAngle( mat2x2 * covariance )
-{
-    double a = covariance->a, b = covariance->b, d = covariance->d,
-    a_minus_d = a - d,
-    radius = sqrt( a_minus_d * a_minus_d + 4. * b * b ),
-    lambda = a_minus_d + radius;
-    return atan2( -2 * b, a - lambda ) * 180 / M_PI;
-}
-
 class RhoDrawer
 {
     uint16_t counter = 0;
@@ -63,7 +53,7 @@ class RhoDrawer
 public:
     RhoDrawer(psm_t *);
 
-    void DrawDetectionMap( detection_map_t * );
+    void DrawDetectionMap( detection_map_t *, uint8_t thresh = 0 );
     void PostProcess( psm_t * );
     
     Mat& GetDetectionMapFrame() {return detection_map_frame;}
