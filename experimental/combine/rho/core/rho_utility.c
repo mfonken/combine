@@ -80,7 +80,7 @@ void InitializePredictionRhoUtility( prediction_t * prediction, const char * nam
     for(uint8_t i = 0; i < MAX_REGIONS; i++)
     {
         memset(&prediction->Regions[i], 0, sizeof(region_t));
-        prediction->RegionsOrder[i] = i;
+        prediction->RegionsOrder[i] = (order_t){ false, i};
     }
 }
 
@@ -88,9 +88,9 @@ void InitializeDensityMapRhoUtility( density_map_t * density_map, const char * n
 {
     density_map->name = name;
     
-    size_t size = sizeof(density_map_unit_t)*length;
-    memset(density_map->map, 0, size);
-    memset(density_map->background, 0, size);
+//    size_t size = sizeof(density_map_unit_t)*length;
+//    memset(density_map->map, 0, size);
+//    memset(density_map->background, 0, size);
     density_map->length = length;
     density_map->max[0] = 0;
     density_map->max[1] = 0;
@@ -118,7 +118,7 @@ void ResetForDetectRhoUtility( rho_detection_variables * _, density_map_t * dens
     for( index_t i = 0; i < MAX_REGIONS; i++ )
     {
         memset( &prediction->Regions[i], 0, sizeof(region_t) );
-        prediction->RegionsOrder[i] = i;
+        prediction->RegionsOrder[i] = (order_t){ false, i };
     }
     for( index_t i = 0; i < MAX_TRACKING_FILTERS; i++ )
         prediction->TrackingFiltersOrder[i] = i;
@@ -134,37 +134,73 @@ void ResetDensityMapPairKalmansRhoUtility( rho_core_t * core )
 
 void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 {
+    _->raw_density_moment = 0;
+    _->total_density = 0;
+    _->filtered_density = 0;
     
     DUAL_FILTER_CYCLE(_->cycle)
     {
         _->maximum  = 0;
         _->start    = _->range[_->cycle];
         _->end      = _->range[_->cycle_];
+        _->recalculation_counter = 0;
+        _->recalculate = false;
 
         RhoUtility.Predict.PeakFilter( _, density_map, prediction );
         if( RhoUtility.Detect.LowerBound( _ ) )
         {
             do
             {
+                LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Recalc: %d\n", prediction->Name, _->cycle, _->recalculation_counter);
                 RhoUtility.Detect.Regions( _, density_map, prediction );
-                RhoUtility.Detect.CalculateChaos( _, prediction );
+                if( !_->recalculate ) RhoUtility.Detect.CalculateChaos( _, prediction );
                 RhoUtility.Detect.ScoreRegions( _, density_map, prediction );
                 if(_->recalculation_counter == 0) _->first_filtered_density = _->filtered_density;
             } while( _->recalculate && ++_->recalculation_counter < MAX_RHO_RECALCULATION_LEVEL );
 
-            RhoUtility.Detect.SortRegions( _, prediction );
         }
 
         prediction->PreviousPeak[_->cycle] = BOUNDU( _->maximum, _->len );
+        LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Peak: %d\n", prediction->Name, _->cycle, prediction->PreviousPeak[_->cycle]);
         prediction->PreviousDensity[_->cycle] = _->first_filtered_density;
         density_map->max[_->cycle] = _->maximum;
     }
-//    LOG_RHO(RHO_DEBUG, "Regions: %d\n", _->region_total);
+    uint8_t valid_regions = 0;
+    for( uint8_t i = 0; i < _->total_regions; i++ )
+        if( prediction->RegionsOrder[i].valid ) valid_regions++;
+    _->total_regions = valid_regions;
+    LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d\n", _->total_regions);
+
+    RhoUtility.Detect.SortRegions( _, prediction );
+//    printf("N%d\n", _->total_regions);
+//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
+//    for( int i = 0; i < _->total_regions; i++)
+//    {
+//        order_t* o = &prediction->RegionsOrder[i];
+//        region_t* curr = &prediction->Regions[o->index];
+//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
+//
+//        c[i] = o->index;
+//        bool already_has = false;
+//        for(int j = i - 1; j >= 0; j--)
+//        {
+//            if(c[j] == c[i])
+//            {
+//                already_has = true;
+//                printf("Already has %d at %d and %d\n", c[i], i, j);
+//                break;
+//            }
+//        }
+//    }
+//    printf("\n");
+    
+    density_map->centroid = (floating_t)_->raw_density_moment/(floating_t)_->total_density;
+    LOG_RHO(RHO_DEBUG_DETECT, "%s> Centroid: %d | Moment: %d | Density: %d\n", prediction->Name, (int)density_map->centroid, _->raw_density_moment, _->total_density);
 }
 
 void PredictPeakFilterRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 {
-    Kalman.Print( &density_map->kalmans[_->cycle]);
+//    Kalman.Print( &density_map->kalmans[_->cycle]);
     _->filter_peak      = (index_t)Kalman.Step( &density_map->kalmans[_->cycle], prediction->PreviousPeak[_->cycle], density_map->kalmans[_->cycle].velocity );
     _->filter_peak_2    = _->filter_peak << 1;
     _->filter_variance  = BOUND((index_t)(RHO_VARIANCE( density_map->kalmans[_->cycle].K[0]) ), MIN_VARIANCE, MAX_VARIANCE);
@@ -186,28 +222,25 @@ inline bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * _ )
 
 inline void DetectRegionsRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 { /* Detect regions - START */
-    
-    if( !_->recalculate )
-    {
-        _->total_density = 0;
-        _->filtered_density = 0;
-    }
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->curr, density_map->map, _->background_curr, density_map->background)
     {
-        /* Update max */
-        if(_->curr > _->maximum) _->maximum = _->curr;
-        
         if( !_->recalculate )
+        {/* Update max */
+            if(_->curr > _->maximum)
+                _->maximum = _->curr;
+            
             RhoUtility.Detect.SubtractBackground( _ );
+        }
         RhoUtility.Detect.Region( _, density_map, prediction );
     }
 } /* Detect regions - END */
 
 inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * _ )
 {
-    if( _->curr > _->background_curr )
+    if( _->curr >= _->background_curr )
     {
         _->total_density += _->curr;
+        _->raw_density_moment += _->curr * (density_t)_->x;
         
 #ifdef USE_BACKGROUNDING
         /* Subtract background */
@@ -242,7 +275,7 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
     }
 
     /* Process completed regions and increment count */
-    else if( ++_->gap_counter > RHO_GAP_MAX && _->has_region
+    else if( ++_->gap_counter > RHO_GAP_MAX && _->has_region && _->total_regions < MAX_REGIONS
 #ifdef __USE_RUNNING_AVERAGE__
     )
     {
@@ -259,9 +292,22 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
         {
             /* Create new region at secondary */
             index_t loc = (index_t)ZDIV( _->average_moment, _->average_curr );
-            prediction->Regions[_->region_total] = (region_t){ density_map->map[loc], _->current_density, loc, _->width };
-            prediction->RegionsOrder[_->region_total] = _->region_total;
-            _->region_total++;
+            uint8_t next_index = _->total_regions;
+            if(_->recalculate)
+            {
+                for( uint8_t i = 0; i < next_index; i++ )
+                {
+                    if( !prediction->RegionsOrder[i].valid )
+                    {
+                        next_index = i;
+                        break;
+                    }
+                }
+            }
+            prediction->Regions[prediction->RegionsOrder[next_index].index] = (region_t){ density_map->map[loc], _->current_density, loc, _->width };
+            prediction->RegionsOrder[next_index].valid = true;
+            if(next_index == _->total_regions)
+                _->total_regions++;
         }
 
         /* reset variables */
@@ -278,8 +324,8 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
 
 void CalculateChaosRhoUtility( rho_detection_variables * _, prediction_t * prediction )
 {
-    _->chaos = (floating_t)prediction->PreviousDensity[_->cycle] / (floating_t)_->filtered_density;
-    LOG_RHO(RHO_DEBUG_2, "chaos:%.4f\n", _->chaos);
+    _->chaos = MAX( ZDIV( (floating_t)prediction->PreviousDensity[_->cycle], (floating_t)_->filtered_density ), MIN_CHAOS);
+    LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Chaos:%.4f\n", prediction->Name, _->cycle, _->chaos);
 }
 
 void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
@@ -291,24 +337,29 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
     if(_->filtered_density > 0 )
     {
         /* Cycle regions */
-        for(uint8_t i = 0; i < _->region_total; i++)
+        for(uint8_t i = 0; i < _->total_regions; i++)
         {
             /* Get region at index from order array and check validity */
-            uint8_t j = prediction->RegionsOrder[i];
-            if(j >= MAX_REGIONS) continue;
-            region_t * curr = &prediction->Regions[j];
+            if(!prediction->RegionsOrder[i].valid) continue;
+            uint8_t jo = prediction->RegionsOrder[i].index;
+            region_t * curr = &prediction->Regions[jo];
 
             /* Score current region */
             RhoUtility.Generate.RegionScore( curr, _->filtered_density, _->maximum );
 
             /* Recalculate regions with chaos */
-            if(curr->score > _->chaos)
+            floating_t chaos = ( _->recalculation_chaos > 0 && _->recalculation_chaos < ZDIV_LNUM )
+                ? _->recalculation_chaos : _->chaos;
+            _->recalculation_chaos = ZDIV_LNUM;
+            if( curr->score > chaos )
             {
+                _->recalculation_chaos = MIN( curr->score, _->recalculation_chaos );
+                LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> R%d Score: %.4f | Chaos: %.4f\n", prediction->Name, _->cycle, jo, curr->score, chaos);
                 /* Recalculate around chaotic region */
                 _->recalculate = true;
 
                 /* Remove this index */
-                prediction->RegionsOrder[i] = MAX_REGIONS;
+                prediction->RegionsOrder[i].valid = false;
 
                 /* Get centroid peak and update filter peak double */
                 sdensity_t current_peak = (sdensity_t)density_map->map[curr->location];
@@ -337,26 +388,110 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
 
 void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * prediction )
 {
+    
+//    region_t *curr;
+//
+//    printf("\nN%d\n", _->total_regions);
+//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
+//    for( int i = 0; i < _->total_regions; i++)
+//    {
+//        order_t* o = &prediction->RegionsOrder[i];
+//        curr = &prediction->Regions[o->index];
+//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
+//
+//        c[i] = o->index;
+//        bool already_has = false;
+//        for(int j = i - 1; j >= 0; j--)
+//        {
+//            if(c[j] == c[i])
+//            {
+//                already_has = true;
+//                printf("Already has %d at %d and %d\n", c[i], i, j);
+//                break;
+//            }
+//        }
+//    }
+//
+//
+//    order_t* o;
+//    floating_t primary_score = 0., secondary_score = 0.;
+//    int8_t primary_index = -1, secondary_index = -1;
+//    for( uint8_t i = 0; i < _->total_regions; i++)
+//    {
+//        if( !prediction->RegionsOrder[i].valid ) continue;
+//        o = &prediction->RegionsOrder[i];
+//        curr = &prediction->Regions[o->index];
+//
+//        if( curr->score > primary_score )
+//        {
+//            secondary_score = primary_score;
+//            secondary_index = primary_index;
+//
+//            primary_score = curr->score;
+//            primary_index = i;
+//        }
+//        else if( curr->score > secondary_score )
+//        {
+//            secondary_score = curr->score;
+//            secondary_score = i;
+//        }
+//    }
+//
+//    printf("p:%d | s:%d\n", primary_index, secondary_index);
+//    if( primary_index != -1 ) prediction->RegionsOrder[0].index = primary_index;
+//    if( secondary_index != -1 ) prediction->RegionsOrder[1].index = secondary_index;
+//
+//    printf("Order: ");
+//    for( int i = 0; i < _->total_regions; i++)
+//        printf("%d(%.4f) ", prediction->RegionsOrder[i].index, prediction->Regions[prediction->RegionsOrder[i].index].score);
+//    printf("\n");
+
     /// NOTE: Smaller scores are better
     /* Assume all regions are valid */
     index_t i, io, j, jo, best_index;
     floating_t best_score;
     region_t *curr, *check;
 
+//    printf("\nN%d\n", _->total_regions);
+//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
+//    for( i = 0; i < _->total_regions; i++)
+//    {
+//        order_t* o = &prediction->RegionsOrder[i];
+//        curr = &prediction->Regions[o->index];
+//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
+//
+//        c[i] = o->index;
+//        bool already_has = false;
+//        for(int j = i - 1; j >= 0; j--)
+//        {
+//            if(c[j] == c[i])
+//            {
+//                already_has = true;
+//                printf("Already has %d at %d and %d\n", c[i], i, j);
+//                break;
+//            }
+//        }
+//    }
+
     /* Cycle through found regions */
-    for( i = 0; i < _->region_total; i++)
+    for( i = 0; i < _->total_regions; i++)
     {
-        io = prediction->RegionsOrder[i];
+//        printf("i%d:\n", i);
+        if( !prediction->RegionsOrder[i].valid ) continue;
+        io = prediction->RegionsOrder[i].index;
         curr = &prediction->Regions[io];
         if( curr->sort ) continue;
 
         best_score = curr->score;
         best_index = i;
         /* Cycle through other regions */
-        for( j = i+1; j < _->region_total; j++ )
+        for( j = i+1; j < _->total_regions; j++ )
         {
-            jo = prediction->RegionsOrder[j];
+//            printf(" j%d", j);
+            if( !prediction->RegionsOrder[j].valid ) continue;
+            jo = prediction->RegionsOrder[j].index;
             check = &prediction->Regions[jo];
+            if( check->sort ) continue;
 
             /* If unscored and less than min, set as new min */
             if( check->score < best_score )
@@ -365,12 +500,27 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
                 best_index = j;
             }
         }
+//        printf("\n%d and %d\n", best_index, i);
+        if( best_index == i ) continue;
 
-        prediction->RegionsOrder[i] = best_index;
-        prediction->RegionsOrder[best_index] = i;
+//        printf("Before: ");
+//        for( j = 0; j < _->total_regions; j++)
+//            printf("%d ", prediction->RegionsOrder[j].index);
+//        printf("\n");
 
+        prediction->RegionsOrder[i].index = best_index;
+        prediction->RegionsOrder[best_index].valid = true;
+        prediction->RegionsOrder[best_index].index = i;
         prediction->Regions[i].sort = true;
-        LOG_RHO(RHO_DEBUG_2, "R%d:{%d,%d,%d,%d} = %.4f\n",
+
+//        printf("After: ");
+//        for( j = 0; j < _->total_regions; j++)
+//            printf("%d ", prediction->RegionsOrder[j].index);
+//         printf("\n");
+
+        curr = &prediction->Regions[i];
+        LOG_RHO(RHO_DEBUG_DETECT, "%s> R%d:{ M%3d, D%3d, X%3d, W%3d } = S%.4f\n",
+            prediction->Name,
             i,
             curr->maximum,
             curr->density,
@@ -378,107 +528,112 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
             curr->width,
             curr->score
             );
+        if( curr->score > 100. )
+            printf(".\n");
     }
     for(; i < MAX_REGIONS; i++ )
     {
-        prediction->RegionsOrder[i] = i;
+        prediction->RegionsOrder[i] = (order_t){ false, i };
+    }
+
+    int c2[MAX_REGIONS] = {-1, -1, -1, -1};
+    for( i = 0; i < _->total_regions; i++)
+    {
+        order_t* o = &prediction->RegionsOrder[i];
+        curr = &prediction->Regions[o->index];
+        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d S:%.4f\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location, curr->score);
+
+        c2[i] = o->index;
+        bool already_has = false;
+        for(int j = i - 1; j >= 0; j--)
+        {
+            if(c2[j] == c2[i])
+            {
+                already_has = true;
+                printf("Already has %d at %d and %d\n", c2[i], i, j);
+                break;
+            }
+        }
     }
 }
 
 void CalculatedFrameStatisticsRhoUtility( rho_detection_variables * _, prediction_t * prediction )
 {
     /* Update frame statistics */
-    _->assumed_regions = (floating_t)_->region_total;
+    _->assumed_regions = (floating_t)_->total_regions;
     if( _->assumed_regions == 0. ) _->assumed_regions = 1.;
 
     prediction->NuRegions = BOUNDU( ZDIV( (floating_t)_->total_density * (floating_t)_->assumed_regions, _->target_density ), MAX_NU_REGIONS );
-    prediction->NumRegions = _->region_total;
+    prediction->NumRegions = _->total_regions;
     prediction->TotalDensity = _->total_density;
     prediction->AverageDensity = ZDIV( (floating_t)prediction->TotalDensity, prediction->NuRegions );
 
-    /* reset sort flags */
+    /* Reset sort flags */
     for( uint8_t i = 0; i < MAX_REGIONS; i++ )
         prediction->Regions[i].sort = false;
     
-    LOG_RHO(RHO_DEBUG, "Total:%d | Target:%d | Frame:%d\n", _->total_density, (int)_->target_density, TOTAL_RHO_PIXELS);
-//    LOG_RHO(RHO_DEBUG, "Regions: %d{%.3f}\n", prediction->NumRegions, prediction->NuRegions);
+    LOG_RHO(RHO_DEBUG_DETECT_2, "Total:%d | Target:%d | Frame:%d\n", _->total_density, (int)_->target_density, TOTAL_RHO_PIXELS);
+    LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d{%.3f}\n", prediction->NumRegions, prediction->NuRegions);
 }
 
 void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
 {
     index_t valid_tracks = RhoUtility.Predict.CalculateValidTracks( prediction );
-    LOG_RHO( RHO_DEBUG_2, "Found %d valid/active tracking filter(s)\n", valid_tracks);
+    LOG_RHO( RHO_DEBUG_PREDICT_2, "Found %d valid/active tracking filter(s)\n", valid_tracks);
 
     /* Declare essential variables */
-    floating_t aa, bb, ab, ba, total_difference = 0., average_difference = 0.;
+    floating_t aa, bb, ab, ba, curr_difference = 0., total_difference = 0., average_difference = 0.;
 
     /* Match regions to Kalmans */
-    index_t m = 0, n = 0, updated = 0;
-    for( ; m < ( valid_tracks - 1 ); m ++ )
-    {
-        for( ; n < ( prediction->NumRegions - 1 ); n++ )
-        { /* Update tracking filters in pairs following determinant */
+    index_t m = 0, n = 0, v = 0, updated = 0;
+    while( m < ( valid_tracks - 1 ) && n < ( prediction->NumRegions - 1 ) )
+    { /* Update tracking filters in pairs following determinant */
+        /* Retreive current region pair */
+        for( ; v < MAX_REGIONS && !prediction->RegionsOrder[v].valid; v++ );
+        region_t *regionA = &prediction->Regions[prediction->RegionsOrder[v++].index];
+        for( ; v < MAX_REGIONS && !prediction->RegionsOrder[v].valid; v++ );
+        region_t *regionB = &prediction->Regions[prediction->RegionsOrder[v++].index];
 
-            /* Retreive current region pair */
-            region_t
-            *regionA = &prediction->Regions[prediction->RegionsOrder[n]],
-            *regionB = &prediction->Regions[prediction->RegionsOrder[n+1]];
+        /* Retreive tracking filters pair */
+        byte_t
+        fAi = prediction->TrackingFiltersOrder[m],
+        fBi = prediction->TrackingFiltersOrder[m+1];
 
-            /* Retreive tracking filters pair */
-            byte_t
-            fAi = prediction->TrackingFiltersOrder[m],
-            fBi = prediction->TrackingFiltersOrder[m+1];
+        kalman_filter_t
+        *filterA = &prediction->TrackingFilters[fAi],
+        *filterB = &prediction->TrackingFilters[fBi];
 
-            kalman_filter_t
-            *filterA = &prediction->TrackingFilters[fAi],
-            *filterB = &prediction->TrackingFilters[fBi];
-
-            bool swapped = false;
-
-            /* Calculate distances between filters and regions */
-            aa = fabs(filterA->value - regionA->location );
-            bb = fabs(filterB->value - regionB->location );
-            ab = fabs(filterA->value - regionB->location );
-            ba = fabs(filterB->value - regionA->location );
-
-            if( aa > MAX_TRACKING_MATCH_DIFFERNCE )
-            {
-                aa = MAX_TRACKING_MATCH_DIFFERNCE;
-                Kalman.Punish(filterA);
-            }
-            if( ab > MAX_TRACKING_MATCH_DIFFERNCE )
-            {
-                ab = MAX_TRACKING_MATCH_DIFFERNCE;
-                Kalman.Punish(filterA);
-            }
-            if( bb > MAX_TRACKING_MATCH_DIFFERNCE )
-            {
-                bb = MAX_TRACKING_MATCH_DIFFERNCE;
-                Kalman.Punish(filterB);
-            }
-            if( ba > MAX_TRACKING_MATCH_DIFFERNCE )
-            {
-                ba = MAX_TRACKING_MATCH_DIFFERNCE;
-                Kalman.Punish(filterB);
-            }
-
-            /* Swap on upward determinant */
-            if( aa * bb > ab * ba )
-            {
-                swapped = true;
-                total_difference += aa + bb;
-            }
-            else
-                total_difference += ab + ba;
-            updated += 2;
-
+        /* Calculate distances between filters and regions */
+        aa = fabs(filterA->value - regionA->location );
+        bb = fabs(filterB->value - regionB->location );
+        ab = fabs(filterA->value - regionB->location );
+        ba = fabs(filterB->value - regionA->location );
+        
+        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> aa:%.3f ab:%.3f ba:%.3f bb:%.3f\n", prediction->Name, m, n, aa, ab, ba, bb);
+    
+        bool swapped = false;
+        /* Swap on upward determinant */
+        if( aa * bb < ab * ba )
+        {
+            curr_difference = aa + bb;
+        }
+        else
+        {
+            swapped = true;
+            curr_difference = ab + ba;
+        }
+        LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", ab + ba);
+        total_difference += curr_difference;
+        
+        if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
+        {
             /* Update filters */
             if(swapped)
             {
                 Kalman.Update(filterA, regionB->location );
                 Kalman.Update(filterB, regionA->location );
-                regionB->tracking_id = fAi;
                 regionA->tracking_id = fBi;
+                regionB->tracking_id = fAi;
             }
             else
             {
@@ -487,33 +642,43 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
                 regionA->tracking_id = fAi;
                 regionB->tracking_id = fBi;
             }
-
-            m++; n++;
+            updated += 2;
             
-            LOG_RHO(RHO_DEBUG_2, "Updating %d: %.4f\n", fAi, filterA->value);
-            LOG_RHO(RHO_DEBUG_2, "Updating %d: %.4f\n", fBi, filterB->value);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fAi, filterA->value);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fBi, filterB->value);
         }
+        m+=2; n+=2;
+    }
+    
+    /* Account for odd number of and spare regions */
+    if( m < valid_tracks && n < prediction->NumRegions )
+    {
+        kalman_filter_t *filter = &prediction->TrackingFilters[prediction->TrackingFiltersOrder[m]];
+        for( ; v < MAX_REGIONS && !prediction->RegionsOrder[v].valid; v++ );
+        region_t *region = &prediction->Regions[prediction->RegionsOrder[v++].index];
 
-        /* Account for odd number of and spare regions */
-        if( m < valid_tracks && n < prediction->NumRegions )
+        curr_difference = fabs(filter->value - region->location);
+        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> curr_difference:%.3f\n", prediction->Name, m, n, curr_difference);
+        
+        LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", curr_difference);
+        if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
         {
-            kalman_filter_t
-            *filter = &prediction->TrackingFilters[prediction->TrackingFiltersOrder[m]];
-            floating_t
-            bloc = (floating_t)prediction->Regions[prediction->RegionsOrder[n]].location;
-            Kalman.Update(filter, bloc);
-
-            aa = fabs(filter->value - bloc);
-            total_difference += aa;
+            region->tracking_id = prediction->TrackingFiltersOrder[m];
+            
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", region->tracking_id, filter->value);
+            Kalman.Update(filter, region->location);
+            
+            total_difference += curr_difference;
             updated++;
         }
+        m++; n++;
     }
 
     /* Activate new filters */
     for( ; n < prediction->NumRegions && n < MAX_REGIONS; n++ )
     {
-        LOG_RHO( RHO_DEBUG_2, "Activating filter at index %d[%d]\n", prediction->TrackingFiltersOrder[n], n );
-        Kalman.Step( &prediction->TrackingFilters[prediction->TrackingFiltersOrder[n]], prediction->Regions[prediction->RegionsOrder[n]].location, 0. );
+        LOG_RHO( RHO_DEBUG_PREDICT_2, "Activating filter at index %d[%d]\n", prediction->TrackingFiltersOrder[n], n );
+        Kalman.Step( &prediction->TrackingFilters[prediction->TrackingFiltersOrder[n]], prediction->Regions[prediction->RegionsOrder[n].index].location, 0. );
     }
 
     /* Punish unused ones */
@@ -527,8 +692,8 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
     if( updated )
     {
         average_difference = total_difference / (floating_t)updated;
-        if( average_difference > MAX_TRACKING_MATCH_DIFFERNCE ) prediction->Probabilities.confidence = 0.;
-        else prediction->Probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERNCE ) );
+        if( average_difference > MAX_TRACKING_MATCH_DIFFERENCE ) prediction->Probabilities.confidence = 0.;
+        else prediction->Probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERENCE ) );
     }
 
     RhoUtility.Predict.SortFilters( prediction );
@@ -586,6 +751,7 @@ index_t CalculateValidTracksRhoUtility( prediction_t * prediction )
         if( Kalman.IsExpired(curr)
            || ( score < MIN_TRACKING_KALMAN_SCORE ) ) break;
         Kalman.Predict(curr, curr->velocity);
+        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s> K%d->score=%.4f\n", prediction->Name, io, curr->score);
         curr->valid = true;
         valid_tracks++;
     }
@@ -602,7 +768,6 @@ void PredictTrackingProbabilitiesRhoUtility( prediction_t * prediction )
         prediction->Probabilities.P[i] = curr_CDF - prev_CDF;
         prev_CDF = curr_CDF;
     }
-    
     
     prediction->Primary   = prediction->TrackingFilters[0].value;
     prediction->Secondary = prediction->TrackingFilters[1].value;
@@ -643,10 +808,13 @@ void CombineAxisProbabilitesRhoUtility( prediction_pair_t * prediction )
 
 void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_core_t * core )
 {
-    _->Centroid.x = RhoUtility.Calculate.PredictionCenter( _->Primary.x, _->Secondary.x, core->Height);
-    _->Centroid.y = RhoUtility.Calculate.PredictionCenter( _->Primary.y, _->Secondary.y, core->Height);
+//    _->Centroid.x = RhoUtility.Calculate.PredictionCenter( _->Primary.x, _->Secondary.x, core->Height);
+//    _->Centroid.y = RhoUtility.Calculate.PredictionCenter( _->Primary.y, _->Secondary.y, core->Width);
+    
+    _->Centroid.x = (index_t)core->DensityMapPair.y.centroid;
+    _->Centroid.y = (index_t)core->DensityMapPair.x.centroid;
 
-    LOG_RHO(RHO_DEBUG_2, "Centroid.x>%d | Centroid.y>%d\n", _->Centroid.x, _->Centroid.y);
+    LOG_RHO(RHO_DEBUG_UPDATE_2, "A: Centroid.x>%d | Centroid.y>%d\n", _->Centroid.x, _->Centroid.y);
 
     core->Primary   = _->Primary;
     core->Secondary = _->Secondary;
@@ -698,7 +866,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     core->TargetCoverageFactor = core->TargetFilter.value;
     core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
-    LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.3f|%.3f\n", core->FilteredPercentage, core->TotalPercentage);
+    LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.7f|%.7f\n", core->FilteredPercentage, core->TotalPercentage);
 #ifdef __PSM__
 //    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
     core->TargetFilter.value = core->TotalPercentage;
@@ -726,8 +894,8 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
     core->Tune.state = core->ThreshFilter.Value;
     
-    LOG_RHO(RHO_DEBUG, "Avg:%d | Nu:%.4f\n", (int)core->PredictionPair.AverageDensity, core->PredictionPair.NuRegions);
-    LOG_RHO(RHO_DEBUG, "Target cov.:%.4f | Target val: %.4f | Thresh val:%.4f\n", core->TargetCoverageFactor, core->TargetFilter.value, core->ThreshFilter.Value);
+    LOG_RHO(RHO_DEBUG_2, "Avg:%d | Nu:%.4f\n", (int)core->PredictionPair.AverageDensity, core->PredictionPair.NuRegions);
+    LOG_RHO(RHO_DEBUG_2, "Target cov.:%.4f | Target val: %.4f | Thresh val:%.4f\n", core->TargetCoverageFactor, core->TargetFilter.value, core->ThreshFilter.Value);
 }
 
 void CalculateTargetTuneFactorRhoUtility( rho_core_t * core )
@@ -829,7 +997,9 @@ void GenerateRegionScoreRhoUtility( region_t * region, density_t total_density, 
     floating_t
         delta_d = ( (floating_t)region->density / (floating_t)total_density) - 0.5,
         delta_p = (floating_t)peak / (floating_t)region->maximum;
-    region->score = REGION_SCORE_FACTOR * ( ( delta_d * delta_d ) + ( delta_p * delta_p ) );
+    region->score = sqrt( REGION_SCORE_FACTOR * ( ( delta_d * delta_d ) + ( delta_p * delta_p ) ) );
+    if( region->score > 100. )
+        printf(".\n");
 }
 
 /* Generic centroid and mass calculator */
@@ -916,8 +1086,8 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * prediction
         index_t io = prediction->TrackingFiltersOrder[i];
         if( io >= MAX_TRACKING_FILTERS ) continue;
         floating_t x = prediction->TrackingFilters[io].value;
-        io = prediction->RegionsOrder[i];
-        region_t * region = &prediction->Regions[io];
+        if( !prediction->RegionsOrder[i].valid ) continue;
+        region_t * region = &prediction->Regions[prediction->RegionsOrder[i].index];
         bool below_centroid = (density_t)x < prediction->PreviousCentroid;
 
         index_t density =  (index_t)region->density + (index_t)prediction->PreviousPeak[(uint8_t)below_centroid];

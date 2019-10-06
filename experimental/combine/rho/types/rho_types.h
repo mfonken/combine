@@ -55,7 +55,8 @@ typedef struct
         *background,
         max[2];
     index_t
-        length,
+        length;
+    floating_t
         centroid;
     bool
         has_background;
@@ -92,23 +93,29 @@ typedef struct
 
 typedef struct
 {
-    kalman_filter_t    TrackingFilters[MAX_TRACKING_FILTERS];
+    uint8_t valid;
+    uint8_t index;
+} order_t;
+
+typedef struct
+{
+    const char *    Name;
+    kalman_filter_t TrackingFilters[MAX_TRACKING_FILTERS];
     uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
     region_t        Regions[MAX_REGIONS];
-    uint8_t         RegionsOrder[MAX_REGIONS],
-                    NumRegions;
-    floating_t      NuRegions,
-                    Primary,
-                    Secondary,
-                    AverageDensity;
+    order_t         RegionsOrder[MAX_REGIONS];
+    uint8_t         NumRegions;
     density_t       PreviousPeak[2],
                     PreviousCentroid;
     density_2d_t    PreviousDensity[2],
                     TotalDensity,
                     FilterDensity[2];
+    floating_t      NuRegions,
+                    Primary,
+                    Secondary,
+                    AverageDensity;
     observation_list_t ObservationList;
     prediction_probabilities Probabilities;
-    const char *    Name;
 } prediction_t;
 
 typedef struct
@@ -117,6 +124,7 @@ typedef struct
     prediction_probabilities Probabilities;
 
     floating_t      NuRegions,
+                    NumRegions,
 //                    BestConfidence,
                     AverageDensity;
 } prediction_pair_t;
@@ -188,8 +196,8 @@ typedef struct
       cycle_,
       gap_counter,
       width,
-      region_total,            /* Region fill */
-      x,               /* Generic index */
+      total_regions,
+      x,
       start,
       end;
     density_t
@@ -198,23 +206,26 @@ typedef struct
       filter_band_lower,
       curr,
       background_curr,
-      recalculation_counter;
+      maximum;
     variance_t
       filter_variance;
     density_2d_t
-      maximum,
       current_density,
       total_density,
       filtered_density,
-      first_filtered_density; /* Initial filtered density before retries */
+      first_filtered_density, /* Initial filtered density before retries */
+      raw_density_moment;
     bool
       has_region,
       recalculate;
+    byte_t
+      recalculation_counter;
     floating_t
       average_counter,
       average_curr,   /* cumulative average */
       average_moment,   /* moment average */
       chaos,
+      recalculation_chaos,
       target_density,
       assumed_regions;
 } rho_detection_variables;
@@ -267,7 +278,6 @@ typedef struct
         Secondary,
         Centroid,
         BackgroundCentroid;
-//        Px, Py, Sx, Sy, Cx, Cy, Bx, By;
     byte_t
         ThreshByte,
         BackgroundCounter;

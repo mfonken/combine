@@ -83,7 +83,8 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
 }
 
-/* Calculate and process data in variance band from density filter to generate predictions */
+/* Calculate and process data in variance band from density filter to generat
+ e predictions */
 void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t * prediction )
 {
     LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );
@@ -97,7 +98,7 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
     /* Perform detect */
     LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
     RhoUtility.Detect.Perform( &_, density_map, prediction );
-
+    
     /* Update frame statistics */
     LOG_RHO(RHO_DEBUG_2, "Calculating frame statistics:\n");
     RhoUtility.Detect.CalculateFrameStatistics( &_, prediction );
@@ -113,15 +114,17 @@ void DetectRhoCorePairs( rho_core_t * core )
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 
     /* Calculate accumulated filtered percentage from both axes */
-//    core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );//core->TotalCoverage );
+    core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );
     core->TotalPercentage = ZDIV( (floating_t)core->TotalCoverage, (floating_t)TOTAL_RHO_PIXELS );
+    core->PredictionPair.NumRegions = MAX( core->PredictionPair.x.NumRegions, core->PredictionPair.y.NumRegions );
     core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
 void UpdateRhoCorePrediction( prediction_t * prediction )
 {
-    LOG_RHO(RHO_DEBUG_2,"Updating %s Map:\n", prediction->Name);
+    LOG_RHO(RHO_DEBUG_PREDICT,"Updating %s Map:\n", prediction->Name);
+    
     /* Step predictions of all Kalmans */
     RhoUtility.Predict.TrackingFilters( prediction );
     RhoUtility.Predict.TrackingProbabilities( prediction );
@@ -148,7 +151,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     }
 #else
     double state_intervals[NUM_STATE_GROUPS];
-    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
+    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NumRegions, state_intervals );
     FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
 

@@ -9,9 +9,9 @@
 #ifndef test_config_h
 #define test_config_h
 
-#define MAIN_FPS        60
-#define TAU_FPS         60
-#define COMBINE_FPS     100
+#define MAIN_FPS        10
+#define TAU_FPS         15
+#define COMBINE_FPS     15
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
@@ -27,13 +27,13 @@
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     360
+#define IMAGE_TICKS                     (360*2)
 #define THRESH_IMAGE
-#define ROTATE_IMAGE
+#define ROTATE_IMAGEgit
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"
-#define FILE_NAME                       "gradient_centralized"//"double_circle_fade"
+#define FILE_NAME                       "triple_circle_corner_triangle_fade_high_contrast"//"gradient_centralized"
 //#define GROUP_NAME                      "/frames/small/"
 //#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"

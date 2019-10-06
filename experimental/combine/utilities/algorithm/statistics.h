@@ -17,7 +17,7 @@ extern "C" {
 #include "rho_global.h"
 
 void GenerateCumulativeMomentsStatistics( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
-void CumulativeMovingAverageStatistics( floating_t, floating_t *, int );
+void GenerateCumulativeAverageStatistics( floating_t, floating_t *, int );
     
 #ifdef __cplusplus
 }

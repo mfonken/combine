@@ -53,6 +53,7 @@ class TestInterface
 protected:
     int id;
     const char * name;
+    double actual_rate;
 public:
     virtual void    Init( void ) = 0;
     virtual void    Trigger( void ) = 0;
@@ -61,6 +62,8 @@ public:
     TestInterface(int id, const char * name ) : id(id), name(name) {}
     int             GetId( void ) { return id; }
     const char *    GetName( void ) { return name; }
+    double          GetRate( void ) { return actual_rate; }
+    void            SetRate( double rate ) { actual_rate = rate; }
 };
 
 typedef enum
@@ -76,6 +79,7 @@ class Event
 public:
     int id,
         rate;
+    long last_time;
     pthread_t       thread;
     pthread_mutex_t * mutex;
     SerialWriter    * sercom;
@@ -105,7 +109,6 @@ class Environment
 {
 private:
     pthread_mutex_t lock;
-    pthread_cond_t  condition;
     
     void controlTick();
 public:

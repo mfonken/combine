@@ -18,6 +18,8 @@
 
 #define IS_RGGB_ELIMINATE_G     true
 
+#define __USE_RUNNING_AVERAGE__
+
 #ifdef HAS_CAMERA
 /* Camera Config */
 #define RHO_WIDTH               1920
@@ -59,7 +61,7 @@
 #define COVERAGE_NORMAL_MAX     0.45
 #define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
 #define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
-#define DEFAULT_THRESH          1// 170//250
+#define DEFAULT_THRESH          THRESH_MIN// 170//250
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
@@ -72,14 +74,14 @@
 /*                                RHO PARAMETERS                                       */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #define THRESH_STEP_MAX     5
-#define THRESH_MIN          1
+#define THRESH_MIN          10
 #define THRESH_MAX          250
 
 #define MIN_VARIANCE        1
 #define MAX_VARIANCE        100
 
 #define MAX_REGION_HEIGHT   700//200
-#define RHO_GAP_MAX         10
+#define RHO_GAP_MAX         5
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
@@ -95,12 +97,13 @@
 #define REGION_SCORE_FACTOR   0.5
 #define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
 #define MAX_OBSERVATIONS      (1 << 4)
+#define MIN_CHAOS             1.0
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
 #define MAX_TRACKING_FILTERS MAX_REGIONS
 #define MIN_TRACKING_KALMAN_SCORE 0.02
-#define MAX_TRACKING_MATCH_DIFFERNCE 500
+#define MAX_TRACKING_MATCH_DIFFERENCE 500
 #define TRACKING_MATCH_TRUST 0.4
 
 #define TARGET_TUNE_FACTOR  1.0
@@ -122,19 +125,19 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
 #define RHO_K_TARGET        0.4
-#define RHO_VARIANCE_NORMAL 50.
+#define RHO_VARIANCE_NORMAL 20.
 #define RHO_VARIANCE_SCALE  10.
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
 #define RHO_DEFAULT_LS      5.      // Lifespan
-#define RHO_DEFAULT_VU      0.075   // Value uncertainty
+#define RHO_DEFAULT_VU      0.1   // Value uncertainty
 #define RHO_DEFAULT_BU      0.001   // Bias uncertainty
 #define RHO_DEFAULT_SU      0.01     // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
 #define RHO_PREDICTION_LS   1.
-#define RHO_PREDICTION_VU   0.05
+#define RHO_PREDICTION_VU   0.5
 #define RHO_PREDICTION_BU   0.001
 #define RHO_PREDICTION_SU   0.05
 #define DEFAULT_PREDICTION_UNCERTAINTY \
@@ -147,7 +150,7 @@
 #define DEFAULT_TARGET_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 #define RHO_TARGET_FILTER_MAX   0.5
-#define RHO_TARGET_FILTER_MIN   0.003
+#define RHO_TARGET_FILTER_MIN   0.001
 
 #define MIN_STATE_CONFIDENCE        0.01 //0.5
 #define BACKGROUND_PERCENT_MIN      0.02

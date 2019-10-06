@@ -118,7 +118,7 @@ void PunishKalman( kalman_filter_t * k )
 void PrintKalman( kalman_filter_t * k )
 {
     LOG_KALMAN(KALMAN_DEBUG, "Val: %.4f | Rate: %.4f | Vel:%.4f\n", k->value, k->rate, k->velocity);
-    LOG_KALMAN(KALMAN_DEBUG, "Bias: %.4f | Var: %.4f\n", k->bias, k->variance);
+    LOG_KALMAN(KALMAN_DEBUG, "Bias: %.4f | Var: %.4f | Scr:%.4f\n", k->bias, k->variance, k->score);
     LOG_KALMAN(KALMAN_DEBUG, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
     LOG_KALMAN(KALMAN_DEBUG, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
     LOG_KALMAN(KALMAN_DEBUG, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);

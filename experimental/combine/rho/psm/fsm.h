@@ -25,9 +25,15 @@ extern "C" {
     static inline uint8_t stateToSelection(uint8_t s) {return ((uint8_t)((s+1)/2) - 1);};
     static inline const char *stateString(int8_t s)
     {
-        s++;
-        static const char *strings[] = { "UN", "UP", "TP", "OP", "CH" };
-        return strings[(uint8_t)s];
+        static const char *strings[] = {
+            "UN",
+//            "NP",
+            "UP",
+            "TP",
+            "OP",
+            "CH"
+        };
+        return strings[(uint8_t)s+1];
     }
     
     

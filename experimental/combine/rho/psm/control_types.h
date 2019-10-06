@@ -53,6 +53,7 @@ extern "C" {
       typedef enum
     {
         UNKNOWN_STATE = -1,
+//        NONE_POPULATED,
         UNDER_POPULATED,
         TARGET_POPULATED,
         OVER_POPULATED,

@@ -46,26 +46,24 @@ void Tau::Init( void )
 }
 
 static bool up = true;
-static int sweep_speed = 3;
+static int sweep_speed = 1;
 void Tau::Trigger( void )
 {
     double p = 0.;
 
-//    pthread_mutex_lock(&utility.outframe_mutex);
     utility.Trigger();
     p = Perform( utility.outimage );
-//    pthread_mutex_unlock(&utility.outframe_mutex);
     
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
     {
         double pacc = accuracy;
-        CumulativeMovingAverageStatistics(p, &avg, ++count);
+        GenerateCumulativeAverageStatistics(p, &avg, ++count);
         stddev_sum += pacc;
-        CumulativeMovingAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
+        GenerateCumulativeAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
-//    if(( up && rho.core.Thresh > 225 ) || (!up && rho.core.Thresh < 10)) up = !up;
+//    if(( up && rho.core.Thresh > THRESH_MAX ) || (!up && rho.core.Thresh < THRESH_MIN)) up = !up;
 //    rho.core.Thresh += sweep_speed*(up?1:-1); ///TEST
     rho.core.ThreshByte = (byte_t)rho.core.Thresh;
     

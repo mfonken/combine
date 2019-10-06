@@ -27,7 +27,7 @@ extern "C" {
     /*~ Kalman structure */
     typedef struct
     {
-        floating_t
+      floating_t
         K[2],
         P[2][2],
         rate,
@@ -42,9 +42,9 @@ extern "C" {
         timestamp,
         origin,
         score;
-        kalman_uncertainty_c
+      kalman_uncertainty_c
         uncertainty;
-        bool
+      bool
         sorted,
         valid,
         flag;

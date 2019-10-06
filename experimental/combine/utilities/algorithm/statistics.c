@@ -21,7 +21,7 @@ void GenerateCumulativeMomentsStatistics( floating_t v, floating_t i, floating_t
 #endif
 }
 
-void CumulativeMovingAverageStatistics( floating_t new_val, floating_t *avg, int num )
+void GenerateCumulativeAverageStatistics( floating_t new_val, floating_t *avg, int num )
 {
     *avg+=(new_val-*avg)/(floating_t)(num+1);
 }

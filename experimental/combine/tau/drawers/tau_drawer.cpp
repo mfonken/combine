@@ -217,6 +217,9 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
     
     putText(M, to_string((int)accuracy), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH*3/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(100,150,0));
     putText(M, to_string(frame_rate), Point(W-SIDEBAR_WIDTH+2, H-SIDEBAR_WIDTH/2+4), FONT_HERSHEY_PLAIN, 1, Scalar(0,100,150));
+    
+    putText(M, to_stringn(this->GetRate(),2) + string("Hz"), Point(110, 18), FONT_HERSHEY_PLAIN, 1.5, white, 2);
+    
     pthread_mutex_unlock(&drawer_mutex);
 }
 
@@ -389,13 +392,13 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     // Draw regions
     for( int i = 0; i < rho.core.PredictionPair.y.NumRegions; i++ )
     {
-        int o = rho.core.PredictionPair.y.RegionsOrder[i];
+        int o = rho.core.PredictionPair.y.RegionsOrder[i].index;
         int v = rho.core.PredictionPair.y.Regions[o].location;
         line(M, Point(v,0),Point(v,h), bluish);
     }
     for( int i = 0; i < rho.core.PredictionPair.x.NumRegions; i++ )
     {
-        int o = rho.core.PredictionPair.x.RegionsOrder[i];
+        int o = rho.core.PredictionPair.x.RegionsOrder[i].index;
         int v = rho.core.PredictionPair.x.Regions[o].location;
         line(M, Point(0,v),Point(w,v), bluish);
     }
@@ -806,7 +809,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     region_t regions[MAX_REGIONS];
     for(int i = 0; i < MAX_REGIONS; i++)
-        memcpy(&regions[i], &prediction.Regions[prediction.RegionsOrder[i]], sizeof(region_t));
+        memcpy(&regions[i], &prediction.Regions[prediction.RegionsOrder[i].index], sizeof(region_t));
     
     
 #define MATCH_DATA_WIDTH 3

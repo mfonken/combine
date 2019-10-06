@@ -66,12 +66,10 @@ Event::Event( int id )
 }
 
 Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * sercom, int rate )
+: id(0), mutex(mutex), test(test), sercom(sercom), rate(rate)
 {
-    this->id = 0;
-    this->mutex = mutex;
-    this->test = test;
-    this->sercom = sercom;
-    this->rate = rate;
+    struct timeval time;
+    last_time = getTime(time);
 }
 
 void * Event::worker( void * data )
@@ -92,10 +90,15 @@ void * Event::worker( void * data )
     int sl = 1000000/e.rate;
     
     struct timeval time;
-    long curr_time, end_time;
+    long end_time, curr_time;
     while( pthread_mutex_trylock(e.mutex) )
     {
-        end_time = getTime(time) + sl;
+        long prev_time = e.last_time;
+        e.last_time = getTime(time);
+        
+        e.test->SetRate( 1000000. / (double)( e.last_time - prev_time ) );
+        //LOG_ENV("Event \"%s\" has actual rate %.3fHz\n", e.test->GetName(), e.test->GetRate());
+        end_time = e.last_time + sl;
     
         e.test->Trigger();
         if(e.sercom != NULL)
