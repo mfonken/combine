@@ -29,7 +29,7 @@
 
 #define IMAGE_TICKS                     (360*2)
 #define THRESH_IMAGE
-#define ROTATE_IMAGEgit
+#define ROTATE_IMAGE
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"
