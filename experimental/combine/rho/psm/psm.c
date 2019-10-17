@@ -18,7 +18,6 @@ void InitializePSM( psm_t * model, const char * name )
     HMMFunctions.Initialize( &model->hmm, name );
     model->state_bands.length = NUM_STATE_GROUPS;
     
-#ifdef __PSM__
     floating_t default_bands_intervals[] = STATE_KUMARASWAMY_INTERVALS;
     floating_t prev_boundary = 0., vertical_center = 0;
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
@@ -29,9 +28,8 @@ void InitializePSM( psm_t * model, const char * name )
         vertical_center = ( ( (floating_t)( band->upper_boundary + band->lower_boundary ) ) * THRESH_RANGE ) / 2;
         band->true_center = (vec2){ 0, vertical_center };
     }
-#else
-    memset( model->state_bands.band, 0, sizeof(model->state_bands.band) );
-#endif
+    
+    KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
 }
 static int c = 0;
 void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
@@ -70,11 +68,13 @@ void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
     {
         current = GetProbabilityFromEmission( &model->hmm.B[i], model->current_observation );
         cumulative += current;
-        observation_set[i] = cumulative;
+        model->kumaraswamy.bands[i] = cumulative;
         LOG_PSM_BARE(PSM_DEBUG_UPDATE, "[%.4f]", current);
     }
-//    LOG_PSM_BARE(PSM_DEBUG, "\n");
-//    KumaraswamyFunctions.GetVector( &model->kumaraswamy, nu, model->state_intervals, observation_set, NUM_STATE_GROUPS );
+    LOG_PSM_BARE(PSM_DEBUG, "\n");
+    
+//    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
+    KumaraswamyFunctions.GetVector( &model->kumaraswamy, model->current_observation.a, model->state_intervals );
     
     LOG_PSM(PSM_DEBUG_UPDATE, "Update:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
@@ -91,13 +91,13 @@ void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floati
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
     model->observation_state = PSMFunctions.GetCurrentBand( model, &model->state_bands );
     ///TODO: Compare model->observation_state with hmm recommendation
-    
-    /* Update state bands */
-    PSMFunctions.UpdateStateIntervals( model );//, nu );
 
-    /* Update states/transition matrix */
-    FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
-    model->current_state = model->fsm.state;
+    /* Update state bands */
+    //PSMFunctions.UpdateStateIntervals( model );//, nu );
+
+//    /* Update states/transition matrix */
+//    FSMFunctions.Sys.Update( &model->fsm, model->state_intervals );
+//    model->current_state = model->fsm.state;
 
     /* Generate proposals to complete update */
     PSMFunctions.GenerateProposals( model );
@@ -202,7 +202,13 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
                < MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC )
             {
                 LOG_PSM(PSM_DEBUG_UPDATE, "Combining cluster %d\n", min_id);
+                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "  (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
+                
+                gaussian2d_t g = model->gmm.cluster[min_id]->gaussian_in;
+                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "x (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", g.mean.a, g.mean.b, g.covariance.a, g.covariance.b, g.covariance.c, g.covariance.d);
                 MatVec.Gaussian2D.Multiply( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
+                MatVec.Mat2x2.ScalarMultiply( 2., &band_gaussian.covariance, &band_gaussian.covariance );
+                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "= (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
                 num_clusters_in_band++;
             }
         }
@@ -230,6 +236,8 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 #endif
 }
 
+
+/// TODO: Fix this, HMM order may be scrabbled and/or incomplete
 uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, floating_t * confidence )
 {
     /* Determine target observation band */
@@ -292,14 +300,19 @@ void GenerateProposalsPSM( psm_t * model )
     
     /* Update predictions */
     vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
-    model->proposed_avg_den = proposed_center->a;
-    model->proposed_thresh = proposed_center->b;
     
     /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];
-    model->proposed_primary_id = cluster->primary_id;
-    model->proposed_secondary_id = cluster->secondary_id;
-    model->proposed_nu = GetNumberOfValidLabels( &cluster->labels );
+    
+    model->proposed = (psm_proposal_t)
+    {
+        proposed_center->a,
+        proposed_center->b,
+        GetNumberOfValidLabels( &cluster->labels ),
+        cluster->primary_id,
+        cluster->secondary_id
+    };
+    LOG_PSM(PSM_DEBUG_UPDATE, "Proposal: Density - %.2f | Thresh - %.2f | Num - %d | P_id - %d | S_id - %d\n", model->proposed.density, model->proposed.thresh, model->proposed.num, model->proposed.primary_id, model->proposed.secondary_id);
 }
 
 #endif

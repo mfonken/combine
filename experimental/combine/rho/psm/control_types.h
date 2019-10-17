@@ -90,7 +90,7 @@ extern "C" {
 #define MAX_ERROR 0.2
 #define INITIAL_VARIANCE 50.
 #define INV_INITIAL_VARIANCE (1./INITIAL_VARIANCE)
-#define MAX_MAHALANOBIS_SQ 9//25
+#define MAX_MAHALANOBIS_SQ 25
 #define MAX_MAHALANOBIS_SQ_FOR_UPDATE MAX_MAHALANOBIS_SQ
 #define VALID_CLUSTER_STD_DEV 0.25
 #define MIN_CLUSTER_SCORE 0.5
@@ -118,7 +118,7 @@ extern "C" {
     typedef vec2         hmm_observation_t;
     typedef gaussian2d_t emission_t;
 #else
-    typedef double       hmm_observation_t;
+    typedef floating_t       hmm_observation_t;
     typedef gaussian1d_t emission_t;
 #endif
     
@@ -240,7 +240,7 @@ extern "C" {
         for( uint8_t i = 0, m = 1; i < 32; i++, c += !!(v & m), m <<= 1 );
         return c;
     }
-    static uint32_t GetNumberOfValidLabels( label_manager_t * labels )
+    static uint8_t GetNumberOfValidLabels( label_manager_t * labels )
     {
         return CountSet( GetValidLabels( labels ) );
     }

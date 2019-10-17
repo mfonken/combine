@@ -19,9 +19,9 @@ extern "C" {
     /*~ Kalman Uncertainties */
     typedef struct
     {
-        floating_t value;
+        floating_t value; /* Q */
         floating_t bias;
-        floating_t sensor;
+        floating_t sensor; /* R */
     } kalman_uncertainty_c;
     
     /*~ Kalman structure */
@@ -41,7 +41,8 @@ extern "C" {
         max_value,
         timestamp,
         origin,
-        score;
+        score,
+        estimation_error;
       kalman_uncertainty_c
         uncertainty;
       bool

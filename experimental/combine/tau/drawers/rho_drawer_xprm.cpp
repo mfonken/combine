@@ -90,7 +90,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
         label_manager_t &labels = (*psm->gmm.cluster[j]).labels;
         for(int i = 0, offset = -12; i < NUM_LABELS_TO_SHOW; i++, offset+=12)
         {
-            Scalar c(rcolors[i][0]*0.7,rcolors[i][1]*0.7,rcolors[i][2]*0.7);
+            Scalar c(MIN(255,rcolors[i][0]*0.5),MIN(255,rcolors[i][1]*0.5),MIN(255,rcolors[i][2]*0.5));
             putText(detection_map_frame, pto_string(labels.average[i],1), Point(center.x, center.y+offset), FONT_HERSHEY_PLAIN, 1, c, 2);
         }
         

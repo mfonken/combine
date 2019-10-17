@@ -85,6 +85,7 @@ public:
     cimage_t outimage;
     pthread_mutex_t frame_mtuex,
                     outframe_mutex,
+                    preoutframe_mutex,
                     outimage_mutex,
                     tau_cross_mutex,
                     self_mutex;

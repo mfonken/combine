@@ -15,10 +15,10 @@ extern "C" {
     
 #include "kumaraswamy.h"
 
-typedef double transition_matrix_t[NUM_STATES][NUM_STATES];
+typedef floating_t transition_matrix_t[NUM_STATES][NUM_STATES];
 typedef emission_t observation_matrix_t[NUM_STATES];
-typedef double state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
-typedef double state_vector_t[NUM_STATES];
+typedef floating_t state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
+typedef floating_t state_vector_t[NUM_STATES];
 
 #ifdef __PSM__
     typedef struct
@@ -26,7 +26,7 @@ typedef double state_vector_t[NUM_STATES];
         gaussian2d_t
         gaussian_in,
         gaussian_out;
-        double
+        floating_t
         mahalanobis_sq,
         log_gaussian_norm_factor,
         probability_of_in,
@@ -36,7 +36,7 @@ typedef double state_vector_t[NUM_STATES];
         inv_covariance_in,
         llt_in;
         label_manager_t labels;
-        double
+        floating_t
         max_y,
         min_y,
         timestamp;
@@ -72,7 +72,7 @@ typedef double state_vector_t[NUM_STATES];
         state_sequence_matrix   beta;                // Backward solve vector
         state_sequence_matrix   gamma;               // Gamma solve vector
         state_sequence_matrix   xi[NUM_STATES];      // Xi solve matrix
-        double                  P;                   // Latest probability
+        floating_t                  P;                   // Latest probability
         kumaraswamy_t           k_dist;              // Kumaraswamy distribution
         const char *            name;                // Instance name
     } hidden_markov_model_t;
@@ -98,6 +98,18 @@ typedef double state_vector_t[NUM_STATES];
         transition_matrix_t *P;
         const char *    name;                // Instance name
     } fsm_system_t;
+
+    /* Proposal elements */
+    typedef struct
+    {
+        floating_t
+            density,
+            thresh;
+        uint8_t
+            num,
+            primary_id,
+            secondary_id;
+    } psm_proposal_t;
     
     typedef struct
     { /* Predictive State Model */
@@ -106,15 +118,9 @@ typedef double state_vector_t[NUM_STATES];
         hidden_markov_model_t hmm;
         fsm_system_t fsm;
 #endif
-//        kumaraswamy_t kumaraswamy;
+        kumaraswamy_t kumaraswamy;
         band_list_t state_bands;
-        double
-        previous_thresh,
-        proposed_thresh,
-        proposed_nu,
-        proposed_avg_den,
-        proposed_primary_id,
-        proposed_secondary_id;
+        psm_proposal_t proposed;
         uint8_t
         best_state,
         best_cluster_id,
@@ -123,7 +129,8 @@ typedef double state_vector_t[NUM_STATES];
         current_state;
         hmm_observation_t
         current_observation;
-        double
+        floating_t
+        previous_thresh,
         best_confidence,
         best_cluster_weight,
         state_intervals[NUM_STATE_GROUPS];

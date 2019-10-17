@@ -86,7 +86,7 @@
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
 #ifdef __PSM__
-#define PSM_UPDATE_PERIOD     3.
+#define PSM_UPDATE_PERIOD     1.
 #endif
 #define BACKGROUNDING_PERIOD  100000 // Frames
 
@@ -124,29 +124,29 @@
 /*                              FILTER PARAMETERS                                      */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
-#define RHO_K_TARGET        0.4
+#define RHO_K_TARGET        0.02
 #define RHO_VARIANCE_NORMAL 20.
 #define RHO_VARIANCE_SCALE  10.
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
-#define RHO_DEFAULT_LS      5.      // Lifespan
-#define RHO_DEFAULT_VU      0.1   // Value uncertainty
-#define RHO_DEFAULT_BU      0.001   // Bias uncertainty
-#define RHO_DEFAULT_SU      0.01     // Sensor uncertainty
+#define RHO_DEFAULT_LS      5.          // Lifespan
+#define RHO_DEFAULT_VU      0.001       // Value uncertainty
+#define RHO_DEFAULT_BU      0.1         // Bias uncertainty
+#define RHO_DEFAULT_SU      0.02        // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
 #define RHO_PREDICTION_LS   1.
-#define RHO_PREDICTION_VU   0.5
+#define RHO_PREDICTION_VU   0.005
 #define RHO_PREDICTION_BU   0.001
-#define RHO_PREDICTION_SU   0.05
+#define RHO_PREDICTION_SU   0.001
 #define DEFAULT_PREDICTION_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 
 #define RHO_TARGET_LS       5.
-#define RHO_TARGET_VU       0.005
-#define RHO_TARGET_BU       0.005
-#define RHO_TARGET_SU       0.2
+#define RHO_TARGET_VU       0.001
+#define RHO_TARGET_BU       0.001
+#define RHO_TARGET_SU       0.025
 #define DEFAULT_TARGET_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_TARGET_VU, RHO_TARGET_BU, RHO_TARGET_SU }
 #define RHO_TARGET_FILTER_MAX   0.5
@@ -160,17 +160,18 @@
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
+#define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.5, 0.75, 1.0 }
+
 #ifdef __PSM__
 #define USE_2D_OBSERVATIONS
 
-#define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.5, 0.75, 1.0 }
 #ifdef USE_2D_OBSERVATIONS
 #define DEFAULT_OBSERVATION_LIST \
 { \
     { { 0.5, 225 },  { 0.5, 0., 0., 10. }, 0. }, \
     { { 1.0, 175 },  { 0.5, 0., 0., 10. }, 0. }, \
     { { 2.0, 100 },  { 0.5, 0., 0., 10. }, 0. }, \
-    { { 4.0, 40 },  { 0.5, 0., 0., 10. }, 0. } \
+    { { 4.0,  40 },  { 0.5, 0., 0., 10. }, 0. }  \
 }
 #else
 #define DEFAULT_OBSERVATION_LIST \

@@ -27,11 +27,11 @@
 #define MAX_DETECTION_MAP_DENSITTY_VALUE 500
 #define MAX_DETECTION_MAP_THRESH_VALUE (1 << 8)
 
-#define DETECTION_MAP_INTERVAL  1//0
+#define DETECTION_MAP_INTERVAL  1
 
-#define COV_SCALE 0.25
+#define COV_SCALE 1
 
-#define NUM_LABELS_TO_SHOW 5
+#define NUM_LABELS_TO_SHOW 3
 
 using namespace cv;
 

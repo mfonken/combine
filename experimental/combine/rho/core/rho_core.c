@@ -149,11 +149,11 @@ void UpdateRhoCorePredictions( rho_core_t * core )
         RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
         core->Timestamp = TIMESTAMP();
     }
-#else
-    double state_intervals[NUM_STATE_GROUPS];
-    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NumRegions, state_intervals );
-    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 #endif
+    
+    double state_intervals[NUM_STATE_GROUPS];
+    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
+    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
 
     prediction_predict_variables _;
     RhoUtility.Reset.Prediction( &_, &core->PredictionPair, core->Centroid );

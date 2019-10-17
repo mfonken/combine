@@ -47,10 +47,8 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;
     core->DensityMapPair.y.background   = BACKGROUND_DENSITY_MAP_Y;
     
-#ifndef __PSM__
-    KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1, (floating_t[])SPOOF_STATE_BANDS );
+    KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
     FSMFunctions.Sys.Initialize( &core->StateMachine, "A", &core->StateTransitions, CHAOTIC );
-#endif
     
     core->Timestamp = TIMESTAMP();
 }
@@ -200,10 +198,9 @@ void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * densi
 
 void PredictPeakFilterRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 {
-//    Kalman.Print( &density_map->kalmans[_->cycle]);
     _->filter_peak      = (index_t)Kalman.Step( &density_map->kalmans[_->cycle], prediction->PreviousPeak[_->cycle], density_map->kalmans[_->cycle].velocity );
     _->filter_peak_2    = _->filter_peak << 1;
-    _->filter_variance  = BOUND((index_t)(RHO_VARIANCE( density_map->kalmans[_->cycle].K[0]) ), MIN_VARIANCE, MAX_VARIANCE);
+    _->filter_variance  = BOUND((index_t)(RHO_VARIANCE( density_map->kalmans[_->cycle].P[0][0]) ), MIN_VARIANCE, MAX_VARIANCE);
     density_map->kalmans[_->cycle].variance = _->filter_variance;
 }
 
@@ -388,95 +385,15 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
 
 void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * prediction )
 {
-    
-//    region_t *curr;
-//
-//    printf("\nN%d\n", _->total_regions);
-//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
-//    for( int i = 0; i < _->total_regions; i++)
-//    {
-//        order_t* o = &prediction->RegionsOrder[i];
-//        curr = &prediction->Regions[o->index];
-//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
-//
-//        c[i] = o->index;
-//        bool already_has = false;
-//        for(int j = i - 1; j >= 0; j--)
-//        {
-//            if(c[j] == c[i])
-//            {
-//                already_has = true;
-//                printf("Already has %d at %d and %d\n", c[i], i, j);
-//                break;
-//            }
-//        }
-//    }
-//
-//
-//    order_t* o;
-//    floating_t primary_score = 0., secondary_score = 0.;
-//    int8_t primary_index = -1, secondary_index = -1;
-//    for( uint8_t i = 0; i < _->total_regions; i++)
-//    {
-//        if( !prediction->RegionsOrder[i].valid ) continue;
-//        o = &prediction->RegionsOrder[i];
-//        curr = &prediction->Regions[o->index];
-//
-//        if( curr->score > primary_score )
-//        {
-//            secondary_score = primary_score;
-//            secondary_index = primary_index;
-//
-//            primary_score = curr->score;
-//            primary_index = i;
-//        }
-//        else if( curr->score > secondary_score )
-//        {
-//            secondary_score = curr->score;
-//            secondary_score = i;
-//        }
-//    }
-//
-//    printf("p:%d | s:%d\n", primary_index, secondary_index);
-//    if( primary_index != -1 ) prediction->RegionsOrder[0].index = primary_index;
-//    if( secondary_index != -1 ) prediction->RegionsOrder[1].index = secondary_index;
-//
-//    printf("Order: ");
-//    for( int i = 0; i < _->total_regions; i++)
-//        printf("%d(%.4f) ", prediction->RegionsOrder[i].index, prediction->Regions[prediction->RegionsOrder[i].index].score);
-//    printf("\n");
-
     /// NOTE: Smaller scores are better
     /* Assume all regions are valid */
     index_t i, io, j, jo, best_index;
     floating_t best_score;
     region_t *curr, *check;
-
-//    printf("\nN%d\n", _->total_regions);
-//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
-//    for( i = 0; i < _->total_regions; i++)
-//    {
-//        order_t* o = &prediction->RegionsOrder[i];
-//        curr = &prediction->Regions[o->index];
-//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
-//
-//        c[i] = o->index;
-//        bool already_has = false;
-//        for(int j = i - 1; j >= 0; j--)
-//        {
-//            if(c[j] == c[i])
-//            {
-//                already_has = true;
-//                printf("Already has %d at %d and %d\n", c[i], i, j);
-//                break;
-//            }
-//        }
-//    }
-
+    
     /* Cycle through found regions */
     for( i = 0; i < _->total_regions; i++)
     {
-//        printf("i%d:\n", i);
         if( !prediction->RegionsOrder[i].valid ) continue;
         io = prediction->RegionsOrder[i].index;
         curr = &prediction->Regions[io];
@@ -484,10 +401,10 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
 
         best_score = curr->score;
         best_index = i;
+        
         /* Cycle through other regions */
         for( j = i+1; j < _->total_regions; j++ )
         {
-//            printf(" j%d", j);
             if( !prediction->RegionsOrder[j].valid ) continue;
             jo = prediction->RegionsOrder[j].index;
             check = &prediction->Regions[jo];
@@ -500,23 +417,12 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
                 best_index = j;
             }
         }
-//        printf("\n%d and %d\n", best_index, i);
         if( best_index == i ) continue;
-
-//        printf("Before: ");
-//        for( j = 0; j < _->total_regions; j++)
-//            printf("%d ", prediction->RegionsOrder[j].index);
-//        printf("\n");
 
         prediction->RegionsOrder[i].index = best_index;
         prediction->RegionsOrder[best_index].valid = true;
         prediction->RegionsOrder[best_index].index = i;
         prediction->Regions[i].sort = true;
-
-//        printf("After: ");
-//        for( j = 0; j < _->total_regions; j++)
-//            printf("%d ", prediction->RegionsOrder[j].index);
-//         printf("\n");
 
         curr = &prediction->Regions[i];
         LOG_RHO(RHO_DEBUG_DETECT, "%s> R%d:{ M%3d, D%3d, X%3d, W%3d } = S%.4f\n",
@@ -867,23 +773,24 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
     LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.7f|%.7f\n", core->FilteredPercentage, core->TotalPercentage);
-#ifdef __PSM__
-//    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
-    core->TargetFilter.value = core->TotalPercentage;
-//    Kalman.Print( &core->TargetFilter );
-//    switch(-1)
-    
-    LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->PredictiveStateModelPair.current_state));
-    switch(core->PredictiveStateModelPair.current_state)
-#else
+//#ifdef __PSM__
+////    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
+//    core->TargetFilter.value = core->TotalPercentage;
+////    Kalman.Print( &core->TargetFilter );
+////    switch(-1)
+//
+//    LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->PredictiveStateModelPair.current_state));
+//    switch(core->PredictiveStateModelPair.current_state)
+//#else
     LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->StateMachine.state));
     switch(core->StateMachine.state)
-#endif
+//#endif
     {
         case CHAOTIC:
             RhoUtility.Reset.DensityMapPairKalmans( core );
         case TARGET_POPULATED:
             Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
+            Kalman.Print( &core->TargetFilter );
         case OVER_POPULATED:
         case UNDER_POPULATED:
             RhoUtility.Calculate.TargetCoverageFactor( core );
@@ -891,6 +798,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
         default:
             break;
     }
+    
     RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
     core->Tune.state = core->ThreshFilter.Value;
     
@@ -905,17 +813,18 @@ void CalculateTargetTuneFactorRhoUtility( rho_core_t * core )
     
 void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core )
 {
-#ifdef __PSM__
-    if( core->PredictiveStateModelPair.best_confidence > MIN_STATE_CONFIDENCE )
-        core->TargetCoverageFactor = core->PredictiveStateModelPair.proposed_nu * core->PredictiveStateModelPair.proposed_avg_den / (floating_t)TOTAL_RHO_PIXELS;
-#else
     if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
         core->TargetCoverageFactor = core->PredictionPair.NuRegions * core->PredictionPair.AverageDensity / (floating_t)TOTAL_RHO_PIXELS;
-#endif
     else
         core->TargetCoverageFactor = core->TotalCoverage / (floating_t)TOTAL_RHO_PIXELS;
+#ifdef __PSM__
+    if( core->PredictiveStateModelPair.proposed_avg_den > 0 && core->PredictiveStateModelPair.best_confidence > MIN_STATE_CONFIDENCE )
+    {
+        LOG_RHO(RHO_DEBUG_2, "Proposed: Num - %d | Density - %.2f | State - %s\n", core->PredictiveStateModelPair.proposed_num, core->PredictiveStateModelPair.proposed_avg_den, stateString(core->PredictiveStateModelPair.current_state));
+//        core->TargetCoverageFactor = core->PredictiveStateModelPair.proposed_num * core->PredictiveStateModelPair.proposed_avg_den / (floating_t)TOTAL_RHO_PIXELS;
+    }
+#endif
 }
-
 
 /* Perform density redistribution from combining current frame and background */
 void RedistributeDensitiesRhoUtility( rho_core_t * core )
@@ -1121,9 +1030,9 @@ void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
 #ifdef __PSM__
     PSMFunctions.Update( &core->PredictiveStateModelPair.x );
     PSMFunctions.Update( &core->PredictiveStateModelPair.y );
-    core->PredictiveStateModelPair.current_state = MAX( core->PredictiveStateModelPair.x.current_state, core->PredictiveStateModelPair.y.current_state );
+    core->PredictiveStateModelPair.current_state = core->StateMachine.state;// MAX( core->PredictiveStateModelPair.x.current_state, core->PredictiveStateModelPair.y.current_state );
     core->PredictiveStateModelPair.best_confidence = AVG2( core->PredictiveStateModelPair.x.best_confidence, core->PredictiveStateModelPair.y.best_confidence );
-    core->PredictiveStateModelPair.proposed_nu = MAX( core->PredictiveStateModelPair.x.proposed_nu, core->PredictiveStateModelPair.y.proposed_nu );
-    core->PredictiveStateModelPair.proposed_avg_den = AVG2( core->PredictiveStateModelPair.x.proposed_avg_den, core->PredictiveStateModelPair.y.proposed_avg_den );
+    core->PredictiveStateModelPair.proposed_num = MAX( core->PredictiveStateModelPair.x.proposed.num, core->PredictiveStateModelPair.y.proposed.num );
+    core->PredictiveStateModelPair.proposed_avg_den = AVG2( core->PredictiveStateModelPair.x.proposed.density, core->PredictiveStateModelPair.y.proposed.density );
 #endif
 }

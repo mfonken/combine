@@ -33,6 +33,7 @@ preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
 //#endif
     cimageInit(outimage, width, height);
     pthread_mutex_init(&outframe_mutex, NULL);
+    pthread_mutex_init(&preoutframe_mutex, NULL);
     pthread_mutex_init(&outimage_mutex, NULL);
     pthread_mutex_init(&tau_cross_mutex, NULL);
     pthread_mutex_init(&self_mutex, NULL);
@@ -161,6 +162,7 @@ void ImageUtility::RequestBackground()
 
 void ImageUtility::Trigger()
 {
+    pthread_mutex_lock(&preoutframe_mutex);
     preoutframe = {0};
     if(!single_frame)
         ++counter;
@@ -184,6 +186,8 @@ void ImageUtility::Trigger()
     pthread_mutex_lock(&outframe_mutex);
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
 #ifdef ROTATE_IMAGE
+    pthread_mutex_unlock(&preoutframe_mutex);
+    
     double angle = 360. * (double)counter / (double)path_num_ticks;
     Point2f center(outframe.cols/2.0, outframe.rows/2.0);
     Mat rot = cv::getRotationMatrix2D(center, angle, 1.0);
@@ -200,7 +204,9 @@ void ImageUtility::Trigger()
     cimageFromMat(outframe, outimage);
     pthread_mutex_unlock(&outframe_mutex);
 #else
+    pthread_mutex_lock(&preoutframe_mutex);
     cimageFromMat(preoutframe, outimage);
+    pthread_mutex_unlock(&preoutframe_mutex);
 #endif
 }
 
@@ -226,8 +232,11 @@ int ImageUtility::Loop(char c)
         default:
             return 0;
     }
+    
+    pthread_mutex_lock(&preoutframe_mutex);
     if( has_file ) preoutframe = GetImage();
     if( has_camera ) preoutframe = GetNextFrame();
+    pthread_mutex_unlock(&preoutframe_mutex);
     
     return 1;
 }

@@ -10,7 +10,7 @@
 #define test_config_h
 
 #define MAIN_FPS        10
-#define TAU_FPS         15
+#define TAU_FPS         10
 #define COMBINE_FPS     15
 
 /* GLOBAL SETUP */
@@ -33,7 +33,7 @@
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"
-#define FILE_NAME                       "triple_circle_corner_triangle_fade_high_contrast"//"gradient_centralized"
+#define FILE_NAME                       "triple_circle_fade"//"gradient_centralized"
 //#define GROUP_NAME                      "/frames/small/"
 //#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"

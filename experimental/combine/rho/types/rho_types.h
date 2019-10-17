@@ -132,10 +132,11 @@ typedef struct
 typedef struct
 {
     psm_t x,y;
-    uint8_t current_state;
+    state_t current_state;
+    uint8_t
+        proposed_num;
     double
         best_confidence,
-        proposed_nu,
         proposed_avg_den;
 } psm_pair_t;
 
@@ -303,11 +304,10 @@ typedef struct
 
 #ifdef __PSM__
     psm_pair_t          PredictiveStateModelPair;
-#else
+#endif
     transition_matrix_t StateTransitions;
     kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;
-#endif
     packet_t            Packet;
 
 #ifdef USE_DECOUPLING
