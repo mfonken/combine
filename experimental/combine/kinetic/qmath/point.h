@@ -13,24 +13,21 @@
 extern "C" {
 #endif
     
-#include <stdio.h>
-#include <math.h>
-    
-#include "qmath.h"
+#include "qmath_types.h"
     
     typedef struct
     {
-        double x, y, z, the, phi;
+        floating_t x, y, z, the, phi;
     } kpoint_t;
     
     typedef struct kpoint kpoint;
     struct kpoint
     {
-        void (*init)( kpoint_t *, double, double, double, double );
-        double (*dist)( kpoint_t * );
-        double (*disq)( kpoint_t * );
-        double (*angl)( kpoint_t * );
-        double (*anga)( kpoint_t * );
+        void   (*init)( kpoint_t *, floating_t, floating_t, floating_t, floating_t );
+        floating_t (*dist)( kpoint_t * );
+        floating_t (*disq)( kpoint_t * );
+        floating_t (*angl)( kpoint_t * );
+        floating_t (*anga)( kpoint_t * );
         void   (*copy)( kpoint_t *, kpoint_t * );
         void (*toVec3)( kpoint_t *, vec3_t * );
     };
@@ -41,4 +38,3 @@ extern "C" {
 #endif
 
 #endif /* point_h */
-

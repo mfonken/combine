@@ -14,11 +14,14 @@ extern "C" {
 #endif
     
 #include <stdio.h>
+#include <stdbool.h>
 #include <math.h>
     
-//#include "sercom.h"
+#include "sercom.h"
     
 #define DEFAULT_INTERFACE SERCOM
+
+#define ORIENTATION_NUM_CHANNELS 6
     
 #define LSM9DS1
     
@@ -28,6 +31,23 @@ extern "C" {
         I2C,
         SPI
     } INTERFACE;
+
+    typedef struct
+    {
+        uint32_t index:8;
+        uint32_t offset:16;
+        uint32_t reversed:1;
+    } remap_t;
+
+    typedef remap_t orientation_remap_t[ORIENTATION_NUM_CHANNELS];
+
+    static double getRemappedValue( int i, double v[ORIENTATION_NUM_CHANNELS], orientation_remap_t remap )
+    {
+        if(!remap[i].reversed)
+            return v[remap[i].index] + remap[i].offset;
+        else
+            return remap[i].offset - v[remap[i].index];
+    }
     
     typedef struct
     {
@@ -37,23 +57,25 @@ extern "C" {
     
     typedef struct
     {
-        double 	accel_raw[3];
+        orientation_remap_t remap;
         
-        double 	accel[3];
-        double 	gyro[3];
-        double 	mag[3];
+        double     accel_raw[3];
         
-        double  accel_res;
-        double 	gyro_res;
-        double 	mag_res;
+        double     accel[3];
+        double     gyro[3];
+        double     mag[3];
         
-        double 	accel_bias[3];
-        double 	gyro_bias[3];
-        double 	mag_bias[3];
+        double     accel_res;
+        double     gyro_res;
+        double     mag_res;
         
-        double	roll;
-        double	pitch;
-        double	yaw;
+        double     accel_bias[3];
+        double     gyro_bias[3];
+        double     mag_bias[3];
+        
+        double    roll;
+        double    pitch;
+        double    yaw;
         
         channel_t channel;
     } imu_t;
@@ -82,7 +104,7 @@ extern "C" {
     {
         struct imu_update_ops update;
         struct imu_normalize_ops normalize;
-        int (*init)(imu_t * imu);
+        int (*init)(imu_t * imu, orientation_remap_t remap);
     } imu_functions;
     extern const imu_functions IMUFunctions;
     
@@ -105,3 +127,4 @@ extern "C" {
 #endif
 
 #endif /* imu_wrapper_h */
+

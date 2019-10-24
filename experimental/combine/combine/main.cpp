@@ -15,7 +15,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     Environment env(&tau, TAU_FPS);
 #ifdef HAS_IMU
     Combine combine("Combine", &tau );
-    SerialWriter comm(BLUETOOTH, FILENAME);
+    SerialWriter comm(SFILE, TX_FILENAME);
     env.AddTest(&combine, &comm, COMBINE_FPS);
 #endif
     

@@ -18,9 +18,7 @@ extern "C" {
 #include <math.h>
 #include <string.h>
 
-#ifdef __RHO__
 #include "rho_config.h"
-#endif
     
 #include "kalman.h"
 #include "pid.h"

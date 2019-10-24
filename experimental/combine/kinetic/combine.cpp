@@ -24,14 +24,15 @@ string Combine::Serialize()
     char kin_packet[MAX_BUFFER];
     
     double r[3], p[3];
-    r[0] = kin.values.rotation[0];
-    r[1] = kin.values.rotation[1];
-    r[2] = kin.values.rotation[2];
-    p[0] = kin.values.position[0] * SCALE;
-    p[1] = kin.values.position[1] * SCALE;
-    p[2] = kin.values.position[2] * SCALE;
+    r[0] = kin.values.rotation[0] * rotation_scale;
+    r[1] = kin.values.rotation[1] * rotation_scale;
+    r[2] = kin.values.rotation[2] * rotation_scale;
+    p[0] = kin.values.position[0] * position_scale;
+    p[1] = kin.values.position[1] * position_scale;
+    p[2] = kin.values.position[2] * position_scale;
 
     sprintf(kin_packet, "f,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f\r\n", r[0], r[1], r[2], p[0], p[1], p[2] );
+//    printf("%s", kin_packet);
     return string(kin_packet);
 #else
     return "";
@@ -42,7 +43,7 @@ void Combine::Init()
 {
 #ifdef __IMU__
     printf("Initializing IMU Utility.\n");
-    IMUFunctions.init( &imu );
+    IMUFunctions.init( &imu, DEFAULT_IMU_REMAP );
 #endif
 
 #ifdef __KIN__
@@ -67,6 +68,9 @@ void Combine::Trigger()
     vec3_t n;
     KineticFunctions.Nongrav( &kin, &n );
     KineticFunctions.UpdatePosition( &kin, &n, B, A );
+#else
+    IMUFunctions.update.orientation( &imu );
+    printf("[IMU] <%.4f, %.4f, %.4f>\n", imu.roll, imu.pitch, imu.yaw);
 #endif
 #endif
 }

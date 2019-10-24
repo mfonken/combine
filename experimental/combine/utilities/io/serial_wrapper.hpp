@@ -17,7 +17,7 @@
 
 #define UTILITY_VERBOSE
 
-#define DEFAULT_HANDSHAKE_DELAY     1000000
+#define DEFAULT_HANDSHAKE_DELAY_US  1000000
 #define DEFAULT_HANDSHAKE_ATTEMPTS  3
 #define DEFAULT_HANDSHAKE_ID        "ab\r\n"
 #define NO_HANDSHAKE                NULL
@@ -47,14 +47,12 @@ class SerialWriter
     SerialWriter_STATUS status;
     
 public:
-    SerialWriter();
-    SerialWriter( SerialWriter_TYPE );
-    SerialWriter( SerialWriter_TYPE, const char * );
+    SerialWriter( SerialWriter_TYPE type = USB, const char * data = NO_HANDSHAKE );
     SerialWriter_STATUS initUSB(const char *);
     SerialWriter_STATUS initBluetooth(const char *);
-    SerialWriter_STATUS initFile(const char *);
+    SerialWriter_STATUS initFile(const char * );
     SerialWriter_STATUS init(char *, char *, const char *);
-    SerialWriter_STATUS handshake(const  char * id, int delay = DEFAULT_HANDSHAKE_DELAY, int attempts = DEFAULT_HANDSHAKE_ATTEMPTS );
+    SerialWriter_STATUS handshake(const  char * id, int delay = DEFAULT_HANDSHAKE_DELAY_US, int attempts = DEFAULT_HANDSHAKE_ATTEMPTS );
     
     int isInitialized();
     void write(std::string);

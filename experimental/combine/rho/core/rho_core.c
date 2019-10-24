@@ -72,13 +72,9 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
         RhoUtility.Generate.Background( core );
     else
     {
-        LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
         RhoCore.DetectPairs( core );
-        LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
         RhoCore.UpdatePredictions( core );
-        LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
         RhoCore.UpdateThreshold( core );
-//        LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
 //        RhoCore.GeneratePacket( core );
     }
 }
@@ -110,6 +106,7 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
+    LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
     RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 
@@ -132,6 +129,7 @@ void UpdateRhoCorePrediction( prediction_t * prediction )
 
 void UpdateRhoCorePredictions( rho_core_t * core )
 {
+    LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
@@ -165,11 +163,13 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 /* Use background and state information to update image threshold */
 void UpdateRhoCoreThreshold( rho_core_t * core )
 {
+    LOG_RHO(RHO_DEBUG_2,"Updating threshold.\n");
     RhoUtility.Calculate.Tune( core );
 }
 
 void GenerateRhoCorePacket( rho_core_t * core )
 {
+    LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
     RhoUtility.Generate.Packet( core );
     RhoUtility.Print.Packet( &core->Packet, DEFAULT_PACKET_LENGTH );
 }

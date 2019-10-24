@@ -25,18 +25,25 @@
 #include "kalman.h"
 
 /* Kalman Defaults */
-#define MOTION_MAX_KALMAN_LIFE     10.0
+#define MOTION_MAX_KALMAN_LIFESPAN 10.0
 #define MOTION_VALUE_UNCERTAINTY   0.01
 #define MOTION_BIAS_UNCERTAINTY    0.003
 #define MOTION_SENSOR_UNCERTAINTY  0.02
+#define ROTATION_MAX               (2. * M_PI)
+#define ROTATION_MIN               (-ROTATION_MAX)
+#define POSITION_MIN               -100
+#define POSITION_MAX               1000
+
+#define DEFAULT_MOTION_UNCERTAINTY \
+(kalman_uncertainty_c){ MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY }
 
 /** Absolute value */
 #define     absl(x) x > 0 ? x:-x
 
 /** Initial normal unit vector to beacon plane */
-#define     VISION_ZSTATE_I  0
-#define     VISION_ZSTATE_J  0
-#define     VISION_ZSTATE_K -1
+//#define     VISION_ZSTATE_I  0
+//#define     VISION_ZSTATE_J  0
+//#define     VISION_ZSTATE_K -1
 
 /* Camera Precalculated values */
 #define     CAMERA_OFFSET_ANGLE_X   0       // radians
@@ -59,8 +66,8 @@
 #define     PIXEL_TO_UNIT           3e-6
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
 
-#define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
-#define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
+//#define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
+//#define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
 
 #define     FOCAL_REFRACTION        2.4e-6//1.3e-6//  // units / units
 #define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
@@ -70,14 +77,14 @@
 /** Kinetic Type */
 typedef struct _kinetic_values_t
 {
-    double     position[3];             /**< Raw position */
+    floating_t     position[3];             /**< Raw position */
     double     rotation[3];             /**< Raw rotation */
 } kinetic_values_t;
 
 typedef struct _kinetic_filters_t
 {
-    kalman_t position[3];             /**< Raw position */
-    kalman_t rotation[3];             /**< Raw rotation */
+    kalman_filter_t position[3];             /**< Raw position */
+    kalman_filter_t rotation[3];             /**< Raw rotation */
 } kinetic_filters_t;
 
 typedef struct _kinetic_t
@@ -87,7 +94,7 @@ typedef struct _kinetic_t
     kpoint_t
     A,
     B;
-    double  omega,
+    floating_t  omega,
     sigmaA,
     sigmaR,
     nu,
@@ -97,7 +104,7 @@ typedef struct _kinetic_t
     gamma;
     int     W,
     H;
-    double  f_l,
+    floating_t  f_l,
     d_l,
     d__l,
     r_l;
@@ -108,12 +115,12 @@ typedef struct _kinetic_t
     quaternion_t
     qd,
     qd_,
-    qs,
+//    qs,
     qs_,
     qc,
     qc_,
     qr,
-    qg,
+//    qg,
     qa;
 } kinetic_t;
 
@@ -127,7 +134,7 @@ typedef struct _serial_kinetic_t
 typedef struct
 {
     void  (*DefaultInit)(kinetic_t * );
-    void  (*Init)( kinetic_t *, int, int, double, double);
+    void  (*Init)( kinetic_t *, int, int, floating_t, floating_t);
     void  (*UpdateRotation)( kinetic_t *, ang3_t *, ang3_t * );
     void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t, kpoint_t );
     

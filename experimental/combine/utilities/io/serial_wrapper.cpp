@@ -8,14 +8,6 @@
 
 #include "serial_wrapper.hpp"
 
-SerialWriter::SerialWriter(){}
-
-SerialWriter::SerialWriter( SerialWriter_TYPE type )
-{
-    SerialWriter(type, NO_HANDSHAKE);
-    this->type = type;
-}
-
 SerialWriter::SerialWriter( SerialWriter_TYPE type, const char * data )
 {
     this->type = type;

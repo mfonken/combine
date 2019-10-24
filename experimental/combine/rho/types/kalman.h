@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#ifdef __RHO__
 #include "rho_global.h"
-#endif
 
 #define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001
@@ -46,6 +44,7 @@ extern "C" {
       kalman_uncertainty_c
         uncertainty;
       bool
+        velocity_mode,
         sorted,
         valid,
         flag;

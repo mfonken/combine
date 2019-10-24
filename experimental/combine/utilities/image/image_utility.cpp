@@ -127,9 +127,9 @@ void ImageUtility::InitCamera()
 {
     counter = 0;
     
-//    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
-//    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
-//    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
+    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
+    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
+    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
     
     if (!cam.isOpened())
     {
@@ -182,8 +182,8 @@ void ImageUtility::Trigger()
         background_request = false;
     }
     
-#ifdef THRESH_IMAGE
     pthread_mutex_lock(&outframe_mutex);
+#ifdef THRESH_IMAGE
     cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
 #ifdef ROTATE_IMAGE
     pthread_mutex_unlock(&preoutframe_mutex);
@@ -202,12 +202,12 @@ void ImageUtility::Trigger()
         printf("");
 #endif
     cimageFromMat(outframe, outimage);
-    pthread_mutex_unlock(&outframe_mutex);
 #else
-    pthread_mutex_lock(&preoutframe_mutex);
+    outframe = preoutframe;
     cimageFromMat(preoutframe, outimage);
-    pthread_mutex_unlock(&preoutframe_mutex);
 #endif
+    pthread_mutex_unlock(&outframe_mutex);
+    pthread_mutex_unlock(&preoutframe_mutex);
 }
 
 std::string ImageUtility::Serialize()
@@ -230,13 +230,14 @@ int ImageUtility::Loop(char c)
             if( counter < 1 ) counter = 1;
             break;
         default:
-            return 0;
+            break;
+            //return 0;
     }
     
-    pthread_mutex_lock(&preoutframe_mutex);
+//    pthread_mutex_lock(&preoutframe_mutex);
     if( has_file ) preoutframe = GetImage();
     if( has_camera ) preoutframe = GetNextFrame();
-    pthread_mutex_unlock(&preoutframe_mutex);
+//    pthread_mutex_unlock(&preoutframe_mutex);
     
     return 1;
 }

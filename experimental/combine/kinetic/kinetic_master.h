@@ -15,22 +15,16 @@
 
 typedef struct
 {
-    quaternion_t
-    data;
-    double
-    confidence;
-    uint32_t
-    timestamp;
+    quaternion_t data;
+    floating_t confidence; /// TODO: Incorporate confidence
+    uint32_t timestamp;
 } orientation_data_t;
 
 typedef struct
 {
-    kpoint_t
-    data[3];
-    double
-    confidence[3];
-    uint32_t
-    timestamp;
+    kpoint_t data[3];
+    floating_t confidence[3];
+    uint32_t timestamp;
 } rho_data_t;
 
 #endif /* kinetic_master_h */

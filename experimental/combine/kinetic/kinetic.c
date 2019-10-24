@@ -17,7 +17,7 @@ void KineticDefaultInit( kinetic_t * k )
     KineticFunctions.Init( k, KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
 }
 
-void KineticInit( kinetic_t * k, int W, int H, double F, double L )
+void KineticInit( kinetic_t * k, int W, int H, floating_t F, floating_t L )
 {
     k->W = W;
     k->H = H;
@@ -31,7 +31,7 @@ void KineticInit( kinetic_t * k, int W, int H, double F, double L )
 static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 {
     /* Step 1: Update Pitch (Restricted) */
-    double v = k->filters.rotation[0].value;
+    floating_t v = k->filters.rotation[0].value;
     if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
        ( e->x >  M_PI_2 && v < -M_PI_2 ) )
     {
@@ -40,7 +40,7 @@ static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
     }
     else
     {
-        Kalman.update( &k->filters.rotation[0], e->x, g->x, VELOCITY );
+        Kalman.Step( &k->filters.rotation[0], e->x, g->x );
         k->values.rotation[0] = k->filters.rotation[0].value;
     }
     
@@ -51,11 +51,11 @@ static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
     }
     
     /* Step 2: Update Roll */
-    Kalman.update( &k->filters.rotation[1], e->y, g->y, VELOCITY );
+    Kalman.Step( &k->filters.rotation[1], e->y, g->y );
     k->values.rotation[1] = k->filters.rotation[1].value;
     
     /* Step 3: Update Yaw */
-    Kalman.update( &k->filters.rotation[2], e->z, g->z, VELOCITY );
+    Kalman.Step( &k->filters.rotation[2], e->z, g->z );
     k->values.rotation[2] = k->filters.rotation[2].value;
     
     k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
@@ -88,9 +88,9 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint
     k->values.position[0] =  k->r.j;
     k->values.position[2] =  k->r.k;
     
-    Kalman.update( &k->filters.position[1], -k->r.i, 0, VELOCITY );
-    Kalman.update( &k->filters.position[0],  k->r.j, 0, VELOCITY );
-    Kalman.update( &k->filters.position[2],  k->r.k, 0, VELOCITY );
+    Kalman.Step( &k->filters.position[1], -k->r.i, 0 );
+    Kalman.Step( &k->filters.position[0],  k->r.j, 0 );
+    Kalman.Step( &k->filters.position[2],  k->r.k, 0 );
     
 //    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;
@@ -127,7 +127,7 @@ static void KineticQuaternions( kinetic_t * k )
 //    Quaternion.copy( O, &k->qd );
     
     /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizonatl and vertical angle offset */
-    double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
+    floating_t cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
     k->nu      = atan2( ( sin_ry * k->A.x + cos_ry * k->A.y ), k->f_l );
     k->upsilon = atan2( ( sin_ry * k->A.y - cos_ry * k->A.x ), k->f_l );
     
@@ -159,7 +159,7 @@ static void KineticMajorAngles( kinetic_t * k )
  */
 static int KineticChi( kinetic_t * k )
 {
-    double m, n;
+    floating_t m, n;
     if( ( fabs( k->sigmaA ) != M_PI_2 ) && ( k->d__l > 0 ) )
     {
         m = k->f_l / cos(k->sigmaA);
@@ -177,7 +177,7 @@ static int KineticChi( kinetic_t * k )
  */
 static int KineticMu( kinetic_t * k )
 {
-    double m, n, a = k->qc_.x, b = k->qc_.z;
+    floating_t m, n, a = k->qc_.x, b = k->qc_.z;
     m = ( a * a ) + ( b * b );
     n = 1.0 - ( 2 * m );
     //OP2A: k->mu = -RASIN( n );
@@ -203,7 +203,7 @@ static void KineticGamma( kinetic_t * k )
  */
 static int KineticR_l( kinetic_t * k )
 {
-    double m;
+    floating_t m;
     if( fabs(k->sigmaR) < 1 )
     {
         m = sin( k->gamma ) / sin( k->sigmaR );
@@ -227,9 +227,9 @@ static void KineticNongrav( kinetic_t * k, vec3_t * n )
 {
     Quaternion.rotVec( n, &k->qd, &k->n );
     
-    Kalman.update( &k->filters.position[1], k->r.i, k->n.i, ACCELERATION );
-    Kalman.update( &k->filters.position[0], k->r.j, k->n.j, ACCELERATION );
-    Kalman.update( &k->filters.position[2], k->r.k, k->n.k, ACCELERATION );
+    Kalman.Step( &k->filters.position[1], k->r.i, k->n.i );
+    Kalman.Step( &k->filters.position[0], k->r.j, k->n.j );
+    Kalman.Step( &k->filters.position[2], k->r.k, k->n.k );
     
     k->values.position[0] = k->filters.position[0].value;
     k->values.position[1] = k->filters.position[1].value;
@@ -258,12 +258,16 @@ kinetic_functions KineticFunctions =
  **************************************************************************************************/
 void Filters_Init( kinetic_t * k )
 {
-    Kalman.init(&k->filters.rotation[0], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.rotation[1], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.rotation[2], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[1], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[2], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
+    for( uint8_t i = 0; i < 3; i++ )
+    {
+        Kalman.Initialize(&k->filters.rotation[i], 0.0, MOTION_MAX_KALMAN_LIFESPAN, ROTATION_MIN, ROTATION_MAX, DEFAULT_MOTION_UNCERTAINTY );
+    }
+    
+    for( uint8_t i = 0; i < 3; i++ )
+    {
+        Kalman.Initialize(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFESPAN, POSITION_MIN, POSITION_MAX, DEFAULT_MOTION_UNCERTAINTY );
+        k->filters.position[i].velocity_mode = false;
+    }
 }
 
 void Camera_Rotation_Init( kinetic_t * k )

@@ -12,13 +12,7 @@
 extern "C" {
 #endif
     
-    /* Standard headers */
-#include <stdbool.h>
-#include <stdint.h>
-#include <math.h>
-    
-/* Included types header */
-#include "vector.h"
+#include "qmath_types.h"
     
 #define SIGN(X)   X>=0?1:-1
 #define RASIN(X)  X>-1&&X<1?asin(X):SIGN(X)*M_PI/2
@@ -29,25 +23,25 @@ extern "C" {
     /** Tait-Bryan Angles */
     typedef struct _ang3_t
     {
-        double    x;                /**< Phi value */
-        double    y;                /**< Theta value */
-        double    z;                /**< Psi value */
+        floating_t    x;                /**< Phi value */
+        floating_t    y;                /**< Theta value */
+        floating_t    z;                /**< Psi value */
     } ang3_t;
     
-    /*! Quaternion hypercomplex type */
+    /** Quaternion hypercomplex type */
     typedef struct
     {
-        double x;
-        double y;
-        double z;
-        double w;
+        floating_t x;
+        floating_t y;
+        floating_t z;
+        floating_t w;
     } quaternion_t;
     
     struct quaternion
     {
         void (*fromEuler)( ang3_t       * a, quaternion_t * q );
         void (*toEuler)(   quaternion_t * q, ang3_t       * a );
-        void (*toMatrix)(  quaternion_t * q, mat3x3_t     * m );
+//        void (*toMatrix)(  quaternion_t * q, mat3x3_t     * m );
         void (*rotVec)(    vec3_t       * v, quaternion_t * q, vec3_t       * r );
         void (*combine)(   quaternion_t * a, quaternion_t * b, quaternion_t * c );
         void (*copy)(      quaternion_t * a, quaternion_t * b );

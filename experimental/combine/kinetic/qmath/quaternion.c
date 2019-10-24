@@ -7,16 +7,17 @@
 
 /* Own header */
 #include "quaternion.h"
+#include "vector.h"
 
 /* See - http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php */
 /* Generic intrinsic euler angles to quaternion conversion */
 void fromEuler( ang3_t * a, quaternion_t * q )
 {
-    double half_roll, half_pitch, half_yaw;
+    floating_t half_roll, half_pitch, half_yaw;
     half_roll   = a->x / 2;
     half_pitch  = a->y / 2;
     half_yaw    = a->z / 2;
-    double cr, cp, cy, sr, sp, sy, cpcy, spsy, spcy, cpsy;
+    floating_t cr, cp, cy, sr, sp, sy, cpcy, spsy, spcy, cpsy;
     cr = cos( half_roll  );
     cp = cos( half_pitch );
     cy = cos( half_yaw   );
@@ -35,7 +36,7 @@ void fromEuler( ang3_t * a, quaternion_t * q )
 
 void toEuler( quaternion_t * q, ang3_t * a )
 {
-    double w = q->w, x = q->x, y = q->y, z = q->z, m, n;
+    floating_t w = q->w, x = q->x, y = q->y, z = q->z, m, n;
     
     m = 2*(w*x+y*z);
     n = 1-2*(x*x+y*y);
@@ -49,30 +50,30 @@ void toEuler( quaternion_t * q, ang3_t * a )
     a->z = atan2(m, n);
 }
 
-void toMatrix(quaternion_t * q, mat3x3_t * m)
-{
-    double wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
-    double w = q->w, x = q->x, y = q->y, z = q->z;
-    
-    x2 = x + x;
-    y2 = y + y;
-    z2 = z + z;
-    xx = x * x2; xy = x * y2; xz = x * z2;
-    yy = y * y2; yz = y * z2; zz = z * z2;
-    wx = w * x2; wy = w * y2; wz = w * z2;
-    
-    m->ii = 1.0 - (yy + zz);
-    m->ji = xy - wz;
-    m->ki = xz + wy;
-    
-    m->ij = xy + wz;
-    m->jj = 1.0 - (xx + zz);
-    m->kj = yz - wx;
-    
-    m->ik = xz - wy;
-    m->jk = yz + wx;
-    m->kk = 1.0 - (xx + yy);
-}
+//void toMatrix(quaternion_t * q, mat3x3_t * m)
+//{
+//    floating_t wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+//    floating_t w = q->w, x = q->x, y = q->y, z = q->z;
+//    
+//    x2 = x + x;
+//    y2 = y + y;
+//    z2 = z + z;
+//    xx = x * x2; xy = x * y2; xz = x * z2;
+//    yy = y * y2; yz = y * z2; zz = z * z2;
+//    wx = w * x2; wy = w * y2; wz = w * z2;
+//    
+//    m->ii = 1.0 - (yy + zz);
+//    m->ji = xy - wz;
+//    m->ki = xz + wy;
+//    
+//    m->ij = xy + wz;
+//    m->jj = 1.0 - (xx + zz);
+//    m->kj = yz - wx;
+//    
+//    m->ik = xz - wy;
+//    m->jk = yz + wx;
+//    m->kk = 1.0 - (xx + yy);
+//}
 
 /* See - https://blog.molecular-matters.com/2013/05/24/a-faster-quaternion-vector-multiplication/ */
 void rotVec(vec3_t * v, quaternion_t * q, vec3_t * r)
@@ -81,7 +82,7 @@ void rotVec(vec3_t * v, quaternion_t * q, vec3_t * r)
     u.i = q->x;
     u.j = q->y;
     u.k = q->z;
-    double s = q->w;
+    floating_t s = q->w;
     vec3_t a, b, c, t;
     
     Vector.mul3  (  2, &u, &a );
@@ -91,10 +92,10 @@ void rotVec(vec3_t * v, quaternion_t * q, vec3_t * r)
     Vector.add33 (  v, &b, &c, r );
 }
 
-/* Double quaternion Hamilton multiplication (Generic) */
+/* floating_t quaternion Hamilton multiplication (Generic) */
 void combine(quaternion_t * a, quaternion_t * b, quaternion_t * c )
 {
-    double A, B, C, D, E, F, G, H;
+    floating_t A, B, C, D, E, F, G, H;
     A = ( a->w + a->x ) * ( b->w + b->x );
     B = ( a->z - a->y ) * ( b->y - b->z );
     C = ( a->w - a->x ) * ( b->y + b->z );
@@ -120,7 +121,7 @@ void copy( quaternion_t * a, quaternion_t * b )
 const struct quaternion Quaternion = {
     .fromEuler = fromEuler,
     .toEuler = toEuler,
-    .toMatrix = toMatrix,
+//    .toMatrix = toMatrix,
     .rotVec = rotVec,
     .combine = combine,
     .copy = copy

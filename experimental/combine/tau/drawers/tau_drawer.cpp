@@ -54,7 +54,7 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, height), CV_8UC3, Scalar(0,0,0))
     y_peak_data_lt = new floating_t[width];
     y_peak_data_ut = new floating_t[width];
     
-    ofstream file(FILENAME);
+    ofstream file(TX_FILENAME);
     file << "#,cvg%," << "flt%";
     for(int i = 0; i < NUM_STATE_GROUPS; i++) file << ",X" << to_string(i);
     for(int i = 0; i < NUM_STATE_GROUPS; i++) file << ",Y" << to_string(i);
@@ -557,7 +557,7 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     pthread_mutex_unlock(&rho.c_mutex);
     
     /* Write to file */
-    ofstream file(FILENAME, ofstream::out | ofstream::app);
+    ofstream file(TX_FILENAME, ofstream::out | ofstream::app);
     file << frame_i++ << "," << total_cvg_percent << "," << filtered_cvg_percent;
     for(int i = 0; i < NUM_STATE_GROUPS; i++) file << "," << X_kumaraswamy[i];
     for(int i = 0; i < NUM_STATE_GROUPS; i++) file << "," << Y_kumaraswamy[i];

@@ -18,13 +18,15 @@
 
 #define BUFFER_LENGTH   (1 << 7)
 
+#define PACKET_ID  'o'
 #define PACKET_DEL '\r'
 
 double mag_cal[] = { -2.396, 38.040, 1.093 };
 char line[BUFFER_LENGTH];
 
-static int init( imu_t * imu )
+static int init( imu_t * imu, orientation_remap_t remap )
 {
+    memcpy(imu->remap, remap, ORIENTATION_NUM_CHANNELS * sizeof(remap_t));
     switch(imu->channel.interface)
     {
         default:
@@ -160,7 +162,7 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
 #endif
     
     double v[9];
-    tokenifyPacket( line, ptr, 9, 'r', v);
+    tokenifyPacket( line, 9, v);
     
     if( v[0] == 0xffff ) return;
 #ifdef PACKET_DEBUG
@@ -186,26 +188,30 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
 
 void Read_SERCOM_IMU_Orientation( imu_t * imu )
 {
-    char buffer[BUFFER_LENGTH];
-    int bytes_read = -1, ptr = 0, isnl = 0;
-    while( !isnl && ptr < BUFFER_LENGTH-1)
+    char buffer[BUFFER_LENGTH], curr;
+    int bytes_read = 0, ptr = 0, isnl = 0;
+    bool line_started = false;
+    Write_SERCOM_Byte(imu->channel.descriptor, 'o');
+    while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+    //Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+    for(int i = 0; i < bytes_read && !isnl; i++)
     {
-        bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
-        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
-        for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
+        curr = buffer[i];
+        if(curr == PACKET_ID)
         {
-            if(buffer[j] == PACKET_DEL)
-            {
-                line[i] = PACKET_DEL;
-                isnl = 1;
-            }
-            else if(buffer[j] != '\n' && buffer[j] != '\\') line[i] = buffer[j];
-            buffer[j] = 0;
+            line_started = true;
+            line[ptr++] = curr;
         }
-        ptr += bytes_read;
+        else if(line_started)
+        {
+            if(curr == PACKET_DEL)
+                isnl = 1;
+            else if (curr == '\n' || curr == '\\') continue;
+            line[ptr++] = curr;
+        }
+        buffer[i] = 0;
     }
-    line[ptr] = ',';
+
     line[++ptr] = '\0';
     if(ptr < MIN_PACKET_LEN_ORI) return;
     
@@ -214,20 +220,21 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
 #endif
     
     double v[6];
-    tokenifyPacket( line, ptr, 6, 'o', v );
+    tokenifyPacket( line + 2, 6, v );
     
     if( v[0] == 0xffff ) return;
+    
 #ifdef PACKET_DEBUG
     for(int i = 0; i < 6; i++)
     printf("(%d)%.2f ", i, v[i]);
     printf("\n");
 #endif
     
-    imu->pitch  =  v[0];
-    imu->roll   = -v[1];
-    imu->yaw    =  360-v[2];
+    imu->pitch  = getRemappedValue(0, v, imu->remap);
+    imu->roll   = getRemappedValue(1, v, imu->remap);
+    imu->yaw    = getRemappedValue(2, v, imu->remap);
     
-    imu->accel_raw[0] = v[3];
-    imu->accel_raw[1] = v[4];
-    imu->accel_raw[2] = v[5];
+    imu->accel_raw[0] = getRemappedValue(3, v, imu->remap);
+    imu->accel_raw[1] = getRemappedValue(4, v, imu->remap);
+    imu->accel_raw[2] = getRemappedValue(5, v, imu->remap);
 }

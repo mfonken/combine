@@ -15,9 +15,7 @@
 extern "C" {
 #endif
     
-#ifdef __RHO__
 #include "rho_global.h"
-#endif
     
     /* PID Filter Configs */
 #define PID_SCALE   1//10

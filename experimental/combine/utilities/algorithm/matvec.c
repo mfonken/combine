@@ -113,33 +113,35 @@ void Mat2x2LLT( mat2x2 * mat, mat2x2 * llt )
 }
 
 /* Gaussian1D Functions */
-//void MulGaussian1d( gaussian1d_t * a, gaussian1d_t * b, gaussian1d_t * c )
-//{
-//    floating_t cov_y_a_var = a->std_dev * a->std_dev, cov_y_b_var = b->std_dev * b->std_dev;
-//    floating_t k = cov_y_a_var / ( cov_y_a_var + cov_y_b_var), mean_diff = b->mean - a->mean;
-//    c->mean = a->mean + k * mean_diff;
-//    c->std_dev = a->std_dev * ( 1 - k );
-//}
+#ifdef INCLUDE_FULL_GAUSSIAN_1D
+void MulGaussian1d( gaussian1d_t * a, gaussian1d_t * b, gaussian1d_t * c )
+{
+    floating_t cov_y_a_var = a->std_dev * a->std_dev, cov_y_b_var = b->std_dev * b->std_dev;
+    floating_t k = cov_y_a_var / ( cov_y_a_var + cov_y_b_var), mean_diff = b->mean - a->mean;
+    c->mean = a->mean + k * mean_diff;
+    c->std_dev = a->std_dev * ( 1 - k );
+}
 
-//void DivGaussian1d( gaussian1d_t * a, gaussian1d_t * b, gaussian1d_t * c )
-//{
-//    floating_t cov_y_a_var = a->std_dev * a->std_dev, cov_y_b_var = b->std_dev * b->std_dev;
-//    floating_t k = cov_y_a_var / ( cov_y_a_var - cov_y_b_var), mean_diff = a->mean - b->mean;
-//    c->mean = -a->mean + k * mean_diff;
-//    c->std_dev = a->std_dev * ( 1 + k );
-//}
-//void CopyGaussian1d( gaussian1d_t * a, gaussian1d_t * b )
-//{
-//    b->mean = a->mean;
-//    b->std_dev = a->std_dev;
-//}
+void DivGaussian1d( gaussian1d_t * a, gaussian1d_t * b, gaussian1d_t * c )
+{
+    floating_t cov_y_a_var = a->std_dev * a->std_dev, cov_y_b_var = b->std_dev * b->std_dev;
+    floating_t k = cov_y_a_var / ( cov_y_a_var - cov_y_b_var), mean_diff = a->mean - b->mean;
+    c->mean = -a->mean + k * mean_diff;
+    c->std_dev = a->std_dev * ( 1 + k );
+}
+void CopyGaussian1d( gaussian1d_t * a, gaussian1d_t * b )
+{
+    b->mean = a->mean;
+    b->std_dev = a->std_dev;
+}
+#endif
 floating_t ProbabilityFromGaussian1d( gaussian1d_t * a, floating_t v )
 {
     floating_t two_std_dev = 2. * a->std_dev,
     diff = ( v - a->mean ),
     e = SafeExp( - ( diff * diff ) / two_std_dev ),
     f = sqrt( M_PI * two_std_dev );
-    return ( e / f );
+    return ZDIV( e, f );
 }
 
 /* Gaussian2D Functions */

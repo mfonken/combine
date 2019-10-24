@@ -8,7 +8,7 @@
 
 #include "point.h"
 
-static void init( kpoint_t * p, double offset_x, double offset_y, double scale, double focal_length )
+static void init( kpoint_t * p, floating_t offset_x, floating_t offset_y, floating_t scale, floating_t focal_length )
 {
     p->x = ( p->x - offset_x ) * scale;
     p->y = ( p->y - offset_y ) * scale;
@@ -17,24 +17,24 @@ static void init( kpoint_t * p, double offset_x, double offset_y, double scale, 
     p->the = atan2( p->y, p->z);
 }
 
-static double dist( kpoint_t * p )
+static floating_t dist( kpoint_t * p )
 {
     return sqrt( KPoint.disq(p) );
 }
-static double disq( kpoint_t * p )
+static floating_t disq( kpoint_t * p )
 {
     return ( p->x * p->x ) + ( p->y * p->y );
 }
 
 /* Linear angle of point relative to origin */
-static double angl( kpoint_t * p )
+static floating_t angl( kpoint_t * p )
 {
     return atan2( p->y, p->x );
 }
 
 /* Combined angle of point relative to origin */
 ///NOTE: acos(cos()cos()) only works for combining frame-perpendicular angles (i.e. theta & phi)
-static double anga( kpoint_t * p )
+static floating_t anga( kpoint_t * p )
 {
     return acos( cos( p->the ) * cos( p->phi ) );
 }

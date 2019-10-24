@@ -12,13 +12,25 @@
 #include <stdio.h>
 #include <string>
 
-//#include "kinetic_master.h"
+#include "kinetic_master.h"
 #include "utility_master.h"
 #include "environment_master.h"
 #include "tau_master.h"
 
 #define MAX_BUFFER 256
-#define SCALE 100
+
+#define DEFAULT_ROTATION_SCALE 1
+#define DEFAULT_POSITION_SCALE 100
+
+static orientation_remap_t DEFAULT_IMU_REMAP =
+{
+    { 0, 0, 0 }, /* Pitch */
+    { 1, 0, 1 }, /* Roll  */
+    { 2, 0, 1 }, /* Yaw   */
+    { 0, 0, 1 }, /* Linear Acceleration X */
+    { 1, 0, 1 }, /* Linear Acceleration Y */
+    { 2, 0, 1 }, /* Linear Acceleration Z */
+};
 
 class Combine : public TestInterface
 {
@@ -30,6 +42,9 @@ public:
     Combine(const char *, Tau * );
     
 private:
+    double      rotation_scale = DEFAULT_ROTATION_SCALE,
+                position_scale = DEFAULT_POSITION_SCALE;
+    
     int         width,
                 height;
     Tau       * tau;

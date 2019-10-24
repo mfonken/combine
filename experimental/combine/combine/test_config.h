@@ -15,7 +15,7 @@
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
-//#define HAS_IMU
+#define HAS_IMU
 #define HAS_FILE
 //#define HAS_GENERATOR
 
@@ -29,7 +29,7 @@
 
 #define IMAGE_TICKS                     (360*2)
 #define THRESH_IMAGE
-#define ROTATE_IMAGE
+//#define ROTATE_IMAGE
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"
@@ -71,7 +71,7 @@
 //#define sleep(X) usleep(X*1E6)
 #define KEY_DELAY 1E3/MAIN_FPS
 
-#define FILENAME                        FILE_ROOT "psm_perf/p_data.csv"
+#define TX_FILENAME                     FILE_ROOT "psm_perf/p_data.csv"
 #define X_DIM_FILENAME                  FILE_ROOT "psm_perf/x_data.csv"
 #define Y_DIM_FILENAME                  FILE_ROOT "psm_perf/y_data.csv"
 

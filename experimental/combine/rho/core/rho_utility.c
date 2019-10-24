@@ -435,7 +435,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
             curr->score
             );
         if( curr->score > 100. )
-            printf(".\n");
+            printf(" \n");
     }
     for(; i < MAX_REGIONS; i++ )
     {
@@ -908,7 +908,7 @@ void GenerateRegionScoreRhoUtility( region_t * region, density_t total_density, 
         delta_p = (floating_t)peak / (floating_t)region->maximum;
     region->score = sqrt( REGION_SCORE_FACTOR * ( ( delta_d * delta_d ) + ( delta_p * delta_p ) ) );
     if( region->score > 100. )
-        printf(".\n");
+        printf(" \n");
 }
 
 /* Generic centroid and mass calculator */
