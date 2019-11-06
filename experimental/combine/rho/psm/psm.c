@@ -62,7 +62,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
 
 void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
 {
-    floating_t observation_set[NUM_STATE_GROUPS], cumulative = 0., current = 0.;
+    floating_t cumulative = 0., current = 0.;
     LOG_PSM(PSM_DEBUG_UPDATE, "Hidden:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
     {
@@ -85,7 +85,7 @@ void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
 void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
     /* Update state path prediction to best cluster */
-    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
+//    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
 //    return;
     /* Calculate current observation and update observation matrix */
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
@@ -166,7 +166,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
             if( processed_clusters & m ) continue;
-            if( model->gmm.cluster[i]->gaussian_in.mean.a > PSM_OBSERVATION_MAX ) continue;
+            if( model->gmm.cluster[i]->gaussian_in.mean.b > PSM_OBSERVATION_MAX ) continue;
             check_boundary = model->gmm.cluster[i]->max_y;
             if( check_boundary > min_boundary )
             {
@@ -181,10 +181,10 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         if( check )
         { /* If new labels in cluster */
             uint32_t new_label_vector = running_label_vector | current_label_vector;
-            
-            /* If new update skipped bands, if any */
+
+            /* If new update skipped bands... */
             current_band_id = CountSet(new_label_vector);
-            
+
             for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
             {
                 PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
@@ -287,19 +287,38 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
     return state;
 }
 
+//#define MIN_VALID_TARGET_BAND_VARIANCE 3
+//#define MAX_VALID_TARGET_BAND_VARIANCE 7
+
 void GenerateProposalsPSM( psm_t * model )
 {
     if( !model->gmm.num_clusters ) return;
+
+//    /* Update current state */
+//    model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
+//    PSMFunctions.UpdateBestCluster( model, &model->state_bands );
+//
+//    if( model->best_cluster_id >= model->gmm.num_clusters
+//       || model->best_cluster_id < 0) return;
     
-    /* Update current state */
-    model->best_state = PSMFunctions.FindMostLikelyHiddenState( model, TARGET_STATE, &model->best_confidence );
-    PSMFunctions.UpdateBestCluster( model, &model->state_bands );
     
-    if( model->best_cluster_id >= model->gmm.num_clusters
-       || model->best_cluster_id < 0) return;
     
+    double target_band_variance = model->state_bands.band[2].variance;
+    LOG_PSM(PSM_DEBUG_UPDATE, "Target Band: var>%.4f\n", target_band_variance);
+    
+//    if(target_band_variance > 0 && target_band_variance < MAX_VALID_TARGET_BAND_VARIANCE)
+        model->best_state = 2;
+    
+    
+#define MIN_VALID_TARGET_BAND_VARIANCE 1
+#define MAX_VALID_TARGET_BAND_VARIANCE 10
     /* Update predictions */
     vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
+    if(target_band_variance < MIN_VALID_TARGET_BAND_VARIANCE
+       || target_band_variance > MAX_VALID_TARGET_BAND_VARIANCE)
+        proposed_center->b = 0;
+    else
+        proposed_center->b += 0.00001;
     
     /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];
@@ -308,9 +327,9 @@ void GenerateProposalsPSM( psm_t * model )
     {
         proposed_center->a,
         proposed_center->b,
-        GetNumberOfValidLabels( &cluster->labels ),
-        cluster->primary_id,
-        cluster->secondary_id
+        2,//GetNumberOfValidLabels( &cluster->labels ),
+        0,//cluster->primary_id,
+        1//cluster->secondary_id
     };
     LOG_PSM(PSM_DEBUG_UPDATE, "Proposal: Density - %.2f | Thresh - %.2f | Num - %d | P_id - %d | S_id - %d\n", model->proposed.density, model->proposed.thresh, model->proposed.num, model->proposed.primary_id, model->proposed.secondary_id);
 }

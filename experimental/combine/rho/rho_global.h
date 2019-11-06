@@ -74,9 +74,9 @@ enum LogLevel
 //#define KALMAN_DEBUG            RHO_DEBUG
 //#define KALMAN_DEBUG_2          RHO_DEBUG_2
 
-//#define PSM_DEBUG               RHO_DEBUG
-//#define PSM_DEBUG_2             RHO_DEBUG_2
-//#define PSM_DEBUG_UPDATE        RHO_DEBUG_2
+#define PSM_DEBUG               RHO_DEBUG
+#define PSM_DEBUG_2             RHO_DEBUG_2
+#define PSM_DEBUG_UPDATE        PSM_DEBUG
 //#define HMM_DEBUG               RHO_DEBUG
 //#define HMM_REPORT              RHO_DEBUG_2
 //#define GMM_DEBUG               PSM_DEBUG

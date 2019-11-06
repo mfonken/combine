@@ -17,7 +17,13 @@ double TIMESTAMP(void)
 
 bool ISTIMEDOUT( double check, double time_out )
 {
-    double diff = TIMESTAMP() - check;
+    double diff = SECONDSSINCE(check);
 //    printf("∆%f c%f t%f\n", diff, check, time_out);
     return (diff > time_out);
+}
+
+double SECONDSSINCE( double check )
+{
+    return 0.010;
+    return TIMESTAMP() - check;
 }

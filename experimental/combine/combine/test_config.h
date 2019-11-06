@@ -9,13 +9,13 @@
 #ifndef test_config_h
 #define test_config_h
 
-#define MAIN_FPS        10
-#define TAU_FPS         10
+#define MAIN_FPS        15
+#define TAU_FPS         MAIN_FPS//10
 #define COMBINE_FPS     15
 
 /* GLOBAL SETUP */
 //#define HAS_CAMERA
-#define HAS_IMU
+//#define HAS_IMU
 #define HAS_FILE
 //#define HAS_GENERATOR
 
@@ -29,7 +29,7 @@
 
 #define IMAGE_TICKS                     (360*2)
 #define THRESH_IMAGE
-//#define ROTATE_IMAGE
+#define ROTATE_IMAGE
 
 #define TITLE_STRING                    "Combine Alpha v1.0"
 #define GROUP_NAME                      "/gradient/"

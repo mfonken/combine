@@ -45,6 +45,7 @@ extern "C" {
         void (*rotVec)(    vec3_t       * v, quaternion_t * q, vec3_t       * r );
         void (*combine)(   quaternion_t * a, quaternion_t * b, quaternion_t * c );
         void (*copy)(      quaternion_t * a, quaternion_t * b );
+        void (*inverse)(   quaternion_t * a, quaternion_t * b );
     };
               
     extern const struct quaternion Quaternion;

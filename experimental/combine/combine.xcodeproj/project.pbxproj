@@ -603,10 +603,9 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					__IMU__,
-					__KIN__,
-					__RHO__,
 					"$(inherited)",
+					__RHO__,
+					__PSM__,
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

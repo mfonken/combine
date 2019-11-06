@@ -40,7 +40,7 @@
 
 //#define IU_WIDTH        FRAME_WIDTH
 //#define IU_HEIGHT       FRAME_HEIGHT
-#define IU_FRAME_RATE   30
+#define IU_FRAME_RATE   15
 
 #define IU_THRESHOLD    1//00
 #define IU_BRIGHTNESS   230

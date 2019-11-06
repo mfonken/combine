@@ -139,7 +139,7 @@ void ImageUtility::InitCamera()
     }
     cam >> image;
     
-    LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", image.cols, image.rows, (int)cam.get(CAP_PROP_FPS));
+    LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", (int)cam.get(CAP_PROP_FRAME_WIDTH), (int)cam.get(CAP_PROP_FRAME_HEIGHT), (int)cam.get(CAP_PROP_FPS));
     
 #ifdef GREYSCALE
     Mat grey;

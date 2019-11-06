@@ -137,6 +137,7 @@ typedef struct
         proposed_num;
     double
         best_confidence,
+        proposed_threshold,
         proposed_avg_den;
 } psm_pair_t;
 

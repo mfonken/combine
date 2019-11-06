@@ -10,8 +10,8 @@
 #define kinetic_master_h
 
 #include "imu_wrapper.h"
-#include "kinetic.h"
 #include "point.h"
+#include "kinetic.h"
 
 typedef struct
 {

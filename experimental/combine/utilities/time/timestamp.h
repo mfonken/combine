@@ -19,6 +19,7 @@ extern "C" {
 
 double TIMESTAMP( void );
 bool ISTIMEDOUT( double, double );
+double SECONDSSINCE( double );
     
 #ifdef __cplusplus
 }

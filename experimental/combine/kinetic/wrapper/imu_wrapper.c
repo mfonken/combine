@@ -230,10 +230,9 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     printf("\n");
 #endif
     
-    imu->pitch  = getRemappedValue(0, v, imu->remap);
-    imu->roll   = getRemappedValue(1, v, imu->remap);
-    imu->yaw    = getRemappedValue(2, v, imu->remap);
-    
+    imu->pitch        = getRemappedValue(0, v, imu->remap);
+    imu->roll         = getRemappedValue(1, v, imu->remap);
+    imu->yaw          = getRemappedValue(2, v, imu->remap);
     imu->accel_raw[0] = getRemappedValue(3, v, imu->remap);
     imu->accel_raw[1] = getRemappedValue(4, v, imu->remap);
     imu->accel_raw[2] = getRemappedValue(5, v, imu->remap);

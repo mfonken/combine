@@ -48,26 +48,6 @@ extern "C" {
 
 #define TARGET_STATE TARGET_POPULATED
 
-      typedef enum
-    {
-        UNKNOWN_STATE = -1,
-//        NONE_POPULATED,
-        UNDER_POPULATED,
-        TARGET_POPULATED,
-        OVER_POPULATED,
-        CHAOTIC,
-        NUM_STATES
-    } state_t;
-#define NUM_STATE_GROUPS NUM_STATES
-
-    /* Stability tracking for selec tions */
-    typedef struct
-    {
-        kalman_filter_t
-            state,
-            system;
-    } stability_t;
-
 #ifdef __PSM__
     //#define NUM_STATES              10
 //#define NUM_OBSERVATION_SYMBOLS 2//5 // Should be max number of clusters in GMM
@@ -119,6 +99,26 @@ extern "C" {
     typedef floating_t       hmm_observation_t;
     typedef gaussian1d_t emission_t;
 #endif
+
+    typedef enum
+    {
+        UNKNOWN_STATE = -1,
+//        NONE_POPULATED,
+        UNDER_POPULATED,
+        TARGET_POPULATED,
+        OVER_POPULATED,
+        CHAOTIC,
+        NUM_STATES
+    } state_t;
+#define NUM_STATE_GROUPS NUM_STATES
+
+    /* Stability tracking for selec tions */
+    typedef struct
+    {
+        kalman_filter_t
+            state,
+            system;
+    } stability_t;
     
     typedef struct
     {

@@ -43,10 +43,7 @@ extern "C" {
 
     static double getRemappedValue( int i, double v[ORIENTATION_NUM_CHANNELS], orientation_remap_t remap )
     {
-        if(!remap[i].reversed)
-            return v[remap[i].index] + remap[i].offset;
-        else
-            return remap[i].offset - v[remap[i].index];
+        return remap[i].offset + ( !remap[i].reversed ? 1 : -1 ) * v[remap[i].index];
     }
     
     typedef struct

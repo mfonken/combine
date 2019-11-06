@@ -38,9 +38,9 @@ void RhoDrawer::DrawDetectionMap( detection_map_t * map, uint8_t thresh )
 {
     if(++counter == DETECTION_MAP_INTERVAL)
     {
-        detection_map_frame = {0};
-        rectangle(detection_map_frame, Point(DETECTION_MAP_INSET,DETECTION_MAP_INSET), Point(DETECTION_MAP_FRAME_OWIDTH-DETECTION_MAP_INSET, DETECTION_MAP_FRAME_OHEIGHT-DETECTION_MAP_INSET), rwhite);
         counter = 0;
+        detection_map_frame = {Scalar(245,245,245)};
+        rectangle(detection_map_frame, Point(DETECTION_MAP_INSET,DETECTION_MAP_INSET), Point(DETECTION_MAP_FRAME_OWIDTH-DETECTION_MAP_INSET, DETECTION_MAP_FRAME_OHEIGHT-DETECTION_MAP_INSET), rblack);
         if( !map->length ) return;
 #ifdef PRINT_DETECTION_MAP
         printf("Detection Map:");
@@ -73,7 +73,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
     gaussian2d_t gaus;
     double angle;
 //    printf("b:%p\n", &psm->gmm);
-    putText(detection_map_frame, std::to_string(psm->gmm.num_clusters), Point(DETECTION_MAP_FRAME_IWIDTH-32, DETECTION_MAP_INSET+32), FONT_HERSHEY_PLAIN, 1, rwhite, 2);
+    putText(detection_map_frame, std::to_string(psm->gmm.num_clusters), Point(DETECTION_MAP_FRAME_IWIDTH-32, DETECTION_MAP_INSET+32), FONT_HERSHEY_PLAIN, 1, rgray, 2);
     for( int j = 0; j < psm->gmm.num_clusters; j++)
     {
         gaus = (*psm->gmm.cluster[j]).gaussian_in;
@@ -94,7 +94,7 @@ void RhoDrawer::PostProcess(psm_t * psm)
             putText(detection_map_frame, pto_string(labels.average[i],1), Point(center.x, center.y+offset), FONT_HERSHEY_PLAIN, 1, c, 2);
         }
         
-        putText(detection_map_frame, pto_string(j,0), Point(center.x-size.width/2, center.y-size.height/2), FONT_HERSHEY_PLAIN, 1, rwhite, 2);
+        putText(detection_map_frame, pto_string(j,0), Point(center.x-size.width/2, center.y-size.height/2), FONT_HERSHEY_PLAIN, 1, rgray, 2);
     }
     
     for( uint8_t i = 0; i < psm->state_bands.length; i++ )

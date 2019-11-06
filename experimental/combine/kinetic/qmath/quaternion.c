@@ -118,13 +118,22 @@ void copy( quaternion_t * a, quaternion_t * b )
     b->z = a->z;
 }
 
+void inverse( quaternion_t * a, quaternion_t * b )
+{
+    b->w = a->w;
+    b->x = -a->x;
+    b->y = -a->y;
+    b->z = -a->z;
+}
+
 const struct quaternion Quaternion = {
     .fromEuler = fromEuler,
     .toEuler = toEuler,
 //    .toMatrix = toMatrix,
     .rotVec = rotVec,
     .combine = combine,
-    .copy = copy
+    .copy = copy,
+    .inverse = inverse
 };
 
 void radToDeg( ang3_t * a )

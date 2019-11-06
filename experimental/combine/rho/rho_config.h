@@ -86,7 +86,7 @@
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
 #ifdef __PSM__
-#define PSM_UPDATE_PERIOD     1.
+#define PSM_UPDATE_PERIOD     0.5
 #endif
 #define BACKGROUNDING_PERIOD  100000 // Frames
 

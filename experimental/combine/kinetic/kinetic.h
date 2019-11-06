@@ -15,20 +15,24 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 
-//#include "test_setup.h"
+#include "test_config.h"
 
 /* Math headers */
 #include "qmath.h"
 
 /* Filters */
+#ifdef __KALMAN__
 #include "kalman.h"
 
 /* Kalman Defaults */
 #define MOTION_MAX_KALMAN_LIFESPAN 10.0
-#define MOTION_VALUE_UNCERTAINTY   0.01
-#define MOTION_BIAS_UNCERTAINTY    0.003
-#define MOTION_SENSOR_UNCERTAINTY  0.02
+#define MOTION_VALUE_UNCERTAINTY   0.2
+#define MOTION_BIAS_UNCERTAINTY    0.001
+#define MOTION_SENSOR_UNCERTAINTY  0.01
+#endif
+
 #define ROTATION_MAX               (2. * M_PI)
 #define ROTATION_MIN               (-ROTATION_MAX)
 #define POSITION_MIN               -100
@@ -52,13 +56,13 @@
 
 #define     REFERENCE_OFFSET_ANGLE_X   0    // radians
 #define     REFERENCE_OFFSET_ANGLE_Y   0    // radians
-#define     REFERENCE_OFFSET_ANGLE_Z   -110 * DEG_TO_RAD //M_PI_2 // radians
+#define     REFERENCE_OFFSET_ANGLE_Z   0//-110 * DEG_TO_RAD // radians
 
 //#define     CAMERA_ALPHA_W          120     // degrees
 //#define     CAMERA_ALPHA_H          75      // degrees
 
-#define     KINETIC_CAMERA_WIDTH    1//CAMERA_WIDTH//1280    // pixels
-#define     KINETIC_CAMERA_HEIGHT   1//CAMERA_HEIGHT//800     // pixels
+#define     KINETIC_CAMERA_WIDTH    FRAME_WIDTH//1280    // pixels
+#define     KINETIC_CAMERA_HEIGHT   FRAME_HEIGHT//800     // pixels
 #define     CAMERA_HALF_WIDTH       FNL_RESIZE_W/2
 #define     CAMERA_HALF_HEIGHT      FNL_RESIZE_H/2
 
@@ -81,16 +85,20 @@ typedef struct _kinetic_values_t
     double     rotation[3];             /**< Raw rotation */
 } kinetic_values_t;
 
+#ifdef __KALMAN__
 typedef struct _kinetic_filters_t
 {
     kalman_filter_t position[3];             /**< Raw position */
     kalman_filter_t rotation[3];             /**< Raw rotation */
 } kinetic_filters_t;
+#endif
 
 typedef struct _kinetic_t
 {
     kinetic_values_t values;
+#ifdef __KALMAN__
     kinetic_filters_t filters;
+#endif
     kpoint_t
     A,
     B;
@@ -151,7 +159,9 @@ typedef struct
 
 extern kinetic_functions KineticFunctions;
 
+#ifdef __KALMAN__
 void Filters_Init( kinetic_t *);
+#endif
 void Camera_Rotation_Init( kinetic_t *);
 void Reference_Rotation_Init( kinetic_t *);
 

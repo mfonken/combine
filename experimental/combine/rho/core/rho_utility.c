@@ -754,6 +754,8 @@ void CalculateTuneRhoUtility( rho_core_t * core )
     core->Tune.proposed = BOUND( core->Tune.background + core->Tune.state + core->Tune.target, -THRESH_STEP_MAX, THRESH_STEP_MAX);
     
     core->Thresh = BOUND(core->Thresh + core->Tune.proposed, THRESH_MIN, THRESH_MAX);
+//    if(core->PredictiveStateModelPair.proposed_threshold > 0)
+//        core->Thresh = WeightedAverage(core->PredictiveStateModelPair.proposed_threshold, core->Thresh, 0.5);
     core->ThreshByte = (byte_t)core->Thresh;
 }
 
@@ -773,6 +775,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     core->TargetCoverageFactor = core->TargetFilter.value;
     core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
     LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.7f|%.7f\n", core->FilteredPercentage, core->TotalPercentage);
+    
 //#ifdef __PSM__
 ////    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
 //    core->TargetFilter.value = core->TotalPercentage;
@@ -782,7 +785,7 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 //    LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->PredictiveStateModelPair.current_state));
 //    switch(core->PredictiveStateModelPair.current_state)
 //#else
-    LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->StateMachine.state));
+    LOG_RHO(RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->StateMachine.state));
     switch(core->StateMachine.state)
 //#endif
     {
@@ -1034,5 +1037,6 @@ void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
     core->PredictiveStateModelPair.best_confidence = AVG2( core->PredictiveStateModelPair.x.best_confidence, core->PredictiveStateModelPair.y.best_confidence );
     core->PredictiveStateModelPair.proposed_num = MAX( core->PredictiveStateModelPair.x.proposed.num, core->PredictiveStateModelPair.y.proposed.num );
     core->PredictiveStateModelPair.proposed_avg_den = AVG2( core->PredictiveStateModelPair.x.proposed.density, core->PredictiveStateModelPair.y.proposed.density );
+    core->PredictiveStateModelPair.proposed_threshold = AVG2( core->PredictiveStateModelPair.x.proposed.thresh, core->PredictiveStateModelPair.y.proposed.thresh );
 #endif
 }
