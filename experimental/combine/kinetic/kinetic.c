@@ -78,6 +78,11 @@ static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
 
 static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint_t B )
 {
+#ifdef __KALMAN__
+    /* Preparation: Correct rotation according to new points */
+    KineticFunctions.CorrectRotationByPointTranslation( k, A, B );
+#endif
+    
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
     
@@ -94,7 +99,45 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint
     KineticFunctions.Nongrav( k, n );
     
     //printf("Yaw: %4d | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+    
+    KPoint.copy( &k->A, &k->A_ );
+    KPoint.copy( &k->B, &k->B_ );
+    
     return;
+}
+
+static void KineticCorrectRotationByPointTranslation( kinetic_t * k, kpoint_t A, kpoint_t B )
+{
+#ifdef __KALMAN__
+    ang3_t e = KineticFunctions.PointTranslationParameters( k, A, B );
+    
+    Kalman.Step( &k->filters.rotation[0], k->filters.rotation[0].value, e.x );
+    Kalman.Step( &k->filters.rotation[1], k->filters.rotation[1].value, e.y );
+    Kalman.Step( &k->filters.rotation[2], k->filters.rotation[2].value, e.z );
+#endif
+}
+
+static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t A, kpoint_t B )
+{
+    vec3_t AB = (vec3_t){ B.x - A.x, B.y - A.y, A.z };
+    floating_t theta = Vector.ang2( &k->AB_, &AB );
+    
+    vec3_t daA, dbB, aAbB;
+    Vector.sub3( (vec3_t*)&k->A_, (vec3_t*)&A, &daA );
+    Vector.sub3( (vec3_t*)&k->B_, (vec3_t*)&B, &dbB );
+    Vector.rot2( &aAbB, theta );
+    Vector.add3( &daA, &dbB, &aAbB );
+    
+    floating_t phi = atan2( aAbB.j, A.z ),  psi = atan2( aAbB.i, A.z );
+    
+    floating_t theta_deg = theta * RAD_TO_DEG, phi_deg = phi * RAD_TO_DEG, psi_deg = psi * RAD_TO_DEG;
+    //    floating_t dR = KineticFunctions.DeltaR( k->r_l, &k->AB_, &AB );
+    
+    memcpy( &k->A_,  &A,  sizeof(kpoint_t) );
+    memcpy( &k->B_,  &B,  sizeof(kpoint_t) );
+    memcpy( &k->AB_, &AB, sizeof(vec3_t)   );
+    
+    return (ang3_t){ phi, theta, psi };
 }
 
 static void KineticMinorAngles( kinetic_t * k, kpoint_t A, kpoint_t B )
@@ -241,12 +284,20 @@ static void KineticNongrav( kinetic_t * k, vec3_t * n )
 #endif
 }
 
+static floating_t KineticDeltaR( floating_t r, vec3_t * ab, vec3_t * AB )
+{
+    floating_t d = Vector.len2( ab ), D = Vector.len2( AB );
+    return r * ( 1 - D / d );
+}
+
 kinetic_functions KineticFunctions =
 {
     .DefaultInit = KineticDefaultInit,
     .Init = KineticInit,
     .UpdateRotation = KineticUpdateRotation,
     .UpdatePosition = KineticUpdatePosition,
+    .CorrectRotationByPointTranslation = KineticCorrectRotationByPointTranslation,
+    .PointTranslationParameters = KineticPointTranslationParameters,
     .MinorAngles = KineticMinorAngles,
     .Quaternions = KineticQuaternions,
     .MajorAngles = KineticMajorAngles,
@@ -255,7 +306,8 @@ kinetic_functions KineticFunctions =
     .Gamma = KineticGamma,
     .R_l = KineticR_l,
     .R = KineticR,
-    .Nongrav = KineticNongrav
+    .Nongrav = KineticNongrav,
+    .DeltaR = KineticDeltaR
 };
 
 /***************************************************************************************************

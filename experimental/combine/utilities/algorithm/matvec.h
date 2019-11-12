@@ -32,13 +32,13 @@ typedef double floating_t;
 
 typedef struct
 {
-    floating_t a,b,c,d;
-} mat2x2;
+    floating_t a,b;
+} vec2_t;
 
 typedef struct
 {
-    floating_t a,b;
-} vec2;
+    floating_t a,b,c,d;
+} mat2x2;
 
 typedef struct
 {
@@ -49,23 +49,23 @@ typedef struct
 
 typedef struct
 {
-    vec2 mean;
+    vec2_t mean;
     mat2x2 covariance;
     uint8_t combinations;
 } gaussian2d_t;
 
 float SafeExp(floating_t x);
 
-void Vec2AddVec2( vec2 *, vec2 *, vec2 *);
-void Vec2SubVec2( vec2 *, vec2 *, vec2 *);
-void ScalarMulVec2( floating_t A, vec2 *, vec2 *);
-floating_t Vec2DotVec2( vec2 *, vec2 * );
-void Vec2AAT( vec2 *, mat2x2 * m );
+void Vec2AddVec2( vec2_t *, vec2_t *, vec2_t *);
+void Vec2SubVec2( vec2_t *, vec2_t *, vec2_t *);
+void ScalarMulVec2( floating_t A, vec2_t *, vec2_t *);
+floating_t Vec2DotVec2( vec2_t *, vec2_t * );
+void Vec2AAT( vec2_t *, mat2x2 * m );
 
 void Mat2x2AddMat2x2( mat2x2 *, mat2x2 *, mat2x2 *);
 void Mat2x2SubMat2x2( mat2x2 *, mat2x2 *, mat2x2 *);
 void ScalarMulMat2x2( floating_t, mat2x2 *, mat2x2 * );
-void Mat2x2DotVec2( mat2x2 *, vec2 *, vec2 *);
+void Mat2x2DotVec2( mat2x2 *, vec2_t *, vec2_t *);
 floating_t Mat2x2Determinant( mat2x2 * );
 void Mat2x2Inverse( mat2x2 *, mat2x2 * );
 void Mat2x2LLT( mat2x2 *, mat2x2 * );
@@ -78,28 +78,28 @@ void CopyGaussian1d( gaussian1d_t *, gaussian1d_t * );
 floating_t ProbabilityFromGaussian1d( gaussian1d_t *, floating_t );
 
 void MulGaussian2d( gaussian2d_t *, gaussian2d_t *, gaussian2d_t * );
-floating_t ProbabilityFromGaussian2d( gaussian2d_t *, vec2 * );
-void UpdateGaussianWithWeightGaussian2d( vec2 *, vec2 *, gaussian2d_t *, floating_t );
-vec2 WeightedMeanUpdateGaussian2d( vec2 *, gaussian2d_t *, floating_t );
-floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 *, vec2 * );
+floating_t ProbabilityFromGaussian2d( gaussian2d_t *, vec2_t * );
+void UpdateGaussianWithWeightGaussian2d( vec2_t *, vec2_t *, gaussian2d_t *, floating_t );
+vec2_t WeightedMeanUpdateGaussian2d( vec2_t *, gaussian2d_t *, floating_t );
+floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 *, vec2_t * );
 bool LimitCovarianceGaussian2d( mat2x2 * );
 floating_t CovarianceAngleGaussian2d( mat2x2 * );
 
 typedef struct
 {
-    void (*Add)( vec2 *, vec2 *, vec2 * );
-    void (*Subtract)( vec2 *, vec2 *, vec2 * );
-    void (*ScalarMultiply)( floating_t, vec2 *, vec2 * );
-    floating_t (*Dot)( vec2 *, vec2 * );
-    void (*AAT)( vec2 *, mat2x2 * );
-} vec2_functions;
+    void (*Add)( vec2_t *, vec2_t *, vec2_t * );
+    void (*Subtract)( vec2_t *, vec2_t *, vec2_t * );
+    void (*ScalarMultiply)( floating_t, vec2_t *, vec2_t * );
+    floating_t (*Dot)( vec2_t *, vec2_t * );
+    void (*AAT)( vec2_t *, mat2x2 * );
+} vec2_t_functions;
 
 typedef struct
 {
     void (*Add)( mat2x2 *, mat2x2 *, mat2x2 * );
     void (*Subtract)( mat2x2 *, mat2x2 *, mat2x2 * );
     void (*ScalarMultiply)( floating_t, mat2x2 *, mat2x2 * );
-    void (*DotVec2)( mat2x2 *, vec2 *, vec2 * );
+    void (*DotVec2)( mat2x2 *, vec2_t *, vec2_t * );
     floating_t (*Determinant)( mat2x2 * );
     void (*Inverse)( mat2x2 *, mat2x2 * );
     void (*LLT)( mat2x2 *, mat2x2 * );
@@ -117,22 +117,22 @@ typedef struct
 
 typedef struct
 {
-    floating_t (*MahalanobisSq)( mat2x2 *, vec2 * );
+    floating_t (*MahalanobisSq)( mat2x2 *, vec2_t * );
     bool (*Limit)( mat2x2 * );
     floating_t (*Angle)( mat2x2 * );
 } covariance_functions;
 typedef struct
 {
     void (*Multiply)( gaussian2d_t *, gaussian2d_t *, gaussian2d_t * );
-    floating_t (*Probability)( gaussian2d_t *, vec2 * );
-    void (*WeightedUpdate)( vec2 *, vec2 *, gaussian2d_t *, floating_t );
-    vec2 (*WeightedMeanUpdate)( vec2 *, gaussian2d_t *, floating_t );
+    floating_t (*Probability)( gaussian2d_t *, vec2_t * );
+    void (*WeightedUpdate)( vec2_t *, vec2_t *, gaussian2d_t *, floating_t );
+    vec2_t (*WeightedMeanUpdate)( vec2_t *, gaussian2d_t *, floating_t );
     covariance_functions Covariance;
 } gaussian2d_functions;
 
 typedef struct
 {
-    vec2_functions Vec2;
+    vec2_t_functions Vec2;
     mat2x2_functions Mat2x2;
     gaussian1d_functions Gaussian1D;
     gaussian2d_functions Gaussian2D;

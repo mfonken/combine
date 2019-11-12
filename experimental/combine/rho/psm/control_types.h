@@ -19,10 +19,10 @@ extern "C" {
 #include <string.h>
 
 #include "rho_config.h"
-    
+
+#include "matvec.h"
 #include "kalman.h"
 #include "pid.h"
-#include "matvec.h"
 
 #ifndef ZDIV
 #define ZDIV_LNUM 1 << 10
@@ -93,10 +93,10 @@ extern "C" {
 #endif
     
 #ifdef HMM_2D_EMISSIONS
-    typedef vec2         hmm_observation_t;
+    typedef vec2_t       hmm_observation_t;
     typedef gaussian2d_t emission_t;
 #else
-    typedef floating_t       hmm_observation_t;
+    typedef floating_t   hmm_observation_t;
     typedef gaussian1d_t emission_t;
 #endif
 
@@ -156,7 +156,7 @@ extern "C" {
         lower_boundary,
         upper_boundary,
         variance;
-        vec2
+        vec2_t
         true_center;
     } band_t;
     
@@ -274,7 +274,7 @@ extern "C" {
     {
         if( buffer->index.next == buffer->index.first ) return
 #ifdef HMM_2D_EMISSIONS
-            (vec2){ -1, -1 };
+            (vec2_t){ -1, -1 };
 #else
         -1;
 #endif
@@ -294,7 +294,7 @@ extern "C" {
         uint8_t l = buffer->length;// GetLengthObservationBuffer( buffer );
         if( i > l ) return
 #ifdef HMM_2D_EMISSIONS
-            (vec2){ -1, -1 };
+            (vec2_t){ -1, -1 };
 #else
         -1;
 #endif

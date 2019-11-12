@@ -44,7 +44,7 @@ extern "C" {
       kalman_uncertainty_c
         uncertainty;
       bool
-        velocity_mode,
+        acceleration_mode,
         sorted,
         valid,
         flag;
@@ -61,7 +61,7 @@ extern "C" {
     void       PrintKalman( kalman_filter_t * );
     
     struct kalman {
-        void (*  Initialize)( kalman_filter_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
+        void (* Initialize)( kalman_filter_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
         void (*      Reset)( kalman_filter_t *, floating_t );
         void (*    Predict)( kalman_filter_t *, floating_t );
         void (*     Update)( kalman_filter_t *, floating_t );

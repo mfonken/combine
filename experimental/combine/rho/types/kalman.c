@@ -17,7 +17,7 @@ void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floatin
     k->min_value = minv;
     k->max_value = maxv;
     
-    k->velocity_mode = true;
+    k->acceleration_mode = false;
     
     ResetKalman(k, v);
 }
@@ -53,14 +53,11 @@ void PredictKalman( kalman_filter_t * k, floating_t rate_new )
     }
     
     /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
-    k->velocity   = k->value - k->prev;
-    k->prev       = k->value;
-    if(k->velocity_mode)
-        k->rate   = rate_new - k->bias;
-    else
-        k->rate   = delta_time * rate_new - k->bias + k->velocity;
-    k->value     += delta_time * k->rate;
-    k->value      = BOUND(k->value, k->min_value, k->max_value);
+    k->velocity = k->value - k->prev;
+    k->prev     = k->value;
+    k->rate     = k->acceleration_mode ? delta_time * rate_new - k->bias + k->velocity : rate_new - k->bias;
+    k->value   += delta_time * k->rate;
+    k->value    = BOUND(k->value, k->min_value, k->max_value);
     
     /* P_{k\mid k-1} = F P_{k-1\mid k-1} F^T + Q_k */
     floating_t dt_P_1_1 = delta_time * k->P[1][1];

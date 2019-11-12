@@ -19,30 +19,30 @@ float SafeExp(floating_t x)
 }
 
 /* Vec2 Functions */
-void Vec2SubVec2(vec2 * A, vec2 * B, vec2 * C)
+void Vec2SubVec2(vec2_t * A, vec2_t * B, vec2_t * C)
 {
     C->a = A->a - B->a;
     C->b = A->b - B->b;
 }
 
-void Vec2AddVec2(vec2 * A, vec2 * B, vec2 * C)
+void Vec2AddVec2(vec2_t * A, vec2_t * B, vec2_t * C)
 {
     C->a = A->a + B->a;
     C->b = A->b + B->b;
 }
 
-void ScalarMulVec2(floating_t A, vec2 * B, vec2 * C)
+void ScalarMulVec2(floating_t A, vec2_t * B, vec2_t * C)
 {
     C->a = A * B->a;
     C->b = A * B->b;
 }
 
-floating_t Vec2DotVec2( vec2 * A, vec2 * B )
+floating_t Vec2DotVec2( vec2_t * A, vec2_t * B )
 {
     return A->a * B->a + A->b * B->b;
 }
 
-void Vec2AAT( vec2 * A, mat2x2 * m )
+void Vec2AAT( vec2_t * A, mat2x2 * m )
 {
     floating_t ab = A->a * A->b;
     m->a = A->a * A->a;
@@ -76,7 +76,7 @@ void ScalarMulMat2x2( floating_t A, mat2x2 * B, mat2x2 * C )
     C->d = A * B->d;
 }
 
-void Mat2x2DotVec2(mat2x2 * mat, vec2 * vec, vec2 * res)
+void Mat2x2DotVec2(mat2x2 * mat, vec2_t * vec, vec2_t * res)
 {
     res->a = mat->a * vec->a + mat->b * vec->b;
     res->b = mat->c * vec->a + mat->d * vec->b;
@@ -154,7 +154,7 @@ void MulGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
     MatVec.Mat2x2.Add( &a_computation, &b_computation, &c_computation );
     MatVec.Mat2x2.Inverse( &c_computation, &c->covariance );
     
-    vec2 a_computation_vec, b_computation_vec, c_computation_vec;
+    vec2_t a_computation_vec, b_computation_vec, c_computation_vec;
     MatVec.Mat2x2.DotVec2( &a_computation, &a->mean, &a_computation_vec );
     MatVec.Mat2x2.DotVec2( &b_computation, &b->mean, &b_computation_vec );
     MatVec.Vec2.Add( &a_computation_vec, &b_computation_vec, &c_computation_vec );
@@ -162,12 +162,12 @@ void MulGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
     
     c->combinations = a->combinations + b->combinations + 1;
 }
-floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2 * v )
+floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2_t * v )
 {
     floating_t two_pi = 2. * M_PI, mahalanobis_sq, e, f,
     cov_det = MatVec.Mat2x2.Determinant( &a->covariance );
     if(fabs(cov_det) < SMALL_VALUE_ERROR_OFFSET) return 0;
-    vec2 mean_diff;
+    vec2_t mean_diff;
     mat2x2 cov_inv;
     
     MatVec.Vec2.Subtract( v, &a->mean, &mean_diff );
@@ -179,7 +179,7 @@ floating_t ProbabilityFromGaussian2d( gaussian2d_t * a, vec2 * v )
     return ( e / f );
 }
 
-void UpdateGaussianWithWeightGaussian2d( vec2 * A, vec2 * B, gaussian2d_t * gaussian, floating_t weight )
+void UpdateGaussianWithWeightGaussian2d( vec2_t * A, vec2_t * B, gaussian2d_t * gaussian, floating_t weight )
 {
     floating_t delta_mean_a_a = A->a * B->a,
     delta_mean_a_b = A->a * B->b,
@@ -199,18 +199,18 @@ void UpdateGaussianWithWeightGaussian2d( vec2 * A, vec2 * B, gaussian2d_t * gaus
     MatVec.Gaussian2D.Covariance.Limit( &gaussian->covariance );
 }
 
-vec2 WeightedMeanUpdateGaussian2d( vec2 * new_val, gaussian2d_t * gaussian, floating_t weight )
+vec2_t WeightedMeanUpdateGaussian2d( vec2_t * new_val, gaussian2d_t * gaussian, floating_t weight )
 {
-    vec2 delta_mean, weighted_mean;
+    vec2_t delta_mean, weighted_mean;
     MatVec.Vec2.Subtract( new_val, &gaussian->mean, &delta_mean );
     MatVec.Vec2.ScalarMultiply( weight, &delta_mean, &weighted_mean );
     MatVec.Vec2.Add( &weighted_mean, &gaussian->mean, &gaussian->mean );
     return delta_mean;
 }
 
-floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 * inv_covariance, vec2 * delta )
+floating_t MahalanobisDistanceSquaredGaussian2d( mat2x2 * inv_covariance, vec2_t * delta )
 {
-    vec2 inv_covariance_delta;
+    vec2_t inv_covariance_delta;
     MatVec.Mat2x2.DotVec2(inv_covariance, delta, &inv_covariance_delta);
     floating_t mahalanobis_distance_squared;
     mahalanobis_distance_squared = MatVec.Vec2.Dot(delta, &inv_covariance_delta );

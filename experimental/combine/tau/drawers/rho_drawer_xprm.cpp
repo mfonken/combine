@@ -103,10 +103,10 @@ void RhoDrawer::PostProcess(psm_t * psm)
         double l = band->lower_boundary, u = band->upper_boundary;
         l = (l / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
         u = (u / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
-        vec2 tc = band->true_center;
+        vec2_t tc = band->true_center;
         tc.a = ((double)tc.a / MAX_DETECTION_MAP_DENSITTY_VALUE * DETECTION_MAP_FRAME_IWIDTH) + DETECTION_MAP_INSET*2;
         tc.b = ((double)tc.b / MAX_DETECTION_MAP_THRESH_VALUE * DETECTION_MAP_FRAME_IHEIGHT) + DETECTION_MAP_INSET;
-        if(tc.a == 0 && tc.b == 0) tc = (vec2){0, (double)DETECTION_MAP_FRAME_IHEIGHT};
+        if(tc.a == 0 && tc.b == 0) tc = (vec2_t){0, (double)DETECTION_MAP_FRAME_IHEIGHT};
         int tc_line_len = 20;
         
         double f = ((double)i)/5.;

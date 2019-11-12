@@ -229,7 +229,7 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
     floating_t gamma_sum = 0.;
     hmm_observation_t o;
 #ifdef HMM_2D_EMISSIONS
-    vec2 mean_diff = { 0. }, mean_sum = { 0. }, working_vec;
+    vec2_t mean_diff = { 0. }, mean_sum = { 0. }, working_vec;
     mat2x2 cov_est = { 0. }, cov_sum = { 0. }, working_mat;
 #else
     floating_t mean_diff = 0., sum = 0.;
@@ -239,7 +239,7 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
     {
         /* µ_i = ( ∑_{t=1}^T γ_i(t) x y(t) ) / ( ∑_{t=1}^T γ_i(t) ) */
 #ifdef HMM_2D_EMISSIONS
-        mean_sum = (vec2){ 0. };
+        mean_sum = (vec2_t){ 0. };
 #else
         sum = 0.;
 #endif

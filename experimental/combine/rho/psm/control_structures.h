@@ -14,6 +14,7 @@ extern "C" {
 #endif
     
 #include "kumaraswamy.h"
+#include "matvec.h"
 
 typedef floating_t transition_matrix_t[NUM_STATES][NUM_STATES];
 typedef emission_t observation_matrix_t[NUM_STATES];
@@ -52,7 +53,7 @@ typedef floating_t state_vector_t[NUM_STATES];
         uint8_t
         num_clusters,
         selected_cluster;
-        vec2
+        vec2_t
         min_in,
         max_in,
         max_out,
@@ -72,7 +73,7 @@ typedef floating_t state_vector_t[NUM_STATES];
         state_sequence_matrix   beta;                // Backward solve vector
         state_sequence_matrix   gamma;               // Gamma solve vector
         state_sequence_matrix   xi[NUM_STATES];      // Xi solve matrix
-        floating_t                  P;                   // Latest probability
+        floating_t              P;                   // Latest probability
         kumaraswamy_t           k_dist;              // Kumaraswamy distribution
         const char *            name;                // Instance name
     } hidden_markov_model_t;
@@ -80,7 +81,7 @@ typedef floating_t state_vector_t[NUM_STATES];
     static floating_t GetProbabilityFromEmission( emission_t * e, hmm_observation_t v )
     {
 #ifdef HMM_2D_EMISSIONS
-        return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2 *)&v );
+        return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2_t *)&v );
 #else
         return MatVec.Gaussian1D.Probability( (gaussian1d_t *)e, (floating_t)v );
 #endif

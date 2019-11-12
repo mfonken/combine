@@ -24,6 +24,13 @@ typedef struct _vec3_t
     floating_t    k;             /**< \$f\hat{k}\$f value */
 } vec3_t;
 
+//typedef struct _vec2_t
+//{
+//    floating_t    i;             /**< \$f\hat{i}\$f value */
+//    floating_t    j;             /**< \$f\hat{j}\$f value */
+////    floating_t    k;             /**< \$f\hat{k}\$f value */
+//} vec2_t;
+
 ///*! Simple 3d Vector */
 //typedef struct _mat3x3_t
 //{

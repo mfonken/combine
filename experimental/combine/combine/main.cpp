@@ -100,6 +100,14 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 
 int main(int argc, const char * argv[])
 {
+//    kinetic_t kin;
+//    double f = 5;
+//    kin.A_ = (kpoint_t){ 0.1, 2, f };
+//    kin.B_ = (kpoint_t){ 1.8, 0, f };
+//    kin.AB_ = (vec3_t){ kin.B_.x - kin.A_.x, kin.B_.y - kin.A_.y, kin.A_.z };
+//    kpoint_t A = { 0, 2, f }, B = { 2, 0, f };
+//    KineticFunctions.UpdatePosition( &kin, nullptr, A, B );
+    
 #ifdef AUTOMATION_RUN
     string header = "Algorithm,Dimension(px),Iterations,Total Time(s),Avg. Time(ms), Avg. Diff.(%), Std. Dev. Diff. (%)\n";
     performanceFile.init(header);

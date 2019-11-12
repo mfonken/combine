@@ -101,7 +101,11 @@ typedef struct _kinetic_t
 #endif
     kpoint_t
     A,
-    B;
+    B,
+    A_,
+    B_;
+    vec3_t
+    AB_;
     floating_t  omega,
     sigmaA,
     sigmaR,
@@ -146,6 +150,8 @@ typedef struct
     void  (*UpdateRotation)( kinetic_t *, ang3_t *, ang3_t * );
     void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t, kpoint_t );
     
+    void (*CorrectRotationByPointTranslation)(kinetic_t * k, kpoint_t A, kpoint_t B );
+    ang3_t (*PointTranslationParameters)( kinetic_t * k, kpoint_t A, kpoint_t B );
     void (*MinorAngles)( kinetic_t *, kpoint_t, kpoint_t );
     void (*Quaternions)( kinetic_t * );
     void (*MajorAngles)( kinetic_t * );
@@ -155,6 +161,7 @@ typedef struct
     int  (*R_l)( kinetic_t * );
     void (*R)( kinetic_t * );
     void (*Nongrav)( kinetic_t *, vec3_t * );
+    floating_t (*DeltaR)( floating_t, vec3_t *, vec3_t * );
 } kinetic_functions;
 
 extern kinetic_functions KineticFunctions;

@@ -606,6 +606,7 @@
 					"$(inherited)",
 					__RHO__,
 					__PSM__,
+					__KALMAN__,
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

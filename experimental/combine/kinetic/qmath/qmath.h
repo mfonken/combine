@@ -9,7 +9,7 @@
 #ifndef qmath_master_h
 #define qmath_master_h
 
-#include "matvec.h"
+//#include "matvec.h"
 #include "vector.h"
 #include "quaternion.h"
 #include "point.h"

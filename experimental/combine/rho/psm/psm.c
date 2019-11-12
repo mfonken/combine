@@ -26,7 +26,7 @@ void InitializePSM( psm_t * model, const char * name )
         band->lower_boundary = prev_boundary;
         band->upper_boundary = default_bands_intervals[i];
         vertical_center = ( ( (floating_t)( band->upper_boundary + band->lower_boundary ) ) * THRESH_RANGE ) / 2;
-        band->true_center = (vec2){ 0, vertical_center };
+        band->true_center = (vec2_t){ 0, vertical_center };
     }
     
     KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
@@ -38,19 +38,19 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     if( observation_list->length == 0 ) return;
     
 #ifdef HMM_2D_EMISSIONS
-    model->current_observation = (vec2){ nu, thresh };
+    model->current_observation = (vec2_t){ nu, thresh };
 #else
     model->current_observation = nu;
 #endif
     HMMFunctions.ReportObservation( &model->hmm, model->current_observation );
     
     /* Cycle through and add observations to gaussian mixture model */
-    vec2 value = { 0 };
+    vec2_t value = { 0 };
     for( uint8_t i = 0; i < observation_list->length && i < MAX_OBSERVATIONS; i++ )
     {
         c++;
         observation_t * observation = &observation_list->observations[i];
-        value = (vec2){ (double)observation->density, (double)observation->thresh };
+        value = (vec2_t){ (double)observation->density, (double)observation->thresh };
         GMMFunctions.Model.AddValue( &model->gmm, observation, &value );
     }
     
@@ -109,7 +109,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
     if( c == 0 )
     { /* If no gaussian for band, zero state info */
         if( !i )
-            band_list->band[i] = (band_t){ PSM_OBSERVATION_MAX, PSM_OBSERVATION_MAX,  0., (vec2){ 0., 0. } };
+            band_list->band[i] = (band_t){ PSM_OBSERVATION_MAX, PSM_OBSERVATION_MAX,  0., (vec2_t){ 0., 0. } };
         else
             memcpy( &band_list->band[i], &band_list->band[i-1], sizeof(band_t) );
     }
@@ -118,7 +118,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
         floating_t boundary = band_list->band[i-1].upper_boundary;
         band_list->band[i].lower_boundary = boundary;
         band_list->band[i].upper_boundary = boundary;
-        band_list->band[i].true_center = (vec2){ band_list->band[i-1].true_center.a, boundary };
+        band_list->band[i].true_center = (vec2_t){ band_list->band[i-1].true_center.a, boundary };
         band_list->band[i].variance = band_list->band[i-1].variance;
     }
     else
@@ -144,7 +144,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     {
         curr = spoof_bands[i] * PSM_OBSERVATION_MAX;
         center = ( curr + prev ) / 2;
-        band_list->band[NUM_STATE_GROUPS - 1 - i] = (band_t){ curr, prev, spoof_deviation, (vec2){ (1 - spoof_bands[i]) * CAPTURE_WIDTH, center } };
+        band_list->band[NUM_STATE_GROUPS - 1 - i] = (band_t){ curr, prev, spoof_deviation, (vec2_t){ (1 - spoof_bands[i]) * CAPTURE_WIDTH, center } };
         prev = curr;
     }
     return;
@@ -313,7 +313,7 @@ void GenerateProposalsPSM( psm_t * model )
 #define MIN_VALID_TARGET_BAND_VARIANCE 1
 #define MAX_VALID_TARGET_BAND_VARIANCE 10
     /* Update predictions */
-    vec2 * proposed_center = &model->state_bands.band[model->best_state].true_center;
+    vec2_t * proposed_center = &model->state_bands.band[model->best_state].true_center;
     if(target_band_variance < MIN_VALID_TARGET_BAND_VARIANCE
        || target_band_variance > MAX_VALID_TARGET_BAND_VARIANCE)
         proposed_center->b = 0;
