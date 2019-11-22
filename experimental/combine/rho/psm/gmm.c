@@ -12,7 +12,7 @@
 void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2_t * output )
 {
     if(cluster == NULL) return;
-    LOG_GMM(GMM_DEBUG, "Initializing cluster %p\n", cluster);
+    LOG_GMM(GMM_DEBUG_2, "Initializing cluster %p\n", cluster);
     
     cluster->gaussian_in.mean.a = observation->density;
     cluster->gaussian_in.mean.b = observation->thresh;
@@ -35,10 +35,10 @@ void InitializeGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, obs
 
 void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observation_t * observation, vec2_t * output )
 {
-    LOG_GMM(GMM_DEBUG_2, "Log gaussian norm factor: %.2f\n", cluster->log_gaussian_norm_factor);
+    LOG_GMM(GMM_DEBUG, "Log gaussian norm factor: %.2f\n", cluster->log_gaussian_norm_factor);
     if (isnan(cluster->log_gaussian_norm_factor))
         return;
-    LOG_GMM(GMM_DEBUG_2, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
+    LOG_GMM(GMM_DEBUG, "Mahalanobis sq: %.2f\n", cluster->mahalanobis_sq);
     if (cluster->mahalanobis_sq > MAX_MAHALANOBIS_SQ_FOR_UPDATE)
         return;
     double score_weight = ALPHA * SafeExp( -BETA * cluster->mahalanobis_sq );
@@ -49,7 +49,7 @@ void UpdateGaussianMixtureCluster( gaussian_mixture_cluster_t * cluster, observa
     vec2_t delta_mean_in = MatVec.Gaussian2D.WeightedMeanUpdate( (vec2_t *)observation, &cluster->gaussian_in, weight );
     vec2_t delta_mean_out = MatVec.Gaussian2D.WeightedMeanUpdate( output, &cluster->gaussian_out, weight );
     
-    LOG_GMM(GMM_DEBUG_2, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
+    LOG_GMM(GMM_DEBUG, "Gaussian mean in: [%.2f %.2f]\n", cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b);
     
     MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_in,  &cluster->gaussian_in,  weight );
     MatVec.Gaussian2D.WeightedUpdate( &delta_mean_in, &delta_mean_out, &cluster->gaussian_out, weight );
@@ -210,17 +210,21 @@ void UpdateGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t
     for( uint8_t i = 0; i < model->num_clusters; i++ )
     {
         gaussian_mixture_cluster_t * cluster = model->cluster[i];
+//        double age = SECONDSSINCE( cluster->timestamp );
+//        LOG_GMM(GMM_DEBUG, "Cluster %d age is %.3f\n", i, age);
         if( cluster->score < MIN_CLUSTER_SCORE
            || ISTIMEDOUT( cluster->timestamp, MAX_CLUSTER_LIFETIME )
            || isnan(cluster->log_gaussian_norm_factor) )
             GMMFunctions.Model.RemoveCluster( model, i );
     }
+#ifdef GMM_DEBUG_CLUSTERS
     for( uint8_t i = 0; i < model->num_clusters; i++ )
     {
         cluster = model->cluster[i];
         LOG_GMM(GMM_DEBUG_CLUSTERS, "%d: µ<%6.3f, %7.3f> ∑[%6.3f, %6.3f; %6.3f, %6.3f] : weight:%5.3f score:%5.3f\n", i, cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b, cluster->gaussian_in.covariance.a, cluster->gaussian_in.covariance.b, cluster->gaussian_in.covariance.c, cluster->gaussian_in.covariance.d, cluster->weight, cluster->score);
     }
     LOG_GMM(GMM_DEBUG_CLUSTERS, "\n");
+#endif
 }
 
 void AddValueToGaussianMixtureModel( gaussian_mixture_model_t * model, observation_t * observation, vec2_t * value )

@@ -6,6 +6,12 @@
 
 #include "rho_global.h"
 
+#define MATVEC_LIB
+
+#ifdef MATVEC_LIB
+#include "matvec.h"
+#endif
+
 #define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001
 #define KALMAN_MATURATION     3 // Seconds
@@ -59,6 +65,9 @@ extern "C" {
     floating_t ScoreKalman( kalman_filter_t * );
     void      PunishKalman( kalman_filter_t * );
     void       PrintKalman( kalman_filter_t * );
+#ifdef MATVEC_LIB
+    gaussian1d_t GetGaussian1DKalman( kalman_filter_t * );
+#endif
     
     struct kalman {
         void (* Initialize)( kalman_filter_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
@@ -70,6 +79,9 @@ extern "C" {
         floating_t (*Score)( kalman_filter_t * );
         void (*     Punish)( kalman_filter_t * );
         void (*      Print)( kalman_filter_t * );
+#ifdef MATVEC_LIB
+        gaussian1d_t (*Gaussian1D)( kalman_filter_t * );
+#endif
     };
     
     static const struct kalman Kalman =
@@ -82,7 +94,10 @@ extern "C" {
         .IsExpired = IsKalmanExpired,
         .Score = ScoreKalman,
         .Punish = PunishKalman,
-        .Print = PrintKalman
+        .Print = PrintKalman,
+#ifdef MATVEC_LIB
+        .Gaussian1D = GetGaussian1DKalman
+#endif
     };
     
 #ifdef __cplusplus

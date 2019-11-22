@@ -55,7 +55,9 @@ void PredictKalman( kalman_filter_t * k, floating_t rate_new )
     /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
     k->velocity = k->value - k->prev;
     k->prev     = k->value;
-    k->rate     = k->acceleration_mode ? delta_time * rate_new - k->bias + k->velocity : rate_new - k->bias;
+    k->rate     = k->acceleration_mode ?
+        delta_time * rate_new - k->bias + k->velocity
+        : rate_new - k->bias;
     k->value   += delta_time * k->rate;
     k->value    = BOUND(k->value, k->min_value, k->max_value);
     
@@ -135,3 +137,10 @@ void PrintKalman( kalman_filter_t * k )
     LOG_KALMAN(KALMAN_DEBUG, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
     LOG_KALMAN(KALMAN_DEBUG, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);
 }
+
+#ifdef MATVEC_LIB
+gaussian1d_t GetGaussian1DKalman( kalman_filter_t * k )
+{
+    return (gaussian1d_t){ k->value, k->P[0][0] };
+}
+#endif

@@ -14,6 +14,7 @@
  **************************************************************************************************/
 void KineticDefaultInit( kinetic_t * k )
 {
+    LOG_KIN(KIN_DEBUG, "Intializing: %p\n", k);
     KineticFunctions.Init( k, KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
 }
 
@@ -31,22 +32,29 @@ void KineticInit( kinetic_t * k, int W, int H, floating_t F, floating_t L )
 #endif
 }
 
-static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
+static void KineticUpdateRotation( kinetic_t * k,
+#ifdef KINETIC_USE_QUATERNION_INPUT
+                                  quaternion_t * q,
+#else
+                                  ang3_t * e,
+#endif
+                                  ang3_t * g
+#ifdef KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
+                                  , kpoint_t * A, kpoint_t * B
+#endif
+    )
 {
 #ifdef __KALMAN__
+#ifdef KINETIC_USE_QUATERNION_INPUT
+    Quaternion.toEuler( &q, &k->e );
+#endif
     /* Step 1: Update Pitch (Restricted) */
     floating_t v = k->filters.rotation[0].value;
     if( ( e->x < -M_PI_2 && v >  M_PI_2 ) ||
        ( e->x >  M_PI_2 && v < -M_PI_2 ) )
-    {
         k->filters.rotation[0].value = e->x;
-        k->values.rotation[0] = e->x;
-    }
     else
-    {
         Kalman.Step( &k->filters.rotation[0], e->x, g->x );
-        k->values.rotation[0] = k->filters.rotation[0].value;
-    }
     
     if ( k->values.rotation[0] > M_PI_2 )
     {
@@ -56,33 +64,48 @@ static void KineticUpdateRotation( kinetic_t * k, ang3_t * e, ang3_t * g )
     
     /* Step 2: Update Roll */
     Kalman.Step( &k->filters.rotation[1], e->y, g->y );
-    k->values.rotation[1] = k->filters.rotation[1].value;
     
     /* Step 3: Update Yaw */
     Kalman.Step( &k->filters.rotation[2], e->z, g->z );
-    k->values.rotation[2] = k->filters.rotation[2].value;
     
     k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
     k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
     k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
     
-    /* Get proper device angles from kinetic */
-    k->e.x = k->values.rotation[0];
-    k->e.y = k->values.rotation[1];
-    k->e.z = k->values.rotation[2];
-    Quaternion.fromEuler( &k->e, &k->qd );
+    
+#ifdef KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
+    /* Preparation: Correct rotation according to new points */
+    ang3_t pt = KineticFunctions.PointTranslationParameters( k, A, B );
+    
+    gaussian1d_t rot_g1[3], point_g1[3];
+    CYCLE3(i)
+    {
+        Kalman.Step( &k->filters.point_rotation[i], ((floating_t*)e)[i], ((floating_t*)&pt)[i] );
+        rot_g1[i] = Kalman.Gaussian1D( &k->filters.rotation[i] );
+        point_g1[i] = Kalman.Gaussian1D( &k->filters.point_rotation[i] );
+        
+        MatVec.Gaussian1D.Multiply( &rot_g1[i], &point_g1[i], &rot_g1[i] );
+        k->values.rotation[i] = rot_g1[i].mean;
+    }
 #else
+    CYCLE3(i)
+        k->values.rotation[i] = k->filters.rotation[i].value;
+#endif
+    
+    /* Get proper device angles from kinetic */
+    CYCLE3(i)
+        ((floating_t *)&k->e)[i] = k->values.rotation[i];
+    Quaternion.fromEuler( &k->e, &k->qd );
+    
+#else
+#ifndef KINETIC_USE_QUATERNION_INPUT
     memcpy( &k->e, e, sizeof(ang3_t) );
+#endif
 #endif
 }
 
-static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint_t B )
+static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
 {
-#ifdef __KALMAN__
-    /* Preparation: Correct rotation according to new points */
-    KineticFunctions.CorrectRotationByPointTranslation( k, A, B );
-#endif
-    
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
     
@@ -98,7 +121,7 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint
     /* Step 5B: Update Position Using Non-gravitational Data */
     KineticFunctions.Nongrav( k, n );
     
-    //printf("Yaw: %4d | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+    LOG_KIN(KIN_DEBUG, "Yaw: %4d | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
     
     KPoint.copy( &k->A, &k->A_ );
     KPoint.copy( &k->B, &k->B_ );
@@ -106,20 +129,9 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t A, kpoint
     return;
 }
 
-static void KineticCorrectRotationByPointTranslation( kinetic_t * k, kpoint_t A, kpoint_t B )
+static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 {
-#ifdef __KALMAN__
-    ang3_t e = KineticFunctions.PointTranslationParameters( k, A, B );
-    
-    Kalman.Step( &k->filters.rotation[0], k->filters.rotation[0].value, e.x );
-    Kalman.Step( &k->filters.rotation[1], k->filters.rotation[1].value, e.y );
-    Kalman.Step( &k->filters.rotation[2], k->filters.rotation[2].value, e.z );
-#endif
-}
-
-static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t A, kpoint_t B )
-{
-    vec3_t AB = (vec3_t){ B.x - A.x, B.y - A.y, A.z };
+    vec3_t AB = (vec3_t){ B->x - A->x, B->y - A->y, A->z };
     floating_t theta = Vector.ang2( &k->AB_, &AB );
     
     vec3_t daA, dbB, aAbB;
@@ -128,10 +140,10 @@ static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t A, kpoi
     Vector.rot2( &aAbB, theta );
     Vector.add3( &daA, &dbB, &aAbB );
     
-    floating_t phi = atan2( aAbB.j, A.z ),  psi = atan2( aAbB.i, A.z );
+    floating_t phi = atan2( aAbB.j, A->z ),  psi = atan2( aAbB.i, A->z );
     
     floating_t theta_deg = theta * RAD_TO_DEG, phi_deg = phi * RAD_TO_DEG, psi_deg = psi * RAD_TO_DEG;
-    //    floating_t dR = KineticFunctions.DeltaR( k->r_l, &k->AB_, &AB );
+//    floating_t dR = KineticFunctions.DeltaR( k->r_l, &k->AB_, &AB );
     
     memcpy( &k->A_,  &A,  sizeof(kpoint_t) );
     memcpy( &k->B_,  &B,  sizeof(kpoint_t) );
@@ -140,10 +152,10 @@ static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t A, kpoi
     return (ang3_t){ phi, theta, psi };
 }
 
-static void KineticMinorAngles( kinetic_t * k, kpoint_t A, kpoint_t B )
+static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 {
-    KPoint.copy(&A, &k->A);
-    KPoint.copy(&B, &k->B);
+    KPoint.copy(A, &k->A);
+    KPoint.copy(B, &k->B);
     /* Get distance between beacons and origin */
     KPoint.init( &k->A, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
     KPoint.init( &k->B, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
@@ -159,10 +171,11 @@ static void KineticMinorAngles( kinetic_t * k, kpoint_t A, kpoint_t B )
     vec3_t Av, Bv;
     KPoint.toVec3( &k->A, &Av );
     KPoint.toVec3( &k->B, &Bv );
+    
     /* Get angle between beacons */
     k->sigmaR = Vector.ang3( &Av, &Bv );
     
-    //printf("Omega: %6.3fº | SigmaA: %6.3fº | SigmaR: %6.3fº\n", k->omega*RAD_TO_DEG, k->sigmaA*RAD_TO_DEG, k->sigmaR*RAD_TO_DEG);
+    LOG_KIN(KIN_DEBUG, "Omega: %6.3fº | SigmaA: %6.3fº | SigmaR: %6.3fº\n", k->omega*RAD_TO_DEG, k->sigmaA*RAD_TO_DEG, k->sigmaR*RAD_TO_DEG);
 }
 
 static void KineticQuaternions( kinetic_t * k )
@@ -180,11 +193,12 @@ static void KineticQuaternions( kinetic_t * k )
     ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
     Quaternion.fromEuler( &b, &k->qc_ );
     
-/* OP1: Potential parallelization */
-//    Quaternion.fromEuler( &k->e, &k->qd );
-//    Quaternion.fromEuler( &a, &k->qd_ );
-//    Quaternion.fromEuler( &b, &k->qc_ );
-//    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
+/* OP1: Potential parallelization
+    Quaternion.fromEuler( &k->e, &k->qd );
+    Quaternion.fromEuler( &a, &k->qd_ );
+    Quaternion.fromEuler( &b, &k->qc_ );
+    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
+  */
 }
 
 static void KineticMajorAngles( kinetic_t * k )
@@ -231,7 +245,7 @@ static int KineticMu( kinetic_t * k )
     return 0;
 }
 
-/* Calculation of gammama */
+/* Calculation of gamma */
 static void KineticGamma( kinetic_t * k )
 {
     //OP2B: k->gamma = k->chi - k->mu;
@@ -270,17 +284,14 @@ static void KineticNongrav( kinetic_t * k, vec3_t * n )
     Quaternion.inverse(&k->qd, &k->qd);
     Quaternion.rotVec( n, &k->qd, &k->n );
     
-    Kalman.Step( &k->filters.position[0], k->r.i, k->n.i );
-    Kalman.Step( &k->filters.position[1], k->r.j, k->n.j );
-    Kalman.Step( &k->filters.position[2], k->r.k, k->n.k );
-    
-    k->values.position[0] = k->filters.position[0].value;
-    k->values.position[1] = k->filters.position[1].value;
-    k->values.position[2] = k->filters.position[2].value;
+    CYCLE3(i)
+    {
+        Kalman.Step( &k->filters.position[i], ((floating_t*)&k->r)[i], ((floating_t*)&k->n)[i] );
+        k->values.position[i] = k->filters.position[i].value;
+    }
 #else
-    k->values.position[0] = k->r.i;
-    k->values.position[1] = k->r.j;
-    k->values.position[2] = k->r.k;
+    CYCLE3(i)
+        k->values.position[i] = ((floating_t*)k->r)[i];
 #endif
 }
 
@@ -296,7 +307,6 @@ kinetic_functions KineticFunctions =
     .Init = KineticInit,
     .UpdateRotation = KineticUpdateRotation,
     .UpdatePosition = KineticUpdatePosition,
-    .CorrectRotationByPointTranslation = KineticCorrectRotationByPointTranslation,
     .PointTranslationParameters = KineticPointTranslationParameters,
     .MinorAngles = KineticMinorAngles,
     .Quaternions = KineticQuaternions,
@@ -316,14 +326,11 @@ kinetic_functions KineticFunctions =
 #ifdef __KALMAN__
 void Filters_Init( kinetic_t * k )
 {
-    for( uint8_t i = 0; i < 3; i++ )
+    CYCLE3(i)
     {
         Kalman.Initialize(&k->filters.rotation[i], 0.0, MOTION_MAX_KALMAN_LIFESPAN, ROTATION_MIN, ROTATION_MAX, DEFAULT_MOTION_UNCERTAINTY );
-    }
-    
-    for( uint8_t i = 0; i < 3; i++ )
-    {
-        Kalman.Initialize(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFESPAN, POSITION_MIN, POSITION_MAX, DEFAULT_MOTION_UNCERTAINTY );
+        Kalman.Initialize(&k->filters.point_rotation[i], 0.0, MOTION_MAX_KALMAN_LIFESPAN, ROTATION_MIN, ROTATION_MAX, DEFAULT_MOTION_UNCERTAINTY );
+        Kalman.Initialize(&k->filters.position[i], 0.0, MOTION_MAX_KALMAN_LIFESPAN, POSITION_MIN, POSITION_MAX, DEFAULT_MOTION_UNCERTAINTY );
         k->filters.position[i].acceleration_mode = true;
     }
 }

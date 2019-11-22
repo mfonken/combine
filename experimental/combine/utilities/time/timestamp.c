@@ -24,6 +24,6 @@ bool ISTIMEDOUT( double check, double time_out )
 
 double SECONDSSINCE( double check )
 {
-    return 0.010;
+//    return 0.010;
     return TIMESTAMP() - check;
 }

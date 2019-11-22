@@ -14,8 +14,8 @@ extern "C" {
     
 #include "qmath_types.h"
     
-#define SIGN(X)   X>=0?1:-1
-#define RASIN(X)  X>-1&&X<1?asin(X):SIGN(X)*M_PI/2
+#define SIGN(X)   ((X)>=0?1:-1)
+#define RASIN(X)  ((X)>-1&&X<1?asin(X):SIGN(X)*M_PI_2)
     
 #define RAD_TO_DEG (180 / M_PI)
 #define DEG_TO_RAD (M_PI / 180)

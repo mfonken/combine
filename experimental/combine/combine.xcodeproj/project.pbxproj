@@ -118,6 +118,7 @@
 		340196F922FF57E500F152CC /* statistics.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = statistics.c; sourceTree = "<group>"; };
 		3402A3E9235CF7FA00984E01 /* rho_spoof.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_spoof.h; sourceTree = "<group>"; };
 		342A10072308F406008928F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3441995923877A4300589E21 /* genlog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = genlog.h; sourceTree = "<group>"; };
 		34546E4F235BED84009ECAD1 /* qmath_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = qmath_types.h; sourceTree = "<group>"; };
 		3455398822FF62F200DDE874 /* combine_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = combine_master.h; sourceTree = "<group>"; };
 		3455398922FF62F200DDE874 /* combine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = combine.cpp; sourceTree = "<group>"; };
@@ -203,6 +204,7 @@
 		3401965722FE780600F152CC /* io */ = {
 			isa = PBXGroup;
 			children = (
+				3441995923877A4300589E21 /* genlog.h */,
 				3401965822FE780600F152CC /* serial_wrapper.hpp */,
 				3401965C22FE780600F152CC /* serial_wrapper.cpp */,
 				3401965922FE780600F152CC /* file_writer.hpp */,
@@ -606,7 +608,10 @@
 					"$(inherited)",
 					__RHO__,
 					__PSM__,
+					__IMU__,
+					__KIN__,
 					__KALMAN__,
+					"TEST_LOG_LEVEL=DEBUG_1",
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

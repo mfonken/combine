@@ -14,8 +14,8 @@
 #define COMBINE_FPS     15
 
 /* GLOBAL SETUP */
-//#define HAS_CAMERA
-//#define HAS_IMU
+//#define __CAM__
+//#define __IMU__
 #define HAS_FILE
 //#define HAS_GENERATOR
 
@@ -54,7 +54,7 @@
 #define FRAME_WIDTH                     50
 #define FRAME_HEIGHT                    FRAME_WIDTH
 #else
-#ifdef HAS_CAMERA
+#ifdef __CAM__
 #define FRAME_WIDTH                     1280
 #define FRAME_HEIGHT                    720
 #else

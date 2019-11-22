@@ -24,7 +24,7 @@
 double mag_cal[] = { -2.396, 38.040, 1.093 };
 char line[BUFFER_LENGTH];
 
-static int init( imu_t * imu, orientation_remap_t remap )
+static int init( imu_t * imu, remap_array_t remap )
 {
     memcpy(imu->remap, remap, ORIENTATION_NUM_CHANNELS * sizeof(remap_t));
     switch(imu->channel.interface)

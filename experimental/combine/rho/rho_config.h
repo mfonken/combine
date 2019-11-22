@@ -20,7 +20,7 @@
 
 #define __USE_RUNNING_AVERAGE__
 
-#ifdef HAS_CAMERA
+#ifdef __CAM__
 /* Camera Config */
 #define RHO_WIDTH               1920
 #define RHO_HEIGHT              1080
@@ -39,7 +39,7 @@
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 
 #if defined __linux || defined __APPLE__
-#ifdef HAS_CAMERA
+#ifdef __CAM__
 #define DENSITY_MAP_X_SIZE       CAPTURE_WIDTH
 #define DENSITY_MAP_Y_SIZE       CAPTURE_HEIGHT
 #else
@@ -118,7 +118,6 @@
 #define FRAME_QUADRANT_BTM_RIGHT_INDEX  3
 
 #define TOTAL_RHO_PIXELS    ( CAPTURE_WIDTH * CAPTURE_HEIGHT )
-
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                              FILTER PARAMETERS                                      */

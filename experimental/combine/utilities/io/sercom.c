@@ -17,11 +17,14 @@ int Init_SERCOM_Default( void )
 int Init_SERCOM( SERCOM_Channel * chan )
 {
     chan->initialized = false;
+    #ifdef UTILITY_VERBOSE
+            printf("Trying port: %s\n", chan->port);
+    #endif
     chan->filestream = open(chan->port, O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
     if (chan->filestream == -1)
     {
 #ifdef UTILITY_VERBOSE
-        printf("Trying alternate port at %s\n", chan->port_alt);
+        printf("Trying alternate port: %s\n", chan->port_alt);
 #endif
         chan->filestream = open(chan->port_alt, O_RDWR | O_NOCTTY | O_NDELAY);
         if (chan->filestream == -1)

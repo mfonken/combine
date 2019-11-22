@@ -39,9 +39,9 @@ extern "C" {
         uint32_t reversed:1;
     } remap_t;
 
-    typedef remap_t orientation_remap_t[ORIENTATION_NUM_CHANNELS];
+    typedef remap_t remap_array_t[ORIENTATION_NUM_CHANNELS];
 
-    static double getRemappedValue( int i, double v[ORIENTATION_NUM_CHANNELS], orientation_remap_t remap )
+    static double getRemappedValue( int i, double v[ORIENTATION_NUM_CHANNELS], remap_array_t remap )
     {
         return remap[i].offset + ( !remap[i].reversed ? 1 : -1 ) * v[remap[i].index];
     }
@@ -54,7 +54,7 @@ extern "C" {
     
     typedef struct
     {
-        orientation_remap_t remap;
+        remap_array_t remap;
         
         double     accel_raw[3];
         
@@ -101,7 +101,7 @@ extern "C" {
     {
         struct imu_update_ops update;
         struct imu_normalize_ops normalize;
-        int (*init)(imu_t * imu, orientation_remap_t remap);
+        int (*init)(imu_t * imu, remap_array_t remap);
     } imu_functions;
     extern const imu_functions IMUFunctions;
     

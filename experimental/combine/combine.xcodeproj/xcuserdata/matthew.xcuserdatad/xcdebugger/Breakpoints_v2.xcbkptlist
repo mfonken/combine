@@ -395,7 +395,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "220F6F88-3760-433A-8320-6C91C04C933B"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "rho/psm/psm.c"
@@ -417,9 +417,121 @@
             filePath = "kinetic/kinetic.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
+            startingLineNumber = "145"
+            endingLineNumber = "145"
             landmarkName = "KineticPointTranslationParameters(k, A, B)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F5845822-869C-4D1A-A80B-C026D4DD9417"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "rho/psm/gmm.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "UpdateGaussianMixtureCluster(cluster, observation, output)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6822F978-24EB-4A22-A7EF-7C815715E281"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "kinetic/kinetic.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "124"
+            endingLineNumber = "124"
+            landmarkName = "KineticUpdatePosition(k, n, A, B)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - 267199e9bda61a60"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "KineticUpdatePosition"
+                  moduleName = "combine"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/combine/kinetic/kinetic.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "124"
+                  endingLineNumber = "124"
+                  offsetFromSymbolStart = "104">
+               </Location>
+               <Location
+                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - 267199e9bda61a60"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "KineticUpdatePosition"
+                  moduleName = "combine"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthew/Desktop/marbl/Techincal/combine/experimental/combine/kinetic/kinetic.c"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "124"
+                  endingLineNumber = "124"
+                  offsetFromSymbolStart = "159">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F5265853-C356-48E1-8B57-1B662447FC5A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "kinetic/kinetic.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "122"
+            endingLineNumber = "122"
+            landmarkName = "KineticUpdatePosition(k, n, A, B)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "218DA49A-39C2-4257-9B23-8B92EBC60F4B"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "kinetic/combine.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "Combine::Init()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E47122B3-C418-4B73-B8D9-E1708A2B502B"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "combine/main.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "17"
+            endingLineNumber = "17"
+            landmarkName = "run(instructions, FRAME_WIDTH, FRAME_HEIGHT)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

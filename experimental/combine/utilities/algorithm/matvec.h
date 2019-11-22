@@ -14,7 +14,7 @@
 #include <math.h>
 #include <string.h>
 
-//#ifdef INCLUDE_FULL_GAUSSIAN_1D
+#define INCLUDE_FULL_GAUSSIAN_1D
 
 #ifndef ZDIV
 #define ZDIV_LNUM 1 << 10

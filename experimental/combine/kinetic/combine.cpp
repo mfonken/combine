@@ -63,11 +63,11 @@ void Combine::Trigger()
     IMUFunctions.update.orientation( &imu );
     ang3_t e = { imu.pitch * DEG_TO_RAD, imu.roll * DEG_TO_RAD, imu.yaw * DEG_TO_RAD },
            g = { imu.gyro[0], imu.gyro[1], imu.gyro[2] };
-    KineticFunctions.UpdateRotation( &kin, &e, &g );
+    KineticFunctions.UpdateRotation( &kin, &e, &g, &A, &B );
 
     vec3_t n;
     KineticFunctions.Nongrav( &kin, &n );
-    KineticFunctions.UpdatePosition( &kin, &n, B, A );
+    KineticFunctions.UpdatePosition( &kin, &n, &A, &B );
 #else
     IMUFunctions.update.orientation( &imu );
     printf("[IMU] <%.4f, %.4f, %.4f>\n", imu.roll, imu.pitch, imu.yaw);

@@ -18,13 +18,20 @@
 #include <string.h>
 
 #include "test_config.h"
+#include "genlog.h"
 
 /* Math headers */
 #include "qmath.h"
+#include "matvec.h"
 
 /* Filters */
 #ifdef __KALMAN__
 #include "kalman.h"
+
+//#define KINETIC_USE_QUATERNION_INPUT
+#define KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
+
+#define CYCLE3(X) for(uint8_t X=0;X<3;X++)
 
 /* Kalman Defaults */
 #define MOTION_MAX_KALMAN_LIFESPAN 10.0
@@ -78,11 +85,22 @@
 
 #define     D_FIXED                 5.0e-2
 
+#define KIN_DEBUG DEBUG_2
+
+#ifdef KIN_DEBUG
+#define LOG_KIN(L,...)          LOG(L,"<Kinetic> " __VA_ARGS__)
+#define LOG_KIN_BARE(L,...)     LOG_BARE(L,"" __VA_ARGS__)
+#else
+#define LOG_KIN(...)
+#define LOG_KIN_BARE(L,...)
+#endif
+
+
 /** Kinetic Type */
 typedef struct _kinetic_values_t
 {
-    floating_t     position[3];             /**< Raw position */
-    double     rotation[3];             /**< Raw rotation */
+    floating_t      position[3];             /**< Raw position */
+    double          rotation[3];             /**< Raw rotation */
 } kinetic_values_t;
 
 #ifdef __KALMAN__
@@ -90,6 +108,7 @@ typedef struct _kinetic_filters_t
 {
     kalman_filter_t position[3];             /**< Raw position */
     kalman_filter_t rotation[3];             /**< Raw rotation */
+    kalman_filter_t point_rotation[3];             /**< Raw rotation */
 } kinetic_filters_t;
 #endif
 
@@ -147,12 +166,21 @@ typedef struct
 {
     void  (*DefaultInit)(kinetic_t * );
     void  (*Init)( kinetic_t *, int, int, floating_t, floating_t);
-    void  (*UpdateRotation)( kinetic_t *, ang3_t *, ang3_t * );
-    void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t, kpoint_t );
+    void  (*UpdateRotation)( kinetic_t *,
+#ifdef KINETIC_USE_QUATERNION_INPUT
+                            quaternion_t *,
+#else
+                            ang3_t *,
+#endif
+                            ang3_t *
+#ifdef KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
+                            , kpoint_t *, kpoint_t *
+#endif
+                            );
+    void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t *, kpoint_t * );
     
-    void (*CorrectRotationByPointTranslation)(kinetic_t * k, kpoint_t A, kpoint_t B );
-    ang3_t (*PointTranslationParameters)( kinetic_t * k, kpoint_t A, kpoint_t B );
-    void (*MinorAngles)( kinetic_t *, kpoint_t, kpoint_t );
+    ang3_t (*PointTranslationParameters)( kinetic_t *, kpoint_t *, kpoint_t * );
+    void (*MinorAngles)( kinetic_t *, kpoint_t *, kpoint_t * );
     void (*Quaternions)( kinetic_t * );
     void (*MajorAngles)( kinetic_t * );
     int  (*Chi)( kinetic_t * );

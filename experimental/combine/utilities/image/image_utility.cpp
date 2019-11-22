@@ -19,7 +19,7 @@ preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 image(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
-#ifdef HAS_CAMERA
+#ifdef __CAM__
 ,cam(CAMERA_ID)
 #endif
 {
@@ -68,7 +68,7 @@ void ImageUtility::Init()
     = false;
 #endif
     has_camera
-#ifdef HAS_CAMERA
+#ifdef __CAM__
     = true;
 #else
     = false;
