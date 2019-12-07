@@ -24,6 +24,8 @@ extern "C" {
     //#define HEIGHT 700
     //#define WIDTH HEIGHT
     
+#define MAX_CLUSTER_Y_VARIANCE 30
+
 #ifdef __RHO__
 #define PSM_OBSERVATION_MAX THRESH_MAX
 #else

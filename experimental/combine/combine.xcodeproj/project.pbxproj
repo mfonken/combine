@@ -608,10 +608,8 @@
 					"$(inherited)",
 					__RHO__,
 					__PSM__,
-					__IMU__,
-					__KIN__,
 					__KALMAN__,
-					"TEST_LOG_LEVEL=DEBUG_1",
+					"GLOBAL_LOG_LEVEL=DEBUG_2",
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

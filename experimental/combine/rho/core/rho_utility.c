@@ -978,7 +978,7 @@ void GeneratePacketRhoUtility( rho_core_t * core )
         if( _.packet->header.includes & 0x01 )
         {
             if(!_.t) _.l = (*(packing_template_t*)_.llPtr).a;
-            else          _.l = (*(packing_template_t*)_.llPtr).b;
+            else     _.l = (*(packing_template_t*)_.llPtr).b;
             for( _.j = 0; _.j < _.l; _.j++)
                 ((byte_t*)_.pdPtr)[_.j] = *(((byte_t*)* _.alPtr)+_.j);
             _.pdPtr += _.l;
@@ -1005,7 +1005,7 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * prediction
         index_t density =  (index_t)region->density + (index_t)prediction->PreviousPeak[(uint8_t)below_centroid];
         density = BOUNDU( density, MAX_REGION_HEIGHT );
         LOG_RHO_BARE(RHO_DEBUG_2, "\t\t(%d) <%d %d %d>\n", i, density, thresh, io);
-        prediction->ObservationList.observations[i] = (observation_t){ density, thresh, io };
+        prediction->ObservationList.observations[i] = (observation_t){ density/2, thresh, io };
     }
     prediction->ObservationList.length = i;
 }

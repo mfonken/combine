@@ -23,10 +23,10 @@ enum LogLevel
 #endif
 
 #ifndef LOG
-#define LOG(L,...)              if(L >= TEST_LOG_LEVEL) \
+#define LOG(L,...)              if(L >= GLOBAL_LOG_LEVEL) \
                                 {  for(uint8_t i=L;i<ALWAYS;i++) \
                                 printf("\t"); printf(__VA_ARGS__); }
-#define LOG_BARE(L,...)         if(L >= TEST_LOG_LEVEL) \
+#define LOG_BARE(L,...)         if(L >= GLOBAL_LOG_LEVEL) \
                                 { printf(__VA_ARGS__); }
 #endif
 

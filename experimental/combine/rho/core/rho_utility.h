@@ -150,7 +150,7 @@ extern "C" {
     typedef struct
     {
         void (*CumulativeMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
-        void (*CumulativeAverage)( floating_t, floating_t *, int );
+        void (*CumulativeAverage)( floating_t, floating_t *, int * );
         void (*RegionScore)( region_t *, density_t, byte_t );
         density_2d_t (*Centroid)( density_map_unit_t *, index_t, index_t *, density_t );
         void (*Background)( rho_core_t * );

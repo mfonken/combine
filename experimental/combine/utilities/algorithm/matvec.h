@@ -21,6 +21,10 @@
 #define ZDIV(X,Y) ((Y==0)?(X==0?0:ZDIV_LNUM):X/Y)
 #endif
 
+#ifndef SWAP
+#define SWAP(A,B)               { typeof(A) temp = A; A = B; B = temp; }
+#endif
+
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
 
 #define MAX_COVARIANCE 50
@@ -62,10 +66,11 @@ void ScalarMulVec2( floating_t A, vec2_t *, vec2_t *);
 floating_t Vec2DotVec2( vec2_t *, vec2_t * );
 void Vec2AAT( vec2_t *, mat2x2 * m );
 
-void Mat2x2AddMat2x2( mat2x2 *, mat2x2 *, mat2x2 *);
-void Mat2x2SubMat2x2( mat2x2 *, mat2x2 *, mat2x2 *);
+void Mat2x2AddMat2x2( mat2x2 *, mat2x2 *, mat2x2 * );
+void Mat2x2SubMat2x2( mat2x2 *, mat2x2 *, mat2x2 * );
 void ScalarMulMat2x2( floating_t, mat2x2 *, mat2x2 * );
-void Mat2x2DotVec2( mat2x2 *, vec2_t *, vec2_t *);
+void MulTwoMat2x2s( mat2x2 *, mat2x2 *, mat2x2 * );
+void Mat2x2DotVec2( mat2x2 *, vec2_t *, vec2_t * );
 floating_t Mat2x2Determinant( mat2x2 * );
 void Mat2x2Inverse( mat2x2 *, mat2x2 * );
 void Mat2x2LLT( mat2x2 *, mat2x2 * );
@@ -77,7 +82,7 @@ void CopyGaussian1d( gaussian1d_t *, gaussian1d_t * );
 #endif
 floating_t ProbabilityFromGaussian1d( gaussian1d_t *, floating_t );
 
-void MulGaussian2d( gaussian2d_t *, gaussian2d_t *, gaussian2d_t * );
+void MultiplyGaussian2d( gaussian2d_t *, gaussian2d_t *, gaussian2d_t * );
 floating_t ProbabilityFromGaussian2d( gaussian2d_t *, vec2_t * );
 void UpdateGaussianWithWeightGaussian2d( vec2_t *, vec2_t *, gaussian2d_t *, floating_t );
 vec2_t WeightedMeanUpdateGaussian2d( vec2_t *, gaussian2d_t *, floating_t );
@@ -99,6 +104,7 @@ typedef struct
     void (*Add)( mat2x2 *, mat2x2 *, mat2x2 * );
     void (*Subtract)( mat2x2 *, mat2x2 *, mat2x2 * );
     void (*ScalarMultiply)( floating_t, mat2x2 *, mat2x2 * );
+    void (*Multiply)( mat2x2 *, mat2x2 *, mat2x2 * );
     void (*DotVec2)( mat2x2 *, vec2_t *, vec2_t * );
     floating_t (*Determinant)( mat2x2 * );
     void (*Inverse)( mat2x2 *, mat2x2 * );
@@ -149,6 +155,7 @@ static const matvec_functions MatVec =
     .Mat2x2.Add = Mat2x2AddMat2x2,
     .Mat2x2.Subtract = Mat2x2SubMat2x2,
     .Mat2x2.ScalarMultiply = ScalarMulMat2x2,
+    .Mat2x2.Multiply = MulTwoMat2x2s,
     .Mat2x2.DotVec2 = Mat2x2DotVec2,
     .Mat2x2.Determinant = Mat2x2Determinant,
     .Mat2x2.Inverse = Mat2x2Inverse,
@@ -161,7 +168,7 @@ static const matvec_functions MatVec =
 #endif
     .Gaussian1D.Probability = ProbabilityFromGaussian1d,
     
-    .Gaussian2D.Multiply = MulGaussian2d,
+    .Gaussian2D.Multiply = MultiplyGaussian2d,
     .Gaussian2D.Probability = ProbabilityFromGaussian2d,
     .Gaussian2D.WeightedUpdate = UpdateGaussianWithWeightGaussian2d,
     .Gaussian2D.WeightedMeanUpdate = WeightedMeanUpdateGaussian2d,

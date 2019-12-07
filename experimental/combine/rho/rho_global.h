@@ -49,7 +49,7 @@ typedef uint32_t        address_t;
 // #define ALLOW_NEGATIVE_REDISTRIBUTION
 
 #define RHO_DEBUG               DEBUG_2
-#define RHO_DEBUG_2             DEBUG_1
+#define RHO_DEBUG_2             DEBUG_1//2
 #define RHO_DEBUG_INIT          DEBUG_1
 #define RHO_DEBUG_UPDATE        DEBUG_1
 #define RHO_DEBUG_DETECT        DEBUG_1
@@ -62,9 +62,9 @@ typedef uint32_t        address_t;
 //#define KALMAN_DEBUG            RHO_DEBUG
 //#define KALMAN_DEBUG_2          RHO_DEBUG_2
 
-#define PSM_DEBUG               RHO_DEBUG
-#define PSM_DEBUG_2             RHO_DEBUG_2
-#define PSM_DEBUG_UPDATE        PSM_DEBUG
+//#define PSM_DEBUG               DEBUG_2
+//#define PSM_DEBUG_2             DEBUG_1
+//#define PSM_DEBUG_UPDATE        PSM_DEBUG
 //#define HMM_DEBUG               RHO_DEBUG
 //#define HMM_REPORT              RHO_DEBUG_2
 //#define GMM_DEBUG               PSM_DEBUG

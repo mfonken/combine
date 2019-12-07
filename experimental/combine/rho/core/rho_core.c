@@ -111,10 +111,10 @@ void DetectRhoCorePairs( rho_core_t * core )
     RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
 
     /* Calculate accumulated filtered percentage from both axes */
-    core->FilteredPercentage = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );
-    core->TotalPercentage = ZDIV( (floating_t)core->TotalCoverage, (floating_t)TOTAL_RHO_PIXELS );
+    core->FilteredPercentage        = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );
+    core->TotalPercentage           = ZDIV( (floating_t)core->TotalCoverage, (floating_t)TOTAL_RHO_PIXELS );
     core->PredictionPair.NumRegions = MAX( core->PredictionPair.x.NumRegions, core->PredictionPair.y.NumRegions );
-    core->PredictionPair.NuRegions = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
+    core->PredictionPair.NuRegions  = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */

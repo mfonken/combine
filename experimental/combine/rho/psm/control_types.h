@@ -73,15 +73,19 @@ extern "C" {
 #define VALID_CLUSTER_STD_DEV 0.25
 #define MIN_CLUSTER_SCORE 0.2//5
 #define FALLBACK_MAX_ERROR 1e-2f
-#define ALPHA 0.0001
+#define ALPHA 0.00001
 #define BETA 2
+
+#if MAX_CLUSTERS >= 32
+#error "Max clusters should be less than 32 for binary vector in DiscoverStateBandsPSM()."
+#endif
     
 #define SMALL_VALUE_ERROR_OFFSET 1e-4f
 
 #define MAX_LABELS 10
 #define LABEL_MOVING_AVERAGE_MAX_HISTORY 10
 #define NULL_LABEL 0xff
-#define MIN_LABEL_CONTRIBUTION 0.15
+#define MIN_LABEL_CONTRIBUTION 0.20 //0.15
 
 #define BOUNDARY_START(X)   !!(X<0)
 #define BOUNDARY_END(X)     !!(X>0)

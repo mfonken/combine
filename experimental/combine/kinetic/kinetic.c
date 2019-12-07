@@ -142,7 +142,7 @@ static ang3_t KineticPointTranslationParameters( kinetic_t * k, kpoint_t * A, kp
     
     floating_t phi = atan2( aAbB.j, A->z ),  psi = atan2( aAbB.i, A->z );
     
-    floating_t theta_deg = theta * RAD_TO_DEG, phi_deg = phi * RAD_TO_DEG, psi_deg = psi * RAD_TO_DEG;
+    LOG_KIN(KIN_DEBUG, "Point T> theta: %6.3fº | phi: %6.3fº | psi: %6.3fº\n", theta*RAD_TO_DEG, phi*RAD_TO_DEG, psi*RAD_TO_DEG);
 //    floating_t dR = KineticFunctions.DeltaR( k->r_l, &k->AB_, &AB );
     
     memcpy( &k->A_,  &A,  sizeof(kpoint_t) );
@@ -347,4 +347,3 @@ void Reference_Rotation_Init( kinetic_t * k )
     ang3_t r_a = { REFERENCE_OFFSET_ANGLE_X, REFERENCE_OFFSET_ANGLE_Y, REFERENCE_OFFSET_ANGLE_Z };
     Quaternion.fromEuler( &r_a, &k->qr );
 }
-

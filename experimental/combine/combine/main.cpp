@@ -20,9 +20,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 #endif
     
     env.Start();
-    env.Pause();
-    sleep(0.1);
-    env.Resume();
+//    env.Pause();
+//    sleep(0.1);
+//    env.Resume();
     
     struct timeval a,b;
     int instruction_index = 0;
@@ -32,7 +32,6 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     
     while(1)
     {
-        if(local_frame.data == nullptr) continue;
             tau.GetDensitiesFrame(local_frame);
             imshow(TITLE_STRING, local_frame);
 #ifdef USE_DETECTION_MAP
@@ -100,15 +99,15 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 
 int main(int argc, const char * argv[])
 {
-    kinetic_t kin;
-    KineticFunctions.DefaultInit( &kin );
-    double f = 5;
-    kin.A_ = (kpoint_t){ 0.1, 2, f };
-    kin.B_ = (kpoint_t){ 1.8, 0.5, f };
-    kin.AB_ = (vec3_t){ kin.B_.x - kin.A_.x, kin.B_.y - kin.A_.y, kin.A_.z };
-    kpoint_t A = { 0, 2, f }, B = { 2, 0, f };
-    ang3_t e = { 0, 0, 0 }, g = { 0, 0, 0 };
-    KineticFunctions.UpdateRotation( &kin, &e, &g, &A, &B );
+//    kinetic_t kin;
+//    KineticFunctions.DefaultInit( &kin );
+//    double f = 5;
+//    kin.A_ = (kpoint_t){ 0.1, 2, f };
+//    kin.B_ = (kpoint_t){ 1.8, 0.5, f };
+//    kin.AB_ = (vec3_t){ kin.B_.x - kin.A_.x, kin.B_.y - kin.A_.y, kin.A_.z };
+//    kpoint_t A = { 0, 2, f }, B = { 2, 0, f };
+//    ang3_t e = { 0, 0, 0 }, g = { 0, 0, 0 };
+//    KineticFunctions.UpdateRotation( &kin, &e, &g, &A, &B );
     
 #ifdef AUTOMATION_RUN
     string header = "Algorithm,Dimension(px),Iterations,Total Time(s),Avg. Time(ms), Avg. Diff.(%), Std. Dev. Diff. (%)\n";

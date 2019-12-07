@@ -82,6 +82,13 @@ void Mat2x2DotVec2(mat2x2 * mat, vec2_t * vec, vec2_t * res)
     res->b = mat->c * vec->a + mat->d * vec->b;
 }
 
+void MulTwoMat2x2s( mat2x2 * A, mat2x2 * B, mat2x2 * C )
+{
+    MatVec.Mat2x2.DotVec2( A, (vec2_t *)B, (vec2_t *)C );
+    MatVec.Mat2x2.DotVec2( A, (vec2_t *)&(((floating_t*)B)[2]), (vec2_t *)&(((floating_t*)C)[2]) );
+    SWAP( C->b, C->c );
+}
+
 floating_t Mat2x2Determinant( mat2x2 * mat )
 {
     return ( ( mat->a * mat->d ) - ( mat->c * mat->b ) );
@@ -145,20 +152,44 @@ floating_t ProbabilityFromGaussian1d( gaussian1d_t * a, floating_t v )
 }
 
 /* Gaussian2D Functions */
-void MulGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
-{ /* See https://math.stackexchange.com/questions/157172/product-of-two-multivariate-gaussians-distributions */
-    mat2x2 a_computation, b_computation, c_computation;
+void MultiplyGaussian2d( gaussian2d_t * a, gaussian2d_t * b, gaussian2d_t * c )
+{
+//    /* See https://math.stackexchange.com/questions/157172/product-of-two-multivariate-gaussians-distributions */
+//    mat2x2 a_computation, b_computation, c_computation;
+//
+//    MatVec.Mat2x2.Inverse( &a->covariance, &a_computation );
+//    MatVec.Mat2x2.Inverse( &b->covariance, &b_computation );
+//    MatVec.Mat2x2.Add( &a_computation, &b_computation, &c_computation );
+//    MatVec.Mat2x2.Inverse( &c_computation, &c->covariance );
+//
+//    vec2_t a_computation_vec, b_computation_vec, c_computation_vec;
+//    MatVec.Mat2x2.DotVec2( &a_computation, &a->mean, &a_computation_vec );
+//    MatVec.Mat2x2.DotVec2( &b_computation, &b->mean, &b_computation_vec );
+//    MatVec.Vec2.Add( &a_computation_vec, &b_computation_vec, &c_computation_vec );
+//    MatVec.Mat2x2.DotVec2( &c->covariance, &c_computation_vec, &c->mean );
     
-    MatVec.Mat2x2.Inverse( &a->covariance, &a_computation );
-    MatVec.Mat2x2.Inverse( &b->covariance, &b_computation );
-    MatVec.Mat2x2.Add( &a_computation, &b_computation, &c_computation );
-    MatVec.Mat2x2.Inverse( &c_computation, &c->covariance );
+//    vec2_t a_bc = { a->covariance.b, a->covariance.c };
+//    vec2_t b_bc = { b->covariance.b, b->covariance.c };
+//    /// Temporary check for reducing error compounding
+//    a->covariance.b = 0; a->covariance.c = 0;
+//    b->covariance.b = 0; b->covariance.c = 0;
     
-    vec2_t a_computation_vec, b_computation_vec, c_computation_vec;
-    MatVec.Mat2x2.DotVec2( &a_computation, &a->mean, &a_computation_vec );
-    MatVec.Mat2x2.DotVec2( &b_computation, &b->mean, &b_computation_vec );
-    MatVec.Vec2.Add( &a_computation_vec, &b_computation_vec, &c_computation_vec );
-    MatVec.Mat2x2.DotVec2( &c->covariance, &c_computation_vec, &c->mean );
+    /* https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/ - eq's 14 & 15 */
+    mat2x2 covariance_sum, inverse_covariance_sum, K, a_covariance_K;
+    MatVec.Mat2x2.Add( &a->covariance, &b->covariance, &covariance_sum );
+    MatVec.Mat2x2.Inverse( &covariance_sum, &inverse_covariance_sum);
+    MatVec.Mat2x2.Multiply( &a->covariance, &inverse_covariance_sum, &K );
+    MatVec.Mat2x2.Multiply( &a->covariance, &K, &a_covariance_K );
+    
+    vec2_t mean_diff, K_mean_diff;
+    MatVec.Vec2.Subtract( &b->mean, &a->mean, &mean_diff );
+    MatVec.Mat2x2.DotVec2( &K, &mean_diff, &K_mean_diff );
+    MatVec.Vec2.Add( &a->mean, &K_mean_diff, &c->mean );
+    
+    MatVec.Mat2x2.Subtract( &a->covariance, &a_covariance_K, &c->covariance );
+    
+//    a->covariance.b = a_bc.a; a->covariance.c = a_bc.b;
+//    b->covariance.b = b_bc.a; b->covariance.c = b_bc.b;
     
     c->combinations = a->combinations + b->combinations + 1;
 }

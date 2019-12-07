@@ -250,7 +250,7 @@ typedef struct
 
 #define DETECTION_BUFFER_SIZE ( 1 << 9 )
 #define DETECTION_BUFFER_MASK ( DETECTION_BUFFER_SIZE - 1 )
-#define MAX_DENSITY           ( 1 << 9 )
+//#define MAX_DENSITY           ( 1 << 9 )
 
 typedef struct
 {

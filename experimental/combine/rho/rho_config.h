@@ -80,15 +80,16 @@
 #define MIN_VARIANCE        1
 #define MAX_VARIANCE        100
 
-#define MAX_REGION_HEIGHT   700//200
+#define MAX_REGION_HEIGHT   1000//200
 #define RHO_GAP_MAX         5
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
 #ifdef __PSM__
-#define PSM_UPDATE_PERIOD     0.5
+#define PSM_UPDATE_PERIOD_MS  750
+#define PSM_UPDATE_PERIOD     ( PSM_UPDATE_PERIOD_MS / 1000 )
 #endif
-#define BACKGROUNDING_PERIOD  100000 // Frames
+#define BACKGROUNDING_PERIOD  0 // Frames
 
 #define EXPECTED_NUM_REGIONS  2
 #define MAX_REGIONS           4

@@ -9,6 +9,7 @@
 #ifdef __PSM__
 
 #include "psm.h"
+#include "statistics.h"
 
 void InitializePSM( psm_t * model, const char * name )
 {
@@ -120,21 +121,37 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
         band_list->band[i].upper_boundary = boundary;
         band_list->band[i].true_center = (vec2_t){ band_list->band[i-1].true_center.a, boundary };
         band_list->band[i].variance = band_list->band[i-1].variance;
+//        printf("A ");
     }
     else
     { /* Otherwise set using cumulated band gaussian */
         floating_t radius = band_gaussian->covariance.d * VALID_CLUSTER_STD_DEV * 5;
         band_list->band[i].lower_boundary = band_gaussian->mean.b + radius;
         band_list->band[i].upper_boundary = band_gaussian->mean.b - radius;
-        band_list->band[i].true_center = band_gaussian->mean;
+        band_list->band[i].true_center.a = band_gaussian->mean.a;
+        band_list->band[i].true_center.b = band_gaussian->mean.b;
         band_list->band[i].variance = band_gaussian->covariance.d;
         if( i )
             band_list->band[i-1].upper_boundary = band_list->band[i].lower_boundary;
+//        printf("B ");
     }
+//    printf("\tTrue center [%d] is (%7.3f, %7.3f)\n", i, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
 }
 
 void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 {
+//    for(uint32_t i = 0; i < model->gmm.num_clusters; i++)
+//    {
+//        gaussian2d_t * g = &model->gmm.cluster[i]->gaussian_in;
+//        int c = CountSet(GetValidLabels(&model->gmm.cluster[i]->labels));
+//        printf("[%2d|%d](%7.3f, %7.3f)<%6.3f, %6.3f, %6.3f, %6.3f>\n", i, c, g->mean.a, g->mean.b, g->covariance.a, g->covariance.b, g->covariance.c, g->covariance.d);
+////        mat2x2 * cov = &model->gmm.cluster[i]->gaussian_in.covariance;
+////        cov->b = 0; cov->c = 0;
+////        floating_t max = MAX(cov->a, cov->d);
+////        cov->a = max; cov->d = max;
+//    }
+    
+    LOG_PSM(PSM_DEBUG_UPDATE, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Discovering state bands~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 #ifdef SPOOF_STATE_BANDS
     band_list->length = NUM_STATE_GROUPS;
     floating_t prev = 0, curr, center;
@@ -155,84 +172,155 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
     
     gaussian2d_t band_gaussian = { 0 };
     band_list->band[0].lower_boundary = 0;
-    /// NOTE: Minimum boundary has greatest y
+    /// NOTE: Boundaries are found from greatest to least
     int8_t current_band_id = 0, num_clusters_in_band = 0, num_to_process = model->gmm.num_clusters;
     uint32_t running_label_vector = 0;
+    
+
+//########################################################//
+    gaussian2d_t band_gaussians[5] = { 0 };
+    int8_t num_clusters_in_bands[5] = { 0 };
+    cumulative_average_t band_centers[5][3] = { 0 };
+//########################################################//
     while(num_to_process-- > 0)
     {
         /* Get next min cluster */
-        uint8_t min_id = 0;
-        floating_t min_boundary = 0, check_boundary;
+        uint8_t max_id = 0;
+        floating_t max_boundary = 0, check_boundary;
         for(uint32_t i = 0, m = 1; i < model->gmm.num_clusters; i++, m <<= 1 )
         {
-            if( processed_clusters & m ) continue;
-            if( model->gmm.cluster[i]->gaussian_in.mean.b > PSM_OBSERVATION_MAX ) continue;
-            check_boundary = model->gmm.cluster[i]->max_y;
-            if( check_boundary > min_boundary )
+            gaussian_mixture_cluster_t * cluster = model->gmm.cluster[i];
+            if( cluster->gaussian_in.covariance.d > MAX_CLUSTER_Y_VARIANCE
+               || cluster->max_y < 100 )
             {
-                min_boundary = check_boundary;
-                min_id = i;
+                processed_clusters |= m;
+                continue;
             }
+            
+            if( processed_clusters & m ) continue;
+            if( cluster->gaussian_in.mean.b > PSM_OBSERVATION_MAX ) continue;
+            check_boundary = cluster->max_y;
+            LOG_PSM(PSM_DEBUG_2, "Checking cluster %d: %6.3f|%6.3f (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>... ", i, check_boundary, max_boundary, cluster->gaussian_in.mean.a, cluster->gaussian_in.mean.b, cluster->gaussian_in.covariance.a, cluster->gaussian_in.covariance.b, cluster->gaussian_in.covariance.c, cluster->gaussian_in.covariance.d);
+            if( check_boundary > max_boundary )
+            {
+                max_boundary = check_boundary;
+                max_id = i;
+                LOG_PSM_BARE(PSM_DEBUG_2, "is max");
+            }
+            LOG_PSM_BARE(PSM_DEBUG_2, "\n");
         }
         
+//        if( !band_gaussian.mean.a && !band_gaussian.mean.b )
+//            band_gaussian = model->gmm.cluster[max_id]->gaussian_in;
+            
         /* Check if new cluster has new label(s) */
-        uint32_t current_label_vector = GetValidLabels( &model->gmm.cluster[min_id]->labels );
-        uint32_t check = current_label_vector & ~running_label_vector;
-        if( check )
-        { /* If new labels in cluster */
-            uint32_t new_label_vector = running_label_vector | current_label_vector;
-
-            /* If new update skipped bands... */
-            current_band_id = CountSet(new_label_vector);
-
-            for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
-            {
-                PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
-                num_clusters_in_band = -1;
-            }
-            band_gaussian = model->gmm.cluster[min_id]->gaussian_in;
-            num_clusters_in_band = 1;
-            running_label_vector = new_label_vector;
+        uint32_t current_label_vector = GetValidLabels( &model->gmm.cluster[max_id]->labels );
+//########################################################//
+        current_band_id = CountSet(current_label_vector);
+        if(current_band_id > 4) current_band_id = 4;
+        gaussian2d_t * gaussian = &model->gmm.cluster[max_id]->gaussian_in;
+        //            band_gaussian.covariance.b = 0; band_gaussian.covariance.c = 0;
+        if(band_gaussians[current_band_id].mean.a == 0)
+        {
+            band_centers[current_band_id][0] = (cumulative_average_t){ gaussian->mean.a, 1 };
+            band_centers[current_band_id][1] = (cumulative_average_t){ gaussian->mean.b, 1 };
+            band_centers[current_band_id][2] = (cumulative_average_t){ gaussian->covariance.d, 1 };
+            band_gaussians[current_band_id] = *gaussian;
+            num_clusters_in_bands[current_band_id]++;
         }
         else
-        { /* Otherwise cumulate current gaussian into band gaussian */
-            LOG_PSM(PSM_DEBUG_UPDATE, "bcy: %.4f vs min: %d | stddevs: %.4f\n", band_gaussian.covariance.d, MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC, NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b ));
-            if( band_gaussian.covariance.d < MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC
-               || NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[min_id]->gaussian_in.mean.b )
-               < MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC )
-            {
-                LOG_PSM(PSM_DEBUG_UPDATE, "Combining cluster %d\n", min_id);
-                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "  (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
-                
-                gaussian2d_t g = model->gmm.cluster[min_id]->gaussian_in;
-                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "x (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", g.mean.a, g.mean.b, g.covariance.a, g.covariance.b, g.covariance.c, g.covariance.d);
-                MatVec.Gaussian2D.Multiply( &band_gaussian, &model->gmm.cluster[min_id]->gaussian_in, &band_gaussian );
-                MatVec.Mat2x2.ScalarMultiply( 2., &band_gaussian.covariance, &band_gaussian.covariance );
-                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "= (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
-                num_clusters_in_band++;
-            }
+        {
+            CumulateAverageStatistics( model->gmm.cluster[max_id]->gaussian_in.mean.a, &band_centers[current_band_id][0] );
+            CumulateAverageStatistics( model->gmm.cluster[max_id]->gaussian_in.mean.b, &band_centers[current_band_id][1] );
+            CumulateAverageStatistics( model->gmm.cluster[max_id]->gaussian_in.covariance.d, &band_centers[current_band_id][2] );
+            gaussian2d_t working_gaussian;
+            MatVec.Gaussian2D.Multiply( &band_gaussians[current_band_id], &model->gmm.cluster[max_id]->gaussian_in, &working_gaussian );
+            MatVec.Mat2x2.ScalarMultiply( 2., &working_gaussian.covariance, &working_gaussian.covariance );
+            band_gaussians[current_band_id] = working_gaussian;
+            num_clusters_in_bands[current_band_id]++;
         }
-        
-        LOG_PSM(PSM_DEBUG_UPDATE, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
-        
-        if( !num_to_process )
-        { /* Always update band on last cluster */
-            PSMFunctions.UpdateStateBand( band_list, current_band_id, num_clusters_in_band, &band_gaussian );
-        }
-        
-        processed_clusters |= 1 << min_id;
+//########################################################//
+//        uint32_t check = current_label_vector & ~running_label_vector;
+//        if( check )
+//        { /* If new labels in cluster */
+//            uint32_t new_label_vector = running_label_vector | current_label_vector;
+//
+//            /* If new update skipped bands... */
+//            current_band_id = CountSet(new_label_vector);
+//
+//            for( uint8_t i = CountSet(running_label_vector); i < current_band_id; i++ )
+//            {
+//                LOG_PSM( PSM_DEBUG, "Completing band %d: |%d|(%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", i, num_clusters_in_band, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
+//                PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_band, &band_gaussian );
+//                num_clusters_in_band = -1;
+//            }
+//            band_gaussian = model->gmm.cluster[max_id]->gaussian_in;
+//            band_gaussian.covariance.b = 0; band_gaussian.covariance.c = 0;
+//            num_clusters_in_band = 1;
+//            running_label_vector = new_label_vector;
+//        }
+//        else
+//        { /* Otherwise cumulate current gaussian into band gaussian */
+//            LOG_PSM(PSM_DEBUG_UPDATE, "bcy: %.4f vs min: %d | stddevs: %.4f\n", band_gaussian.covariance.d, MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC, NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[max_id]->gaussian_in.mean.b ));
+//            if( band_gaussian.covariance.d < MIN_VARIANCE_SPAN_TO_REJECT_FOR_BAND_CALC
+//               && NumStdDevsFromYMean( &band_gaussian, model->gmm.cluster[max_id]->gaussian_in.mean.b ) < MAX_STD_DEVS_TO_BE_INCLUDED_IN_BAND_CALC )
+//            {
+//                floating_t a = 0, b = 0, c = 0;
+//                LOG_PSM(PSM_DEBUG_UPDATE, "Combining cluster %d to band %d\n", max_id, current_band_id);
+//                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "  (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d);
+//
+//                gaussian2d_t g = model->gmm.cluster[max_id]->gaussian_in;
+//                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "x (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", g.mean.a, g.mean.b, g.covariance.a, g.covariance.b, g.covariance.c, g.covariance.d);
+//                a = band_gaussian.mean.a; b = model->gmm.cluster[max_id]->gaussian_in.mean.a;
+//                gaussian2d_t working_gaussian;
+//                MatVec.Gaussian2D.Multiply( &band_gaussian, &model->gmm.cluster[max_id]->gaussian_in, &working_gaussian );
+//                c = working_gaussian.mean.a;
+//                MatVec.Mat2x2.ScalarMultiply( 2., &working_gaussian.covariance, &working_gaussian.covariance );
+//                LOG_PSM_BARE(PSM_DEBUG_UPDATE, "= (%.2f, %.2f) <%.2f, %.2f, %.2f, %.2f>\n", working_gaussian.mean.a, working_gaussian.mean.b, working_gaussian.covariance.a, working_gaussian.covariance.b, working_gaussian.covariance.c, working_gaussian.covariance.d);
+//                num_clusters_in_band++;
+//
+//                if( (a - c >= 0 && b - c > 0) || (a - c <= 0 && b - c < 0))
+//                {
+//                    MatVec.Gaussian2D.Multiply( &band_gaussian, &model->gmm.cluster[max_id]->gaussian_in, &working_gaussian );
+//                }
+//                band_gaussian = working_gaussian;
+//            }
+//        }
+//
+//        LOG_PSM(PSM_DEBUG_UPDATE, "Band %d gaussian is <%.4f %.4f> [%.4f %.4f %.4f %.4f]\n", current_band_id, band_gaussian.mean.a, band_gaussian.mean.b, band_gaussian.covariance.a, band_gaussian.covariance.b, band_gaussian.covariance.c, band_gaussian.covariance.d );
+//
+//        if( !num_to_process )
+//        { /* Always update band on last cluster */
+//            PSMFunctions.UpdateStateBand( band_list, current_band_id, num_clusters_in_band, &band_gaussian );
+//        }
+
+        processed_clusters |= 1 << max_id;
     }
-    for( uint8_t i = current_band_id+1; i < band_list->length; i++ )
-        PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
-    band_list->band[band_list->length-1].upper_boundary = 0;
-    
-    if(band_list->length > 0)
+
+//########################################################//
+    for( uint8_t i = 0; i < 5; i++ )
     {
-        LOG_PSM(PSM_DEBUG_UPDATE, "State bands: \n");
-        for( uint8_t i = 0; i < band_list->length; i++ )
-            LOG_PSM(PSM_DEBUG_UPDATE, " %2d: (%7.3f %7.3f)  C<%7.3f %7.3f>[%7.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
-        LOG_PSM(PSM_DEBUG_UPDATE, "\n");
+        band_gaussians[i].mean.a = band_centers[i][0].value;
+        band_gaussians[i].mean.b = band_centers[i][1].value;
+        band_gaussians[i].covariance.a = band_centers[i][2].value;
+        band_gaussians[i].covariance.d = band_centers[i][2].value;
+        num_clusters_in_bands[i] = band_centers[i][0].count;
+        
+        PSMFunctions.UpdateStateBand( band_list, i, num_clusters_in_bands[i], &band_gaussians[i] );
     }
+//########################################################//
+    
+//    for( uint8_t i = current_band_id+1; i < band_list->length; i++ )
+//        PSMFunctions.UpdateStateBand( band_list, i, -1, NULL );
+//    band_list->band[band_list->length-1].upper_boundary = 0;
+//
+//    if(band_list->length > 0)
+//    {
+//        LOG_PSM(PSM_DEBUG_UPDATE, "State bands: \n");
+//        for( uint8_t i = 0; i < band_list->length; i++ )
+//            LOG_PSM(PSM_DEBUG_UPDATE, " %2d: (%7.3f %7.3f)  C<%7.3f %7.3f>[%7.3f]\n", i, band_list->band[i].lower_boundary, band_list->band[i].upper_boundary, band_list->band[i].true_center.a, band_list->band[i].true_center.b, band_list->band[i].variance);
+//        LOG_PSM(PSM_DEBUG_UPDATE, "\n");
+//    }
 #endif
 }
 
@@ -314,11 +402,11 @@ void GenerateProposalsPSM( psm_t * model )
 #define MAX_VALID_TARGET_BAND_VARIANCE 10
     /* Update predictions */
     vec2_t * proposed_center = &model->state_bands.band[model->best_state].true_center;
-    if(target_band_variance < MIN_VALID_TARGET_BAND_VARIANCE
-       || target_band_variance > MAX_VALID_TARGET_BAND_VARIANCE)
-        proposed_center->b = 0;
-    else
-        proposed_center->b += 0.00001;
+//    if(target_band_variance < MIN_VALID_TARGET_BAND_VARIANCE
+//       || target_band_variance > MAX_VALID_TARGET_BAND_VARIANCE)
+//        proposed_center->b = 0;
+//    else
+//        proposed_center->b += 0.00001;
     
     /* Update primary & secondary to be reconstructed */
     gaussian_mixture_cluster_t * cluster = model->gmm.cluster[model->best_cluster_id];

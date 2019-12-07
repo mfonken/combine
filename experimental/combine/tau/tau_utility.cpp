@@ -58,9 +58,9 @@ void Tau::Trigger( void )
     if(count < MAX_COUNT)
     {
         double pacc = accuracy;
-        GenerateCumulativeAverageStatistics(p, &avg, ++count);
+        GenerateCumulativeAverageStatistics(p, &avg, &count);
         stddev_sum += pacc;
-        GenerateCumulativeAverageStatistics(current_accuracy, &accuracy, ++accuracy_count);
+        GenerateCumulativeAverageStatistics(current_accuracy, &accuracy, &accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
 //    if(( up && rho.core.Thresh > THRESH_MAX ) || (!up && rho.core.Thresh < THRESH_MIN)) up = !up;
@@ -85,17 +85,16 @@ std::string Tau::Serialize( void )
 
 double Tau::Perform( cimage_t &img )
 {
-    bool background_event = !!( ++tick >= BACKGROUNDING_PERIOD );
+    bool background_event = !!( BACKGROUNDING_PERIOD && ++tick >= BACKGROUNDING_PERIOD );
     
     if( background_event )
     {
         utility.RequestBackground();
-        LOG_TAU(DEBUG_2, "Waiting for utility to generate background...\n");
+        LOG_TAU(DEBUG_1, "Waiting for utility to generate background...\n");
         
         while(!utility.background_ready)
             utility.Trigger();
         
-//        LOG_RHO(DEBUG_2, "Background ready.\n");
         rho.backgrounding_event = true;
     }
     
