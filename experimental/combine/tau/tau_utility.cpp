@@ -98,7 +98,10 @@ double Tau::Perform( cimage_t &img )
         rho.backgrounding_event = true;
     }
     
-    double p = rho.Perform( img, &packet );
+    double p = 0;
+#ifdef __RHO__
+    p = rho.Perform( img, &packet );
+#endif
     
     if( background_event )
     {

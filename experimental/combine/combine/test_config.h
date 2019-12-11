@@ -10,13 +10,13 @@
 #define test_config_h
 
 #define MAIN_FPS        30
-#define TAU_FPS         30//10
-#define COMBINE_FPS     0//15
+#define TAU_FPS         0//30//10
+#define COMBINE_FPS     60 /// NOTE: BNO055 max rate is 200
 
 /* GLOBAL SETUP */
 //#define __CAM__
 //#define __IMU__
-#define HAS_FILE
+//#define HAS_FILE
 //#define HAS_GENERATOR
 
 //#define AUTOMATION_RUN

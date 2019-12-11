@@ -24,10 +24,10 @@ extern "C" {
 #include <string.h>
 #include <assert.h>
     
-#define  UTILITY_VERBOSE
+#define UTILITY_VERBOSE
 //#define PACKET_DEBUG
 
-#define DEFAULT_SERCOM_PORT     "/dev/tty.usbmodem142401"
+#define DEFAULT_SERCOM_PORT     "/dev/tty.usbmodem141401"
 #define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem143401"
 #define DEFAULT_SERCOM_PORT_LEN sizeof(DEFAULT_SERCOM_PORT)
 

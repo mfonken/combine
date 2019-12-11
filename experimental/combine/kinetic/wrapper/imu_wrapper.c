@@ -10,7 +10,7 @@
 
 #define DEL  sizeof(char)
 #define SEP  sizeof(char)
-#define FLSZ (1+1+3)
+#define FLSZ (3)
 #define BUFFSIZE(X) (int)(DEL+(int)X*(SEP+FLSZ))
 
 #define MIN_PACKET_LEN_RAW BUFFSIZE(9)
@@ -213,14 +213,14 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     }
 
     line[++ptr] = '\0';
-    if(ptr < MIN_PACKET_LEN_ORI) return;
+//    if(ptr < MIN_PACKET_LEN_ORI) return;
     
 #ifdef PACKET_DEBUG
     printf("\nR(%d): %s\n", ptr, line);
 #endif
     
     double v[6];
-    tokenifyPacket( line + 2, 6, v );
+    tokenifyPacket( line+2, 6, v );
     
     if( v[0] == 0xffff ) return;
     

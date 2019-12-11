@@ -42,7 +42,6 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 //          imshow("X Detection", tau.DrawRhoDetection(X_DIMENSION));
 //          imshow("Y Detection", tau.DrawRhoDetection(Y_DIMENSION));
         
-        
         char c = waitKey(KEY_DELAY);
 #ifdef AUTOMATION_INSTRUCTIONS
         if(num_instructions)

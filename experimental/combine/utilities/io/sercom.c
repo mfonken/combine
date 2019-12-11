@@ -96,6 +96,6 @@ void tokenifyPacket( char * a, int n, double * d)
         d[i] = atof(token);
         token = strtok(NULL, ",");
     }
-    if(token == NULL)
+    if(i != n )//token == NULL)
         d[0] = 0xffff;
 }

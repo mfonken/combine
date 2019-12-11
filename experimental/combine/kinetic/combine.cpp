@@ -70,7 +70,7 @@ void Combine::Trigger()
     KineticFunctions.UpdatePosition( &kin, &n, &A, &B );
 #else
     IMUFunctions.update.orientation( &imu );
-    printf("[IMU] <%.4f, %.4f, %.4f>\n", imu.roll, imu.pitch, imu.yaw);
+    printf("[IMU-%3.1f] <%.4f, %.4f, %.4f>\n", actual_rate, imu.roll, imu.pitch, imu.yaw);
 #endif
 #endif
 }
