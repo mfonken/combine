@@ -41,7 +41,7 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
 
     core->Thresh = (double)AVG2( MAX_THRESH, MIN_THRESH );
     core->ThreshByte = (byte_t)core->Thresh;
-
+    
     core->DensityMapPair.x.map          = FOREGROUND_DENSITY_MAP_X;
     core->DensityMapPair.x.background   = BACKGROUND_DENSITY_MAP_X;
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;

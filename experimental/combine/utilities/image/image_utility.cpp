@@ -127,18 +127,30 @@ void ImageUtility::InitCamera()
 {
     counter = 0;
     
-    cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
-    cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
-    cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
-    
-    if (!cam.isOpened())
+    bool success = false;
+    while(!success)
     {
-        LOG_IU("Could not open or find camera.\n");
-        while(1);
-        return;
+        cam.set(CAP_PROP_FRAME_WIDTH,  frame.cols);
+        cam.set(CAP_PROP_FRAME_HEIGHT, frame.rows);
+        cam.set(CAP_PROP_FPS,          IU_FRAME_RATE);
+        
+        if (!cam.isOpened())
+        {
+            LOG_IU("Could not open or find camera.\n");
+            sleep(1);
+            cam = VideoCapture(CAMERA_ID);
+            continue;
+        }
+        cam >> image;
+        if(image.cols != frame.cols)
+        {
+            LOG_IU("Failed to configure camera!\n");
+            sleep(1);
+            cam = VideoCapture(CAMERA_ID);
+            continue;
+        }
+        success = true;
     }
-    cam >> image;
-    
     LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", (int)cam.get(CAP_PROP_FRAME_WIDTH), (int)cam.get(CAP_PROP_FRAME_HEIGHT), (int)cam.get(CAP_PROP_FPS));
     
 #ifdef GREYSCALE
@@ -270,8 +282,12 @@ Mat ImageUtility::GetImage()
 
 Mat ImageUtility::GetNextFrame()
 {
-    cam >> image;
-    
+    try
+    {
+        cam >> image;
+    }
+    catch(...)
+    {}
 #ifdef RESCALE_FRAME
     resize(image, image, size, 1, 1);
 #endif

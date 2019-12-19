@@ -606,6 +606,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
+					__RHO__,
+					__CAM__,
 					__IMU__,
 					__KALMAN__,
 					"GLOBAL_LOG_LEVEL=DEBUG_2",

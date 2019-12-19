@@ -28,7 +28,7 @@ extern "C" {
 //#define PACKET_DEBUG
 
 #define DEFAULT_SERCOM_PORT     "/dev/tty.usbmodem141401"
-#define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem143401"
+#define DEFAULT_SERCOM_PORT_ALT "/dev/tty.usbmodem144401"
 #define DEFAULT_SERCOM_PORT_LEN sizeof(DEFAULT_SERCOM_PORT)
 
 typedef struct

@@ -13,6 +13,7 @@ rho_variables RhoVariables = { 0 };
 void RIM_INIT_FROM_CORE( rho_core_t * core )
 {
     /* Connect to Interrupt Model variable structure */
+    //printf(">>%d:%p\n", core->DensityMapPair.y.length, core->DensityMapPair.y.map);
     RhoVariables.ram.Dx      =  core->DensityMapPair.x.map;
     RhoVariables.ram.Dy      =  core->DensityMapPair.y.map;
     RhoVariables.ram.Q       =  core->Q;
@@ -43,6 +44,8 @@ void RIM_FRAME_START( void )
     RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.C_FRAME_MAX;
 
 //    memset(RhoVariables.ram.C_FRAME, 0, sizeof(char)*RhoVariables.global.C_FRAME_MAX);
+    //printf(">>%d:%p | %d\n", RhoVariables.global.W, RhoVariables.ram.Dy, (int)sizeof(density_map_unit_t));
+    //printf("%d | %d\n", (int)sizeof(density_map_unit_t) * RhoVariables.global.W, (int)sizeof(RhoVariables.ram.Dy));
     memset(RhoVariables.ram.Dy, 0, sizeof(density_map_unit_t) * RhoVariables.global.W);
     memset(RhoVariables.ram.Dx, 0, sizeof(density_map_unit_t) * RhoVariables.global.H);
     memset(RhoVariables.ram.Q,  0, sizeof(density_2d_t) * 4);

@@ -20,35 +20,30 @@
 
 #define __USE_RUNNING_AVERAGE__
 
-#ifdef __CAM__
-/* Camera Config */
-#define RHO_WIDTH               1920
-#define RHO_HEIGHT              1080
-
-#define CAPTURE_DIV             4
-
-#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
-#else
+//#ifdef __CAM__
+///* Camera Config */
+//#define RHO_WIDTH               1920
+//#define RHO_HEIGHT              1080
+//
+//#define CAPTURE_DIV             4
+//
+//#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
+//#else
 #define CAPTURE_DIV             0
 #define RHO_WIDTH               FRAME_WIDTH
 #define RHO_HEIGHT              FRAME_HEIGHT
-#endif
+//#endif
 
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
 #define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
 
-#if defined __linux || defined __APPLE__
 #ifdef __CAM__
-#define DENSITY_MAP_X_SIZE       CAPTURE_WIDTH
-#define DENSITY_MAP_Y_SIZE       CAPTURE_HEIGHT
+#define DENSITY_MAP_W_SIZE       CAPTURE_WIDTH
+#define DENSITY_MAP_H_SIZE       CAPTURE_HEIGHT
 #else
-#define DENSITY_MAP_X_SIZE       RHO_WIDTH
-#define DENSITY_MAP_Y_SIZE       RHO_HEIGHT
-#endif
-#else
-#define DENSITY_MAP_X_SIZE       DENSITY_MAP_X_LENGTH
-#define DENSITY_MAP_Y_SIZE       DENSITY_MAP_Y_LENGTH
+#define DENSITY_MAP_W_SIZE       RHO_WIDTH
+#define DENSITY_MAP_H_SIZE       RHO_HEIGHT
 #endif
 
 #define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH

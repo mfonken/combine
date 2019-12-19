@@ -63,11 +63,11 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
                 else env.Pause();
                 break;
             default:
-                if(tau.utility.Loop(c))
-                {
-                    tau.utility.Trigger();
-                    tau.Trigger();
-                }
+//                if(tau.utility.Loop(c))
+//                {
+//                    tau.utility.Trigger();
+//                    tau.Trigger();
+//                }
                 break;
             case 's':
                 env.Pause();

@@ -10,7 +10,7 @@
 #define test_config_h
 
 #define MAIN_FPS        30
-#define TAU_FPS         0//30//10
+#define TAU_FPS         MAIN_FPS
 #define COMBINE_FPS     60 /// NOTE: BNO055 max rate is 200
 
 /* GLOBAL SETUP */
@@ -29,7 +29,9 @@
 
 #define IMAGE_TICKS                     (360)//*20)
 #define THRESH_IMAGE
+#ifndef __CAM__
 #define ROTATE_IMAGE
+#endif
 
 #define TITLE_STRING                    "Combine Alpha v1.1"
 #define GROUP_NAME                      "/gradient/"
@@ -55,8 +57,8 @@
 #define FRAME_HEIGHT                    FRAME_WIDTH
 #else
 #ifdef __CAM__
-#define FRAME_WIDTH                     1280
-#define FRAME_HEIGHT                    720
+#define FRAME_WIDTH                     1920
+#define FRAME_HEIGHT                    1080
 #else
 #define FRAME_WIDTH                     700
 #define FRAME_HEIGHT                    FRAME_WIDTH
