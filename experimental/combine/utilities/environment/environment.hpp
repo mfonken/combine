@@ -25,7 +25,7 @@
 #define LOG(...) printf(__VA_ARGS__)
 #endif
 
-#define ENV_DEBUG
+//#define ENV_DEBUG
 
 #ifdef ENV_DEBUG
 #define LOG_ENV(...) LOG("<Environment> " __VA_ARGS__)

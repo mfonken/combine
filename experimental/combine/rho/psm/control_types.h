@@ -49,8 +49,12 @@ extern "C" {
 #define TARGET_STATE TARGET_POPULATED
 
 #ifdef __PSM__
-    //#define NUM_STATES              10
-//#define NUM_OBSERVATION_SYMBOLS 2//5 // Should be max number of clusters in GMM
+//#define USE_2D_OBSERVATIONS
+#define HMM_GAUSSIAN_EMISSIONS
+#ifndef HMM_GAUSSIAN_EMISSIONS
+#define NUM_OBSERVATION_SYMBOLS 5
+#endif
+
 #ifndef MAX_OBSERVATIONS
 #define MAX_OBSERVATIONS        (1 << 7) // Length of history
 #endif
@@ -91,17 +95,53 @@ extern "C" {
 #define BOUNDARY_END(X)     !!(X>0)
 #endif
     
-#define HMM_GAUSSIAN_EMISSIONS
 #ifdef USE_2D_OBSERVATIONS
 #define HMM_2D_EMISSIONS
 #endif
     
+#ifdef HMM_GAUSSIAN_EMISSIONS
+#ifdef USE_2D_OBSERVATIONS
+#define DEFAULT_OBSERVATION_LIST \
+{ \
+    { { 0.5, 245 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 1.0, 235 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 2.0, 225 },  { 0.5, 0., 0., 10. }, 0. }, \
+    { { 4.0,  40 },  { 0.5, 0., 0., 10. }, 0. }  \
+}
+#else
+#define DEFAULT_OBSERVATION_LIST \
+{ \
+    { 0.5, 0.5 }, \
+    { 1.0, 0.5 }, \
+    { 2.0, 0.5 }, \
+    { 4.0, 0.5 } \
+}
+#endif
+#else
+#define DEFAULT_OBSERVATION_LIST \
+{ \
+    { 1, 0, 0, 0, 0 }, \
+    { 0, 1, 0, 0, 0 }, \
+    { 0, 0, 0.25, 0.5, 0.25 }, \
+    { 0, 0, 0, 0.25, 1 }, \
+}
+#endif
+
+#define DEFAULT_STATE_VECTOR        { 0.2, 0.05, 0.05, 0.7 }
+
+#ifdef __PSM__
+#ifdef HMM_GAUSSIAN_EMISSIONS
 #ifdef HMM_2D_EMISSIONS
     typedef vec2_t       hmm_observation_t;
     typedef gaussian2d_t emission_t;
 #else
     typedef floating_t   hmm_observation_t;
     typedef gaussian1d_t emission_t;
+#endif
+#else
+    typedef index_t      hmm_observation_t;
+    typedef floating_t   emission_t[NUM_OBSERVATION_SYMBOLS];
+#endif
 #endif
 
     typedef enum
@@ -136,16 +176,6 @@ extern "C" {
         observation_t observations[MAX_OBSERVATIONS];
         uint8_t length;
     } observation_list_t;
-    
-//    typedef enum
-//    {
-//        UNKNOWN_SYMBOL = -1,
-//        ZERO_SYMBOL,
-//        ONE_SYMBOL,
-//        TWO_SYMBOL,
-//        THREE_SYMBOL,
-//        MANY_SYMBOL
-//    } observation_symbol_t;
     
     /* FSM state tree with fsm base */
     typedef struct

@@ -19,6 +19,7 @@
 #include "fsm.h"
 #endif
 
+#include "statistics.h"
 #include "rho_packet.h"
 #include "kalman.h"
 #include "pid.h"
@@ -53,6 +54,7 @@ typedef struct
     density_map_unit_t
         *map,
         *background,
+        *bound,
         max[2];
     index_t
         length;
@@ -160,7 +162,7 @@ typedef struct
   uint8_t (*Transmit)( byte_t *, index_t);
 } rho_platform_uart_interace_functions;
 
-#ifndef USE_DECOUPLING
+#ifndef __USE_DECOUPLING__
 typedef struct
 {
   void (*Activate)( camera_application_flags * );
@@ -199,16 +201,30 @@ typedef struct
       gap_counter,
       width,
       total_regions,
+#ifdef __USE_ZSCORE_THRESHOLD__
+      z_index,
+      z_thresh_factor,
+      z_thresh,
+#endif
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+      region_boundaries[MAX_REGIONS*2],
+      region_boundary_index,
+#endif
       x,
       start,
       end;
+#ifdef __USE_ZSCORE_THRESHOLD__
+    cumulative_avg_stdv_t
+      z_stat;
+#endif
     density_t
       filter_peak,
       filter_peak_2,
       filter_band_lower,
-      curr,
       background_curr,
       maximum;
+    sdensity_t
+      curr;
     variance_t
       filter_variance;
     density_2d_t
@@ -218,6 +234,9 @@ typedef struct
       first_filtered_density, /* Initial filtered density before retries */
       raw_density_moment;
     bool
+#ifdef __USE_ZSCORE_THRESHOLD__
+      has_stat_update,
+#endif
       has_region,
       recalculate;
     byte_t
@@ -311,7 +330,7 @@ typedef struct
     fsm_system_t        StateMachine;
     packet_t            Packet;
 
-#ifdef USE_DECOUPLING
+#ifdef __USE_DECOUPLING__
     uint8_t             cframe[C_FRAME_SIZE];
 #endif
     

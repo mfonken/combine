@@ -15,9 +15,9 @@ FileWriter::FileWriter( const char * name )
     file_name = name;
 }
 
-void FileWriter::init( std::string name )
+void FileWriter::init( std::string header )
 {
-    file_name = name.c_str();
+//    file_name = name.c_str();
     std::ofstream outfile;
     outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
     if (!outfile.is_open())
@@ -30,7 +30,7 @@ void FileWriter::init( std::string name )
 #ifdef UTILITY_VERBOSE
     printf("Opened %s\n", file_name);
 #endif
-//    if(!header.empty()) trigger(header);
+    if(!header.empty()) trigger(header);
 }
 
 void FileWriter::trigger( std::string data, ios_base::openmode mode )

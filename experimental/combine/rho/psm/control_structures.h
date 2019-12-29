@@ -17,11 +17,11 @@ extern "C" {
 #include "matvec.h"
 
 typedef floating_t transition_matrix_t[NUM_STATES][NUM_STATES];
+#ifdef __PSM__
 typedef emission_t observation_matrix_t[NUM_STATES];
 typedef floating_t state_sequence_matrix[MAX_OBSERVATIONS][NUM_STATES];
 typedef floating_t state_vector_t[NUM_STATES];
 
-#ifdef __PSM__
     typedef struct
     {
         gaussian2d_t
@@ -80,10 +80,14 @@ typedef floating_t state_vector_t[NUM_STATES];
     
     static floating_t GetProbabilityFromEmission( emission_t * e, hmm_observation_t v )
     {
+#ifdef HMM_GAUSSIAN_EMISSIONS
 #ifdef HMM_2D_EMISSIONS
         return MatVec.Gaussian2D.Probability( (gaussian2d_t *)e, (vec2_t *)&v );
 #else
         return MatVec.Gaussian1D.Probability( (gaussian1d_t *)e, (floating_t)v );
+#endif
+#else
+        return (*e)[BOUNDU(v, NUM_OBSERVATION_SYMBOLS - 1)];
 #endif
     }
 #endif
@@ -118,6 +122,8 @@ typedef floating_t state_vector_t[NUM_STATES];
         gaussian_mixture_model_t gmm;
         hidden_markov_model_t hmm;
         fsm_system_t fsm;
+        hmm_observation_t
+        current_observation;
 #endif
         kumaraswamy_t kumaraswamy;
         band_list_t state_bands;
@@ -128,8 +134,6 @@ typedef floating_t state_vector_t[NUM_STATES];
         observation_state;
         state_t
         current_state;
-        hmm_observation_t
-        current_observation;
         floating_t
         previous_thresh,
         best_confidence,

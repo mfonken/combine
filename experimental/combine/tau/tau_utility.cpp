@@ -58,9 +58,9 @@ void Tau::Trigger( void )
     if(count < MAX_COUNT)
     {
         double pacc = accuracy;
-        GenerateCumulativeAverageStatistics(p, &avg, &count);
+        RhoUtility.Generate.CumulativeAverage(p, &avg, &count);
         stddev_sum += pacc;
-        GenerateCumulativeAverageStatistics(current_accuracy, &accuracy, &accuracy_count);
+        RhoUtility.Generate.CumulativeAverage(current_accuracy, &accuracy, &accuracy_count);
         if(accuracy_count > AVERAGE_COUNT) accuracy_count--;
     }
 //    if(( up && rho.core.Thresh > THRESH_MAX ) || (!up && rho.core.Thresh < THRESH_MIN)) up = !up;

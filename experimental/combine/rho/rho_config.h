@@ -9,30 +9,22 @@
 #include "rho_global.h"
 
 //#define SPOOF_STATE_BANDS
-#define USE_DETECTION_MAP
+#ifndef AUTOMATION_RUN
+//#define __USE_DETECTION_MAP__
 #define RHO_DRAWER
+#endif
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                               CAPTUE PARAMETERS                                     */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#define IS_RGGB_ELIMINATE_G     true
+//#define __USE_ZSCORE_THRESHOLD__ /* Detect regions using z-scoring - account for variance and overly aggressive banding */
+//#define __USE_REGION_BOUNDARY_OFFSET__ /* Bump proposed center if true centroid is within a region to nearest edge (+ gap margin) */
+#define __USE_RUNNING_AVERAGE__ /* Actively calculate running average as opposed to raw sum and count - ALT NOT FULLY IMPLEMENTED */
 
-#define __USE_RUNNING_AVERAGE__
-
-//#ifdef __CAM__
-///* Camera Config */
-//#define RHO_WIDTH               1920
-//#define RHO_HEIGHT              1080
-//
-//#define CAPTURE_DIV             4
-//
-//#define CAPTURE_SUB_SAMPLE      SUBSAMPLE_APPLICATION
-//#else
 #define CAPTURE_DIV             0
 #define RHO_WIDTH               FRAME_WIDTH
 #define RHO_HEIGHT              FRAME_HEIGHT
-//#endif
 
 #define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
 #define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
@@ -46,16 +38,6 @@
 #define DENSITY_MAP_H_SIZE       RHO_HEIGHT
 #endif
 
-#define CAPTURE_BUFFER_WIDTH    (uint32_t)CAPTURE_WIDTH
-#define CAPTURE_BUFFER_HEIGHT   (uint32_t)CAPTURE_HEIGHT
-#define CWL                     80 // CAPTURE_BUFFER_WIDTH
-#define CAPTURE_BUFFER_SIZE     CAPTURE_BUFFER_LENGTH
-
-#define SS                      6 // DEFAULT_SUBSAMPLE
-
-#define COVERAGE_NORMAL_MAX     0.45
-#define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
-#define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH//((index_t)(sizeof(index_t)*(index_t)THRESH_BUFFER_SIZE))
 #define DEFAULT_THRESH          THRESH_MIN// 170//250
 
 #define FILTERED_COVERAGE_TARGET   0.007
@@ -155,33 +137,10 @@
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
 //#define BACKGROUND_COVERAGE_TOL_PX   ((int)(BACKGROUND_COVERAGE_TOL_PR*FRAME_SIZE))
 
-#define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.5, 0.75, 1.0 }
-
-#ifdef __PSM__
-#define USE_2D_OBSERVATIONS
-
-#ifdef USE_2D_OBSERVATIONS
-#define DEFAULT_OBSERVATION_LIST \
-{ \
-    { { 0.5, 225 },  { 0.5, 0., 0., 10. }, 0. }, \
-    { { 1.0, 175 },  { 0.5, 0., 0., 10. }, 0. }, \
-    { { 2.0, 100 },  { 0.5, 0., 0., 10. }, 0. }, \
-    { { 4.0,  40 },  { 0.5, 0., 0., 10. }, 0. }  \
-}
-#else
-#define DEFAULT_OBSERVATION_LIST \
-{ \
-    { 0.5, 0.5 }, \
-    { 1.0, 0.5 }, \
-    { 2.0, 0.5 }, \
-    { 4.0, 0.5 } \
-}
-#endif
-#define DEFAULT_STATE_VECTOR        { 0.25, 0.5, 0.2, 0.05 }
-#else
-#define SPOOF_STATE_BANDS           { 0.2, 0.5, 0.75, 1.0 }
-#endif
+#define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.45, 0.6, 1.0 }
 
 #define DEFAULT_PACKET_LENGTH       3
+
+//#define SPOOF_STATE_BANDS           { 0.2, 0.5, 0.75, 1.0 }
 
 #endif /* rho_config_h */

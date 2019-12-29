@@ -23,10 +23,10 @@
 
 typedef double          floating_t;
 typedef uint8_t         byte_t;
-typedef uint16_t        index_t;
+typedef int16_t         index_t;
 typedef uint16_t        density_t;
 typedef int16_t         sdensity_t;
-typedef uint16_t        density_map_unit_t;
+typedef sdensity_t      density_map_unit_t;
 typedef int16_t         variance_t;
 typedef uint32_t        density_2d_t;
 typedef floating_t      timestamp_t;
@@ -44,12 +44,12 @@ typedef uint32_t        address_t;
 #define density_2d_t_max        ( (sizeof(density_2d_t) << 3 ) - 1 )
 #define density_map_unit_t_max  ( (sizeof(density_map_unit_t) << 3 ) - 1 )
 
-#define USE_DECOUPLING
+#define __USE_DECOUPLING__
 #define USE_BACKGROUNDING
 // #define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define RHO_DEBUG               DEBUG_2
-#define RHO_DEBUG_2             DEBUG_1//2
+#define RHO_DEBUG               DEBUG_1
+#define RHO_DEBUG_2             DEBUG_1
 #define RHO_DEBUG_INIT          DEBUG_1
 #define RHO_DEBUG_UPDATE        DEBUG_1
 #define RHO_DEBUG_DETECT        DEBUG_1
@@ -65,8 +65,8 @@ typedef uint32_t        address_t;
 //#define PSM_DEBUG               DEBUG_2
 //#define PSM_DEBUG_2             DEBUG_1
 //#define PSM_DEBUG_UPDATE        PSM_DEBUG
-//#define HMM_DEBUG               RHO_DEBUG
-//#define HMM_REPORT              RHO_DEBUG_2
+#define HMM_DEBUG               RHO_DEBUG
+#define HMM_REPORT              RHO_DEBUG_2
 //#define GMM_DEBUG               PSM_DEBUG
 //#define GMM_DEBUG_2             PSM_DEBUG_2
 //#define GMM_DEBUG_CLUSTERS      PSM_DEBUG_2

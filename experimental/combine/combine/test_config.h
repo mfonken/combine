@@ -9,33 +9,33 @@
 #ifndef test_config_h
 #define test_config_h
 
-#define MAIN_FPS        30
+#define MAIN_FPS        10//50
 #define TAU_FPS         MAIN_FPS
 #define COMBINE_FPS     60 /// NOTE: BNO055 max rate is 200
 
 /* GLOBAL SETUP */
 //#define __CAM__
 //#define __IMU__
-//#define HAS_FILE
+#define HAS_FILE
 //#define HAS_GENERATOR
 
 //#define AUTOMATION_RUN
-#define AUTOMATION_SIZES        { /*100, 250, 500, 750, 1000, 1250,*/ 1500, 1750, 2000 }
+#define AUTOMATION_SIZES        { 100, 250, 500, 750, 1000, /* 1250, 1500, 1750, 2000*/ }
 #define AUTOMATION_INSTRUCTIONS { 's' };//, 's', 's' }
 #define AUTOMATION_END_AFTER_INSTRUCTIONS
 
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     (360)//*20)
+#define IMAGE_TICKS                     (90)//*20)
 #define THRESH_IMAGE
 #ifndef __CAM__
 #define ROTATE_IMAGE
 #endif
 
-#define TITLE_STRING                    "Combine Alpha v1.1"
-#define GROUP_NAME                      "/gradient/"
-#define FILE_NAME                       "gradient_centralized"//"triple_circle_fade"
+#define TITLE_STRING                    "Combine Alpha v1.2"
+#define GROUP_NAME                      "/gradient/"// "/misc/""/frames/star/"
+#define FILE_NAME                       "gradient_centralized"//"double_circle_fade""triple_circle_fade"//"double_square"
 //#define GROUP_NAME                      "/frames/small/"
 //#define FILE_NAME                       "1"
 #define FILE_TYPE                       ".png"
@@ -46,7 +46,7 @@
 #define FRAME_IMAGE_SOURCE_NUM_FRAMES   IMAGE_TICKS
 #elif IMAGE_TYPE == IMAGE_SET
 #define FRAME_IMAGE_IMAGE_SOURCE_PATH   GROUP_NAME
-#define FRAME_IMAGE_SOURCE_NUM_FRAMES   26//31
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES   15//26//31
 #endif
 
 //#define PRINT_TUNING_STAGES

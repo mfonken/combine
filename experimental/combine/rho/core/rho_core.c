@@ -8,7 +8,7 @@
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include "rho_core.h"
 
-#ifdef USE_DETECTION_MAP
+#ifdef __USE_DETECTION_MAP__
 #include "detection_map.h"
 #endif
 #ifndef TIMESTAMP
@@ -52,11 +52,11 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     RhoUtility.Initialize.Prediction( &core->PredictionPair.x, X_INSTANCE_NAME, core->Height );
     RhoUtility.Initialize.Prediction( &core->PredictionPair.y, Y_INSTANCE_NAME, core->Width  );
 
-#ifdef USE_DETECTION_MAP
+#ifdef __USE_DETECTION_MAP__
     /* Detection map */
     DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
 #endif
-#ifdef USE_DECOUPLING
+#ifdef __USE_DECOUPLING__
     /* Frame Conversion Model Connection */
     RhoInterrupts.INIT_FROM_CORE( core );
 #endif
@@ -79,13 +79,11 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
     }
 }
 
-/* Calculate and process data in variance band from density filter to generat
- e predictions */
+/* Calculate and process data in variance band from density filter to generate predictions */
 void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t * prediction )
 {
-    LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );
-    
-    rho_detection_variables _;
+    LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );   
+    static rho_detection_variables _;
     RhoUtility.Reset.Detect( &_, density_map, prediction );
     core->TotalCoverage = 0;
     core->FilteredCoverage = 0;
@@ -133,17 +131,15 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
     
+#ifdef __USE_DETECTION_MAP__
     RhoUtility.Predict.ReportObservationLists( core );
-
-#ifdef USE_DETECTION_MAP
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair );
 #endif
     
 #ifdef __PSM__
     if( ISTIMEDOUT( core->Timestamp, PSM_UPDATE_PERIOD ) )
-    {
+    { /* Process both dimensions' predictive state */
         LOG_PSM(PSM_DEBUG, "Updating PSM\n");
-        /* Process both dimensions' predictive state */
         RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
         core->Timestamp = TIMESTAMP();
     }

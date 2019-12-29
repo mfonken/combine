@@ -130,5 +130,5 @@ void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
 
     LOG_RHO(DEBUG_0, "Quadrants are [%d][%d][%d][%d] (%d|%d)\n", Q0, Q1, Q2, Q3, RhoVariables.registers.Cx, RhoVariables.registers.Cy);
     LOG_RHO(DEBUG_0, "# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
-    LOG_RHO(DEBUG_0, ">>>frame density is %d<<<\n", RhoVariables.ram.QT);
+    LOG_RHO(DEBUG_0, "\t\t\t\tQT %d\n", RhoVariables.ram.QT);
 }
