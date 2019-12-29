@@ -67,7 +67,8 @@ void UpdateAlphaHMM( hidden_markov_model_t * model )
     /* 1. α_i(0) = π_i x B_i(y_0) */
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
-        model->alpha[0][i] = model->pi[i] * GetProbabilityFromEmission( &model->B[i], o );
+        floating_t p = model->pi[i], P = GetProbabilityFromEmission( &model->B[i], o );
+        model->alpha[0][i] = p * P;
     }
     
     /*  2. α_i(t) = B_i(y_(t)) x ∑_{j=0}^N ( α_j(t-1) x A_{ji} ) */
@@ -290,6 +291,7 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
 #endif
     }
 #else
+    floating_t n, d; uint8_t T = model->O.length; hmm_observation_t o;
     /* Source - https://en.wikipedia.org/wiki/Baum–Welch_algorithm#cite_note-6 */
     /* B_i^*(v_k) = ( ∑_{t=1}^{T-1} ( 1_{y_t=v_k} x γ_i(t) ) ) / ( ∑_{t=1}^{T-1} γ_i(t) ) */
     for( uint8_t j = 0; j < NUM_STATES; j++ )
@@ -299,12 +301,12 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
             n = 0; d = 0;
             for( uint8_t t = 0; t < T; ++t )
             {
-                o = GetIndexObservationBuffer( &model->O, t );
+                o = BOUNDU(GetIndexObservationBuffer( &model->O, t ), NUM_OBSERVATION_SYMBOLS - 1);
                 if( o == k )
                     n += model->gamma[t][j];
                 d += model->gamma[t][j];
             }
-            model->B[j][k] = SOFTEN( n / d );
+            model->B[j][k] = SOFTEN( ZDIV( n, d ) );
         }
     }
 #endif
@@ -312,15 +314,18 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
 
 void BaumWelchSolveHMM( hidden_markov_model_t * model, floating_t DELTA )
 {
-    if( model->O.length <= 1 ) return;
+    if( model->O.length < MAX_OBSERVATIONS - 1 ) return;
     HMMFunctions.Update.All( model );
     do
     {
         HMMFunctions.Update.Pi( model );
         HMMFunctions.Update.A( model );
         HMMFunctions.Update.B( model );
+#ifdef HMM_DEBUG
         HMMFunctions.Print( model );
+#endif
     } while( HMMFunctions.Update.All( model ) > DELTA );
+    model->O.length = 0;
 }
 
 void PrintHMM( hidden_markov_model_t * model )
@@ -338,10 +343,17 @@ void PrintHMM( hidden_markov_model_t * model )
     for( uint8_t i = 0; i < NUM_STATES; i++ )
     {
         LOG_HMM_BARE(HMM_DEBUG, "\t");
+#ifdef HMM_GAUSSIAN_EMISSIONS
 #ifdef HMM_2D_EMISSIONS
         LOG_HMM_BARE(HMM_DEBUG, "µ:(%8.4f, %8.4f) ∑:[%7.4f, %7.4f; %7.4f, %7.4f]", model->B[i].mean.a, model->B[i].mean.b, model->B[i].covariance.a, model->B[i].covariance.b, model->B[i].covariance.c, model->B[i].covariance.d);
 #else
         LOG_HMM_BARE(HMM_DEBUG, "[%8.4f,%8.4f]", model->B[i].mean, model->B[i].std_dev);
+#endif
+#else
+        LOG_HMM_BARE(HMM_DEBUG, "[");
+        for( uint8_t k = 0; k < NUM_OBSERVATION_SYMBOLS; k++)
+            LOG_HMM_BARE(HMM_DEBUG, "%8.4f%s", model->B[i][k], (k==NUM_OBSERVATION_SYMBOLS-1?"":","));
+        LOG_HMM_BARE(HMM_DEBUG, "]");
 #endif
         if( !i ) { LOG_HMM_BARE(HMM_DEBUG, " \tpi: "); }
         else { LOG_HMM_BARE(HMM_DEBUG, " \t    "); }
@@ -349,5 +361,4 @@ void PrintHMM( hidden_markov_model_t * model )
     }
     LOG_HMM_BARE(HMM_DEBUG, "\n");
 }
-
 #endif

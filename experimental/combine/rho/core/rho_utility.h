@@ -14,11 +14,11 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "statistics.h"
+//#include "statistics.h"
 #include "rho_structure.h"
 #include "rho_types.h"
 
-#ifdef USE_DECOUPLING
+#ifdef __USE_DECOUPLING__
 #include "rho_deco.h"
 #endif
 
@@ -33,12 +33,16 @@ extern "C" {
     FOREGROUND_DENSITY_MAP_Y[2000],
     FOREGROUND_DENSITY_MAP_X[2000],
     BACKGROUND_DENSITY_MAP_Y[2000],
-    BACKGROUND_DENSITY_MAP_X[2000];
+    BACKGROUND_DENSITY_MAP_X[2000],
+    BOUND_DENSITY_MAP_Y[2000],
+    BOUND_DENSITY_MAP_X[2000];
 #else
     FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
     FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE],
     BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
-    BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE];
+    BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE],
+    BOUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
+    BOUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE];
 #endif
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,6 +67,10 @@ extern "C" {
     bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
     void DetectRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
     void DetectRegionRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
+#ifdef __USE_ZSCORE_THRESHOLD__
+    index_t ZscoreLowerBoundRhoUtility( rho_detection_variables * );
+    bool ZscoreRegionRhoUtility( rho_detection_variables *, bool );
+#endif
     void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * );
     void CalculateChaosRhoUtility( rho_detection_variables *, prediction_t * );
     void ScoreRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
@@ -130,6 +138,10 @@ extern "C" {
         bool (*LowerBound)( rho_detection_variables * );
         void (*Regions)( rho_detection_variables *, density_map_t *, prediction_t *);
         void (*Region)( rho_detection_variables *, density_map_t *, prediction_t * );
+#ifdef __USE_ZSCORE_THRESHOLD__
+        index_t (*ZLower)( rho_detection_variables * );
+        bool (*ZRegion)( rho_detection_variables *, bool );
+#endif
         void (*SubtractBackground)( rho_detection_variables *);
         void (*CalculateChaos)( rho_detection_variables *, prediction_t * );
         void (*ScoreRegions)( rho_detection_variables *, density_map_t *, prediction_t * );
@@ -150,7 +162,9 @@ extern "C" {
     typedef struct
     {
         void (*CumulativeMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
-        void (*CumulativeAverage)( floating_t, floating_t *, int * );
+        void (*CumulativeAverage)( floating_t, floating_t *, index_t * );
+        void (*CumulateAverageStandardDeviation)( floating_t, cumulative_avg_stdv_t * );
+        floating_t (*Variance)( cumulative_avg_stdv_t * );
         void (*RegionScore)( region_t *, density_t, byte_t );
         density_2d_t (*Centroid)( density_map_unit_t *, index_t, index_t *, density_t );
         void (*Background)( rho_core_t * );
@@ -206,6 +220,10 @@ extern "C" {
         .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
         .Detect.Regions = DetectRegionsRhoUtility,
         .Detect.Region = DetectRegionRhoUtility,
+#ifdef __USE_ZSCORE_THRESHOLD__
+        .Detect.ZLower = ZscoreLowerBoundRhoUtility,
+        .Detect.ZRegion = ZscoreRegionRhoUtility,
+#endif
         .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,
         .Detect.CalculateChaos = CalculateChaosRhoUtility,
         .Detect.ScoreRegions = ScoreRegionsRhoUtility,
@@ -221,6 +239,8 @@ extern "C" {
         
         .Generate.CumulativeMoments = GenerateCumulativeMomentsStatistics,
         .Generate.CumulativeAverage = GenerateCumulativeAverageStatistics,
+        .Generate.CumulateAverageStandardDeviation = CumulateAverageStandardDeviationStatistics,
+        .Generate.Variance = GetVarianceFromStatistic,
         .Generate.RegionScore = GenerateRegionScoreRhoUtility,
         .Generate.Centroid = GenerateCentroidRhoUtility,
         .Generate.Packet = GeneratePacketRhoUtility,

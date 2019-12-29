@@ -18,6 +18,7 @@ Vec3b ap       (150, 255, 150);
 Vec3b bp       (150, 150, 255);
 //Vec3b white    (255, 255, 255);
 Vec3b red      (  0,   0, 255);
+Vec3b green    (  0, 255,   0);
 Vec3b blue     (255,   0,   0);
 
 Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
@@ -225,7 +226,7 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
 
 void TauDrawer::DrawDensityGraph(Mat &M)
 {
-    int u, v, w = width, h = height;
+    int u, v, vv, w = width, h = height;
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
     rangex[3] = { w, (int)rho.core.Centroid.x, 0 },
@@ -268,18 +269,20 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         
         /* Density Maps */
         pthread_mutex_lock(&rho.density_map_pair_mutex);
-        int dX[h], dY[w], fX[h], fY[w];
+        int dX[h], dY[w], fX[h], fY[w], bX[h], bY[w];
         for( y1 = rangey[i]; y1 > rangey[j];  )
         {
             --y1;
             dX[y1] = INR(rho.core.DensityMapPair.x.map[y1], h);
             fX[y1] = INR(rho.core.DensityMapPair.x.background[y1], h);
+            bX[y1] = INRLH(rho.core.DensityMapPair.x.bound[y1], -h, h);
         }
         for( x1 = rangex[i]; x1 > rangex[j];  )
         {
             --x1;
             dY[x1] = INR(rho.core.DensityMapPair.y.map[x1], w);
             fY[x1] = INR(rho.core.DensityMapPair.y.background[x1], w);
+            bY[x1] = INRLH(rho.core.DensityMapPair.y.bound[x1], -w, w);
         }
         pthread_mutex_unlock(&rho.density_map_pair_mutex);
         
@@ -291,17 +294,22 @@ void TauDrawer::DrawDensityGraph(Mat &M)
 //        line(RMY, Point(0,nv1d), Point(H,nv1d), yellowish);
 //        line(RMY, Point(0,nv2d), Point(H,nv2d), yellowish);
 #endif
-        int vprev = 0, uprev = 0, underprev = 0, overprev = 0;
+        int vprev = 0, uprev = 0, vvprev = 0, underprev = 0, overprev = 0;
         for( y2 = rangey[i]; y2 > rangey[j];  )
         {
             --y2;
             u = INR(OP_ALIGN((fX[y2]/DENSITY_SCALE),w),w);
             v = INR(OP_ALIGN((dX[y2]/DENSITY_SCALE),w),w);
             
+            vv = bX[y2]/DENSITY_SCALE;
+            bool vvt = vv>=0;
+            vv = INR(OP_ALIGN(abs(vv),w),w);
+            
             if(v>ndm)
             {
 //                M.at<Vec3b>(y2,v) = white;
                 line(M, Point(vprev,y2), Point(v,y2-1), white);
+                line(M, Point(vvprev,y2), Point(vv,y2-1), (vvt?green:red));
                 underprev = 0;
                 overprev = 0;
             }
@@ -322,6 +330,8 @@ void TauDrawer::DrawDensityGraph(Mat &M)
             }
             vprev = v;
             uprev = u;
+            vvprev = vv;
+            
             pT = !pT;
 //            first = 0;
 #ifdef DRAW_RHO_MAPS
@@ -336,19 +346,24 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         line(RMX, Point(0,mv2d), Point(W,mv2d), yellowish);
 #endif
         
-        vprev = 0; uprev = 0; underprev = 0; overprev = 0;
+        vprev = 0; uprev = 0; vvprev = 0; underprev = 0; overprev = 0;
         for( x2 = rangex[i]; x2 > rangex[j]; --x2 )
         {
             u = INR(OP_ALIGN((fY[x2]/DENSITY_SCALE),h),h);
             v = INR(OP_ALIGN((dY[x2]/DENSITY_SCALE),h),h);
-
+            
+            vv = bY[x2]/DENSITY_SCALE;
+            bool vvt = vv>=0;
+            vv = INR(OP_ALIGN(abs(vv),h),h);
+            
             if(v>mdm)
             {
 //                M.at<Vec3b>(v,x2) = white;
                 line(M, Point(x2,vprev), Point(x2-1,v), white);
+                line(M, Point(x2,vvprev), Point(x2-1,vv), (vvt?green:red));
 //                line(M, Point(x2,v), Point(x2,h), white);
-                underprev = 0;
-                overprev = 0;
+//                underprev = 0;
+//                overprev = 0;
             }
             else
             {
@@ -365,14 +380,14 @@ void TauDrawer::DrawDensityGraph(Mat &M)
 
 //                line(M, Point(x2,under), Point(x2,h), white);
 //                line(M, Point(x2,under), Point(x2,over), bluish);
-
-
-                underprev = under;
-                overprev = over;
+                
+//                underprev = under;
+//                overprev = over;
             }
 
             vprev = v;
             uprev = u;
+            vvprev = vv;
 #ifdef DRAW_RHO_MAPS
             u = INR(OP_ALIGN((fY[x2]/DENSITY_SCALE),RHO_MAPS_HEIGHT),RHO_MAPS_HEIGHT);
             line(RMX, Point(x2,RHO_MAPS_HEIGHT), Point(x2,u), greenish);

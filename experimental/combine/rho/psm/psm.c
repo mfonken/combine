@@ -9,7 +9,7 @@
 #ifdef __PSM__
 
 #include "psm.h"
-#include "statistics.h"
+//#include "statistics.h"
 
 void InitializePSM( psm_t * model, const char * name )
 {
@@ -75,7 +75,13 @@ void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
     LOG_PSM_BARE(PSM_DEBUG, "\n");
     
 //    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
-    KumaraswamyFunctions.GetVector( &model->kumaraswamy, model->current_observation.a, model->state_intervals );
+    floating_t o
+#ifdef HMM_2D_EMISSIONS
+     = model->current_observation.a;
+#else
+     = model->current_observation;
+#endif
+    KumaraswamyFunctions.GetVector( &model->kumaraswamy, o, model->state_intervals );
     
     LOG_PSM(PSM_DEBUG_UPDATE, "Update:");
     for( uint8_t i = 0; i < NUM_STATE_GROUPS; i++ )
@@ -86,7 +92,7 @@ void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
 void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
     /* Update state path prediction to best cluster */
-//    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
+    HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
 //    return;
     /* Calculate current observation and update observation matrix */
     PSMFunctions.DiscoverStateBands( model, &model->state_bands );
@@ -180,7 +186,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 //########################################################//
     gaussian2d_t band_gaussians[5] = { 0 };
     int8_t num_clusters_in_bands[5] = { 0 };
-    cumulative_average_t band_centers[5][3] = { 0 };
+    cumulative_avg_t band_centers[5][3] = { 0 };
 //########################################################//
     while(num_to_process-- > 0)
     {
@@ -222,9 +228,9 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
         //            band_gaussian.covariance.b = 0; band_gaussian.covariance.c = 0;
         if(band_gaussians[current_band_id].mean.a == 0)
         {
-            band_centers[current_band_id][0] = (cumulative_average_t){ gaussian->mean.a, 1 };
-            band_centers[current_band_id][1] = (cumulative_average_t){ gaussian->mean.b, 1 };
-            band_centers[current_band_id][2] = (cumulative_average_t){ gaussian->covariance.d, 1 };
+            band_centers[current_band_id][0] = (cumulative_avg_t){ gaussian->mean.a, 1 };
+            band_centers[current_band_id][1] = (cumulative_avg_t){ gaussian->mean.b, 1 };
+            band_centers[current_band_id][2] = (cumulative_avg_t){ gaussian->covariance.d, 1 };
             band_gaussians[current_band_id] = *gaussian;
             num_clusters_in_bands[current_band_id]++;
         }
@@ -330,12 +336,17 @@ uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, 
 {
     /* Determine target observation band */
     emission_t * state_emission = &model->hmm.B[observation_state];//GetProbabilityFromEmission( &model->hmm.B[observation_state],  );
+#ifdef HMM_GAUSSIAN_EMISSIONS
 #ifdef HMM_2D_EMISSIONS
     if( confidence != NULL) *confidence = state_emission->covariance.a;
     return state_emission->mean.a;
 #else
     if( confidence != NULL) *confidence = state_emission->std_dev;
     return state_emission->mean;
+#endif
+#else
+    // TODO: Do discrete emiisions have confidence
+    return (uint8_t)*state_emission;
 #endif
 }
 

@@ -7,7 +7,7 @@
 #define rho_structure_h
 
 #define DUAL_FILTER_CYCLE(X) \
-for( X = 1, X##_ = 2; X##_ > 0; X--, X##_-- )
+for( X = 0, X##_ = 1; X##_ <= 2; X++, X##_++ )
 
 #define BOUNDED_CYCLE_DUAL(A,B,C,D,E,F,G) \
 for(A = B, D = 0, F = 0; A > C; --A, D = E[A], F = G[A] )

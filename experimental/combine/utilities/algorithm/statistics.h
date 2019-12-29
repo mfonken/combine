@@ -18,14 +18,23 @@ extern "C" {
 
 typedef struct
 {
-    floating_t value;
-    int count;
-} cumulative_average_t;
+    floating_t avg;
+    index_t n;
+} cumulative_avg_t;
+
+typedef struct
+{
+    floating_t avg;
+    floating_t S;
+    index_t n, max_n;
+} cumulative_avg_stdv_t;
 
 void GenerateCumulativeMomentsStatistics( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
-void GenerateCumulativeAverageStatistics( floating_t, floating_t *, int * );
-void CumulateAverageStatistics( floating_t, cumulative_average_t * );
-    
+void GenerateCumulativeAverageStatistics( floating_t, floating_t *, index_t * );
+void CumulateAverageStatistics( floating_t, cumulative_avg_t * );
+void CumulateAverageStandardDeviationStatistics( floating_t, cumulative_avg_stdv_t * );
+floating_t GetVarianceFromStatistic( cumulative_avg_stdv_t * );
+
 #ifdef __cplusplus
 }
 #endif

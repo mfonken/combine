@@ -11,9 +11,6 @@
 
 #include "rho_config.h"
 
-#define BEACON_PACKET_ID 0x11
-#define BEACON_DEFAULT_PERIOD 20 // cycles
-
 /* Packet Generation Settings */
 #define YES 1
 #define NO  0
@@ -114,7 +111,7 @@ byte_t
     includes;
 timestamp_t
     timestamp;
-uint8_t
+byte_t
     padding[6];
 } packet_header_t;
 

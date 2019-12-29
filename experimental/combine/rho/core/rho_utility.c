@@ -44,8 +44,10 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
     
     core->DensityMapPair.x.map          = FOREGROUND_DENSITY_MAP_X;
     core->DensityMapPair.x.background   = BACKGROUND_DENSITY_MAP_X;
+    core->DensityMapPair.x.bound        = BOUND_DENSITY_MAP_X;
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;
     core->DensityMapPair.y.background   = BACKGROUND_DENSITY_MAP_Y;
+    core->DensityMapPair.y.bound        = BOUND_DENSITY_MAP_Y;
     
     KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
     FSMFunctions.Sys.Initialize( &core->StateMachine, "A", &core->StateTransitions, CHAOTIC );
@@ -135,6 +137,14 @@ void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * densi
     _->raw_density_moment = 0;
     _->total_density = 0;
     _->filtered_density = 0;
+#ifdef __USE_ZSCORE_THRESHOLD__
+    _->z_thresh_factor = 5;
+    _->z_stat.max_n = 5;//density_map->length;
+#endif
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+    memset( _->region_boundaries, 0, sizeof(_->region_boundaries[0])*MAX_REGIONS*2);
+    _->region_boundary_index = 0;
+#endif
     
     DUAL_FILTER_CYCLE(_->cycle)
     {
@@ -170,29 +180,26 @@ void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * densi
     LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d\n", _->total_regions);
 
     RhoUtility.Detect.SortRegions( _, prediction );
-//    printf("N%d\n", _->total_regions);
-//    int c[MAX_REGIONS] = {-1, -1, -1, -1};
-//    for( int i = 0; i < _->total_regions; i++)
-//    {
-//        order_t* o = &prediction->RegionsOrder[i];
-//        region_t* curr = &prediction->Regions[o->index];
-//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location);
-//
-//        c[i] = o->index;
-//        bool already_has = false;
-//        for(int j = i - 1; j >= 0; j--)
-//        {
-//            if(c[j] == c[i])
-//            {
-//                already_has = true;
-//                printf("Already has %d at %d and %d\n", c[i], i, j);
-//                break;
-//            }
-//        }
-//    }
-//    printf("\n");
     
-    density_map->centroid = (floating_t)_->raw_density_moment/(floating_t)_->total_density;
+    floating_t proposed_center = (floating_t)_->raw_density_moment/(floating_t)_->total_density;
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+    if(_->region_boundary_index > MAX_REGIONS)
+        printf("");
+    for( uint8_t i = 0; i < _->region_boundary_index - 1; i += 2)
+    {
+        if( proposed_center < _->region_boundaries[i]
+           && proposed_center > _->region_boundaries[i+1] )
+        {
+            if( fabs(_->region_boundaries[i] - proposed_center)
+               > fabs(_->region_boundaries[i+1] - proposed_center) )
+                i++;
+            proposed_center = _->region_boundaries[i] + RHO_GAP_MAX / 2;
+            break;
+        }
+    }
+#endif
+    density_map->centroid = BOUNDU(proposed_center, density_map->length);
+
     LOG_RHO(RHO_DEBUG_DETECT, "%s> Centroid: %d | Moment: %d | Density: %d\n", prediction->Name, (int)density_map->centroid, _->raw_density_moment, _->total_density);
 }
 
@@ -221,13 +228,9 @@ inline void DetectRegionsRhoUtility( rho_detection_variables * _, density_map_t 
 { /* Detect regions - START */
     BOUNDED_CYCLE_DUAL(_->x, _->start, _->end, _->curr, density_map->map, _->background_curr, density_map->background)
     {
+        density_map->bound[_->x] = 0;
         if( !_->recalculate )
-        {/* Update max */
-            if(_->curr > _->maximum)
-                _->maximum = _->curr;
-            
             RhoUtility.Detect.SubtractBackground( _ );
-        }
         RhoUtility.Detect.Region( _, density_map, prediction );
     }
 } /* Detect regions - END */
@@ -238,6 +241,10 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * 
     {
         _->total_density += _->curr;
         _->raw_density_moment += _->curr * (density_t)_->x;
+
+        /* Update max */
+        if(_->curr > _->maximum)
+            _->maximum = _->curr;
         
 #ifdef USE_BACKGROUNDING
         /* Subtract background */
@@ -253,26 +260,70 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * 
         _->curr = 0;
 }
 
+#ifdef __USE_ZSCORE_THRESHOLD__
+inline index_t ZscoreLowerBoundRhoUtility( rho_detection_variables * _ )
+{
+    floating_t variance = RhoUtility.Generate.Variance( &_->z_stat );
+    _->z_thresh = (index_t)(sqrt(variance) * _->z_thresh_factor);
+    return _->z_thresh;
+}
+
+inline bool ZscoreRegionRhoUtility( rho_detection_variables * _, bool update )
+{
+    if(update)
+    {
+        RhoUtility.Generate.CumulateAverageStandardDeviation( _->curr, &_->z_stat );
+        _->has_stat_update = true;
+    }
+    if(_->z_stat.n >= _->z_stat.max_n)
+    {
+        sdensity_t delta = _->curr - (sdensity_t)_->z_stat.avg;
+        if( -delta > (_->has_stat_update?RhoUtility.Detect.ZLower( _ ):_->z_thresh) ) return false;
+    }
+    return true;
+}
+#endif
+
 inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 {
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+    bool had_region = _->has_region;
+#endif
+    
+#ifdef __USE_ZSCORE_THRESHOLD__
+        density_map->bound[_->x] = MAX((sdensity_t)(_->z_stat.avg - (floating_t)_->z_thresh),0) * (RhoUtility.Detect.ZRegion( _, false )?1:-1);
+#endif
+    
     /* Check if CMA value is in band */
-    if( _->curr > _->filter_band_lower )
+    if( _->curr > _->filter_band_lower)
     {
+        /* reset flag and counter */
+#ifdef __USE_ZSCORE_THRESHOLD__
+        if(!_->has_region)
+            _->z_stat.avg = _->curr;
+        _->has_region = RhoUtility.Detect.ZRegion( _, true );
+#else
+        _->has_region = 1;
+#endif
+        _->gap_counter = 0;
+        
         /* De-offset valid values */
         _->curr -= _->filter_band_lower;
 
         /* Process new values into region */
-        RhoUtility.Generate.CumulativeMoments( (floating_t)_->curr, (floating_t)_->x, &_->average_curr, &_->average_moment, &_->average_counter );
+        if( _->curr >= 0 )
+           RhoUtility.Generate.CumulativeMoments( (floating_t)_->curr, (floating_t)_->x, &_->average_curr, &_->average_moment, &_->average_counter );
 
         /* Increment width */
         _->width++;
-
-        /* reset flag and counter */
-        _->has_region = 1; _->gap_counter = 0;
     }
 
     /* Process completed regions and increment count */
     else if( ++_->gap_counter > RHO_GAP_MAX && _->has_region && _->total_regions < MAX_REGIONS
+#ifdef __USE_ZSCORE_THRESHOLD__
+            /* Check if region continues below boundary within z-threshold (doesn't drop off) */
+            && !( RhoUtility.Detect.ZRegion( _, false ) && _->curr > (index_t)_->z_stat.avg - _->z_thresh )
+#endif
 #ifdef __USE_RUNNING_AVERAGE__
     )
     {
@@ -310,13 +361,23 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
         /* reset variables */
         _->average_moment = 0.; _->average_curr = 0.; _->average_counter = 0.;
         _->has_region = 0; _->gap_counter = 0;
-    }
 
+#ifdef __USE_ZSCORE_THRESHOLD__
+        _->z_stat.avg = 0.; _->z_stat.S = 0;
+        _->z_stat.n = 0; _->z_index = 0;
+#endif
+    }
     else if (!_->has_region )
-    {
-        /* reset width */
+    { /* reset width */
         _->width = 0;
     }
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+    if(had_region != _->has_region
+       && _->region_boundary_index < MAX_REGIONS*2 )
+    {
+        _->region_boundaries[_->region_boundary_index++] = _->x;
+    }
+#endif
 }
 
 void CalculateChaosRhoUtility( rho_detection_variables * _, prediction_t * prediction )
@@ -435,7 +496,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
             curr->score
             );
         if( curr->score > 100. )
-            printf(" \n");
+            printf("");
     }
     for(; i < MAX_REGIONS; i++ )
     {
@@ -456,7 +517,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
             if(c2[j] == c2[i])
             {
                 already_has = true;
-                printf("Already has %d at %d and %d\n", c2[i], i, j);
+                LOG_RHO(RHO_DEBUG_DETECT_2, "Already has %d at %d and %d\n", c2[i], i, j);
                 break;
             }
         }
@@ -714,13 +775,10 @@ void CombineAxisProbabilitesRhoUtility( prediction_pair_t * prediction )
 
 void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_core_t * core )
 {
-//    _->Centroid.x = RhoUtility.Calculate.PredictionCenter( _->Primary.x, _->Secondary.x, core->Height);
-//    _->Centroid.y = RhoUtility.Calculate.PredictionCenter( _->Primary.y, _->Secondary.y, core->Width);
-    
     _->Centroid.x = (index_t)core->DensityMapPair.y.centroid;
     _->Centroid.y = (index_t)core->DensityMapPair.x.centroid;
 
-    LOG_RHO(RHO_DEBUG_UPDATE_2, "A: Centroid.x>%d | Centroid.y>%d\n", _->Centroid.x, _->Centroid.y);
+    LOG_RHO(RHO_DEBUG_UPDATE_2, "Centroid.x>%d | Centroid.y>%d\n", _->Centroid.x, _->Centroid.y);
 
     core->Primary   = _->Primary;
     core->Secondary = _->Secondary;
@@ -789,16 +847,16 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
     switch(core->StateMachine.state)
 //#endif
     {
-        case CHAOTIC:
-            RhoUtility.Reset.DensityMapPairKalmans( core );
+        default:
+            RhoUtility.Calculate.TargetCoverageFactor( core );
+            //RhoUtility.Reset.DensityMapPairKalmans( core );
+            break;
         case TARGET_POPULATED:
             Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
             Kalman.Print( &core->TargetFilter );
         case OVER_POPULATED:
         case UNDER_POPULATED:
             RhoUtility.Calculate.TargetCoverageFactor( core );
-            break;
-        default:
             break;
     }
     
@@ -911,7 +969,7 @@ void GenerateRegionScoreRhoUtility( region_t * region, density_t total_density, 
         delta_p = (floating_t)peak / (floating_t)region->maximum;
     region->score = sqrt( REGION_SCORE_FACTOR * ( ( delta_d * delta_d ) + ( delta_p * delta_p ) ) );
     if( region->score > 100. )
-        printf(" \n");
+        printf("");
 }
 
 /* Generic centroid and mass calculator */

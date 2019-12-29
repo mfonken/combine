@@ -18,7 +18,7 @@
 
 Rho::Rho( int width, int height ) : width(width), height(height)
 {
-    LOG_RHO(ALWAYS, "Initializing Rho Utility: %dx%d & [KTarg-%f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
+    LOG_RHO(RHO_DEBUG, "Initializing Rho Utility: %dx%d & [KTarg-%f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     
     pthread_mutex_init(&density_map_pair_mutex, NULL);
     pthread_mutex_init(&c_mutex, NULL);
@@ -41,7 +41,8 @@ double Rho::Perform( cimage_t & img, GlobalPacket * p )
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
-    RhoCore.Perform( &core, backgrounding_event );
+    if(core.Q[0] + core.Q[1] + core.Q[2] + core.Q[3])
+        RhoCore.Perform( &core, backgrounding_event );
     gettimeofday( &b, NULL);
 
     /* * * * * * * * * * */

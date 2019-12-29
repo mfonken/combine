@@ -20,7 +20,7 @@
 #include "environment_master.h"
 #include "image_utility.hpp"
 #include "rho_wrapper.hpp"
-#include "statistics.h"
+//#include "statistics.h"
 
 
 class Tau : public TestInterface
@@ -39,7 +39,7 @@ public:
     void        UpdatePrediction( void );
     void        PrintPacket( GlobalPacket *, int );
     
-    int                 count,
+    index_t                 count,
                         accuracy_count,
                         stddev_sum;
     double              avg,

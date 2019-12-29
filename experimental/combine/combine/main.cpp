@@ -32,9 +32,11 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     
     while(1)
     {
-            tau.GetDensitiesFrame(local_frame);
-            imshow(TITLE_STRING, local_frame);
-#ifdef USE_DETECTION_MAP
+#ifndef AUTOMATION_RUN
+        tau.GetDensitiesFrame(local_frame);
+        imshow(TITLE_STRING, local_frame);
+#endif
+#ifdef __USE_DETECTION_MAP__
 #ifdef __PSM__
             imshow("Detection Map", tau.rho_drawer.GetDetectionMapFrame());
 #endif
@@ -58,16 +60,11 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
         ofstream file;
         switch(c)
         {
+            default:
+                break;
             case ' ':
                 if(env.status != LIVE) env.Resume();
                 else env.Pause();
-                break;
-            default:
-//                if(tau.utility.Loop(c))
-//                {
-//                    tau.utility.Trigger();
-//                    tau.Trigger();
-//                }
                 break;
             case 's':
                 env.Pause();
