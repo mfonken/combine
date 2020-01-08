@@ -68,8 +68,7 @@ void PerformRhoSystemProcess( void )
 {
     if( RhoSystem.Variables.Flags->Active == false ) return;
     RhoSystem.Functions.Perform.FrameCapture();
-//    RhoCore.Perform( &RhoSystem.Variables.Utility, RhoSystem.Variables.Flags->Backgrounding );
-//    RhoSystem.Functions.Perform.TransmitPacket();
+    RhoSystem.Functions.Perform.TransmitPacket();
 }
 
 void ProcessRhoSystemFrameCapture( void )
@@ -78,8 +77,6 @@ void ProcessRhoSystemFrameCapture( void )
     RhoSystem.Functions.Platform.Interrupt.Enable();
     CaptureAndProcessFrame();
     RhoSystem.Functions.Platform.Interrupt.Disable();
-//    DrawDensityMap( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH );
-//    DrawDensityMap( RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
     PrintDensityMaps( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH, RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
 }
 
@@ -105,7 +102,7 @@ void CaptureAndProcessFrame( void )
     EnableCaptureCallback();
 
     uint32_t TopLeft = 0, TopRight = 0, BtmLeft = 0, BtmRight = 0;
-    //ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
+    ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
     ProcessFrameSectionControl( RhoSystem.Variables.Utility.Height, &BtmLeft, &BtmRight );
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = TopLeft;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = TopRight;
@@ -359,7 +356,7 @@ void DeactivateRhoSystem( void )
 
 inline void TransmitRhoSystemPacket( void )
 {
-    //RhoSystem.Functions.Platform.Host.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
+    RhoSystem.Functions.Platform.Host.Transmit( (byte_t *)&RhoSystem.Variables.Utility.Packet, sizeof(packet_t) );
 }
 /***************************************************************************************/
 /*                                  Initializers                                       */

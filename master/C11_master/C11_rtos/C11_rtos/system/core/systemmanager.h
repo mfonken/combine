@@ -29,17 +29,17 @@ void PerformSystemManagerSubactivity( system_subactivity_t );
 void PerformSystemManagerEnableProfileEntryState( system_profile_entry_t * );
 void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * );
 
-void RegisterystemManangerOSTaskList( os_task_list_t * );
-void RegisterystemManangerTaskShelf( system_task_shelf_t * );
-void RegisterystemManangerSubactivityMap( system_subactivity_map_t * );
-void RegisterystemManagerProfile( system_profile_t * );
-void RegisterystemManagerProfileEntry( system_profile_entry_t * );
-void RegisterystemManagerStateProfileList( system_state_profile_list_t * );
-void RegisterystemManagerState( system_state_t );
-void RegisterystemManagerActivity( system_activity_t );
-void RegisterystemManagerSubactivity( system_subactivity_t );
-void RegisterystemManagerError( system_error_t );
-void RegisterystemManagerConsumption( system_consumption_t );
+void RegisterSystemManagerOSTaskList( os_task_list_t * );
+void RegisterSystemManagerTaskShelf( system_task_shelf_t * );
+void RegisterSystemManagerSubactivityMap( system_subactivity_map_t * );
+void RegisterSystemManagerProfile( system_profile_t * );
+void RegisterSystemManagerProfileEntry( system_profile_entry_t * );
+void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
+void RegisterSystemManagerState( system_state_t );
+void RegisterSystemManagerActivity( system_activity_t );
+void RegisterSystemManagerSubactivity( system_subactivity_t );
+void RegisterSystemManagerError( system_error_t );
+void RegisterSystemManagerConsumption( system_consumption_t );
 
 system_subactivity_map_entry_t * GetSystemManagerSubactivityMapEntryById( system_subactivity_t );
 system_task_shelf_entry_t * GetSystemManagerTaskShelfEntryById( system_task_shelf_entry_id_t );
@@ -100,17 +100,17 @@ static system_functions SystemFunctions =
     .Perform.Subactivity        = PerformSystemManagerSubactivity,
     .Perform.EnableProfileEntry = PerformSystemManagerEnableProfileEntryState,
     .Perform.DisableProfileEntry= PerformSystemManagerEnableProfileEntryState,
-    .Register.OSTaskList        = RegisterystemManangerOSTaskList,
-    .Register.TaskShelf         = RegisterystemManangerTaskShelf,
-    .Register.SubactivityMap    = RegisterystemManangerSubactivityMap,
-    .Register.Profile           = RegisterystemManagerProfile,
-    .Register.ProfileEntry      = RegisterystemManagerProfileEntry,
-    .Register.StateProfileList  = RegisterystemManagerStateProfileList,
-    .Register.State             = RegisterystemManagerState,
-    .Register.Activity          = RegisterystemManagerActivity,
-    .Register.Subactivity       = RegisterystemManagerSubactivity,
-    .Register.Error             = RegisterystemManagerError,
-    .Register.Consumption       = RegisterystemManagerConsumption,
+    .Register.OSTaskList        = RegisterSystemManagerOSTaskList,
+    .Register.TaskShelf         = RegisterSystemManagerTaskShelf,
+    .Register.SubactivityMap    = RegisterSystemManagerSubactivityMap,
+    .Register.Profile           = RegisterSystemManagerProfile,
+    .Register.ProfileEntry      = RegisterSystemManagerProfileEntry,
+    .Register.StateProfileList  = RegisterSystemManagerStateProfileList,
+    .Register.State             = RegisterSystemManagerState,
+    .Register.Activity          = RegisterSystemManagerActivity,
+    .Register.Subactivity       = RegisterSystemManagerSubactivity,
+    .Register.Error             = RegisterSystemManagerError,
+    .Register.Consumption       = RegisterSystemManagerConsumption,
     .Enstate.TaskShelfEntry     = EnstateSystemManagerTaskShelfEntry,
     .Enstate.StateProfile       = EnstateSystemManagerStateProfile,
     .Get.SubactivityMapEntry    = GetSystemManagerSubactivityMapEntryById,

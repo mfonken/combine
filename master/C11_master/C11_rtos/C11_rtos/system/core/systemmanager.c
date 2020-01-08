@@ -62,13 +62,13 @@ void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * entr
     os_task_data_t * task_data = SystemFunctions.Get.TaskData( entry->ID );
     InterfaceFunctions.OS.Suspend(task_data);
 }
-void RegisterystemManangerOSTaskList( os_task_list_t * task_list )
+void RegisterSystemManagerOSTaskList( os_task_list_t * task_list )
 {
     System.os_tasks = task_list;
     for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
         InterfaceFunctions.OS.Create( &((*System.os_tasks)[i]) );
 }
-void RegisterystemManangerTaskShelf( system_task_shelf_t * shelf )
+void RegisterSystemManagerTaskShelf( system_task_shelf_t * shelf )
 {
     for(uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++)
     {
@@ -79,17 +79,17 @@ void RegisterystemManangerTaskShelf( system_task_shelf_t * shelf )
             SystemFunctions.Register.ProfileEntry( &System.profile->shelf[i].scheduled[j]);
     }
 }
-void RegisterystemManangerSubactivityMap( system_subactivity_map_t * map)
+void RegisterSystemManagerSubactivityMap( system_subactivity_map_t * map)
 {
     System.subactivity_map = map;
 }
-void RegisterystemManagerProfile( system_profile_t * profile )
+void RegisterSystemManagerProfile( system_profile_t * profile )
 {
     System.profile = profile;
     SystemFunctions.Register.TaskShelf( &profile->shelf );
     SystemFunctions.Register.StateProfileList( &profile->state_profiles );
 }
-void RegisterystemManagerProfileEntry( system_profile_entry_t * entry )
+void RegisterSystemManagerProfileEntry( system_profile_entry_t * entry )
 {
     system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
     if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
@@ -129,11 +129,11 @@ void RegisterystemManagerProfileEntry( system_profile_entry_t * entry )
 
     ///TODO: Implement interval delay and hardware interrupt functionality!!!
 }
-void RegisterystemManagerStateProfileList( system_state_profile_list_t * state_profiles )
+void RegisterSystemManagerStateProfileList( system_state_profile_list_t * state_profiles )
 {
 //    System.profile->state_profiles = state_profiles;
 }
-void RegisterystemManagerState( system_state_t state )
+void RegisterSystemManagerState( system_state_t state )
 {
     if( System.state == state ) return;
     
@@ -143,22 +143,22 @@ void RegisterystemManagerState( system_state_t state )
     System.state = state;
     SystemFunctions.Enstate.StateProfile( &System.profile->state_profiles[state] );
 }
-void RegisterystemManagerActivity( system_activity_t activity )
+void RegisterSystemManagerActivity( system_activity_t activity )
 {
     printd("Registering activity: %s\n", activity_strings[activity]);
     System.activity = activity;
 }
-void RegisterystemManagerSubactivity( system_subactivity_t subactivity )
+void RegisterSystemManagerSubactivity( system_subactivity_t subactivity )
 {
     printd("Registering subactivity: %s\n", subactivity_strings[subactivity]);
     System.subactivity = subactivity;
 }
-void RegisterystemManagerError( system_error_t error )
+void RegisterSystemManagerError( system_error_t error )
 {
     printd("Registering error: %s\n", error_strings[error]);
     System.error.type = error;
 }
-void RegisterystemManagerConsumption( system_consumption_t consumption )
+void RegisterSystemManagerConsumption( system_consumption_t consumption )
 {
     System.consumption_level = consumption;
 }

@@ -260,7 +260,8 @@ PROFILE_TEMPLATE =
                 SYSTEM_STATE_IDLE//SYSTEM_STATE_ACTIVE
             },
             { COMPONENT_FAMILIES_ALL }, /* Families */
-            0, { /* Tasks */
+            1, { /* Tasks */
+                SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS
             }
         },
         {
