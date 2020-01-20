@@ -9,6 +9,16 @@
 #ifndef system_types_h
 #define system_types_h
 
+#include "application_types.h"
+
+#if __OS__ == MICRIUM
+#include "micrium_interface.h"
+#else
+/*#error */#warning "No OS defined."
+#endif
+
+#include "globaltypes.h"
+
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
 typedef enum
@@ -23,16 +33,7 @@ typedef enum
 
 #define DEFAULT_TASK_OS_OPTIONS             0 //OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR
 
-
-#include "application_types.h"
-
-#if __OS__ == MICRIUM
-#include "micrium_interface.h"
-#else
-/*#error */#warning "No OS defined."
-#endif
-
-#include "globaltypes.h"
+typedef OS_Q queue_t;
 
 #define GENERIC_PROFILE profile
 
@@ -50,6 +51,7 @@ typedef enum
 #define SYSTEM_ACTION_ID_NONE APPLICATION_ACTION_ID_NONE
 
 #define APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS
+#define SYSTEM_COMPONENT_NONE APPLICATION_COMPONENT_NONE
 
 /************************************************************************************/
 /***                               Enums Start                                    ***/
@@ -205,6 +207,8 @@ system_profile_header
     {
         frequency_t
         schedule;
+        INTERRUPT_ACTION
+        action;
         uint8_t
         info[4];
     } data;
@@ -291,7 +295,7 @@ typedef struct
 {
     void (*Send)(system_task_id_t);
     void (*Receive)(system_task_id_t);
-    void (*Perform)(component_t *);
+    void (*Perform)(system_task_id_t);
 } system_interrupter_functions;
 
 typedef OS_ERR RTOS_ERR;
@@ -315,8 +319,21 @@ RTOS_ERR
 
 typedef struct
 {
-    system_state_t          state, prev_state;
+queue_t
+    interrupt;
+} system_queue_list_t;
+
+typedef struct
+{
+    bool                    profile_entries[NUM_APPLICATION_TASKS];
+    system_task_id_t        component_tasks[MAX_COMPONENTS];
+} system_registration_log_t;
+
+typedef struct
+{
+    system_state_t          state, prev_state, exit_state;
     os_task_list_t         *os_tasks;
+    system_queue_list_t     queue;
     system_activity_t       activity;
     system_subactivity_t    subactivity;
     system_error_buffer_t   error;
@@ -325,7 +342,7 @@ typedef struct
     system_buffers_t        buffers;
     system_objects_t        objects;
     system_profile_t       *profile;
-    bool                    registered_profile_entries[NUM_APPLICATION_TASKS];
+    system_registration_log_t registration;
 } system_master_t;
 /************************************************************************************/
 

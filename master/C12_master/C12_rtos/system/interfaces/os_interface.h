@@ -12,8 +12,11 @@
 #include "profilemanager.h"
 #include "sysiocontroller.h"
 
+bool TaskHasValidTimer( os_task_data_t * );
+
 void OSInterface_Init(void);
 void OSInterface_Start(void);
+void OSInterface_DelayMs( uint32_t ms );
 
 void OSInterface_CreateTask( os_task_data_t * );
 void OSInterface_ResumeTask( os_task_data_t * );
@@ -69,6 +72,7 @@ typedef struct
 {
     void (*Init)(void);
     void (*Start)(void);
+    void (*DelayMs)(uint32_t);
     system_os_interface_task_functions Task;
     system_os_interface_queue_functions Queue;
     system_os_interface_timer_functions Timer;
@@ -78,6 +82,7 @@ static system_os_interface_functions OSFunctions =
 {
     .Init = OSInterface_Init,
     .Start = OSInterface_Start,
+    .DelayMs = OSInterface_DelayMs,
     
     .Task.Create = OSInterface_CreateTask,
     .Task.Resume = OSInterface_ResumeTask,

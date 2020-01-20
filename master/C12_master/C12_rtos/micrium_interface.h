@@ -10,14 +10,21 @@
 #define micrium_interface_h
 
 #include "globaltypes.h"
+#include <unistd.h>
 
 /// SPOOF START
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
 typedef const char      CPU_CHAR;
-typedef unsigned char   OS_PRIO, OS_ERR;
+typedef unsigned char   OS_PRIO, OS_ERR, RTOS_ERR;
 typedef unsigned int    CPU_STK, CPU_STK_SIZE, OS_TICK, CPU_TS;
 typedef unsigned short  OS_MSG_QTY, OS_OPT, OS_MSG_SIZE;
+
+
+#ifndef OSTaskDel
+static void OSTaskDel (OS_TCB *p_tcb, RTOS_ERR *p_err) {}
+#endif
+#define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 
 #define OS_CFG_TICK_RATE_HZ 10000
 /// SPOOF END
@@ -41,13 +48,21 @@ typedef struct
     void          *p_ext; /* Task control block extension for extended data during context switch */
     OS_OPT         opt; /* Task specific options */
     OS_ERR        *p_err; /* Pointer to error receiver */
-    struct timer
+    union
     {
-        OS_TICK dly;
-        OS_TICK period;
-        OS_OPT opt;
-        OS_TMR tmr;
-    } schedule;
+        struct basic_timer
+        {
+            OS_TICK dly;
+            OS_TICK period;
+            OS_OPT opt;
+            OS_TMR tmr;
+        } schedule;
+        struct basic_interrupt
+        {
+            INTERRUPT_ACTION action;
+            component_id_t component_id;
+        } interrupt;
+    } event_data;
     OS_TCB         tcb; /* Operating System: Task Control Block */
     CPU_STK        stk_base[DEFAULT_STACK_SIZE]; /* Stack base address */
 } micrium_os_task_data_t, MICRIUM_OS_TASK_DATA_T;
@@ -105,11 +120,11 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 #define TIMER_FROM_SCHEDULED_TASK(p_task_data) \
 { \
     p_task_data->ID, \
-    p_task_data->schedule.tmr, \
+    p_task_data->event_data.schedule.tmr, \
     p_task_data->p_name, \
-    p_task_data->schedule.dly, \
-    p_task_data->schedule.period, \
-    p_task_data->schedule.opt, \
+    p_task_data->event_data.schedule.dly, \
+    p_task_data->event_data.schedule.period, \
+    p_task_data->event_data.schedule.opt, \
     p_task_data->p_task, \
     p_task_data->p_arg, \
     p_task_data->p_err \
@@ -117,6 +132,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 
 static void MICRIUM_OSInterface_Init( void ) {}
 static void MICRIUM_OSInterface_Start( void ) {}
+static void MICRIUM_OSInterface_DelayMs( uint32_t ms ) { usleep(ms * 1000); }
 static void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_SuspendTask( micrium_os_task_data_t * task_data ) {}
@@ -166,6 +182,13 @@ static inline void MICRIUM_OSInterface_Start( void )
     / *   Check error code.                                  * /
     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
 }
+ 
+ static inline void MICRIUM_OSInterface_Delay( uint32_t ms )
+ {
+     RTOS_ERR  err;
+     
+     void  OSTimeDly (MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
+ }
 
 static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data )
 {

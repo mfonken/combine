@@ -20,7 +20,7 @@
 
 #define SUBACTIVITY(ID, PTR, ARGS) { ID, (void(*)(void*))PTR, (void*)ARGS }
 
-#define COMPONENT_ID(A,B) { A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
+#define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
 
 #ifndef __PLATFORM__
 #error "No platform specified!"
@@ -95,6 +95,13 @@ typedef enum
     COMPONENT_ACTIVITY_TRIGGER
 } COMPONENT_ACTIVITY;
 
+typedef enum
+{
+    INTERRUPT_ACTION_IGNORE = 0x00,
+    INTERRUPT_ACTION_QUEUE,
+    INTERRUPT_ACTION_IMMEDIATE
+} INTERRUPT_ACTION;
+
 typedef struct
 {
 uint8_t
@@ -119,6 +126,8 @@ COMPONENT_STATE
 void *
     instance;
 } component_t;
+
+typedef uint32_t port_t, pin_t;
 
 typedef struct
 {

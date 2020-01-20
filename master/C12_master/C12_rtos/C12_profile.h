@@ -101,7 +101,7 @@
 #define APPLICATION_COMPONENT_MOTION_PRIMARY_INTERRUPT_ENTRY { \
 .ID = APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT }, \
-.data.info = { 0 }, \
+.data.action = INTERRUPT_ACTION_IMMEDIATE, \
 .component_id = APPLICATION_COMPONENT_MOTION_PRIMARY, \
 .handler_id = APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT }
 
@@ -150,7 +150,7 @@
 #define COMMUNICATION_HOST_RECEIVE_PACKET_INTERRUPT_ENTRY { \
 .ID = APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE, \
 .header = { SYSTEM_PROFILE_ENTRY_STATE_ENABLED, SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT, SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED }, \
-.data.schedule = 0, \
+.data.action = INTERRUPT_ACTION_IMMEDIATE, \
 .component_id = APPLICATION_COMPONENT_BLE_RADIO_RX, \
 .handler_id = APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET }
 
@@ -171,9 +171,9 @@
 #define APPLICATION_TASK_SHELF_ENTRY_GLOBAL_TASKS { \
 .task_id = APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS, \
 .num_interrupts = 1, \
-.interrupts = { COMMUNICATION_HOST_RECEIVE_PACKET_INTERRUPT_ENTRY }, \
-.num_scheduled = 1, \
-.scheduled = { APPLICATION_COMPONENT_BATTERY_MONITOR_SCHEDULED_PROBE_ENTRY } }
+.interrupts = { APPLICATION_COMPONENT_MOTION_PRIMARY_INTERRUPT_ENTRY }, \
+.num_scheduled = 0, \
+.scheduled = { } }
 
 #define APPLICATION_TASK_SHELF_ENTRY_SENSOR_MOTION_TASKS { \
 .task_id = APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS, \
@@ -248,7 +248,7 @@ PROFILE_TEMPLATE =
     { /* State Profiles */
         {
             SYSTEM_STATE_STARTUP, /* State */
-            { /* Activities and subactivities */
+            { /* Activity with subactivities to run on entry */
                 SYSTEM_ACTIVITY_STARTUP,
                 5, {
                     APPLICATION_SUBACTIVITY_SELF_CHECK,
@@ -260,7 +260,7 @@ PROFILE_TEMPLATE =
                 SYSTEM_STATE_IDLE//SYSTEM_STATE_ACTIVE /* Next state */
             },
             { COMPONENT_FAMILIES_ALL }, /* Families */
-            1, { /* Tasks */
+            1, { /* Tasks to run during state */
                 APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS
             }
         },

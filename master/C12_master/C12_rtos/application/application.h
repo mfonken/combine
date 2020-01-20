@@ -10,7 +10,7 @@
 #define application_h
 
 #include "application.h"
-#include "systemmanager.h"
+#include "systembehavior.h"
 #include "C12_profile.h"
 
 system_subactivity_map_t global_subactivity_map = { 0 };
@@ -25,12 +25,17 @@ static void InitApplication( void )
 
 static void StartApplication( void )
 {
+    SystemFunctions.Perform.ExitState();
+    OSFunctions.DelayMs(1000);
     SystemFunctions.Register.State( SYSTEM_STATE_ACTIVE );
+    ComponentInterrupt( PORTC, 9 );
 }
 
 static void TickApplication( void )
 {
+COMPLETE_TASK
 }
+
 
 /* [Meta] Global buffers */
 

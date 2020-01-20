@@ -41,9 +41,28 @@ void SystemBehavior_PerformInterrupterSend( system_task_id_t id )
 {
     //Enable BehaviorInterruptTasks[id]
 }
-void SystemBehavior_PerformInterrupterReceive( component_t * component )
+void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id )
 {
-//    OSFunctions.Queue.Post( App.Get.MessageForComponent( component ) );
+    bool handled = false;
+    os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
+    if( task_data == NULL ) return;
+    switch( task_data->event_data.interrupt.action )
+    {
+        case  INTERRUPT_ACTION_IMMEDIATE:
+            OSFunctions.Task.Resume( task_data );
+        case INTERRUPT_ACTION_IGNORE:
+        default:
+            handled = true;
+            break;
+        case INTERRUPT_ACTION_QUEUE:
+            break;
+    }
+    if( !handled )
+    {
+        os_queue_data_t queue_data;
+//        message_t message = App.Get.MessageForComponent( component->ID );
+        OSFunctions.Queue.Post( &queue_data );
+    }
     
 //    os_task_data_t * task = SystemFunctions.Get.TaskByComponent( component );
 //    void_handler_t handler = SystemFunctions.Get.HandlerByComponentId( component->ID );

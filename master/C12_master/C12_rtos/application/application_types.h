@@ -155,7 +155,6 @@ typedef enum
 #define APPLICATION_COMPONENT_HAPTIC_SECONDARY           COMPONENT_ID(COMPONENT_TYPE_DRIVER, APPLICATION_DRIVER_HAPTIC_SECONDARY)
 #define APPLICATION_COMPONENT_REGULATOR_1V5              COMPONENT_ID(COMPONENT_TYPE_DRIVER, APPLICATION_DRIVER_REGULATOR_1V5)
 
-
 typedef struct
 {
 tau_config_t
@@ -183,7 +182,6 @@ battery_monitor_basic_t
 application_config_t
     config;
 } application_buffers_t;
-
 typedef struct
 {
 imu_t

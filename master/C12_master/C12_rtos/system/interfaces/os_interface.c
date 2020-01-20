@@ -8,6 +8,12 @@
 
 #include "os_interface.h"
 
+bool TaskHasValidTimer( os_task_data_t * task_data )
+{
+    return (task_data->event_data.schedule.tmr != NULL
+        && task_data->event_data.schedule.period != 0);
+}
+
 void OSInterface_Init(void)
 {
     LOG_OSI(OSI_DEBUG, "Initializing OS.\n");
@@ -19,11 +25,26 @@ void OSInterface_Start(void)
     LOG_OSI(OSI_DEBUG, "Starting OS.\n");
     OS_SPECIFIC(OSInterface_Start)();
 }
+
+void OSInterface_DelayMs( uint32_t ms )
+{
+    LOG_OSI(OSI_DEBUG, "Delaying OS Task for %dms", ms);
+    OS_SPECIFIC(OSInterface_DelayMs)( ms );
+}
+
 void OSInterface_CreateTask( os_task_data_t * task_data )
 {
     if( task_data->ID == SYSTEM_ACTION_ID_NONE ) return;
-    LOG_OSI(OSI_DEBUG, "Creating OS Task: %s\n", task_id_strings[(uint8_t)task_data->ID]);
+    LOG_OSI(OSI_DEBUG, "Creating OS Task: %s", task_id_strings[(uint8_t)task_data->ID]);
     OS_SPECIFIC(OSInterface_CreateTask)(task_data);
+    
+    if( TaskHasValidTimer(task_data) )
+    {
+        os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
+        LOG_OSI_BARE(OSI_DEBUG, " with schedule of %.2fHz", TICK_TO_HZ(timer_data.period));
+        OS_SPECIFIC(OSInterface_CreateTimer)( &timer_data );
+    }
+    LOG_OSI_BARE(OSI_DEBUG, "\n");
 }
 
 void OSInterface_ResumeTask( os_task_data_t * task_data )
@@ -31,7 +52,7 @@ void OSInterface_ResumeTask( os_task_data_t * task_data )
     LOG_OSI(OSI_DEBUG, "Resuming OS Task: %s", task_id_strings[(uint8_t)task_data->ID]);
     OS_SPECIFIC(OSInterface_ResumeTask)(task_data);
     
-    if( task_data->schedule.period != 0 )
+    if( TaskHasValidTimer(task_data) )
     {
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
         LOG_OSI_BARE(OSI_DEBUG, " with schedule of %.2fHz", TICK_TO_HZ(timer_data.period));
@@ -45,7 +66,7 @@ void OSInterface_SuspendTask( os_task_data_t * task_data )
     LOG_OSI(OSI_DEBUG, "Suspending OS Task: %s", task_id_strings[(uint8_t)task_data->ID]);
     OS_SPECIFIC(OSInterface_SuspendTask)(task_data);
     
-    if( task_data->schedule.period != 0 )
+    if( TaskHasValidTimer(task_data) )
     {
         LOG_OSI_BARE(OSI_DEBUG, " with schedule");
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
@@ -60,7 +81,7 @@ void OSInterface_DeleteTask( os_task_data_t * task_data )
     LOG_OSI(OSI_DEBUG, "Deleting OS Task: %s", task_id_strings[(uint8_t)task_data->ID]);
     OS_SPECIFIC(OSInterface_DeleteTask)(task_data);
     
-    if( task_data->schedule.period != 0 )
+    if( TaskHasValidTimer(task_data) )
     {
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
         OS_SPECIFIC(OSInterface_DeleteTimer)( &timer_data );

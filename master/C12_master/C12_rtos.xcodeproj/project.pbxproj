@@ -131,7 +131,6 @@
 				347F720D23D3A34400427FD0 /* application.h */,
 				347F720F23D3A5C500427FD0 /* tau */,
 				3491A32E23C57815008010C8 /* debug */,
-				3491A33123C57815008010C8 /* peripherals */,
 			);
 			path = application;
 			sourceTree = "<group>";
@@ -173,6 +172,7 @@
 				347F720B23D381E900427FD0 /* micrium_interface.h */,
 				3491A31023C57814008010C8 /* main.c */,
 				347F720E23D3A45600427FD0 /* application */,
+				3491A33123C57815008010C8 /* peripherals */,
 				3491A31123C57815008010C8 /* system */,
 			);
 			path = C12_rtos;
@@ -370,13 +370,13 @@
 		3491A34923C57815008010C8 /* motionsensor */ = {
 			isa = PBXGroup;
 			children = (
-				3491A34A23C57815008010C8 /* motionsensor.c */,
-				3491A34B23C57815008010C8 /* shtp.h */,
 				3491A34C23C57815008010C8 /* sh2.h */,
-				3491A34D23C57815008010C8 /* BNO080.h */,
-				3491A34E23C57815008010C8 /* motionsensor.h */,
+				3491A34B23C57815008010C8 /* shtp.h */,
 				3491A34F23C57815008010C8 /* shtp.c */,
+				3491A34D23C57815008010C8 /* BNO080.h */,
 				3491A35023C57815008010C8 /* BNO080.c */,
+				3491A34E23C57815008010C8 /* motionsensor.h */,
+				3491A34A23C57815008010C8 /* motionsensor.c */,
 			);
 			path = motionsensor;
 			sourceTree = "<group>";

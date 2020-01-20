@@ -25,7 +25,7 @@ void SystemManager_PerformRoutine( system_activity_routine_t * routine )
 {
     SystemFunctions.Register.Activity(routine->activity);
     SystemFunctions.Perform.Subactivities( routine->subactivities, routine->length );
-    SystemFunctions.Register.State( routine->exit_state );
+    SystemFunctions.Register.ExitState( routine->exit_state );
 }
 
 void SystemManager_PerformRoutineSubactivities( system_subactivity_t * subactivities, uint8_t len )
@@ -56,8 +56,26 @@ void SystemManager_PerformEnableProfileEntryState( system_profile_entry_t * entr
     
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
     if( task_data == NULL ) return;
-    OSFunctions.Task.Resume( task_data );
+    
+//    if( TaskHasValidTimer( task_data ) )
+//        OSFunctions.Task.Resume(task_data);
+//    else
+        OSFunctions.Task.Create(task_data);
 }
+
+void SystemManager_PerformExitState( void )
+{
+    if( System.state == System.exit_state )
+    {
+        LOG_SYSTEM(SYSTEM_DEBUG, "Rejecting state exit.\n");
+        return;
+    }
+    System.prev_state = System.state;
+    System.state = System.exit_state;
+    LOG_SYSTEM(SYSTEM_DEBUG, "Exiting to state: %s\n", state_strings[System.state]);
+    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state] );
+}
+
 void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * entry )
 {
     uint8_t id = entry->ID;
@@ -65,13 +83,16 @@ void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * ent
     entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_DISABLED;
     
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
-    OSFunctions.Task.Suspend(task_data);
+//    if( TaskHasValidTimer( task_data ) )
+//        OSFunctions.Task.Suspend(task_data);
+//    else
+        OSFunctions.Task.Delete(task_data);
 }
 void SystemManager_RegisterTaskList( os_task_list_t * task_list )
 {
     System.os_tasks = task_list;
-    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
-        OSFunctions.Task.Create( &((*System.os_tasks)[i]) );
+//    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
+//        OSFunctions.Task.Create( &((*System.os_tasks)[i]) );
 }
 void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
 {
@@ -97,13 +118,13 @@ void SystemManager_RegisterProfile( system_profile_t * profile )
 void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool scheduled )
 {
     uint8_t id = entry->ID;
-    if(System.registered_profile_entries[id])
+    if(System.registration.profile_entries[id])
     {
         LOG_SYSTEM( SYSTEM_DEBUG, "Profile entry %s already registered.\n", task_id_strings[id]);
         return;
     }
     LOG_SYSTEM( SYSTEM_DEBUG, "Registering profile entry %s(%d).\n", task_id_strings[id], id);
-    System.registered_profile_entries[id] = true;
+    System.registration.profile_entries[id] = true;
 //    system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
     if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
     {
@@ -136,22 +157,46 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
                 break;
         }
     }
+    os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
+    if( task_data == NULL ) return;
     
     // Create OS utilities with task_data
     if( scheduled && entry->data.schedule != 0)
     {
-        os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
-        if( task_data == NULL ) return;
-        
-        task_data->schedule.dly = 0;
-        task_data->schedule.period = HZ_TO_TICK(entry->data.schedule);
-        task_data->schedule.opt = OS_OPT_TMR_PERIODIC;
+        task_data->event_data.schedule.dly = 0;
+        task_data->event_data.schedule.period = HZ_TO_TICK(entry->data.schedule);
+        task_data->event_data.schedule.opt = OS_OPT_TMR_PERIODIC;
         
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
         OSFunctions.Timer.Create( &timer_data );
     }
+    else if( entry->data.action != INTERRUPT_ACTION_IGNORE )
+    {
+        task_data->event_data.interrupt.action = entry->data.action;
+        task_data->event_data.interrupt.component_id = entry->component_id;
+        
+        int8_t component_number = SystemFunctions.Get.ComponentNumber(entry->component_id);
+        if(component_number < 0 )
+        {
+            LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
+        }
+        else
+            System.registration.component_tasks[component_number] = task_data->ID;
+    }
     ///TODO: Implement and hardware interrupt functionality!!!
 }
+
+int8_t SystemManager_GetSystemComponentNumber( component_id_t component_id )
+{
+    for( uint8_t i = 0; i < System.profile->component_list.num_entries; i++ )
+    {
+        component_t * check = &System.profile->component_list.entries[i];
+        if( check->ID.macro == component_id.macro
+           && check->ID.micro == component_id.micro ) return i;
+    }
+    return -1;
+}
+
 void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state_profiles )
 {
 //    System.profile->state_profiles = state_profiles;
@@ -161,11 +206,17 @@ void SystemManager_RegisterState( system_state_t state )
     if( System.state == state ) return;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering state: %s\n", state_strings[state]);
     
-    SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.prev_state] );
+    SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.state] );
     System.prev_state = System.state;
     System.state = state;
     SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state] );
 }
+
+void SystemManager_RegisterExitState( system_state_t exit_state )
+{
+    System.exit_state = exit_state;
+}
+
 void SystemManager_RegisterActivity( system_activity_t activity )
 {
     uint8_t id = activity;
@@ -218,6 +269,28 @@ os_task_data_t * SystemManager_GetTaskDataById( system_task_id_t task_id )
     }
     return NULL;
 }
+
+os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t component_id )
+{
+    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
+    {
+        os_task_data_t * task_data = &((*System.os_tasks)[i]);
+        if( task_data == NULL ) continue;
+        SystemFunctions.Get.ComponentNumber( component_id );
+    }
+    return NULL;
+}
+
+component_id_t SystemManager_GetComponentIdFromPortPin( port_t port, pin_t pin )
+{
+    for( uint8_t i = 0; i < System.profile->component_list.num_entries; i++ )
+    {
+        component_t * check = &System.profile->component_list.entries[i];
+        if( check->port == port && check->pin == pin ) return check->ID;
+    }
+    return SYSTEM_COMPONENT_NONE;
+}
+
 void SystemManager_InstateTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
 {
     if( entry_id == APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS ) return;

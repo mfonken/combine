@@ -21,7 +21,7 @@ void SystemBehavior_PerformProbeReceive( system_task_id_t );
 void SystemBehavior_PerformSchedulerSchedule( system_task_id_t, uint32_t );
 void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t );
 void SystemBehavior_PerformInterrupterSend( system_task_id_t );
-void SystemBehavior_PerformInterrupterReceive( component_t * );//system_task_id_t );
+void SystemBehavior_PerformInterrupterReceive( system_task_id_t );
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t );
 
 void InitProfileEntry( system_profile_entry_t * );
@@ -71,5 +71,13 @@ static behavior_functions BehaviorFunctions =
 //    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE */
 //    NullFunction /* SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE */
 //};
+
+static void ComponentInterrupt( port_t port, pin_t pin )
+{
+    component_id_t component_id = SystemFunctions.Get.ComponentIdFromPortPin( port, pin );
+    int8_t component_number = SystemFunctions.Get.ComponentNumber( component_id );
+    if( component_number >= 0 )
+        BehaviorFunctions.Perform.Interrupter.Receive( System.registration.component_tasks[component_number] );
+}
 
 #endif /* systembehavior_h */
