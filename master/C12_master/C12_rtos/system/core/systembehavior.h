@@ -11,18 +11,18 @@
 
 #include <stdio.h>
 
-#include "systemtypes.h"
+#include "systemmanager.h"
 
-void PerformBehaviorSelfCheck(void);
-void PerformBehaviorConfirmInit(void);
-void PerformBehaviorWaitForWake(void);
-void PerformBehaviorProbeSend( system_task_id_t );
-void PerformBehaviorProbeReceive( system_task_id_t );
-void PerformBehaviorSchedulerSchedule( system_task_id_t, uint32_t );
-void PerformBehaviorSchedulerDeschedule( system_task_id_t );
-void PerformBehaviorInterrupterSend( system_task_id_t );
-void PerformBehaviorInterrupterReceive( system_task_id_t );
-void PerformBehaviorInterrupterPerform( system_task_id_t );
+void SystemBehavior_PerformSelfCheck(void);
+void SystemBehavior_PerformConfirmInit(void);
+void SystemBehavior_PerformWaitForWake(void);
+void SystemBehavior_PerformProbeSend( system_task_id_t );
+void SystemBehavior_PerformProbeReceive( system_task_id_t );
+void SystemBehavior_PerformSchedulerSchedule( system_task_id_t, uint32_t );
+void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t );
+void SystemBehavior_PerformInterrupterSend( system_task_id_t );
+void SystemBehavior_PerformInterrupterReceive( component_t * );//system_task_id_t );
+void SystemBehavior_PerformInterrupterPerform( system_task_id_t );
 
 void InitProfileEntry( system_profile_entry_t * );
 
@@ -44,16 +44,16 @@ typedef struct
 
 static behavior_functions BehaviorFunctions =
 {
-    .Perform.SelfCheck              = PerformBehaviorSelfCheck,
-    .Perform.ConfirmInit            = PerformBehaviorConfirmInit,
-    .Perform.WaitForWake            = PerformBehaviorWaitForWake,
-    .Perform.Probe.Send             = PerformBehaviorProbeSend,
-    .Perform.Probe.Receive          = PerformBehaviorProbeReceive,
-    .Perform.Scheduler.Schedule     = PerformBehaviorSchedulerSchedule,
-    .Perform.Scheduler.Deschedule   = PerformBehaviorSchedulerDeschedule,
-    .Perform.Interrupter.Send       = PerformBehaviorInterrupterSend,
-    .Perform.Interrupter.Receive    = PerformBehaviorInterrupterReceive,
-    .Perform.Interrupter.Perform    = PerformBehaviorInterrupterPerform
+    .Perform.SelfCheck              = SystemBehavior_PerformSelfCheck,
+    .Perform.ConfirmInit            = SystemBehavior_PerformConfirmInit,
+    .Perform.WaitForWake            = SystemBehavior_PerformWaitForWake,
+    .Perform.Probe.Send             = SystemBehavior_PerformProbeSend,
+    .Perform.Probe.Receive          = SystemBehavior_PerformProbeReceive,
+    .Perform.Scheduler.Schedule     = SystemBehavior_PerformSchedulerSchedule,
+    .Perform.Scheduler.Deschedule   = SystemBehavior_PerformSchedulerDeschedule,
+    .Perform.Interrupter.Send       = SystemBehavior_PerformInterrupterSend,
+    .Perform.Interrupter.Receive    = SystemBehavior_PerformInterrupterReceive,
+    .Perform.Interrupter.Perform    = SystemBehavior_PerformInterrupterPerform
 };
 
 //static generic_function_t BehaviorScheduledTasks[] =

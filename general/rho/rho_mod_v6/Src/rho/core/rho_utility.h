@@ -18,10 +18,6 @@
 #include "rho_structure.h"
 #include "rho_types.h"
 
-#ifdef __USE_DECOUPLING__
-#include "rho_deco.h"
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -158,7 +154,7 @@ extern "C" {
         void (*TargetTuneFactor)( rho_core_t * );
         void (*TargetCoverageFactor)( rho_core_t * );
     } rho_utility_calculate_functions;
-    
+
     typedef struct
     {
         void (*CumulativeMoments)( floating_t, floating_t, floating_t *, floating_t *, floating_t * );
@@ -170,7 +166,7 @@ extern "C" {
         void (*Background)( rho_core_t * );
         void (*Packet)( rho_core_t * );
     } rho_utility_generate_functions;
-    
+
     typedef struct
     {
         void (*Packet)( packet_t *, index_t );
@@ -213,7 +209,7 @@ extern "C" {
         .Predict.GenerateObservationList = GenerateObservationListFromPredictionsRhoUtility,
         .Predict.GenerateObservationLists = GenerateObservationListsFromPredictionsRhoUtility,
         .Predict.ReportObservationLists = ReportObservationListsFromPredictionsRhoUtility,
-        
+
         .Predict.UpdatePredictiveStateModelPair = UpdatePredictiveStateModelPairRhoUtility,
 
         .Detect.Perform = PerformDetectRhoUtility,
@@ -236,7 +232,7 @@ extern "C" {
         .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
         .Calculate.TargetTuneFactor = CalculateTargetTuneFactorRhoUtility,
         .Calculate.TargetCoverageFactor = CalculateTargetCoverageFactorRhoUtility,
-        
+
         .Generate.CumulativeMoments = GenerateCumulativeMomentsStatistics,
         .Generate.CumulativeAverage = GenerateCumulativeAverageStatistics,
         .Generate.CumulateAverageStandardDeviation = CumulateAverageStandardDeviationStatistics,
@@ -245,7 +241,7 @@ extern "C" {
         .Generate.Centroid = GenerateCentroidRhoUtility,
         .Generate.Packet = GeneratePacketRhoUtility,
         .Generate.Background = GenerateBackgroundRhoUtility,
-        
+
         .Print.Packet = PrintPacketRhoUtility,
     };
 

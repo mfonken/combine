@@ -59,6 +59,7 @@
 
 #define MAX_REGION_HEIGHT   1000//200
 #define RHO_GAP_MAX         5
+#define ZCORE_SAMPLES       5
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 

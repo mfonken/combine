@@ -9,7 +9,8 @@
 #ifndef systemmanager_h
 #define systemmanager_h
 
-#include "systeminterface.h"
+//#include "systemhandlers.h"
+#include "os_interface.h"
 
 #define DEFAULT_SYSTEM_STATE SYSTEM_STATE_IDLE
 #define DEFAULT_SYSTEM_ACTION SYSTEM_ACTION_NONE
@@ -21,32 +22,37 @@
 
 extern system_master_t System;
 
-void InitSystemManager(system_profile_t *);
+void SystemManager_Init(system_profile_t *);
 
-void PerformSystemManagerRoutine( system_activity_routine_t * );
-void PerformSystemManagerRoutineSubactivities( system_subactivity_t *, uint8_t );
-void PerformSystemManagerSubactivity( system_subactivity_t );
-void PerformSystemManagerEnableProfileEntryState( system_profile_entry_t * );
-void PerformSystemManagerDisableProfileEntryState( system_profile_entry_t * );
+void SystemManager_PerformRoutine( system_activity_routine_t * );
+void SystemManager_PerformRoutineSubactivities( system_subactivity_t *, uint8_t );
+void SystemManager_PerformSubactivity( system_subactivity_t );
+void SystemManager_PerformEnableProfileEntryState( system_profile_entry_t * );
+void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * );
 
-void RegisterSystemManagerOSTaskList( os_task_list_t * );
-void RegisterSystemManagerTaskShelf( system_task_shelf_t * );
-void RegisterSystemManagerSubactivityMap( system_subactivity_map_t * );
-void RegisterSystemManagerProfile( system_profile_t * );
-void RegisterSystemManagerProfileEntry( system_profile_entry_t * );
-void RegisterSystemManagerStateProfileList( system_state_profile_list_t * );
-void RegisterSystemManagerState( system_state_t );
-void RegisterSystemManagerActivity( system_activity_t );
-void RegisterSystemManagerSubactivity( system_subactivity_t );
-void RegisterSystemManagerError( system_error_t );
-void RegisterSystemManagerConsumption( system_consumption_t );
+void SystemManager_RegisterTaskList( os_task_list_t * );
+void SystemManager_RegisterTaskShelf( system_task_shelf_t * );
+void SystemManager_RegisterSubactivityMap( system_subactivity_map_t * );
+void SystemManager_RegisterProfile( system_profile_t * );
+void SystemManager_RegisterProfileEntry( system_profile_entry_t *, bool );
+void SystemManager_RegisterStateProfileList( system_state_profile_list_t * );
+void SystemManager_RegisterState( system_state_t );
+void SystemManager_RegisterActivity( system_activity_t );
+void SystemManager_RegisterSubactivity( system_subactivity_t );
+void SystemManager_RegisterError( system_error_t );
+void SystemManager_RegisterConsumption( system_consumption_t );
 
-system_subactivity_map_entry_t * GetSystemManagerSubactivityMapEntryById( system_subactivity_t );
-system_task_shelf_entry_t * GetSystemManagerTaskShelfEntryById( system_task_shelf_entry_id_t );
-os_task_data_t * GetSystemManagerTaskDataById( system_task_id_t );
+system_subactivity_map_entry_t * SystemManager_GetSubactivityMapEntryById( system_subactivity_t );
+system_task_shelf_entry_t * SystemManager_GetTaskShelfEntryById( system_task_shelf_entry_id_t );
+os_task_data_t * SystemManager_GetTaskDataById( system_task_id_t );
+//os_task_data_t * SystemManager_GetTaskDataByComponent( component_t * );
+void_handler_t GetHandlerByComponent( component_t * );
 
-void EnstateSystemManagerTaskShelfEntry( system_task_shelf_entry_id_t );
-void EnstateSystemManagerStateProfile( system_state_profile_t * );
+void SystemManager_InstateTaskShelfEntry( system_task_shelf_entry_id_t );
+void SystemManager_InstateStateProfile( system_state_profile_t * );
+
+void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t );
+void SystemManager_TerminateStateProfile( system_state_profile_t * );
 
 typedef struct
 {
@@ -58,11 +64,11 @@ typedef struct
 } system_perform_functions;
 typedef struct
 {
-    void (*OSTaskList)( os_task_list_t * );
+    void (*TaskList)( os_task_list_t * );
     void (*TaskShelf)( system_task_shelf_t * );
     void (*SubactivityMap)( system_subactivity_map_t * );
     void (*Profile)( system_profile_t * );
-    void (*ProfileEntry)( system_profile_entry_t * );
+    void (*ProfileEntry)( system_profile_entry_t *, bool );
     void (*StateProfileList)( system_state_profile_list_t * );
     void (*State)( system_state_t );
     void (*Activity)( system_activity_t );
@@ -74,13 +80,15 @@ typedef struct
 {
     void (*TaskShelfEntry)( system_task_shelf_entry_id_t );
     void (*StateProfile)( system_state_profile_t * );
-} system_enstate_functions;
+} system_instate_functions;
 
 typedef struct
 {
     system_subactivity_map_entry_t * (*SubactivityMapEntry)( system_subactivity_t );
     system_task_shelf_entry_t * (*TaskShelfEntry)( system_task_shelf_entry_id_t );
-    os_task_data_t * (*TaskData)( system_task_id_t );
+    os_task_data_t * (*TaskById)( system_task_id_t );
+//    os_task_data_t * (*TaskByComponent)( component_t * );
+    void* (*HandlerByComponentId)( component_id_t );
 } system_get_functions;
 
 typedef struct
@@ -88,34 +96,40 @@ typedef struct
     void (*Init)(system_profile_t *);
     system_perform_functions Perform;
     system_register_functions Register;
-    system_enstate_functions Enstate;
+    system_instate_functions Instate, Terminate;
     system_get_functions Get;
 } system_functions;
 
 static system_functions SystemFunctions =
 {
-    .Init                       = InitSystemManager,
-    .Perform.Routine            = PerformSystemManagerRoutine,
-    .Perform.Subactivities      = PerformSystemManagerRoutineSubactivities,
-    .Perform.Subactivity        = PerformSystemManagerSubactivity,
-    .Perform.EnableProfileEntry = PerformSystemManagerEnableProfileEntryState,
-    .Perform.DisableProfileEntry= PerformSystemManagerEnableProfileEntryState,
-    .Register.OSTaskList        = RegisterSystemManagerOSTaskList,
-    .Register.TaskShelf         = RegisterSystemManagerTaskShelf,
-    .Register.SubactivityMap    = RegisterSystemManagerSubactivityMap,
-    .Register.Profile           = RegisterSystemManagerProfile,
-    .Register.ProfileEntry      = RegisterSystemManagerProfileEntry,
-    .Register.StateProfileList  = RegisterSystemManagerStateProfileList,
-    .Register.State             = RegisterSystemManagerState,
-    .Register.Activity          = RegisterSystemManagerActivity,
-    .Register.Subactivity       = RegisterSystemManagerSubactivity,
-    .Register.Error             = RegisterSystemManagerError,
-    .Register.Consumption       = RegisterSystemManagerConsumption,
-    .Enstate.TaskShelfEntry     = EnstateSystemManagerTaskShelfEntry,
-    .Enstate.StateProfile       = EnstateSystemManagerStateProfile,
-    .Get.SubactivityMapEntry    = GetSystemManagerSubactivityMapEntryById,
-    .Get.TaskShelfEntry         = GetSystemManagerTaskShelfEntryById,
-    .Get.TaskData               = GetSystemManagerTaskDataById
+    .Init                       = SystemManager_Init,
+    .Perform.Routine            = SystemManager_PerformRoutine,
+    .Perform.Subactivities      = SystemManager_PerformRoutineSubactivities,
+    .Perform.Subactivity        = SystemManager_PerformSubactivity,
+    .Perform.EnableProfileEntry = SystemManager_PerformEnableProfileEntryState,
+    .Perform.DisableProfileEntry= SystemManager_PerformDisableProfileEntryState,
+    .Register.TaskList          = SystemManager_RegisterTaskList,
+    .Register.TaskShelf         = SystemManager_RegisterTaskShelf,
+    .Register.SubactivityMap    = SystemManager_RegisterSubactivityMap,
+    .Register.Profile           = SystemManager_RegisterProfile,
+    .Register.ProfileEntry      = SystemManager_RegisterProfileEntry,
+    .Register.StateProfileList  = SystemManager_RegisterStateProfileList,
+    .Register.State             = SystemManager_RegisterState,
+    .Register.Activity          = SystemManager_RegisterActivity,
+    .Register.Subactivity       = SystemManager_RegisterSubactivity,
+    .Register.Error             = SystemManager_RegisterError,
+    .Register.Consumption       = SystemManager_RegisterConsumption,
+    .Instate.TaskShelfEntry     = SystemManager_InstateTaskShelfEntry,
+    .Instate.StateProfile       = SystemManager_InstateStateProfile,
+    
+    .Terminate.TaskShelfEntry   = SystemManager_TerminateTaskShelfEntry,
+    .Terminate.StateProfile     = SystemManager_TerminateStateProfile,
+    
+    .Get.SubactivityMapEntry    = SystemManager_GetSubactivityMapEntryById,
+    .Get.TaskShelfEntry         = SystemManager_GetTaskShelfEntryById,
+    .Get.TaskById               = SystemManager_GetTaskDataById,
+//    .Get.TaskByComponent        = SystemManager_GetTaskDataByComponent
+//    .Get.HandlerByComponentId   = GetHandlerByComponentId
 };
 
 #endif /* systemmanager_h */

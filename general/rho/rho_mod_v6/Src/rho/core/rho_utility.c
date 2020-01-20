@@ -41,17 +41,17 @@ void InitializeDataRhoUtility( rho_core_t * core, index_t width, index_t height 
 
     core->Thresh = (double)AVG2( MAX_THRESH, MIN_THRESH );
     core->ThreshByte = (byte_t)core->Thresh;
-    
+
     core->DensityMapPair.x.map          = FOREGROUND_DENSITY_MAP_X;
     core->DensityMapPair.x.background   = BACKGROUND_DENSITY_MAP_X;
     core->DensityMapPair.x.bound        = BOUND_DENSITY_MAP_X;
     core->DensityMapPair.y.map          = FOREGROUND_DENSITY_MAP_Y;
     core->DensityMapPair.y.background   = BACKGROUND_DENSITY_MAP_Y;
     core->DensityMapPair.y.bound        = BOUND_DENSITY_MAP_Y;
-    
+
     KumaraswamyFunctions.Initialize( &core->Kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
     FSMFunctions.Sys.Initialize( &core->StateMachine, "A", &core->StateTransitions, CHAOTIC );
-    
+
     core->Timestamp = TIMESTAMP();
 }
 
@@ -68,7 +68,7 @@ void InitializeFiltersRhoUtility( rho_core_t * core )
 void InitializePredictionRhoUtility( prediction_t * prediction, const char * name, index_t length )
 {
     prediction->Name = name;
-    
+
     /* Prediction probabilities */
     memset( &prediction->Probabilities, 0, sizeof(floating_t) * 4 );
     for(uint8_t i = 0; i < MAX_TRACKING_FILTERS; i++)
@@ -87,7 +87,7 @@ void InitializePredictionRhoUtility( prediction_t * prediction, const char * nam
 void InitializeDensityMapRhoUtility( density_map_t * density_map, const char * name, index_t length, index_t centroid )
 {
     density_map->name = name;
-    
+
 //    size_t size = sizeof(density_map_unit_t)*length;
 //    memset(density_map->map, 0, size);
 //    memset(density_map->background, 0, size);
@@ -138,14 +138,14 @@ void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * densi
     _->total_density = 0;
     _->filtered_density = 0;
 #ifdef __USE_ZSCORE_THRESHOLD__
-    _->z_thresh_factor = 5;
-    _->z_stat.max_n = 5;//density_map->length;
+    _->z_thresh_factor = ZCORE_SAMPLES;
+    _->z_stat.max_n = ZCORE_SAMPLES;
 #endif
 #ifdef __USE_REGION_BOUNDARY_OFFSET__
     memset( _->region_boundaries, 0, sizeof(_->region_boundaries[0])*MAX_REGIONS*2);
     _->region_boundary_index = 0;
 #endif
-    
+
     DUAL_FILTER_CYCLE(_->cycle)
     {
         _->maximum  = 0;
@@ -180,7 +180,7 @@ void PerformDetectRhoUtility( rho_detection_variables * _, density_map_t * densi
     LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d\n", _->total_regions);
 
     RhoUtility.Detect.SortRegions( _, prediction );
-    
+
     floating_t proposed_center = (floating_t)_->raw_density_moment/(floating_t)_->total_density;
 #ifdef __USE_REGION_BOUNDARY_OFFSET__
     if(_->region_boundary_index > MAX_REGIONS)
@@ -245,7 +245,7 @@ inline void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * 
         /* Update max */
         if(_->curr > _->maximum)
             _->maximum = _->curr;
-        
+
 #ifdef USE_BACKGROUNDING
         /* Subtract background */
         _->curr -= _->background_curr;
@@ -289,11 +289,11 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
 #ifdef __USE_REGION_BOUNDARY_OFFSET__
     bool had_region = _->has_region;
 #endif
-    
+
 #ifdef __USE_ZSCORE_THRESHOLD__
         density_map->bound[_->x] = MAX((sdensity_t)(_->z_stat.avg - (floating_t)_->z_thresh),0) * (RhoUtility.Detect.ZRegion( _, false )?1:-1);
 #endif
-    
+
     /* Check if CMA value is in band */
     if( _->curr > _->filter_band_lower)
     {
@@ -306,7 +306,7 @@ inline void DetectRegionRhoUtility( rho_detection_variables * _, density_map_t *
         _->has_region = 1;
 #endif
         _->gap_counter = 0;
-        
+
         /* De-offset valid values */
         _->curr -= _->filter_band_lower;
 
@@ -390,7 +390,7 @@ void ScoreRegionsRhoUtility( rho_detection_variables * _, density_map_t * densit
 {
     /* Assume no recalculations are needed */
     _->recalculate = false;
-    
+
     /* Return on empty frames */
     if(_->filtered_density > 0 )
     {
@@ -451,7 +451,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
     index_t i, io, j, jo, best_index;
     floating_t best_score;
     region_t *curr, *check;
-    
+
     /* Cycle through found regions */
     for( i = 0; i < _->total_regions; i++)
     {
@@ -462,7 +462,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
 
         best_score = curr->score;
         best_index = i;
-        
+
         /* Cycle through other regions */
         for( j = i+1; j < _->total_regions; j++ )
         {
@@ -538,7 +538,7 @@ void CalculatedFrameStatisticsRhoUtility( rho_detection_variables * _, predictio
     /* Reset sort flags */
     for( uint8_t i = 0; i < MAX_REGIONS; i++ )
         prediction->Regions[i].sort = false;
-    
+
     LOG_RHO(RHO_DEBUG_DETECT_2, "Total:%d | Target:%d | Frame:%d\n", _->total_density, (int)_->target_density, TOTAL_RHO_PIXELS);
     LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d{%.3f}\n", prediction->NumRegions, prediction->NuRegions);
 }
@@ -575,9 +575,9 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
         bb = fabs(filterB->value - regionB->location );
         ab = fabs(filterA->value - regionB->location );
         ba = fabs(filterB->value - regionA->location );
-        
+
         LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> aa:%.3f ab:%.3f ba:%.3f bb:%.3f\n", prediction->Name, m, n, aa, ab, ba, bb);
-    
+
         bool swapped = false;
         /* Swap on upward determinant */
         if( aa * bb < ab * ba )
@@ -591,7 +591,7 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
         }
         LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", ab + ba);
         total_difference += curr_difference;
-        
+
         if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
         {
             /* Update filters */
@@ -610,13 +610,13 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
                 regionB->tracking_id = fBi;
             }
             updated += 2;
-            
+
             LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fAi, filterA->value);
             LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fBi, filterB->value);
         }
         m+=2; n+=2;
     }
-    
+
     /* Account for odd number of and spare regions */
     if( m < valid_tracks && n < prediction->NumRegions )
     {
@@ -626,15 +626,15 @@ void PredictTrackingFiltersRhoUtility( prediction_t * prediction )
 
         curr_difference = fabs(filter->value - region->location);
         LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> curr_difference:%.3f\n", prediction->Name, m, n, curr_difference);
-        
+
         LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", curr_difference);
         if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
         {
             region->tracking_id = prediction->TrackingFiltersOrder[m];
-            
+
             LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", region->tracking_id, filter->value);
             Kalman.Update(filter, region->location);
-            
+
             total_difference += curr_difference;
             updated++;
         }
@@ -735,7 +735,7 @@ void PredictTrackingProbabilitiesRhoUtility( prediction_t * prediction )
         prediction->Probabilities.P[i] = curr_CDF - prev_CDF;
         prev_CDF = curr_CDF;
     }
-    
+
     prediction->Primary   = prediction->TrackingFilters[0].value;
     prediction->Secondary = prediction->TrackingFilters[1].value;
 }
@@ -790,7 +790,7 @@ void UpdateCorePredictionDataRhoUtility( prediction_predict_variables * _, rho_c
     core->PredictionPair.y.PreviousCentroid = _->Centroid.x;
     core->PredictionPair.x.PreviousCentroid = _->Centroid.y;
 }
-    
+
 index_t CalculatePredictionCenterRhoUtility( index_t primary, index_t secondary, index_t width )
 {
     index_t sum = primary + secondary;
@@ -810,7 +810,7 @@ void CalculateTuneRhoUtility( rho_core_t * core )
     RhoUtility.Calculate.TargetTuneFactor( core );
 
     core->Tune.proposed = BOUND( core->Tune.background + core->Tune.state + core->Tune.target, -THRESH_STEP_MAX, THRESH_STEP_MAX);
-    
+
     core->Thresh = BOUND(core->Thresh + core->Tune.proposed, THRESH_MIN, THRESH_MAX);
 //    if(core->PredictiveStateModelPair.proposed_threshold > 0)
 //        core->Thresh = WeightedAverage(core->PredictiveStateModelPair.proposed_threshold, core->Thresh, 0.5);
@@ -827,13 +827,13 @@ void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * core )
     }
     core->Tune.background = background_tune_factor;
 }
-    
+
 void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
 {
     core->TargetCoverageFactor = core->TargetFilter.value;
     core->PredictionPair.AverageDensity = MAX( core->PredictionPair.x.AverageDensity, core->PredictionPair.y.AverageDensity );
     LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.7f|%.7f\n", core->FilteredPercentage, core->TotalPercentage);
-    
+
 //#ifdef __PSM__
 ////    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
 //    core->TargetFilter.value = core->TotalPercentage;
@@ -859,10 +859,10 @@ void CalculateStateTuneFactorRhoUtility( rho_core_t * core )
             RhoUtility.Calculate.TargetCoverageFactor( core );
             break;
     }
-    
+
     RhoPID.Update( &core->ThreshFilter, core->TargetCoverageFactor, core->TargetFilter.value );
     core->Tune.state = core->ThreshFilter.Value;
-    
+
     LOG_RHO(RHO_DEBUG_2, "Avg:%d | Nu:%.4f\n", (int)core->PredictionPair.AverageDensity, core->PredictionPair.NuRegions);
     LOG_RHO(RHO_DEBUG_2, "Target cov.:%.4f | Target val: %.4f | Thresh val:%.4f\n", core->TargetCoverageFactor, core->TargetFilter.value, core->ThreshFilter.Value);
 }
@@ -871,7 +871,7 @@ void CalculateTargetTuneFactorRhoUtility( rho_core_t * core )
 {
     core->Tune.target = TARGET_TUNE_FACTOR * ZDIV( core->ThreshFilter.Value, core->TargetFilter.value );
 }
-    
+
 void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core )
 {
     if( core->PredictionPair.Probabilities.confidence > MIN_STATE_CONFIDENCE )
@@ -968,8 +968,6 @@ void GenerateRegionScoreRhoUtility( region_t * region, density_t total_density, 
         delta_d = ( (floating_t)region->density / (floating_t)total_density) - 0.5,
         delta_p = (floating_t)peak / (floating_t)region->maximum;
     region->score = sqrt( REGION_SCORE_FACTOR * ( ( delta_d * delta_d ) + ( delta_p * delta_p ) ) );
-    if( region->score > 100. )
-        printf("");
 }
 
 /* Generic centroid and mass calculator */
@@ -1004,13 +1002,13 @@ void PrintPacketRhoUtility( packet_t * packet, index_t length )
     uint32_t px = *(uint32_t*)packet->data;
     floating_t pxf = *(floating_t*)packet->data;
     uint8_t * ptr = (uint8_t*)&px;
-    
+
     uint8_t pxr[4] = {ptr[3],ptr[2],ptr[1],ptr[0]};
     floating_t pxfr = *(floating_t*)&pxr;
     LOG_PACKET(DEBUG_0,"{%02x}{%02x}{%02x}{%02x} %f:%f\n",ptr[0],ptr[1],ptr[2],ptr[3],pxf,pxfr);
 #endif
 }
-    
+
 void GenerateBackgroundRhoUtility( rho_core_t * core )
 {
     density_2d_t xt = RhoUtility.Generate.Centroid( core->DensityMapPair.x.background, core->DensityMapPair.x.length, &core->Secondary.x, BACKGROUND_CENTROID_CALC_THRESH );
@@ -1067,7 +1065,7 @@ void GenerateObservationListFromPredictionsRhoUtility( prediction_t * prediction
     }
     prediction->ObservationList.length = i;
 }
-    
+
 void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
     if(core->PredictionPair.x.NumRegions > 0)
@@ -1085,7 +1083,7 @@ void ReportObservationListsFromPredictionsRhoUtility( rho_core_t * core )
     PSMFunctions.ReportObservations( &core->PredictiveStateModelPair.y, &core->PredictionPair.y.ObservationList, core->PredictionPair.y.NuRegions, core->ThreshByte );
 #endif
 }
-    
+
 void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * core )
 {
 #ifdef __PSM__

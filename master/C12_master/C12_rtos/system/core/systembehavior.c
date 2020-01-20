@@ -11,40 +11,51 @@
 void SystemBehaviorTask( )
 {
 }
-void PerformBehaviorSelfCheck(void)
+
+void SystemBehavior_PerformSelfCheck(void)
 {
 }
-void PerformBehaviorConfirmInit(void)
+
+void SystemBehavior_PerformConfirmInit(void)
 {
 }
-void PerformBehaviorWaitForWake(void)
+
+void SystemBehavior_PerformWaitForWake(void)
 {
 }
-void PerformBehaviorProbeSend( system_task_id_t id )
+
+void SystemBehavior_PerformProbeSend( system_task_id_t id )
 {
 }
-void PerformBehaviorProbeReceive( system_task_id_t id )
+void SystemBehavior_PerformProbeReceive( system_task_id_t id )
 {
 }
-void PerformBehaviorSchedulerSchedule( system_task_id_t id, uint32_t data )
+void SystemBehavior_PerformSchedulerSchedule( system_task_id_t id, uint32_t data )
 {
 }
-void PerformBehaviorSchedulerDeschedule( system_task_id_t id )
+void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t id )
 {
     //Deschedule BehaviorScheduledTasks[id]
 }
-void PerformBehaviorInterrupterSend( system_task_id_t id )
+void SystemBehavior_PerformInterrupterSend( system_task_id_t id )
 {
     //Enable BehaviorInterruptTasks[id]
 }
-void PerformBehaviorInterrupterReceive( system_task_id_t id )
+void SystemBehavior_PerformInterrupterReceive( component_t * component )
 {
+//    OSFunctions.Queue.Post( App.Get.MessageForComponent( component ) );
+    
+//    os_task_data_t * task = SystemFunctions.Get.TaskByComponent( component );
+//    void_handler_t handler = SystemFunctions.Get.HandlerByComponentId( component->ID );
+//    if(handler == NULL) return;
+//    handler();
     //Handle BehaviorInterruptTasks[id]
 }
-void PerformBehaviorInterrupterPerform( system_task_id_t id )
+void SystemBehavior_PerformInterrupterPerform( system_task_id_t id )
 {
     //Disable BehaviorInterruptTasks[id]
 }
-void InitProfileEntry( system_profile_entry_t * entry )
-{
-}
+
+//void InitProfileEntry( system_profile_entry_t * entry )
+//{
+//}

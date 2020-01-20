@@ -6,10 +6,14 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include "combinemaster.h"
+/* Types */
+#include "systemtypes.h"
+
+/* Functions */
+#include "systembridge.h"
 
 int main(int argc, const char * argv[])
-{
+{    
     Bridge.Start();
     return 0;
 }

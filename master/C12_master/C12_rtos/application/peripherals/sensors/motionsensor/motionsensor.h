@@ -24,7 +24,7 @@ typedef uint8_t imu_feature_t;
 
 typedef struct
 {
-    component_id ID;
+    component_id_t ID;
     shtp_client_t client;
     imu_chip_t chip;
     rotation_vector_t rotation;
@@ -32,7 +32,7 @@ typedef struct
     uint32_t interval;
 } imu_t;
 
-bool Init_IMU( imu_t *, component_id, uint8_t, comm_channel, imu_chip_t );
+bool Init_IMU( imu_t *, component_id_t, uint8_t, comm_channel, imu_chip_t );
 bool Set_IMU_RotVec( imu_t * );
 
 static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
@@ -45,7 +45,7 @@ static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
 
 typedef struct
 {
-    bool (*Init)( imu_t *, component_id, uint8_t, comm_channel, imu_chip_t );
+    bool (*Init)( imu_t *, component_id_t, uint8_t, comm_channel, imu_chip_t );
     bool (*Start)( shtp_client_t *, imu_feature_t, uint32_t, uint32_t );
     bool (*Stop)( shtp_client_t *, imu_feature_t );
     bool (*Read)( shtp_client_t * );

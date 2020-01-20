@@ -1,13 +1,13 @@
 //
-//  systemdebug.h
+//  application_debug.h
 //  C12_rtos
 //
 //  Created by Matthew Fonken on 8/28/18.
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#ifndef systemdebug_h
-#define systemdebug_h
+#ifndef application_debug_h
+#define application_debug_h
 
 #define _DEBUG_
 
@@ -211,21 +211,36 @@ static const char * task_id_strings[] =
     "PROBE_ID_RHO",
     "PROBE_ID_TIP",
     "PROBE_ID_BATTERY_MONITOR",
+    
+    //    "INTERRUPTER_ID_NONE",
+    "INTERRUPTER_ID_TAU_PACKET_TRANSMIT",
+    "INTERRUPTER_ID_TAU_PACKET_RECEIVE",
+    "INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT",
+    "INTERRUPTER_ID_HAPTIC_TRIGGER",
 
 //    "SCHEDULER_ID_NONE",
     "SCHEDULER_ID_TAU_PERFORM",
     "SCHEDULER_ID_TAU_PACKET_QUEUE",
     "SCHEDULER_ID_TIP_POLL",
     "SCHEDULER_ID_BATTERY_MONITOR_POLL",
-
-//    "INTERRUPTER_ID_NONE",
-    "INTERRUPTER_ID_TAU_PACKET_TRANSMIT",
-    "INTERRUPTER_ID_TAU_PACKET_RECEIVE",
-    "INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT",
-    "INTERRUPTER_ID_HAPTIC_TRIGGER",
+    
     "SCHEDULER_ID_MOTION_INTERRUPT",
     "SCHEDULER_ID_RHO_INTERRUPT",
     "SCHEDULER_ID_TOUCH_INTERRUPT"
 };
 
-#endif /* systemdebug_h */
+static const char * queue_id_strings[] =
+{
+    "SYSTEM_QUEUE_ID_HW_INTERRUPTS",
+    "SYSTEM_QUEUE_ID_COMM_INTERRUPTS",
+    "SYSTEM_QUEUE_ID_RUNTIME_MESSAGES",
+    "SYSTEM_QUEUE_ID_APPLICATION_MESSAGES"
+};
+
+#define timer_id_strings task_id_strings
+//static const char * timer_id_strings[] =
+//{
+//    
+//};
+
+#endif /* application_debug_h */

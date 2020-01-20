@@ -17,9 +17,10 @@
 
 #define GLOBAL_LOG_LEVEL    DEBUG_1
 
-#define KALMAN_DEBUG        DEBUG_2
+#define KALMAN_DEBUG        DEBUG_1
 #define KALMAN_DEBUG_2      DEBUG_1
 #define SYSTEM_DEBUG        DEBUG_2
+#define OSI_DEBUG           DEBUG_1
 #define IO_CTL_DEBUG        DEBUG_1
 
 #ifdef KALMAN_DEBUG
@@ -30,8 +31,18 @@
 
 #ifdef SYSTEM_DEBUG
 #define LOG_SYSTEM(L,...)       LOG(L,"<System> " __VA_ARGS__)
+#define LOG_SYSTEM_BARE(L,...)  LOG_BARE(L, __VA_ARGS__)
 #else
 #define LOG_SYSTEM(...)
+#define LOG_SYSTEM_BARE(...)
+#endif
+
+#ifdef OSI_DEBUG
+#define LOG_OSI(L,...)          LOG(L,"<OSI> " __VA_ARGS__)
+#define LOG_OSI_BARE(L,...)     LOG_BARE(L, __VA_ARGS__)
+#else
+#define LOG_OSI(...)
+#define LOG_OSI_BARE(...)
 #endif
 
 #ifdef IO_CTL_DEBUG
@@ -66,7 +77,5 @@
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
-
-
 
 #endif /* global_config_h */

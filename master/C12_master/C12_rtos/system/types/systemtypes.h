@@ -9,15 +9,30 @@
 #ifndef system_types_h
 #define system_types_h
 
+#define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
+
+typedef enum
+{
+    TASK_PRIORITY_CLASS_EXECUTIVE = 2,
+    TASK_PRIORITY_CLASS_HIGH,
+    TASK_PRIORITY_CLASS_MEDIUM,
+    TASK_PRIORITY_CLASS_LOW,
+    TASK_PRIORITY_CLASS_PASSIVE,
+    TASK_PRIORITY_CLASS_QUARANTINE
+} TASK_PRIORITY_CLASS;
+
+#define DEFAULT_TASK_OS_OPTIONS             0 //OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR
+
+
+#include "application_types.h"
+
+#if __OS__ == MICRIUM
+#include "micrium_interface.h"
+#else
+/*#error */#warning "No OS defined."
+#endif
+
 #include "globaltypes.h"
-#include "systemdebug.h"
-#include "taumanager.h"
-#include "communicationmanager.h"
-#include "motionsensor.h"
-#include "rho_client.h"
-#include "batterymonitor.h"
-#include "touchcontroller.h"
-#include "hapticcontroller.h"
 
 #define GENERIC_PROFILE profile
 
@@ -29,11 +44,17 @@
 #define MAX_TASK_SHELF_ENTRIES 20
 #define MAX_STATE_PROFILE_ENTRIES 10
 
-#define COMPONENT_ID(A,B) { A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
+//#define APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS
+#define NUM_SYSTEM_TASKS NUM_APPLICATION_TASKS
+#define NUM_SYSTEM_SUBACTIVITIES NUM_APPLICATION_SUBACTIVITIES
+#define SYSTEM_ACTION_ID_NONE APPLICATION_ACTION_ID_NONE
+
+#define APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS
 
 /************************************************************************************/
 /***                               Enums Start                                    ***/
 /************************************************************************************/
+
 typedef enum
 {
     SYSTEM_STATE_STARTUP = 0,
@@ -51,7 +72,7 @@ typedef enum
 {
     SYSTEM_ACTIVITY_NONE = 0,
     SYSTEM_ACTIVITY_STARTUP,
-    SYSTEM_ACTIVITY_TAU_STANDARD_START,
+//    SYSTEM_ACTIVITY_TAU_STANDARD_START,
     
     SYSTEM_ACTIVITY_IDLE,
     SYSTEM_ACTIVITY_SLEEP,
@@ -61,64 +82,12 @@ typedef enum
 
 typedef enum
 {
-    /* General */
-    SYSTEM_SUBACTIVITY_NONE = 0,
-    SYSTEM_SUBACTIVITY_SELF_CHECK,
-    SYSTEM_SUBACTIVITY_WAIT_FOR_WAKE,
-    
-    /* Initialization */
-    SYSTEM_SUBACTIVITY_INIT_COMMUNICATION,
-    SYSTEM_SUBACTIVITY_INIT_COMPONENTS,
-    SYSTEM_SUBACTIVITY_INIT_TAU_CLIENT,
-    SYSTEM_SUBACTIVITY_INIT_RHO_CLIENT,
-    SYSTEM_SUBACTIVITY_INIT_CONFIRM,
-    SYSTEM_SUBACTIVITY_BATTERY_MONITOR_ACTIVE,
-    
-    /* Profile */
-//    SYSTEM_SUBACTIVITY_PROFILE_FETCH,
-//    SYSTEM_SUBACTIVITY_PROFILE_PERFORM,
-//    SYSTEM_SUBACTIVITY_PROFILE_UPDATE,
-//    SYSTEM_SUBACTIVITY_PROFILE_STORE,
-    
-    /* Probes */
-    SYSTEM_SUBACTIVITY_SEND_HOST_PROBE,
-    SYSTEM_SUBACTIVITY_RECEIVE_HOST_PROBE,
-    
-    /* Handles */
-    SYSTEM_SUBACTIVITY_HANDLE_MOTION_EVENT,
-    SYSTEM_SUBACTIVITY_HANDLE_RHO_EVENT,
-    SYSTEM_SUBACTIVITY_HANDLE_TOUCH_EVENT,
-    
-    SYSTEM_SUBACTIVITY_POLL_BATTERY_MONITOR,
-    SYSTEM_SUBACTIVITY_POLL_TIP,
-    
-    SYSTEM_SUBACTIVITY_TRIGGER_HAPTIC,
-    
-    SYSTEM_SUBACTIVITY_TRANSMIT_HOST_PACKET,
-    SYSTEM_SUBACTIVITY_RECEIVE_HOST_PACKET,
-    SYSTEM_SUBACTIVITY_TRANSMIT_SUB_RADIO_PACKET,
-    SYSTEM_SUBACTIVITY_RECEIVE_SUB_RADIO_PACKET,
-    
-    /* Tau */
-    SYSTEM_SUBACTIVITY_TAU_STANDARD_RHO_START,
-    SYSTEM_SUBACTIVITY_TAU_STANDARD_MOTION_START,
-    SYSTEM_SUBACTIVITY_TAU_STANDARD_START,
-    
-    /* Sleep/Idle */
-    SYSTEM_SUBACTIVITY_TAU_STANDARD_RHO_STOP,
-    SYSTEM_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,
-    SYSTEM_SUBACTIVITY_TAU_STOP,
-    SYSTEM_SUBACTIVITY_BATTERY_MONITOR_SLEEP,
-    
-    NUM_SYSTEM_SUBACTIVITIES
-} SYSTEM_SUBACTIVITY, system_subactivity_t;
-typedef enum
-{
     SYSTEM_ERROR_NONE = 0,
     SYSTEM_ERROR_STARTUP,
     SYSTEM_ERROR_HARDWARE_NOT_FOUND,
     SYSTEM_ERROR_HOST_NOT_FOUND
 } SYSTEM_ERROR, system_error_t;
+
 typedef enum
 {
     SYSTEM_CONSUMPTION_NONE = 0,
@@ -128,6 +97,7 @@ typedef enum
     SYSTEM_CONSUMPTION_HIGH,
     SYSTEM_CONSUMPTION_SURGE
 } SYSTEM_CONSUMPTION, system_consumption_t;
+
 typedef enum
 {
     SYSTEM_FAMILY_NONE = 0,
@@ -138,50 +108,16 @@ typedef enum
     SYSTEM_FAMILY_D,
     NUM_SYSTEM_FAMILIES
 } SYSTEM_FAMILY, system_family_t;
-typedef enum
-{
-    SYSTEM_SENSOR_MOTION_PRIMARY = 0x50,
-    SYSTEM_SENSOR_MOTION_SECONDARY = 0x51,
-    SYSTEM_SENSOR_RHO_MODULE_PRIMARY = 0x60,
-    SYSTEM_SENSOR_RHO_MODULE_SECONDARY = 0x61,
-    SYSTEM_SENSOR_TOUCH_PRIMARY = 0x70,
-    SYSTEM_SENSOR_TOUCH_SECONDARY = 0x71,
-    SYSTEM_SENSOR_TIP_PRIMARY = 0x80,
-    SYSTEM_SENSOR_TIP_SECONDARY = 0x81,
-    SYSTEM_SENSOR_TIP_ALTERNATE = 0x82,
-    SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY = 0x90
-} SYSTEM_SENSOR;
-typedef enum
-{
-    SYSTEM_DRIVER_BLE_RADIO = 0x30,
-    SYSTEM_DRIVER_SUB_RADIO = 0x40,
-    SYSTEM_DRIVER_HAPTIC_PRIMARY = 0x50,
-    SYSTEM_DRIVER_HAPTIC_SECONDARY = 0x51,
-    SYSTEM_DRIVER_REGULATOR_1V5 = 0x61
-} SYSTEM_DRIVER;
-typedef enum
-{
-    SYSTEM_COMPONENT_TYPE_NONE = 0x00,
-    SYSTEM_COMPONENT_TYPE_SENSOR,
-    SYSTEM_COMPONENT_TYPE_DRIVER
-} SYSTEM_COMPONENT_TYPE;
 
-#define SYSTEM_COMPONENT_NONE COMPONENT_ID(SYSTEM_COMPONENT_TYPE_NONE, 0)
-#define SYSTEM_COMPONENT_MOTION_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_MOTION_PRIMARY)
-#define SYSTEM_COMPONENT_MOTION_SECONDARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_MOTION_SECONDARY)
-#define SYSTEM_COMPONENT_RHO_MODULE_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_RHO_MODULE_PRIMARY)
-#define SYSTEM_COMPONENT_RHO_MODULE_SECONDARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_RHO_MODULE_SECONDARY)
-#define SYSTEM_COMPONENT_TOUCH_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_TOUCH_PRIMARY)
-#define SYSTEM_COMPONENT_TOUCH_SECONDARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_TOUCH_SECONDARY)
-#define SYSTEM_COMPONENT_TIP_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_TIP_PRIMARY)
-#define SYSTEM_COMPONENT_TIP_SECONDARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_TIP_SECONDARY)
-#define SYSTEM_COMPONENT_TIP_ALTERNATE COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_TIP_ALTERNATE)
-#define SYSTEM_COMPONENT_BATTERY_MONITOR_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_SENSOR, SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY)
-#define SYSTEM_COMPONENT_BLE_RADIO COMPONENT_ID(SYSTEM_COMPONENT_TYPE_DRIVER, SYSTEM_DRIVER_BLE_RADIO)
-#define SYSTEM_COMPONENT_SUB_RADIO COMPONENT_ID(SYSTEM_COMPONENT_TYPE_DRIVER, SYSTEM_DRIVER_SUB_RADIO)
-#define SYSTEM_COMPONENT_HAPTIC_PRIMARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_DRIVER, SYSTEM_DRIVER_HAPTIC_PRIMARY)
-#define SYSTEM_COMPONENT_HAPTIC_SECONDARY COMPONENT_ID(SYSTEM_COMPONENT_TYPE_DRIVER, SYSTEM_DRIVER_HAPTIC_SECONDARY)
-#define SYSTEM_COMPONENT_REGULATOR_1V5 COMPONENT_ID(SYSTEM_COMPONENT_TYPE_DRIVER, SYSTEM_DRIVER_REGULATOR_1V5)
+typedef enum
+{
+    SYSTEM_QUEUE_ID_HW_INTERRUPTS,
+    SYSTEM_QUEUE_ID_COMM_INTERRUPTS,
+    SYSTEM_QUEUE_ID_RUNTIME_MESSAGES,
+    SYSTEM_QUEUE_ID_APPLICATION_MESSAGES,
+    
+    NUM_SYSTEM_QUEUE
+} SYSTEM_QUEUE_ID, system_queue_id_t;
 
 typedef enum
 {
@@ -204,44 +140,7 @@ typedef enum
     SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT,
     SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED
 } SYSTEM_PROFILE_ENTRY_TYPE, system_profile_entry_type;
-typedef enum
-{
-    SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS = 0,
-    SYSTEM_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_DRIVER_HAPTIC_PRIMARY_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS,
-    SYSTEM_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS
-} SYSTEM_TASK_SHELF_ENTRY_ID, system_task_shelf_entry_id_t;
-typedef enum
-{
-    SYSTEM_ACTION_ID_NONE = 0,
-    SYSTEM_COMBINE_GLOBAL,
-    
-    SYSTEM_PROBE_ID_HOST,
-    SYSTEM_PROBE_ID_RHO,
-    SYSTEM_PROBE_ID_TIP,
-    SYSTEM_PROBE_ID_BATTERY_MONITOR,
-    
-    SYSTEM_SCHEDULER_ID_TAU_PERFORM,
-    SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE,
-    SYSTEM_SCHEDULER_ID_TIP_POLL,
-    SYSTEM_SCHEDULER_ID_BATTERY_MONITOR_POLL,
 
-    SYSTEM_INTERRUPTER_ID_TAU_PACKET_TRANSMIT,
-    SYSTEM_INTERRUPTER_ID_TAU_PACKET_RECEIVE,
-    SYSTEM_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT,
-    SYSTEM_INTERRUPTER_ID_HAPTIC_TRIGGER,
-    SYSTEM_SCHEDULER_ID_MOTION_INTERRUPT,
-    SYSTEM_SCHEDULER_ID_RHO_INTERRUPT,
-    SYSTEM_SCHEDULER_ID_TOUCH_INTERRUPT,
-
-    NUM_SYSTEM_TASKS
-} SYSTEM_TASK_ID, system_task_id_t;
 
 /************************************************************************************/
 
@@ -249,48 +148,31 @@ typedef enum
 /***                               Types Start                                    ***/
 /************************************************************************************/
 
-typedef  void           (*OS_TASK_PTR)(void *p_arg);
-typedef  void * OS_TCB;
-typedef           const char CPU_CHAR;
-typedef   unsigned char OS_PRIO, OS_ERR;
-typedef  unsigned int   CPU_STK, CPU_STK_SIZE, OS_TICK;
-typedef unsigned short  OS_MSG_QTY, OS_OPT;
+//typedef enum
+//{
+//    TASK_TYPE_GENERIC   = 0x00,
+//    TASK_TYPE_PROBE     = 0x01,
+//    TASK_TYPE_SCHEDULE  = 0x02,
+//    TASK_TYPE_INTERRUPT = 0x0a
+//} TASK_TYPE;
 
-typedef struct
-{
-system_task_id_t   ID;
-    OS_TCB        *p_tcb; /* Operating System: Task Control Block */
-    CPU_CHAR      *p_name; /* Name */
-    OS_TASK_PTR    p_task; /* Pointer to task */
-    void          *p_arg; /* Argument */
-    OS_PRIO        prio; /* Priority */
-    CPU_STK       *p_stk_base; /* Stack base address */
-    CPU_STK_SIZE   stk_limit; /* Stack limit */
-    CPU_STK_SIZE   stk_size; /* Stack size */
-    OS_MSG_QTY     q_size; /* Max messages that can be received through queue */
-    OS_TICK        time_quanta; /* Clock ticks for time quanta during round robin */
-    void          *p_ext; /* Task control block extension for extended data during context switch */
-    OS_OPT         opt; /* Task specific options */
-    OS_ERR        *p_err; /* Pointer to error receiver */
-} os_task_data_t;
+typedef OS_SPECIFIC(OS_TASK_DATA_T) os_task_data_t;
+typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
+typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
+
 typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
+
+typedef application_subactivity_t system_subactivity_t;
+typedef application_task_id_t system_task_id_t;
+typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
+typedef application_objects_t system_objects_t;
+typedef application_buffers_t system_buffers_t;
 
 typedef struct
 {
     uint8_t ID;
-    union
-    {
-        void (*blank)(void);
-        void (*byte)(uint8_t);
-        void (*word)(uint32_t);
-        void (*pointer)(void *);
-    } function;
-    union
-    {
-        uint8_t byte;
-        uint32_t word;
-        void * pointer;
-    } data;
+    void (*function)(void *);
+    void * data;
 } system_subactivity_map_entry_t;
 typedef system_subactivity_map_entry_t system_subactivity_map_t[NUM_SYSTEM_SUBACTIVITIES];
 
@@ -321,13 +203,13 @@ system_profile_header
     header;
     union
     {
-        uint32_t
+        frequency_t
         schedule;
         uint8_t
         info[4];
     } data;
-component_id
-    component_ID;
+component_id_t
+    component_id;
 system_subactivity_t
     handler_id;
 os_task_data_t
@@ -409,36 +291,8 @@ typedef struct
 {
     void (*Send)(system_task_id_t);
     void (*Receive)(system_task_id_t);
-    void (*Perform)(system_task_id_t);
+    void (*Perform)(component_t *);
 } system_interrupter_functions;
-
-typedef struct
-{
-tau_config_t
-    tau;
-uint8_t
-    battery_monitor_mode,
-    haptic;
-} system_config_t;
-
-typedef struct
-{
-orientation_data_t
-    orientation;
-rho_data_t
-    rho;
-touch_data_t
-    touch;
-comm_packet_t
-    packet_in,
-    packet_out,
-    sub_packet_in,
-    sub_packet_out;
-battery_monitor_basic_t
-    battery;
-system_config_t
-    config;
-} system_buffers_t;
 
 typedef OS_ERR RTOS_ERR;
 typedef struct
@@ -447,24 +301,22 @@ system_error_t
     type;
 RTOS_ERR
     system,
-    sensors,
+    peripheral,
     runtime,
     recovery;
 } system_error_buffer_t;
 
-typedef struct
-{
-imu_t
-    IMU;
-rho_t
-    Rho;
-tau_t
-    Kinetic;
-} system_objects_t;
+//typedef struct
+//{
+//    bool
+//    [MAX_INTERRUPTS],
+//    scheduled[MAX_SCHEDULED];
+//} system_registered_t;
 
 typedef struct
 {
-    system_state_t          state;
+    system_state_t          state, prev_state;
+    os_task_list_t         *os_tasks;
     system_activity_t       activity;
     system_subactivity_t    subactivity;
     system_error_buffer_t   error;
@@ -473,7 +325,7 @@ typedef struct
     system_buffers_t        buffers;
     system_objects_t        objects;
     system_profile_t       *profile;
-    os_task_list_t         *os_tasks;
+    bool                    registered_profile_entries[NUM_APPLICATION_TASKS];
 } system_master_t;
 /************************************************************************************/
 

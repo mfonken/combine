@@ -15,15 +15,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #include <stdio.h>
-    
+
 #include "hmm.h"
-    
+
     //// TEMP LOCATION
     //#define HEIGHT 700
     //#define WIDTH HEIGHT
-    
+
 #define MAX_CLUSTER_Y_VARIANCE 30
 
 #ifdef __RHO__
@@ -31,8 +31,8 @@ extern "C" {
 #else
 #define PSM_OBSERVATION_MAX (1<<7)
 #endif
-    
-    
+
+
     void InitializePSM(                     psm_t *, const char * );
     void ReportObservationsPSM(             psm_t *, observation_list_t *, floating_t, uint8_t );
     void UpdateStateIntervalsPSM(           psm_t * );//, floating_t );
@@ -43,7 +43,7 @@ extern "C" {
     void UpdateBestClusterPSM(              psm_t *, band_list_t * );
     uint8_t GetCurrentBandPSM(              psm_t *, band_list_t * );
     void GenerateProposalsPSM(              psm_t * );
-    
+
     typedef struct
     {
         void (*Initialize)(                     psm_t *, const char * );
@@ -57,7 +57,7 @@ extern "C" {
         uint8_t (*GetCurrentBand)(              psm_t *, band_list_t * );
         void (*GenerateProposals)(              psm_t * );
     } psm_functions_t;
-    
+
     static const psm_functions_t PSMFunctions =
     {
         .Initialize                 = InitializePSM,
@@ -71,7 +71,7 @@ extern "C" {
         .GetCurrentBand             = GetCurrentBandPSM,
         .GenerateProposals          = GenerateProposalsPSM,
     };
-    
+
 #ifdef __cplusplus
 }
 #endif

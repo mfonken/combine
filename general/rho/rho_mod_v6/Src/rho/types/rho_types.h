@@ -162,12 +162,10 @@ typedef struct
   uint8_t (*Transmit)( byte_t *, index_t);
 } rho_platform_uart_interace_functions;
 
-#ifndef __USE_DECOUPLING__
 typedef struct
 {
   void (*Activate)( camera_application_flags * );
 } rho_platform_flag_interace_functions;
-#endif
 
 typedef struct
 {
@@ -329,12 +327,7 @@ typedef struct
     kumaraswamy_t       Kumaraswamy;
     fsm_system_t        StateMachine;
     packet_t            Packet;
-
-#ifdef __USE_DECOUPLING__
-    uint8_t             cframe[C_FRAME_SIZE];
-#endif
-    
-    double             Timestamp;
+    double              Timestamp;
 } rho_core_t;
 
 #endif /* rho_c_types_h */

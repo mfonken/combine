@@ -37,25 +37,26 @@ typedef struct
 {
     component_t component[SYSIOCTL_NUM_FAMILIES][SYSIOCTL_MAX_COMPONENTS_PER_FAMILY];
     uint8_t index[SYSIOCTL_MAX_COMPONENTS_PER_FAMILY];
-    component_id interrupt[SYSIOCTL_NUM_FAMILIES][SYSIOCTL_MAX_COMPONENTS_PER_FAMILY];
+    component_id_t interrupt[SYSIOCTL_NUM_FAMILIES][SYSIOCTL_MAX_COMPONENTS_PER_FAMILY];
 } sysioctl_tables;
 
 void SYSIOCTL_Init( system_master_t * );
-component_t * SYSIOCTL_Get_Component( component_id );
-void SYSIOCTL_Tie_Component( component_id, void * );
+component_t * SYSIOCTL_Get_Component( component_id_t );
+void SYSIOCTL_Tie_Component( component_id_t, void * );
 void SYSIOCTL_Init_Component( component_t * );
 void SYSIOCTL_Push_Component( component_t * );
 void SYSIOCTL_Enable_Family( system_family_t );
 void SYSIOCTL_Disable_Family( system_family_t );
 void SYSIOCTL_Enable_Component( component_t * );
 void SYSIOCTL_Disable_Component( component_t * );
-uint8_t SYSTIOCTL_Generate_ID( protocol_id_base_t );
+uint8_t SYSIOCTL_Generate_ID( protocol_id_base_t );
+//void * SYSIOCTL_Get_Component_Callback( component_t * );
 
 typedef struct
 {
     void (*Init)( system_master_t * );
-    component_t * (*Get)( component_id );
-    void (*Tie)( component_id, void * );
+    component_t * (*Get)( component_id_t );
+    void (*Tie)( component_id_t, void * );
     void (*InitComponent)( component_t * );
     void (*Push)( component_t * );
     void (*EnableFamily)( system_family_t );
@@ -63,6 +64,7 @@ typedef struct
     void (*EnableComponent)( component_t * );
     void (*DisableComponent)( component_t * );
     uint8_t (*GenerateID)( protocol_id_base_t );
+//    void * (*GetCallback)( component_t * );
 } sysioctl_functions;
 
 static sysioctl_functions SysIOCtlFunctions =
@@ -76,7 +78,8 @@ static sysioctl_functions SysIOCtlFunctions =
     .DisableFamily = SYSIOCTL_Disable_Family,
     .EnableComponent = SYSIOCTL_Enable_Component,
     .DisableComponent = SYSIOCTL_Disable_Component,
-    .GenerateID = SYSTIOCTL_Generate_ID
+    .GenerateID = SYSIOCTL_Generate_ID,
+//    .GetCallback = SYSIOCTL_Get_Component_Callback
 };
 
 typedef struct
@@ -89,6 +92,6 @@ sysioctl_tables
     tables;
 } sysioctl_t;
 
-static sysioctl_t SysIOCtl = { 0 };
+extern sysioctl_t SysIOCtl;
 
 #endif /* sysiocontroller_h */

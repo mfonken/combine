@@ -24,7 +24,7 @@ void SYSIOCTL_Init( system_master_t * system )
     SysIOCtlFunctions.EnableFamily( SYSTEM_FAMILY_0 );
 }
 
-component_t * SYSIOCTL_Get_Component( component_id id )
+component_t * SYSIOCTL_Get_Component( component_id_t id )
 {
     for( uint8_t i = 0; i < SYSIOCTL_NUM_FAMILIES; i++ )
     {
@@ -39,7 +39,7 @@ component_t * SYSIOCTL_Get_Component( component_id id )
     return NULL;
 }
 
-void SYSIOCTL_Tie_Component( component_id id, void * instance )
+void SYSIOCTL_Tie_Component( component_id_t id, void * instance )
 {
     SYSIOCTL_Get_Component(id)->instance = instance;
 }
@@ -52,39 +52,39 @@ shtp_client_output * output )
  */
 void SYSIOCTL_Init_Component( component_t * component )
 {
-    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s 0x%02x\n", component_type_strings[component->ID.macro], component->ID.micro);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", component_type_strings[component->ID.macro], component->ID.micro);
     generic_id_t ID = PROTOCOL_ID_NULL;
-    if( component->ID.macro == SYSTEM_COMPONENT_TYPE_SENSOR )
+    if( component->ID.macro == COMPONENT_TYPE_SENSOR )
     {
-        switch( component->ID.micro)
-        {
-            case SYSTEM_SENSOR_MOTION_PRIMARY:
-            case SYSTEM_SENSOR_MOTION_SECONDARY:
-                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
-                if( ID != PROTOCOL_ID_NULL )
-                {
-                    IMUFunctions.GenerateClient( &SysIOCtl.system->objects.IMU.client, ID );
-                    IMUFunctions.Init( &SysIOCtl.system->objects.IMU, component->ID, ID, COMM_CHAN_I2C, IMU_CHIP_BNO080 );
-                }
-                break;
-            case SYSTEM_SENSOR_RHO_MODULE_PRIMARY:
-            case SYSTEM_SENSOR_RHO_MODULE_SECONDARY:
-                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_RHO);
-                if( ID != PROTOCOL_ID_NULL )
-                    RhoFunctions.Init( &(rho_setting_t){ ID } );
-                break;
-            case SYSTEM_SENSOR_TOUCH_PRIMARY:
-            case SYSTEM_SENSOR_TOUCH_SECONDARY:
-                break;
-            case SYSTEM_SENSOR_TIP_PRIMARY:
-            case SYSTEM_SENSOR_TIP_SECONDARY:
-            case SYSTEM_SENSOR_TIP_ALTERNATE:
-                break;
-            case SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY:
-                break;
-            default:
-                break;
-        }
+//        switch( component->ID.micro)
+//        {
+//            case SYSTEM_SENSOR_MOTION_PRIMARY:
+//            case SYSTEM_SENSOR_MOTION_SECONDARY:
+//                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
+//                if( ID != PROTOCOL_ID_NULL )
+//                {
+//                    IMUFunctions.GenerateClient( &SysIOCtl.system->objects.IMU.client, ID );
+//                    IMUFunctions.Init( &SysIOCtl.system->objects.IMU, component->ID, ID, COMM_CHAN_I2C, IMU_CHIP_BNO080 );
+//                }
+//                break;
+//            case SYSTEM_SENSOR_RHO_MODULE_PRIMARY:
+//            case SYSTEM_SENSOR_RHO_MODULE_SECONDARY:
+//                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_RHO);
+//                if( ID != PROTOCOL_ID_NULL )
+//                    RhoFunctions.Init( &(rho_setting_t){ ID } );
+//                break;
+//            case SYSTEM_SENSOR_TOUCH_PRIMARY:
+//            case SYSTEM_SENSOR_TOUCH_SECONDARY:
+//                break;
+//            case SYSTEM_SENSOR_TIP_PRIMARY:
+//            case SYSTEM_SENSOR_TIP_SECONDARY:
+//            case SYSTEM_SENSOR_TIP_ALTERNATE:
+//                break;
+//            case SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY:
+//                break;
+//            default:
+//                break;
+//        }
     }
 }
 
@@ -148,7 +148,7 @@ void SYSIOCTL_Disable_Component( component_t * component )
     component->state = COMPONENT_STATE_OFF;
 }
 
-generic_id_t SYSTIOCTL_Generate_ID( protocol_id_base_t base )
+generic_id_t SYSIOCTL_Generate_ID( protocol_id_base_t base )
 {
     switch( base )
     {
@@ -171,4 +171,3 @@ generic_id_t SYSTIOCTL_Generate_ID( protocol_id_base_t base )
     }
     return PROTOCOL_ID_NULL;
 }
-

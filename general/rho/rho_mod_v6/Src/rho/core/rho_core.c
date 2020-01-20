@@ -2,7 +2,7 @@
  *  File: rho_core.h
  *  Group: Rho Core
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
- 
+
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                          Includes                                    *
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -43,7 +43,7 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 
     /* Filters */
     RhoUtility.Initialize.Filters( core );
-    
+
     /* Density Data */
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, X_INSTANCE_NAME, height, core->Centroid.y );
     RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, Y_INSTANCE_NAME, width, core->Centroid.x  );
@@ -55,10 +55,6 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 #ifdef __USE_DETECTION_MAP__
     /* Detection map */
     DetectionMapFunctions.Init( &core->DetectionMap, DETECTION_BUFFER_SIZE );
-#endif
-#ifdef __USE_DECOUPLING__
-    /* Frame Conversion Model Connection */
-    RhoInterrupts.INIT_FROM_CORE( core );
 #endif
 #ifdef __PSM__
     PSMFunctions.Initialize( &core->PredictiveStateModelPair.x, X_INSTANCE_NAME );
@@ -82,7 +78,7 @@ void PerformRhoCore( rho_core_t * core, bool background_event )
 /* Calculate and process data in variance band from density filter to generate predictions */
 void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t * prediction )
 {
-    LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );   
+    LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );
     static rho_detection_variables _;
     RhoUtility.Reset.Detect( &_, density_map, prediction );
     core->TotalCoverage = 0;
@@ -92,7 +88,7 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
     /* Perform detect */
     LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
     RhoUtility.Detect.Perform( &_, density_map, prediction );
-    
+
     /* Update frame statistics */
     LOG_RHO(RHO_DEBUG_2, "Calculating frame statistics:\n");
     RhoUtility.Detect.CalculateFrameStatistics( &_, prediction );
@@ -119,7 +115,7 @@ void DetectRhoCorePairs( rho_core_t * core )
 void UpdateRhoCorePrediction( prediction_t * prediction )
 {
     LOG_RHO(RHO_DEBUG_PREDICT,"Updating %s Map:\n", prediction->Name);
-    
+
     /* Step predictions of all Kalmans */
     RhoUtility.Predict.TrackingFilters( prediction );
     RhoUtility.Predict.TrackingProbabilities( prediction );
@@ -130,12 +126,12 @@ void UpdateRhoCorePredictions( rho_core_t * core )
     LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
     RhoCore.UpdatePrediction( &core->PredictionPair.x );
     RhoCore.UpdatePrediction( &core->PredictionPair.y );
-    
+
 #ifdef __USE_DETECTION_MAP__
     RhoUtility.Predict.ReportObservationLists( core );
     DetectionMapFunctions.AddSet( &core->DetectionMap, &core->PredictionPair );
 #endif
-    
+
 #ifdef __PSM__
     if( ISTIMEDOUT( core->Timestamp, PSM_UPDATE_PERIOD ) )
     { /* Process both dimensions' predictive state */
@@ -144,7 +140,7 @@ void UpdateRhoCorePredictions( rho_core_t * core )
         core->Timestamp = TIMESTAMP();
     }
 #endif
-    
+
     double state_intervals[NUM_STATE_GROUPS];
     KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
     FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
