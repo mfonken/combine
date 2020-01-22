@@ -84,17 +84,17 @@ typedef struct
 } stc_t;
 
 /* I2C Events */
-static i2c_event_t STCSetModeEvent(void)        { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_MODE,             STC_REG_LEN,     STC_ADDR    }; }
-static i2c_event_t STCGetModeEvent(void)        { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_MODE,             STC_REG_LEN,     STC_ADDR    }; }
-static i2c_event_t STCSetControlEvent(void)     { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR    }; }
-static i2c_event_t STCGetControlEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR    }; }
-static i2c_event_t STCGetIDEvent(void)          { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_ID0,              STC_REG_ID_LEN,  STC_ADDR    }; }
-static i2c_event_t STCGetRAMEvent(void)         { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_RAM_START,        STC_REG_RAM_LEN, STC_ADDR    }; }
-static i2c_event_t STCGetChargeEvent(void)      { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CHARGE_LOW,       STC_WORD_LEN,    STC_ADDR    }; }
-static i2c_event_t STCGetCounterEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_COUNTER_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
-static i2c_event_t STCGetCurrentEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CURRENT_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
-static i2c_event_t STCGetVoltageEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_VOLTAGE_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
-static i2c_event_t STCGetTemperatureEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN,    STC_ADDR    }; }
+static inline i2c_event_t STCSetModeEvent(void)        { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_MODE,             STC_REG_LEN,     STC_ADDR    }; }
+static inline i2c_event_t STCGetModeEvent(void)        { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_MODE,             STC_REG_LEN,     STC_ADDR    }; }
+static inline i2c_event_t STCSetControlEvent(void)     { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR    }; }
+static inline i2c_event_t STCGetControlEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR    }; }
+static inline i2c_event_t STCGetIDEvent(void)          { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_ID0,              STC_REG_ID_LEN,  STC_ADDR    }; }
+static inline i2c_event_t STCGetRAMEvent(void)         { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_RAM_START,        STC_REG_RAM_LEN, STC_ADDR    }; }
+static inline i2c_event_t STCGetChargeEvent(void)      { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CHARGE_LOW,       STC_WORD_LEN,    STC_ADDR    }; }
+static inline i2c_event_t STCGetCounterEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_COUNTER_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
+static inline i2c_event_t STCGetCurrentEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CURRENT_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
+static inline i2c_event_t STCGetVoltageEvent(void)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_VOLTAGE_LOW,      STC_WORD_LEN,    STC_ADDR    }; }
+static inline i2c_event_t STCGetTemperatureEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN,    STC_ADDR    }; }
 
 static void STCSetMode( stc_reg_mode_t data )
 {

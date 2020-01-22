@@ -9,7 +9,7 @@
 #ifndef hapticcontroller_h
 #define hapticcontroller_h
 
-#include "drv2605.h"
+#include "DRV2605.h"
 
 typedef enum
 {

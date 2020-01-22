@@ -52,7 +52,7 @@ void SystemManager_PerformEnableProfileEntryState( system_profile_entry_t * entr
 {
     uint8_t id = entry->ID;
     LOG_SYSTEM(SYSTEM_DEBUG, "Enabling profile entry state: %s(%d)\n", task_id_strings[id], id);
-    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_ENABLED;
+//    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_ENABLED;
     
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
     if( task_data == NULL ) return;
@@ -80,7 +80,7 @@ void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * ent
 {
     uint8_t id = entry->ID;
     LOG_SYSTEM(SYSTEM_DEBUG, "Disabling profile entry state: %s(%d)\n", task_id_strings[id], id);
-    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_DISABLED;
+//    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_DISABLED;
     
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
 //    if( TaskHasValidTimer( task_data ) )
@@ -94,6 +94,13 @@ void SystemManager_RegisterTaskList( os_task_list_t * task_list )
 //    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
 //        OSFunctions.Task.Create( &((*System.os_tasks)[i]) );
 }
+
+void SystemManager_RegisterQueueList( os_queue_list_t * queue_list )
+{
+    System.queue_list = queue_list;
+    
+}
+
 void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
 {
     for(uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++)
@@ -126,37 +133,37 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
     LOG_SYSTEM( SYSTEM_DEBUG, "Registering profile entry %s(%d).\n", task_id_strings[id], id);
     System.registration.profile_entries[id] = true;
 //    system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
-    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
-    {
-        switch( entry->header.type )
-        {
-            case SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT:
-                switch( entry->header.direction )
-                {
-                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-//                        handler->blank();
-                        break;
-                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
-                switch( entry->header.direction )
-                {
-                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
-                        break;
-                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
-    }
+//    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
+//    {
+//        switch( entry->header.type )
+//        {
+//            case SYSTEM_PROFILE_ENTRY_TYPE_INTERRUPT:
+//                switch( entry->header.direction )
+//                {
+//                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+////                        handler->blank();
+//                        break;
+//                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                break;
+//            case SYSTEM_PROFILE_ENTRY_TYPE_SCHEDULED:
+//                switch( entry->header.direction )
+//                {
+//                    case SYSTEM_PROFILE_ENTRY_DIRECTION_INPUT:
+//                        break;
+//                    case SYSTEM_PROFILE_ENTRY_DIRECTION_OUTPUT:
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
     if( task_data == NULL ) return;
     

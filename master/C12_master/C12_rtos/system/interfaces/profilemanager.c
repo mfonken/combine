@@ -17,14 +17,17 @@ void FetchProfile(void)
 {
     
 }
+
 void PerformProfile(void)
 {
     
 }
+
 void UpdateProfile(void)
 {
     
 }
+
 void StoreProfile(void)
 {
     

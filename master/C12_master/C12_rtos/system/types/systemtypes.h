@@ -47,6 +47,7 @@ typedef OS_Q queue_t;
 
 //#define APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS
 #define NUM_SYSTEM_TASKS NUM_APPLICATION_TASKS
+#define NUM_SYSTEM_QUEUES NUM_APPLICATION_QUEUES
 #define NUM_SYSTEM_SUBACTIVITIES NUM_APPLICATION_SUBACTIVITIES
 #define SYSTEM_ACTION_ID_NONE APPLICATION_ACTION_ID_NONE
 
@@ -163,6 +164,7 @@ typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
 typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
 
 typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
+typedef os_queue_data_t os_queue_list_t[NUM_SYSTEM_QUEUES];
 
 typedef application_subactivity_t system_subactivity_t;
 typedef application_task_id_t system_task_id_t;
@@ -201,8 +203,8 @@ typedef struct
 {
 system_task_id_t
     ID;
-system_profile_header
-    header;
+//system_profile_header
+//    header;
     union
     {
         frequency_t
@@ -294,7 +296,7 @@ typedef struct
 typedef struct
 {
     void (*Send)(system_task_id_t);
-    void (*Receive)(system_task_id_t);
+    void (*Receive)(system_task_id_t, hw_event_message_t);
     void (*Perform)(system_task_id_t);
 } system_interrupter_functions;
 
@@ -306,6 +308,8 @@ system_error_t
 RTOS_ERR
     system,
     peripheral,
+    interrupt,
+    messaging,
     runtime,
     recovery;
 } system_error_buffer_t;
@@ -319,12 +323,6 @@ RTOS_ERR
 
 typedef struct
 {
-queue_t
-    interrupt;
-} system_queue_list_t;
-
-typedef struct
-{
     bool                    profile_entries[NUM_APPLICATION_TASKS];
     system_task_id_t        component_tasks[MAX_COMPONENTS];
 } system_registration_log_t;
@@ -333,7 +331,7 @@ typedef struct
 {
     system_state_t          state, prev_state, exit_state;
     os_task_list_t         *os_tasks;
-    system_queue_list_t     queue;
+    os_queue_list_t        *queue_list;
     system_activity_t       activity;
     system_subactivity_t    subactivity;
     system_error_buffer_t   error;

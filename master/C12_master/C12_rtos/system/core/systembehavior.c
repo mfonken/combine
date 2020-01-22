@@ -24,24 +24,25 @@ void SystemBehavior_PerformWaitForWake(void)
 {
 }
 
-void SystemBehavior_PerformProbeSend( system_task_id_t id )
+void SystemBehavior_PerformProbeSend( system_task_id_t task_id )
 {
 }
-void SystemBehavior_PerformProbeReceive( system_task_id_t id )
+void SystemBehavior_PerformProbeReceive( system_task_id_t task_id )
 {
 }
-void SystemBehavior_PerformSchedulerSchedule( system_task_id_t id, uint32_t data )
+void SystemBehavior_PerformSchedulerSchedule( system_task_id_t task_id, uint32_t data )
 {
 }
-void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t id )
+void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t task_id )
 {
     //Deschedule BehaviorScheduledTasks[id]
 }
-void SystemBehavior_PerformInterrupterSend( system_task_id_t id )
+void SystemBehavior_PerformInterrupterSend( system_task_id_t task_id )
 {
     //Enable BehaviorInterruptTasks[id]
+    os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
 }
-void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id )
+void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_event_message_t message )
 {
     bool handled = false;
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
@@ -59,16 +60,11 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id )
     }
     if( !handled )
     {
-        os_queue_data_t queue_data;
-//        message_t message = App.Get.MessageForComponent( component->ID );
-        OSFunctions.Queue.Post( &queue_data );
+        os_queue_data_t * queue_data = &(*System.queue_list[INTERRUPT_CHANNEL]);
+        queue_data->p_void = (void*)&message;
+        queue_data->msg_size = sizeof(hw_event_message_t);
+        OSFunctions.Queue.Post( queue_data );
     }
-    
-//    os_task_data_t * task = SystemFunctions.Get.TaskByComponent( component );
-//    void_handler_t handler = SystemFunctions.Get.HandlerByComponentId( component->ID );
-//    if(handler == NULL) return;
-//    handler();
-    //Handle BehaviorInterruptTasks[id]
 }
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t id )
 {

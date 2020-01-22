@@ -238,9 +238,5 @@ static const char * queue_id_strings[] =
 };
 
 #define timer_id_strings task_id_strings
-//static const char * timer_id_strings[] =
-//{
-//    
-//};
 
 #endif /* application_debug_h */

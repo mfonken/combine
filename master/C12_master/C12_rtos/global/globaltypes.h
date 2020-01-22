@@ -141,4 +141,20 @@ uint32_t
     timestamp;
 } touch_data_t;
 
+typedef enum
+{
+    HW_EDGE_RISING = 0,
+    HW_EDGE_FALLING,
+} HW_EDGE_T, hw_edge_t;
+
+typedef struct
+{
+    port_t port;
+    pin_t pin;
+    hw_edge_t edge;
+} hw_event_message_t;
+
+#define DEFAULT_QUEUE_TIMEOUT_MS 100
+#define DEFAULT_QUEUE_MAX_QTY 50
+
 #endif /* globaltypes_h */

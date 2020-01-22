@@ -69,16 +69,16 @@ typedef struct
 
 typedef struct
 {
-    generic_id_t  ID;
-    OS_Q          *p_q;
+    generic_id_t   ID;
     CPU_CHAR      *p_name;
     OS_MSG_QTY     max_qty;
     OS_ERR        *p_err;
     OS_OPT         opt;
     OS_TICK        timeout;
-    OS_MSG_SIZE   *p_msg_size;
+    OS_MSG_SIZE    msg_size;
     CPU_TS        *p_ts;
     void          *p_void;
+    OS_Q           q;
 } micrium_os_queue_data_t, MICRIUM_OS_QUEUE_DATA_T;
 
 typedef struct
@@ -113,6 +113,25 @@ typedef struct
 
 #define TASK( ID_, PTR_, ARGS_, PRIORITY_, ERROR_ ) \
 TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_TASK_OS_OPTIONS, ERROR_/*, 0u, 0u, 0u*/ )
+
+#define QUEUE_ADV( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_, OPT_ ) \
+{ \
+    (generic_id_t)ID_, \
+    (CPU_CHAR*)queue_id_strings[ID_], \
+    (OS_MSG_QTY)MAX_QTY_, \
+    (OS_ERR*)ERROR_, \
+    (OS_OPT)OPT_, \
+    (OS_TICK)MS_TO_TICK(TIMEOUT_MS_), \
+    0 \
+}
+
+#ifndef OS_OPT_PEND_BLOCKING
+#define OS_OPT_PEND_BLOCKING 0
+#endif
+#define DEFAULT_OS_Q_OPT OS_OPT_PEND_BLOCKING
+
+#define QUEUE( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_ ) \
+    QUEUE_ADV( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_, DEFAULT_OS_Q_OPT )
 
 //#define SCHEDULED_TASK( ID_, PTR_, ARGS_, PRIORITY_, ERROR_, TIMER_DELAY_, TIMER_HZ_, TIMER_OPT_ ) \
 //TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_TASK_OS_OPTIONS, ERROR_, TIMER_DELAY_MS_, TIMER_HZ_, TIMER_OPT_ )

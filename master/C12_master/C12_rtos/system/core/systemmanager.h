@@ -32,6 +32,7 @@ void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * );
 void SystemManager_PerformExitState( void );
 
 void SystemManager_RegisterTaskList( os_task_list_t * );
+void SystemManager_RegisterQueueList( os_queue_list_t * );
 void SystemManager_RegisterTaskShelf( system_task_shelf_t * );
 void SystemManager_RegisterSubactivityMap( system_subactivity_map_t * );
 void SystemManager_RegisterProfile( system_profile_t * );
@@ -70,6 +71,7 @@ typedef struct
 typedef struct
 {
     void (*TaskList)( os_task_list_t * );
+    void (*QueueList)( os_queue_list_t * );
     void (*TaskShelf)( system_task_shelf_t * );
     void (*SubactivityMap)( system_subactivity_map_t * );
     void (*Profile)( system_profile_t * );
@@ -119,6 +121,7 @@ static system_functions SystemFunctions =
     .Perform.ExitState          = SystemManager_PerformExitState,
     
     .Register.TaskList          = SystemManager_RegisterTaskList,
+    .Register.QueueList         = SystemManager_RegisterQueueList,
     .Register.TaskShelf         = SystemManager_RegisterTaskShelf,
     .Register.SubactivityMap    = SystemManager_RegisterSubactivityMap,
     .Register.Profile           = SystemManager_RegisterProfile,
@@ -130,6 +133,7 @@ static system_functions SystemFunctions =
     .Register.Subactivity       = SystemManager_RegisterSubactivity,
     .Register.Error             = SystemManager_RegisterError,
     .Register.Consumption       = SystemManager_RegisterConsumption,
+    
     .Instate.TaskShelfEntry     = SystemManager_InstateTaskShelfEntry,
     .Instate.StateProfile       = SystemManager_InstateStateProfile,
     

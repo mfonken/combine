@@ -20,7 +20,7 @@
 		3491A36823C57815008010C8 /* shtp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A34F23C57815008010C8 /* shtp.c */; };
 		3491A36923C57815008010C8 /* BNO080.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35023C57815008010C8 /* BNO080.c */; };
 		3491A36A23C57815008010C8 /* batterymonitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35323C57815008010C8 /* batterymonitor.c */; };
-		3491A36B23C57815008010C8 /* drv2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35923C57815008010C8 /* drv2605.c */; };
+		3491A36B23C57815008010C8 /* DRV2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35923C57815008010C8 /* DRV2605.c */; };
 		3491A38523C57877008010C8 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37023C57877008010C8 /* kalman.c */; };
 		3491A38723C57877008010C8 /* kinetic.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37623C57877008010C8 /* kinetic.c */; };
 		3491A38823C57877008010C8 /* matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37A23C57877008010C8 /* matvec.c */; };
@@ -68,15 +68,8 @@
 		3491A32C23C57815008010C8 /* taumanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = taumanager.h; sourceTree = "<group>"; };
 		3491A32D23C57815008010C8 /* communicationmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = communicationmanager.c; sourceTree = "<group>"; };
 		3491A32F23C57815008010C8 /* application_debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = application_debug.h; sourceTree = "<group>"; };
-		3491A33023C57815008010C8 /* combinemaster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = combinemaster.h; sourceTree = "<group>"; };
 		3491A33423C57815008010C8 /* touchcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchcontroller.h; sourceTree = "<group>"; };
 		3491A33523C57815008010C8 /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
-		3491A33A23C57815008010C8 /* .suo */ = {isa = PBXFileReference; lastKnownFileType = file; path = .suo; sourceTree = "<group>"; };
-		3491A33E23C57815008010C8 /* PROFILEMANAGER.ipch */ = {isa = PBXFileReference; lastKnownFileType = file; path = PROFILEMANAGER.ipch; sourceTree = "<group>"; };
-		3491A33F23C57815008010C8 /* Browse.VC.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = Browse.VC.db; sourceTree = "<group>"; };
-		3491A34023C57815008010C8 /* slnx.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = slnx.sqlite; sourceTree = "<group>"; };
-		3491A34123C57815008010C8 /* ProjectSettings.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ProjectSettings.json; sourceTree = "<group>"; };
-		3491A34223C57815008010C8 /* VSWorkspaceState.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = VSWorkspaceState.json; sourceTree = "<group>"; };
 		3491A34723C57815008010C8 /* rho_client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rho_client.h; sourceTree = "<group>"; };
 		3491A34823C57815008010C8 /* rho_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rho_client.c; sourceTree = "<group>"; };
 		3491A34A23C57815008010C8 /* motionsensor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = motionsensor.c; sourceTree = "<group>"; };
@@ -89,9 +82,9 @@
 		3491A35223C57815008010C8 /* STC3100IQT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STC3100IQT.h; sourceTree = "<group>"; };
 		3491A35323C57815008010C8 /* batterymonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = batterymonitor.c; sourceTree = "<group>"; };
 		3491A35423C57815008010C8 /* batterymonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
-		3491A35723C57815008010C8 /* drv2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drv2605.h; sourceTree = "<group>"; };
+		3491A35723C57815008010C8 /* DRV2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRV2605.h; sourceTree = "<group>"; };
 		3491A35823C57815008010C8 /* hapticcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
-		3491A35923C57815008010C8 /* drv2605.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drv2605.c; sourceTree = "<group>"; };
+		3491A35923C57815008010C8 /* DRV2605.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DRV2605.c; sourceTree = "<group>"; };
 		3491A35A23C57815008010C8 /* peripheralbridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = peripheralbridge.h; sourceTree = "<group>"; };
 		3491A35C23C57815008010C8 /* C12_profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = C12_profile.h; sourceTree = "<group>"; };
 		3491A36F23C57877008010C8 /* kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kalman.h; sourceTree = "<group>"; };
@@ -145,6 +138,24 @@
 			path = tau;
 			sourceTree = "<group>";
 		};
+		348D188E23D8133F002271B6 /* global */ = {
+			isa = PBXGroup;
+			children = (
+				3491A38C23C578F5008010C8 /* genlog.h */,
+				3491A38D23C57CB0008010C8 /* global_config.h */,
+				3491A31423C57815008010C8 /* globaltypes.h */,
+			);
+			path = global;
+			sourceTree = "<group>";
+		};
+		348D188F23D8135A002271B6 /* specific */ = {
+			isa = PBXGroup;
+			children = (
+				347F720B23D381E900427FD0 /* micrium_interface.h */,
+			);
+			path = specific;
+			sourceTree = "<group>";
+		};
 		3491A2FD23C577DD008010C8 = {
 			isa = PBXGroup;
 			children = (
@@ -164,12 +175,8 @@
 		3491A30823C577DD008010C8 /* C12_rtos */ = {
 			isa = PBXGroup;
 			children = (
-				3491A38C23C578F5008010C8 /* genlog.h */,
-				3491A38D23C57CB0008010C8 /* global_config.h */,
+				348D188E23D8133F002271B6 /* global */,
 				3491A35C23C57815008010C8 /* C12_profile.h */,
-				3491A33023C57815008010C8 /* combinemaster.h */,
-				3491A31423C57815008010C8 /* globaltypes.h */,
-				347F720B23D381E900427FD0 /* micrium_interface.h */,
 				3491A31023C57814008010C8 /* main.c */,
 				347F720E23D3A45600427FD0 /* application */,
 				3491A33123C57815008010C8 /* peripherals */,
@@ -224,6 +231,7 @@
 		3491A32523C57815008010C8 /* interfaces */ = {
 			isa = PBXGroup;
 			children = (
+				348D188F23D8135A002271B6 /* specific */,
 				3491A32923C57815008010C8 /* communicationmanager.h */,
 				3491A32D23C57815008010C8 /* communicationmanager.c */,
 				3491A32623C57815008010C8 /* profilemanager.h */,
@@ -256,9 +264,6 @@
 			isa = PBXGroup;
 			children = (
 				3491A33323C57815008010C8 /* touchcontroller */,
-				3491A33623C57815008010C8 /* camera */,
-				3491A33723C57815008010C8 /* .vs */,
-				3491A34323C57815008010C8 /* imu */,
 				3491A34623C57815008010C8 /* rhoclient */,
 				3491A34923C57815008010C8 /* motionsensor */,
 				3491A35123C57815008010C8 /* batterymonitor */,
@@ -269,93 +274,10 @@
 		3491A33323C57815008010C8 /* touchcontroller */ = {
 			isa = PBXGroup;
 			children = (
-				3491A33423C57815008010C8 /* touchcontroller.h */,
 				3491A33523C57815008010C8 /* CPT112S.h */,
+				3491A33423C57815008010C8 /* touchcontroller.h */,
 			);
 			path = touchcontroller;
-			sourceTree = "<group>";
-		};
-		3491A33623C57815008010C8 /* camera */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = camera;
-			sourceTree = "<group>";
-		};
-		3491A33723C57815008010C8 /* .vs */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33823C57815008010C8 /* sensors */,
-				3491A34023C57815008010C8 /* slnx.sqlite */,
-				3491A34123C57815008010C8 /* ProjectSettings.json */,
-				3491A34223C57815008010C8 /* VSWorkspaceState.json */,
-			);
-			path = .vs;
-			sourceTree = "<group>";
-		};
-		3491A33823C57815008010C8 /* sensors */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33923C57815008010C8 /* v15 */,
-			);
-			path = sensors;
-			sourceTree = "<group>";
-		};
-		3491A33923C57815008010C8 /* v15 */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33A23C57815008010C8 /* .suo */,
-				3491A33B23C57815008010C8 /* ipch */,
-				3491A33F23C57815008010C8 /* Browse.VC.db */,
-			);
-			path = v15;
-			sourceTree = "<group>";
-		};
-		3491A33B23C57815008010C8 /* ipch */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33C23C57815008010C8 /* AutoPCH */,
-			);
-			path = ipch;
-			sourceTree = "<group>";
-		};
-		3491A33C23C57815008010C8 /* AutoPCH */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33D23C57815008010C8 /* eb8a91221b4437d5 */,
-			);
-			path = AutoPCH;
-			sourceTree = "<group>";
-		};
-		3491A33D23C57815008010C8 /* eb8a91221b4437d5 */ = {
-			isa = PBXGroup;
-			children = (
-				3491A33E23C57815008010C8 /* PROFILEMANAGER.ipch */,
-			);
-			path = eb8a91221b4437d5;
-			sourceTree = "<group>";
-		};
-		3491A34323C57815008010C8 /* imu */ = {
-			isa = PBXGroup;
-			children = (
-				3491A34423C57815008010C8 /* .deps */,
-				3491A34523C57815008010C8 /* .libs */,
-			);
-			path = imu;
-			sourceTree = "<group>";
-		};
-		3491A34423C57815008010C8 /* .deps */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = .deps;
-			sourceTree = "<group>";
-		};
-		3491A34523C57815008010C8 /* .libs */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = .libs;
 			sourceTree = "<group>";
 		};
 		3491A34623C57815008010C8 /* rhoclient */ = {
@@ -385,8 +307,8 @@
 			isa = PBXGroup;
 			children = (
 				3491A35223C57815008010C8 /* STC3100IQT.h */,
-				3491A35323C57815008010C8 /* batterymonitor.c */,
 				3491A35423C57815008010C8 /* batterymonitor.h */,
+				3491A35323C57815008010C8 /* batterymonitor.c */,
 			);
 			path = batterymonitor;
 			sourceTree = "<group>";
@@ -402,9 +324,9 @@
 		3491A35623C57815008010C8 /* hapticontroller */ = {
 			isa = PBXGroup;
 			children = (
-				3491A35723C57815008010C8 /* drv2605.h */,
+				3491A35723C57815008010C8 /* DRV2605.h */,
+				3491A35923C57815008010C8 /* DRV2605.c */,
 				3491A35823C57815008010C8 /* hapticcontroller.h */,
-				3491A35923C57815008010C8 /* drv2605.c */,
 			);
 			path = hapticontroller;
 			sourceTree = "<group>";
@@ -510,7 +432,7 @@
 				3491A36323C57815008010C8 /* os_interface.c in Sources */,
 				3491A36423C57815008010C8 /* profilemanager.c in Sources */,
 				3491A38B23C57877008010C8 /* quaternion.c in Sources */,
-				3491A36B23C57815008010C8 /* drv2605.c in Sources */,
+				3491A36B23C57815008010C8 /* DRV2605.c in Sources */,
 				3491A36523C57815008010C8 /* communicationmanager.c in Sources */,
 				3491A36723C57815008010C8 /* motionsensor.c in Sources */,
 				3491A38723C57877008010C8 /* kinetic.c in Sources */,

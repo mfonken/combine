@@ -1,13 +1,13 @@
 //
-//  drv2605.h
+//  DRV2605.h
 //  C12_rtos
 //
 //  Created by Matthew Fonken on 8/28/18.
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#ifndef drv2605_h
-#define drv2605_h
+#ifndef DRV2605_h
+#define DRV2605_h
 
 #include "i2c_template.h"
 #include <stdint.h>
@@ -59,20 +59,20 @@
 #define DRV2605_REG_VBAT            0x21
 #define DRV2605_REG_LRARESON        0x22
 
-bool DRV2605Start(void);
-void DRV2605Go(void);
-void DRV2605Stop(void);
-void DRV2605SetWaveform(uint8_t, uint8_t);
-void DRV2605SelectLibrary(uint8_t);
-void DRV2605SetMode(uint8_t);
-void DRV2605SetRealtimeValue(uint8_t);
-void DRV2605UseERM(void);
-void DRV2605UseLRA(void);
-uint8_t DRV2605ReadRegister(uint8_t);
-void DRV2605WriteRegister(uint8_t, uint8_t);
+bool DRV2605_Start(void);
+void DRV2605_Go(void);
+void DRV2605_Stop(void);
+void DRV2605_SetWaveform(uint8_t, uint8_t);
+void DRV2605_SelectLibrary(uint8_t);
+void DRV2605_SetMode(uint8_t);
+void DRV2605_SetRealtimeValue(uint8_t);
+void DRV2605_UseERM(void);
+void DRV2605_UseLRA(void);
+uint8_t DRV2605_ReadRegister(uint8_t);
+void DRV2605_WriteRegister(uint8_t, uint8_t);
 
-static i2c_event_t DRV2605GetReadEvent(uint8_t reg) { return (i2c_event_t){ I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
-static i2c_event_t DRV2605GetWriteEvent(uint8_t reg) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
+static i2c_event_t DRV2605_GetReadEvent(uint8_t reg) { return (i2c_event_t){ I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
+static i2c_event_t DRV2605_GetWriteEvent(uint8_t reg) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
 
 
-#endif /* drv2605_h */
+#endif /* DRV2605_h */

@@ -15,6 +15,7 @@
 
 system_subactivity_map_t global_subactivity_map = { 0 };
 os_task_list_t global_task_list = { 0 };
+os_queue_list_t global_queue_list = { 0 };
 
 void InitializeMeta(void);
 
@@ -28,7 +29,7 @@ static void StartApplication( void )
     SystemFunctions.Perform.ExitState();
     OSFunctions.DelayMs(1000);
     SystemFunctions.Register.State( SYSTEM_STATE_ACTIVE );
-    ComponentInterrupt( PORTC, 9 );
+    ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
 }
 
 static void TickApplication( void )
@@ -280,11 +281,22 @@ void InitializeMeta(void)
         TASK(APPLICATION_SCHEDULER_ID_TIP_POLL,                    App.Tick,                       NULL,                           TASK_PRIORITY_CLASS_HIGH,   &System.error.peripheral )
     };
     
+    os_queue_list_t queue_list_initializer =
+    (os_queue_list_t)
+    {
+        QUEUE( APPLICATION_QUEUE_ID_HW_INTERRUPTS,                  DEFAULT_QUEUE_TIMEOUT_MS, DEFAULT_QUEUE_MAX_QTY, &System.error.interrupt ),
+        QUEUE( APPLICATION_SYSTEM_QUEUE_ID_COMM_MESSAGES,           DEFAULT_QUEUE_TIMEOUT_MS, DEFAULT_QUEUE_MAX_QTY, &System.error.messaging ),
+        QUEUE( APPLICATION_SYSTEM_QUEUE_ID_RUNTIME_MESSAGES,        DEFAULT_QUEUE_TIMEOUT_MS, DEFAULT_QUEUE_MAX_QTY, &System.error.messaging ),
+        QUEUE( APPLICATION_SYSTEM_QUEUE_ID_APPLICATION_MESSAGES,    DEFAULT_QUEUE_TIMEOUT_MS, DEFAULT_QUEUE_MAX_QTY, &System.error.messaging ),
+    };
+    
     memcpy(&global_subactivity_map, &subactivity_map_initializer, sizeof(system_subactivity_map_t));
     memcpy(&global_task_list, &task_list_initializer, sizeof(os_task_list_t));
+    memcpy(&global_queue_list, &queue_list_initializer, sizeof(os_queue_list_t));
     
     SystemFunctions.Register.SubactivityMap(&global_subactivity_map);
     SystemFunctions.Register.TaskList(&global_task_list);
+    SystemFunctions.Register.QueueList(&global_queue_list);
     
     SystemFunctions.Init( &GENERIC_PROFILE );
 }

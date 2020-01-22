@@ -12,6 +12,6 @@
 #include "globaltypes.h"
 #include "communicationmanager.h"
 
-static void (*PerformCommEvent)( comm_event_t, uint8_t * ) = PerformCommunicationManagerEvent;
+static void (*PerformCommEvent)( comm_event_t, uint8_t * ) = CommunicationManager_PerformEvent;
 
 #endif /* peripheralbridge_h */

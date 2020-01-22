@@ -13,7 +13,7 @@ void CommunicationManagerInit(void)
     
 }
 
-void PerformCommunicationManagerEvent( comm_event_t event, uint8_t * data )
+void CommunicationManager_PerformEvent( comm_event_t event, uint8_t * data )
 {
     switch( event.channel )
     {
@@ -37,11 +37,11 @@ void PerformCommunicationManagerEvent( comm_event_t event, uint8_t * data )
     }
 }
 
-void PerformCommunicationManagerTransmit( comm_packet_t * packet )
+void CommunicationManager_PerformTransmit( comm_packet_t * packet )
 {
     
 }
-void PerformCommunicationManagerReceive( comm_packet_t * packet )
+void CommunicationManager_PerformReceive( comm_packet_t * packet )
 {
     
 }

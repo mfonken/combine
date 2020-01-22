@@ -12,7 +12,19 @@
 #include "i2c_template.h"
 #include "spi_template.h"
 
+/* Port spoof */
+#define PORT0 0
+#define PORTA 0
+#define PORTB 0
+#define PORTC 0
+#define PORTD 0
+#define PORTF 0
+
+#define INTERNAL 0xff
+
+#define COMM_PORT_NONE 0xff
 #define COMM_ADDR_NONE 0xff
+
 typedef enum
 {
     COMM_NONE = 0,
@@ -52,9 +64,9 @@ typedef struct
 } comm_packet_t;
 
 void CommunicationManagerInit(void);
-void PerformCommunicationManagerEvent( comm_event_t event, uint8_t * data );
-void PerformCommunicationManagerTransmit(comm_packet_t *);
-void PerformCommunicationManagerReceive(comm_packet_t *);
+void CommunicationManager_PerformEvent( comm_event_t event, uint8_t * data );
+void CommunicationManager_PerformTransmit(comm_packet_t *);
+void CommunicationManager_PerformReceive(comm_packet_t *);
 
 typedef struct
 {
@@ -72,9 +84,9 @@ typedef struct
 static comm_functions CommFunctions =
 {
     .Init = CommunicationManagerInit,
-    .Perform.Event = PerformCommunicationManagerEvent,
-    .Perform.Transmit = PerformCommunicationManagerTransmit,
-    .Perform.Receive = PerformCommunicationManagerReceive
+    .Perform.Event = CommunicationManager_PerformEvent,
+    .Perform.Transmit = CommunicationManager_PerformTransmit,
+    .Perform.Receive = CommunicationManager_PerformReceive
 };
 
 #endif /* communicationmanager_h */
