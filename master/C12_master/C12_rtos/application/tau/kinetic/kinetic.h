@@ -176,7 +176,7 @@ typedef struct
                             , kpoint_t *, kpoint_t *
 #endif
                             );
-    void  (*UpdatePosition)( kinetic_t *, vec3_t *, kpoint_t *, kpoint_t * );
+    void  (*UpdatePosition)( kinetic_t *, quaternion_t *, kpoint_t *, kpoint_t * );
     
     ang3_t (*PointTranslationParameters)( kinetic_t *, kpoint_t *, kpoint_t * );
     void (*MinorAngles)( kinetic_t *, kpoint_t *, kpoint_t * );

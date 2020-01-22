@@ -51,19 +51,19 @@ typedef struct
 static haptic_functions HapticFunctions =
 {
     .Trigger = HapticControllerTrigger,
-    .Start = DRV2605Start,
-    .Go = DRV2605Go,
-    .Stop = DRV2605Stop,
-    .Read = DRV2605ReadRegister,
-    .Write = DRV2605WriteRegister,
-    .Set.Waveform = DRV2605SetWaveform,
-    .Set.Library = DRV2605SelectLibrary,
-    .Set.Mode = DRV2605SetMode,
-    .Set.RealtimeValue = DRV2605SetRealtimeValue,
-    .Set.ERM = DRV2605UseERM,
-    .Set.LRA = DRV2605UseLRA,
-    .GetReadEvent = DRV2605GetReadEvent,
-    .GetWriteEvent = DRV2605GetWriteEvent
+    .Start = DRV2605_Start,
+    .Go = DRV2605_Go,
+    .Stop = DRV2605_Stop,
+    .Read = DRV2605_ReadRegister,
+    .Write = DRV2605_WriteRegister,
+    .Set.Waveform = DRV2605_SetWaveform,
+    .Set.Library = DRV2605_SelectLibrary,
+    .Set.Mode = DRV2605_SetMode,
+    .Set.RealtimeValue = DRV2605_SetRealtimeValue,
+    .Set.ERM = DRV2605_UseERM,
+    .Set.LRA = DRV2605_UseLRA,
+    .GetReadEvent = DRV2605_GetReadEvent,
+    .GetWriteEvent = DRV2605_GetWriteEvent
 };
 
 #endif /* hapticcontroller_h */
