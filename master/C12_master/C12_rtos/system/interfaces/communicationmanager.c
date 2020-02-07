@@ -13,15 +13,15 @@ void CommunicationManagerInit(void)
     
 }
 
-void CommunicationManager_PerformEvent( comm_event_t event, uint8_t * data )
+void CommunicationManager_PerformEvent( comm_event_t event )
 {
-    switch( event.channel )
+    switch( event.generic_event.protocol )
     {
         case COMM_I2C:
-            performI2CEvent(*(i2c_event_t *)&event, data );
+            PAPI.I2C.Perform(*(i2c_event_t *)&event );
             break;
         case COMM_SPI:
-            performSPIEvent(*(spi_event_t *)&event, data );
+            PAPI.SPI.Perform(*(spi_event_t *)&event );
             break;
         case COMM_UART:
             //            performUARTEvent(*(uart_event_t *)&event, data );

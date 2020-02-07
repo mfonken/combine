@@ -9,8 +9,7 @@
 #ifndef communicationmanager_h
 #define communicationmanager_h
 
-#include "i2c_template.h"
-#include "spi_template.h"
+#include "systembehavior.h"
 
 /* Port spoof */
 #define PORT0 0
@@ -33,29 +32,43 @@ typedef enum
     COMM_UART,
     COMM_BLE,
     COMM_SUB
-} COMM;
+} COMM_PROTOCOL, comm_protocol;
+
 typedef enum
 {
-    COMM_CHANNEL_NONE = 0,
-    COMM_CHANNEL_PRIMARY,
-    COMM_CHANNEL_SECONDARY
-} COMM_CHANNEL;
+    COMM_ROUTE_NONE = 0,
+    COMM_ROUTE_PRIMARY,
+    COMM_ROUTE_SECONDARY
+} COMM_ROUTE;
+
 typedef enum
 {
     COMM_READ_REG = 1,
     COMM_WRITE_REG
 } COMM_TYPE;
 
+//typedef enum
+//{
+//    COMM_CHAN_I2C = 0x01,
+//    COMM_CHAN_SPI = 0x02
+//} comm_channel;
+
 typedef struct
 {
-uint8_t
-    type:8;
-uint8_t
-    reg,
-    length,
-    addr;
-uint8_t
-    channel;
+    comm_protocol
+        protocol:8;
+    uint8_t
+        reg,
+        addr,
+        length,
+        *buffer;
+} generic_comm_event_t;
+
+typedef union
+{
+    i2c_event_t i2c_event;
+    spi_event_t spi_event;
+    generic_comm_event_t generic_event;
 } comm_event_t;
 
 typedef struct
@@ -64,13 +77,13 @@ typedef struct
 } comm_packet_t;
 
 void CommunicationManagerInit(void);
-void CommunicationManager_PerformEvent( comm_event_t event, uint8_t * data );
+void CommunicationManager_PerformEvent( comm_event_t );
 void CommunicationManager_PerformTransmit(comm_packet_t *);
 void CommunicationManager_PerformReceive(comm_packet_t *);
 
 typedef struct
 {
-    void (*Event)( comm_event_t, uint8_t * );
+    void (*Event)( comm_event_t );
     void (*Transmit)(comm_packet_t *);
     void (*Receive)(comm_packet_t *);
 } comm_perform_functions;

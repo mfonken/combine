@@ -76,12 +76,12 @@ typedef struct
     void (*Init)( rho_setting_t * );
     void (*Send)( rho_setting_t * );
     void (*Receive)( rho_t * );
-    comm_event_t (*GetSendEvent)(void);
-    comm_event_t (*GetReceiveEvent)(void);
+    comm_event_t (*GetSendEvent)(rho_setting_t *);
+    comm_event_t (*GetReceiveEvent)(rho_packet_t *);
 } rho_functions;
 
-static comm_event_t RhoGetSendEvent(void) { return (comm_event_t){ COMM_WRITE_REG, NO_REG, sizeof(rho_setting_t), RHO_DEFAULT_COMM_CHANNEL }; }
-static comm_event_t RhoGetReceiveEvent(void) { return (comm_event_t){ COMM_READ_REG, NO_REG, sizeof(rho_packet_t), RHO_DEFAULT_COMM_CHANNEL }; }
+static comm_event_t RhoGetSendEvent(rho_setting_t * s) { return (comm_event_t){ RHO_DEFAULT_COMM_CHANNEL, COMM_WRITE_REG, NO_REG, sizeof(rho_setting_t), s }; }
+static comm_event_t RhoGetReceiveEvent(rho_packet_t * p) { return (comm_event_t){ RHO_DEFAULT_COMM_CHANNEL, COMM_READ_REG, NO_REG, sizeof(rho_packet_t), p }; }
 
 static rho_functions RhoFunctions =
 {

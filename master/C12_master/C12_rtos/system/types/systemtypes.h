@@ -9,7 +9,9 @@
 #ifndef system_types_h
 #define system_types_h
 
+#include "global_config.h"
 #include "application_types.h"
+#include "application_debug.h"
 
 #if __OS__ == MICRIUM
 #include "micrium_interface.h"
@@ -17,7 +19,15 @@
 /*#error */#warning "No OS defined."
 #endif
 
+#if __PAPI__ == EMLIB
+#include "emlib_interface.h"
+#else
+#error "No peripheral API defined."
+#endif
+
 #include "globaltypes.h"
+
+#define NO_REG 0xff
 
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
@@ -35,8 +45,6 @@ typedef enum
 
 typedef OS_Q queue_t;
 
-#define GENERIC_PROFILE profile
-
 #define MAX_ROUTINES 45
 #define MAX_SUBACTIVITIES_PER_ACTIVITY 20
 #define MAX_TASKS 10
@@ -46,8 +54,8 @@ typedef OS_Q queue_t;
 #define MAX_STATE_PROFILE_ENTRIES 10
 
 //#define APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS
-#define NUM_SYSTEM_TASKS NUM_APPLICATION_TASKS
-#define NUM_SYSTEM_QUEUES NUM_APPLICATION_QUEUES
+#define NUM_SYSTEM_TASKS 1//NUM_APPLICATION_TASKS
+#define NUM_SYSTEM_QUEUES 1//NUM_APPLICATION_QUEUES
 #define NUM_SYSTEM_SUBACTIVITIES NUM_APPLICATION_SUBACTIVITIES
 #define SYSTEM_ACTION_ID_NONE APPLICATION_ACTION_ID_NONE
 
@@ -163,14 +171,24 @@ typedef OS_SPECIFIC(OS_TASK_DATA_T) os_task_data_t;
 typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
 typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
 
+typedef bool generic_comm_return_t;
+
+typedef PAPI_SPECIFIC(I2C_EVENT_T) i2c_event_t;
+typedef PAPI_SPECIFIC(I2C_TRANSFER_TYPE_T) i2c_transfer_type_t;
+typedef PAPI_SPECIFIC(I2C_TRANSFER_RETURN_T) i2c_transfer_return_t;
+
+typedef PAPI_SPECIFIC(SPI_EVENT_T) spi_event_t;
+typedef PAPI_SPECIFIC(SPI_TRANSFER_TYPE_T) spi_transfer_type_t;
+typedef PAPI_SPECIFIC(SPI_TRANSFER_RETURN_T) spi_transfer_return_t;
+
 typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
 typedef os_queue_data_t os_queue_list_t[NUM_SYSTEM_QUEUES];
 
 typedef application_subactivity_t system_subactivity_t;
 typedef application_task_id_t system_task_id_t;
 typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
-typedef application_objects_t system_objects_t;
-typedef application_buffers_t system_buffers_t;
+//typedef application_objects_t system_objects_t;
+//typedef application_buffers_t system_buffers_t;
 
 typedef struct
 {
@@ -183,8 +201,8 @@ typedef system_subactivity_map_entry_t system_subactivity_map_t[NUM_SYSTEM_SUBAC
 typedef struct
 {
     system_activity_t activity;
-    uint8_t length;
     system_subactivity_t subactivities[MAX_SUBACTIVITIES_PER_ACTIVITY];
+    uint8_t length;
     system_state_t exit_state;
 } system_activity_routine_t;
 typedef system_activity_routine_t system_routine_map_t[MAX_ROUTINES];
@@ -225,7 +243,7 @@ os_task_data_t
 typedef struct
 {
 uint8_t
-    task_id,
+    ID,
     num_interrupts;
 system_profile_entry_t
     interrupts[MAX_INTERRUPTS];
@@ -234,20 +252,26 @@ uint8_t
 system_profile_entry_t
     scheduled[MAX_SCHEDULED];
 } system_task_shelf_entry_t;
-typedef system_task_shelf_entry_t system_task_shelf_t[MAX_TASK_SHELF_ENTRIES];
 
 typedef struct
 {
-system_state_t
-    state_id;
+uint8_t
+    num_tasks;
+system_task_shelf_entry_t tasks[MAX_TASK_SHELF_ENTRIES];
+} system_task_shelf_t;
+
+typedef struct
+{
 system_activity_routine_t
     routine;
+system_state_t
+    state_id;
 uint8_t
     families[NUM_SYSTEM_FAMILIES];
-uint8_t
-    num_entries;
 system_task_shelf_entry_id_t
     entries[MAX_STATE_PROFILE_ENTRIES];
+uint8_t
+    num_entries;
 } system_state_profile_t;
 typedef system_state_profile_t system_state_profile_list_t[NUM_SYSTEM_STATES];
 
@@ -262,15 +286,13 @@ component_t
 
 typedef struct
 {
+component_list_t
+    component_list;
 system_task_shelf_t
     shelf;
 system_state_profile_list_t
     state_profiles;
-component_list_t
-    component_list;
 } system_profile_t;
-
-#define PROFILE_TEMPLATE static system_profile_t GENERIC_PROFILE
 
 typedef struct
 {
@@ -337,8 +359,6 @@ typedef struct
     system_error_buffer_t   error;
     system_consumption_t    consumption_level;
     system_subactivity_map_t *subactivity_map;
-    system_buffers_t        buffers;
-    system_objects_t        objects;
     system_profile_t       *profile;
     system_registration_log_t registration;
 } system_master_t;

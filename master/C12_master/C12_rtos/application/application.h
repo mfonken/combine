@@ -9,9 +9,65 @@
 #ifndef application_h
 #define application_h
 
-#include "application.h"
-#include "systembehavior.h"
+#include "application_types.h"
+
+#include "application_debug.h"
+#include "taumanager.h"
+//#include "communicationmanager.h"
+#include "motionsensor.h"
+#include "rho_client.h"
+#include "batterymonitor.h"
+#include "touchcontroller.h"
+#include "hapticcontroller.h"
+
 #include "C12_profile.h"
+static system_profile_t GENERIC_PROFILE = PROFILE_TEMPLATE;
+
+typedef struct
+{
+tau_config_t
+    tau;
+uint8_t
+    battery_monitor_mode,
+    haptic;
+} application_config_t;
+
+typedef struct
+{
+orientation_data_t
+    orientation;
+rho_data_t
+    rho;
+touch_data_t
+    touch;
+comm_packet_t
+    packet_in,
+    packet_out,
+    sub_packet_in,
+    sub_packet_out;
+battery_monitor_basic_t
+    battery;
+application_config_t
+    config;
+} application_buffers_t;
+
+typedef struct
+{
+imu_t
+    IMU;
+rho_t
+    Rho;
+tau_t
+    Kinetic;
+} application_objects_t;
+
+typedef struct
+{
+    application_buffers_t buffers;
+    application_objects_t objects;
+} application_t;
+
+static application_t App;
 
 system_subactivity_map_t global_subactivity_map = { 0 };
 os_task_list_t global_task_list = { 0 };
@@ -27,43 +83,38 @@ static void InitApplication( void )
 static void StartApplication( void )
 {
     SystemFunctions.Perform.ExitState();
-    OSFunctions.DelayMs(1000);
+    OS.DelayMs(1000);
     SystemFunctions.Register.State( SYSTEM_STATE_ACTIVE );
     ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
 }
 
 static void TickApplication( void )
 {
-COMPLETE_TASK
-}
+    
+COMPLETE_TASK }
 
 
-/* [Meta] Global buffers */
+/* [Meta] */
 
-/* Rho Out */
-static void RhoOutputHandler( void )
-{
-    RhoFunctions.Send( &System.objects.Rho.settings );
-}
 
 /* Rho In */
 static void RhoInputHandler( void )
 {
-    RhoFunctions.Receive( &System.objects.Rho );
-    RhoPointToKPoint( &System.objects.Rho.packet.primary, &System.buffers.rho.data[0] );
-    RhoPointToKPoint( &System.objects.Rho.packet.secondary, &System.buffers.rho.data[1] );
-//    System.buffers.rho.confidence = System.objects.Rho.packet.probabilites.;
+    RhoFunctions.Receive( &App.objects.Rho );
+    RhoPointToKPoint( &App.objects.Rho.packet.primary, &App.buffers.rho.data[0] );
+    RhoPointToKPoint( &App.objects.Rho.packet.secondary, &App.buffers.rho.data[1] );
+//    App.buffers.rho.confidence = App.objects.Rho.packet.probabilites.;
 }
 
 /* Motion Out */
 static void MotionOutputHandler( imu_feature_t feature, uint32_t interval )
 {
-    IMUFunctions.Start( &System.objects.IMU.client, feature, interval, System.objects.IMU.chip );
+    IMUFunctions.Start( &App.objects.IMU.client, feature, interval, App.objects.IMU.chip );
 }
 /* Motion In */
 static void MotionInputHandler( void )
 {
-    shtp_client_t * client = &System.objects.IMU.client;
+    shtp_client_t * client = &App.objects.IMU.client;
     
     if( IMUFunctions.Refresh( client ) )
     {
@@ -76,8 +127,8 @@ static void MotionInputHandler( void )
             case SH2_SENSOR_REPORT_STABILIZED_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_STABILIZED_GAME_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_GYRO_INTEGRATED_ROTATION_VECTOR:
-                RotVecToQuaternion( &client->output.rotation_vector, &System.buffers.orientation.data );
-                System.buffers.orientation.timestamp = client->output.rotation_vector.timestamp;
+                RotVecToQuaternion( &client->output.rotation_vector, &App.buffers.orientation.data );
+                App.buffers.orientation.timestamp = client->output.rotation_vector.timestamp;
                 break;
             default:
                 break;
@@ -90,6 +141,7 @@ static void HostOutputHandler( void )
 {
     
 }
+
 /* BLE In */
 static void HostInputHandler( void )
 {
@@ -106,7 +158,7 @@ static void SubRadioOutputHandler( void )
 /* Touch In */
 static void TouchInterruptHandler( component_id_t ID )
 {
-    touch_data_t * ptr = &System.buffers.touch;
+    touch_data_t * ptr = &App.buffers.touch;
 //    component_t * component = SysIOCtlFunctions.Get( ID );
     touch_packet_t packet = TouchController.Read();
     switch(packet.type)
@@ -126,7 +178,6 @@ static void TouchInterruptHandler( component_id_t ID )
             break;
     }
 }
-
 
 //#define MAX_HANDLER_QUEUE 10
 //
@@ -178,7 +229,7 @@ typedef struct
     application_handler_functions Handler;
 } application_functions;
 
-static application_functions App =
+static application_functions AppFunctions =
 {
     .Init = InitApplication,
     .Start = StartApplication,
@@ -186,7 +237,7 @@ static application_functions App =
 //    .Interrupt.Queue    = ComponentInterruptQueuer,
 //    .Interrupt.Handle   = ComponentInterruptHandler,
     .Handler.Input.Rho          = RhoInputHandler,
-    .Handler.Output.Rho         = RhoOutputHandler,
+//    .Handler.Output.Rho         = RhoOutputHandler,
     .Handler.Input.Motion       = MotionInputHandler,
     .Handler.Output.Motion      = MotionOutputHandler,
     .Handler.Input.Host         = HostInputHandler,
@@ -199,86 +250,52 @@ void InitializeMeta(void)
 {
     system_subactivity_map_t subactivity_map_initializer = (system_subactivity_map_t)
     {
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_SELF_CHECK,                  NULL,                               NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_SELF_CHECK,                NULL,                               NO_DATA ),
 
-        ////SUBACTIVITY( APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT,         HandlerFunctions.Input.Motion,      NO_DATA ),
-        ////SUBACTIVITY( APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT,            HandlerFunctions.Input.Rho,         NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START,    RhoFunctions.Send,                  &App.objects.Rho.settings ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START, IMUFunctions.RotVec,                &App.objects.IMU ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_START,        TauFunctions.Start,                 TAU_STATE_STANDARD ),
 
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START,      RhoFunctions.Send,                  &System.objects.Rho.settings ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START,   IMUFunctions.RotVec,                &System.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_START,          TauFunctions.Start,                 TAU_STATE_STANDARD ),
-
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP,       RhoFunctions.Send,                  &System.objects.Rho.settings ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,    IMUFunctions.RotVec,                &System.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STOP,                    TauFunctions.Stop,                  NO_DATA ),
-
-        //             SUBACTIVITY( APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP, BatteryMonitor.Set, BATTERY_MONITOR_MODE_SLEEP ),
-
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET,       CommFunctions.Perform.Receive,        NO_DATA ),
-
-
-        //             APPLICATION_SUBACTIVITY_SELF_CHECK,
-        //             APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE,
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP,     RhoFunctions.Send,                  &App.objects.Rho.settings ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,  IMUFunctions.RotVec,                &App.objects.IMU ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STOP,                  TauFunctions.Stop,                  NO_DATA ),
 
         /* Initialization */
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_COMMUNICATION,        CommFunctions.Init,                   NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_SUB_VREG,             PAPI.Energy.InitDCDC,                 SUB_VREG_MV ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_COMPONENTS,           SysIOCtlFunctions.Init,               &System ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT,           TauFunctions.Perform.Init,            NO_DATA ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_RHO_CLIENT,           RhoFunctions.Init,                    &System.objects.Rho.settings ),
-        //         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_CONFIRM, BehaviorFunctions.Perform.ConfirmInit, .data.byte = NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_RHO_CLIENT,           RhoFunctions.Init,                    &App.objects.Rho.settings ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_CONFIRM,              BehaviorFunctions.Perform.ConfirmInit, NO_DATA ),
 
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_BATTERY_MONITOR_ACTIVE,    BatteryMonitor.Set,                   System.buffers.config.battery_monitor_mode ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_ACTIVATE_BATTERY_MONITOR,  BatteryMonitor.Set,                   ACTIVE ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_DEACTIVATE_BATTERY_MONITOR, BatteryMonitor.Set,                  INACTIVE ),
 
-        /* Profile */
-        //    APPLICATION_SUBACTIVITY_PROFILE_FETCH,
-        //    APPLICATION_SUBACTIVITY_PROFILE_PERFORM,
-        //    APPLICATION_SUBACTIVITY_PROFILE_UPDATE,
-        //    APPLICATION_SUBACTIVITY_PROFILE_STORE,
-
-        /* Probes */
-        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_SEND_HOST_PROBE,  ),
-        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_HOST_PROBE, .function.blank = (void(*)(void))CommFunctions.Receive, NO_DATA ),
-
-        /* Handles */
-        ////SUBACTIVITY( APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT,       HandlerFunctions.Input.Motion,        NO_DATA ),
-        ////SUBACTIVITY( APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT,          HandlerFunctions.Input.Rho,           NO_DATA ),
-
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR,      BatteryMonitor.GetBasic,              &System.buffers.battery ),
-        //             SUBACTIVITY( APPLICATION_SUBACTIVITY_POLL_TIP, BatteryMonitor.GetBasic, &System.buffers.tip_data ),
-
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRIGGER_HAPTIC,            HapticFunctions.Trigger,              System.buffers.config.haptic ),
-
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET,      CommFunctions.Perform.Transmit,       &System.buffers.packet_out ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET,       CommFunctions.Perform.Receive,        &System.buffers.packet_in ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRANSMIT_SUB_RADIO_PACKET, CommFunctions.Perform.Transmit,       &System.buffers.sub_packet_out ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_SUB_RADIO_PACKET,  CommFunctions.Perform.Receive,        &System.buffers.sub_packet_in ),
-
-        /* Tau */
-        //             SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START, RhoFunctions.Send, .data.byte = RHO_START ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP,     IMUFunctions.RotVec,                  &System.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_START,        TauFunctions.Start,                   TAU_STATE_START ),
-
-        /* Sleep/Idle */
-        //             SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP, RhoFunctions.Send, .data.byte = RHO_STOP ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,  IMUFunctions.RotVec,                  &System.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STOP,                  TauFunctions.Stop,                    TAU_STATE_IDLE )
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET,      CommFunctions.Perform.Transmit,       &App.buffers.packet_out ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET,       CommFunctions.Perform.Receive,        &App.buffers.packet_in ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRANSMIT_SUB_RADIO_PACKET, CommFunctions.Perform.Transmit,       &App.buffers.sub_packet_out ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_RECEIVE_SUB_RADIO_PACKET,  CommFunctions.Perform.Receive,        &App.buffers.sub_packet_in ),
+                
+        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP, BatteryMonitor.Set, BATTERY_MONITOR_MODE_SLEEP ),
+        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_POLL_TIP, BatteryMonitor.GetBasic, &App.buffers.tip_data ),
+        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRIGGER_HAPTIC,            HapticFunctions.Trigger,              App.buffers.config.haptic ),
     };
     
     os_task_list_t task_list_initializer =
     (os_task_list_t)
-    {/* Task name                                                  Function to call                Variable to fill                Priority                  Error */
-        TASK(APPLICATION_COMBINE_GLOBAL,                           App.Tick,                       NULL,                           TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
-        TASK(APPLICATION_SCHEDULER_ID_TAU_PERFORM,                 TauFunctions.Tick,              NULL,                           TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
-        TASK(APPLICATION_SCHEDULER_ID_TAU_PACKET_QUEUE,            TauFunctions.Tick,              NULL,                           TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
-        TASK(APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL,        BatteryMonitor.GetBasic,        &System.buffers.battery,        TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
-        TASK(APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT,       CommFunctions.Perform.Transmit, &System.buffers.packet_out,     TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
-        TASK(APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE,        CommFunctions.Perform.Receive,  &System.buffers.packet_in,      TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
-        TASK(APPLICATION_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT, CommFunctions.Perform.Transmit, &System.buffers.sub_packet_out, TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
-        TASK(APPLICATION_INTERRUPTER_ID_HAPTIC_TRIGGER,            HapticFunctions.Trigger,        &System.buffers.config.haptic,  TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
-        TASK(APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT,            IMUFunctions.Read,              &System.objects.IMU.client,     TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
-        TASK(APPLICATION_SCHEDULER_ID_RHO_INTERRUPT,               RhoFunctions.Receive,           &System.objects.Rho,            TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
-//        TASK(APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT,           ,                               ,                           TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
-        TASK(APPLICATION_SCHEDULER_ID_TIP_POLL,                    App.Tick,                       NULL,                           TASK_PRIORITY_CLASS_HIGH,   &System.error.peripheral )
+    {/* Task name                                                  Function to call                Variable to fill             Priority                  Error */
+        TASK(APPLICATION_COMBINE_GLOBAL,                           AppFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
+        TASK(APPLICATION_SCHEDULER_ID_TAU_PERFORM,                 TauFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
+        TASK(APPLICATION_SCHEDULER_ID_TAU_PACKET_QUEUE,            TauFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
+        TASK(APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL,        BatteryMonitor.GetBasic,        &App.buffers.battery,        TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
+        TASK(APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT,       CommFunctions.Perform.Transmit, &App.buffers.packet_out,     TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
+        TASK(APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE,        CommFunctions.Perform.Receive,  &App.buffers.packet_in,      TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
+        TASK(APPLICATION_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT, CommFunctions.Perform.Transmit, &App.buffers.sub_packet_out, TASK_PRIORITY_CLASS_HIGH, &System.error.system     ),
+        TASK(APPLICATION_INTERRUPTER_ID_HAPTIC_TRIGGER,            HapticFunctions.Trigger,        &App.buffers.config.haptic,  TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
+        TASK(APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT,            IMUFunctions.Read,              &App.objects.IMU.client,     TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
+        TASK(APPLICATION_SCHEDULER_ID_RHO_INTERRUPT,               RhoFunctions.Receive,           &App.objects.Rho,            TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
+//        TASK(APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT,             ,                               ,                          TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral ),
+        TASK(APPLICATION_SCHEDULER_ID_TIP_POLL,                    AppFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.peripheral )
     };
     
     os_queue_list_t queue_list_initializer =

@@ -28,7 +28,7 @@ void OSInterface_Start(void)
 
 void OSInterface_DelayMs( uint32_t ms )
 {
-    LOG_OSI(OSI_DEBUG, "Delaying OS Task for %dms", ms);
+    LOG_OSI(OSI_DEBUG, "Delaying OS Task for %dms\n", ms);
     OS_SPECIFIC(OSInterface_DelayMs)( ms );
 }
 

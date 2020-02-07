@@ -20,7 +20,7 @@
 
 #define SHTP_CLIENT_BUFFER_LEN 100
 
-#define SHTP_HEADER_LENGTH 4
+#define SHTP_HEADER_LENGTH sizeof(shtp_packet_header_t)
 #define SHTP_MAX_PACKET_SIZE 128 // bytes - packets can be up to 32k but we don't have that much RAM.
 #define SHTP_MAX_MEMORY_SIZE 128 // bytes
 #define SHTP_MAX_METADATA_SIZE 9 // words
@@ -203,10 +203,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(void) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t len) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, len }; }
-static comm_event_t GetSHTPHeaderSendEvent(void) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t len) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, len }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, l, d }; }
+static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, l, d }; }
 
 typedef struct
 {
@@ -236,10 +236,10 @@ typedef struct
     bool (*ParseConfigurationFRSWriteResponse)(void);
     void (*ParseConfigurationProductIDResponse)(void);
     
-    comm_event_t (*GetHeaderReceiveEvent)(void);
-    comm_event_t (*GetPacketReceiveEvent)(uint8_t);
-    comm_event_t (*GetHeaderSendEvent)(void);
-    comm_event_t (*GetPacketSendEvent)(uint8_t);
+    comm_event_t (*GetHeaderReceiveEvent)(shtp_packet_header_t *);
+    comm_event_t (*GetPacketReceiveEvent)(uint8_t, uint8_t *);
+    comm_event_t (*GetHeaderSendEvent)(shtp_packet_header_t *);
+    comm_event_t (*GetPacketSendEvent)(uint8_t, uint8_t *);
     
     void (*GenerateClient)( shtp_client_t *,
                             uint8_t, uint8_t,

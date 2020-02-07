@@ -7,8 +7,7 @@
 #ifndef CPT112S_h
 #define CPT112S_h
 
-#include "i2c_template.h"
-
+#include "peripheralbridge.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -38,11 +37,11 @@ typedef struct
     uint32_t PADDING:8;
 } cpt_packet_t;
 
-static i2c_event_t CPTGetReadEvent(void) { return (i2c_event_t){ I2C_READ_REG_EVENT, NO_REG, CPT_PACKET_LEN, CPT_ADDR }; }
+static i2c_event_t CPTGetReadEvent(cpt_packet_t * p) { return (i2c_event_t){ I2C_READ_REG_EVENT, NO_REG, CPT_PACKET_LEN, CPT_ADDR, p }; }
 
 typedef struct
 {
-    i2c_event_t (*GetReadEvent)(void);
+    i2c_event_t (*GetReadEvent)(cpt_packet_t *);
 } cpt_functions;
 
 static cpt_functions CPTFunctions =

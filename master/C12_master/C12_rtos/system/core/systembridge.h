@@ -10,16 +10,14 @@
 #define systembridge_h
 
 #include "application.h"
-//#include "systemhandlers.h"
-#include "C12_profile.h"
 
 void Start(void)
 {
-    OSFunctions.Init();
-    App.Init();
+    OS.Init();
+    AppFunctions.Init();
     
-    OSFunctions.Start();
-    App.Start();
+    OS.Start();
+    AppFunctions.Start();
 }
 
 typedef struct

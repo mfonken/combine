@@ -11,10 +11,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+//#include "systemtypes.h"
 
 #define NO_REG 0xff
 #define I2C_DATA_LEN 32
-static uint8_t i2c_data[I2C_DATA_LEN];
+//static uint8_t i2c_data[I2C_DATA_LEN];
 
 typedef enum
 {
@@ -28,48 +29,34 @@ I2C_type_t
     type:8;
 uint8_t
     reg,
-    length,
-    addr;
+    addr,
+    length;
 } i2c_event_t;
+
+i2c_data_t * GetGenericI2CDataFromEvent( i2c_event_t * e, uint8_t * buffer )
+{
+    i2c_data_t * i2c_data  = &e->reg;
+    i2c_data->data = buffer;
+    return i2c_data;
+}
 
 static uint8_t performI2CEvent( i2c_event_t e, uint8_t * data )
 {
     uint8_t len = 0;
+    i2c_data_t * i2c_data = GetGenericI2CDataFromEvent( e, data );
     switch(e.type)
     {
         case I2C_READ_REG_EVENT:
-            if(e.length == 1)
-            {
-                //
-            }
+            if(e.reg == NO_REG)
+                PAPI.I2C.Read( i2c_data );
             else
-            {
-                if(e.reg == NO_REG)
-                {
-                    //
-                }
-                else
-                {
-                    //
-                }
-            }
+                PAPI.I2C.ReadReg( i2c_data );
             break;
         case I2C_WRITE_REG_EVENT:
-            if(e.length == 1)
-            {
-                //
-            }
+            if(e.reg == NO_REG)
+                PAPI.I2C.Write( i2c_data );
             else
-            {
-                if(e.reg == NO_REG)
-                {
-                    //
-                }
-                else
-                {
-                    //
-                }
-            }
+                PAPI.I2C.WriteReg( i2c_data );
             break;
         default:
             break;

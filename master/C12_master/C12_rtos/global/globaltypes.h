@@ -22,18 +22,10 @@
 
 #define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
 
-#ifndef __PLATFORM__
-#error "No platform specified!"
-#else
+/// Should global def be checked here or in implementation?
 #define PLATFORM_SPECIFIC(NAME) NAME_BUILDER(__PLATFORM__, NAME)
-#endif
-
-#ifndef __OS__
-#error "No platform specified!"
-#else
 #define OS_SPECIFIC(NAME) NAME_BUILDER(__OS__, NAME)
-#endif
-
+#define PAPI_SPECIFIC(NAME) NAME_BUILDER(__PAPI__, NAME)
 
 #define CALL_OS_PARENT(X) OS_SPECIFIC(__LINE__)(X)
 

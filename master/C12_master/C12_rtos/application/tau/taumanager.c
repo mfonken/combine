@@ -46,19 +46,23 @@ void TauManagerInit(void)
 void TauManagerDoNothing(void)
 {
 }
+
 void TauManagerStart( void )
 {
     RegisterTauManagerState( TAU_STATE_START );
 }
+
 void TauManagerPause(void)
 {
     RegisterTauManagerState( TAU_STATE_IDLE );
 }
+
 void TauManagerStop(void)
 {
     Tau.locks.kinetic = UNLOCK;
     Tau.locks.packet = UNLOCK;
 }
+
 void TauManagerPerformKinetic(void)
 {
     Tau.locks.kinetic = LOCK;

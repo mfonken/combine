@@ -9,14 +9,6 @@
 #ifndef application_debug_h
 #define application_debug_h
 
-#define _DEBUG_
-
-#ifdef _DEBUG_
-#define printd printf
-#else
-#define printd void
-#endif
-
 static const char * state_strings[] =
 {
     "STATE_STARTUP",

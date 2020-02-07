@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 /// SPOOF START
+#ifndef __MICRIUM__
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
 typedef const char      CPU_CHAR;
@@ -27,12 +28,14 @@ static void OSTaskDel (OS_TCB *p_tcb, RTOS_ERR *p_err) {}
 #define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 
 #define OS_CFG_TICK_RATE_HZ 10000
+#define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
+
+#endif /* __MICRIUM__ */
 /// SPOOF END
 
-#define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) ) /// <--- Double Check
-#define TICK_TO_HZ(X)   ( (double)X / (double)OS_CFG_TICK_RATE_HZ ) /// <--- Double Check
+#define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
+#define TICK_TO_HZ(X)   ( (double)X / (double)OS_CFG_TICK_RATE_HZ )                          /// <--- Double Check
 #define MS_TO_TICK(X)   ( (OS_TICK)( ( (double)X / 1000. ) * (double)OS_CFG_TICK_RATE_HZ ) ) /// <--- Double Check
-#define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
 
 typedef struct
 {
@@ -149,6 +152,8 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
     p_task_data->p_err \
 }
 
+#ifndef __MICRIUM__
+
 static void MICRIUM_OSInterface_Init( void ) {}
 static void MICRIUM_OSInterface_Start( void ) {}
 static void MICRIUM_OSInterface_DelayMs( uint32_t ms ) { usleep(ms * 1000); }
@@ -170,7 +175,8 @@ static bool MICRIUM_OSInterface_StartTimer( micrium_os_timer_data_t * timer_data
 static os_state_t MICRIUM_OSInterface_StartGetTimer( micrium_os_timer_data_t * timer_data ) { return 0; }
 static bool MICRIUM_OSInterface_StopTimer( micrium_os_timer_data_t * timer_data ) { return 0; }
 
-/*
+#else
+
 static inline void MICRIUM_OSInterface_Init( void )
 {
     RTOS_ERR  err;
@@ -346,6 +352,7 @@ static inline bool MICRIUM_OSInterface_StopTimer( micrium_os_timer_data_t * time
                      timer_data->p_callback_arg,
                      timer_data->p_err);
 }
-*/
+#endif /* __MICRIUM__ */
 
 #endif /* micrium_interface_h */
+

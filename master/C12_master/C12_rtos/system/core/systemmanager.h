@@ -9,8 +9,7 @@
 #ifndef systemmanager_h
 #define systemmanager_h
 
-//#include "systemhandlers.h"
-#include "os_interface.h"
+#include "papi_interface.h"
 
 #define DEFAULT_SYSTEM_STATE SYSTEM_STATE_IDLE
 #define DEFAULT_SYSTEM_ACTION SYSTEM_ACTION_NONE

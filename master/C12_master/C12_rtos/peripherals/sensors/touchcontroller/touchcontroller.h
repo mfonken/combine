@@ -18,8 +18,9 @@ typedef cpt_event_t touch_event_t;
 
 static touch_packet_t ReadTouchController(void)
 {
-    performI2CEvent(CPTFunctions.GetReadEvent(), i2c_data);
-    return *(touch_packet_t *)&i2c_data;
+    touch_packet_t packet;
+    PerformI2CEvent(CPTFunctions.GetReadEvent((cpt_packet_t*)&packet));
+    return packet;
 }
 
 typedef struct

@@ -50,7 +50,7 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
     switch( task_data->event_data.interrupt.action )
     {
         case  INTERRUPT_ACTION_IMMEDIATE:
-            OSFunctions.Task.Resume( task_data );
+            OS.Task.Resume( task_data );
         case INTERRUPT_ACTION_IGNORE:
         default:
             handled = true;
@@ -63,7 +63,7 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
         os_queue_data_t * queue_data = &(*System.queue_list[INTERRUPT_CHANNEL]);
         queue_data->p_void = (void*)&message;
         queue_data->msg_size = sizeof(hw_event_message_t);
-        OSFunctions.Queue.Post( queue_data );
+        OS.Queue.Post( queue_data );
     }
 }
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t id )

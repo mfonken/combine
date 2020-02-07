@@ -37,8 +37,8 @@ void ParseSHTPRotation(void) {}
 
 void SendSHTPPacket(void)
 {
-    PerformCommEvent(SHTPFunctions.GetHeaderSendEvent(), (uint8_t*)&local.header);
-    PerformCommEvent(SHTPFunctions.GetPacketSendEvent(local.header.length), (uint8_t*)&local.data);
+    PerformCommEvent( SHTPFunctions.GetHeaderSendEvent(&local.header) );
+    PerformCommEvent(SHTPFunctions.GetPacketSendEvent(local.header.length, (uint8_t*)&local.data));
 }
 
 void SendSHTPExecutableCommand(SHTP_EXECUTABLE_COMMAND command)
@@ -148,7 +148,7 @@ void GetSHTPSensorMetaDataRecord( SH2_METADATA_RECORD metadata_record_id, uint16
 
 bool ReceiveSHTPHeader( shtp_packet_header_t * header )
 {
-    PerformCommEvent(SHTPFunctions.GetHeaderReceiveEvent(), (uint8_t *)header);
+    PerformCommEvent(SHTPFunctions.GetHeaderReceiveEvent(header));
     header->length &= ~(1<<15);
     return true;
 }
@@ -156,7 +156,7 @@ bool ReceiveSHTPHeader( shtp_packet_header_t * header )
 bool ReceiveSHTPPacket(void)
 {
     if(!ReceiveSHTPHeader( &local.header )) return false;
-    PerformCommEvent(SHTPFunctions.GetPacketReceiveEvent(local.header.length), (uint8_t*)&local.data);
+    PerformCommEvent(SHTPFunctions.GetPacketReceiveEvent(local.header.length, &local.data));
     switch( local.data[0] )
     {
         case SH2_BATCHING_BASE_TIMESTAMP_REFERENCE:

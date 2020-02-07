@@ -38,7 +38,6 @@ bool OSInterface_StartTimer( os_timer_data_t * );
 os_state_t OSInterface_StartGetTimer( os_timer_data_t * );
 bool OSInterface_StopTimer( os_timer_data_t * );
 
-
 typedef struct
 {
     void (*Create)( os_task_data_t * );
@@ -78,7 +77,7 @@ typedef struct
     system_os_interface_timer_functions Timer;
 } system_os_interface_functions;
 
-static system_os_interface_functions OSFunctions =
+static system_os_interface_functions OS =
 {
     .Init = OSInterface_Init,
     .Start = OSInterface_Start,
@@ -103,8 +102,6 @@ static system_os_interface_functions OSFunctions =
     .Timer.Start = OSInterface_StartTimer,
     .Timer.StartGet = OSInterface_StartGetTimer,
     .Timer.Stop = OSInterface_StopTimer
-    
 };
-
 
 #endif /* os_interface_h */

@@ -58,9 +58,9 @@ void SystemManager_PerformEnableProfileEntryState( system_profile_entry_t * entr
     if( task_data == NULL ) return;
     
 //    if( TaskHasValidTimer( task_data ) )
-//        OSFunctions.Task.Resume(task_data);
+//        OS.Task.Resume(task_data);
 //    else
-        OSFunctions.Task.Create(task_data);
+        OS.Task.Create(task_data);
 }
 
 void SystemManager_PerformExitState( void )
@@ -84,15 +84,15 @@ void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * ent
     
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
 //    if( TaskHasValidTimer( task_data ) )
-//        OSFunctions.Task.Suspend(task_data);
+//        OS.Task.Suspend(task_data);
 //    else
-        OSFunctions.Task.Delete(task_data);
+        OS.Task.Delete(task_data);
 }
 void SystemManager_RegisterTaskList( os_task_list_t * task_list )
 {
     System.os_tasks = task_list;
 //    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
-//        OSFunctions.Task.Create( &((*System.os_tasks)[i]) );
+//        OS.Task.Create( &((*System.os_tasks)[i]) );
 }
 
 void SystemManager_RegisterQueueList( os_queue_list_t * queue_list )
@@ -105,11 +105,11 @@ void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
 {
     for(uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++)
     {
-        system_task_shelf_entry_t * entry = &(*shelf)[i];
+        system_task_shelf_entry_t * entry = &(shelf->tasks[i]);
         for( uint8_t j = 0; j < entry->num_interrupts; j++ )
-            SystemFunctions.Register.ProfileEntry( &System.profile->shelf[i].interrupts[j], false );
+            SystemFunctions.Register.ProfileEntry( &System.profile->shelf.tasks[i].interrupts[j], false );
         for( uint8_t j = 0; j < entry->num_scheduled; j++ )
-            SystemFunctions.Register.ProfileEntry( &System.profile->shelf[i].scheduled[j], true );
+            SystemFunctions.Register.ProfileEntry( &System.profile->shelf.tasks[i].scheduled[j], true );
     }
 }
 void SystemManager_RegisterSubactivityMap( system_subactivity_map_t * map)
@@ -175,7 +175,7 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
         task_data->event_data.schedule.opt = OS_OPT_TMR_PERIODIC;
         
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
-        OSFunctions.Timer.Create( &timer_data );
+        OS.Timer.Create( &timer_data );
     }
     else if( entry->data.action != INTERRUPT_ACTION_IGNORE )
     {
@@ -260,9 +260,9 @@ system_task_shelf_entry_t * SystemManager_GetTaskShelfEntryById( system_task_she
 {
     for( uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++ )
     {
-        system_task_shelf_entry_t * entry = &System.profile->shelf[i];
+        system_task_shelf_entry_t * entry = &System.profile->shelf.tasks[i];
         if( entry == NULL ) continue;
-        if( entry->task_id == entry_id ) return entry;
+        if( entry->ID == entry_id ) return entry;
     }
     return NULL;
 }

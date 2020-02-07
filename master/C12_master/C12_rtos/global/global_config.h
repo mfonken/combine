@@ -20,6 +20,7 @@
 #define KALMAN_DEBUG        DEBUG_1
 #define KALMAN_DEBUG_2      DEBUG_1
 #define SYSTEM_DEBUG        DEBUG_2
+#define PAPI_DEBUG          DEBUG_1
 #define OSI_DEBUG           DEBUG_1
 #define IO_CTL_DEBUG        DEBUG_1
 
@@ -35,6 +36,14 @@
 #else
 #define LOG_SYSTEM(...)
 #define LOG_SYSTEM_BARE(...)
+#endif
+
+#ifdef PAPI_DEBUG
+#define LOG_PAPI(L,...)          LOG(L,"<PAP> " __VA_ARGS__)
+#define LOG_PAPI_BARE(L,...)     LOG_BARE(L, __VA_ARGS__)
+#else
+#define LOG_PAPI(...)
+#define LOG_PAPI_BARE(...)
 #endif
 
 #ifdef OSI_DEBUG

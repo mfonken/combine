@@ -15,10 +15,10 @@ void InitRho( rho_setting_t * setting )
 
 void SendRhoSetting( rho_setting_t * setting )
 {
-    PerformCommEvent( RhoFunctions.GetSendEvent(), (uint8_t*)setting );
+    PerformCommEvent( RhoFunctions.GetSendEvent(setting) );
 }
 
 void ReceiveRhoPacket( rho_t * rho )
 {
-    PerformCommEvent( RhoFunctions.GetReceiveEvent(), (uint8_t*)&rho->packet );
+    PerformCommEvent( RhoFunctions.GetReceiveEvent(&rho->packet) );
 }

@@ -9,7 +9,7 @@
 #ifndef DRV2605_h
 #define DRV2605_h
 
-#include "i2c_template.h"
+#include "peripheralbridge.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -71,8 +71,8 @@ void DRV2605_UseLRA(void);
 uint8_t DRV2605_ReadRegister(uint8_t);
 void DRV2605_WriteRegister(uint8_t, uint8_t);
 
-static i2c_event_t DRV2605_GetReadEvent(uint8_t reg) { return (i2c_event_t){ I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
-static i2c_event_t DRV2605_GetWriteEvent(uint8_t reg) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR }; }
+static i2c_event_t DRV2605_GetReadEvent(uint8_t reg, uint8_t * data) { return (i2c_event_t){ I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR, data }; }
+static i2c_event_t DRV2605_GetWriteEvent(uint8_t reg, uint8_t * val ) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR, val }; }
 
 
 #endif /* DRV2605_h */

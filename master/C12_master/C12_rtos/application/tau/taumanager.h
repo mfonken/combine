@@ -63,7 +63,7 @@ typedef struct
 {
     void (*RegisterState)(tau_state_t);
     void (*Tick)(void);
-    void (*Start)(tau_state_t);
+    void (*Start)(void);
     void (*Pause)(void);
     void (*Stop)(void);
     tau_perform_functions Perform;
