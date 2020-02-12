@@ -91,14 +91,11 @@ void SystemManager_PerformDisableProfileEntryState( system_profile_entry_t * ent
 void SystemManager_RegisterTaskList( os_task_list_t * task_list )
 {
     System.os_tasks = task_list;
-//    for( uint8_t i = 0; i < NUM_SYSTEM_TASKS; i++ )
-//        OS.Task.Create( &((*System.os_tasks)[i]) );
 }
 
 void SystemManager_RegisterQueueList( os_queue_list_t * queue_list )
 {
     System.queue_list = queue_list;
-    
 }
 
 void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
@@ -133,6 +130,7 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
     LOG_SYSTEM( SYSTEM_DEBUG, "Registering profile entry %s(%d).\n", task_id_strings[id], id);
     System.registration.profile_entries[id] = true;
 //    system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
+//    handler-
 //    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
 //    {
 //        switch( entry->header.type )
@@ -166,6 +164,14 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
 //    }
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
     if( task_data == NULL ) return;
+
+    int8_t component_number = SystemFunctions.Get.ComponentNumber(entry->component_id);
+    if( component_number >= 0 )
+    { /* If component is included, populate communication host */
+        System.registration.comm_hosts[component_number] = SystemFunctions.Get.CommHostForComponentById( entry->component_id );
+        System.registration.comm_hosts[component_number].generic_comm_host.buffer = task_data->p_arg; // Slide argument to buffer part of comm_host
+        task_data->p_arg = &System.registration.comm_hosts[component_number];
+    }
     
     // Create OS utilities with task_data
     if( scheduled && entry->data.schedule != 0)
@@ -182,7 +188,6 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
         task_data->event_data.interrupt.action = entry->data.action;
         task_data->event_data.interrupt.component_id = entry->component_id;
         
-        int8_t component_number = SystemFunctions.Get.ComponentNumber(entry->component_id);
         if(component_number < 0 )
         {
             LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
@@ -190,7 +195,6 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
         else
             System.registration.component_tasks[component_number] = task_data->ID;
     }
-    ///TODO: Implement and hardware interrupt functionality!!!
 }
 
 int8_t SystemManager_GetSystemComponentNumber( component_id_t component_id )
@@ -236,16 +240,19 @@ void SystemManager_RegisterSubactivity( system_subactivity_t subactivity )
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering subactivity: %s(%d)\n", subactivity_strings[id], id);
     System.subactivity = subactivity;
 }
+
 void SystemManager_RegisterError( system_error_t error )
 {
     uint8_t id = error;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering error: %s(%d)\n", error_strings[id], id);
     System.error.type = error;
 }
+
 void SystemManager_RegisterConsumption( system_consumption_t consumption )
 {
     System.consumption_level = consumption;
 }
+
 system_subactivity_map_entry_t * SystemManager_GetSubactivityMapEntryById( system_subactivity_t entry_id )
 {
     for( uint8_t i = 0; i < NUM_SYSTEM_SUBACTIVITIES; i++ )
@@ -284,6 +291,7 @@ os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t componen
         os_task_data_t * task_data = &((*System.os_tasks)[i]);
         if( task_data == NULL ) continue;
         SystemFunctions.Get.ComponentNumber( component_id );
+        ///TODO: Finish
     }
     return NULL;
 }
@@ -368,4 +376,37 @@ void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t entry_i
         SystemFunctions.Perform.DisableProfileEntry( &entry->interrupts[i] );
     for( uint8_t i = 0; i < entry->num_scheduled; i++ )
         SystemFunctions.Perform.DisableProfileEntry( &entry->scheduled[i] );
+}
+
+comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_id )
+{
+    int8_t component_number = SystemFunctions.Get.ComponentNumber( component_id );
+//    if( component_number < 0 )
+//    {
+//        return {};
+//    }
+    
+    component_t * component = &System.profile->component_list.entries[component_number];
+    
+    comm_host_t comm_host = { component->protocol };
+    I2C_Channel * I2C_Channels[] = Channels_I2C;
+    SPI_Channel * SPI_Channels[] = Channels_SPI;
+    
+    switch(component->protocol)
+    {
+        case COMM_PROTOCOL_I2C:
+            comm_host.i2c_host.address = component->addr;
+            comm_host.i2c_host.device = I2C_Channels[component->route];
+            break;
+        case COMM_PROTOCOL_SPI:
+            comm_host.spi_host.cs.gpio.pin = component->pin;
+            comm_host.spi_host.cs.gpio.port = component->port;
+            comm_host.spi_host.device = SPI_Channels[component->route];
+            break;
+        default:
+            break;
+    }
+    
+    
+    return comm_host;
 }

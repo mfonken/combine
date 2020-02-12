@@ -183,7 +183,7 @@ static inline void MICRIUM_OSInterface_Init( void )
 
     CMU_ClockEnable(cmuClock_PRS, true);
 
-    BSP_CPUInit();                                                / * Initialize CPU and make all interrupts Kernel Aware. * /
+    BSP_CPUInit();                                                /* Initialize CPU and make all interrupts Kernel Aware. */
     //system already initialized by enter_DefaultMode_from_RESET
     //BSP_SystemInit();                                           / * Initialize System.                                   * /
 

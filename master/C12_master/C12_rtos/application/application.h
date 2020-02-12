@@ -283,7 +283,7 @@ void InitializeMeta(void)
     
     os_task_list_t task_list_initializer =
     (os_task_list_t)
-    {/* Task name                                                  Function to call                Variable to fill             Priority                  Error */
+    {/* Task name                                                  Function to call                Argument                     Priority                  Error */
         TASK(APPLICATION_COMBINE_GLOBAL,                           AppFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
         TASK(APPLICATION_SCHEDULER_ID_TAU_PERFORM,                 TauFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),
         TASK(APPLICATION_SCHEDULER_ID_TAU_PACKET_QUEUE,            TauFunctions.Tick,              NULL,                        TASK_PRIORITY_CLASS_HIGH, &System.error.runtime    ),

@@ -85,7 +85,7 @@
 
 #define     D_FIXED                 5.0e-2
 
-#define KIN_DEBUG DEBUG_2
+#define KIN_DEBUG DEBUG_1
 
 #ifdef KIN_DEBUG
 #define LOG_KIN(L,...)          LOG(L,"<Kinetic> " __VA_ARGS__)

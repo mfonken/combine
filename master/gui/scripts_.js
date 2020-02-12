@@ -2,11 +2,11 @@
 // toggle between hiding and showing the dropdown content */
 var version = "v0.1";
 
-var example_profile ={"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_A","2":"SYSTEM_FAMILY_B","3":"SYSTEM_FAMILY_C","4":"SYSTEM_FAMILY_D"},"num_ALL":5,"ERROR":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_B","2":"SYSTEM_FAMILY_C"},"num_ERROR":3}},"Channels":{"type":"list","Channels_0":{"I2C":{"0":"I2C1","1":"I2C2"},"num_I2C":2,"SPI":{"0":"SPI1","1":"SPI2"},"num_SPI":2,"USART":{"0":"USART1","1":"USART2"},"num_USART":2}},"Components":{"type":"group","Components_0":{"NAME":"EFR32_BLE","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_BLE","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_1":{"NAME":"EFR32_SUB","ID":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","PROTOCOL":"COMM_PROTOCOL_SUB","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_2":{"NAME":"BNO080","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","PROTOCOL":"COMM_PROTOCOL_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"PORTC","PIN":"9","STATE":"COMPONENT_STATE_OFF"},"Components_3":{"NAME":"RHOMOD","ID":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xee","PORT":"PORTA","PIN":"2","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_4":{"NAME":"STC310","ID":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","FAMILY":"SYSTEM_FAMILY_C","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0x00","PORT":"PORT0","PIN":"0","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_5":{"NAME":"XC9265","ID":"APPLICATION_COMPONENT_REGULATOR_1V5","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_NONE","ROUTE":"COMM_ROUTE_NONE","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT","data":"INTERRUPT_ACTION_IMMEDIATE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT"},"Subactivities_1":{"ID":"APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT","data":"0","component_id":"APPLICATION_COMPONENT_TOUCH_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_TOUCH_EVENT"},"Subactivities_2":{"ID":"APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL","data":"1","component_id":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR"},"Subactivities_3":{"ID":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT"},"Subactivities_4":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT","data":"0","component_id":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET"},"Subactivities_5":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS","interrupts":"","num_interrupts":0,"scheduled":"","num_scheduled":0},"Tasks_1":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_2":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_3":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_PROBE_ID_BATTERY_MONITOR"},"num_scheduled":1},"Tasks_4":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT"},"num_scheduled":1},"Tasks_5":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS","interrupts":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_INIT_CONFIRM","1":"APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT","2":"APPLICATION_SUBACTIVITY_INIT_COMPONENTS","3":"APPLICATION_SUBACTIVITY_INIT_COMMUNICATION","4":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":5,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1},"States_1":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_IDLE","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_2":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_WAITING","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_3":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ACTIVE"},"STATE":"SYSTEM_STATE_ACTIVE","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","1":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS"},"num_TASKS":2},"States_4":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_ASLEEP","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_5":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_ERROR","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_6":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_RECOVERY","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_7":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ERROR"},"STATE":"SYSTEM_STATE_UNKNOWN","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1}}}
-// {"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}}
-// {"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1},"Families_1":{"IDLE":{"0":"SYSTEM_FAMILY_B"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_C"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_D"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}}
-//{"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"},"Components_1":{"NAME":"DEF","ID":"APPLICATION_COMPONENT_TIP_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xde","PORT":"PORTB","PIN":"1","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_2":{"NAME":"GHI","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_C","PROTOCOL":"COMM_PROTOCOL_UART","ROUTE":"COMM_ROUTE_SECONDARY","ADDR":"0x12","PORT":"PORTC","PIN":"2","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}};
-//{"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_A","2":"SYSTEM_FAMILY_B","3":"SYSTEM_FAMILY_C","4":"SYSTEM_FAMILY_D"},"num_ALL":5,"ERROR":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_B","2":"SYSTEM_FAMILY_C"},"num_ERROR":3}},"Components":{"type":"group","Components_0":{"NAME":"EFR32_BLE","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_BLE","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_1":{"NAME":"BNO080","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","PROTOCOL":"COMM_PROTOCOL_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"PORTC","PIN":"9","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT","data":"INTERRUPT_ACTION_IMMEDIATE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS","interrupts":"","num_interrupts":0,"scheduled":"","num_scheduled":0},"Tasks_1":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_2":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_INIT_CONFIRM","1":"APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT","2":"APPLICATION_SUBACTIVITY_INIT_COMPONENTS","3":"APPLICATION_SUBACTIVITY_INIT_COMMUNICATION","4":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":5,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1},"States_1":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_IDLE","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1}}}
+var example_profile = {"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_D","1":"SYSTEM_FAMILY_C","2":"SYSTEM_FAMILY_B","3":"SYSTEM_FAMILY_A","4":"SYSTEM_FAMILY_0"},"num_ALL":5,"ERROR":{"0":"SYSTEM_FAMILY_C","1":"SYSTEM_FAMILY_B","2":"SYSTEM_FAMILY_0"},"num_ERROR":3}},"Components":{"type":"group","Components_0":{"NAME":"EFR32_BLE","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","COMM":"COMM_BLE","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_1":{"NAME":"EFR32_SUB","ID":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","COMM":"COMM_SUB","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_2":{"NAME":"BNO080","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","COMM":"COMM_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"PORTC","PIN":"9","STATE":"COMPONENT_STATE_OFF"},"Components_3":{"NAME":"RHOMOD","ID":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","COMM":"COMM_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xee","PORT":"PORTA","PIN":"2","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_4":{"NAME":"STC310","ID":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","FAMILY":"SYSTEM_FAMILY_C","COMM":"COMM_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0x00","PORT":"PORT0","PIN":"0","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_5":{"NAME":"XC9265","ID":"APPLICATION_COMPONENT_REGULATOR_1V5","FAMILY":"SYSTEM_FAMILY_A","COMM":"COMM_NONE","ROUTE":"COMM_ROUTE_NONE","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT","data":"INTERRUPT_ACTION_IMMEDIATE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT"},"Subactivities_1":{"ID":"APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT","data":"0","component_id":"APPLICATION_COMPONENT_TOUCH_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_TOUCH_EVENT"},"Subactivities_2":{"ID":"APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL","data":"1","component_id":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR"},"Subactivities_3":{"ID":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT"},"Subactivities_4":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT","data":"0","component_id":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET"},"Subactivities_5":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS","interrupts":"","num_interrupts":0,"scheduled":"","num_scheduled":0},"Tasks_1":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_2":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_3":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_PROBE_ID_BATTERY_MONITOR"},"num_scheduled":1},"Tasks_4":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT"},"num_scheduled":1},"Tasks_5":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS","interrupts":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK","1":"APPLICATION_SUBACTIVITY_INIT_COMMUNICATION","2":"APPLICATION_SUBACTIVITY_INIT_COMPONENTS","3":"APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT","4":"APPLICATION_SUBACTIVITY_INIT_CONFIRM"},"num_SUBACTIVITIES":5,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1},"States_1":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_IDLE","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_2":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_WAITING","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_3":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ACTIVE"},"STATE":"SYSTEM_STATE_ACTIVE","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS","1":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS"},"num_TASKS":2},"States_4":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_ASLEEP","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_5":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_ERROR","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_6":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_RECOVERY","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_7":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ERROR"},"STATE":"SYSTEM_STATE_UNKNOWN","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1}}}
+// {"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","COMM":"COMM_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}}
+// {"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1},"Families_1":{"IDLE":{"0":"SYSTEM_FAMILY_B"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_C"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_D"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","COMM":"COMM_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}}
+//{"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_A"},"num_ALL":1,"ERROR":{"0":"SYSTEM_FAMILY_B"},"num_ERROR":1}},"Components":{"type":"group","Components_0":{"NAME":"ABC","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","COMM":"COMM_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xab","PORT":"PORTA","PIN":"0","STATE":"COMPONENT_STATE_ON"},"Components_1":{"NAME":"DEF","ID":"APPLICATION_COMPONENT_TIP_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","COMM":"COMM_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xde","PORT":"PORTB","PIN":"1","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_2":{"NAME":"GHI","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_C","COMM":"COMM_UART","ROUTE":"COMM_ROUTE_SECONDARY","ADDR":"0x12","PORT":"PORTC","PIN":"2","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_COMBINE_GLOBAL","data":"INTERRUPT_ACTION_IGNORE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_COMBINE_GLOBAL"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_PROBE_ID_HOST"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":1,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1}}};
+//{"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_A","2":"SYSTEM_FAMILY_B","3":"SYSTEM_FAMILY_C","4":"SYSTEM_FAMILY_D"},"num_ALL":5,"ERROR":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_B","2":"SYSTEM_FAMILY_C"},"num_ERROR":3}},"Components":{"type":"group","Components_0":{"NAME":"EFR32_BLE","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","COMM":"COMM_BLE","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_1":{"NAME":"BNO080","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","COMM":"COMM_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"PORTC","PIN":"9","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT","data":"INTERRUPT_ACTION_IMMEDIATE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS","interrupts":"","num_interrupts":0,"scheduled":"","num_scheduled":0},"Tasks_1":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_2":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_INIT_CONFIRM","1":"APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT","2":"APPLICATION_SUBACTIVITY_INIT_COMPONENTS","3":"APPLICATION_SUBACTIVITY_INIT_COMMUNICATION","4":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":5,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1},"States_1":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_IDLE","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1}}}
 var all_options =
 {
     "Families":[{
@@ -19,28 +19,6 @@ var all_options =
         ],
         "ERROR":[
             "array:.Components.FAMILY"
-        ]
-    }],
-    "Channels":[{
-        "options":"list",
-        "I2C":[
-            "array",
-            "I2C1",
-            "I2C2"
-        ],
-        "SPI":[
-            "array",
-            "SPI1",
-            "SPI2",
-            "SPI3",
-        ],
-        "USART":[
-            "array",
-            "USART1",
-            "USART2",
-            "USART3",
-            "UART4",
-            "UART5"
         ]
     }],
     "Components":[{
@@ -68,13 +46,13 @@ var all_options =
             "SYSTEM_FAMILY_C",
             "SYSTEM_FAMILY_D"
         ],
-        "PROTOCOL":[
-            "COMM_PROTOCOL_NONE",
-            "COMM_PROTOCOL_I2C",
-            "COMM_PROTOCOL_SPI",
-            "COMM_PROTOCOL_UART",
-            "COMM_PROTOCOL_BLE",
-            "COMM_PROTOCOL_SUB"
+        "COMM":[
+            "COMM_NONE",
+            "COMM_I2C",
+            "COMM_SPI",
+            "COMM_UART",
+            "COMM_BLE",
+            "COMM_SUB"
         ],
         "ROUTE":[
             "COMM_ROUTE_NONE",
@@ -105,8 +83,7 @@ var all_options =
             "COMPONENT_STATE_INTERRUPT"
         ]
     }],
-    "Subactivities":[{
-        "options":"struct",
+    "Subactivities:struct":[{
         "ID":[
             "APPLICATION_ACTION_ID_NONE",
             "APPLICATION_COMBINE_GLOBAL",
@@ -158,6 +135,7 @@ var all_options =
             "APPLICATION_SUBACTIVITY_SELF_CHECK",
             "APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE",
 
+            /* Initialization */
             "APPLICATION_SUBACTIVITY_INIT_COMMUNICATION",
             "APPLICATION_SUBACTIVITY_INIT_SUB_VREG",
             "APPLICATION_SUBACTIVITY_INIT_COMPONENTS",
@@ -166,9 +144,17 @@ var all_options =
             "APPLICATION_SUBACTIVITY_INIT_CONFIRM",
             "APPLICATION_SUBACTIVITY_BATTERY_MONITOR_ACTIVE",
 
+            /* Profile */
+            //    "APPLICATION_SUBACTIVITY_PROFILE_FETCH",
+            //    "APPLICATION_SUBACTIVITY_PROFILE_PERFORM",
+            //    "APPLICATION_SUBACTIVITY_PROFILE_UPDATE",
+            //    "APPLICATION_SUBACTIVITY_PROFILE_STORE",
+
+            /* Probes */
             "APPLICATION_SUBACTIVITY_SEND_HOST_PROBE",
             "APPLICATION_SUBACTIVITY_RECEIVE_HOST_PROBE",
 
+            /* Handles */
             "APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT",
             "APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT",
             "APPLICATION_SUBACTIVITY_HANDLE_TOUCH_EVENT",
@@ -183,18 +169,19 @@ var all_options =
             "APPLICATION_SUBACTIVITY_TRANSMIT_SUB_RADIO_PACKET",
             "APPLICATION_SUBACTIVITY_RECEIVE_SUB_RADIO_PACKET",
 
+            /* Tau */
             "APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START",
             "APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START",
             "APPLICATION_SUBACTIVITY_TAU_STANDARD_START",
 
+            /* Sleep/Idle */
             "APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP",
             "APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP",
             "APPLICATION_SUBACTIVITY_TAU_STOP",
-            "APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP"
+            "APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP",
         ]
     }],
-    "Tasks":[{
-        "options":"struct:~",
+    "Tasks:struct:~":[{
         "ID":[
             "APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS",
             "APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS",
@@ -208,14 +195,13 @@ var all_options =
             "APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS"
         ],
         "interrupts":[
-            "array:.Subactivities.ID"
+            "array:.Subactivities:struct.ID"
         ],
         "scheduled":[
-            "array:.Subactivities.ID"
+            "array:.Subactivities:struct.ID"
         ]
     }],
-    "States":[{
-        "options":"nested",
+    "States:nested":[{
         "STATE":[
             "SYSTEM_STATE_STARTUP",
             "SYSTEM_STATE_IDLE",
@@ -226,26 +212,23 @@ var all_options =
             "SYSTEM_STATE_RECOVERY",
             "SYSTEM_STATE_UNKNOWN"
         ],
-        "ACTIVITY":[
-            {"options":">"},
+        "ACTIVITY:>":[
             "SYSTEM_ACTIVITY_NONE",
             "SYSTEM_ACTIVITY_STARTUP",
             "SYSTEM_ACTIVITY_IDLE",
-            "SYSTEM_ACTIVITY_SLEEP"
+            "SYSTEM_ACTIVITY_SLEEP",
         ],
-        "SUBACTIVITIES":[
-            {"options":">"},
-            "array:.Subactivities.handler_id"
+        "SUBACTIVITIES:>":[
+            "array:.Subactivities:struct.handler_id",
         ],
-        "EXIT_STATE":[
-            {"options":">"},
-            ":.States.STATE"
+        "EXIT_STATE:>":[
+            ":.States:nested.STATE"
         ],
         "FAMILIES":[
-            ":.Families"
+            ":.Families",
         ],
         "TASKS":[
-            "array:.Tasks.ID"
+            "array:.Tasks:struct:~.ID"
         ]
     }]
 };
@@ -260,8 +243,8 @@ function createMain(index) {
         var global_type = "global_type_";
         // if(key_items.length > 1) {
         if(global_list[0]['options'] != undefined) {
-            // console.log(global_list[0]['options'].split(":")[0]);
-            global_type += global_list[0]['options'].split(":")[0];
+            // console.log(global_list[0]['options']);
+            global_type += global_list[0]['options'].split(":");
         }
         else {
             global_type += "none";
@@ -341,23 +324,16 @@ function createDropdownElement(element, key, list) {
     element.append('<div class="option_list_div"></div');
     var option_list_div = element.children("div");
 
+    var nest_check = key.indexOf(":>");
     var nest_count = 0;
-    // console.log(list, list[0]['options'])
-    if(list[0]['options'] != undefined && $.inArray(">", list[0]['options'].split(":")) >= 0) {
-        var options = list[0]['options'].split(":");
-        // console.log(options,$.inArray(">", options));
-        nest_count = options[$.inArray(">", options)].match(/>/g).length;
+    if(nest_check >= 0) {
+        nest_count = key.match(/>/g).length;
     }
-    // console.log(nest_count)
     key = key.split(":")[0];
 
     option_list_div.append('<p class="entry_list_title" id="' + nest_count + '">' + key + ':</p>');
 
-    var list_head = list[0];
-    if($.type(list_head) != "string") {
-        list_head = list[1];
-        // console.log("head", list_head, $.type(list_head));
-    }
+    var list_head =  list[0];
     var is_array = list_head.includes("array");
     option_list_element = option_list_div
     if(is_array) {
@@ -388,7 +364,7 @@ function createDropdownElement(element, key, list) {
             // console.log(last_path_key, sub_list);
             $.each(sub_list[0], function (key, sub_list_item) {
                 if(key == 'options') return;
-                // console.log(last_path_key + "_" + key);
+                console.log(last_path_key + "_" + key);
                 list.push(last_path_key + "_" + key);
             });
         }
@@ -396,20 +372,18 @@ function createDropdownElement(element, key, list) {
             list = sub_list;
         }
     }
-    // console.log(list);
+    console.log(list);
     createDropdown(option_list_element, key, list, btn_id, is_array);
 }
 
 function createDropdown(element, key, list, btn_id, is_array) {
     var list_head =  list[0];
+
     element.append('<ul class="dropdown-menu" role="menu" aria-labelledby=\"' + btn_id + '\"></ul>');
     if(is_array && list[0] != "REMOVE") list.splice(0,0,"REMOVE");
     $.each(list, function (i, item) {
-        if(item == "array") return;
         // console.log(item);
-        if($.type(item) != "string") return;
-        // console.log("item", item);
-
+        if($.type(item) == "array") return;
         if(item.includes("enter")) {
             var prefix = "";
             if( list_head.includes("address") ) prefix = "0x";
@@ -609,181 +583,178 @@ function generateC() {
         var section_text = "";
         var include_group = false;
         $.each(all_options, function(option_group_key, option_group) {
-            // console.log(option_group_key, option_group[0]['options'], option_group[0]['options'].includes("~"));
-            if(option_group_key.includes(group_key)
-            && option_group[0]['options'] != undefined
-            && option_group[0]['options'].includes("~"))
-            include_group = true;
+
+            // console.log(option_group_key, option_group[0]['options']);
+            if(option_group[0]['options'] != undefined && option_group[0]['options'].includes("~"))
+            // if(option_group_key.includes(group_key) && option_group_key.includes("~"))
+                include_group = true;
         });
         // console.log(group)
         group_key = deplural(group_key);
 
-        // console.log(group_key);
-        full_text += "\/\* " + group_key + " \*\/\n";
         switch (group["type"]) {
             case "list":
-            $.each(group, function (entry_key, entry) {
-                if(!$.isPlainObject(entry)) return;
-                section_text = "";
-                var full_group_name = "";
-                var found_definition = false;
-                $.each(entry, function (list_key, list) {
-                    if(!$.isPlainObject(list)) return;
-                    found_definition = true;
-                    full_group_name = group_key + "_" + list_key;
-                    section_text += "#define " + full_group_name + " { ";
+                // console.log("group", group_key);
+                // collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    if(!$.isPlainObject(entry)) return;
+                    section_text = "";
+                    var full_group_name = "";
+                    var found_definition = false;
+                    $.each(entry, function (list_key, list) {
+                        if(!$.isPlainObject(list)) return;
+                        found_definition = true;
+                        full_group_name = group_key + "_" + list_key;
+                        section_text += "#define " + full_group_name + " { ";
 
-                    $.each(list, function (i, list_item) {
-                        // console.log(list_item);
-                        section_text += list_item;
-                        if(i < Object.keys(list).length - 1)
-                        section_text += ", ";
+                        $.each(list, function (i, list_item) {
+                            // console.log(list_item);
+                            section_text += list_item;
+                            if(i < Object.keys(list).length - 1)
+                                section_text += ", ";
+                        });
+                        section_text += " }\n";
+                        // console.log(full_group_name);
+                        // collection[group_key].push(full_group_name);
                     });
-                    section_text += " }\n";
-                    // console.log(full_group_name);
-                    // collection[group_key].push(full_group_name);
+                    if(!found_definition) return;
+                    full_text += section_text;
                 });
-                if(!found_definition) return;
-                full_text += section_text;
-            });
-            full_text += "\n";
-            break;
+                full_text += "\n";
+                break;
             case "group":
-            if(include_group)
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                section_text = "";
-                // console.log("entry", entry_key, entry);
-                var group_item_names = {};
-                if(!$.isPlainObject(entry)) return;
-                var group_name = entry_key;
-                var i = 0;
-                // console.log(entry_key);
-                $.each(entry, function (item_key, item) {
-                    if($.isPlainObject(item)) {
-                        console.log("Group should not have internal list.");
-                    }
-                    else {
-                        if(item_key != "NAME") {
-                            section_text += "#define " + group_name + "_" + item_key + " " + item + "\n";
-                            group_item_names[i++] = (group_name + "_" + item_key);
+                if(include_group)
+                    collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    section_text = "";
+                    // console.log("entry", entry_key, entry);
+                    var group_item_names = {};
+                    if(!$.isPlainObject(entry)) return;
+                    var group_name = entry_key;
+                    var i = 0;
+                    // console.log(entry_key);
+                    $.each(entry, function (item_key, item) {
+                        if($.isPlainObject(item)) {
+                            console.log("Group should not have internal list.");
                         }
                         else {
-                            group_name = item;
+                            if(item_key != "NAME") {
+                                section_text += "#define " + group_name + "_" + item_key + " " + item + "\n";
+                                group_item_names[i++] = (group_name + "_" + item_key);
+                            }
+                            else {
+                                group_name = item;
+                            }
                         }
-                    }
+                    });
+                    if(group_name == "") return;
+                    section_text += "#define " + group_name + "_" + group_key + " { ";
+                    $.each(group_item_names, function (i, group_item) {
+                        section_text += group_item;
+                        if( i < Object.keys(group_item_names).length - 1)
+                        section_text += ", ";
+                    });
+                    section_text += " }\n\n";
+                    if(include_group)
+                        collection[group_key].push(group_name + "_" + group_key);
+                    full_text += section_text;
                 });
-                if(group_name == "") return;
-                section_text += "#define " + group_name + "_" + group_key + " { ";
-                $.each(group_item_names, function (i, group_item) {
-                    section_text += group_item;
-                    if( i < Object.keys(group_item_names).length - 1)
-                    section_text += ", ";
-                });
-                section_text += " }\n\n";
-                if(include_group)
-                collection[group_key].push(group_name + "_" + group_key);
-                full_text += section_text;
-            });
-            break;
+                break;
             case "struct":
-            // console.log("include", include_group, group_key)
-            if(include_group)
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                section_text = "";
-                var id = "";
-                if(!$.isPlainObject(entry)) return;
-                $.each(entry, function (item_key, item) {
-                    if($.isPlainObject(item)) {
-                        section_text += "\t." + item_key + " = { ";
-                        $.each(item, function (i, list_item) {
-                            // console.log(list_item);
-                            list_item = list_item.replace("_ID", "");
-                            if(list_item == "" ) section_text += "NONE";
-                            else section_text += list_item;
-                            if(i < Object.keys(item).length - 1)
-                            section_text += ", ";
+                if(include_group)
+                    collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    section_text = "";
+                    var id = "";
+                    if(!$.isPlainObject(entry)) return;
+                    $.each(entry, function (item_key, item) {
+                        if($.isPlainObject(item)) {
+                            section_text += "\t." + item_key + " = { ";
+                            $.each(item, function (i, list_item) {
+                                if(list_item == "" ) section_text += "NONE";
+                                else section_text += list_item;
+                                if(i < Object.keys(item).length - 1)
+                                section_text += ", ";
+                            });
+                            section_text += " }, \\\n";
+                        }
+                        else {
+                            if(item_key == "ID") {
+                                id = item;
+                                var macro_name = item.replace("_ID", "");
+                                section_text += "#define " + macro_name + " { \\\n";
+                                if(include_group)
+                                    collection[group_key].push(macro_name);
+                            }
+                            section_text += "\t." + item_key + " = ";
+                            if(item == "" ) section_text += "NONE";
+                            else section_text += item;
+                            if(item_key != Object.keys(entry)[Object.keys(entry).length-1]) {
+                                section_text += ",";
+                            }
+                            section_text += " \\\n";
+                        }
+                    });
+                    if(id == "") return;
+                    section_text += "}\n\n";
+                    full_text += section_text;
+                });
+                break;
+            case "nested":
+                collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    // console.log(":", entry);
+                    if($.isPlainObject(entry)) {
+                        section_text += "\t\t{ \\\n";
+                        $.each(entry, function (list_key, list) {
+                            if($.isPlainObject(list)) {
+                                if($.isNumeric(Object.keys(list)[0])) {
+                                    section_text += "\t\t\t{ \/* " + list_key + " *\/ \\\n";
+                                    $.each(list, function (item_key, item) {
+                                        section_text += "\t\t\t\t" + item;
+                                        // console.log(parseInt(item_key), Object.keys(list).length);
+                                        if(parseInt(item_key) < Object.keys(list).length - 1) {
+                                            section_text += ",";
+                                        }
+                                        section_text += " \\\n";
+                                    });
+                                    section_text += "\t\t\t}, \\\n";
+                                }
+                                else if(Object.keys(list).length > 0) {
+                                    section_text += "\t\t\t{ \\\n";
+                                    $.each(list, function (item_key, item) {
+                                        if($.isPlainObject(item) || ( item == "" && $.type(item) == "string" )) {
+                                            section_text += "\t\t\t\t{ \/* " + item_key + " *\/ \\\n";
+                                            $.each(item, function (nested_key, nested) {
+                                                section_text += "\t\t\t\t\t" + nested;
+                                                if(nested_key != Object.keys(item)[Object.keys(item).length-1])
+                                                    section_text += ",";
+                                                section_text += " \\\n";
+                                            });
+                                            section_text += "\t\t\t\t}, \\\n";
+                                        }
+                                        else {
+                                            section_text += "\t\t\t\t" + item + ", \\\n";
+                                        }
+                                    });
+                                    section_text += "\t\t\t}, \\\n";
+                                }
+                            }
+                            else {
+                                section_text += "\t\t\t" + list + ", \/* " + list_key + " *\/ \\\n";
+                            }
                         });
-                        section_text += " }, \\\n";
-                    }
-                    else {
-                        if(item_key == "ID") {
-                            id = item;
-                            var macro_name = item.replace("_ID", "");
-                            section_text += "#define " + macro_name + " { \\\n";
-                            if(include_group)
-                            collection[group_key].push(macro_name);
-                        }
-                        section_text += "\t." + item_key + " = ";
-                        if(item == "" ) section_text += "NONE";
-                        else section_text += item;
-                        if(item_key != Object.keys(entry)[Object.keys(entry).length-1]) {
-                            section_text += ",";
-                        }
+                        // section_text += ">\t\t\t},\n";
+                        section_text += "\t\t}";
+                        if(entry_key != Object.keys(group)[Object.keys(group).length-1])
+                            section_text += ","
                         section_text += " \\\n";
                     }
                 });
-                if(id == "") return;
-                section_text += "}\n\n";
-                full_text += section_text;
-            });
-            break;
-            case "nested":
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                // console.log(":", entry);
-                if($.isPlainObject(entry)) {
-                    section_text += "\t\t{ \\\n";
-                    $.each(entry, function (list_key, list) {
-                        if($.isPlainObject(list)) {
-                            if($.isNumeric(Object.keys(list)[0])) {
-                                section_text += "\t\t\t{ \/* " + list_key + " *\/ \\\n";
-                                $.each(list, function (item_key, item) {
-                                    section_text += "\t\t\t\t" + item;
-                                    // console.log(parseInt(item_key), Object.keys(list).length);
-                                    if(parseInt(item_key) < Object.keys(list).length - 1) {
-                                        section_text += ",";
-                                    }
-                                    section_text += " \\\n";
-                                });
-                                section_text += "\t\t\t}, \\\n";
-                            }
-                            else if(Object.keys(list).length > 0) {
-                                section_text += "\t\t\t{ \\\n";
-                                $.each(list, function (item_key, item) {
-                                    if($.isPlainObject(item) || ( item == "" && $.type(item) == "string" )) {
-                                        section_text += "\t\t\t\t{ \/* " + item_key + " *\/ \\\n";
-                                        $.each(item, function (nested_key, nested) {
-                                            section_text += "\t\t\t\t\t" + nested;
-                                            if(nested_key != Object.keys(item)[Object.keys(item).length-1])
-                                            section_text += ",";
-                                            section_text += " \\\n";
-                                        });
-                                        section_text += "\t\t\t\t}, \\\n";
-                                    }
-                                    else {
-                                        section_text += "\t\t\t\t" + item + ", \\\n";
-                                    }
-                                });
-                                section_text += "\t\t\t}, \\\n";
-                            }
-                        }
-                        else {
-                            section_text += "\t\t\t" + list + ", \/* " + list_key + " *\/ \\\n";
-                        }
-                    });
-                    // section_text += ">\t\t\t},\n";
-                    section_text += "\t\t}";
-                    if(entry_key != Object.keys(group)[Object.keys(group).length-1])
-                    section_text += ","
-                    section_text += " \\\n";
-                }
-            });
-            // section_text += "\t\t}";
-            // console.log(section_text);
-            collection[group_key].push(section_text);
-            break;
+                // section_text += "\t\t}";
+                // console.log(section_text);
+                collection[group_key].push(section_text);
+                break;
             default:
         }
         // if(section_text != "")
@@ -801,7 +772,7 @@ function generateC() {
         $.each(group, function(i, group_item) {
             // console.log("A", group_item);
             if(!group[0].includes("{"))
-            section_text += "\t\t\t";
+                section_text += "\t\t\t";
             section_text += group_item;
 
             if(!group[0].includes("{")) {
@@ -816,7 +787,7 @@ function generateC() {
         // }
         section_text += "\t}";
         if(group_key != Object.keys(collection)[Object.keys(collection).length-1])
-        section_text += ", ";
+            section_text += ", ";
         section_text += " \\\n";
     });
     section_text += "};\n";

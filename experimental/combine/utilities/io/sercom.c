@@ -37,14 +37,14 @@ int Init_SERCOM( SERCOM_Channel * chan )
         else
         {
 #ifdef UTILITY_VERBOSE
-            printf("Initializing SERCOM on alternate.\n", chan->port);
+            printf("Initializing SERCOM on alternate.\n");
 #endif
         }
     }
 #ifdef UTILITY_VERBOSE
     else
     {
-        printf("Initializing SERCOM on main.\n", chan->filestream);
+        printf("Initializing SERCOM on main.\n");
     }
 #endif
     

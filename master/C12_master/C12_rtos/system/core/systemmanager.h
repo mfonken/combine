@@ -58,6 +58,9 @@ void SystemManager_InstateStateProfile( system_state_profile_t * );
 void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t );
 void SystemManager_TerminateStateProfile( system_state_profile_t * );
 
+
+comm_host_t SystemManager_GetCommHostForComponentById( component_id_t );
+
 typedef struct
 {
     void (*Routine)( system_activity_routine_t * );
@@ -98,6 +101,7 @@ typedef struct
 //    void* (*HandlerByComponentId)( component_id_t );
     int8_t (*ComponentNumber)( component_id_t );
     component_id_t (*ComponentIdFromPortPin)( port_t, pin_t );
+    comm_host_t (*CommHostForComponentById)( component_id_t );
 } system_get_functions;
 
 typedef struct
@@ -145,7 +149,8 @@ static system_functions SystemFunctions =
     .Get.TaskByComponent        = SystemManager_GetTaskDataByComponentId,
     .Get.ComponentNumber        = SystemManager_GetSystemComponentNumber,
 //    .Get.HandlerByComponentId   = GetHandlerByComponentId
-    .Get.ComponentIdFromPortPin = SystemManager_GetComponentIdFromPortPin
+    .Get.ComponentIdFromPortPin = SystemManager_GetComponentIdFromPortPin,
+    .Get.CommHostForComponentById = SystemManager_GetCommHostForComponentById
 };
 
 #endif /* systemmanager_h */

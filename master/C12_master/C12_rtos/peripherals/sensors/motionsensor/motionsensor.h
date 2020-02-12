@@ -12,7 +12,7 @@
 #include "BNO080.h"
 #include "quaternion.h"
 
-#define IMU_DEFAULT_COMM_CHANNEL SYSTEM_COMM_SPI
+#define IMU_DEFAULT_COMM_PROTOCOL SYSTEM_COMM_PROTOCOL_SPI
 
 typedef enum
 {
@@ -32,7 +32,7 @@ typedef struct
     uint32_t interval;
 } imu_t;
 
-bool Init_IMU( imu_t *, component_id_t, uint8_t, comm_channel, imu_chip_t );
+bool Init_IMU( imu_t *, component_id_t, uint8_t, comm_protocol, imu_chip_t );
 bool Set_IMU_RotVec( imu_t * );
 
 static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
@@ -45,13 +45,13 @@ static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
 
 typedef struct
 {
-    bool (*Init)( imu_t *, component_id_t, uint8_t, comm_channel, imu_chip_t );
+    bool (*Init)( imu_t *, component_id_t, uint8_t, comm_protocol, imu_chip_t );
     bool (*Start)( shtp_client_t *, imu_feature_t, uint32_t, uint32_t );
     bool (*Stop)( shtp_client_t *, imu_feature_t );
     bool (*Read)( shtp_client_t * );
     bool (*Refresh)( shtp_client_t * );
     bool (*RotVec)( imu_t * );
-    void (*GenerateClient)( shtp_client_t *, uint8_t );
+    void (*GenerateClient)( shtp_client_t *, uint8_t, uint32_t );
 } imu_functions;
 
 static const imu_functions IMUFunctions =

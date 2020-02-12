@@ -8,12 +8,23 @@
 
 #include "papi_interface.h"
 
+#ifndef DCDC_SERVICE
+void PAPIInterface_DCDC_Init( uint16_t mV ) {}
+#else
 void PAPIInterface_DCDC_Init( uint16_t mV )
 {
     LOG_PAPI(PAPI_DEBUG, "Starting DCDC at %.3fV.\n", (double)mV / 1000. );
     PAPI_SPECIFIC(PAPIInterface_DCDC_Init)(mV);
 }
+#endif
 
+#ifndef I2C_SERVICE
+void PAPIInterface_I2C_Init( i2c_event_t * data ) {}
+void PAPIInterface_I2C_Enable( i2c_event_t * data ) {}
+i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * data ) { return false; }
+i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * data ) { return false; }
+i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event ) { return false; }
+#else
 void PAPIInterface_I2C_Init( i2c_event_t * data )
 {
     LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel \n");
@@ -63,8 +74,9 @@ i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event )
     }
     return false;
 }
+#endif
 
-#ifndef __SPI_SERVICE__
+#ifndef SPI_SERVICE
 /// TODO look into "weak" across compilers
 void PAPIInterface_SPI_Init( spi_event_t * data ) {}
 void PAPIInterface_SPI_Enable( spi_event_t * data ) {}
@@ -107,4 +119,12 @@ spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t event )
 //    }
     return false;
 }
+#endif
+
+#ifndef USART_SERVICE
+#else
+#endif
+
+#ifndef LEUART_SERVICE
+#else
 #endif

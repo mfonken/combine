@@ -44,8 +44,8 @@ void SYSIOCTL_Tie_Component( component_id_t id, void * instance )
     SYSIOCTL_Get_Component(id)->instance = instance;
 }
 /*
-uint8_t ID, uint8_t sequence_number, uint8_t comm_channel,
-shtp_client_header * header,
+uint8_t ID, uint8_t sequence_number, uint8_t comm_protocol,
+shtp_client_comm_host * header,
 shtp_client_buffer * buffer,
 shtp_client_product_id * product,
 shtp_client_output * output )
@@ -63,7 +63,7 @@ void SYSIOCTL_Init_Component( component_t * component )
 //                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
 //                if( ID != PROTOCOL_ID_NULL )
 //                {
-//                    IMUFunctions.GenerateClient( &SysIOCtl.system->objects.IMU.client, ID );
+//                    IMUFunctions.GenerateClient( &SysIOCtl.system->objects.IMU.client, ID, ...address/device );
 //                    IMUFunctions.Init( &SysIOCtl.system->objects.IMU, component->ID, ID, COMM_CHAN_I2C, IMU_CHIP_BNO080 );
 //                }
 //                break;

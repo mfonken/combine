@@ -27,21 +27,26 @@ void SystemBehavior_PerformWaitForWake(void)
 void SystemBehavior_PerformProbeSend( system_task_id_t task_id )
 {
 }
+
 void SystemBehavior_PerformProbeReceive( system_task_id_t task_id )
 {
 }
+
 void SystemBehavior_PerformSchedulerSchedule( system_task_id_t task_id, uint32_t data )
 {
 }
+
 void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t task_id )
 {
     //Deschedule BehaviorScheduledTasks[id]
 }
+
 void SystemBehavior_PerformInterrupterSend( system_task_id_t task_id )
 {
     //Enable BehaviorInterruptTasks[id]
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
 }
+
 void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_event_message_t message )
 {
     bool handled = false;

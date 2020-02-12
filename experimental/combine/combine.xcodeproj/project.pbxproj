@@ -607,6 +607,8 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					__RHO__,
+					__KIN__,
+					__IMU__,
 					__KALMAN__,
 					"GLOBAL_LOG_LEVEL=DEBUG_2",
 				);

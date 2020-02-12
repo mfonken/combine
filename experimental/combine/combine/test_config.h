@@ -11,12 +11,12 @@
 
 #define MAIN_FPS        10//50
 #define TAU_FPS         MAIN_FPS
-#define COMBINE_FPS     60 /// NOTE: BNO055 max rate is 200
+#define COMBINE_FPS     10 /// NOTE: BNO055 max rate is 200
 
 /* GLOBAL SETUP */
-//#define __CAM__
+#define __CAM__
 //#define __IMU__
-#define HAS_FILE
+//#define HAS_FILE
 //#define HAS_GENERATOR
 
 //#define AUTOMATION_RUN

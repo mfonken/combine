@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include "motionsensor.h"
 
-bool Init_IMU( imu_t * imu, component_id_t component_ID, uint8_t shtp_ID, comm_channel channel, imu_chip_t chip )
+bool Init_IMU( imu_t * imu, component_id_t component_ID, uint8_t shtp_ID, comm_protocol protocol, imu_chip_t chip )
 {
     imu->ID = component_ID;
     imu->client.ID = shtp_ID;

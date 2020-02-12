@@ -15,7 +15,8 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     Environment env(&tau, TAU_FPS);
 #ifdef __IMU__
     Combine combine("Combine", &tau );
-    SerialWriter comm(SFILE, TX_FILENAME);
+    SerialWriter comm(BLUETOOTH, "/dev/tty.MARBL-COM15");
+//    SerialWriter comm(SFILE, TX_FILENAME);
     env.AddTest(&combine, &comm, COMBINE_FPS);
 #endif
     

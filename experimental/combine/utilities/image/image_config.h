@@ -13,7 +13,7 @@
 
 #define IMAGE_ROOT              FRAME_IMAGE_ROOT
 
-#define CAMERA_ID       1
+#define CAMERA_ID       0
 
 //#define TILT_LINES
 //#define GREYSCALE

@@ -59,20 +59,20 @@
 #define DRV2605_REG_VBAT            0x21
 #define DRV2605_REG_LRARESON        0x22
 
-bool DRV2605_Start(void);
-void DRV2605_Go(void);
-void DRV2605_Stop(void);
-void DRV2605_SetWaveform(uint8_t, uint8_t);
-void DRV2605_SelectLibrary(uint8_t);
-void DRV2605_SetMode(uint8_t);
-void DRV2605_SetRealtimeValue(uint8_t);
-void DRV2605_UseERM(void);
-void DRV2605_UseLRA(void);
-uint8_t DRV2605_ReadRegister(uint8_t);
-void DRV2605_WriteRegister(uint8_t, uint8_t);
+bool DRV2605_Start( comm_host_t * );
+void DRV2605_Go( comm_host_t * );
+void DRV2605_Stop( comm_host_t * );
+void DRV2605_SetWaveform( comm_host_t *, uint8_t, uint8_t);
+void DRV2605_SelectLibrary( comm_host_t *, uint8_t);
+void DRV2605_SetMode( comm_host_t *, uint8_t);
+void DRV2605_SetRealtimeValue( comm_host_t *, uint8_t);
+void DRV2605_UseERM( comm_host_t * );
+void DRV2605_UseLRA( comm_host_t * );
+uint8_t DRV2605_ReadRegister(comm_host_t *, uint8_t);
+void DRV2605_WriteRegister(comm_host_t *, uint8_t, uint8_t);
 
-static i2c_event_t DRV2605_GetReadEvent(uint8_t reg, uint8_t * data) { return (i2c_event_t){ I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR, data }; }
-static i2c_event_t DRV2605_GetWriteEvent(uint8_t reg, uint8_t * val ) { return (i2c_event_t){ I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, DRV2605_ADDR, val }; }
+static i2c_event_t DRV2605_GetReadEvent( comm_host_t * host, uint8_t reg, uint8_t * data) { return (i2c_event_t){ (i2c_host_t*)host, I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, data }; }
+static i2c_event_t DRV2605_GetWriteEvent( comm_host_t * host, uint8_t reg, uint8_t * data ) { return (i2c_event_t){ (i2c_host_t*)host, I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, data }; }
 
 
 #endif /* DRV2605_h */

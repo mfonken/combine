@@ -19,33 +19,34 @@ typedef enum
     HAPTIC_TRIGGER_TYPE_LONG,
 } HAPTIC_TRIGGER_TYPE, haptic_trigger_t;
 
-static void HapticControllerTrigger( haptic_trigger_t type )
+static void HapticControllerTrigger( comm_host_t * host )
 {
-    
+    haptic_trigger_t trigger_type = (haptic_trigger_t)host->i2c_host.buffer;
+    //TODO: Finish...
 }
 
 typedef struct
 {
-    void (*Waveform)(uint8_t, uint8_t);
-    void (*Library)(uint8_t);
-    void (*Mode)(uint8_t);
-    void (*RealtimeValue)(uint8_t);
-    void (*ERM)(void);
-    void (*LRA)(void);
+    void (*Waveform)(comm_host_t *, uint8_t, uint8_t);
+    void (*Library)(comm_host_t *, uint8_t);
+    void (*Mode)(comm_host_t *, uint8_t);
+    void (*RealtimeValue)(comm_host_t *, uint8_t);
+    void (*ERM)(comm_host_t *);
+    void (*LRA)(comm_host_t *);
 } haptic_set_functions;
 
 typedef struct
 {
-    void (*Trigger)(haptic_trigger_t);
-    bool (*Start)(void);
-    void (*Go)(void);
-    void (*Stop)(void);
-    uint8_t (*Read)(uint8_t);
-    void (*Write)(uint8_t, uint8_t);
+    void (*Trigger)(comm_host_t *);
+    bool (*Start)(comm_host_t *);
+    void (*Go)(comm_host_t *);
+    void (*Stop)(comm_host_t *);
+    uint8_t (*Read)(comm_host_t *, uint8_t);
+    void (*Write)(comm_host_t *, uint8_t, uint8_t);
     haptic_set_functions Set;
     
-    i2c_event_t (*GetReadEvent)(uint8_t);
-    i2c_event_t (*GetWriteEvent)(uint8_t);
+    i2c_event_t (*GetReadEvent)(comm_host_t *, uint8_t, uint8_t*);
+    i2c_event_t (*GetWriteEvent)(comm_host_t *, uint8_t, uint8_t*);
 } haptic_functions;
 
 static haptic_functions HapticFunctions =

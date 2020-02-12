@@ -31,6 +31,42 @@
 
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
+/* Port spoof */
+#define PORT0 0
+#define PORTA 0
+#define PORTB 0
+#define PORTC 0
+#define PORTD 0
+#define PORTF 0
+
+#define INTERNAL 0xff
+
+#define COMM_PORT_NONE 0xff
+#define COMM_ADDR_NONE 0xff
+
+typedef enum
+{
+    COMM_PROTOCOL_NONE = 0,
+    COMM_PROTOCOL_I2C,
+    COMM_PROTOCOL_SPI,
+    COMM_PROTOCOL_UART,
+    COMM_PROTOCOL_BLE,
+    COMM_PROTOCOL_SUB
+} COMM_PROTOCOL, comm_protocol;
+
+typedef enum
+{
+    COMM_ROUTE_PRIMARY = 0,
+    COMM_ROUTE_SECONDARY,
+    COMM_ROUTE_NONE
+} COMM_ROUTE;
+
+typedef enum
+{
+    COMM_READ_REG = 1,
+    COMM_WRITE_REG
+} COMM_TYPE;
+
 typedef enum
 {
     TASK_PRIORITY_CLASS_EXECUTIVE = 2,
@@ -174,11 +210,13 @@ typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
 typedef bool generic_comm_return_t;
 
 typedef PAPI_SPECIFIC(I2C_EVENT_T) i2c_event_t;
+typedef PAPI_SPECIFIC(I2C_HOST_T) i2c_host_t;
 typedef PAPI_SPECIFIC(I2C_TRANSFER_TYPE_T) i2c_transfer_type_t;
 typedef PAPI_SPECIFIC(I2C_TRANSFER_RETURN_T) i2c_transfer_return_t;
 
 typedef PAPI_SPECIFIC(SPI_EVENT_T) spi_event_t;
-typedef PAPI_SPECIFIC(SPI_TRANSFER_TYPE_T) spi_transfer_type_t;
+typedef PAPI_SPECIFIC(SPI_HOST_T) spi_host_t;
+//typedef PAPI_SPECIFIC(SPI_TRANSFER_TYPE_T) spi_transfer_type_t;
 typedef PAPI_SPECIFIC(SPI_TRANSFER_RETURN_T) spi_transfer_return_t;
 
 typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
@@ -189,6 +227,27 @@ typedef application_task_id_t system_task_id_t;
 typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
 //typedef application_objects_t system_objects_t;
 //typedef application_buffers_t system_buffers_t;
+
+typedef I2C_TypeDef I2C_Channel;
+typedef SPI_TypeDef SPI_Channel;
+
+typedef struct
+{
+uint8_t
+    protocol:8,
+    address:8;
+void *
+    device;
+void *
+    buffer;
+} generic_comm_host_t;
+
+typedef union
+{
+    i2c_host_t i2c_host;
+    spi_host_t spi_host;
+    generic_comm_host_t generic_comm_host;
+} comm_host_t;
 
 typedef struct
 {
@@ -347,6 +406,7 @@ typedef struct
 {
     bool                    profile_entries[NUM_APPLICATION_TASKS];
     system_task_id_t        component_tasks[MAX_COMPONENTS];
+    comm_host_t             comm_hosts[MAX_COMPONENTS];
 } system_registration_log_t;
 
 typedef struct

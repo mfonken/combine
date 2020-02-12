@@ -40,19 +40,14 @@ typedef struct
     uint32_t timestamp;
 } rotation_vector_t;
 
-typedef enum
-{
-    COMM_CHAN_I2C = 0x01,
-    COMM_CHAN_SPI = 0x02
-} comm_channel;
-
-typedef struct
-{
-comm_channel
-    channel;
-uint8_t
-    address;
-} shtp_client_header;
+typedef comm_host_t shtp_client_comm_host;
+//typedef struct
+//{
+//comm_protocol
+//    protocol;
+//uint32_t
+//    device;
+//} shtp_client_header;
 
 typedef struct
 {
@@ -90,7 +85,7 @@ typedef struct
 
 typedef struct
 {
-    shtp_client_header header;
+    shtp_client_comm_host host;
     shtp_client_buffer buffer;
     shtp_client_product_id product;
     shtp_client_output output;
@@ -101,14 +96,14 @@ typedef struct
 
 static void SHTP_GenerateSH2Client( shtp_client_t * client,
                                     uint8_t ID, uint8_t sequence_number,
-                                    shtp_client_header * header,
+                                    shtp_client_comm_host * host,
                                     shtp_client_buffer * buffer,
                                     shtp_client_product_id * product,
                                     shtp_client_output * output )
 {
     client->ID = ID;
     client->sequence_number = sequence_number;
-    memcpy( (void *)&client->header, header, sizeof(shtp_client_header) );
+    memcpy( (void *)&client->host, host, sizeof(shtp_client_comm_host) );
     memcpy( (void *)&client->buffer, buffer, sizeof(shtp_client_buffer) );
     memcpy( (void *)&client->product, product, sizeof(shtp_client_product_id) );
     memcpy( (void *)&client->output, output, sizeof(shtp_client_output) );
@@ -203,10 +198,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ active_client->header.channel, COMM_READ_REG, NO_REG, l, d }; }
-static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ active_client->header.channel, COMM_WRITE_REG, NO_REG, l, d }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_READ_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_READ_REG, l, d }; }
+static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_WRITE_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_WRITE_REG, l, d }; }
 
 typedef struct
 {
@@ -243,7 +238,7 @@ typedef struct
     
     void (*GenerateClient)( shtp_client_t *,
                             uint8_t, uint8_t,
-                            shtp_client_header *,
+                            shtp_client_comm_host *,
                             shtp_client_buffer *,
                             shtp_client_product_id *,
                             shtp_client_output * );

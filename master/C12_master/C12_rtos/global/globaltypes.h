@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include "C12_profile.h"
 
 #define NAME_STRINGIFY(x,y) x ## _ ## y
 #define NAME_BUILDER(x,y) NAME_STRINGIFY(x,y)
@@ -107,8 +108,8 @@ component_id_t
     ID;
 uint8_t
     family,
-    comm,
-    chann,
+    protocol,
+    route,
     addr,
     port,
     pin,

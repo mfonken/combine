@@ -12,7 +12,7 @@
 #include "peripheralbridge.h"
 #include "point.h"
 
-#define RHO_DEFAULT_COMM_CHANNEL COMM_UART
+#define RHO_DEFAULT_COMM_PROTOCOL COMM_PROTOCOL_UART
 
 typedef uint16_t packet_data_type;
 typedef float global_timestamp_t;
@@ -80,8 +80,8 @@ typedef struct
     comm_event_t (*GetReceiveEvent)(rho_packet_t *);
 } rho_functions;
 
-static comm_event_t RhoGetSendEvent(rho_setting_t * s) { return (comm_event_t){ RHO_DEFAULT_COMM_CHANNEL, COMM_WRITE_REG, NO_REG, sizeof(rho_setting_t), s }; }
-static comm_event_t RhoGetReceiveEvent(rho_packet_t * p) { return (comm_event_t){ RHO_DEFAULT_COMM_CHANNEL, COMM_READ_REG, NO_REG, sizeof(rho_packet_t), p }; }
+static comm_event_t RhoGetSendEvent(rho_setting_t * s) { return (comm_event_t){ RHO_DEFAULT_COMM_PROTOCOL, COMM_WRITE_REG, sizeof(rho_setting_t), s }; }
+static comm_event_t RhoGetReceiveEvent(rho_packet_t * p) { return (comm_event_t){ RHO_DEFAULT_COMM_PROTOCOL, COMM_READ_REG, sizeof(rho_packet_t), p }; }
 
 static rho_functions RhoFunctions =
 {

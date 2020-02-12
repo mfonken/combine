@@ -49,13 +49,13 @@ SerialWriter_STATUS SerialWriter::initUSB(const char * handshake_id)
     return handshake(handshake_id);
 }
 
-SerialWriter_STATUS SerialWriter::initBluetooth(const char * handshake_id)
+SerialWriter_STATUS SerialWriter::initBluetooth(const char * port)
 {
     channel.filestream = -1;
-    channel.port = "/dev/tty.Bluetooth-Incoming-Port";
-    channel.port_alt = "/dev/cu.Bluetooth-Incoming-Port";
+    channel.port = port;
+    channel.port_alt = port;//"/dev/cu.Bluetooth-Incoming-Port";
     Init_SERCOM( &channel );
-    return handshake(handshake_id);
+    return handshake(NULL);
 }
 
 SerialWriter_STATUS SerialWriter::initFile(const char * name)
@@ -64,7 +64,7 @@ SerialWriter_STATUS SerialWriter::initFile(const char * name)
     return HANDSHAKE_SKIPPED;
 }
 
-SerialWriter_STATUS SerialWriter::init( char * port, char * port_alt,const  char * handshake_id )
+SerialWriter_STATUS SerialWriter::init( char * port, char * port_alt, const  char * handshake_id )
 {
     channel.filestream = -1;
     channel.port = port;
