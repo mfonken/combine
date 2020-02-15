@@ -19,7 +19,9 @@
 #define NAME_STRINGIFY(x,y) x ## _ ## y
 #define NAME_BUILDER(x,y) NAME_STRINGIFY(x,y)
 
-#define SUBACTIVITY(ID, PTR, ARGS) { ID, (void(*)(void*))PTR, (void*)ARGS }
+
+#define SUBACTIVITY_ADVANCED(ID, PTR, ARGS, COMPONENT) { ID, (void(*)(void*))PTR, (void*)ARGS, (component_id_t)COMPONENT }
+#define SUBACTIVITY(ID, PTR, ARGS) { ID, (void(*)(void*))PTR, (void*)ARGS, 0 }
 
 #define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
 

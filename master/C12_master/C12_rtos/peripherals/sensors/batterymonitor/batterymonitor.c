@@ -9,15 +9,20 @@
 #include <stdio.h>
 #include "batterymonitor.h"
 
-void GetBatteryMonitorBasic( battery_monitor_basic_t * buffer )
+void GetBatteryMonitorBasicBase( comm_host_t * host )
 {
-    buffer->charge = STCFunctions.GetCharge();
-    buffer->counter = STCFunctions.GetCounter();
-    buffer->current = STCFunctions.GetCurrent();
-    buffer->voltage = STCFunctions.GetVoltage();
+    BatteryMonitor.GetBasic( host, host->generic_comm_host.buffer );
 }
 
-void SetBatteryMonitorMode( uint8_t mode )
+void GetBatteryMonitorBasic( comm_host_t * host, battery_monitor_basic_t * buffer )
+{
+    buffer->charge = STCFunctions.GetCharge( host );
+    buffer->counter = STCFunctions.GetCounter( host );
+    buffer->current = STCFunctions.GetCurrent( host );
+    buffer->voltage = STCFunctions.GetVoltage( host );
+}
+
+void SetBatteryMonitorMode( comm_host_t * host, uint8_t mode )
 {
     
 }

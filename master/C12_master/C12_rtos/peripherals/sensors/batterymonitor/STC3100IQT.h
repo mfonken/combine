@@ -83,107 +83,107 @@ typedef struct
 } stc_t;
 
 /* I2C Events */
-static inline i2c_event_t STCSetModeEvent(uint8_t * b)        { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_MODE,             STC_REG_LEN,     STC_ADDR, b }; }
-static inline i2c_event_t STCGetModeEvent(uint8_t * b)        { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_MODE,             STC_REG_LEN,     STC_ADDR, b }; }
-static inline i2c_event_t STCSetControlEvent(uint8_t * b)     { return (i2c_event_t){ I2C_WRITE_REG_EVENT, STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR, b }; }
-static inline i2c_event_t STCGetControlEvent(uint8_t * b)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CTRL,             STC_REG_LEN,     STC_ADDR, b }; }
-static inline i2c_event_t STCGetIDEvent(uint8_t * b)          { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_ID0,              STC_REG_ID_LEN,  STC_ADDR, b }; }
-static inline i2c_event_t STCGetRAMEvent(uint8_t * b)         { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_RAM_START,        STC_REG_RAM_LEN, STC_ADDR, b }; }
-static inline i2c_event_t STCGetChargeEvent(uint8_t * b)      { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CHARGE_LOW,       STC_WORD_LEN,    STC_ADDR, b }; }
-static inline i2c_event_t STCGetCounterEvent(uint8_t * b)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_COUNTER_LOW,      STC_WORD_LEN,    STC_ADDR, b }; }
-static inline i2c_event_t STCGetCurrentEvent(uint8_t * b)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_CURRENT_LOW,      STC_WORD_LEN,    STC_ADDR, b }; }
-static inline i2c_event_t STCGetVoltageEvent(uint8_t * b)     { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_VOLTAGE_LOW,      STC_WORD_LEN,    STC_ADDR, b }; }
-static inline i2c_event_t STCGetTemperatureEvent(uint8_t * b) { return (i2c_event_t){ I2C_READ_REG_EVENT,  STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN,    STC_ADDR, b }; }
+static inline i2c_event_t STCSetModeEvent( comm_host_t * host, uint8_t * b )        { return (i2c_event_t){ (i2c_host_t *)host, I2C_WRITE_REG_EVENT, STC_REG_MODE,             STC_REG_LEN,     b }; }
+static inline i2c_event_t STCGetModeEvent( comm_host_t * host, uint8_t * b )        { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_MODE,             STC_REG_LEN,     b }; }
+static inline i2c_event_t STCSetControlEvent( comm_host_t * host, uint8_t * b )     { return (i2c_event_t){ (i2c_host_t *)host, I2C_WRITE_REG_EVENT, STC_REG_CTRL,             STC_REG_LEN,     b }; }
+static inline i2c_event_t STCGetControlEvent( comm_host_t * host, uint8_t * b )     { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_CTRL,             STC_REG_LEN,     b }; }
+static inline i2c_event_t STCGetIDEvent( comm_host_t * host, uint8_t * b )          { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_ID0,              STC_REG_ID_LEN,  b }; }
+static inline i2c_event_t STCGetRAMEvent( comm_host_t * host, uint8_t * b )         { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_RAM_START,        STC_REG_RAM_LEN, b }; }
+static inline i2c_event_t STCGetChargeEvent( comm_host_t * host, uint8_t * b )      { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_CHARGE_LOW,       STC_WORD_LEN,    b }; }
+static inline i2c_event_t STCGetCounterEvent( comm_host_t * host, uint8_t * b )     { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_COUNTER_LOW,      STC_WORD_LEN,    b }; }
+static inline i2c_event_t STCGetCurrentEvent( comm_host_t * host, uint8_t * b )     { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_CURRENT_LOW,      STC_WORD_LEN,    b }; }
+static inline i2c_event_t STCGetVoltageEvent( comm_host_t * host, uint8_t * b )     { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_VOLTAGE_LOW,      STC_WORD_LEN,    b }; }
+static inline i2c_event_t STCGetTemperatureEvent( comm_host_t * host, uint8_t * b ) { return (i2c_event_t){ (i2c_host_t *)host, I2C_READ_REG_EVENT,  STC_REG_TEMPERATURE_LOW,  STC_WORD_LEN,    b }; }
 
-static void STCSetMode( stc_reg_mode_t data )
+static void STCSetMode( comm_host_t * host, stc_reg_mode_t data )
 {
-    PerformI2CEvent(STCSetModeEvent((uint8_t *)&data));
+    PerformI2CEvent(STCSetModeEvent( host, (uint8_t *)&data));
 }
-static stc_reg_mode_t STCGetMode(void)
+static stc_reg_mode_t STCGetMode( comm_host_t * host )
 {
     stc_reg_mode_t mode;
-    PerformI2CEvent(STCGetModeEvent((uint8_t *)&mode) );
+    PerformI2CEvent(STCGetModeEvent( host, (uint8_t *)&mode) );
     return mode;
 }
-static void STCSetControl( stc_reg_ctrl_t data )
+static void STCSetControl( comm_host_t * host, stc_reg_ctrl_t data )
 {
-    PerformI2CEvent(STCSetControlEvent((uint8_t *)&data));
+    PerformI2CEvent(STCSetControlEvent( host, (uint8_t *)&data));
 }
-static stc_reg_ctrl_t STCGetControl(void)
+static stc_reg_ctrl_t STCGetControl( comm_host_t * host )
 {
     stc_reg_ctrl_t reg_ctrl;
-    PerformI2CEvent(STCGetControlEvent((uint8_t *)&reg_ctrl));
+    PerformI2CEvent(STCGetControlEvent( host, (uint8_t *)&reg_ctrl));
     return reg_ctrl;
 }
-static uint8_t STCGetIDE(void)
+static uint8_t STCGetIDE( comm_host_t * host )
 {
     uint8_t IDE;
-    PerformI2CEvent(STCGetIDEvent((uint8_t *)&IDE));
+    PerformI2CEvent(STCGetIDEvent( host, (uint8_t *)&IDE));
     return IDE;
 }
-static uint8_t STCGetRAM(void)
+static uint8_t STCGetRAM( comm_host_t * host )
 {
     uint8_t RAM;
-    PerformI2CEvent(STCGetRAMEvent((uint8_t *)&RAM));
+    PerformI2CEvent(STCGetRAMEvent( host, (uint8_t *)&RAM));
     return RAM;
 }
-static uint8_t STCGetCharge(void)
+static uint8_t STCGetCharge( comm_host_t * host )
 {
     uint8_t charge;
-    PerformI2CEvent(STCGetChargeEvent((uint8_t *)&charge));
+    PerformI2CEvent(STCGetChargeEvent( host, (uint8_t *)&charge));
     return charge;
 }
-static uint8_t STCGetCounter(void)
+static uint8_t STCGetCounter( comm_host_t * host )
 {
     uint8_t counter;
-    PerformI2CEvent(STCGetCounterEvent((uint8_t *)&counter));
+    PerformI2CEvent(STCGetCounterEvent( host, (uint8_t *)&counter));
     return counter;
 }
-static uint8_t STCGetCurrent(void)
+static uint8_t STCGetCurrent( comm_host_t * host )
 {
     uint8_t current;
-    PerformI2CEvent(STCGetCurrentEvent((uint8_t *)&current));
+    PerformI2CEvent(STCGetCurrentEvent( host, (uint8_t *)&current));
     return current;
 }
-static uint8_t STCGetVoltage(void)
+static uint8_t STCGetVoltage( comm_host_t * host )
 {
     uint8_t voltage;
-    PerformI2CEvent(STCGetVoltageEvent((uint8_t *)&voltage));
+    PerformI2CEvent(STCGetVoltageEvent( host, (uint8_t *)&voltage));
     return voltage;
 }
-static uint8_t STCGetTemperature(void)
+static uint8_t STCGetTemperature( comm_host_t * host )
 {
     uint8_t temperature;
-    PerformI2CEvent(STCGetTemperatureEvent((uint8_t *)&temperature));
+    PerformI2CEvent(STCGetTemperatureEvent( host, (uint8_t *)&temperature));
     return temperature;
 }
 
 typedef struct
 {
 i2c_event_t
-    (*SetModeEvent)(uint8_t *),
-    (*GetModeEvent)(uint8_t *),
-    (*SetControlEvent)(uint8_t *),
-    (*GetControlEvent)(uint8_t *),
-    (*GetIDEvent)(uint8_t *),
-    (*GetRAMEvent)(uint8_t *),
-    (*GetChargeEvent)(uint8_t *),
-    (*GetCounterEvent)(uint8_t *),
-    (*GetCurrentEvent)(uint8_t *),
-    (*GetVoltageEvent)(uint8_t *),
-    (*GetTemperatureEvent)(uint8_t *);
-    void (*SetMode)( stc_reg_mode_t );
-    stc_reg_mode_t (*GetMode)(void);
-    void (*SetControl)( stc_reg_ctrl_t );
-    stc_reg_ctrl_t (*GetControl)(void);
+    (*SetModeEvent)( comm_host_t *, uint8_t * ),
+    (*GetModeEvent)( comm_host_t *, uint8_t * ),
+    (*SetControlEvent)( comm_host_t *, uint8_t * ),
+    (*GetControlEvent)( comm_host_t *, uint8_t * ),
+    (*GetIDEvent)( comm_host_t *, uint8_t * ),
+    (*GetRAMEvent)( comm_host_t *, uint8_t * ),
+    (*GetChargeEvent)( comm_host_t *, uint8_t * ),
+    (*GetCounterEvent)( comm_host_t *, uint8_t * ),
+    (*GetCurrentEvent)( comm_host_t *, uint8_t * ),
+    (*GetVoltageEvent)( comm_host_t *, uint8_t * ),
+    (*GetTemperatureEvent)( comm_host_t *, uint8_t * );
+    void (*SetMode)( comm_host_t *, stc_reg_mode_t );
+    stc_reg_mode_t (*GetMode)( comm_host_t * );
+    void (*SetControl)( comm_host_t *, stc_reg_ctrl_t );
+    stc_reg_ctrl_t (*GetControl)( comm_host_t * );
 uint8_t
-    (*GetIDE)(void),
-    (*GetRAM)(void),
-    (*GetCharge)(void),
-    (*GetCounter)(void),
-    (*GetCurrent)(void),
-    (*GetVoltage)(void),
-    (*GetTemperature)(void);
+    (*GetIDE)( comm_host_t * ),
+    (*GetRAM)( comm_host_t * ),
+    (*GetCharge)( comm_host_t * ),
+    (*GetCounter)( comm_host_t * ),
+    (*GetCurrent)( comm_host_t * ),
+    (*GetVoltage)( comm_host_t * ),
+    (*GetTemperature)( comm_host_t * );
 } stc_functions;
 
 static stc_functions STCFunctions =

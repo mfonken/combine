@@ -59,7 +59,6 @@
 		3491A31A23C57815008010C8 /* systembehavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systembehavior.c; sourceTree = "<group>"; };
 		3491A31C23C57815008010C8 /* systemmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemmanager.c; sourceTree = "<group>"; };
 		3491A32123C57815008010C8 /* sysiocontroller.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysiocontroller.c; sourceTree = "<group>"; };
-		3491A32223C57815008010C8 /* spi_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi_template.h; sourceTree = "<group>"; };
 		3491A32323C57815008010C8 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
 		3491A32423C57815008010C8 /* sysiocontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysiocontroller.h; sourceTree = "<group>"; };
 		3491A32623C57815008010C8 /* profilemanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profilemanager.h; sourceTree = "<group>"; };
@@ -224,7 +223,6 @@
 		3491A31F23C57815008010C8 /* sysiocontroller */ = {
 			isa = PBXGroup;
 			children = (
-				3491A32223C57815008010C8 /* spi_template.h */,
 				3491A32423C57815008010C8 /* sysiocontroller.h */,
 				3491A32123C57815008010C8 /* sysiocontroller.c */,
 				3491A32323C57815008010C8 /* timestamp.h */,

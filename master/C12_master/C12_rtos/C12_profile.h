@@ -1,7 +1,7 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 2/11/2020
+// Created by Combine Profile Generator v0.1 on 2/15/2020
 // Copyright Â© Marbl. All rights reserved.
 
 #ifndef C12_profile_h
@@ -64,7 +64,7 @@
 #define STC310_FAMILY SYSTEM_FAMILY_C
 #define STC310_PROTOCOL COMM_PROTOCOL_I2C
 #define STC310_ROUTE COMM_ROUTE_PRIMARY
-#define STC310_ADDR 0x00
+#define STC310_ADDR 0x70
 #define STC310_PORT PORT0
 #define STC310_PIN 0
 #define STC310_STATE COMPONENT_STATE_INTERRUPT
@@ -134,7 +134,7 @@
 
 #define APPLICATION_TASK_SHELF_ENTRY_GLOBAL_TASKS { \
     .ID = APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS, \
-    .interrupts = { APPLICATION_SCHEDULER_MOTION_INTERRUPT }, \
+    .interrupts = { APPLICATION_SCHEDULER_BATTERY_MONITOR_POLL }, \
     .num_interrupts = 1, \
     .scheduled = NONE, \
     .num_scheduled = NONE \
@@ -152,7 +152,7 @@
     .ID = APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS, \
     .interrupts = NONE, \
     .num_interrupts = NONE, \
-    .scheduled = { APPLICATION_PROBE_ID_BATTERY_MONITOR }, \
+    .scheduled = { APPLICATION_PROBE_BATTERY_MONITOR }, \
     .num_scheduled = 1 \
 }
 
@@ -202,6 +202,7 @@
             { \
                 SYSTEM_ACTIVITY_STARTUP, \
                 { /* SUBACTIVITIES */ \
+                    APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR, \
                     APPLICATION_SUBACTIVITY_SELF_CHECK, \
                     APPLICATION_SUBACTIVITY_INIT_COMMUNICATION, \
                     APPLICATION_SUBACTIVITY_INIT_COMPONENTS, \

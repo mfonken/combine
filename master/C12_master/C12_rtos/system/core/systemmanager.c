@@ -24,7 +24,7 @@ void SystemManager_Init( system_profile_t * profile )
 void SystemManager_PerformRoutine( system_activity_routine_t * routine )
 {
     SystemFunctions.Register.Activity(routine->activity);
-    SystemFunctions.Perform.Subactivities( routine->subactivities, routine->length );
+    SystemFunctions.Perform.Subactivities( routine->subactivities, routine->num_subactivities );
     SystemFunctions.Register.ExitState( routine->exit_state );
 }
 
@@ -43,9 +43,13 @@ void SystemManager_PerformSubactivity( system_subactivity_t subactivity )
     LOG_SYSTEM(SYSTEM_DEBUG, "Performing subactivity: %s(%d)\n", subactivity_strings[id], id);
     system_subactivity_map_entry_t * entry = SystemFunctions.Get.SubactivityMapEntry(id);
     if( entry == NULL ) return;
-
+    
     if( entry->function == NULL ) return;
-    else entry->function( entry->data );
+    else
+    {
+        SystemFunctions.Perform.InjectCommHostIntoTaskData( &entry->data, entry->component_id );
+        entry->function( entry->data );
+    }
 }
 
 void SystemManager_PerformEnableProfileEntryState( system_profile_entry_t * entry )
@@ -117,7 +121,7 @@ void SystemManager_RegisterProfile( system_profile_t * profile )
 {
     System.profile = profile;
     SystemFunctions.Register.TaskShelf( &profile->shelf );
-    SystemFunctions.Register.StateProfileList( &profile->state_profiles );
+    SystemFunctions.Register.StateProfileList( &profile->state_profiles);
 }
 void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool scheduled )
 {
@@ -129,8 +133,14 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
     }
     LOG_SYSTEM( SYSTEM_DEBUG, "Registering profile entry %s(%d).\n", task_id_strings[id], id);
     System.registration.profile_entries[id] = true;
-//    system_subactivity_map_entry_t * handler = SystemFunctions.Get.SubactivityMapEntry( entry->handler_id );
-//    handler-
+    
+    if( !(entry->component_id.macro == 0 && entry->component_id.micro == 0) )
+    {
+        system_subactivity_map_entry_t * subactivity = SystemFunctions.Get.SubactivityMapEntry( id );
+        if( subactivity != NULL )
+            subactivity->component_id = entry->component_id;
+    }
+    
 //    if( entry->header.state == SYSTEM_PROFILE_ENTRY_STATE_ENABLED)
 //    {
 //        switch( entry->header.type )
@@ -165,13 +175,7 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
     os_task_data_t * task_data = SystemFunctions.Get.TaskById( entry->ID );
     if( task_data == NULL ) return;
 
-    int8_t component_number = SystemFunctions.Get.ComponentNumber(entry->component_id);
-    if( component_number >= 0 )
-    { /* If component is included, populate communication host */
-        System.registration.comm_hosts[component_number] = SystemFunctions.Get.CommHostForComponentById( entry->component_id );
-        System.registration.comm_hosts[component_number].generic_comm_host.buffer = task_data->p_arg; // Slide argument to buffer part of comm_host
-        task_data->p_arg = &System.registration.comm_hosts[component_number];
-    }
+    SystemFunctions.Perform.InjectCommHostIntoTaskData( task_data->p_arg, entry->component_id);
     
     // Create OS utilities with task_data
     if( scheduled && entry->data.schedule != 0)
@@ -187,7 +191,8 @@ void SystemManager_RegisterProfileEntry( system_profile_entry_t * entry, bool sc
     {
         task_data->event_data.interrupt.action = entry->data.action;
         task_data->event_data.interrupt.component_id = entry->component_id;
-        
+
+        int8_t component_number = SystemFunctions.Get.ComponentNumber(entry->component_id);
         if(component_number < 0 )
         {
             LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
@@ -211,6 +216,50 @@ int8_t SystemManager_GetSystemComponentNumber( component_id_t component_id )
 void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state_profiles )
 {
 //    System.profile->state_profiles = state_profiles;
+    for( uint8_t i = 0; i < NUM_SYSTEM_STATES; i++ )
+    {
+        for( uint8_t j = 0; j < state_profiles[i]->routine.num_subactivities; j++ )
+        {
+            system_subactivity_t subactivity_id = state_profiles[i]->routine.subactivities[j];
+
+            component_id_t * component_id_to_assign = NULL;
+            for( uint8_t k = 0; k < state_profiles[i]->num_entries; k++ )
+            {
+                system_task_shelf_entry_id_t task_shelf_entry_id = state_profiles[i]->entries[k];
+                system_task_shelf_entry_t * task_shelf_entry = SystemFunctions.Get.TaskShelfEntry( task_shelf_entry_id );
+                if( task_shelf_entry == NULL ) continue;
+                for( uint8_t l = 0; l < task_shelf_entry->num_interrupts; l++ )
+                {
+                    system_profile_entry_t * profile_entry = &task_shelf_entry->interrupts[l];
+                    if( profile_entry->handler_id == subactivity_id )
+                    {
+                        component_id_to_assign = &profile_entry->component_id;
+                        break;
+                    }
+                }
+                if( component_id_to_assign == NULL)
+                {
+                    for( uint8_t l = 0; l < task_shelf_entry->num_scheduled; l++ )
+                    {
+                        system_profile_entry_t * profile_entry = &task_shelf_entry->scheduled[l];
+                        if( profile_entry->handler_id == subactivity_id )
+                        {
+                            component_id_to_assign = &profile_entry->component_id;
+                            break;
+                        }
+                    }
+                }
+                
+                if( component_id_to_assign != NULL)
+                {
+                    system_subactivity_map_entry_t * subactivity = SystemFunctions.Get.SubactivityMapEntry( subactivity_id );
+                    if( subactivity != NULL )
+                        subactivity->component_id = *component_id_to_assign;
+                    break;
+                }
+            }
+        }
+    }
 }
 void SystemManager_RegisterState( system_state_t state )
 {
@@ -259,7 +308,8 @@ system_subactivity_map_entry_t * SystemManager_GetSubactivityMapEntryById( syste
     {
         system_subactivity_map_entry_t * entry = &((*System.subactivity_map)[i]);
         if( entry == NULL ) continue;
-        if( entry->ID == entry_id ) return entry;
+        if( entry->ID == entry_id )
+            return entry;
     }
     return NULL;
 }
@@ -381,10 +431,8 @@ void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t entry_i
 comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_id )
 {
     int8_t component_number = SystemFunctions.Get.ComponentNumber( component_id );
-//    if( component_number < 0 )
-//    {
-//        return {};
-//    }
+    if( component_number < 0 )
+        return NULL_HOST;
     
     component_t * component = &System.profile->component_list.entries[component_number];
     
@@ -407,6 +455,16 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
             break;
     }
     
-    
     return comm_host;
+}
+
+void SystemManager_InjectCommHostIntoTaskData( void ** data, component_id_t component_id )
+{
+    int8_t component_number = SystemFunctions.Get.ComponentNumber(component_id);
+    if( component_number >= 0 )
+    { /* If component is included, populate communication host */
+        System.registration.comm_hosts[component_number] = SystemFunctions.Get.CommHostForComponentById( component_id );
+        System.registration.comm_hosts[component_number].generic_comm_host.buffer = *data; // Slide argument to buffer part of comm_host
+        *data = &System.registration.comm_hosts[component_number];
+    }
 }

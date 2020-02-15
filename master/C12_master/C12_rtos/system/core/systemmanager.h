@@ -58,8 +58,8 @@ void SystemManager_InstateStateProfile( system_state_profile_t * );
 void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t );
 void SystemManager_TerminateStateProfile( system_state_profile_t * );
 
-
 comm_host_t SystemManager_GetCommHostForComponentById( component_id_t );
+void SystemManager_InjectCommHostIntoTaskData( void **, component_id_t );
 
 typedef struct
 {
@@ -69,6 +69,7 @@ typedef struct
     void (*EnableProfileEntry)( system_profile_entry_t * );
     void (*DisableProfileEntry)( system_profile_entry_t * );
     void (*ExitState)( void );
+    void (*InjectCommHostIntoTaskData)( void *, component_id_t );
 } system_perform_functions;
 typedef struct
 {
@@ -122,6 +123,7 @@ static system_functions SystemFunctions =
     .Perform.EnableProfileEntry = SystemManager_PerformEnableProfileEntryState,
     .Perform.DisableProfileEntry = SystemManager_PerformDisableProfileEntryState,
     .Perform.ExitState          = SystemManager_PerformExitState,
+    .Perform.InjectCommHostIntoTaskData = SystemManager_InjectCommHostIntoTaskData,
     
     .Register.TaskList          = SystemManager_RegisterTaskList,
     .Register.QueueList         = SystemManager_RegisterQueueList,

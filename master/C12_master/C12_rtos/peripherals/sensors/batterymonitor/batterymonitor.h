@@ -20,17 +20,20 @@ uint32_t
     voltage;
 } battery_monitor_basic_t;
 
-void GetBatteryMonitorBasic( battery_monitor_basic_t * );
-void SetBatteryMonitorMode( uint8_t );
+void GetBatteryMonitorBasicBase( comm_host_t * );
+void GetBatteryMonitorBasic( comm_host_t *, battery_monitor_basic_t * );
+void SetBatteryMonitorMode( comm_host_t *, uint8_t );
 
 typedef struct
 {
-    void (*GetBasic)( battery_monitor_basic_t *);
-    void (*Set)( uint8_t );
+    void (*GetBasicBase)( comm_host_t * );
+    void (*GetBasic)( comm_host_t *, battery_monitor_basic_t * );
+    void (*Set)( comm_host_t *, uint8_t );
 } battery_monitor_functions;
 
 static battery_monitor_functions BatteryMonitor =
 {
+    .GetBasicBase = GetBatteryMonitorBasicBase,
     .GetBasic = GetBatteryMonitorBasic,
     .Set = SetBatteryMonitorMode
 };

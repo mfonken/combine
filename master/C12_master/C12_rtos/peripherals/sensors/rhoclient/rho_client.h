@@ -67,21 +67,21 @@ rho_setting_t
     settings;
 } rho_t;
 
-void InitRho( rho_setting_t * );
-void SendRhoSetting( rho_setting_t * );
-void ReceiveRhoPacket( rho_t * );
+void InitRho( comm_host_t *, rho_setting_t * );
+void SendRhoSetting( comm_host_t *, rho_setting_t * );
+void ReceiveRhoPacket( comm_host_t *, rho_t * );
 
 typedef struct
 {
-    void (*Init)( rho_setting_t * );
-    void (*Send)( rho_setting_t * );
-    void (*Receive)( rho_t * );
-    comm_event_t (*GetSendEvent)(rho_setting_t *);
-    comm_event_t (*GetReceiveEvent)(rho_packet_t *);
+    void (*Init)( comm_host_t *, rho_setting_t * );
+    void (*Send)( comm_host_t *, rho_setting_t * );
+    void (*Receive)( comm_host_t *, rho_t * );
+    comm_event_t (*GetSendEvent)( comm_host_t *, rho_setting_t * );
+    comm_event_t (*GetReceiveEvent)( comm_host_t *, rho_packet_t * );
 } rho_functions;
 
-static comm_event_t RhoGetSendEvent(rho_setting_t * s) { return (comm_event_t){ RHO_DEFAULT_COMM_PROTOCOL, COMM_WRITE_REG, sizeof(rho_setting_t), s }; }
-static comm_event_t RhoGetReceiveEvent(rho_packet_t * p) { return (comm_event_t){ RHO_DEFAULT_COMM_PROTOCOL, COMM_READ_REG, sizeof(rho_packet_t), p }; }
+static comm_event_t RhoGetSendEvent( comm_host_t * host, rho_setting_t * s ) { return (comm_event_t)(generic_comm_event_t){ host, COMM_WRITE_REG, (uint8_t)sizeof(rho_setting_t), (uint8_t *)s }; }
+static comm_event_t RhoGetReceiveEvent( comm_host_t * host, rho_packet_t * p ) { return (comm_event_t)(generic_comm_event_t){ host, COMM_READ_REG, (uint8_t)sizeof(rho_packet_t), (uint8_t *)p }; }
 
 static rho_functions RhoFunctions =
 {

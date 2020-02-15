@@ -98,9 +98,9 @@ COMPLETE_TASK }
 
 
 /* Rho In */
-static void RhoInputHandler( void )
+static void RhoInputHandler( comm_host_t * host )
 {
-    RhoFunctions.Receive( &App.objects.Rho );
+    RhoFunctions.Receive( host, &App.objects.Rho );
     RhoPointToKPoint( &App.objects.Rho.packet.primary, &App.buffers.rho.data[0] );
     RhoPointToKPoint( &App.objects.Rho.packet.secondary, &App.buffers.rho.data[1] );
 //    App.buffers.rho.confidence = App.objects.Rho.packet.probabilites.;
@@ -156,11 +156,10 @@ static void SubRadioOutputHandler( void )
 }
 
 /* Touch In */
-static void TouchInterruptHandler( component_id_t ID )
+static void TouchInterruptHandler( comm_host_t * host )
 {
     touch_data_t * ptr = &App.buffers.touch;
-//    component_t * component = SysIOCtlFunctions.Get( ID );
-    touch_packet_t packet = TouchController.Read();
+    touch_packet_t packet = TouchController.Read( host );
     switch(packet.type)
     {
         case TOUCH_EVENT:
@@ -194,15 +193,15 @@ static void TouchInterruptHandler( component_id_t ID )
 //
 typedef struct
 {
-    void (*Rho)(void);
+    void (*Rho)( comm_host_t * );
     void (*Motion)(void);
     void (*Host)(void);
-    void (*Touch)( component_id_t );
+    void (*Touch)( comm_host_t * );
 } application_handler_input_functions;
 
 typedef struct
 {
-    void (*Rho)(void);
+    void (*Rho)( comm_host_t * );
     void (*Motion)( imu_feature_t, uint32_t );
     void (*Host)(void);
     void (*SubRadio)(void);
@@ -250,15 +249,15 @@ void InitializeMeta(void)
 {
     system_subactivity_map_t subactivity_map_initializer = (system_subactivity_map_t)
     {
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_SELF_CHECK,                NULL,                               NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_SELF_CHECK,                NULL,                                 NO_DATA ),
 
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START,    RhoFunctions.Send,                  &App.objects.Rho.settings ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START, IMUFunctions.RotVec,                &App.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_START,        TauFunctions.Start,                 TAU_STATE_STANDARD ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START,    RhoFunctions.Send,                    &App.objects.Rho.settings ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START, IMUFunctions.RotVec,                  &App.objects.IMU ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_START,        TauFunctions.Start,                   TAU_STATE_STANDARD ),
 
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP,     RhoFunctions.Send,                  &App.objects.Rho.settings ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,  IMUFunctions.RotVec,                &App.objects.IMU ),
-        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STOP,                  TauFunctions.Stop,                  NO_DATA ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP,     RhoFunctions.Send,                    &App.objects.Rho.settings ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP,  IMUFunctions.RotVec,                  &App.objects.IMU ),
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_TAU_STOP,                  TauFunctions.Stop,                    NO_DATA ),
 
         /* Initialization */
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_COMMUNICATION,        CommFunctions.Init,                   NO_DATA ),
@@ -267,7 +266,8 @@ void InitializeMeta(void)
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT,           TauFunctions.Perform.Init,            NO_DATA ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_RHO_CLIENT,           RhoFunctions.Init,                    &App.objects.Rho.settings ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_INIT_CONFIRM,              BehaviorFunctions.Perform.ConfirmInit, NO_DATA ),
-
+        
+        SUBACTIVITY( APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR,      BatteryMonitor.GetBasicBase,          &App.buffers.battery ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_ACTIVATE_BATTERY_MONITOR,  BatteryMonitor.Set,                   ACTIVE ),
         SUBACTIVITY( APPLICATION_SUBACTIVITY_DEACTIVATE_BATTERY_MONITOR, BatteryMonitor.Set,                  INACTIVE ),
 
@@ -278,7 +278,7 @@ void InitializeMeta(void)
                 
         //        SUBACTIVITY( APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP, BatteryMonitor.Set, BATTERY_MONITOR_MODE_SLEEP ),
         //        SUBACTIVITY( APPLICATION_SUBACTIVITY_POLL_TIP, BatteryMonitor.GetBasic, &App.buffers.tip_data ),
-        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRIGGER_HAPTIC,            HapticFunctions.Trigger,              App.buffers.config.haptic ),
+        //        SUBACTIVITY( APPLICATION_SUBACTIVITY_TRIGGER_HAPTIC,            HapticFunctions.Trigger,              App.buffers.config.haptic, APPLICATION_COMPONENT_HAPTIC_PRIMARY ),
     };
     
     os_task_list_t task_list_initializer =

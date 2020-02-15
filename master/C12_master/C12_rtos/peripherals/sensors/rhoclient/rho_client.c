@@ -8,17 +8,17 @@
 
 #include "rho_client.h"
 
-void InitRho( rho_setting_t * setting )
+void InitRho( comm_host_t * host, rho_setting_t * setting )
 {
-    SendRhoSetting( setting );
+    SendRhoSetting( host, setting );
 }
 
-void SendRhoSetting( rho_setting_t * setting )
+void SendRhoSetting( comm_host_t * host, rho_setting_t * setting )
 {
-    PerformCommEvent( RhoFunctions.GetSendEvent(setting) );
+    PerformCommEvent( RhoFunctions.GetSendEvent(host, setting) );
 }
 
-void ReceiveRhoPacket( rho_t * rho )
+void ReceiveRhoPacket( comm_host_t * host, rho_t * rho )
 {
-    PerformCommEvent( RhoFunctions.GetReceiveEvent(&rho->packet) );
+    PerformCommEvent( RhoFunctions.GetReceiveEvent(host, &rho->packet) );
 }

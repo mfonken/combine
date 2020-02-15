@@ -242,6 +242,8 @@ void *
     buffer;
 } generic_comm_host_t;
 
+#define NULL_HOST (comm_host_t)(generic_comm_host_t){ 0, 0, NULL, NULL }
+
 typedef union
 {
     i2c_host_t i2c_host;
@@ -254,6 +256,7 @@ typedef struct
     uint8_t ID;
     void (*function)(void *);
     void * data;
+    component_id_t component_id;
 } system_subactivity_map_entry_t;
 typedef system_subactivity_map_entry_t system_subactivity_map_t[NUM_SYSTEM_SUBACTIVITIES];
 
@@ -261,7 +264,7 @@ typedef struct
 {
     system_activity_t activity;
     system_subactivity_t subactivities[MAX_SUBACTIVITIES_PER_ACTIVITY];
-    uint8_t length;
+    uint8_t num_subactivities;
     system_state_t exit_state;
 } system_activity_routine_t;
 typedef system_activity_routine_t system_routine_map_t[MAX_ROUTINES];

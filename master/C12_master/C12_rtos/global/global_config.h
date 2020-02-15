@@ -20,8 +20,8 @@
 #define KALMAN_DEBUG        DEBUG_1
 #define KALMAN_DEBUG_2      DEBUG_1
 #define SYSTEM_DEBUG        DEBUG_2
-#define PAPI_DEBUG          DEBUG_1
-#define OSI_DEBUG           DEBUG_1
+#define PAPI_DEBUG          DEBUG_2
+#define OSI_DEBUG           DEBUG_2
 #define IO_CTL_DEBUG        DEBUG_1
 
 #ifdef KALMAN_DEBUG

@@ -16,16 +16,16 @@
 typedef cpt_packet_t touch_packet_t;
 typedef cpt_event_t touch_event_t;
 
-static touch_packet_t ReadTouchController(void)
+static touch_packet_t ReadTouchController( comm_host_t * host )
 {
     touch_packet_t packet;
-    PerformI2CEvent(CPTFunctions.GetReadEvent((cpt_packet_t*)&packet));
+    PerformI2CEvent(CPTFunctions.GetReadEvent( host, (cpt_packet_t*)&packet));
     return packet;
 }
 
 typedef struct
 {
-    touch_packet_t(*Read)(void);
+    touch_packet_t(*Read)( comm_host_t * );
 } touch_controller_functions;
 
 static touch_controller_functions TouchController =
