@@ -15,6 +15,7 @@ bool Init_IMU( imu_t * imu, component_id_t component_ID, uint8_t shtp_ID, comm_p
     imu->client.ID = shtp_ID;
     imu->chip = chip;
     imu->sensor_specific_metadata = 0;
+    IMUFunctions.GenerateClient( &imu->client, imu->ID, (void *)( &imu->client + sizeof(imu->client) ) );
     return true;
 }
 

@@ -21,7 +21,7 @@ void SYSIOCTL_Init( system_master_t * system )
         SysIOCtlFunctions.Push( component );
         SysIOCtlFunctions.DisableFamily( component->family );
     }
-    SysIOCtlFunctions.EnableFamily( SYSTEM_FAMILY_0 );
+//    SysIOCtlFunctions.EnableFamily( SYSTEM_FAMILY_0 );
 }
 
 component_t * SYSIOCTL_Get_Component( component_id_t id )
@@ -31,8 +31,7 @@ component_t * SYSIOCTL_Get_Component( component_id_t id )
         for( uint8_t j = 0; j < SysIOCtl.tables.index[i]; j++ )
         {
             component_t * curr = &SysIOCtl.tables.component[i][j];
-            if( curr->ID.macro == id.macro
-               && curr->ID.micro == id.micro )
+            if( curr->ID == id )
                 return curr;
         }
     }
@@ -52,45 +51,11 @@ shtp_client_output * output )
  */
 void SYSIOCTL_Init_Component( component_t * component )
 {
-    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", component_type_strings[component->ID.macro], component->ID.micro);
-    generic_id_t ID = PROTOCOL_ID_NULL;
-    if( component->ID.macro == COMPONENT_TYPE_SENSOR )
-    {
-//        switch( component->ID.micro)
-//        {
-//            case SYSTEM_SENSOR_MOTION_PRIMARY:
-//            case SYSTEM_SENSOR_MOTION_SECONDARY:
-//                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
-//                if( ID != PROTOCOL_ID_NULL )
-//                {
-//                    IMUFunctions.GenerateClient( &SysIOCtl.system->objects.IMU.client, ID, ...address/device );
-//                    IMUFunctions.Init( &SysIOCtl.system->objects.IMU, component->ID, ID, COMM_CHAN_I2C, IMU_CHIP_BNO080 );
-//                }
-//                break;
-//            case SYSTEM_SENSOR_RHO_MODULE_PRIMARY:
-//            case SYSTEM_SENSOR_RHO_MODULE_SECONDARY:
-//                ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_RHO);
-//                if( ID != PROTOCOL_ID_NULL )
-//                    RhoFunctions.Init( &(rho_setting_t){ ID } );
-//                break;
-//            case SYSTEM_SENSOR_TOUCH_PRIMARY:
-//            case SYSTEM_SENSOR_TOUCH_SECONDARY:
-//                break;
-//            case SYSTEM_SENSOR_TIP_PRIMARY:
-//            case SYSTEM_SENSOR_TIP_SECONDARY:
-//            case SYSTEM_SENSOR_TIP_ALTERNATE:
-//                break;
-//            case SYSTEM_SENSOR_BATTERY_MONITOR_PRIMARY:
-//                break;
-//            default:
-//                break;
-//        }
-    }
 }
 
 void SYSIOCTL_Push_Component( component_t * component )
 {
-    LOG_IO_CTL(IO_CTL_DEBUG, "Pushing component: 0x%02x\n", component->ID.micro);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Pushing component: 0x%02x\n", component->ID);
     SysIOCtl.tables.component[component->family][SysIOCtl.tables.index[component->family]++] = *component;
     if( SysIOCtl.tables.index[component->family] >= SYSIOCTL_MAX_COMPONENTS_PER_FAMILY )
     {
@@ -102,29 +67,29 @@ void SYSIOCTL_Push_Component( component_t * component )
 
 void SYSIOCTL_Enable_Family( system_family_t family )
 {
-    if( family == SYSTEM_FAMILY_NONE ) return;
-    if( family == SYSTEM_FAMILY_0 ) return;
+    if( family == COMPONENT_FAMILY_NONE ) return;
+    if( family == COMPONENT_FAMILY_0 ) return;
     uint8_t i = 0;
-    LOG_IO_CTL(IO_CTL_DEBUG, "Enabling family: %s\n", family_strings[family]);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Enabling family: %s\n", SYSTEM_COMPONENT_FAMILY_STRINGS[family]);
     for( ; i < SysIOCtl.tables.index[family]; i++)
         SYSIOCTL_Enable_Component( &SysIOCtl.tables.component[family][i] );
     if( !i )
-        LOG_IO_CTL(IO_CTL_DEBUG, "No components in family: %s\n", family_strings[family]);
+        LOG_IO_CTL(IO_CTL_DEBUG, "No components in family: %s\n", SYSTEM_COMPONENT_FAMILY_STRINGS[family]);
 }
 void SYSIOCTL_Disable_Family( system_family_t family )
 {
-    if( family == SYSTEM_FAMILY_NONE ) return;
-    if( family == SYSTEM_FAMILY_0 )
+    if( family == COMPONENT_FAMILY_NONE ) return;
+    if( family == COMPONENT_FAMILY_0 )
     {
         LOG_IO_CTL(IO_CTL_DEBUG, "Rejecting disable of FAMILY_0\n");
         return;
     }
     uint8_t i = 0;
-    LOG_IO_CTL(IO_CTL_DEBUG, "Disabling %s\n", family_strings[family]);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Disabling %s\n", SYSTEM_COMPONENT_FAMILY_STRINGS[family]);
     for( ; i < SysIOCtl.tables.index[family]; i++)
         SYSIOCTL_Disable_Component( &SysIOCtl.tables.component[family][i] );
     if( !i )
-        LOG_IO_CTL(IO_CTL_DEBUG, "No components in family: %s\n", family_strings[family]);
+        LOG_IO_CTL(IO_CTL_DEBUG, "No components in family: %s\n", SYSTEM_COMPONENT_FAMILY_STRINGS[family]);
 }
 
 void GPIO_Set( uint8_t port, uint8_t pin, uint8_t status )
@@ -135,7 +100,7 @@ void GPIO_Set( uint8_t port, uint8_t pin, uint8_t status )
 void SYSIOCTL_Enable_Component( component_t * component )
 {
     if( component->state == COMPONENT_STATE_ON ) return;
-    LOG_IO_CTL(IO_CTL_DEBUG, "Enabling component: 0x%02x\n", component->ID.micro);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Enabling component: 0x%02x\n", component->ID);
     GPIO_Set( component->pin, component->port, 1 );
     component->state = COMPONENT_STATE_ON;
 }
@@ -143,7 +108,7 @@ void SYSIOCTL_Enable_Component( component_t * component )
 void SYSIOCTL_Disable_Component( component_t * component )
 {
     if( component->state == COMPONENT_STATE_OFF ) return;
-    LOG_IO_CTL(IO_CTL_DEBUG, "Disabling component: 0x%02x\n", component->ID.micro);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Disabling component: 0x%02x\n", component->ID);
     GPIO_Set( component->pin, component->port, 0 );
     component->state = COMPONENT_STATE_OFF;
 }
@@ -171,3 +136,19 @@ generic_id_t SYSIOCTL_Generate_ID( protocol_id_base_t base )
     }
     return PROTOCOL_ID_NULL;
 }
+
+sysioctl_functions SysIOCtlFunctions =
+{
+    .Init = SYSIOCTL_Init,
+    .InitComponent = SYSIOCTL_Init_Component,
+    .Get = SYSIOCTL_Get_Component,
+    .Tie = SYSIOCTL_Tie_Component,
+    .Push = SYSIOCTL_Push_Component,
+    .EnableFamily = SYSIOCTL_Enable_Family,
+    .DisableFamily = SYSIOCTL_Disable_Family,
+    .EnableComponent = SYSIOCTL_Enable_Component,
+    .DisableComponent = SYSIOCTL_Disable_Component,
+    .GenerateID = SYSIOCTL_Generate_ID,
+//    .GetCallback = SYSIOCTL_Get_Component_Callback
+};
+

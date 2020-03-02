@@ -46,86 +46,52 @@
 
 typedef enum
 {
-    COMM_PROTOCOL_NONE = 0,
-    COMM_PROTOCOL_I2C,
-    COMM_PROTOCOL_SPI,
-    COMM_PROTOCOL_UART,
-    COMM_PROTOCOL_BLE,
-    COMM_PROTOCOL_SUB
-} COMM_PROTOCOL, comm_protocol;
-
-typedef enum
-{
-    COMM_ROUTE_PRIMARY = 0,
-    COMM_ROUTE_SECONDARY,
-    COMM_ROUTE_NONE
-} COMM_ROUTE;
-
-typedef enum
-{
     COMM_READ_REG = 1,
     COMM_WRITE_REG
 } COMM_TYPE;
 
-typedef enum
-{
-    TASK_PRIORITY_CLASS_EXECUTIVE = 2,
-    TASK_PRIORITY_CLASS_HIGH,
-    TASK_PRIORITY_CLASS_MEDIUM,
-    TASK_PRIORITY_CLASS_LOW,
-    TASK_PRIORITY_CLASS_PASSIVE,
-    TASK_PRIORITY_CLASS_QUARANTINE
-} TASK_PRIORITY_CLASS;
-
-#define DEFAULT_TASK_OS_OPTIONS             0 //OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR
+#define DEFAULT_TASK_OS_OPTIONS 0 //OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR
 
 typedef OS_Q queue_t;
 
-#define MAX_ROUTINES 45
 #define MAX_SUBACTIVITIES_PER_ACTIVITY 20
 #define MAX_TASKS 10
-#define MAX_INTERRUPTS MAX_TASKS/2
-#define MAX_SCHEDULED MAX_TASKS/2
+#define MAX_INTERRUPTS (MAX_TASKS/2)
+#define MAX_SCHEDULED (MAX_TASKS/2)
 #define MAX_TASK_SHELF_ENTRIES 20
 #define MAX_STATE_PROFILE_ENTRIES 10
 
-//#define APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS
-#define NUM_SYSTEM_TASKS 1//NUM_APPLICATION_TASKS
-#define NUM_SYSTEM_QUEUES 1//NUM_APPLICATION_QUEUES
-#define NUM_SYSTEM_SUBACTIVITIES NUM_APPLICATION_SUBACTIVITIES
-#define SYSTEM_ACTION_ID_NONE APPLICATION_ACTION_ID_NONE
+#define NUM_SYSTEM_STATE NUM_APPLICATION_STATE
+#define NUM_SYSTEM_COMPONENT_FAMILY NUM_APPLICATION_COMPONENT_FAMILY
+#define NUM_SYSTEM_QUEUE_ID NUM_APPLICATION_QUEUE_ID
+#define NUM_SYSTEM_SUBACTIVITY_ID NUM_APPLICATION_SUBACTIVITY_ID
+#define NUM_SYSTEM_TASK_ID NUM_APPLICATION_TASK_ID
+
+#define SYSTEM_COMPONENT_FAMILY APPLICATION_COMPONENT_FAMILY
+#define SYSTEM_COMPONENT_FAMILY_0 APPLICATION_COMPONENT_FAMILY_0
+
+#define SYSTEM_ACTION_ID_NONE -1
+#define SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS -1
 
 #define APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS
 #define SYSTEM_COMPONENT_NONE APPLICATION_COMPONENT_NONE
+
+#define SYSTEM_TASK_SHELF_ENTRY_ID_STRINGS APPLICATION_TASK_SHELF_ENTRY_ID_STRINGS
+#define SYSTEM_COMPONENT_FAMILY_STRINGS APPLICATION_COMPONENT_FAMILY_STRINGS
+#define SYSTEM_TASK_ID_STRINGS APPLICATION_TASK_ID_STRINGS
+#define SYSTEM_TIMER_ID_STRINGS APPLICATION_TASK_ID_STRINGS
+#define SYSTEM_SUBACTIVITY_ID_STRINGS APPLICATION_SUBACTIVITY_ID_STRINGS
+#define SYSTEM_STATE_STRINGS APPLICATION_STATE_STRINGS
+#define SYSTEM_ACTIVITY_STRINGS APPLICATION_ACTIVITY_STRINGS
+#define SYSTEM_QUEUE_ID_STRINGS APPLICATION_QUEUE_ID_STRINGS
+
 
 /************************************************************************************/
 /***                               Enums Start                                    ***/
 /************************************************************************************/
 
-typedef enum
-{
-    SYSTEM_STATE_STARTUP = 0,
-    SYSTEM_STATE_IDLE,
-    SYSTEM_STATE_WAITING,
-    SYSTEM_STATE_ACTIVE,
-    SYSTEM_STATE_ASLEEP,
-    SYSTEM_STATE_ERROR,
-    SYSTEM_STATE_RECOVERY,
-    SYSTEM_STATE_UNKNOWN,
-    NUM_SYSTEM_STATES
-} SYSTEM_STATE, system_state_t;
-
-typedef enum
-{
-    SYSTEM_ACTIVITY_NONE = 0,
-    SYSTEM_ACTIVITY_STARTUP,
-//    SYSTEM_ACTIVITY_TAU_STANDARD_START,
-    
-    SYSTEM_ACTIVITY_IDLE,
-    SYSTEM_ACTIVITY_SLEEP,
-    
-    NUM_SYSTEM_ACTIVITIES
-} SYSTEM_ACTIVITY, system_activity_t;
+typedef application_state_t system_state_t;
+typedef application_activity_t system_activity_t;
 
 typedef enum
 {
@@ -145,26 +111,7 @@ typedef enum
     SYSTEM_CONSUMPTION_SURGE
 } SYSTEM_CONSUMPTION, system_consumption_t;
 
-typedef enum
-{
-    SYSTEM_FAMILY_NONE = 0,
-    SYSTEM_FAMILY_0, /* Always on */
-    SYSTEM_FAMILY_A,
-    SYSTEM_FAMILY_B,
-    SYSTEM_FAMILY_C,
-    SYSTEM_FAMILY_D,
-    NUM_SYSTEM_FAMILIES
-} SYSTEM_FAMILY, system_family_t;
-
-typedef enum
-{
-    SYSTEM_QUEUE_ID_HW_INTERRUPTS,
-    SYSTEM_QUEUE_ID_COMM_INTERRUPTS,
-    SYSTEM_QUEUE_ID_RUNTIME_MESSAGES,
-    SYSTEM_QUEUE_ID_APPLICATION_MESSAGES,
-    
-    NUM_SYSTEM_QUEUE
-} SYSTEM_QUEUE_ID, system_queue_id_t;
+typedef application_component_family_t system_family_t;
 
 typedef enum
 {
@@ -195,19 +142,9 @@ typedef enum
 /***                               Types Start                                    ***/
 /************************************************************************************/
 
-//typedef enum
-//{
-//    TASK_TYPE_GENERIC   = 0x00,
-//    TASK_TYPE_PROBE     = 0x01,
-//    TASK_TYPE_SCHEDULE  = 0x02,
-//    TASK_TYPE_INTERRUPT = 0x0a
-//} TASK_TYPE;
-
 typedef OS_SPECIFIC(OS_TASK_DATA_T) os_task_data_t;
 typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
 typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
-
-typedef bool generic_comm_return_t;
 
 typedef PAPI_SPECIFIC(I2C_EVENT_T) i2c_event_t;
 typedef PAPI_SPECIFIC(I2C_HOST_T) i2c_host_t;
@@ -219,12 +156,15 @@ typedef PAPI_SPECIFIC(SPI_HOST_T) spi_host_t;
 //typedef PAPI_SPECIFIC(SPI_TRANSFER_TYPE_T) spi_transfer_type_t;
 typedef PAPI_SPECIFIC(SPI_TRANSFER_RETURN_T) spi_transfer_return_t;
 
-typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASKS];
-typedef os_queue_data_t os_queue_list_t[NUM_SYSTEM_QUEUES];
+typedef bool generic_comm_return_t;
+//typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASK_ID];
+//typedef os_queue_data_t os_queue_list_t[NUM_SYSTEM_QUEUE_ID];
 
-typedef application_subactivity_t system_subactivity_t;
+typedef application_subactivity_id_t system_subactivity_id_t;
 typedef application_task_id_t system_task_id_t;
 typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
+typedef application_task_priority_t system_task_priority_t;
+typedef application_task_action_t system_task_action_t;
 //typedef application_objects_t system_objects_t;
 //typedef application_buffers_t system_buffers_t;
 
@@ -254,20 +194,25 @@ typedef union
 typedef struct
 {
     uint8_t ID;
+    component_id_t component_id[MAX_COMPONENTS];
+    uint8_t num_component_id;
     void (*function)(void *);
     void * data;
-    component_id_t component_id;
-} system_subactivity_map_entry_t;
-typedef system_subactivity_map_entry_t system_subactivity_map_t[NUM_SYSTEM_SUBACTIVITIES];
+} system_subactivity_t;
+
+typedef struct
+{
+    uint8_t num_entries;
+    system_subactivity_t entry[NUM_SYSTEM_SUBACTIVITY_ID];
+} system_subactivity_map_t;
 
 typedef struct
 {
     system_activity_t activity;
-    system_subactivity_t subactivities[MAX_SUBACTIVITIES_PER_ACTIVITY];
+    system_subactivity_id_t subactivities[MAX_SUBACTIVITIES_PER_ACTIVITY];
     uint8_t num_subactivities;
     system_state_t exit_state;
 } system_activity_routine_t;
-typedef system_activity_routine_t system_routine_map_t[MAX_ROUTINES];
 
 typedef struct
 {
@@ -283,6 +228,10 @@ typedef struct
 {
 system_task_id_t
     ID;
+component_id_t
+    component_id[MAX_COMPONENTS];
+uint8_t
+    num_component_id;
 //system_profile_header
 //    header;
     union
@@ -294,24 +243,27 @@ system_task_id_t
         uint8_t
         info[4];
     } data;
-component_id_t
-    component_id;
-system_subactivity_t
-    handler_id;
+    system_task_action_t ACTION;
+    void          *function; /* Pointer to task */
+    void          *object; /* Argument */
+    system_task_priority_t PRIORITY; /* Priority */
+    OS_ERR        *error;
+//system_subactivity_id_t
+//    handler_id;
 os_task_data_t
-    *os_task_data;
-} system_profile_entry_t;
+    os_task_data;
+} system_task_t;
 
 typedef struct
 {
 uint8_t
     ID,
     num_interrupts;
-system_profile_entry_t
+system_task_id_t
     interrupts[MAX_INTERRUPTS];
 uint8_t
     num_scheduled;
-system_profile_entry_t
+system_task_id_t
     scheduled[MAX_SCHEDULED];
 } system_task_shelf_entry_t;
 
@@ -329,15 +281,30 @@ system_activity_routine_t
 system_state_t
     state_id;
 uint8_t
-    families[NUM_SYSTEM_FAMILIES];
+    families[NUM_SYSTEM_COMPONENT_FAMILY];
 system_task_shelf_entry_id_t
     entries[MAX_STATE_PROFILE_ENTRIES];
 uint8_t
     num_entries;
 } system_state_profile_t;
-typedef system_state_profile_t system_state_profile_list_t[NUM_SYSTEM_STATES];
+typedef system_state_profile_t system_state_profile_list_t[NUM_SYSTEM_STATE];
 
-#define MAX_COMPONENTS 20
+typedef struct
+{
+uint8_t
+    num_entries;
+system_task_t
+    entries[NUM_SYSTEM_TASK_ID];
+} task_list_t;
+
+typedef struct
+{
+uint8_t
+    num_entries;
+system_subactivity_t
+    entries[NUM_SYSTEM_TASK_ID];
+} subactivity_list_t;
+
 typedef struct
 {
 uint8_t
@@ -348,12 +315,20 @@ component_t
 
 typedef struct
 {
-component_list_t
-    component_list;
-system_task_shelf_t
-    shelf;
-system_state_profile_list_t
-    state_profiles;
+uint8_t
+    num_entries;
+os_queue_data_t
+    entries[NUM_SYSTEM_TASK_ID];
+} queue_list_t;
+
+typedef struct
+{
+    component_list_t            component_list;
+    system_subactivity_map_t    subactivity_map;
+    queue_list_t                queue_list;
+    task_list_t                 task_list;
+    system_task_shelf_t         shelf;
+    system_state_profile_list_t state_profiles;
 } system_profile_t;
 
 typedef struct
@@ -398,30 +373,22 @@ RTOS_ERR
     recovery;
 } system_error_buffer_t;
 
-//typedef struct
-//{
-//    bool
-//    [MAX_INTERRUPTS],
-//    scheduled[MAX_SCHEDULED];
-//} system_registered_t;
-
 typedef struct
 {
-    bool                    profile_entries[NUM_APPLICATION_TASKS];
-    system_task_id_t        component_tasks[MAX_COMPONENTS];
+    bool                    tasks[NUM_SYSTEM_TASK_ID];
+    bool                    component_tasks[MAX_COMPONENTS][NUM_SYSTEM_TASK_ID];
     comm_host_t             comm_hosts[MAX_COMPONENTS];
 } system_registration_log_t;
 
 typedef struct
 {
     system_state_t          state, prev_state, exit_state;
-    os_task_list_t         *os_tasks;
-    os_queue_list_t        *queue_list;
+//    os_task_list_t          os_tasks;
     system_activity_t       activity;
-    system_subactivity_t    subactivity;
+    system_subactivity_id_t subactivity;
     system_error_buffer_t   error;
     system_consumption_t    consumption_level;
-    system_subactivity_map_t *subactivity_map;
+//    system_subactivity_map_t subactivity_map;
     system_profile_t       *profile;
     system_registration_log_t registration;
 } system_master_t;

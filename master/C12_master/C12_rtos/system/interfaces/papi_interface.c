@@ -29,19 +29,19 @@ i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event ) { return fa
 #else
 void PAPIInterface_I2C_Init( i2c_event_t * event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel %d:0x%02x\n", event->host->device, event->host->address);
+    LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel %p:0x%02x\n", event->host->device, event->host->address);
     PAPI_SPECIFIC(PAPIInterface_I2C_Init)(event);
 }
 
 void PAPIInterface_I2C_Enable( i2c_event_t * event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Enabling I2C on channel %d:0x%02x\n", event->host->device, event->host->address);
+    LOG_PAPI(PAPI_DEBUG, "Enabling I2C on channel %p:0x%02x\n", event->host->device, event->host->address);
     PAPI_SPECIFIC(PAPIInterface_I2C_Enable)(event);
 }
 
 i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Reading I2C on channel %d:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
+    LOG_PAPI(PAPI_DEBUG, "Reading I2C on channel %p:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
     i2c_transfer_return_t ret;
     if( event->length == 1 && event->reg != NO_REG)
         ret = PAPI_SPECIFIC(PAPIInterface_I2C_ReadRegister)(event);
@@ -52,7 +52,7 @@ i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * event )
 
 i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Writing I2C on channel %d:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
+    LOG_PAPI(PAPI_DEBUG, "Writing I2C on channel %p:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
     i2c_transfer_return_t ret;
     if( event->length == 1 && event->reg != NO_REG)
         ret = PAPI_SPECIFIC(PAPIInterface_I2C_WriteRegister)(event);
@@ -63,7 +63,7 @@ i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * event )
 
 i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Performing I2C event on channel %d:0x%02x\n", event.host->device, event.host->address);
+    LOG_PAPI(PAPI_DEBUG, "Performing I2C event on channel %p:0x%02x\n", event.host->device, event.host->address);
     switch(event.command)
     {
         case I2C_READ_REG_EVENT:

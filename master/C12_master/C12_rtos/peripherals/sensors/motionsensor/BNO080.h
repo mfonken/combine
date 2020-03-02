@@ -13,7 +13,7 @@
 #include <string.h>
 
 #define BNO080_DEFAULT_DEVICE 0x4B //
-#define BNO080_DEFAULT_CHANNEL COMM_PROTOCOL_I2C
+#define BNO080_DEFAULT_CHANNEL COMPONENT_PROTOCOLI2C
 #define BNO080_UART_RVC_HEADER 0xAAAA
 
 #define BNO080_DEFAULT_GET_TIMEOUT 1
@@ -90,13 +90,12 @@ typedef BNO080_CLASSIFIER bno080_classifier_t;
 typedef BNO080_DETECTOR bno080_detector_t;
 typedef uint8_t bno080_feature_t;
 
-static void BNO080GenerateSH2Client( shtp_client_t * client, uint8_t ID, uint32_t device )
+static void BNO080GenerateSH2Client( shtp_client_t * client, uint8_t ID, void * data )
 {
-    shtp_client_comm_host header = { BNO080_DEFAULT_CHANNEL, device };
     shtp_client_buffer buffer = { 0 };
     shtp_client_product_id product = { 0 };
     shtp_client_output output = { 0 };
-    SHTPFunctions.GenerateClient( client, ID, 0, &header, &buffer, &product, &output );
+    SHTPFunctions.GenerateClient( client, ID, 0, &buffer, &product, &output, data );
 }
 
 bool BNO080EnableFeature( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );
@@ -111,7 +110,7 @@ typedef struct
     bool (*Refresh)( shtp_client_t * );
     bool (*Read)( shtp_client_t * );
     bool (*AttemptGet)( uint32_t );
-    void (*GenerateClient)( shtp_client_t *, uint8_t, uint32_t );
+    void (*GenerateClient)( shtp_client_t *, uint8_t, void * );
 } bno080_functions;
 
 static const bno080_functions BNO080Functions =

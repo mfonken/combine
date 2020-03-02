@@ -16,19 +16,22 @@
 #include <string.h>
 #include "C12_profile.h"
 
+
+#define MAX_COMPONENTS 3
+
 #define NAME_STRINGIFY(x,y) x ## _ ## y
 #define NAME_BUILDER(x,y) NAME_STRINGIFY(x,y)
 
-
-#define SUBACTIVITY_ADVANCED(ID, PTR, ARGS, COMPONENT) { ID, (void(*)(void*))PTR, (void*)ARGS, (component_id_t)COMPONENT }
+//#define SUBACTIVITY_ADVANCED(ID, PTR, ARGS, COMPONENT) { ID, (void(*)(void*))PTR, (void*)ARGS, (component_id_t)COMPONENT }
 #define SUBACTIVITY(ID, PTR, ARGS) { ID, (void(*)(void*))PTR, (void*)ARGS, 0 }
 
-#define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
+//#define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
 
 /// Should global def be checked here or in implementation?
 #define PLATFORM_SPECIFIC(NAME) NAME_BUILDER(__PLATFORM__, NAME)
 #define OS_SPECIFIC(NAME) NAME_BUILDER(__OS__, NAME)
 #define PAPI_SPECIFIC(NAME) NAME_BUILDER(__PAPI__, NAME)
+#define APP_SPECIFIC(NAME) NAME_BUILDER(APPLICATION, NAME)
 
 #define CALL_OS_PARENT(X) OS_SPECIFIC(__LINE__)(X)
 
@@ -42,7 +45,7 @@
 typedef void (*void_handler_t)(void);
 typedef void_handler_t generic_function_t;
 typedef uint16_t event_id;
-typedef uint8_t generic_id_t;
+typedef int8_t generic_id_t;
 typedef uint16_t qty_t;
 typedef uint32_t tick_t;
 typedef float frequency_t;
@@ -66,13 +69,13 @@ typedef enum
 } tmr_opt_t;
 #endif
 
-typedef enum
-{
-    COMPONENT_STATE_OFF = 0x00,
-    COMPONENT_STATE_ON = 0x01,
-    COMPONENT_STATE_Z = 0x02,
-    COMPONENT_STATE_INTERRUPT = 0x0a
-} COMPONENT_STATE;
+//typedef enum
+//{
+//    COMPONENT_STATE_OFF = 0x00,
+//    COMPONENT_STATE_ON = 0x01,
+//    COMPONENT_STATE_Z = 0x02,
+//    COMPONENT_STATE_INTERRUPT = 0x0a
+//} COMPONENT_STATE;
 
 typedef enum
 {
@@ -97,12 +100,13 @@ typedef enum
     INTERRUPT_ACTION_IMMEDIATE
 } INTERRUPT_ACTION;
 
-typedef struct
-{
-uint8_t
-    macro,
-    micro;
-} component_id_t;
+//typedef struct
+//{
+//uint8_t
+//    macro,
+//    micro;
+//} component_id_t;
+typedef uint8_t component_id_t;
 
 typedef struct
 {
@@ -148,6 +152,14 @@ typedef struct
     pin_t pin;
     hw_edge_t edge;
 } hw_event_message_t;
+
+//typedef struct
+//{
+//component_id_t
+//    ids[MAX_COMPONENTS];
+//uint8_t
+//    num;
+//} component_id_list_t;
 
 #define DEFAULT_QUEUE_TIMEOUT_MS 100
 #define DEFAULT_QUEUE_MAX_QTY 50

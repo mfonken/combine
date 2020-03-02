@@ -44,18 +44,18 @@ void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t task_id )
 void SystemBehavior_PerformInterrupterSend( system_task_id_t task_id )
 {
     //Enable BehaviorInterruptTasks[id]
-    os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
+//    os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
 }
 
 void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_event_message_t message )
 {
     bool handled = false;
-    os_task_data_t * task_data = SystemFunctions.Get.TaskById( task_id );
-    if( task_data == NULL ) return;
-    switch( task_data->event_data.interrupt.action )
+    system_task_t * task = SystemFunctions.Get.TaskById( task_id );
+    if( task == NULL ) return;
+    switch( task->ACTION )
     {
         case  INTERRUPT_ACTION_IMMEDIATE:
-            OS.Task.Resume( task_data );
+            OS.Task.Resume( &task->os_task_data );
         case INTERRUPT_ACTION_IGNORE:
         default:
             handled = true;
@@ -65,7 +65,7 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
     }
     if( !handled )
     {
-        os_queue_data_t * queue_data = &(*System.queue_list[INTERRUPT_CHANNEL]);
+        os_queue_data_t * queue_data = &System.profile->queue_list.entries[INTERRUPT_CHANNEL];
         queue_data->p_void = (void*)&message;
         queue_data->msg_size = sizeof(hw_event_message_t);
         OS.Queue.Post( queue_data );
@@ -76,6 +76,6 @@ void SystemBehavior_PerformInterrupterPerform( system_task_id_t id )
     //Disable BehaviorInterruptTasks[id]
 }
 
-//void InitProfileEntry( system_profile_entry_t * entry )
+//void InitTask( system_task_id_t id )
 //{
 //}

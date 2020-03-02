@@ -208,6 +208,7 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event
 
     seq.addr  = event->addr;
     seq.flags = I2C_FLAG_READ;
+    
     /* Select location/length of data to be read */
     seq.buf[0].data = event->buffer;
     seq.buf[0].len  = event->length;
@@ -247,8 +248,6 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
     }
     return ret;
 };
-
-
 
 static void EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event )
 {

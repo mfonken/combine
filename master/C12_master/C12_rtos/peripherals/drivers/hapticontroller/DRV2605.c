@@ -67,7 +67,7 @@ void DRV2605_UseLRA( comm_host_t * host )
 uint8_t DRV2605_ReadRegister( comm_host_t * host, uint8_t reg )
 {
     uint8_t data = 0;
-    PerformI2CEvent( DRV2605_GetReadEvent( host, DRV2605_REG_MODE, &data ) );
+    PerformI2CEvent( DRV2605_GetReadEvent( host, reg, &data ) );
     return data;
 }
 void DRV2605_WriteRegister( comm_host_t * host, uint8_t reg, uint8_t val )

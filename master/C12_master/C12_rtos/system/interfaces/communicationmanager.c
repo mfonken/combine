@@ -18,19 +18,19 @@ generic_comm_return_t CommunicationManager_PerformEvent( comm_event_t event )
     generic_comm_return_t ret = false;
     switch( event.generic_comm_event.host->generic_comm_host.protocol )
     {
-        case COMM_PROTOCOL_I2C:
+        case COMPONENT_PROTOCOL_I2C:
             ret = (generic_comm_return_t)PAPI.I2C.Perform(*(i2c_event_t *)&event );
             break;
-        case COMM_PROTOCOL_SPI:
+        case COMPONENT_PROTOCOL_SPI:
             ret = (generic_comm_return_t)PAPI.SPI.Perform(*(spi_event_t *)&event );
             break;
-        case COMM_PROTOCOL_UART:
+        case COMPONENT_PROTOCOL_UART:
             //            performUARTEvent(*(uart_event_t *)&event, data );
             break;
-        case COMM_PROTOCOL_BLE:
+        case COMPONENT_PROTOCOL_BLE:
             //            performBLEEvent(*(ble_event_t *)&event, data );
             break;
-        case COMM_PROTOCOL_SUB:
+        case COMPONENT_PROTOCOL_SUB:
             //            performSubEvent(*(sub_event_t *)&event, data );
             break;
         default:

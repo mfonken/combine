@@ -10,6 +10,8 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="options.json"></script>
+    <script type="text/javascript" src="profile.json"></script>
     <script type="text/javascript" src="scripts.js"></script>
 </head>
 <body>
@@ -22,6 +24,9 @@
     </div>
     <div class="main_menu">
         <ul class="menu_list">
+            <!-- <li class="menu_item">
+                <a class="menu_btn" id="generate_options" onclick="generateOptions()">Types</a>
+            </li> -->
             <li class="menu_item">
                 <a class="menu_btn" id="generate_json" onclick="generateJSON(true)">JSON</a>
             </li>
@@ -30,6 +35,7 @@
             </li>
             <li class="menu_item">
                 <a class="menu_btn" id="load_json" onclick="loadJSON()">Load</a>
+                <!-- <input type="file" id="load_json_file"> -->
             </li>
             <!-- <li class="menu_item" id="load">Load</li> -->
         </ul>

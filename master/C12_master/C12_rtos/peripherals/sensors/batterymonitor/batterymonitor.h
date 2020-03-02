@@ -22,13 +22,13 @@ uint32_t
 
 void GetBatteryMonitorBasicBase( comm_host_t * );
 void GetBatteryMonitorBasic( comm_host_t *, battery_monitor_basic_t * );
-void SetBatteryMonitorMode( comm_host_t *, uint8_t );
+void SetBatteryMonitorMode( comm_host_t * );
 
 typedef struct
 {
     void (*GetBasicBase)( comm_host_t * );
     void (*GetBasic)( comm_host_t *, battery_monitor_basic_t * );
-    void (*Set)( comm_host_t *, uint8_t );
+    void (*Set)( comm_host_t * );
 } battery_monitor_functions;
 
 static battery_monitor_functions BatteryMonitor =

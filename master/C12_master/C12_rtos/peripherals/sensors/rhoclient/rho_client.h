@@ -12,7 +12,7 @@
 #include "peripheralbridge.h"
 #include "point.h"
 
-#define RHO_DEFAULT_COMM_PROTOCOL COMM_PROTOCOL_UART
+#define RHO_DEFAULT_COMPONENT_PROTOCOL COMPONENT_PROTOCOLUART
 
 typedef uint16_t packet_data_type;
 typedef float global_timestamp_t;

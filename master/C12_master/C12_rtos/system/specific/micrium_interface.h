@@ -21,16 +21,16 @@ typedef unsigned char   OS_PRIO, OS_ERR, RTOS_ERR;
 typedef unsigned int    CPU_STK, CPU_STK_SIZE, OS_TICK, CPU_TS;
 typedef unsigned short  OS_MSG_QTY, OS_OPT, OS_MSG_SIZE;
 
-
 #ifndef OSTaskDel
-static void OSTaskDel (OS_TCB *p_tcb, RTOS_ERR *p_err) {}
+static void OSTaskDel(OS_TCB *p_tcb, RTOS_ERR *p_err) {}
 #endif
 #define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 
 #define OS_CFG_TICK_RATE_HZ 10000
 #define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
+#define DEFAULT_QUEUE_SIZE 1
 
-#endif /* __MICRIUM__ */
+#endif /* not __MICRIUM__ */
 /// SPOOF END
 
 #define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
@@ -51,21 +51,10 @@ typedef struct
     void          *p_ext; /* Task control block extension for extended data during context switch */
     OS_OPT         opt; /* Task specific options */
     OS_ERR        *p_err; /* Pointer to error receiver */
-    union
-    {
-        struct basic_timer
-        {
-            OS_TICK dly;
-            OS_TICK period;
-            OS_OPT opt;
-            OS_TMR tmr;
-        } schedule;
-        struct basic_interrupt
-        {
-            INTERRUPT_ACTION action;
-            component_id_t component_id;
-        } interrupt;
-    } event_data;
+    OS_TICK        dly;
+    OS_TICK        period;
+    OS_TMR         tmr;
+    OS_OPT         tmr_opt;
     OS_TCB         tcb; /* Operating System: Task Control Block */
     CPU_STK        stk_base[DEFAULT_STACK_SIZE]; /* Stack base address */
 } micrium_os_task_data_t, MICRIUM_OS_TASK_DATA_T;
@@ -97,10 +86,10 @@ typedef struct
     OS_ERR              *p_err;
 } micrium_os_timer_data_t,  MICRIUM_OS_TIMER_DATA_T;
 
-#define TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, SIZE_, Q_SIZE_, OS_TICK_, EXTENSION_, OS_OPTIONS_, ERROR_/*, TIMER_DELAY_MS_, TIMER_HZ_, TIMER_OPT_*/ ) \
+#define TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, SIZE_, Q_SIZE_, OS_TICK_, EXTENSION_, OS_OPTIONS_, ERROR_, COMPONENTS_, NUM_COMPONENTS_, PERIOD_HZ_, ACTION_ ) \
 { \
-    (generic_id_t)ID_, \
-    (CPU_CHAR*)task_id_strings[ID_], \
+    (application_task_id_t)ID_, \
+    (CPU_CHAR*)TASK_ID_STRINGS[ID_], \
     (OS_TASK_PTR)PTR_, \
     (void*)ARGS_, \
     (OS_PRIO)PRIORITY_, \
@@ -110,17 +99,20 @@ typedef struct
     (OS_TICK)OS_TICK_, \
     (void*)EXTENSION_, \
     (OS_OPT)OS_OPTIONS_, \
-    (OS_ERR*)ERROR_/*, \
-    { MS_TO_TICK(TIMER_DELAY_MS_), HZ_TO_TICK(TIMER_HZ_), TIMER_OPT_ }*/ \
+    (OS_ERR*)ERROR_, \
+    COMPONENTS_, \
+    NUM_COMPONENTS_, \
+    HZ_TO_TICK(PERIOD_HZ_), \
+    ACTION_, \
 }
 
-#define TASK( ID_, PTR_, ARGS_, PRIORITY_, ERROR_ ) \
-TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_TASK_OS_OPTIONS, ERROR_/*, 0u, 0u, 0u*/ )
+#define TASK( ID_, PTR_, ARGS_, PRIORITY_, ERROR_, COMPONENTS_, NUM_COMPONENTS_, PERIOD_HZ_, ACTION_ ) \
+TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_TASK_OS_OPTIONS, ERROR_, COMPONENTS_, NUM_COMPONENTS_, PERIOD_HZ_, ACTION_/*, 0u, 0u, 0u*/ )
 
 #define QUEUE_ADV( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_, OPT_ ) \
 { \
     (generic_id_t)ID_, \
-    (CPU_CHAR*)queue_id_strings[ID_], \
+    (CPU_CHAR*)QUEUE_ID_STRINGS[ID_], \
     (OS_MSG_QTY)MAX_QTY_, \
     (OS_ERR*)ERROR_, \
     (OS_OPT)OPT_, \
@@ -136,17 +128,14 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 #define QUEUE( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_ ) \
     QUEUE_ADV( ID_, MAX_QTY_, TIMEOUT_MS_, ERROR_, DEFAULT_OS_Q_OPT )
 
-//#define SCHEDULED_TASK( ID_, PTR_, ARGS_, PRIORITY_, ERROR_, TIMER_DELAY_, TIMER_HZ_, TIMER_OPT_ ) \
-//TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_TASK_OS_OPTIONS, ERROR_, TIMER_DELAY_MS_, TIMER_HZ_, TIMER_OPT_ )
-
 #define TIMER_FROM_SCHEDULED_TASK(p_task_data) \
 { \
     p_task_data->ID, \
-    p_task_data->event_data.schedule.tmr, \
+    p_task_data->tmr, \
     p_task_data->p_name, \
-    p_task_data->event_data.schedule.dly, \
-    p_task_data->event_data.schedule.period, \
-    p_task_data->event_data.schedule.opt, \
+    0, \
+    p_task_data->period, \
+    p_task_data->opt, \
     p_task_data->p_task, \
     p_task_data->p_arg, \
     p_task_data->p_err \

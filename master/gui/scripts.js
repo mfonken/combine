@@ -2,255 +2,19 @@
 // toggle between hiding and showing the dropdown content */
 var version = "v0.1";
 
-var example_profile ={"Families":{"type":"list","Families_0":{"IDLE":{"0":"SYSTEM_FAMILY_0"},"num_IDLE":1,"ALL":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_A","2":"SYSTEM_FAMILY_B","3":"SYSTEM_FAMILY_C","4":"SYSTEM_FAMILY_D"},"num_ALL":5,"ERROR":{"0":"SYSTEM_FAMILY_0","1":"SYSTEM_FAMILY_B","2":"SYSTEM_FAMILY_C"},"num_ERROR":3}},"Channels":{"type":"list","Channels_0":{"I2C":{"0":"I2C1","1":"I2C2"},"num_I2C":2,"SPI":{"0":"SPI1","1":"SPI2"},"num_SPI":2,"USART":{"0":"USART1","1":"USART2"},"num_USART":2}},"Components":{"type":"group","Components_0":{"NAME":"EFR32_BLE","ID":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_BLE","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_1":{"NAME":"EFR32_SUB","ID":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","PROTOCOL":"COMM_PROTOCOL_SUB","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"},"Components_2":{"NAME":"BNO080","ID":"APPLICATION_COMPONENT_MOTION_PRIMARY","FAMILY":"SYSTEM_FAMILY_B","PROTOCOL":"COMM_PROTOCOL_SPI","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"COMM_ADDR_NONE","PORT":"PORTC","PIN":"9","STATE":"COMPONENT_STATE_OFF"},"Components_3":{"NAME":"RHOMOD","ID":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","FAMILY":"SYSTEM_FAMILY_0","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0xee","PORT":"PORTA","PIN":"2","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_4":{"NAME":"STC310","ID":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","FAMILY":"SYSTEM_FAMILY_C","PROTOCOL":"COMM_PROTOCOL_I2C","ROUTE":"COMM_ROUTE_PRIMARY","ADDR":"0x00","PORT":"PORT0","PIN":"0","STATE":"COMPONENT_STATE_INTERRUPT"},"Components_5":{"NAME":"XC9265","ID":"APPLICATION_COMPONENT_REGULATOR_1V5","FAMILY":"SYSTEM_FAMILY_A","PROTOCOL":"COMM_PROTOCOL_NONE","ROUTE":"COMM_ROUTE_NONE","ADDR":"COMM_ADDR_NONE","PORT":"COMM_PORT_NONE","PIN":"INTERNAL","STATE":"COMPONENT_STATE_OFF"}},"Subactivities":{"type":"struct","Subactivities_0":{"ID":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT","data":"INTERRUPT_ACTION_IMMEDIATE","component_id":"APPLICATION_COMPONENT_MOTION_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT"},"Subactivities_1":{"ID":"APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT","data":"0","component_id":"APPLICATION_COMPONENT_TOUCH_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_TOUCH_EVENT"},"Subactivities_2":{"ID":"APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL","data":"1","component_id":"APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR"},"Subactivities_3":{"ID":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_RHO_MODULE_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT"},"Subactivities_4":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT","data":"0","component_id":"APPLICATION_COMPONENT_BLE_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET"},"Subactivities_5":{"ID":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE","data":"INTERRUPT_ACTION_QUEUE","component_id":"APPLICATION_COMPONENT_SUB_RADIO_PRIMARY","handler_id":"APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET"}},"Tasks":{"type":"struct","Tasks_0":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS","interrupts":"","num_interrupts":0,"scheduled":"","num_scheduled":0},"Tasks_1":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_2":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","interrupts":{"0":"APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT"},"num_interrupts":1,"scheduled":"","num_scheduled":0},"Tasks_3":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_PROBE_ID_BATTERY_MONITOR"},"num_scheduled":1},"Tasks_4":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS","interrupts":"","num_interrupts":0,"scheduled":{"0":"APPLICATION_SCHEDULER_ID_RHO_INTERRUPT"},"num_scheduled":1},"Tasks_5":{"ID":"APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS","interrupts":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE"},"num_interrupts":1,"scheduled":{"0":"APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT"},"num_scheduled":1}},"States":{"type":"nested","States_0":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_STARTUP","SUBACTIVITIES":{"0":"APPLICATION_SUBACTIVITY_INIT_CONFIRM","1":"APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT","2":"APPLICATION_SUBACTIVITY_INIT_COMPONENTS","3":"APPLICATION_SUBACTIVITY_INIT_COMMUNICATION","4":"APPLICATION_SUBACTIVITY_SELF_CHECK"},"num_SUBACTIVITIES":5,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_STARTUP","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS"},"num_TASKS":1},"States_1":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_IDLE","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_2":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_WAITING","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_3":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ACTIVE"},"STATE":"SYSTEM_STATE_ACTIVE","FAMILIES":"Families_ALL","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS","1":"APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS"},"num_TASKS":2},"States_4":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_IDLE"},"STATE":"SYSTEM_STATE_ASLEEP","FAMILIES":"Families_IDLE","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_5":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_ERROR","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_6":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_RECOVERY"},"STATE":"SYSTEM_STATE_RECOVERY","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1},"States_7":{"1":{"ACTIVITY":"SYSTEM_ACTIVITY_NONE","SUBACTIVITIES":"","num_SUBACTIVITIES":0,"EXIT_STATE":"SYSTEM_STATE_ERROR"},"STATE":"SYSTEM_STATE_UNKNOWN","FAMILIES":"Families_ERROR","TASKS":{"0":"APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS"},"num_TASKS":1}}}
-
-var all_options =
-{
-    "Families":[{
-        "options":"list",
-        "IDLE":[
-            "array:.Components.FAMILY"
-        ],
-        "ALL":[
-            "array:.Components.FAMILY"
-        ],
-        "ERROR":[
-            "array:.Components.FAMILY"
-        ]
-    }],
-    "Channels":[{
-        "options":"list",
-        "I2C":[
-            "array",
-            "I2C1",
-            "I2C2"
-        ],
-        "SPI":[
-            "array",
-            "SPI1",
-            "SPI2",
-            "SPI3",
-        ],
-        "USART":[
-            "array",
-            "USART1",
-            "USART2",
-            "USART3",
-            "UART4",
-            "UART5"
-        ]
-    }],
-    "Components":[{
-        "options":"group:~",
-        "NAME":[
-            "enter name"
-        ],
-        "ID":[
-            "APPLICATION_COMPONENT_NONE",
-            "APPLICATION_COMPONENT_MOTION_PRIMARY",
-            "APPLICATION_COMPONENT_RHO_MODULE_PRIMARY",
-            "APPLICATION_COMPONENT_TOUCH_PRIMARY",
-            "APPLICATION_COMPONENT_TIP_PRIMARY",
-            "APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY",
-            "APPLICATION_COMPONENT_BLE_RADIO_PRIMARY",
-            "APPLICATION_COMPONENT_SUB_RADIO_PRIMARY",
-            "APPLICATION_COMPONENT_HAPTIC_PRIMARY",
-            "APPLICATION_COMPONENT_REGULATOR_1V5"
-        ],
-        "FAMILY":[
-            "SYSTEM_FAMILY_NONE",
-            "SYSTEM_FAMILY_0",
-            "SYSTEM_FAMILY_A",
-            "SYSTEM_FAMILY_B",
-            "SYSTEM_FAMILY_C",
-            "SYSTEM_FAMILY_D"
-        ],
-        "PROTOCOL":[
-            "COMM_PROTOCOL_NONE",
-            "COMM_PROTOCOL_I2C",
-            "COMM_PROTOCOL_SPI",
-            "COMM_PROTOCOL_UART",
-            "COMM_PROTOCOL_BLE",
-            "COMM_PROTOCOL_SUB"
-        ],
-        "ROUTE":[
-            "COMM_ROUTE_NONE",
-            "COMM_ROUTE_PRIMARY",
-            "COMM_ROUTE_SECONDARY"
-        ],
-        "ADDR":[
-            "enter address",
-            "COMM_ADDR_NONE"
-        ],
-        "PORT":[
-            "PORT0",
-            "PORTA",
-            "PORTB",
-            "PORTC",
-            "PORTD",
-            "PORTF",
-            "COMM_PORT_NONE"
-        ],
-        "PIN":[
-            "enter pin number",
-            "INTERNAL"
-        ],
-        "STATE":[
-            "COMPONENT_STATE_OFF",
-            "COMPONENT_STATE_ON",
-            "COMPONENT_STATE_Z",
-            "COMPONENT_STATE_INTERRUPT"
-        ]
-    }],
-    "Subactivities":[{
-        "options":"struct",
-        "ID":[
-            "APPLICATION_ACTION_ID_NONE",
-            "APPLICATION_COMBINE_GLOBAL",
-
-            "APPLICATION_PROBE_ID_HOST",
-            "APPLICATION_PROBE_ID_RHO",
-            "APPLICATION_PROBE_ID_TIP",
-            "APPLICATION_PROBE_ID_BATTERY_MONITOR",
-
-            "APPLICATION_INTERRUPTER_ID_TAU_PACKET_TRANSMIT",
-            "APPLICATION_INTERRUPTER_ID_TAU_PACKET_RECEIVE",
-            "APPLICATION_INTERRUPTER_ID_SUB_RADIO_PACKET_TRANSMIT",
-            "APPLICATION_INTERRUPTER_ID_HAPTIC_TRIGGER",
-
-            "APPLICATION_SCHEDULER_ID_TAU_PERFORM",
-            "APPLICATION_SCHEDULER_ID_TAU_PACKET_QUEUE",
-            "APPLICATION_SCHEDULER_ID_TIP_POLL",
-            "APPLICATION_SCHEDULER_ID_BATTERY_MONITOR_POLL",
-
-            "APPLICATION_SCHEDULER_ID_MOTION_INTERRUPT",
-            "APPLICATION_SCHEDULER_ID_RHO_INTERRUPT",
-            "APPLICATION_SCHEDULER_ID_TOUCH_INTERRUPT"
-        ],
-        "data":[
-            "enter info",
-            "INTERRUPT_ACTION_IGNORE",
-            "INTERRUPT_ACTION_QUEUE",
-            "INTERRUPT_ACTION_IMMEDIATE"
-        ],
-        "component_id":[
-            "APPLICATION_COMPONENT_NONE",
-            "APPLICATION_COMPONENT_MOTION_PRIMARY",
-            "APPLICATION_COMPONENT_MOTION_SECONDARY",
-            "APPLICATION_COMPONENT_RHO_MODULE_PRIMARY",
-            "APPLICATION_COMPONENT_RHO_MODULE_SECONDARY",
-            "APPLICATION_COMPONENT_TOUCH_PRIMARY",
-            "APPLICATION_COMPONENT_TOUCH_SECONDARY",
-            "APPLICATION_COMPONENT_TIP_PRIMARY",
-            "APPLICATION_COMPONENT_TIP_SECONDARY",
-            "APPLICATION_COMPONENT_BATTERY_MONITOR_PRIMARY",
-            "APPLICATION_COMPONENT_BLE_RADIO_PRIMARY",
-            "APPLICATION_COMPONENT_SUB_RADIO_PRIMARY",
-            "APPLICATION_COMPONENT_HAPTIC_PRIMARY",
-            "APPLICATION_COMPONENT_HAPTIC_SECONDARY",
-            "APPLICATION_COMPONENT_REGULATOR_1V5"
-        ],
-        "handler_id":[
-            "APPLICATION_SUBACTIVITY_NONE",
-            "APPLICATION_SUBACTIVITY_SELF_CHECK",
-            "APPLICATION_SUBACTIVITY_WAIT_FOR_WAKE",
-
-            "APPLICATION_SUBACTIVITY_INIT_COMMUNICATION",
-            "APPLICATION_SUBACTIVITY_INIT_SUB_VREG",
-            "APPLICATION_SUBACTIVITY_INIT_COMPONENTS",
-            "APPLICATION_SUBACTIVITY_INIT_TAU_CLIENT",
-            "APPLICATION_SUBACTIVITY_INIT_RHO_CLIENT",
-            "APPLICATION_SUBACTIVITY_INIT_CONFIRM",
-            "APPLICATION_SUBACTIVITY_BATTERY_MONITOR_ACTIVE",
-
-            "APPLICATION_SUBACTIVITY_SEND_HOST_PROBE",
-            "APPLICATION_SUBACTIVITY_RECEIVE_HOST_PROBE",
-
-            "APPLICATION_SUBACTIVITY_HANDLE_MOTION_EVENT",
-            "APPLICATION_SUBACTIVITY_HANDLE_RHO_EVENT",
-            "APPLICATION_SUBACTIVITY_HANDLE_TOUCH_EVENT",
-
-            "APPLICATION_SUBACTIVITY_POLL_BATTERY_MONITOR",
-            "APPLICATION_SUBACTIVITY_POLL_TIP",
-
-            "APPLICATION_SUBACTIVITY_TRIGGER_HAPTIC",
-
-            "APPLICATION_SUBACTIVITY_TRANSMIT_HOST_PACKET",
-            "APPLICATION_SUBACTIVITY_RECEIVE_HOST_PACKET",
-            "APPLICATION_SUBACTIVITY_TRANSMIT_SUB_RADIO_PACKET",
-            "APPLICATION_SUBACTIVITY_RECEIVE_SUB_RADIO_PACKET",
-
-            "APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_START",
-            "APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_START",
-            "APPLICATION_SUBACTIVITY_TAU_STANDARD_START",
-
-            "APPLICATION_SUBACTIVITY_TAU_STANDARD_RHO_STOP",
-            "APPLICATION_SUBACTIVITY_TAU_STANDARD_MOTION_STOP",
-            "APPLICATION_SUBACTIVITY_TAU_STOP",
-            "APPLICATION_SUBACTIVITY_BATTERY_MONITOR_SLEEP"
-        ]
-    }],
-    "Tasks":[{
-        "options":"struct:~",
-        "ID":[
-            "APPLICATION_TASK_SHELF_ENTRY_ID_NULL_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_GLOBAL_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_MOTION_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_TOUCH_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_TIP_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_BATTERY_MONITOR_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_SENSOR_RHO_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_DRIVER_HAPTIC_PRIMARY_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_HOST_RADIO_TASKS",
-            "APPLICATION_TASK_SHELF_ENTRY_ID_COMMUNICATION_SUB_RADIO_TASKS"
-        ],
-        "interrupts":[
-            "array:.Subactivities.ID"
-        ],
-        "scheduled":[
-            "array:.Subactivities.ID"
-        ]
-    }],
-    "States":[{
-        "options":"nested",
-        "STATE":[
-            "SYSTEM_STATE_STARTUP",
-            "SYSTEM_STATE_IDLE",
-            "SYSTEM_STATE_WAITING",
-            "SYSTEM_STATE_ACTIVE",
-            "SYSTEM_STATE_ASLEEP",
-            "SYSTEM_STATE_ERROR",
-            "SYSTEM_STATE_RECOVERY",
-            "SYSTEM_STATE_UNKNOWN"
-        ],
-        "ACTIVITY":[
-            {"options":">"},
-            "SYSTEM_ACTIVITY_NONE",
-            "SYSTEM_ACTIVITY_STARTUP",
-            "SYSTEM_ACTIVITY_IDLE",
-            "SYSTEM_ACTIVITY_SLEEP"
-        ],
-        "SUBACTIVITIES":[
-            {"options":">"},
-            "array:.Subactivities.handler_id"
-        ],
-        "EXIT_STATE":[
-            {"options":">"},
-            ":.States.STATE"
-        ],
-        "FAMILIES":[
-            ":.Families"
-        ],
-        "TASKS":[
-            "array:.Tasks.ID"
-        ]
-    }]
-};
+var keywords = ["title", "options", "assign"];
 
 var num_entries_per_category = {};
 
 function createMain(index) {
     $.each(all_options, function (global_key, global_list) {
+        // console.log(global_list[0]['options']);
+        if(global_list[0]['options'] != undefined && global_list[0]['options'] == "hidden") return;
+
+        var title = global_key;
+        if(global_list[0]['title'] != undefined)
+            title = global_list[0]['title'];
+        // console.log(global_key, title);
         num_entries_per_category[global_key] = 0;
         var key_items = global_key.split(":");
         var name_key = key_items[0];
@@ -265,7 +29,7 @@ function createMain(index) {
         }
         var list_div_id = name_key + "_div";
         $(".main_div").append('<div class="generated_div" id=\"' + list_div_id + '\"></div>');
-        $("#" + list_div_id).prepend('<h2><a class="generated_div_title">' + name_key + '</a></h2>');
+        $("#" + list_div_id).prepend('<h2><a class="generated_div_title">' + title + '</a></h2>');
         $("#" + list_div_id).append('<ul class="generated_list ' + global_type + '" id=\"' + name_key + '_list\"></ul>');
         createEntry(name_key, global_key);
         var params = '\'' + name_key + '\',\'' + global_key + '\'';
@@ -286,11 +50,15 @@ function createEntry(name_key, global_key)
     $(list_name).append('<li class="entry_group" id=' + entry_id + '></li>');
     $(list_name + " #" + entry_id).append('<div class="entry_box_div"><ul class="entry_box_list" id="options_list_' + index + '"></ul></div>');
 
+    // console.log(global_key);
+    if(global_key == "") return;
     $.each(all_options[global_key][0], function (key, list) {
-        if(key == 'options') return;
+        // console.log(key, $.inArray(key, keywords));
+        if($.inArray(key, keywords) != -1) return;
         // console.log(key);
         $(list_name + " li #options_list_" + index).append('<li class="group_title" id=' + key.split(":")[0] + '></li>');
         var dropdown_list = $(list_name + " li").last();
+        // console.log("Sending", list);
         createDropdownElement(dropdown_list, key, list);
     });
 
@@ -331,6 +99,33 @@ function entryClick(sender, text, is_array)
     }
 }
 
+function generateRecursiveListCall(source, key, layer) {
+    var list = "";
+    // console.log("Key", key);
+    if(source == undefined) return list;
+    $.each(source, function (sub_key, group) {
+        if($.inArray(sub_key, keywords) != -1) return list;
+        if($.type(group) == "string") {
+            // console.log(">", key + "." + group, group);
+            list += "," + key;
+            if(group != "" ) list += "." + group;
+        }
+        else {
+            var next_key = sub_key;
+            if($.isNumeric(sub_key)) next_key = key;
+            else if(key != "") next_key = key + "." + next_key;
+            // console.log(">>", next_key);
+            list += generateRecursiveListCall(group, next_key, layer + 1);
+        }
+    });
+    return list;
+}
+
+function generateRecursiveList(source) {
+    var recursive_list = "";
+    string_list = generateRecursiveListCall(source, "", 0);
+    return string_list.split(",");
+}
 
 function createDropdownElement(element, key, list) {
     // console.log(element, key, list);
@@ -339,7 +134,7 @@ function createDropdownElement(element, key, list) {
     var option_list_div = element.children("div");
 
     var nest_count = 0;
-    // console.log(list, list[0]['options'])
+    // console.log(list, list[0]['options'], list[0]['title'])
     if(list[0]['options'] != undefined && $.inArray(">", list[0]['options'].split(":")) >= 0) {
         var options = list[0]['options'].split(":");
         // console.log(options,$.inArray(">", options));
@@ -351,11 +146,12 @@ function createDropdownElement(element, key, list) {
     option_list_div.append('<p class="entry_list_title" id="' + nest_count + '">' + key + ':</p>');
 
     var list_head = list[0];
-    if($.type(list_head) != "string") {
+    if($.type(list_head) != "string" || list_head == "NONE") {
         list_head = list[1];
         // console.log("head", list_head, $.type(list_head));
     }
     var is_array = list_head.includes("array");
+    // console.log(list, list_head, $.type(list_head), is_array);
     option_list_element = option_list_div
     if(is_array) {
         option_list_div.append('<ul class="entry_array"><li class="entry_array_element"></li</ul>');
@@ -364,18 +160,56 @@ function createDropdownElement(element, key, list) {
     option_list_element.append('<a class="btn dropdown-toggle entry_text" id="' + btn_id + '" type="button" data-toggle="dropdown">+</a>');
 
     var tie_check = list_head.indexOf(":.");
+
     if(tie_check >= 0) {
+        var valid_tie = false;
+        var ii = 0;
         var tie_path = list_head.substring(tie_check+2, list_head.length).split(".");
-        var sub_list = all_options;
-        var last_path_key = "";
-        $.each(tie_path, function (i, path_key) {
-            if(sub_list[path_key] == undefined) return;
-            sub_list = sub_list[path_key];
-            // console.log(tie_path, path_key, sub_list);
-            if(i < tie_path.length - 1 && sub_list[0] != undefined)
-            sub_list = sub_list[0];
-            last_path_key = path_key;
-        });
+        while(!valid_tie && ii < 2) {
+            var sub_list = all_options;
+            var last_path_key = "";
+            // console.log(valid_tie, ii, tie_path);
+            var need_break = false;
+            $.each(tie_path, function (i, path_key) {
+                if(need_break) return;
+
+                if(path_key == "") {
+                    sub_list = generateRecursiveList(sub_list);
+                    list.splice(i-1,1);
+                    sub_list.splice(0,1);
+                    // console.log(list, list.splice(i-1,1))
+                    // console.log(sub_list, sub_list.splice(0,1));
+                    sub_list = $.merge(list,sub_list);
+                    // console.log(list);
+
+                    need_break = true;
+                    valid_tie = true;
+                }
+                else {
+                    // console.log("Path key", i, path_key);
+                    if(sub_list[path_key] == undefined) return;
+                    sub_list = sub_list[path_key];
+                    if(i < tie_path.length - 1 && sub_list[0] != undefined) {
+                        sub_list = sub_list[0];
+                    }
+                    if(sub_list[0] != undefined && $.type(sub_list[0]) == "string" && sub_list[0].includes(":.")) {
+
+                        tie_check = sub_list[0].indexOf(":.");
+                        // console.log("!!!", sub_list[0], tie_check);
+                        tie_path = sub_list[0].substring(tie_check+2, sub_list[0].length).split(".");
+                        ii++;
+                        need_break = true;
+                        valid_tie = false;
+                    }
+                    else {
+                        last_path_key = path_key;
+                        valid_tie = true;
+                    }
+                }
+                // console.log("!!", valid_tie);
+            });
+            // console.log("!", valid_tie);
+        }
         // console.log(tie_path);
         // console.log("List", sub_list);
         // console.log("List[0]", $.type(sub_list[0]));
@@ -398,9 +232,14 @@ function createDropdownElement(element, key, list) {
 }
 
 function createDropdown(element, key, list, btn_id, is_array) {
+    // console.log("createDropdown", element, key, list);
     var list_head =  list[0];
     element.append('<ul class="dropdown-menu" role="menu" aria-labelledby=\"' + btn_id + '\"></ul>');
-    if(is_array && list[0] != "REMOVE") list.splice(0,0,"REMOVE");
+    if(list_head == undefined) return;
+    // console.log(">>", is_array, list_head, list);
+    if(is_array && list_head != "REMOVE") {
+        list.splice(0,0,"REMOVE");
+    }
     $.each(list, function (i, item) {
         if(item == "array") return;
         // console.log(item);
@@ -431,7 +270,7 @@ $(document).ready(function() {
 });
 
 function loadJSON() {
-    $.each(example_profile, function(group_key, group) {
+    $.each(profile, function(group_key, group) {
         // console.log(group_key, group);
         var found = false;
         var option_full_name = "";
@@ -600,187 +439,321 @@ function generateC() {
     json = generateJSON(false);
 
     var full_text = c_header;
+    full_text += generateOptions() + "\n";
     var collection = {};
 
     $.each(json, function (group_key, group) {
         var section_text = "";
         var include_group = false;
-        $.each(all_options, function(option_group_key, option_group) {
-            // console.log(option_group_key, option_group[0]['options'], option_group[0]['options'].includes("~"));
-            if(option_group_key.includes(group_key)
-            && option_group[0]['options'] != undefined
-            && option_group[0]['options'].includes("~"))
-            include_group = true;
-        });
-        // console.log(group)
-        group_key = deplural(group_key);
+        var title = group_key;
+        var option_group = "";
+        var wrap = "";
 
-        // console.log(group_key);
-        full_text += "\/\* " + group_key + " \*\/\n";
+        $.each(all_options, function(option_group_key, option_group_inner) {
+            if(include_group) return;
+            // console.log(group_key, option_group_key, option_group_inner[0]['options']);
+            if(option_group_key == group_key
+            && option_group_inner[0]['options'] != undefined
+            && option_group_inner[0]['options'].includes('~')) {
+                include_group = true;
+
+                wrap = option_group_inner[0]['options'].split('~');
+                wrap = wrap[wrap.length-1];
+            }
+
+            if(option_group_key == group_key
+            && option_group_inner[0]['title'] != undefined) {
+                title = option_group_inner[0]['title'];
+            }
+            // console.log(option_group_key, group_key, option_group_inner[0]['title'], title)
+            if(option_group_key == group_key) {
+                option_group = option_group_inner[0];
+                // console.log(option_group);
+            }
+        });
+
+        // console.log(group)
+        // group_key = deplural(group_key);
+        //
+        // console.log(group_key, group);
+
+        full_text += "\/\* " + title + " \*\/\n";
         switch (group["type"]) {
             case "list":
-            $.each(group, function (entry_key, entry) {
-                if(!$.isPlainObject(entry)) return;
-                section_text = "";
-                var full_group_name = "";
-                var found_definition = false;
-                $.each(entry, function (list_key, list) {
-                    if(!$.isPlainObject(list)) return;
-                    found_definition = true;
-                    full_group_name = group_key + "_" + list_key;
-                    section_text += "#define " + full_group_name + " { ";
+                $.each(group, function (entry_key, entry) {
+                    if(!$.isPlainObject(entry)) return;
+                    section_text = "";
+                    var full_group_name = "";
+                    var found_definition = false;
+                    $.each(entry, function (list_key, list) {
+                        if(!$.isPlainObject(list)) return;
+                        found_definition = true;
+                        full_group_name = group_key + "_" + list_key;
+                        section_text += "#define " + full_group_name + " { ";
 
-                    $.each(list, function (i, list_item) {
-                        // console.log(list_item);
-                        section_text += list_item;
-                        if(i < Object.keys(list).length - 1)
-                        section_text += ", ";
-                    });
-                    section_text += " }\n";
-                    // console.log(full_group_name);
-                    // collection[group_key].push(full_group_name);
-                });
-                if(!found_definition) return;
-                full_text += section_text;
-            });
-            full_text += "\n";
-            break;
-            case "group":
-            if(include_group)
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                section_text = "";
-                // console.log("entry", entry_key, entry);
-                var group_item_names = {};
-                if(!$.isPlainObject(entry)) return;
-                var group_name = entry_key;
-                var i = 0;
-                // console.log(entry_key);
-                $.each(entry, function (item_key, item) {
-                    if($.isPlainObject(item)) {
-                        console.log("Group should not have internal list.");
-                    }
-                    else {
-                        if(item_key != "NAME") {
-                            section_text += "#define " + group_name + "_" + item_key + " " + item + "\n";
-                            group_item_names[i++] = (group_name + "_" + item_key);
+                        var group_prefix = "";
+                        // console.log(list_key, option_group[list_key].length);
+                        for(var j = 0; j < option_group[list_key].length; j++) {
+                            if(option_group[list_key] != undefined
+                                && option_group[list_key][j] != undefined
+                                && option_group[list_key][j].split(':')[1] != undefined) {
+                                var option_path = option_group[list_key][j].split(':')[1];
+                                group_prefix = option_path.substring(1, option_path.length).replace('.',"_") + "_";
+                                break;
+                            }
                         }
-                        else {
-                            group_name = item;
-                        }
-                    }
-                });
-                if(group_name == "") return;
-                section_text += "#define " + group_name + "_" + group_key + " { ";
-                $.each(group_item_names, function (i, group_item) {
-                    section_text += group_item;
-                    if( i < Object.keys(group_item_names).length - 1)
-                    section_text += ", ";
-                });
-                section_text += " }\n\n";
-                if(include_group)
-                collection[group_key].push(group_name + "_" + group_key);
-                full_text += section_text;
-            });
-            break;
-            case "struct":
-            // console.log("include", include_group, group_key)
-            if(include_group)
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                section_text = "";
-                var id = "";
-                if(!$.isPlainObject(entry)) return;
-                $.each(entry, function (item_key, item) {
-                    if($.isPlainObject(item)) {
-                        section_text += "\t." + item_key + " = { ";
-                        $.each(item, function (i, list_item) {
+
+                        $.each(list, function (i, list_item) {
                             // console.log(list_item);
-                            list_item = list_item.replace("_ID", "");
-                            if(list_item == "" ) section_text += "NONE";
-                            else section_text += list_item;
-                            if(i < Object.keys(item).length - 1)
+                            section_text += group_prefix + list_item;
+                            if(i < Object.keys(list).length - 1)
                             section_text += ", ";
                         });
-                        section_text += " }, \\\n";
-                    }
-                    else {
-                        if(item_key == "ID") {
-                            id = item;
-                            var macro_name = item.replace("_ID", "");
-                            section_text += "#define " + macro_name + " { \\\n";
-                            if(include_group)
-                            collection[group_key].push(macro_name);
+                        section_text += " }\n";
+                    });
+                    if(!found_definition) return;
+                    full_text += section_text;
+                });
+                full_text += "\n";
+                break;
+            case "group":
+                if(include_group)
+                collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    section_text = "";
+                    // console.log("entry", entry_key, entry);
+                    var group_item_names = {};
+                    if(!$.isPlainObject(entry)) return;
+                    var group_name = entry_key;
+                    var i = 0;
+                    // console.log(entry_key);
+                    $.each(entry, function (item_key, item) {
+                        if($.isPlainObject(item)) {
+                            console.log("Group should not have internal list.");
                         }
-                        section_text += "\t." + item_key + " = ";
-                        if(item == "" ) section_text += "NONE";
-                        else section_text += item;
-                        if(item_key != Object.keys(entry)[Object.keys(entry).length-1]) {
-                            section_text += ",";
+                        else {
+                            if(item_key != "NAME") {
+                                // console.log(group_key, entry_key, entry, item_key, item);
+                                var element_name = item.replace(item_key, '');
+                                if(!item_key.toLowerCase().includes("pin") && !item_key.toLowerCase().includes("addr") ) {
+                                    element_name = group_key + "_" + item_key + "_" + element_name;
+                                }
+                                section_text += "#define " + group_name + "_" + item_key + " " + element_name + "\n";
+                                group_item_names[i++] = (group_name + "_" + item_key);
+                            }
+                            else {
+                                group_name = item;
+                            }
                         }
+                    });
+                    if(group_name == "") return;
+                    section_text += "#define " + group_name + "_" + group_key + " { ";
+                    $.each(group_item_names, function (i, group_item) {
+                        section_text += group_item;
+                        if( i < Object.keys(group_item_names).length - 1)
+                        section_text += ", ";
+                    });
+                    section_text += " }\n\n";
+                    if(include_group)
+                    collection[group_key].push(group_name + "_" + group_key);
+                    full_text += section_text;
+                });
+                break;
+            case "struct":
+                // console.log("include", include_group, group_key)
+                if(include_group) {
+                    collection[group_key] = [];
+                }
+                $.each(group, function (entry_key, entry) {
+                    section_text = "";
+                    var id = "";
+                    if(!$.isPlainObject(entry)) return;
+                    $.each(entry, function (item_key, item) {
+                        if($.isPlainObject(item)) {
+                            section_text += "\t";
+                            if(wrap == "") {
+                                section_text += "." + item_key + " = "
+                            }
+                            section_text += "{ ";
+                            var group_prefix = "";
+                            // console.log(option_group, entry_key, entry, option_group[item_key], item_key);
+                            // console.log()
+                            for(var j = 0; j < option_group[item_key].length; j++) {
+                                if(option_group[item_key] != undefined
+                                    && option_group[item_key][j] != undefined
+                                    && option_group[item_key][j].split(':')[1] != undefined) {
+                                    var option_path = option_group[item_key][j].split(':')[1];
+                                    group_prefix = option_path.substring(1, option_path.length).replace('.',"_") + "_";
+                                    break;
+                                }
+                            }
+
+                            $.each(item, function (i, list_item) {
+                                // console.log(group_key, group, list_item);
+                                if(list_item == "") section_text += "NONE";
+                                else section_text += group_prefix + list_item;
+                                if(i < Object.keys(item).length - 1)
+                                section_text += ", ";
+                            });
+                            section_text += " }, \\\n";
+                        }
+                        else {
+                            if(item_key == "ID") {
+                                id = item;
+                                var macro_name = item.replace("_ID", "");
+                                section_text += "#define " + group_key + "_" + macro_name + " ";
+                                if(wrap != "") {
+                                    section_text += group_key + "(";
+                                }
+                                else {
+                                    section_text += "{";
+                                }
+                                section_text += " \\\n";
+                                if(include_group) {
+                                    collection[group_key].push(macro_name);
+                                }
+                            }
+                            section_text += "\t";
+                            if(wrap == "") {
+                                section_text += "." + item_key + " = ";
+                            }
+                            if(item == "" ) section_text += "NONE";
+                            else if(item_key.includes('num_')) {
+                                section_text += item;
+                            }
+                            else {
+                                if(item_key == item_key.toUpperCase()) section_text +=  group_key + "_" + item_key + "_";
+                                section_text += item;
+                            }
+
+                            // console.log(item_key);
+                            if(item_key != Object.keys(entry)[Object.keys(entry).length-1]) {
+                                section_text += ",";
+                            }
+                            section_text += " \\\n";
+                        }
+                    });
+                    if(id == "") return;
+                    if(wrap != "") section_text += ")";
+                    else section_text += "}";
+                    section_text += "\n\n";
+                    full_text += section_text;
+                });
+                break;
+            case "nested":
+                collection[group_key] = [];
+                $.each(group, function (entry_key, entry) {
+                    // console.log(":", entry);
+                    if($.isPlainObject(entry)) {
+                        section_text += "\t\t{ \\\n";
+                        $.each(entry, function (list_key, list) {
+                            if($.isPlainObject(list)) {
+                                if($.isNumeric(Object.keys(list)[0])) {
+                                    section_text += "\t\t\t{ \/* " + list_key + " *\/ \\\n";
+                                    $.each(list, function (item_key, item) {
+                                        // console.log(group_key, list_key, item_key, item);
+                                        var group_prefix = "";
+                                        for(var j = 0; j < option_group[list_key].length; j++) {
+                                            if(option_group[list_key] != undefined
+                                                && option_group[list_key][j] != undefined
+                                                && $.type(option_group[list_key][j]) != "object"
+                                                && option_group[list_key][j].split(':')[1] != undefined) {
+                                                var option_path = option_group[list_key][j].split(':')[1];
+                                                group_prefix = option_path.substring(1, option_path.length).replace('.',"_") + "_";
+                                                // console.log(group_prefix);
+                                                break;
+                                            }
+                                        }
+
+                                        section_text += "\t\t\t\t" + group_prefix + item;
+                                        // console.log(parseInt(item_key), Object.keys(list).length);
+                                        if(parseInt(item_key) < Object.keys(list).length - 1) {
+                                            section_text += ",";
+                                        }
+                                        section_text += " \\\n";
+                                    });
+                                    section_text += "\t\t\t}, \\\n";
+                                }
+                                else if(Object.keys(list).length > 0) {
+                                    section_text += "\t\t\t{ \\\n";
+                                    $.each(list, function (item_key, item) {
+                                        if($.isPlainObject(item) || ( item == "" && $.type(item) == "string" )) {
+                                            var group_prefix = "";
+                                            for(var j = 0; j < option_group[item_key].length; j++) {
+                                                if(option_group[item_key] != undefined
+                                                    && option_group[item_key][j] != undefined
+                                                    && $.type(option_group[item_key][j]) != "object"
+                                                    && option_group[item_key][j].split(':')[1] != undefined) {
+                                                    var option_path = option_group[item_key][j].split(':')[1];
+                                                    group_prefix = option_path.substring(1, option_path.length).replace('.',"_") + "_";
+                                                    // console.log(group_prefix);
+                                                    break;
+                                                }
+                                            }
+
+                                            section_text += "\t\t\t\t{ \/* " + item_key + " *\/ \\\n";
+
+                                            $.each(item, function (nested_key, nested) {
+                                                section_text += "\t\t\t\t\t" + group_prefix + nested;
+                                                if(nested_key != Object.keys(item)[Object.keys(item).length-1])
+                                                section_text += ",";
+                                                section_text += " \\\n";
+                                            });
+                                            section_text += "\t\t\t\t}, \\\n";
+                                        }
+                                        else {
+                                            var group_prefix = "";
+                                            if($.isNumeric(item)) {
+                                            }
+                                            else if(option_group[item_key] != undefined) {
+                                                for(var j = 0; j < option_group[item_key].length; j++) {
+                                                    if(option_group[item_key] != undefined
+                                                        && option_group[item_key][j] != undefined
+                                                        && $.type(option_group[item_key][j]) != "object"
+                                                        && option_group[item_key][j].split(':')[1] != undefined) {
+                                                        var option_path = option_group[item_key][j].split(':')[1];
+                                                        group_prefix = option_path.substring(1, option_path.length).replace('.',"_") + "_";
+                                                        break;
+                                                    }
+                                                    else {
+                                                        group_prefix = item_key + "_";
+                                                    }
+                                                }
+                                            }
+                                            comment = item_key;
+                                            if( group_prefix != "" && !item_key.includes(group_key) ) {
+                                                // console.log(group_prefix, group_key, item_key);
+                                                group_prefix = group_key + "_" + group_prefix;
+                                                comment = group_prefix.substring(0, group_prefix.length-1);
+                                            }
+                                            section_text += "\t\t\t\t" + group_prefix + item + ", \/* " + comment + " *\/ \\\n";
+                                        }
+                                    });
+                                    section_text += "\t\t\t}, \\\n";
+                                }
+                            }
+                            else {
+                                // console.log(group_prefix, group_key, list_key, list);
+                                var group_prefix = "";
+                                var comment = list_key;
+                                if(list_key == "NAME") {
+                                    group_prefix = group_key + "_" + list_key + "_";
+                                    comment = group_key + "_" + comment;
+                                }
+                                section_text += "\t\t\t" + group_prefix + list + ", \/* " + comment + " *\/ \\\n";
+                            }
+                        });
+                        // section_text += ">\t\t\t},\n";
+                        section_text += "\t\t}";
+                        if(entry_key != Object.keys(group)[Object.keys(group).length-1])
+                        section_text += ","
                         section_text += " \\\n";
                     }
                 });
-                if(id == "") return;
-                section_text += "}\n\n";
-                full_text += section_text;
-            });
-            break;
-            case "nested":
-            collection[group_key] = [];
-            $.each(group, function (entry_key, entry) {
-                // console.log(":", entry);
-                if($.isPlainObject(entry)) {
-                    section_text += "\t\t{ \\\n";
-                    $.each(entry, function (list_key, list) {
-                        if($.isPlainObject(list)) {
-                            if($.isNumeric(Object.keys(list)[0])) {
-                                section_text += "\t\t\t{ \/* " + list_key + " *\/ \\\n";
-                                $.each(list, function (item_key, item) {
-                                    section_text += "\t\t\t\t" + item;
-                                    // console.log(parseInt(item_key), Object.keys(list).length);
-                                    if(parseInt(item_key) < Object.keys(list).length - 1) {
-                                        section_text += ",";
-                                    }
-                                    section_text += " \\\n";
-                                });
-                                section_text += "\t\t\t}, \\\n";
-                            }
-                            else if(Object.keys(list).length > 0) {
-                                section_text += "\t\t\t{ \\\n";
-                                $.each(list, function (item_key, item) {
-                                    if($.isPlainObject(item) || ( item == "" && $.type(item) == "string" )) {
-                                        section_text += "\t\t\t\t{ \/* " + item_key + " *\/ \\\n";
-                                        $.each(item, function (nested_key, nested) {
-                                            section_text += "\t\t\t\t\t" + nested;
-                                            if(nested_key != Object.keys(item)[Object.keys(item).length-1])
-                                            section_text += ",";
-                                            section_text += " \\\n";
-                                        });
-                                        section_text += "\t\t\t\t}, \\\n";
-                                    }
-                                    else {
-                                        section_text += "\t\t\t\t" + item + ", \\\n";
-                                    }
-                                });
-                                section_text += "\t\t\t}, \\\n";
-                            }
-                        }
-                        else {
-                            section_text += "\t\t\t" + list + ", \/* " + list_key + " *\/ \\\n";
-                        }
-                    });
-                    // section_text += ">\t\t\t},\n";
-                    section_text += "\t\t}";
-                    if(entry_key != Object.keys(group)[Object.keys(group).length-1])
-                    section_text += ","
-                    section_text += " \\\n";
-                }
-            });
-            // section_text += "\t\t}";
-            // console.log(section_text);
-            collection[group_key].push(section_text);
-            break;
+                // section_text += "\t\t}";
+                // console.log(section_text);
+                collection[group_key].push(section_text);
+                break;
             default:
         }
         // if(section_text != "")
@@ -789,6 +762,7 @@ function generateC() {
 
     section_text = "#define PROFILE_TEMPLATE \\\n{ \\\n"
     $.each(collection, function (group_key, group) {
+        // console.log(group_key);
         section_text += "\t{ \/* " + group_key.split(":")[0] + " *\/ \\\n";
         if(!group[0].includes("{")) {
             section_text += "\t\t" + group.length + ", \\\n";
@@ -797,9 +771,17 @@ function generateC() {
         // section_text += "\t\t\t{\n";
         $.each(group, function(i, group_item) {
             // console.log("A", group_item);
-            if(!group[0].includes("{"))
-            section_text += "\t\t\t";
-            section_text += group_item;
+            if(!group[0].includes("{")) {
+                section_text += "\t\t\t";
+            }
+            // console.log(group_item, group_key);
+            if(!group_item.includes("{")
+                && !group_item.includes(group_key)) {
+                section_text += group_key + "_" + group_item;
+            }
+            else {
+                section_text += group_item;
+            }
 
             if(!group[0].includes("{")) {
                 if(i < group.length-1) section_text +=",";
@@ -812,8 +794,9 @@ function generateC() {
         }
         // }
         section_text += "\t}";
-        if(group_key != Object.keys(collection)[Object.keys(collection).length-1])
-        section_text += ", ";
+        if(group_key != Object.keys(collection)[Object.keys(collection).length-1]) {
+            section_text += ", ";
+        }
         section_text += " \\\n";
     });
     section_text += "};\n";
@@ -830,6 +813,133 @@ function generateC() {
         $(".full_text").remove();
         $(".text_display").remove();
     });
+}
+
+function generateOptions() {
+    var full_text = "";
+    $.each(all_options, function(global_key, global_item) {
+        if(global_item[0]['options'] == undefined) return;
+        var option_type = global_item[0]['options'].split(':')[0];
+        if(option_type == 'list' || option_type == 'hidden') return;
+
+        $.each(global_item[0], function(item_key, item_element) {
+            // console.log(item_key, item_element);
+            if($.inArray(item_key, keywords) != -1 || item_key == item_key.toLowerCase()) return;
+            var section_text = "typedef enum\n{\n";
+
+            var element_name = global_key + "_" + item_key;
+
+            var first = true;
+            // console.log(item_element);
+            var assignments = [];
+            var num = "";
+            $.each(item_element, function(list_item_key, list_item) {
+                if($.type(list_item) == "object" && list_item['assign'] != undefined) {
+                    assignments = list_item['assign'].split(":");
+                    return;
+                }
+                else if($.type(list_item) == "object" || list_item.includes(':.')) return;
+                else if(list_item.includes('enter') || list_item.includes('array') || list_item.includes('REMOVE')) return;
+                var list_element_name = "\t" + element_name + "_" + list_item.replace(item_key, '');
+                // console.log(list_element_name);
+                section_text += list_element_name;
+                if(first)
+                    section_text += " = 0";
+                var offset = 1;
+                if($.type(item_element[Object.keys(item_element).length-1]) == "object"
+                && item_element[Object.keys(item_element).length-1]['assign'] != undefined) {
+                    offset = 2;
+                }
+                if(list_item_key != Object.keys(item_element)[Object.keys(item_element).length-offset]) {
+                    section_text += ",";
+                }
+                else {
+                    num = "NUM_" + element_name;
+                    section_text += ",\n\t" + num;
+                }
+                section_text += "\n";
+                first = false;
+            });
+
+            section_text += "} " + element_name;
+
+            // console.log(assignments);
+            $.each(assignments, function(i, assignment) {
+                if(i >= 1) {
+                    if(assignment == assignment.toLowerCase()) {
+                        assignment = assignments[0].toLowerCase() + "_" + assignment;
+                    }
+                    if(assignment == assignment.toUpperCase()) {
+                        assignment = assignments[0].toUpperCase() + "_" + assignment;
+                    }
+                }
+                section_text += ", " + assignment;
+            });
+            section_text += ";\n";
+
+            if(num != "" && assignments.length > 0 && assignments[0] == assignments[0].toUpperCase()) {
+                section_text += "#define " + "NUM_" + assignments[0] + " " + num + "\n";
+            }
+
+            if(!first)
+                full_text += section_text + "\n";
+        });
+
+        // Debug loop
+        $.each(global_item[0], function(item_key, item_element) {
+            if($.type(item_element) == "string") return;
+            // console.log(item_key, item_element);
+            if(item_key == item_key.toLowerCase()) return;
+
+            var assignments = [];
+            var element_name = global_key + "_" + item_key;
+
+            var section_text = "#ifdef DEBUG\n"
+            + "static const char * " + element_name + "_STRINGS[] = \n{\n";
+
+            var first = true;
+            $.each(item_element, function(list_item_key, list_item) {
+                if($.type(list_item) == "object" && list_item['assign'] != undefined) {
+                    assignments = list_item['assign'].split(":");
+                    return;
+                }
+                if($.type(list_item) == "object" || list_item.includes(':.')) return;
+                else if(list_item.includes('enter') || list_item.includes('array') || list_item.includes('REMOVE')) return;
+                var list_element_name = "\t\"" + element_name + "_" + list_item.replace(item_key, '') + "\"";
+                // console.log(list_element_name);
+                section_text += list_element_name;
+                var offset = 1;
+                if($.type(item_element[Object.keys(item_element).length-1]) == "object"
+                && item_element[Object.keys(item_element).length-1]['assign'] != undefined) {
+                    offset = 2;
+                }
+                if(list_item_key != Object.keys(item_element)[Object.keys(item_element).length-offset]) {
+                    section_text += ",";
+                }
+                section_text += "\n";
+                first = false;
+            });
+
+            section_text += "};\n";
+
+            $.each(assignments, function(i, assignment) {
+                // console.log(i, assignment);
+                if(assignment == assignment.toLowerCase()) return;
+                if(i >= 1) {
+                    if(assignment == assignment.toUpperCase()) {
+                       assignment = assignments[0].toUpperCase() + "_" + assignment;
+                    }
+                }
+                section_text += "#define " + assignment + "_STRINGS " + element_name + "_STRINGS\n";
+            });
+            section_text += "#endif\n";
+
+            if(!first)
+                full_text += section_text + "\n";
+        });
+    });
+    // console.log(full_text);
+    return full_text;
 }
 
 function deplural(str) {

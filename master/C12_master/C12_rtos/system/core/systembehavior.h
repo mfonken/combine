@@ -24,7 +24,7 @@ void SystemBehavior_PerformInterrupterSend( system_task_id_t );
 void SystemBehavior_PerformInterrupterReceive( system_task_id_t, hw_event_message_t );
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t );
 
-void InitProfileEntry( system_profile_entry_t * );
+void InitTask( system_task_id_t );
 
 typedef struct
 {
@@ -38,7 +38,7 @@ typedef struct
 
 typedef struct
 {
-    void (*InitEntry)( system_profile_entry_t * );
+    void (*InitTask)( system_task_id_t );
     behavior_perform_functions Perform;
 } behavior_functions;
 
@@ -79,6 +79,8 @@ static void ComponentInterrupt( port_t port, pin_t pin, hw_edge_t edge )
     if( component_number >= 0 )
     {
         hw_event_message_t message = { port, pin, edge };
+        
+#warning Fix to handle task array
         BehaviorFunctions.Perform.Interrupter.Receive( System.registration.component_tasks[component_number], message );
     }
 }

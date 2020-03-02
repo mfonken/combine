@@ -13,7 +13,7 @@
 #include "systemtypes.h"
 
 #define SYSIOCTL_NUM_CS_FAMILY 8
-#define SYSIOCTL_NUM_FAMILIES sizeof(system_family_t)*8
+#define SYSIOCTL_NUM_FAMILIES NUM_SYSTEM_COMPONENT_FAMILY//sizeof(system_family_t)*8
 #define SYSIOCTL_MAX_COMPONENTS_PER_FAMILY 6
 #define SYSIOCTL_MAX_COMPONENTS SYSIOCTL_NUM_FAMILIES * SYSIOCTL_MAX_COMPONENTS_PER_FAMILY
 #define PROTOCOL_ID_NULL 0
@@ -49,7 +49,7 @@ void SYSIOCTL_Enable_Family( system_family_t );
 void SYSIOCTL_Disable_Family( system_family_t );
 void SYSIOCTL_Enable_Component( component_t * );
 void SYSIOCTL_Disable_Component( component_t * );
-uint8_t SYSIOCTL_Generate_ID( protocol_id_base_t );
+generic_id_t SYSIOCTL_Generate_ID( protocol_id_base_t );
 //void * SYSIOCTL_Get_Component_Callback( component_t * );
 
 typedef struct
@@ -63,24 +63,11 @@ typedef struct
     void (*DisableFamily)( system_family_t );
     void (*EnableComponent)( component_t * );
     void (*DisableComponent)( component_t * );
-    uint8_t (*GenerateID)( protocol_id_base_t );
+    generic_id_t (*GenerateID)( protocol_id_base_t );
 //    void * (*GetCallback)( component_t * );
 } sysioctl_functions;
 
-static sysioctl_functions SysIOCtlFunctions =
-{
-    .Init = SYSIOCTL_Init,
-    .InitComponent = SYSIOCTL_Init_Component,
-    .Get = SYSIOCTL_Get_Component,
-    .Tie = SYSIOCTL_Tie_Component,
-    .Push = SYSIOCTL_Push_Component,
-    .EnableFamily = SYSIOCTL_Enable_Family,
-    .DisableFamily = SYSIOCTL_Disable_Family,
-    .EnableComponent = SYSIOCTL_Enable_Component,
-    .DisableComponent = SYSIOCTL_Disable_Component,
-    .GenerateID = SYSIOCTL_Generate_ID,
-//    .GetCallback = SYSIOCTL_Get_Component_Callback
-};
+extern sysioctl_functions SysIOCtlFunctions;
 
 typedef struct
 {

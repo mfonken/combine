@@ -22,7 +22,8 @@ void GetBatteryMonitorBasic( comm_host_t * host, battery_monitor_basic_t * buffe
     buffer->voltage = STCFunctions.GetVoltage( host );
 }
 
-void SetBatteryMonitorMode( comm_host_t * host, uint8_t mode )
+void SetBatteryMonitorMode( comm_host_t * host )
 {
-    
+    uint8_t mode = *(uint8_t *)host->generic_comm_host.buffer;
+    printf("Setting to %d\n", mode);
 }

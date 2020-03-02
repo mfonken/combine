@@ -12,7 +12,7 @@
 #include "BNO080.h"
 #include "quaternion.h"
 
-#define IMU_DEFAULT_COMM_PROTOCOL SYSTEM_COMM_PROTOCOL_SPI
+#define IMU_DEFAULT_COMPONENT_PROTOCOL SYSTEM_COMPONENT_PROTOCOLSPI
 
 typedef enum
 {
@@ -24,8 +24,8 @@ typedef uint8_t imu_feature_t;
 
 typedef struct
 {
-    component_id_t ID;
     shtp_client_t client;
+    component_id_t ID;
     imu_chip_t chip;
     rotation_vector_t rotation;
     uint32_t sensor_specific_metadata;
@@ -51,7 +51,7 @@ typedef struct
     bool (*Read)( shtp_client_t * );
     bool (*Refresh)( shtp_client_t * );
     bool (*RotVec)( imu_t * );
-    void (*GenerateClient)( shtp_client_t *, uint8_t, uint32_t );
+    void (*GenerateClient)( shtp_client_t *, uint8_t, void * );
 } imu_functions;
 
 static const imu_functions IMUFunctions =

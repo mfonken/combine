@@ -40,7 +40,8 @@ typedef struct
     uint32_t timestamp;
 } rotation_vector_t;
 
-typedef comm_host_t shtp_client_comm_host;
+//typedef comm_host_t shtp_client_comm_host;
+
 //typedef struct
 //{
 //comm_protocol
@@ -83,33 +84,40 @@ typedef struct
     SH2_SENSOR_REPORT_ID type;
 } shtp_client_output;
 
+
 typedef struct
 {
-    shtp_client_comm_host host;
     shtp_client_buffer buffer;
     shtp_client_product_id product;
     shtp_client_output output;
+    void * data;
     uint8_t
         ID,
         sequence_number;
 } shtp_client_t;
 
-static void SHTP_GenerateSH2Client( shtp_client_t * client,
+typedef struct
+{
+    comm_host_t comm_host;
+    shtp_client_t shtp_client;
+} shtp_client_comm_host_t;
+
+static void SHTP_GenerateSH2Client( shtp_client_comm_host_t * host,
                                     uint8_t ID, uint8_t sequence_number,
-                                    shtp_client_comm_host * host,
                                     shtp_client_buffer * buffer,
                                     shtp_client_product_id * product,
-                                    shtp_client_output * output )
+                                    shtp_client_output * output,
+                                    void * data)
 {
-    client->ID = ID;
-    client->sequence_number = sequence_number;
-    memcpy( (void *)&client->host, host, sizeof(shtp_client_comm_host) );
-    memcpy( (void *)&client->buffer, buffer, sizeof(shtp_client_buffer) );
-    memcpy( (void *)&client->product, product, sizeof(shtp_client_product_id) );
-    memcpy( (void *)&client->output, output, sizeof(shtp_client_output) );
+    host->shtp_client.ID = ID;
+    host->shtp_client.sequence_number = sequence_number;
+    memcpy( (void *)&host->shtp_client.buffer, buffer, sizeof(shtp_client_buffer) );
+    memcpy( (void *)&host->shtp_client.product, product, sizeof(shtp_client_product_id) );
+    memcpy( (void *)&host->shtp_client.output, output, sizeof(shtp_client_output) );
+    host->shtp_client.data = data;
 }
 
-static shtp_client_t * active_client;
+static shtp_client_comm_host_t * active_client;
 
 typedef enum
 {
@@ -198,10 +206,10 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_READ_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_READ_REG, l, d }; }
-static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_WRITE_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->host, COMM_WRITE_REG, l, d }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->comm_host, COMM_READ_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->comm_host, COMM_READ_REG, l, d }; }
+static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &active_client->comm_host, COMM_WRITE_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &active_client->comm_host, COMM_WRITE_REG, l, d }; }
 
 typedef struct
 {
@@ -238,10 +246,10 @@ typedef struct
     
     void (*GenerateClient)( shtp_client_t *,
                             uint8_t, uint8_t,
-                            shtp_client_comm_host *,
                             shtp_client_buffer *,
                             shtp_client_product_id *,
-                            shtp_client_output * );
+                            shtp_client_output *,
+                            void * );
 } shtp_functions;
 
 static const shtp_functions SHTPFunctions =
