@@ -90,8 +90,10 @@ typedef OS_Q queue_t;
 /***                               Enums Start                                    ***/
 /************************************************************************************/
 
+typedef application_comm_protocol_t system_comm_protocol_t;
 typedef application_state_t system_state_t;
 typedef application_activity_t system_activity_t;
+typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
 
 typedef enum
 {
@@ -173,8 +175,9 @@ typedef SPI_TypeDef SPI_Channel;
 
 typedef struct
 {
+system_comm_protocol_t
+    protocol:8;
 uint8_t
-    protocol:8,
     address:8;
 void *
     device;
@@ -238,8 +241,6 @@ uint8_t
     {
         frequency_t
         schedule;
-        INTERRUPT_ACTION
-        action;
         uint8_t
         info[4];
     } data;
@@ -256,8 +257,9 @@ os_task_data_t
 
 typedef struct
 {
+system_task_shelf_entry_id_t
+    ID;
 uint8_t
-    ID,
     num_interrupts;
 system_task_id_t
     interrupts[MAX_INTERRUPTS];
@@ -383,14 +385,12 @@ typedef struct
 typedef struct
 {
     system_state_t          state, prev_state, exit_state;
-//    os_task_list_t          os_tasks;
     system_activity_t       activity;
     system_subactivity_id_t subactivity;
     system_error_buffer_t   error;
     system_consumption_t    consumption_level;
-//    system_subactivity_map_t subactivity_map;
-    system_profile_t       *profile;
     system_registration_log_t registration;
+    system_profile_t       *profile;
 } system_master_t;
 /************************************************************************************/
 

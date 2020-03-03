@@ -31,6 +31,8 @@ function createMain(index) {
         $(".main_div").append('<div class="generated_div" id=\"' + list_div_id + '\"></div>');
         $("#" + list_div_id).prepend('<h2><a class="generated_div_title">' + title + '</a></h2>');
         $("#" + list_div_id).append('<ul class="generated_list ' + global_type + '" id=\"' + name_key + '_list\"></ul>');
+        // console.log($("#" + list_div_id + " ul"));
+        $("#" + list_div_id + " ul").sortable();
         createEntry(name_key, global_key);
         var params = '\'' + name_key + '\',\'' + global_key + '\'';
         $("#" + list_div_id).append('<div class="add_btn_div"><a class="icon_btn add_btn" onclick="createEntry(' + params + ')" ><i class="fa fa-plus"></i></a></div>');

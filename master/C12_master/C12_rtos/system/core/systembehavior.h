@@ -81,7 +81,9 @@ static void ComponentInterrupt( port_t port, pin_t pin, hw_edge_t edge )
         hw_event_message_t message = { port, pin, edge };
         
 #warning Fix to handle task array
-        BehaviorFunctions.Perform.Interrupter.Receive( System.registration.component_tasks[component_number], message );
+        for( system_task_id_t i = 0; i < NUM_SYSTEM_TASK_ID; i++ )
+            if( System.registration.component_tasks[component_number][i] )
+                BehaviorFunctions.Perform.Interrupter.Receive( i, message );
     }
 }
 

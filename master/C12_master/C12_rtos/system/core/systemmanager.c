@@ -83,8 +83,8 @@ void SystemManager_PerformExitState( void )
     }
     System.prev_state = System.state;
     System.state = System.exit_state;
-    LOG_SYSTEM(SYSTEM_DEBUG, "Exiting to state: %s\n", SYSTEM_STATE_STRINGS[System.state]);
-    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state] );
+    LOG_SYSTEM(SYSTEM_DEBUG, "Exiting to state: %s(%d)\n", SYSTEM_STATE_STRINGS[System.state], (uint8_t)System.state);
+    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state-1] );
 }
 
 void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
@@ -98,11 +98,6 @@ void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
 //    else
         OS.Task.Delete( &task->os_task_data );
 }
-//void SystemManager_RegisterTaskList( os_task_list_t * task_list )
-//{
-//    memcpy(&System.os_tasks, task_list, sizeof(os_task_list_t));
-//}
-
 
 void SystemManager_PopulateTaskDataOfTask( system_task_t * task )
 {
@@ -123,7 +118,7 @@ void SystemManager_PopulateTaskDataOfTask( system_task_t * task )
 
 void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
 {
-    for(uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++)
+    for(uint8_t i = 0; i < shelf->num_tasks; i++)
     {
         system_task_shelf_entry_t * entry = &(shelf->tasks[i]);
         for( uint8_t j = 0; j < entry->num_interrupts; j++ )
@@ -132,16 +127,14 @@ void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
             SystemFunctions.Register.Task( System.profile->shelf.tasks[i].scheduled[j], true );
     }
 }
-//void SystemManager_RegisterSubactivityMap( system_subactivity_map_t * map)
-//{
-//    memcpy(&System.subactivity_map, map, sizeof(system_subactivity_map_t));
-//}
+
 void SystemManager_RegisterProfile( system_profile_t * profile )
 {
     System.profile = profile;
     SystemFunctions.Register.TaskShelf( &profile->shelf );
     SystemFunctions.Register.StateProfileList( &profile->state_profiles);
 }
+
 void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
 {    
     if(System.registration.tasks[task_id])
@@ -250,7 +243,8 @@ void SystemManager_RegisterState( system_state_t state )
     if( System.state == state ) return;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering state: %s\n", SYSTEM_STATE_STRINGS[state]);
     
-    SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.state] );
+    if( System.state != STATE_NAME_UNKNOWN )
+        SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.state] );
     System.prev_state = System.state;
     System.state = state;
     SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state] );
@@ -434,12 +428,12 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
     {
         case COMPONENT_PROTOCOL_I2C:
             comm_host.i2c_host.address = component->addr;
-            comm_host.i2c_host.device = I2C_Channels[component->route];
+            comm_host.i2c_host.device = I2C_Channels[component->route - 1];
             break;
         case COMPONENT_PROTOCOL_SPI:
             comm_host.spi_host.cs.gpio.pin = component->pin;
             comm_host.spi_host.cs.gpio.port = component->port;
-            comm_host.spi_host.device = SPI_Channels[component->route];
+            comm_host.spi_host.device = SPI_Channels[component->route - 1];
             break;
         default:
             break;

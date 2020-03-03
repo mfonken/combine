@@ -53,11 +53,6 @@ typedef struct
         active:1;
 } cs_t;
 
-static bool activeCS( cs_t cs )
-{
-    return cs.gpio.port & 0x7f;
-}
-
 typedef struct
 {
 uint8_t

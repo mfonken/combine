@@ -7,62 +7,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8DA1FB12-03D1-4964-B6FE-BC002AAB9D15"
-            shouldBeEnabled = "Yes"
+            uuid = "E5F30A56-C278-4626-AA74-082E2FFD57B6"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "C12_rtos/system/core/systembridge.h"
+            filePath = "C12_rtos/main.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
-            landmarkName = "Start()"
+            startingLineNumber = "17"
+            endingLineNumber = "17"
+            landmarkName = "main(argc, argv)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3B0259FE-F16B-4187-85AB-22B7921B347F"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "C12_rtos/system/core/systemmanager.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "394"
-            endingLineNumber = "394"
-            landmarkName = "SystemManager_InstateStateProfile(state_profile)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "B4A88E7F-CBAB-47C7-B389-0534278E25EF"
+            uuid = "B28EE892-9A79-4582-AE0A-1D5DFBB8BA6D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "C12_rtos/application/application.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "288"
-            endingLineNumber = "288">
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "Application_Start()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "14AF9D0A-C197-48AC-8206-AD54EC27E189"
-            shouldBeEnabled = "No"
+            uuid = "A25353F6-8141-40DF-889E-0A121A0D1D05"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "C12_rtos/system/core/systemmanager.c"
+            filePath = "C12_rtos/system/core/systembehavior.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
-            landmarkName = "SystemManager_PerformRoutine(routine)"
+            startingLineNumber = "86"
+            endingLineNumber = "86"
+            landmarkName = "ComponentInterrupt(port, pin, edge)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

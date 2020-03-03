@@ -1,8 +1,8 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 3/1/2020
-// Copyright © Marbl. All rights reserved.
+// Created by Combine Profile Generator v0.1 on 3/2/2020
+// Copyright Â© Marbl. All rights reserved.
 
 #ifndef C12_profile_h
 #define C12_profile_h
@@ -38,8 +38,8 @@ typedef enum
     COMPONENT_PROTOCOL_BLE,
     COMPONENT_PROTOCOL_SUB,
     NUM_COMPONENT_PROTOCOL
-} COMPONENT_PROTOCOL, APPLICATION_COMPONENT_PROTOCOL, application_comm_protocol_t;
-#define NUM_APPLICATION_COMPONENT_PROTOCOL NUM_COMPONENT_PROTOCOL
+} COMPONENT_PROTOCOL, APPLICATION_COMM_PROTOCOL, application_comm_protocol_t;
+#define NUM_APPLICATION_COMM_PROTOCOL NUM_COMPONENT_PROTOCOL
 
 typedef enum
 {
@@ -116,7 +116,7 @@ static const char * COMPONENT_PROTOCOL_STRINGS[] =
     "COMPONENT_PROTOCOL_BLE",
     "COMPONENT_PROTOCOL_SUB"
 };
-#define APPLICATION_COMPONENT_PROTOCOLSTRINGS COMPONENT_PROTOCOL_STRINGS
+#define APPLICATION_COMM_PROTOCOL_STRINGS COMPONENT_PROTOCOL_STRINGS
 #endif
 
 #ifdef DEBUG

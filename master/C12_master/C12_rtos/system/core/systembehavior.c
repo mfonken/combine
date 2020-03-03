@@ -54,7 +54,7 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
     if( task == NULL ) return;
     switch( task->ACTION )
     {
-        case  INTERRUPT_ACTION_IMMEDIATE:
+        case INTERRUPT_ACTION_IMMEDIATE:
             OS.Task.Resume( &task->os_task_data );
         case INTERRUPT_ACTION_IGNORE:
         default:

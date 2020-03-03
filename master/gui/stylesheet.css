@@ -32,6 +32,9 @@
     cursor: pointer;
 }
 
+.entry_group {
+    display: inline-block;
+}
 /* input {
     display: none !important;
 } */
