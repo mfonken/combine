@@ -12,7 +12,7 @@
 #ifdef __EMLIB__
 #define DCDC_SERVICE
 #define I2C_SERVICE
-#endif
+#endif /* __EMLIB__ */
 
 typedef enum
 {
@@ -71,8 +71,14 @@ emlib_i2c_host_t *
 uint8_t
     command,
     reg,
-    length,
-    *buffer;
+    length;
+    union _data
+    {
+        uint8_t
+            byte;
+        void *
+            buffer;
+    } data;
 } emlib_i2c_event_t, EMLIB_I2C_EVENT_T;
 
 //typedef enum
@@ -110,15 +116,17 @@ typedef bool EMLIB_SPI_TRANSFER_RETURN_T;
 
 static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV ) {};
 
-static void EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event ) {};
+static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event ) { return true; };
 static void EMLIB_PAPIInterface_I2C_Enable( emlib_i2c_event_t * event ) {};
+static void EMLIB_PAPIInterface_I2C_Disable( emlib_i2c_event_t * event ) {};
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_ReadRegister( emlib_i2c_event_t * event ) { return true; };
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event_t * event ) { return true; };
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_WriteRegister( emlib_i2c_event_t * event ) { return true; };
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_event_t * event ) { return true; };
 
-static void EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event ) {};
+static bool EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event ) { return true; };
 static void EMLIB_PAPIInterface_SPI_Enable( emlib_spi_event_t * event ) {};
+static void EMLIB_PAPIInterface_SPI_Disable( emlib_spi_event_t * event ) {};
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_spi_event_t * event ) { return true; };
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Read( emlib_spi_event_t * event ) { return true; };
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_WriteRegister( emlib_spi_event_t * event ) { return true; };
@@ -164,15 +172,27 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
             break;
     }
 }
+#define DEFAULT_I2C_CLOCKHLR        i2cClockHLRStandard
+#define DEFAULT_I2C_ENABLE_ON_INIT  true
+#define DEFAULT_I2C_FREQUENCY       100
+#define DEFAULT_I2C_MASTER_ON_INIT  true
+#define DEFAULT_I2C_REF_FREQUENCY
 
-static void EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event )
+static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event )
 {
-    
+    I2C_Init_TypeDef initType = I2C_INIT_DEFAULT;
+    I2C_Init( evenet->host.device, &initType );
+    return true;
 };
 
 static void EMLIB_PAPIInterface_I2C_Enable( emlib_i2c_event_t * event )
 {
-    
+    I2C_Enable( event->host.device, true );
+};
+
+static void EMLIB_PAPIInterface_I2C_Disable( emlib_i2c_event_t * event )
+{
+    I2C_Enable( event->host.device, false );
 };
 
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_ReadRegister( emlib_i2c_event_t * event )
@@ -244,35 +264,49 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
     return ret;
 };
 
-static void EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event )
+static bool EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event )
 {
-    
+    USART_InitSync_TypeDef initType = USART_INITASYNC_DEFAULT;
+    USART_InitSync( evenet->host.device, &initType );
+    return true;
 };
 
 static void EMLIB_PAPIInterface_SPI_Enable( emlib_spi_event_t * event )
 {
-    
+    USART_Enable( event->host.device, usartEnable);
+};
+
+static void EMLIB_PAPIInterface_SPI_Disable( emlib_spi_event_t * event )
+{
+    USART_Enable( event->host.device, usartDisable);
 };
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_spi_event_t * event )
 {
     EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, event->host.cs.active );
-    *data = USART_SpiTransfer( event->host.device, event->reg );
+    event->length = 1;
+    event->data.byte = USART_SpiTransfer( event->host.device, event->reg );
     EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, !event->host.cs.active );
-    return ret;
+    return true;
 }
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Read( emlib_spi_event_t * event )
 {
 //    emlib_spi_transfer_return_t ret;
-//    return ret;
+//    uint8_t data = USART_RxDataGet( event->host.device );
+//    event->length = 1;
+//    event->buffer = data;
+    return true;
 };
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_WriteRegister( emlib_spi_event_t * event )
 {
-//    event->length = 1;
-//    event->buffer = event->reg;
-//    return EMLIB_PAPIInterface_SPI_Write(data);
+    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, event->host.cs.active );
+    event->length = 1;
+    USART_SpiTransfer( event->host.device, event->reg );
+    USART_SpiTransfer( event->host.device, event->data );
+    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, !event->host.cs.active );
+    return true;
 }
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Write( emlib_spi_event_t * event )
@@ -283,6 +317,6 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Write( emlib_spi_even
 //    return ret;
 };
 
-#endif
+#endif /* __EMLIB__ */
 
 #endif /* emlib_interface_h */

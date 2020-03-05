@@ -172,18 +172,16 @@ static inline void MICRIUM_OSInterface_Init( void )
 
     CMU_ClockEnable(cmuClock_PRS, true);
 
-    BSP_CPUInit();                                                /* Initialize CPU and make all interrupts Kernel Aware. */
-    //system already initialized by enter_DefaultMode_from_RESET
-    //BSP_SystemInit();                                           / * Initialize System.                                   * /
-
-    // MTM: Not needed anymore
-    //OS_ConfigureTickTask(&tickTaskCfg);
-
-    OSInit(&err);                                                 /  * Initialize the Kernel.                               * /
-    /  *   Check error code.                                  * /
+    /* Initialize CPU and make all interrupts Kernel Aware. */
+    BSP_CPUInit();
+    
+    /* Initialize the Kernel.                               */
+    OSInit(&err);
+    
+    /*   Check error code.                                  */
     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
     
-    / *   Check error code.                                  * /
+    /*   Check error code.                                  */
     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
 }
 
@@ -191,9 +189,10 @@ static inline void MICRIUM_OSInterface_Start( void )
 {
     RTOS_ERR  err;
     
-    OSStart(&err);        / * Start the kernel.                                    * /
+    /* Start the kernel.                                    */
+    OSStart(&err);
     
-    / *   Check error code.                                  * /
+    /* Check error code.                                    */
     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
 }
  
@@ -201,7 +200,9 @@ static inline void MICRIUM_OSInterface_Start( void )
  {
      RTOS_ERR  err;
      
-     void  OSTimeDly (MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
+     OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
+     
+     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
  }
 
 static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data )

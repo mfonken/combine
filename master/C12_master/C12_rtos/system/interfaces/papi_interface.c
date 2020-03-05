@@ -21,16 +21,16 @@ void PAPIInterface_DCDC_Init( uint16_t mV )
 #endif
 
 #ifndef I2C_SERVICE
-void PAPIInterface_I2C_Init( i2c_event_t * event ) {}
+bool PAPIInterface_I2C_Init( i2c_event_t * event ) { return true; }
 void PAPIInterface_I2C_Enable( i2c_event_t * event ) {}
 i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * event ) { return false; }
 i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * event ) { return false; }
 i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event ) { return false; }
 #else
-void PAPIInterface_I2C_Init( i2c_event_t * event )
+bool PAPIInterface_I2C_Init( i2c_event_t * event )
 {
     LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel %p:0x%02x\n", event->host->device, event->host->address);
-    PAPI_SPECIFIC(PAPIInterface_I2C_Init)(event);
+    return PAPI_SPECIFIC(PAPIInterface_I2C_Init)(event);
 }
 
 void PAPIInterface_I2C_Enable( i2c_event_t * event )
@@ -81,16 +81,16 @@ i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event )
 
 #ifndef SPI_SERVICE
 /// TODO look into "weak" across compilers
-void PAPIInterface_SPI_Init( spi_event_t * event ) {}
+bool PAPIInterface_SPI_Init( spi_event_t * event ) { return true; }
 void PAPIInterface_SPI_Enable( spi_event_t * event ) {}
 spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * event ) { return false; }
 spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * event ) { return false; }
 spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t event ) { return false; }
 #else
-void PAPIInterface_SPI_Init( spi_event_t * event )
+bool PAPIInterface_SPI_Init( spi_event_t * event )
 {
     LOG_PAPI(PAPI_DEBUG, "Initializing SPI on channel %d\n", event->host.device);
-    PAPI_SPECIFIC(PAPIInterface_SPI_Init)(event);
+    return PAPI_SPECIFIC(PAPIInterface_SPI_Init)(event);
 }
 
 void PAPIInterface_SPI_Enable( spi_event_t * event )

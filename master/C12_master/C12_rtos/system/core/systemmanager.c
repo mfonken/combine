@@ -337,12 +337,12 @@ component_id_t SystemManager_GetComponentIdFromPortPin( port_t port, pin_t pin )
         component_t * check = &System.profile->component_list.entries[i];
         if( check->port == port && check->pin == pin ) return check->ID;
     }
-    return 0;//SYSTEM_COMPONENT_NONE;
+    return SYSTEM_COMPONENT_NONE;
 }
 
 void SystemManager_InstateTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
 {
-    if( entry_id == SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS ) return;
+    if( entry_id == SYSTEM_TASK_SHELF_ENTRY_ID_NONE ) return;
     
     uint8_t id  = entry_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Instating task shelf entry: %s(%d)\n", SYSTEM_TASK_SHELF_ENTRY_ID_STRINGS[id], id);
@@ -400,7 +400,7 @@ void SystemManager_TerminateStateProfile( system_state_profile_t * state_profile
 
 void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
 {
-    if( entry_id == SYSTEM_TASK_SHELF_ENTRY_ID_NULL_TASKS ) return;
+    if( entry_id == SYSTEM_TASK_SHELF_ENTRY_ID_NONE ) return;
     
     uint8_t id = entry_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Terminating task shelf entry: %s(%d)\n", SYSTEM_TASK_SHELF_ENTRY_ID_STRINGS[id], id);

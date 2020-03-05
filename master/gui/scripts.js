@@ -430,7 +430,7 @@ var c_header =
 + "\/\/ " + profile_name + ".h\n"
 + "\n"
 + "\/\/ Created by Combine Profile Generator " + version + " on " + today() + "\n"
-+ "\/\/ Copyright © Marbl. All rights reserved.\n"
++ "\/\/ Copyright \u00A9 Marbl. All rights reserved.\n"
 + "\n"
 + "#ifndef " + profile_name + "_h\n"
 + "#define " + profile_name + "_h\n"

@@ -13,14 +13,16 @@
 
 void PAPIInterface_DCDC_Init( uint16_t );
 
-void PAPIInterface_I2C_Init( i2c_event_t * );
+bool PAPIInterface_I2C_Init( i2c_event_t * );
 void PAPIInterface_I2C_Enable( i2c_event_t * );
+void PAPIInterface_I2C_Disable( i2c_event_t * );
 i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * );
 i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * );
 i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t );
 
-void PAPIInterface_SPI_Init( spi_event_t * );
+bool PAPIInterface_SPI_Init( spi_event_t * );
 void PAPIInterface_SPI_Enable( spi_event_t * );
+void PAPIInterface_SPI_Disable( spi_event_t * );
 spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * );
 spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * );
 spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t );
@@ -32,8 +34,9 @@ typedef struct
 
 typedef struct
 {
-    void (*Init)( i2c_event_t * );
+    bool (*Init)( i2c_event_t * );
     void (*Enable)( i2c_event_t * );
+    void (*Disable)( i2c_event_t * );
     i2c_transfer_return_t (*Read)( i2c_event_t * );
     i2c_transfer_return_t (*Write)( i2c_event_t * );
     i2c_transfer_return_t (*Perform)( i2c_event_t );
@@ -41,8 +44,9 @@ typedef struct
 
 typedef struct
 {
-    void (*Init)( spi_event_t * );
+    bool (*Init)( spi_event_t * );
     void (*Enable)( spi_event_t * );
+    void (*Disable)( spi_event_t * );
     spi_transfer_return_t (*Read)( spi_event_t * );
     spi_transfer_return_t (*Write)( spi_event_t * );
     spi_transfer_return_t (*Perform)( spi_event_t );

@@ -1,8 +1,8 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 3/2/2020
-// Copyright Â© Marbl. All rights reserved.
+// Created by Combine Profile Generator v0.1 on 3/4/2020
+// Copyright © Marbl. All rights reserved.
 
 #ifndef C12_profile_h
 #define C12_profile_h

@@ -20,6 +20,10 @@
 #define APPLICATION_COMPONENT_FAMILY_0 -1
 #endif
 
+#define APPLICATION_COMPONENT_NONE COMPONENT_ID_NONE
+#define APPLICATION_ACTION_ID_NONE TASK_ACTION_NONE
+#define APPLICATION_TASK_SHELF_ENTRY_ID_NONE TASK_SHELF_ID_NONE
+
 typedef application_comm_protocol_t comm_protocol;
 
 #endif /* application_types_h */
