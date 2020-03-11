@@ -16,10 +16,10 @@ void GetBatteryMonitorBasicBase( comm_host_t * host )
 
 void GetBatteryMonitorBasic( comm_host_t * host, battery_monitor_basic_t * buffer )
 {
-    buffer->charge = STCFunctions.GetCharge( host );
-    buffer->counter = STCFunctions.GetCounter( host );
-    buffer->current = STCFunctions.GetCurrent( host );
-    buffer->voltage = STCFunctions.GetVoltage( host );
+    buffer->charge  = STC3100Functions.GetCharge(  host );
+    buffer->counter = STC3100Functions.GetCounter( host );
+    buffer->current = STC3100Functions.GetCurrent( host );
+    buffer->voltage = STC3100Functions.GetVoltage( host );
 }
 
 void SetBatteryMonitorMode( comm_host_t * host )

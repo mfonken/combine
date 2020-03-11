@@ -81,7 +81,7 @@
 		3491A34E23C57815008010C8 /* motionsensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = motionsensor.h; sourceTree = "<group>"; };
 		3491A34F23C57815008010C8 /* shtp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = shtp.c; sourceTree = "<group>"; };
 		3491A35023C57815008010C8 /* BNO080.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BNO080.c; sourceTree = "<group>"; };
-		3491A35223C57815008010C8 /* STC3100IQT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STC3100IQT.h; sourceTree = "<group>"; };
+		3491A35223C57815008010C8 /* STC3100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STC3100.h; sourceTree = "<group>"; };
 		3491A35323C57815008010C8 /* batterymonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = batterymonitor.c; sourceTree = "<group>"; };
 		3491A35423C57815008010C8 /* batterymonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
 		3491A35723C57815008010C8 /* DRV2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRV2605.h; sourceTree = "<group>"; };
@@ -309,7 +309,7 @@
 		3491A35123C57815008010C8 /* batterymonitor */ = {
 			isa = PBXGroup;
 			children = (
-				3491A35223C57815008010C8 /* STC3100IQT.h */,
+				3491A35223C57815008010C8 /* STC3100.h */,
 				3491A35423C57815008010C8 /* batterymonitor.h */,
 				3491A35323C57815008010C8 /* batterymonitor.c */,
 			);

@@ -63,6 +63,7 @@ typedef OS_Q queue_t;
 
 #define NUM_SYSTEM_STATE NUM_APPLICATION_STATE
 #define NUM_SYSTEM_COMPONENT_FAMILY NUM_APPLICATION_COMPONENT_FAMILY
+#define NUM_SYSTEM_COMPONENT_ID NUM_APPLICATION_COMPONENT_ID
 #define NUM_SYSTEM_QUEUE_ID NUM_APPLICATION_QUEUE_ID
 #define NUM_SYSTEM_SUBACTIVITY_ID NUM_APPLICATION_SUBACTIVITY_ID
 #define NUM_SYSTEM_TASK_ID NUM_APPLICATION_TASK_ID
@@ -148,6 +149,8 @@ typedef OS_SPECIFIC(OS_TASK_DATA_T) os_task_data_t;
 typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
 typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
 
+typedef PAPI_SPECIFIC(GPIO_T) gpio_t;
+
 typedef PAPI_SPECIFIC(I2C_EVENT_T) i2c_event_t;
 typedef PAPI_SPECIFIC(I2C_HOST_T) i2c_host_t;
 typedef PAPI_SPECIFIC(I2C_TRANSFER_TYPE_T) i2c_transfer_type_t;
@@ -184,6 +187,13 @@ void *
 void *
     buffer;
 } generic_comm_host_t;
+
+#define bp(X) ((uint8_t*)&X)
+#define b(X) (*bp(X))
+#define I2C_ACTION( HOST, CMD, REG, LEN, DAT ) (i2c_event_t){ (i2c_host_t *)HOST, CMD, REG, LEN, DAT }
+#define I2C_RD_REG( HOST, REG, BYTE ) I2C_ACTION( HOST, I2C_READ_REG_EVENT, REG, 1, .data.buffer = bp(BYTE) )
+#define I2C_RD_WD( HOST, REG, BYTE ) I2C_ACTION( HOST, I2C_READ_REG_EVENT, REG, 2, .data.buffer = bp(BYTE) )
+#define I2C_WR_REG( HOST, REG, BYTE ) I2C_ACTION( HOST, I2C_WRITE_REG_EVENT, REG, 1, .data.byte = b(BYTE) )
 
 #define NULL_HOST (comm_host_t)(generic_comm_host_t){ 0, 0, NULL, NULL }
 

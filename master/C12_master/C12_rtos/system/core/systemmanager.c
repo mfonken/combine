@@ -271,7 +271,7 @@ void SystemManager_RegisterSubactivity( system_subactivity_id_t subactivity )
 void SystemManager_RegisterError( system_error_t error )
 {
     uint8_t id = error;
-    LOG_SYSTEM(SYSTEM_DEBUG, "Registering error: %s(%d)\n", error_strings[id], id);
+    LOG_SYSTEM(SYSTEM_DEBUG, "%s error: %s(%d)\n", (id?"Registering":"Clearing"), error_strings[id], id);
     System.error.type = error;
 }
 
@@ -375,6 +375,9 @@ void SystemManager_InstateStateProfile( system_state_profile_t * state_profile )
             if( active & ( 1 << i ) ) continue;
             SysIOCtlFunctions.DisableFamily( (system_family_t)i );
         }
+        
+        /* Finish component enables and disables */
+        SysIOCtlFunctions.CompleteComponentTransients();
     }
     else
     {

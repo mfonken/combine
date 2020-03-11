@@ -534,18 +534,21 @@ function generateC() {
                             console.log("Group should not have internal list.");
                         }
                         else {
-                            if(item_key != "NAME") {
                                 // console.log(group_key, entry_key, entry, item_key, item);
                                 var element_name = item.replace(item_key, '');
                                 if(!item_key.toLowerCase().includes("pin") && !item_key.toLowerCase().includes("addr") ) {
                                     element_name = group_key + "_" + item_key + "_" + element_name;
                                 }
+                                if(item_key == "NAME") {
+                                    group_name = item;
+                                    element_name = '"' + element_name.split('_').slice(-1)[0] + '"';
+                                }
                                 section_text += "#define " + group_name + "_" + item_key + " " + element_name + "\n";
                                 group_item_names[i++] = (group_name + "_" + item_key);
-                            }
-                            else {
-                                group_name = item;
-                            }
+                            // }
+                            // else {
+                            //     group_name = item;
+                            // }
                         }
                     });
                     if(group_name == "") return;

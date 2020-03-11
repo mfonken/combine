@@ -10,7 +10,6 @@
 #define os_interface_h
 
 #include "profilemanager.h"
-#include "sysiocontroller.h"
 
 bool TaskHasValidTimer( os_task_data_t * );
 

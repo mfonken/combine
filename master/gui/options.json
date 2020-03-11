@@ -57,6 +57,7 @@ var all_options =
         }
       ],
       "FAMILY": [
+        "array",
         "NONE",
         "0",
         "A",
@@ -106,8 +107,9 @@ var all_options =
       "STATE": [
         "OFF",
         "ON",
-        "Z",
         "INTERRUPT",
+        "ENABLING",
+        "DISABLING",
         {
           "assign": "APPLICATION_COMPONENT_STATE:t"
         }

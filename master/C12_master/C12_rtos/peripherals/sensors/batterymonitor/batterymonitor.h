@@ -9,7 +9,7 @@
 #ifndef batterymonitor_h
 #define batterymonitor_h
 
-#include "STC3100IQT.h"
+#include "STC3100.h"
 
 typedef struct
 {

@@ -43,7 +43,7 @@ typedef struct
         port:8;
     uint8_t
         pin:7;
-} emlib_gpio_t;
+} EMLIB_GPIO_T, emlib_gpio_t;
 
 typedef struct
 {
@@ -172,6 +172,7 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
             break;
     }
 }
+
 #define DEFAULT_I2C_CLOCKHLR        i2cClockHLRStandard
 #define DEFAULT_I2C_ENABLE_ON_INIT  true
 #define DEFAULT_I2C_FREQUENCY       100

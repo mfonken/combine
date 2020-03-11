@@ -18,7 +18,24 @@ void PAPIInterface_DCDC_Init( uint16_t mV )
     LOG_PAPI(PAPI_DEBUG, "Starting DCDC at %.3fV.\n", (double)mV / 1000. );
     PAPI_SPECIFIC(PAPIInterface_DCDC_Init)(mV);
 }
-#endif
+#endif /* DCDC_SERVICE */
+
+#ifndef GPIO_SERVICE
+void PAPIInterace_GPIO_Set( gpio_t gpio ) {}
+void PAPIInterace_GPIO_Clear( gpio_t gpio ) {}
+#else
+void PAPIInterace_GPIO_Set( gpio_t gpio )
+{
+    LOG_PAPI(PAPI_DEBUG, "Set GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
+    PAPI_SPECIFIC(PAPIInterace_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_HIGH));
+}
+
+void PAPIInterace_GPIO_Clear( gpio_t )
+{
+    LOG_PAPI(PAPI_DEBUG, "Clearing GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
+    PAPI_SPECIFIC(PAPIInterace_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_LOW));
+}
+#endif /* GPIO_SERVICE */
 
 #ifndef I2C_SERVICE
 bool PAPIInterface_I2C_Init( i2c_event_t * event ) { return true; }
@@ -77,7 +94,7 @@ i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event )
     }
     return false;
 }
-#endif
+#endif /* I2C_SERVICE */
 
 #ifndef SPI_SERVICE
 /// TODO look into "weak" across compilers
@@ -127,7 +144,7 @@ spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t event )
     }
     return false;
 }
-#endif
+#endif /* SPI_SERVICE */
 
 #ifndef USART_SERVICE
 #else

@@ -9,7 +9,7 @@
 #ifndef systemmanager_h
 #define systemmanager_h
 
-#include "papi_interface.h"
+#include "sysiocontroller.h"
 
 #define DEFAULT_SYSTEM_STATE STATE_NAME_UNKNOWN
 #define DEFAULT_SYSTEM_ACTION SYSTEM_ACTION_NONE

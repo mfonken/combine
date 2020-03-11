@@ -92,7 +92,7 @@ COMPLETE_TASK }
 /* [Meta] */
 static void Application_InitComponent( component_t * component )
 {
-    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: 0x%02x\n", component->ID);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", component->name, component->ID);
     generic_id_t ID = PROTOCOL_ID_NULL;
     switch( component->ID)
     {
@@ -107,10 +107,12 @@ static void Application_InitComponent( component_t * component )
         case COMPONENT_ID_BATTERY_MONITOR:
             break;
         case COMPONENT_ID_BLE_RADIO:
+            break;
+//        case COMPONENT_ID_RHO:
 //            ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_RHO);
 //            if( ID != PROTOCOL_ID_NULL )
 //                RhoFunctions.Init( &(rho_setting_t){ ID } );
-            break;
+//            break;
         default:
             break;
     }

@@ -10,7 +10,7 @@
 #define sysiocontroller_h
 
 /* System includes */
-#include "systemtypes.h"
+#include "papi_interface.h"
 
 #define SYSIOCTL_NUM_CS_FAMILY 8
 #define SYSIOCTL_NUM_FAMILIES NUM_SYSTEM_COMPONENT_FAMILY//sizeof(system_family_t)*8
@@ -41,29 +41,31 @@ typedef struct
 } sysioctl_tables;
 
 void SYSIOCTL_Init( system_master_t * );
-component_t * SYSIOCTL_Get_Component( component_id_t );
-void SYSIOCTL_Tie_Component( component_id_t, void * );
-void SYSIOCTL_Init_Component( component_t * );
-void SYSIOCTL_Push_Component( component_t * );
-void SYSIOCTL_Enable_Family( system_family_t );
-void SYSIOCTL_Disable_Family( system_family_t );
-void SYSIOCTL_Enable_Component( component_t * );
-void SYSIOCTL_Disable_Component( component_t * );
-generic_id_t SYSIOCTL_Generate_ID( protocol_id_base_t );
+component_t * SYSIOCTL_GetComponent( component_id_t );
+void SYSIOCTL_TieComponent( component_id_t, void * );
+void SYSIOCTL_InitComponent( component_t * );
+void SYSIOCTL_PushComponent( component_t * );
+void SYSIOCTL_EnableFamily( system_family_t );
+void SYSIOCTL_DisableFamily( system_family_t );
+void SYSIOCTL_EnableComponent( component_t * );
+void SYSIOCTL_DisableComponent( component_t * );
+generic_id_t SYSIOCTL_GenerateID( protocol_id_base_t );
+void SYSIOCTL_CompleteComponentTransients( void );
 //void * SYSIOCTL_Get_Component_Callback( component_t * );
 
 typedef struct
 {
     void (*Init)( system_master_t * );
-    component_t * (*Get)( component_id_t );
     void (*Tie)( component_id_t, void * );
     void (*InitComponent)( component_t * );
+    component_t * (*GetComponent)( component_id_t );
     void (*Push)( component_t * );
     void (*EnableFamily)( system_family_t );
     void (*DisableFamily)( system_family_t );
     void (*EnableComponent)( component_t * );
     void (*DisableComponent)( component_t * );
     generic_id_t (*GenerateID)( protocol_id_base_t );
+    void (*CompleteComponentTransients)( void );
 //    void * (*GetCallback)( component_t * );
 } sysioctl_functions;
 

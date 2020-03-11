@@ -110,6 +110,8 @@ typedef uint8_t component_id_t;
 
 typedef struct
 {
+char *
+    name;
 component_id_t
     ID;
 uint8_t

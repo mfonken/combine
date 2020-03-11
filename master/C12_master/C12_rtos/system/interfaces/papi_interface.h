@@ -13,6 +13,9 @@
 
 void PAPIInterface_DCDC_Init( uint16_t );
 
+void PAPIInterace_GPIO_Set( gpio_t );
+void PAPIInterace_GPIO_Clear( gpio_t );
+
 bool PAPIInterface_I2C_Init( i2c_event_t * );
 void PAPIInterface_I2C_Enable( i2c_event_t * );
 void PAPIInterface_I2C_Disable( i2c_event_t * );
@@ -31,6 +34,12 @@ typedef struct
 {
     void (*InitDCDC)( uint16_t );
 } system_papi_interface_energy_functions;
+
+typedef struct
+{
+    void (*Set)( gpio_t );
+    void (*Clear)( gpio_t );
+} system_papi_interface_gpio_functions;
 
 typedef struct
 {
@@ -55,6 +64,7 @@ typedef struct
 typedef struct
 {
     system_papi_interface_energy_functions Energy;
+    system_papi_interface_gpio_functions GPIO;
     system_papi_interface_i2c_functions I2C;
     system_papi_interface_spi_functions SPI;
 } system_papi_interface_functions;
@@ -63,12 +73,14 @@ static system_papi_interface_functions PAPI =
 {
     .Energy.InitDCDC = PAPIInterface_DCDC_Init,
     
+    .GPIO.Set = PAPIInterace_GPIO_Set,
+    .GPIO.Clear = PAPIInterace_GPIO_Clear,
+    
     .I2C.Init = PAPIInterface_I2C_Init,
     .I2C.Enable = PAPIInterface_I2C_Enable,
     .I2C.Read = PAPIInterface_I2C_Read,
     .I2C.Write = PAPIInterface_I2C_Write,
     .I2C.Perform = PAPIInterface_I2C_Perform,
-    
     
     .SPI.Init = PAPIInterface_SPI_Init,
     .SPI.Enable = PAPIInterface_SPI_Enable,
