@@ -13,5 +13,6 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 
 #endif /* opencv_master_h */

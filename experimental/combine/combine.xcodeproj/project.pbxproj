@@ -29,6 +29,7 @@
 		340196C422FE7D5900F152CC /* detection_map.c in Sources */ = {isa = PBXBuildFile; fileRef = 340196C222FE7D5900F152CC /* detection_map.c */; };
 		340196C722FE7E3D00F152CC /* rho_wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 340196C522FE7E3D00F152CC /* rho_wrapper.cpp */; };
 		340196FA22FF57E500F152CC /* statistics.c in Sources */ = {isa = PBXBuildFile; fileRef = 340196F922FF57E500F152CC /* statistics.c */; };
+		34098FDD24423B7F0050EF87 /* opencv_tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34098FDB24423B7F0050EF87 /* opencv_tracker.cpp */; };
 		342A10082308F41F008928F6 /* Info.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 342A10072308F406008928F6 /* Info.plist */; };
 		3455398B22FF62F200DDE874 /* combine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3455398922FF62F200DDE874 /* combine.cpp */; };
 		3493AA8D231A066200159CD5 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 3493AA89231A066200159CD5 /* kalman.c */; };
@@ -117,6 +118,9 @@
 		340196F822FF57E500F152CC /* statistics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = statistics.h; sourceTree = "<group>"; };
 		340196F922FF57E500F152CC /* statistics.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = statistics.c; sourceTree = "<group>"; };
 		3402A3E9235CF7FA00984E01 /* rho_spoof.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rho_spoof.h; sourceTree = "<group>"; };
+		34098FDB24423B7F0050EF87 /* opencv_tracker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = opencv_tracker.cpp; sourceTree = "<group>"; };
+		34098FDC24423B7F0050EF87 /* opencv_tracker.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = opencv_tracker.hpp; sourceTree = "<group>"; };
+		3417E60524439F9A00BEAA60 /* open.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = open.hpp; sourceTree = "<group>"; };
 		342A10072308F406008928F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3441995923877A4300589E21 /* genlog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = genlog.h; sourceTree = "<group>"; };
 		34546E4F235BED84009ECAD1 /* qmath_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = qmath_types.h; sourceTree = "<group>"; };
@@ -179,6 +183,8 @@
 				342A10072308F406008928F6 /* Info.plist */,
 				340196C022FE78F300F152CC /* test_config.h */,
 				3401964B22FE77E300F152CC /* main.cpp */,
+				34098FDB24423B7F0050EF87 /* opencv_tracker.cpp */,
+				34098FDC24423B7F0050EF87 /* opencv_tracker.hpp */,
 				34E7BC5823595313006D4AAE /* kinetic */,
 				3401969922FE780600F152CC /* tau */,
 				3401967822FE780600F152CC /* rho */,
@@ -237,6 +243,7 @@
 				3401966922FE780600F152CC /* image_cpp_types.h */,
 				3401966822FE780600F152CC /* image_utility.hpp */,
 				3401966A22FE780600F152CC /* image_utility.cpp */,
+				3417E60524439F9A00BEAA60 /* open.hpp */,
 				349A5D8B22FF85E100060F4C /* unfisheye.hpp */,
 				349A5D8C22FF85E100060F4C /* unfisheye.cpp */,
 			);
@@ -454,6 +461,7 @@
 				340196BA22FE780600F152CC /* hmm.c in Sources */,
 				34BE23A1231F24B800911DEA /* matvec.c in Sources */,
 				34E7BC6E23595313006D4AAE /* point.c in Sources */,
+				34098FDD24423B7F0050EF87 /* opencv_tracker.cpp in Sources */,
 				340196B822FE780600F152CC /* psm.c in Sources */,
 				340196B722FE780600F152CC /* gmm.c in Sources */,
 				340196BB22FE780600F152CC /* tau_structures.cpp in Sources */,
@@ -606,11 +614,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					__RHO__,
+					"GLOBAL_LOG_LEVEL=DEBUG_2",
 					__KIN__,
 					__IMU__,
-					__KALMAN__,
-					"GLOBAL_LOG_LEVEL=DEBUG_2",
+					__RHO__,
 				);
 				HEADER_SEARCH_PATHS = "/usr/local/Cellar/opencv/**";
 				INFOPLIST_FILE = "$(SRCROOT)/combine/Info.plist";

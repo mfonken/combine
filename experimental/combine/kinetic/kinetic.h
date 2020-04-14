@@ -24,6 +24,8 @@
 #include "qmath.h"
 #include "matvec.h"
 
+#define CYCLE3(X) for(uint8_t X=0;X<3;X++)
+
 /* Filters */
 #ifdef __KALMAN__
 #include "kalman.h"
@@ -31,7 +33,6 @@
 //#define KINETIC_USE_QUATERNION_INPUT
 #define KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
 
-#define CYCLE3(X) for(uint8_t X=0;X<3;X++)
 
 /* Kalman Defaults */
 #define MOTION_MAX_KALMAN_LIFESPAN 10.0
@@ -85,7 +86,7 @@
 
 #define     D_FIXED                 5.0e-2
 
-#define KIN_DEBUG DEBUG_1
+#define KIN_DEBUG DEBUG_2
 
 #ifdef KIN_DEBUG
 #define LOG_KIN(L,...)          LOG(L,"<Kinetic> " __VA_ARGS__)

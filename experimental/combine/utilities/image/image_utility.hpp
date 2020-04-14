@@ -40,6 +40,17 @@
 #define LOG_IU(...)
 #endif
 
+#ifdef CV_TRACK_BLOBS
+typedef struct
+{
+    double x, y, s;
+} keypoint_t;
+#endif
+
+
+#ifdef CV_TRACK_BLOBS
+#include "open.hpp"
+#endif
 
 //#include "kinetic.h"
 
@@ -88,6 +99,7 @@ public:
                     preoutframe_mutex,
                     outimage_mutex,
                     tau_cross_mutex,
+                    keypoints_mutex,
                     self_mutex;
     
     void RequestBackground();
@@ -105,8 +117,12 @@ public:
     bool    generator_active,
             background_request,
             background_ready;
+
+    #ifdef CV_TRACK_BLOBS
+        open_t detector;
+    #endif
 private:
-    
+
     std::string file, subdir;
     int iteration;
     int counter;
@@ -115,7 +131,8 @@ private:
     bool live;
     bool has_file,
          has_camera,
-         has_generator;
+         has_generator,
+         track_blobs;
     int num_frames;
     
     path_t path;

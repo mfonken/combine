@@ -14,7 +14,7 @@
 
 #define RHO_DEFAULT_COMPONENT_PROTOCOL COMPONENT_PROTOCOLUART
 
-typedef uint16_t packet_data_type;
+typedef floating_t packet_data_type;
 typedef float global_timestamp_t;
 typedef struct
 {
@@ -66,6 +66,13 @@ rho_packet_t
 rho_setting_t
     settings;
 } rho_t;
+
+static void rho_get_confidence( rho_t * rho, floating_t confidence[3] )
+{
+    confidence[0] = (floating_t)rho->packet.probabilites.primary;
+    confidence[1] = (floating_t)rho->packet.probabilites.secondary;
+    confidence[2] = (floating_t)rho->packet.probabilites.alternate;
+}
 
 void InitRho( comm_host_t *, rho_setting_t * );
 void SendRhoSetting( comm_host_t *, rho_setting_t * );

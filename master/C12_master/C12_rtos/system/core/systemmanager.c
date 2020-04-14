@@ -19,6 +19,7 @@ void SystemManager_Init( system_profile_t * profile )
     SystemFunctions.Register.State(STATE_NAME_STARTUP);
     SystemFunctions.Register.Error(DEFAULT_SYSTEM_ERROR);
     SystemFunctions.Register.Consumption(SYSTEM_CONSUMPTION_NONE);
+    SystemFunctions.Register.MinImmediateHandlePriority(DEFAULT_SYSTEM_MIN_IMMEDIATE_HANDLE_PRIORITY);
 }
 
 void SystemManager_PerformRoutine( system_activity_routine_t * routine )
@@ -76,15 +77,15 @@ void SystemManager_PerformEnableTaskState( system_task_id_t task_id )
 
 void SystemManager_PerformExitState( void )
 {
-    if( System.state == System.exit_state )
+    if( System.status.state == System.status.exit_state )
     {
         LOG_SYSTEM(SYSTEM_DEBUG, "Rejecting state exit.\n");
         return;
     }
-    System.prev_state = System.state;
-    System.state = System.exit_state;
-    LOG_SYSTEM(SYSTEM_DEBUG, "Exiting to state: %s(%d)\n", SYSTEM_STATE_STRINGS[System.state], (uint8_t)System.state);
-    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state-1] );
+    System.status.prev_state = System.status.state;
+    System.status.state = System.status.exit_state;
+    LOG_SYSTEM(SYSTEM_DEBUG, "Exiting to state: %s(%d)\n", SYSTEM_STATE_STRINGS[System.status.state], (uint8_t)System.status.state);
+    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.status.state-1] );
 }
 
 void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
@@ -97,6 +98,25 @@ void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
 //        OS.Task.Suspend(task_data);
 //    else
         OS.Task.Delete( &task->os_task_data );
+}
+
+void SystemManager_PerformCycleQueue( os_queue_data_t * queue_data )
+{
+    LOG_SYSTEM(SYSTEM_DEBUG_QUEUE, "Performing cycle on queue: %s\n", QUEUE_ID_STRINGS[queue_data->ID]);
+//    ASSERT(queue_data->msg_size, sizeof(hw_event_message_t));
+    hw_event_message_t * message = (hw_event_message_t *)queue_data->p_void;
+    
+    system_task_t * task = SystemFunctions.Get.TaskById( (system_task_id_t)message->handle_id );
+    if( task != NULL )
+        OS.Task.Resume( &task->os_task_data );
+}
+
+void SystemManager_PerformCycleQueues( void )
+{
+    for( uint8_t i = 0; i < System.profile->queue_list.num_entries; i++ )
+    {
+        SystemFunctions.Perform.CycleQueue( &System.profile->queue_list.entries[i] );
+    }
 }
 
 void SystemManager_PopulateTaskDataOfTask( system_task_t * task )
@@ -168,12 +188,10 @@ void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
         for( uint8_t i = 0; i < task->num_component_id; i++ )
         {
             int8_t component_number = SystemFunctions.Get.ComponentNumber(task->component_id[i]);
-            if(component_number < 0 )
-            {
-                LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
-            }
-            else
+            if(component_number >= 0 && component_number < System.profile->component_list.num_entries)
                 System.registration.component_tasks[component_number][task->ID] = true;
+            else
+                LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
         }
     }
 }
@@ -240,32 +258,32 @@ void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state
 }
 void SystemManager_RegisterState( system_state_t state )
 {
-    if( System.state == state ) return;
+    if( System.status.state == state ) return;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering state: %s\n", SYSTEM_STATE_STRINGS[state]);
     
-    if( System.state != STATE_NAME_UNKNOWN )
-        SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.state] );
-    System.prev_state = System.state;
-    System.state = state;
-    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.state] );
+    if( System.status.state != STATE_NAME_UNKNOWN )
+        SystemFunctions.Terminate.StateProfile( &System.profile->state_profiles[System.status.state] );
+    System.status.prev_state = System.status.state;
+    System.status.state = state;
+    SystemFunctions.Instate.StateProfile( &System.profile->state_profiles[System.status.state] );
 }
 
 void SystemManager_RegisterExitState( system_state_t exit_state )
 {
-    System.exit_state = exit_state;
+    System.status.exit_state = exit_state;
 }
 
 void SystemManager_RegisterActivity( system_activity_t activity )
 {
     uint8_t id = activity;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering activity: %s(%d)\n", SYSTEM_ACTIVITY_STRINGS[id], id);
-    System.activity = activity;
+    System.status.activity = activity;
 }
 void SystemManager_RegisterSubactivity( system_subactivity_id_t subactivity )
 {
     uint8_t id = subactivity;
     LOG_SYSTEM(SYSTEM_DEBUG, "Registering subactivity: %s(%d)\n", SYSTEM_SUBACTIVITY_ID_STRINGS[id], id);
-    System.subactivity = subactivity;
+    System.status.subactivity = subactivity;
 }
 
 void SystemManager_RegisterError( system_error_t error )
@@ -277,7 +295,12 @@ void SystemManager_RegisterError( system_error_t error )
 
 void SystemManager_RegisterConsumption( system_consumption_t consumption )
 {
-    System.consumption_level = consumption;
+    System.status.consumption_level = consumption;
+}
+
+void SystemManager_RegisterMinImmediateHandlePriority( system_task_priority_t priority )
+{
+    System.status.min_immediate_handle_priority = priority;
 }
 
 system_subactivity_t * SystemManager_GetSubactivityMapEntryById( system_subactivity_id_t entry_id )

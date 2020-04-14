@@ -68,9 +68,9 @@ static void KineticUpdateRotation( kinetic_t * k,
     /* Step 3: Update Yaw */
     Kalman.Step( &k->filters.rotation[2], e->z, g->z );
     
-    k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
-    k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
-    k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
+//    k->values.rotation[0] += REFERENCE_OFFSET_ANGLE_X;
+//    k->values.rotation[1] += REFERENCE_OFFSET_ANGLE_Y;
+//    k->values.rotation[2] += REFERENCE_OFFSET_ANGLE_Z;
     
     
 #ifdef KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
@@ -121,7 +121,7 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoi
     /* Step 5B: Update Position Using Non-gravitational Data */
     KineticFunctions.Nongrav( k, n );
     
-    LOG_KIN(KIN_DEBUG, "Yaw: %4d | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+    LOG_KIN(KIN_DEBUG, "Yaw: %4dº | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
     
     KPoint.copy( &k->A, &k->A_ );
     KPoint.copy( &k->B, &k->B_ );
@@ -291,7 +291,7 @@ static void KineticNongrav( kinetic_t * k, vec3_t * n )
     }
 #else
     CYCLE3(i)
-        k->values.position[i] = ((floating_t*)k->r)[i];
+        k->values.position[i] = ((floating_t*)&k->r)[i];
 #endif
 }
 

@@ -13,37 +13,39 @@
 
 #define IMAGE_ROOT              FRAME_IMAGE_ROOT
 
-#define CAMERA_ID       0
+#define CAMERA_ID               0
 
 //#define TILT_LINES
 //#define GREYSCALE
 
-#define OBJECT_BRIGHTNESS 220
-#define NOISE_BRIGHTNESS 150
+#define OBJECT_BRIGHTNESS       220
+#define NOISE_BRIGHTNESS        150
 
-#define PATH_NUM_TICKS  IMAGE_TICKS//200
-#define PATH_OFFSET     200
-#define TARGET_RADIUS   20
-#define DEFAULT_PATH    CIRCLE_CENTERED
-#define TARGET_COLOR    Scalar(OBJECT_BRIGHTNESS,OBJECT_BRIGHTNESS,OBJECT_BRIGHTNESS)
-#define PATH_OFFSET_A   0.2
-#define PATH_OFFSET_B   1.1
-#define PATH_OFFSET_C   1.5
+#define PATH_NUM_TICKS          IMAGE_TICKS//200
+#define PATH_OFFSET             200
+#define TARGET_RADIUS           20
+#define DEFAULT_PATH            CIRCLE_CENTERED
+#define TARGET_COLOR            Scalar(OBJECT_BRIGHTNESS,OBJECT_BRIGHTNESS,OBJECT_BRIGHTNESS)
+#define PATH_OFFSET_A           0.2
+#define PATH_OFFSET_B           1.1
+#define PATH_OFFSET_C           1.5
 
-#define DEFAULT_NOISE   NONE //STATIC_SMALL
-#define NOISE_RATE      10  //Hz
-#define NOISE_COLOR     Scalar(NOISE_BRIGHTNESS,NOISE_BRIGHTNESS,NOISE_BRIGHTNESS)
-#define NOISE_ORIGIN_X  50
-#define NOISE_ORIGIN_Y  200
-#define NOISE_WIDTH     150
-#define NOISE_HEIGHT    100
+#define DEFAULT_NOISE           NONE //STATIC_SMALL
+#define NOISE_RATE              10  //Hz
+#define NOISE_COLOR             Scalar(NOISE_BRIGHTNESS,NOISE_BRIGHTNESS,NOISE_BRIGHTNESS)
+#define NOISE_ORIGIN_X          50
+#define NOISE_ORIGIN_Y          200
+#define NOISE_WIDTH             150
+#define NOISE_HEIGHT            100
 
-//#define IU_WIDTH        FRAME_WIDTH
-//#define IU_HEIGHT       FRAME_HEIGHT
-#define IU_FRAME_RATE   15
+//#define IU_WIDTH                FRAME_WIDTH
+//#define IU_HEIGHT               FRAME_HEIGHT
+#define IU_FRAME_RATE           15
 
-#define IU_THRESHOLD    1//00
-#define IU_BRIGHTNESS   230
+#define IU_THRESHOLD            1//00
+#define IU_BRIGHTNESS           230
+
+#define THRESHOLD_TYPE          0
 
 // ?
 #define D_FIXED                 5.0e-2

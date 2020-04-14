@@ -80,7 +80,7 @@ static void Application_Start( void )
     SystemFunctions.Perform.ExitState();
     OS.DelayMs(1000);
     SystemFunctions.Register.State( STATE_NAME_ACTIVE );
-    ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
+    SystemBehavior.Perform.ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
 }
 
 static void Application_Tick( void )
@@ -124,7 +124,12 @@ static void RhoInputHandler( comm_host_t * host )
     RhoFunctions.Receive( host, &App.objects.Rho );
     RhoPointToKPoint( &App.objects.Rho.packet.primary, &App.buffers.rho.data[0] );
     RhoPointToKPoint( &App.objects.Rho.packet.secondary, &App.buffers.rho.data[1] );
-//    App.buffers.rho.confidence = App.objects.Rho.packet.probabilites.;
+    rho_get_confidence( &App.objects.Rho, App.buffers.rho.confidence );
+}
+
+/* Rho In */
+static void RhoOutputHandler( comm_host_t * host )
+{
 }
 
 /* Motion Out */
@@ -199,19 +204,6 @@ static void TouchInterruptHandler( comm_host_t * host )
     }
 }
 
-//#define MAX_HANDLER_QUEUE 10
-//
-//void ComponentInterruptQueuer( component_id_t );
-//void ComponentInterruptHandler( component_id_t );
-//void RhoOutputHandler( void );
-//void RhoInputHandler( void );
-//void MotionOutputHandler( imu_feature_t, uint32_t );
-//void MotionInputHandler( void );
-//void HostOutputHandler( void );
-//void HostInputHandler( void );
-//void SubRadioOutputHandler( void );
-//void TouchInterruptHandler( component_id_t );
-//
 typedef struct
 {
     void (*Rho)( comm_host_t * );
@@ -228,15 +220,8 @@ typedef struct
     void (*SubRadio)(void);
 } application_handler_output_functions;
 
-//typedef struct
-//{
-//    void (*Queue)(void);
-//    void (*Handle)(component_id_t);
-//} handler_interrupt_functions;
-
 typedef struct
 {
-//    handler_interrupt_functions Interrupt;
     application_handler_input_functions Input;
     application_handler_output_functions Output;
 } application_handler_functions;
@@ -256,10 +241,8 @@ static application_functions AppFunctions =
     .InitComponent = Application_InitComponent,
     .Start = Application_Start,
     .Tick = Application_Tick,
-//    .Interrupt.Queue    = ComponentInterruptQueuer,
-//    .Interrupt.Handle   = ComponentInterruptHandler,
     .Handler.Input.Rho          = RhoInputHandler,
-//    .Handler.Output.Rho         = RhoOutputHandler,
+    .Handler.Output.Rho         = RhoOutputHandler,
     .Handler.Input.Motion       = MotionInputHandler,
     .Handler.Output.Motion      = MotionOutputHandler,
     .Handler.Input.Host         = HostInputHandler,

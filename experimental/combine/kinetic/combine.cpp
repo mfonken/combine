@@ -59,11 +59,20 @@ void Combine::Trigger()
     pthread_mutex_lock( &tau->predictions_mutex );
     kpoint_t A = (kpoint_t){tau->A.x, tau->A.y}, B = (kpoint_t){tau->B.x, tau->B.y};
     pthread_mutex_unlock( &tau->predictions_mutex );
+#ifdef __SPOOF_TAU__
+    A.x = width / 3; A.y = height / 2;
+    B.x = width / 3 * 2; B.y = height / 2;
+#endif
     
     IMUFunctions.update.orientation( &imu );
     ang3_t e = { imu.pitch * DEG_TO_RAD, imu.roll * DEG_TO_RAD, imu.yaw * DEG_TO_RAD },
            g = { imu.gyro[0], imu.gyro[1], imu.gyro[2] };
-    KineticFunctions.UpdateRotation( &kin, &e, &g, &A, &B );
+    
+    KineticFunctions.UpdateRotation( &kin, &e, &g
+#ifdef KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION
+                                    , &A, &B
+#endif
+                                    );
 
     vec3_t n;
     KineticFunctions.Nongrav( &kin, &n );

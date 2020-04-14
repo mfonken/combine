@@ -30,9 +30,7 @@
 #define ABSINV(X)   ((X<1)?1-X:X-1)
 #define ABS(X)      ((X>=0)?X:-X)
 
-#define GTTHR(X,Y,T)    X>=(Y+T)
-
-#define MAX_PERSISTENCE ( 1 << 7 ) - 1 // MAX OF SIGNED BYTE
+#define GTTHR(X,Y,T)    (X>=(Y+T))
 
 static inline double timeDiff( struct timeval a, struct timeval b )
 { return ((b.tv_sec  - a.tv_sec) + (b.tv_usec - a.tv_usec)/1000000.0) + 0.0005; }

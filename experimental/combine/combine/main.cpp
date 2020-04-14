@@ -15,8 +15,8 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     Environment env(&tau, TAU_FPS);
 #ifdef __IMU__
     Combine combine("Combine", &tau );
-    SerialWriter comm(BLUETOOTH, "/dev/tty.MARBL-COM15");
-//    SerialWriter comm(SFILE, TX_FILENAME);
+//    SerialWriter comm(BLUETOOTH, "/dev/tty.MARBL-COM15");
+    SerialWriter comm(SFILE, TX_FILENAME);
     env.AddTest(&combine, &comm, COMBINE_FPS);
 #endif
     
@@ -31,11 +31,31 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     cimage_t img;
     cimageInit(img, width, height);
     
+    vector<KeyPoint> keyPoints;
+    
     while(1)
     {
-#ifndef AUTOMATION_RUN
+#ifdef AUTOMATION_RUN
+#else
         tau.GetDensitiesFrame(local_frame);
+        
         imshow(TITLE_STRING, local_frame);
+
+#ifdef CV_TRACK_BLOBS
+        pthread_mutex_lock(&tau.utility.outframe_mutex);
+        tau.utility.outframe.copyTo(local_frame);
+        pthread_mutex_unlock(&tau.utility.outframe_mutex);
+        pthread_mutex_lock(&tau.utility.keypoints_mutex);
+        tau.utility.detector.getKeypoints(keyPoints);
+        pthread_mutex_unlock(&tau.utility.keypoints_mutex);
+        if(keyPoints.size() > 0)
+        {
+            Mat keypoint_frame;
+            drawKeypoints(local_frame, keyPoints, keypoint_frame, Scalar(0, 0, 255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+            imshow(TITLE_STRING, keypoint_frame);
+        }
+#endif
+        
 #endif
 #ifdef __USE_DETECTION_MAP__
 #ifdef __PSM__

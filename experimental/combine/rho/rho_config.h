@@ -38,7 +38,7 @@
 #define DENSITY_MAP_H_SIZE       RHO_HEIGHT
 #endif
 
-#define DEFAULT_THRESH          THRESH_MIN// 170//250
+#define DEFAULT_THRESH          170//250 //THRESH_MIN
 
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
@@ -50,42 +50,42 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                                RHO PARAMETERS                                       */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#define THRESH_STEP_MAX     5
-#define THRESH_MIN          10
-#define THRESH_MAX          250
+#define THRESH_STEP_MAX         5
+#define THRESH_MIN              10
+#define THRESH_MAX              250
 
-#define MIN_VARIANCE        1
-#define MAX_VARIANCE        100
+#define MIN_VARIANCE            1
+#define MAX_VARIANCE            100
 
-#define MAX_REGION_HEIGHT   1000//200
-#define RHO_GAP_MAX         5
+#define MAX_REGION_HEIGHT       1000//200
+#define RHO_GAP_MAX             5
 
 #define BACKGROUND_CENTROID_CALC_THRESH 10 // pixels
 
 #ifdef __PSM__
-#define PSM_UPDATE_PERIOD_MS  750
-#define PSM_UPDATE_PERIOD     ( PSM_UPDATE_PERIOD_MS / 1000 )
+#define PSM_UPDATE_PERIOD_MS    750
+#define PSM_UPDATE_PERIOD       ( PSM_UPDATE_PERIOD_MS / 1000 )
 #endif
-#define BACKGROUNDING_PERIOD  0 // Frames
+#define BACKGROUNDING_PERIOD    0 // Frames
 
-#define EXPECTED_NUM_REGIONS  2
-#define MAX_REGIONS           4
-#define MIN_REGION_DENSITY    2
-#define MAX_REGION_SCORE      10
-#define REGION_SCORE_FACTOR   0.5
-#define MAX_NU_REGIONS        NUM_STATE_GROUPS+1
-#define MAX_OBSERVATIONS      (1 << 4)
-#define MIN_CHAOS             1.0
+#define EXPECTED_NUM_REGIONS    2
+#define MAX_REGIONS             4
+#define MIN_REGION_DENSITY      2
+#define MAX_REGION_SCORE        10
+#define REGION_SCORE_FACTOR     0.5
+#define MAX_NU_REGIONS          NUM_STATE_GROUPS+1
+#define MAX_OBSERVATIONS        (1 << 4)
+#define MIN_CHAOS               1.0
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
 #define MAX_TRACKING_FILTERS MAX_REGIONS
 #define MIN_TRACKING_KALMAN_SCORE 0.02
 #define MAX_TRACKING_MATCH_DIFFERENCE 500
-#define TRACKING_MATCH_TRUST 0.4
+#define TRACKING_MATCH_TRUST    0.4
 
-#define TARGET_TUNE_FACTOR  1.0
-#define STATE_TUNE_FACTOR   0.2
+#define TARGET_TUNE_FACTOR      1.0
+#define STATE_TUNE_FACTOR       0.2
 
 #define PIXEL_COUNT_TRUST_FACTOR    0.2
 #define PIXEL_COUNT_DROP_FACTOR     0.75

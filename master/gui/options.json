@@ -200,6 +200,7 @@ var all_options =
         "NONE",
         "INTERRUPT",
         "SCHEDULE",
+        "QUEUE",
         {
           "assign": "APPLICATION_TASK_ACTION:t"
         }

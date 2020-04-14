@@ -27,9 +27,9 @@ static remap_array_t DEFAULT_IMU_REMAP =
     { 0, 0, 0 }, /* Pitch */
     { 1, 0, 1 }, /* Roll  */
     { 2, 0, 1 }, /* Yaw   */
-    { 0, 0, 1 }, /* Linear Acceleration X */
-    { 1, 0, 1 }, /* Linear Acceleration Y */
-    { 2, 0, 1 }, /* Linear Acceleration Z */
+    { 3, 0, 1 }, /* Linear Acceleration X */
+    { 4, 0, 1 }, /* Linear Acceleration Y */
+    { 5, 0, 1 }, /* Linear Acceleration Z */
 };
 
 class Combine : public TestInterface

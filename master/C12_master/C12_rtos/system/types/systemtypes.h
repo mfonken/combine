@@ -394,13 +394,19 @@ typedef struct
 
 typedef struct
 {
+    system_task_priority_t  min_immediate_handle_priority;
     system_state_t          state, prev_state, exit_state;
     system_activity_t       activity;
     system_subactivity_id_t subactivity;
-    system_error_buffer_t   error;
     system_consumption_t    consumption_level;
+} system_status_t;
+
+typedef struct
+{
     system_registration_log_t registration;
     system_profile_t       *profile;
+    system_error_buffer_t   error;
+    system_status_t         status;
 } system_master_t;
 /************************************************************************************/
 

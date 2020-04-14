@@ -7,7 +7,23 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B28EE892-9A79-4582-AE0A-1D5DFBB8BA6D"
+            uuid = "9059D745-575E-4DCE-93F3-B6E5128B1AA4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "C12_rtos/system/core/systemmanager.c"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
+            landmarkName = "SystemManager_RegisterTask(task_id, scheduled)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "92AF7434-6BB1-4057-8FCD-ADC568C0A7ED"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -23,16 +39,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A25353F6-8141-40DF-889E-0A121A0D1D05"
+            uuid = "EF584D26-3B5D-4C1B-BC5B-EC345A25926C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "C12_rtos/system/core/systembehavior.h"
+            filePath = "C12_rtos/system/core/systembehavior.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
-            landmarkName = "ComponentInterrupt(port, pin, edge)"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
+            landmarkName = "SystemBehavior_PerformComponentInterrupt(port, pin, edge)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

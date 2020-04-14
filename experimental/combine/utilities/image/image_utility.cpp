@@ -14,6 +14,7 @@ using namespace std;
 ImageUtility::ImageUtility( std::string n, std::string f, int num, int width, int height) :
 TestInterface(3, n.c_str()),
 num_frames(num), size(width, height), subdir(f),
+track_blobs(false), has_file(false),
 frame(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 preoutframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
 outframe(Size(width, height), CV_8UC3, Scalar(0,0,0)),
@@ -23,7 +24,6 @@ preimage(Size(width, height), CV_8UC3, Scalar(0,0,0))
 ,cam(CAMERA_ID)
 #endif
 {
-    has_file = false;
 #ifdef HAS_FILE
     if(f.length() > 1) has_file = true;
     if(num_frames) LOG_IU("Initialized with path %s and dimensions %dx%d for %d frames\n", f.c_str(), width, height, num);
@@ -75,6 +75,12 @@ void ImageUtility::Init()
 #endif
     has_generator
 #ifdef HAS_GENERATOR
+    = true;
+#else
+    = false;
+#endif
+    track_blobs
+#ifdef CV_TRACK_BLOBS
     = true;
 #else
     = false;
@@ -141,14 +147,14 @@ void ImageUtility::InitCamera()
             cam = VideoCapture(CAMERA_ID);
             continue;
         }
-        cam >> image;
-        if(image.cols != frame.cols)
-        {
-            LOG_IU("Failed to configure camera!\n");
-            sleep(1);
-            cam = VideoCapture(CAMERA_ID);
-            continue;
-        }
+//        cam >> image;
+//        if(image.cols != frame.cols)
+//        {
+//            LOG_IU("Failed to configure camera!\n");
+//            sleep(1);
+//            cam = VideoCapture(CAMERA_ID);
+//            continue;
+//        }
         success = true;
     }
     LOG_IU("Initializing Camera: %dx%d @ %d fps.\n", (int)cam.get(CAP_PROP_FRAME_WIDTH), (int)cam.get(CAP_PROP_FRAME_HEIGHT), (int)cam.get(CAP_PROP_FPS));
@@ -196,7 +202,10 @@ void ImageUtility::Trigger()
     
     pthread_mutex_lock(&outframe_mutex);
 #ifdef THRESH_IMAGE
-    cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, 0);
+//    cv::cvtColor(preoutframe, preoutframe, COLOR_BGR2GRAY);
+    cv::threshold(preoutframe, outframe, thresh, IU_BRIGHTNESS, THRESHOLD_TYPE);
+    
+
 #ifdef ROTATE_IMAGE
     pthread_mutex_unlock(&preoutframe_mutex);
     
@@ -212,6 +221,14 @@ void ImageUtility::Trigger()
     resize(outframe, outframe, original_size);
     if(outframe.cols == 0)
         printf("");
+#endif
+#ifdef CV_TRACK_BLOBS
+    if(track_blobs)
+    {
+        pthread_mutex_unlock(&keypoints_mutex);
+        detector.detect( outframe );
+        pthread_mutex_unlock(&keypoints_mutex);
+    }
 #endif
     cimageFromMat(outframe, outimage);
 #else

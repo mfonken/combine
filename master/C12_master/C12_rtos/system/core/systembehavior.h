@@ -23,6 +23,7 @@ void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t );
 void SystemBehavior_PerformInterrupterSend( system_task_id_t );
 void SystemBehavior_PerformInterrupterReceive( system_task_id_t, hw_event_message_t );
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t );
+void SystemBehavior_PerformComponentInterrupt( port_t, pin_t, hw_edge_t );
 
 void InitTask( system_task_id_t );
 
@@ -31,18 +32,19 @@ typedef struct
     void (*SelfCheck)(void);
     void (*ConfirmInit)(void);
     void (*WaitForWake)(void);
+    void (*ComponentInterrupt)( port_t, pin_t, hw_edge_t);
     system_probe_functions Probe;
     system_scheduler_functions Scheduler;
     system_interrupter_functions Interrupter;
-} behavior_perform_functions;
+} system_behavior_perform_functions;
 
 typedef struct
 {
     void (*InitTask)( system_task_id_t );
-    behavior_perform_functions Perform;
-} behavior_functions;
+    system_behavior_perform_functions Perform;
+} system_behavior_functions;
 
-static behavior_functions BehaviorFunctions =
+static system_behavior_functions SystemBehavior =
 {
     .Perform.SelfCheck              = SystemBehavior_PerformSelfCheck,
     .Perform.ConfirmInit            = SystemBehavior_PerformConfirmInit,
@@ -53,7 +55,8 @@ static behavior_functions BehaviorFunctions =
     .Perform.Scheduler.Deschedule   = SystemBehavior_PerformSchedulerDeschedule,
     .Perform.Interrupter.Send       = SystemBehavior_PerformInterrupterSend,
     .Perform.Interrupter.Receive    = SystemBehavior_PerformInterrupterReceive,
-    .Perform.Interrupter.Perform    = SystemBehavior_PerformInterrupterPerform
+    .Perform.Interrupter.Perform    = SystemBehavior_PerformInterrupterPerform,
+    .Perform.ComponentInterrupt     = SystemBehavior_PerformComponentInterrupt
 };
 
 //static generic_function_t BehaviorScheduledTasks[] =
@@ -71,20 +74,5 @@ static behavior_functions BehaviorFunctions =
 //    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE */
 //    NullFunction /* SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE */
 //};
-
-static void ComponentInterrupt( port_t port, pin_t pin, hw_edge_t edge )
-{
-    component_id_t component_id = SystemFunctions.Get.ComponentIdFromPortPin( port, pin );
-    int8_t component_number = SystemFunctions.Get.ComponentNumber( component_id );
-    if( component_number >= 0 )
-    {
-        hw_event_message_t message = { port, pin, edge };
-        
-#warning Fix to handle task array
-        for( system_task_id_t i = 0; i < NUM_SYSTEM_TASK_ID; i++ )
-            if( System.registration.component_tasks[component_number][i] )
-                BehaviorFunctions.Perform.Interrupter.Receive( i, message );
-    }
-}
 
 #endif /* systembehavior_h */

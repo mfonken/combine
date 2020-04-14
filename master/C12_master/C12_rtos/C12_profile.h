@@ -1,7 +1,7 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 3/10/2020
+// Created by Combine Profile Generator v0.1 on 3/15/2020
 // Copyright © Marbl. All rights reserved.
 
 #ifndef C12_profile_h
@@ -376,7 +376,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 #define STC310_ROUTE COMPONENT_ROUTE_PRIMARY
 #define STC310_ADDR 0x70
 #define STC310_PORT COMPONENT_PORT_A
-#define STC310_PIN INTERNAL
+#define STC310_PIN 1
 #define STC310_STATE COMPONENT_STATE_ON
 #define STC310_COMPONENT { STC310_NAME, STC310_ID, STC310_FAMILY, STC310_PROTOCOL, STC310_ROUTE, STC310_ADDR, STC310_PORT, STC310_PIN, STC310_STATE }
 
@@ -387,7 +387,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 #define BNO080_ROUTE COMPONENT_ROUTE_PRIMARY
 #define BNO080_ADDR 0x4B
 #define BNO080_PORT COMPONENT_PORT_A
-#define BNO080_PIN INTERNAL
+#define BNO080_PIN 2
 #define BNO080_STATE COMPONENT_STATE_ON
 #define BNO080_COMPONENT { BNO080_NAME, BNO080_ID, BNO080_FAMILY, BNO080_PROTOCOL, BNO080_ROUTE, BNO080_ADDR, BNO080_PORT, BNO080_PIN, BNO080_STATE }
 
@@ -506,7 +506,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
     .component_id = { COMPONENT_ID_MOTION_SENSOR }, \
     .num_component_id = 1, \
     .data = 1, \
-    .ACTION = TASK_ACTION_SCHEDULE, \
+    .ACTION = TASK_ACTION_INTERRUPT, \
     .function = IMUFunctions.Read, \
     .object = &App.objects.IMU.client, \
     .PRIORITY = TASK_PRIORITY_MEDIUM, \

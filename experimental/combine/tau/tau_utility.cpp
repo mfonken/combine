@@ -52,8 +52,8 @@ void Tau::Trigger( void )
     double p = 0.;
 
     utility.Trigger();
-    p = Perform( utility.outimage );
     
+    p = Perform( utility.outimage );
     LOG_TAU("Tau perform: %.3fs\n", p);
     if(count < MAX_COUNT)
     {
@@ -99,7 +99,23 @@ double Tau::Perform( cimage_t &img )
     }
     
     double p = 0;
-#ifdef __RHO__
+    
+#ifdef CV_TRACK_BLOBS
+    vector<KeyPoint> keypoints;
+    pthread_mutex_lock(&utility.keypoints_mutex);
+    utility.detector.getKeypoints(keypoints);
+    pthread_mutex_unlock(&utility.keypoints_mutex);
+    if(keypoints.size() >= 2)
+    {
+        std::sort(keypoints.begin(), keypoints.end(), [](const KeyPoint& a, const KeyPoint& b) -> bool { return a.size > b.size; });
+        packet.px = keypoints[0].pt.x; packet.py = keypoints[0].pt.y;
+        packet.sx = keypoints[1].pt.x; packet.sy = keypoints[1].pt.y;
+    }
+    else
+    {
+        memset(&packet, 0, sizeof(packet));
+    }
+#else
     p = rho.Perform( img, &packet );
 #endif
     
@@ -113,10 +129,13 @@ double Tau::Perform( cimage_t &img )
         UpdateThresh();
         UpdatePrediction();
     }
-    
+
+#ifdef CV_TRACK_BLOBS
+#else
     double Cx = utility.pCx-rho.core.Centroid.x,
     Cy = utility.pCy-rho.core.Centroid.y;
     current_accuracy = sqrt( DISTANCE_SQ( Cx, Cy ) );
+#endif
     
     PrintPacket(&packet, 4);
     return p;

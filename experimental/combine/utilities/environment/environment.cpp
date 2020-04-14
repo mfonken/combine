@@ -87,7 +87,7 @@ void * Event::worker( void * data )
         LOG_ENV("ALERT: Event %s has invalid rate.\n", n);
         return NULL;
     }
-    int sl = 1000000/e.rate;
+    int sl = 1000000. / e.rate;
     
     struct timeval time;
     long end_time, curr_time;

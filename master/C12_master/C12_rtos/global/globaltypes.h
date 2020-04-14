@@ -153,6 +153,7 @@ typedef struct
     port_t port;
     pin_t pin;
     hw_edge_t edge;
+    generic_id_t handle_id;
 } hw_event_message_t;
 
 //typedef struct

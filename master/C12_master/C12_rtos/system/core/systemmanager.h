@@ -16,6 +16,7 @@
 #define DEFAULT_SYSTEM_ACTIVITY SYSTEM_ACTIVITY_NONE
 #define DEFAULT_SYSTEM_SUBACTIVITY SYSTEM_SUBACTIVITY_NONE
 #define DEFAULT_SYSTEM_ERROR SYSTEM_ERROR_NONE
+#define DEFAULT_SYSTEM_MIN_IMMEDIATE_HANDLE_PRIORITY TASK_PRIORITY_LOW
 #define DEFAULT_SYSTEM_CONSUMPTION SYSTEM_CONSUMPTION_NONE
 #define DEFAULT_SYSTEM_ACTIVITY SYSTEM_ACTIVITY_NONE
 
@@ -29,6 +30,8 @@ void SystemManager_PerformSubactivity( system_subactivity_id_t );
 void SystemManager_PerformEnableTaskState( system_task_id_t );
 void SystemManager_PerformDisableTaskState( system_task_id_t );
 void SystemManager_PerformExitState( void );
+void SystemManager_PerformCycleQueue( os_queue_data_t * );
+void SystemManager_PerformCycleQueues( void );
 
 //void SystemManager_RegisterTaskList( os_task_list_t * );
 //void SystemManager_RegisterQueueList( os_queue_list_t * );
@@ -43,6 +46,7 @@ void SystemManager_RegisterActivity( system_activity_t );
 void SystemManager_RegisterSubactivity( system_subactivity_id_t );
 void SystemManager_RegisterError( system_error_t );
 void SystemManager_RegisterConsumption( system_consumption_t );
+void SystemManager_RegisterMinImmediateHandlePriority( system_task_priority_t );
 
 system_subactivity_t * SystemManager_GetSubactivityMapEntryById( system_subactivity_id_t );
 system_task_shelf_entry_t * SystemManager_GetTaskShelfEntryById( system_task_shelf_entry_id_t );
@@ -71,8 +75,10 @@ typedef struct
     void (*EnableTask)( system_task_id_t );
     void (*DisableTask)( system_task_id_t );
     void (*ExitState)( void );
-    void (*InjectCommHostIntoTaskData)( void *, component_id_t );
+    void (*InjectCommHostIntoTaskData)( void **, component_id_t );
     void (*PopulateTaskData)( system_task_t * );
+    void (*CycleQueue)( os_queue_data_t * );
+    void (*CycleQueues)( void );
 } system_perform_functions;
 typedef struct
 {
@@ -89,6 +95,7 @@ typedef struct
     void (*Subactivity)( system_subactivity_id_t );
     void (*Error)( system_error_t );
     void (*Consumption)( system_consumption_t );
+    void (*MinImmediateHandlePriority)( system_task_priority_t );
 } system_register_functions;
 typedef struct
 {
@@ -128,7 +135,9 @@ static system_functions SystemFunctions =
     .Perform.DisableTask = SystemManager_PerformDisableTaskState,
     .Perform.ExitState          = SystemManager_PerformExitState,
     .Perform.InjectCommHostIntoTaskData = SystemManager_InjectCommHostIntoTaskData,
-    .Perform.PopulateTaskData = SystemManager_PopulateTaskDataOfTask,
+    .Perform.PopulateTaskData   = SystemManager_PopulateTaskDataOfTask,
+    .Perform.CycleQueue         = SystemManager_PerformCycleQueue,
+    .Perform.CycleQueues        = SystemManager_PerformCycleQueues,
     
 //    .Register.TaskList          = SystemManager_RegisterTaskList,
 //    .Register.QueueList         = SystemManager_RegisterQueueList,
@@ -143,6 +152,7 @@ static system_functions SystemFunctions =
     .Register.Subactivity       = SystemManager_RegisterSubactivity,
     .Register.Error             = SystemManager_RegisterError,
     .Register.Consumption       = SystemManager_RegisterConsumption,
+    .Register.MinImmediateHandlePriority = SystemManager_RegisterMinImmediateHandlePriority,
     
     .Instate.TaskShelfEntry     = SystemManager_InstateTaskShelfEntry,
     .Instate.StateProfile       = SystemManager_InstateStateProfile,

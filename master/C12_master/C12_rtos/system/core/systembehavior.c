@@ -51,16 +51,21 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
 {
     bool handled = false;
     system_task_t * task = SystemFunctions.Get.TaskById( task_id );
-    if( task == NULL ) return;
-    switch( task->ACTION )
+    if( task->ACTION != TASK_ACTION_INTERRUPT ) return;
+    INTERRUPT_ACTION action = task->PRIORITY <= System.status.min_immediate_handle_priority
+        ? INTERRUPT_ACTION_IMMEDIATE
+        : INTERRUPT_ACTION_QUEUE;
+    switch( action )
     {
         case INTERRUPT_ACTION_IMMEDIATE:
-            OS.Task.Resume( &task->os_task_data );
+            if( task != NULL )
+                OS.Task.Resume( &task->os_task_data );
         case INTERRUPT_ACTION_IGNORE:
         default:
             handled = true;
             break;
         case INTERRUPT_ACTION_QUEUE:
+            /* Intentionally empty */
             break;
     }
     if( !handled )
@@ -71,11 +76,34 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
         OS.Queue.Post( queue_data );
     }
 }
-void SystemBehavior_PerformInterrupterPerform( system_task_id_t id )
+
+void SystemBehavior_PerformInterrupterPerform( system_task_id_t task_id )
 {
-    //Disable BehaviorInterruptTasks[id]
+    system_task_t * task = SystemFunctions.Get.TaskById( task_id );
+    if( task != NULL )
+        OS.Task.Resume( &task->os_task_data );
 }
 
-//void InitTask( system_task_id_t id )
-//{
-//}
+void SystemBehavior_PerformComponentInterrupt( port_t port, pin_t pin, hw_edge_t edge )
+{
+    component_id_t component_id = SystemFunctions.Get.ComponentIdFromPortPin( port, pin );
+    int8_t component_number = SystemFunctions.Get.ComponentNumber( component_id );
+    if( component_number >= 0 )
+    {
+        uint16_t interrupts_triggered = 0;
+        hw_event_message_t message = { port, pin, edge };
+        
+#warning Fix to handle task array
+        for( system_task_id_t i = 0; i < NUM_SYSTEM_TASK_ID; i++ )
+        {
+            if( System.registration.component_tasks[component_number][i] )
+            {
+                message.handle_id = i;
+                SystemBehavior.Perform.Interrupter.Receive( i, message );
+                interrupts_triggered++;
+                /* Intentional continue for multiple triggers */
+            }
+        }
+        LOG_SYSTEM(SYSTEM_DEBUG, "Triggered %d interrupts for component event %s.\n", interrupts_triggered, COMPONENT_ID_STRINGS[component_id]);
+    }
+}

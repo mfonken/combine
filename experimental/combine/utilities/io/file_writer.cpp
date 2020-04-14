@@ -17,7 +17,8 @@ FileWriter::FileWriter( const char * name )
 
 void FileWriter::init( std::string header )
 {
-//    file_name = name.c_str();
+    if( file_name == NULL && header.length() > 0 )
+        file_name = header.c_str();
     std::ofstream outfile;
     outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
     if (!outfile.is_open())

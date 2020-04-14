@@ -220,7 +220,7 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
 #endif
     
     double v[6];
-    tokenifyPacket( line+2, 6, v );
+    tokenifyPacket( line + sizeof(PACKET_ID) + sizeof(','), 6, v );
     
     if( v[0] == 0xffff ) return;
     

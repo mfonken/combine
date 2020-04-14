@@ -9,19 +9,21 @@
 #ifndef test_config_h
 #define test_config_h
 
-#define MAIN_FPS        10//50
-#define TAU_FPS         MAIN_FPS
-#define COMBINE_FPS     10 /// NOTE: BNO055 max rate is 200
+#define MAIN_FPS                        10//50
+#define TAU_FPS                         MAIN_FPS
+#define COMBINE_FPS                     10 /// NOTE: BNO055 max rate is 200
 
 /* GLOBAL SETUP */
-#define __CAM__
-//#define __IMU__
+//#define __CAM__
 //#define HAS_FILE
-//#define HAS_GENERATOR
+#define HAS_GENERATOR
+#ifndef __RHO__
+#define CV_TRACK_BLOBS
+#endif
 
 //#define AUTOMATION_RUN
-#define AUTOMATION_SIZES        { 100, 250, 500, 750, 1000, /* 1250, 1500, 1750, 2000*/ }
-#define AUTOMATION_INSTRUCTIONS { 's' };//, 's', 's' }
+#define AUTOMATION_SIZES                { 100, 250, 500, 750, 1000, 1250, 1500, 1750, 2000 }
+#define AUTOMATION_INSTRUCTIONS         { 's' };//, 's', 's' }
 #define AUTOMATION_END_AFTER_INSTRUCTIONS
 
 #define IMAGE_SET 0
@@ -30,7 +32,7 @@
 #define IMAGE_TICKS                     (90)//*20)
 #define THRESH_IMAGE
 #ifndef __CAM__
-#define ROTATE_IMAGE
+//#define ROTATE_IMAGE
 #endif
 
 #define TITLE_STRING                    "Combine Alpha v1.2"
@@ -57,8 +59,8 @@
 #define FRAME_HEIGHT                    FRAME_WIDTH
 #else
 #ifdef __CAM__
-#define FRAME_WIDTH                     1920
-#define FRAME_HEIGHT                    1080
+#define FRAME_WIDTH                     (1920>>1)
+#define FRAME_HEIGHT                    (1080>>1)
 #else
 #define FRAME_WIDTH                     700
 #define FRAME_HEIGHT                    FRAME_WIDTH
