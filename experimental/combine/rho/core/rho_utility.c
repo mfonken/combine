@@ -507,8 +507,7 @@ void SortRegionsRhoUtility( rho_detection_variables * _, prediction_t * predicti
     for( i = 0; i < _->total_regions; i++)
     {
         order_t* o = &prediction->RegionsOrder[i];
-        curr = &prediction->Regions[o->index];
-        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d S:%.4f\n", prediction->Name, o->index, o->valid?'Y':'N', curr->location, curr->score);
+        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> I%d%c L:%d S:%.4f\n", prediction->Name, o->index, o->valid?'Y':'N', prediction->Regions[o->index].location, prediction->Regions[o->index].score);
 
         c2[i] = o->index;
         bool already_has = false;

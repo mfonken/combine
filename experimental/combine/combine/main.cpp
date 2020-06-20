@@ -15,9 +15,13 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
     Environment env(&tau, TAU_FPS);
 #ifdef __IMU__
     Combine combine("Combine", &tau );
-//    SerialWriter comm(BLUETOOTH, "/dev/tty.MARBL-COM15");
-    SerialWriter comm(SFILE, TX_FILENAME);
+    SerialWriter comm(BLUETOOTH, "/dev/tty.MARBL-COM15");
+//    SerialWriter comm(SFILE, TX_FILENAME);
     env.AddTest(&combine, &comm, COMBINE_FPS);
+#endif
+
+#ifdef AUTOMATION_INSTRUCTIONS
+    int instruction_index = 0;
 #endif
     
     env.Start();
@@ -26,12 +30,9 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
 //    env.Resume();
     
     struct timeval a,b;
-    int instruction_index = 0;
-    Mat local_frame(tau.frame.size(), CV_8UC3, Scalar(0));
-    cimage_t img;
-    cimageInit(img, width, height);
     
-    vector<KeyPoint> keyPoints;
+    Mat local_frame(tau.frame.size(), CV_8UC3, Scalar(0));
+    
     
     while(1)
     {
@@ -42,6 +43,7 @@ int run( char instructions[] = {}, int num_instructions = 0, bool end_after_inst
         imshow(TITLE_STRING, local_frame);
 
 #ifdef CV_TRACK_BLOBS
+        vector<KeyPoint> keyPoints;
         pthread_mutex_lock(&tau.utility.outframe_mutex);
         tau.utility.outframe.copyTo(local_frame);
         pthread_mutex_unlock(&tau.utility.outframe_mutex);

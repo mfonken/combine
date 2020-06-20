@@ -29,13 +29,13 @@
 #define IMAGE_SET 0
 #define IMAGE_SINGLE 1
 
-#define IMAGE_TICKS                     (90)//*20)
+#define IMAGE_TICKS                     (90)
 #define THRESH_IMAGE
 #ifndef __CAM__
 //#define ROTATE_IMAGE
 #endif
 
-#define TITLE_STRING                    "Combine Alpha v1.2"
+#define TITLE_STRING                    "Combine Alpha v1.3"
 #define GROUP_NAME                      "/gradient/"// "/misc/""/frames/star/"
 #define FILE_NAME                       "gradient_centralized"//"double_circle_fade""triple_circle_fade"//"double_square"
 //#define GROUP_NAME                      "/frames/small/"
@@ -73,7 +73,7 @@
 #define FRAME_SAVE_ROOT                 FILE_ROOT "PCRImages/"
 
 //#define sleep(X) usleep(X*1E6)
-#define KEY_DELAY 1E3/MAIN_FPS
+#define KEY_DELAY (1E3/MAIN_FPS)
 
 #define TX_FILENAME                     FILE_ROOT "psm_perf/p_data.csv"
 #define X_DIM_FILENAME                  FILE_ROOT "psm_perf/x_data.csv"
