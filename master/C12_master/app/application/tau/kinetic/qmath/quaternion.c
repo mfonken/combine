@@ -6,8 +6,8 @@
 **************************************************************************************************/
 
 /* Own header */
-#include <app/application/tau/kinetic/qmath/quaternion.h>
-#include <app/application/tau/kinetic/qmath/vector.h>
+#include "quaternion.h"
+#include "vector.h"
 
 /* See - http://www.gamasutra.com/view/feature/131686/rotating_objects_using_quaternions.php */
 /* Generic intrinsic euler angles to quaternion conversion */

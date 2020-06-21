@@ -6,7 +6,7 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include <app/application/tau/taumanager.h>
+#include "taumanager.h"
 #include "timestamp.h"
 
 #define TAU_ID 0xef

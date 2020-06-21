@@ -6,7 +6,7 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include <app/application/tau/kinetic/qmath/point.h>
+#include "point.h"
 
 static void init( kpoint_t * p, floating_t offset_x, floating_t offset_y, floating_t scale, floating_t focal_length )
 {

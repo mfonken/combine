@@ -31,6 +31,8 @@
 
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
+
+///TODO: SPOOF!
 /* Port spoof */
 #define PORT0 0
 #define PORTA 0

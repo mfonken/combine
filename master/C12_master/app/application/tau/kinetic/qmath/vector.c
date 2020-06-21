@@ -6,7 +6,7 @@
 **************************************************************************************************/
 
 /* Own header */
-#include <app/application/tau/kinetic/qmath/vector.h>
+#include "vector.h"
 
 floating_t len2( vec3_t * v )
 {

@@ -1,4 +1,4 @@
-app// !$*UTF8*$!
+// !$*UTF8*$!
 {
 	archiveVersion = 1;
 	classes = {
@@ -28,6 +28,7 @@ app// !$*UTF8*$!
 		3491A38923C57877008010C8 /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37C23C57877008010C8 /* vector.c */; };
 		3491A38A23C57877008010C8 /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37F23C57877008010C8 /* point.c */; };
 		3491A38B23C57877008010C8 /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A38323C57877008010C8 /* quaternion.c */; };
+		34C44286249EDB710022D6DB /* application.c in Sources */ = {isa = PBXBuildFile; fileRef = 34C44285249EDB710022D6DB /* application.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -106,6 +107,7 @@ app// !$*UTF8*$!
 		3491A38323C57877008010C8 /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		3491A38C23C578F5008010C8 /* genlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = genlog.h; sourceTree = "<group>"; };
 		3491A38D23C57CB0008010C8 /* global_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_config.h; sourceTree = "<group>"; };
+		34C44285249EDB710022D6DB /* application.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = application.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@ app// !$*UTF8*$!
 			children = (
 				347F720C23D383C200427FD0 /* application_types.h */,
 				347F720D23D3A34400427FD0 /* application.h */,
+				34C44285249EDB710022D6DB /* application.c */,
 				347F720F23D3A5C500427FD0 /* tau */,
 				3491A32E23C57815008010C8 /* debug */,
 			);
@@ -441,6 +444,7 @@ app// !$*UTF8*$!
 				3431DBF923E60F9A00392FD4 /* papi_interface.c in Sources */,
 				3491A38723C57877008010C8 /* kinetic.c in Sources */,
 				3491A36A23C57815008010C8 /* batterymonitor.c in Sources */,
+				34C44286249EDB710022D6DB /* application.c in Sources */,
 				3491A36223C57815008010C8 /* taumanager.c in Sources */,
 				3491A35E23C57815008010C8 /* systembehavior.c in Sources */,
 				3491A38823C57877008010C8 /* matvec.c in Sources */,

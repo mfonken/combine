@@ -293,6 +293,7 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_s
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Read( emlib_spi_event_t * event )
 {
+///TODO: Finish implementing
 //    emlib_spi_transfer_return_t ret;
 //    uint8_t data = USART_RxDataGet( event->host.device );
 //    event->length = 1;

@@ -6,7 +6,7 @@
 //  Copyright © 2019 Matthew Fonken. All rights reserved.
 //
 
-#include <app/application/tau/kinetic/qmath/matvec.h>
+#include "matvec.h"
 
 float SafeExp(floating_t x)
 {
