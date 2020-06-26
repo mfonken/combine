@@ -30,7 +30,7 @@ typedef union
 
 typedef struct
 {
-    
+    uint8_t tmp;
 } comm_packet_t;
 
 void CommunicationManagerInit(void);

@@ -9,15 +9,14 @@
 #ifndef application_h
 #define application_h
 
-#include "../application/application_types.h"
-#include "../application/debug/application_debug.h"
-#include "../application/tau/taumanager.h"
+#include "application_types.h"
+#include "application_debug.h"
+#include "taumanager.h"
+#include "hapticcontroller.h"
 #include "motionsensor.h"
 #include "rho_client.h"
 #include "batterymonitor.h"
 #include "touchcontroller.h"
-#include "hapticcontroller.h"
-
 #include "C12_profile.h"
 
 typedef struct

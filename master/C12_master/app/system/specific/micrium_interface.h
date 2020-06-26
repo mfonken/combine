@@ -10,10 +10,13 @@
 #define micrium_interface_h
 
 #include "globaltypes.h"
-#include <unistd.h>
+//#include <unistd.h>
 
 /// SPOOF START
-#ifndef __MICRIUM__
+#ifdef __MICRIUM__
+#include <os.h>
+#define RTOS_ERR_NONE OS_ERR_NONE
+#else
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
 typedef const char      CPU_CHAR;
@@ -27,10 +30,12 @@ static void OSTaskDel(OS_TCB *p_tcb, RTOS_ERR *p_err) {}
 #define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 
 #define OS_CFG_TICK_RATE_HZ 10000
+
+#endif /* __MICRIUM__ */
+
 #define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
 #define DEFAULT_QUEUE_SIZE 1
 
-#endif /* not __MICRIUM__ */
 /// SPOOF END
 
 #define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
@@ -207,12 +212,12 @@ static inline void MICRIUM_OSInterface_Start( void )
 
 static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskCreate(task_data->p_tcb,
+    OSTaskCreate(&task_data->tcb,
                  task_data->p_name,
                  task_data->p_task,
                  task_data->p_arg,
                  task_data->prio,
-                 task_data->p_stk_base,
+                 &task_data->stk_base,
                  task_data->stk_limit,
                  task_data->stk_size,
                  task_data->q_size,
@@ -225,27 +230,27 @@ static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task
 
 static inline void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskResume(task_data->p_tcb,
+    OSTaskResume(task_data->tcb,
                  task_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_SuspendTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskSuspend(task_data->p_tcb,
+    OSTaskSuspend(task_data->tcb,
                   task_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_DeleteTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskDel(task_data->p_tcb,
+    OSTaskDel(task_data->tcb,
               task_data->p_err);
 }
 
 
-/ * OS Queue * /
+/* OS Queue */
 static inline void MICRIUM_OSInterface_CreateQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQCreate(queue_data->p_q,
+    OSQCreate(&queue_data->q,
               queue_data->p_name,
               queue_data->max_qty,
               queue_data->p_err);
@@ -253,38 +258,38 @@ static inline void MICRIUM_OSInterface_CreateQueue( micrium_os_queue_data_t * qu
 
 static inline void MICRIUM_OSInterface_DeleteQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQDel(queue_data->p_q,
+    OSQDel(&queue_data->q,
            queue_data->opt,
            queue_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_FlushQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQFlush(queue_data->p_q,
+    OSQFlush(&queue_data->q,
              queue_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_PendQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQPend(queue_data->p_q,
+    OSQPend(&queue_data->q,
             queue_data->timeout,
             queue_data->opt,
-            queue_data->p_msg_size,
+            queue_data->msg_size,
             queue_data->p_ts,
             queue_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_PendAbortQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQPendAbort(queue_data->p_q,
+    OSQPendAbort(&queue_data->q,
                  queue_data->opt,
                  queue_data->p_err);
 }
 static inline void MICRIUM_OSInterface_PostQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQPost(queue_data->p_q,
+    OSQPost(&queue_data->q,
             queue_data->p_void,
-            *queue_data->p_msg_size,
+            queue_data->msg_size,
             queue_data->opt,
             queue_data->p_err);
 }
@@ -329,9 +334,9 @@ static inline bool MICRIUM_OSInterface_StartTimer( micrium_os_timer_data_t * tim
                       timer_data->p_err);
 }
 
-static inline CPU_STATE MICRIUM_OSInterface_StartGetTimer( micrium_os_timer_data_t * timer_data )
+static inline OS_STATE MICRIUM_OSInterface_StartGetTimer( micrium_os_timer_data_t * timer_data )
 {
-   return OSTmrStartGet(timer_data->p_tmr,
+   return OSTmrStateGet(timer_data->p_tmr,
                         timer_data->p_err);
 }
 

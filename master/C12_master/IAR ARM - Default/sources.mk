@@ -27,33 +27,28 @@ S79_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-app/appcore/tau/kinetic/filters \
-app/appcore/tau/kinetic \
-app/appcore/tau/kinetic/qmath \
-app/appcore/tau/kinetic/wrapper \
-app/appcore/tau \
+app/application \
+app/application/tau/kinetic/filters \
+app/application/tau/kinetic/imu \
+app/application/tau/kinetic \
+app/application/tau/kinetic/qmath \
+app/application/tau \
 app/bluetooth/common/util \
 app \
-app/peripherals/drivers/hapticontroller \
+app/peripherals/drivers/hapticcontroller \
 app/peripherals/sensors/batterymonitor \
 app/peripherals/sensors/motionsensor \
 app/peripherals/sensors/rhoclient \
-app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M/ARM \
-app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M/CCS \
-app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M/GNU \
 app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR \
 app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M \
 app/rtos/micrium/uC-CPU \
-app/rtos/micrium/uC-LIB/Ports/ARM-Cortex-M3/GNU \
 app/rtos/micrium/uC-LIB/Ports/ARM-Cortex-M3/IAR \
-app/rtos/micrium/uC-LIB/Ports/ARM-Cortex-M3/RealView \
 app/rtos/micrium/uC-LIB \
-app/rtos/micrium/uCOS-III/Ports/ARM-Cortex-M/ARMv7-M/ARM \
-app/rtos/micrium/uCOS-III/Ports/ARM-Cortex-M/ARMv7-M/CCS \
-app/rtos/micrium/uCOS-III/Ports/ARM-Cortex-M/ARMv7-M/GNU \
+app/rtos/micrium/uCOS-III/Cfg/Template \
 app/rtos/micrium/uCOS-III/Ports/ARM-Cortex-M/ARMv7-M/IAR \
 app/rtos/micrium/uCOS-III/Ports/ARM-Cortex-M/ARMv7-M \
 app/rtos/micrium/uCOS-III/Source \
+app/rtos/micrium/uCOS-III/TLS/IAR \
 app/system/core \
 app/system/interfaces \
 app/system/sysiocontroller \
@@ -66,11 +61,4 @@ platform/emdrv/sleep/src \
 platform/emlib/src \
 platform/service/sleeptimer/src \
 protocol/bluetooth/lib/EFR32BG13P/IAR \
-tau/kinetic/filters \
-tau/kinetic \
-tau/kinetic/qmath \
-tau/kinetic/wrapper \
-tau/utilities/algorithm \
-tau/utilities/time \
-tau/xprm \
 

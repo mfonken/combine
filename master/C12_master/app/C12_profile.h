@@ -7,6 +7,7 @@
 #ifndef C12_profile_h
 #define C12_profile_h
 
+#define APPLICATION C12
 #define NONE 0
 
 typedef enum

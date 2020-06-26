@@ -17,6 +17,8 @@
 #ifndef APP_H_
 #define APP_H_
 
+#include "systembridge.h"
+
 #include "gecko_configuration.h"
 
 /* DEBUG_LEVEL is used to enable/disable debug prints. Set DEBUG_LEVEL to 1 to enable debug prints */

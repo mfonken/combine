@@ -35,6 +35,9 @@ static uint8_t boot_to_dfu = 0;
 /* Main application */
 void appMain(gecko_configuration_t *pconfig)
 {
+#warning Integrate BLE into application
+	Bridge.Start();
+
 #if DISABLE_SLEEP > 0
   pconfig->sleep.flags = 0;
 #endif

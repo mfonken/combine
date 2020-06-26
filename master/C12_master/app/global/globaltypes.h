@@ -17,6 +17,11 @@
 #include "C12_profile.h"
 
 
+#define __MICRIUM__
+#define __PAPI__ 		EMLIB
+#define __PLATFORM__ 	EFR32
+#define __OS__ 			MICRIUM
+
 #define MAX_COMPONENTS 3
 
 #define NAME_STRINGIFY(x,y) x ## _ ## y
@@ -27,7 +32,7 @@
 
 //#define COMPONENT_ID(A,B) (component_id_t){ A, B } //( ( A << 8 ) & 0xff00 | ( B & 0x00ff ) )
 
-/// Should global def be checked here or in implementation?
+#warning Should global def be checked here or in implementation?
 #define PLATFORM_SPECIFIC(NAME) NAME_BUILDER(__PLATFORM__, NAME)
 #define OS_SPECIFIC(NAME) NAME_BUILDER(__OS__, NAME)
 #define PAPI_SPECIFIC(NAME) NAME_BUILDER(__PAPI__, NAME)

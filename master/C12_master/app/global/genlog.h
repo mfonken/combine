@@ -27,6 +27,7 @@ enum LogLevel
 #define LOG(L,...)              if(L >= GLOBAL_LOG_LEVEL) \
                                 {  for(uint8_t i=L;i<ALWAYS;i++) \
                                 printf("\t"); printf(__VA_ARGS__); }
+#warning TODO: Implement printf for EFR32
 #define LOG_BARE(L,...)         if(L >= GLOBAL_LOG_LEVEL) \
                                 { printf(__VA_ARGS__); }
 #endif
