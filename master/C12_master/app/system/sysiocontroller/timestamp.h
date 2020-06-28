@@ -9,14 +9,22 @@
 #ifndef timestamp_h
 #define timestamp_h
 
+#if __OS__ == MICRIUM
+#include "systemmanager.h"
+static double TIMESTAMP(void)
+{
+    (double) ms = (double)OS_SPECIFIC(OS.Timestamp());
+    return ms / 1000.0;
+}
+#else
 #include <sys/time.h>
-
 static double TIMESTAMP(void)
 {
     struct timeval stamp;
     gettimeofday(&stamp, NULL);
     return stamp.tv_sec + stamp.tv_usec/1000000.0;
 }
+#endif
 
 static double SECONDSSINCE( double check )
 {

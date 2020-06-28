@@ -1,19 +1,21 @@
-////
-////  main.c
-////  C12_rtos
-////
-////  Created by Matthew Fonken on 8/5/18.
-////  Copyright © 2018 Marbl. All rights reserved.
-////
+#ifdef APP_MAIN
 //
-//// /* Types */
-//// #include "systemtypes.h"
+//  main.c
+//  C12_rtos
 //
-///* Functions */
-//#include "systembridge.h"
+//  Created by Matthew Fonken on 8/5/18.
+//  Copyright © 2018 Marbl. All rights reserved.
 //
-//int main(int argc, const char * argv[])
-//{
-//    Bridge.Start();
-//    return 0;
-//}
+
+// /* Types */
+// #include "systemtypes.h"
+
+/* Functions */
+#include "systembridge.h"
+
+int main(int argc, const char * argv[])
+{
+    Bridge.Start();
+    return 0;
+}
+#endif

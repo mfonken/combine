@@ -17,15 +17,15 @@
 #include <math.h>
 #include <string.h>
 
-#include "../../../application/tau/kinetic/qmath/matvec.h"
-#include "../../../application/tau/kinetic/qmath/qmath.h"
+#include "matvec.h"
+#include "qmath.h"
 #include "global_config.h"
 
 /* Math headers */
 
 /* Filters */
 #ifdef __KALMAN__
-#include "../../../application/tau/kinetic/filters/kalman.h"
+#include "kalman.h"
 
 //#define KINETIC_USE_QUATERNION_INPUT
 #define KINETIC_USE_POINT_TRANSLATION_ROTATION_CORRECTION

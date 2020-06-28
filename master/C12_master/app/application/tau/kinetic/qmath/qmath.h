@@ -10,8 +10,8 @@
 #define qmath_master_h
 
 //#include "matvec.h"
-#include "../../../../application/tau/kinetic/qmath/point.h"
-#include "../../../../application/tau/kinetic/qmath/quaternion.h"
-#include "../../../../application/tau/kinetic/qmath/vector.h"
+#include "point.h"
+#include "quaternion.h"
+#include "vector.h"
     
 #endif /* imu_math_h */

@@ -9,8 +9,8 @@
 #ifndef system_types_h
 #define system_types_h
 
-#include "../../application/application_types.h"
-#include "../../application/debug/application_debug.h"
+#include "application_types.h"
+#include "application_debug.h"
 #include "global_config.h"
 
 #if __OS__ == MICRIUM

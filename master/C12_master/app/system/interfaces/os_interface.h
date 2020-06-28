@@ -81,6 +81,7 @@ static system_os_interface_functions OS =
     .Init = OSInterface_Init,
     .Start = OSInterface_Start,
     .DelayMs = OSInterface_DelayMs,
+    .Timestamp = OSInterface_Timestamp,
     
     .Task.Create = OSInterface_CreateTask,
     .Task.Resume = OSInterface_ResumeTask,

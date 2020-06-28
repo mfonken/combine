@@ -12,7 +12,7 @@
 extern "C" {
 #endif
     
-#include "../../../../application/tau/kinetic/qmath/qmath_types.h"
+#include "qmath_types.h"
     
 #define SIGN(X)   ((X)>=0?1:-1)
 #define RASIN(X)  ((X)>-1&&X<1?asin(X):SIGN(X)*M_PI_2)

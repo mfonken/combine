@@ -9,7 +9,7 @@
 #define MATVEC_LIB
 
 #ifdef MATVEC_LIB
-#include "../../../../application/tau/kinetic/qmath/matvec.h"
+#include "matvec.h"
 #endif
 
 #define KALMAN_PUNISH_FACTOR  0.7

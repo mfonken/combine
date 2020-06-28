@@ -41,6 +41,7 @@ static void OSTaskDel(OS_TCB *p_tcb, RTOS_ERR *p_err) {}
 #define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
 #define TICK_TO_HZ(X)   ( (double)X / (double)OS_CFG_TICK_RATE_HZ )                          /// <--- Double Check
 #define MS_TO_TICK(X)   ( (OS_TICK)( ( (double)X / 1000. ) * (double)OS_CFG_TICK_RATE_HZ ) ) /// <--- Double Check
+#define TICK_TO_MS(X)   ( (CPU_TS)( ( (double)X * 1000. ) / (double)OS_CFG_TICK_RATE_HZ ) )/// <--- Double Check
 
 typedef struct
 {
@@ -151,6 +152,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 static void MICRIUM_OSInterface_Init( void ) {}
 static void MICRIUM_OSInterface_Start( void ) {}
 static void MICRIUM_OSInterface_DelayMs( uint32_t ms ) { usleep(ms * 1000); }
+static CPU_TS MICRIUM_OSInterface_Timestamp( void ) { return (uint32_t)TIMESTAMP(); }
 static void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_SuspendTask( micrium_os_task_data_t * task_data ) {}
@@ -201,14 +203,25 @@ static inline void MICRIUM_OSInterface_Start( void )
     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
 }
  
- static inline void MICRIUM_OSInterface_Delay( uint32_t ms )
- {
-     RTOS_ERR  err;
-     
-     OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
-     
-     APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
- }
+static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
+{
+    RTOS_ERR  err;
+
+    OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
+
+    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+}
+
+static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
+{
+    RTOS_ERR  err;
+
+    OS_TICK ticks = OSTimeGet(&err);
+
+    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    
+    return TICK_TO_MS(ticks);
+}
 
 static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data )
 {

@@ -9,7 +9,7 @@
 #ifndef systembridge_h
 #define systembridge_h
 
-#include "../../application/application.h"
+#include "application.h"
 
 void Start(void)
 {

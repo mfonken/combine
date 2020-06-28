@@ -13,7 +13,7 @@
 extern "C" {
 #endif
     
-#include "../../../../application/tau/kinetic/qmath/qmath_types.h"
+#include "qmath_types.h"
     
     typedef struct
     {
