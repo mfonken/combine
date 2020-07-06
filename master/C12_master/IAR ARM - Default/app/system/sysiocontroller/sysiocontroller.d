@@ -22,12 +22,6 @@ app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\m
 app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
 app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\genlog.h
 app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\micrium_interface.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Source\os.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Cfg\Template\os_cfg.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Cfg\Template\os_cfg_app.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\cpu_core.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\ARM-Cortex-M\ARMv7-M\IAR\cpu.h
-app/system/sysiocontroller/sysiocontroller.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\intrinsics.h
-app/system/sysiocontroller/sysiocontroller.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iccarm_builtin.h
-app/system/sysiocontroller/sysiocontroller.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iar_intrinsics_common.h
-app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\cpu_def.h
+app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\kernel\include\os.h
+app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu.h
+app/system/sysiocontroller/sysiocontroller.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu_def.h

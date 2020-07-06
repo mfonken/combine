@@ -156,14 +156,15 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/peripherals/sensors/motionsensor}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/peripherals/sensors/rhoclient}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/peripherals/sensors/touchcontroller}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/micrium/uCOS-III/Cfg/Template}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/micrium/uC-CPU/}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/micrium/uCOS-III/Source}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/micrium/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/micrium_os}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/Source}&quot;"/>
 								</option>
 								<option id="iar.arm.toolchain.compiler.option.defines.v5.4.0.1061833428" name="Defined Symbols:" superClass="iar.arm.toolchain.compiler.option.defines.v5.4.0" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAL_CONFIG=1"/>
 									<listOptionValue builtIn="false" value="EFR32BG13P632F512GM48=1"/>
+									<listOptionValue builtIn="false" value="DEBUG=1"/>
+									<listOptionValue builtIn="false" value="__MICRIUM__=1"/>
+									<listOptionValue builtIn="false" value="NULL=0"/>
 								</option>
 								<inputType id="iar.arm.toolchain.compiler.inputType.c.v6.12.0.81332682" name="IAR C/C++ Compiler Input Type" superClass="iar.arm.toolchain.compiler.inputType.c.v6.12.0"/>
 							</tool>

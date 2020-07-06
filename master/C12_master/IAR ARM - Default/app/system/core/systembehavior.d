@@ -7,6 +7,7 @@ app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Config_Normal.h
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product.h
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ysizet.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\sysiocontroller.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papi_interface.h
@@ -24,12 +25,6 @@ app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techinc
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\genlog.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\micrium_interface.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Source\os.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Cfg\Template\os_cfg.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uCOS-III\Cfg\Template\os_cfg_app.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\cpu_core.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\ARM-Cortex-M\ARMv7-M\IAR\cpu.h
-app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\intrinsics.h
-app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iccarm_builtin.h
-app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iar_intrinsics_common.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium\uC-CPU\cpu_def.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\kernel\include\os.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu_def.h

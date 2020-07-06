@@ -11,13 +11,14 @@
 
 #if __OS__ == MICRIUM
 #include "systemmanager.h"
+
 static double TIMESTAMP(void)
 {
-    (double) ms = (double)OS_SPECIFIC(OS.Timestamp());
-    return ms / 1000.0;
+    return (double)OS.Timestamp() / 1000.0;
 }
 #else
 #include <sys/time.h>
+
 static double TIMESTAMP(void)
 {
     struct timeval stamp;

@@ -14,8 +14,11 @@
 
 /// SPOOF START
 #ifdef __MICRIUM__
-#include <os.h>
-#define RTOS_ERR_NONE OS_ERR_NONE
+#include <kernel/include/os.h>
+#ifndef OS_ERR
+#define OS_ERR RTOS_ERR
+#define OS_ERR_NONE RTOS_ERR_NONE
+#endif
 #else
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
@@ -27,12 +30,12 @@ typedef unsigned short  OS_MSG_QTY, OS_OPT, OS_MSG_SIZE;
 #ifndef OSTaskDel
 static void OSTaskDel(OS_TCB *p_tcb, RTOS_ERR *p_err) {}
 #endif
-#define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 
-#define OS_CFG_TICK_RATE_HZ 10000
 
 #endif /* __MICRIUM__ */
 
+#define OS_CFG_TICK_RATE_HZ 10000
+#define COMPLETE_TASK OSTaskDel((OS_TCB *)0, &System.error.runtime);
 #define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
 #define DEFAULT_QUEUE_SIZE 1
 
@@ -186,10 +189,10 @@ static inline void MICRIUM_OSInterface_Init( void )
     OSInit(&err);
     
     /*   Check error code.                                  */
-    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
     
     /*   Check error code.                                  */
-    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
 }
 
 static inline void MICRIUM_OSInterface_Start( void )
@@ -200,7 +203,7 @@ static inline void MICRIUM_OSInterface_Start( void )
     OSStart(&err);
     
     /* Check error code.                                    */
-    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
 }
  
 static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
@@ -209,7 +212,7 @@ static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
 
     OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
 
-    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
 }
 
 static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
@@ -218,7 +221,7 @@ static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
 
     OS_TICK ticks = OSTimeGet(&err);
 
-    APP_RTOS_ASSERT_DBG((RTOS_ERR_CODE_GET(err) == RTOS_ERR_NONE), 1);
+    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
     
     return TICK_TO_MS(ticks);
 }

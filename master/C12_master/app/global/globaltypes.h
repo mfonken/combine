@@ -17,10 +17,11 @@
 #include "C12_profile.h"
 
 
-#define __MICRIUM__
 #define __PAPI__ 		EMLIB
 #define __PLATFORM__ 	EFR32
+#ifdef __MICRIUM__
 #define __OS__ 			MICRIUM
+#endif
 
 #define MAX_COMPONENTS 3
 
