@@ -32,24 +32,19 @@ void InitializeMeta(void)
 {
     /* Override SYSIOCTL's component initializer for Application's */
     SysIOCtlFunctions.InitComponent = AppFunctions.InitComponent;
-
-    system_profile_t profile = PROFILE_TEMPLATE;
-    memcpy( &Profile, &profile, sizeof(system_profile_t));
-    
-    SystemFunctions.Init( &Profile );
 }
 
-void Application_InitComponent( component_t * component )
+void Application_InitComponent( component_t * p_component )
 {
-    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", component->name, component->ID);
+    LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", p_component->name, p_component->ID);
     generic_id_t ID = PROTOCOL_ID_NULL;
-    switch( component->ID)
+    switch( p_component->ID)
     {
         case COMPONENT_ID_MOTION_SENSOR:
             ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
             if( ID != PROTOCOL_ID_NULL )
             {
-                IMUFunctions.Init( &App.objects.IMU, component->ID, ID, component->protocol, IMU_CHIP_BNO080 );
+                IMUFunctions.Init( &App.objects.IMU, p_component->ID, ID, p_component->protocol, IMU_CHIP_BNO080 );
             }
             break;
         
@@ -68,16 +63,16 @@ void Application_InitComponent( component_t * component )
 }
 
 /* Rho In */
-void RhoInputHandler( comm_host_t * host )
+void RhoInputHandler( comm_host_t * p_host )
 {
-    RhoFunctions.Receive( host, &App.objects.Rho );
+    RhoFunctions.Receive( p_host, &App.objects.Rho );
     RhoPointToKPoint( &App.objects.Rho.packet.primary, &App.buffers.rho.data[0] );
     RhoPointToKPoint( &App.objects.Rho.packet.secondary, &App.buffers.rho.data[1] );
     rho_get_confidence( &App.objects.Rho, App.buffers.rho.confidence );
 }
 
 /* Rho In */
-void RhoOutputHandler( comm_host_t * host )
+void RhoOutputHandler( comm_host_t * p_host )
 {
 }
 
@@ -89,11 +84,11 @@ void MotionOutputHandler( imu_feature_t feature, uint32_t interval )
 /* Motion In */
 void MotionInputHandler( void )
 {
-    shtp_client_t * client = &App.objects.IMU.client;
+    shtp_client_t * p_client = &App.objects.IMU.client;
     
-    if( IMUFunctions.Refresh( client ) )
+    if( IMUFunctions.Refresh( p_client ) )
     {
-        switch( client->output.type )
+        switch( p_client->output.type )
         {
             case SH2_SENSOR_REPORT_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_GRAVITY:
@@ -102,8 +97,8 @@ void MotionInputHandler( void )
             case SH2_SENSOR_REPORT_STABILIZED_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_STABILIZED_GAME_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_GYRO_INTEGRATED_ROTATION_VECTOR:
-                RotVecToQuaternion( &client->output.rotation_vector, &App.buffers.orientation.data );
-                App.buffers.orientation.timestamp = client->output.rotation_vector.timestamp;
+                RotVecToQuaternion( &p_client->output.rotation_vector, &App.buffers.orientation.data );
+                App.buffers.orientation.timestamp = p_client->output.rotation_vector.timestamp;
                 break;
             default:
                 break;
@@ -112,41 +107,34 @@ void MotionInputHandler( void )
 }
 
 /* BLE Out */
-void HostOutputHandler( void )
+void HostOutputHandler( comm_packet_t * p_packet )
 {
-    
+    CommFunctions.Perform.Transmit( p_packet );
 }
 
 /* BLE In */
-void HostInputHandler( void )
+void HostInputHandler( comm_packet_t * p_packet )
 {
-    // State change?
-//    CommFunctions.Perform.Receive();
+    CommFunctions.Perform.Receive( p_packet );
 }
 
-///* Sub Out */
-//void SubRadioOutputHandler( void )
-//{
-//
-//}
-
 /* Touch In */
-void TouchInterruptHandler( comm_host_t * host )
+void TouchInterruptHandler( comm_host_t * p_host )
 {
-    touch_data_t * ptr = &App.buffers.touch;
-    touch_packet_t packet = TouchController.Read( host );
+    touch_data_t * p_touch_data = &App.buffers.touch;
+    touch_packet_t packet = TouchController.Read( p_host );
     switch(packet.type)
     {
         case TOUCH_EVENT:
-            ptr->buttons |= ( 1 << packet.index );
+            p_touch_data->buttons |= ( 1 << packet.index );
             break;
         case SLIDER_EVENT:
-            ptr->slider = packet.slider;
+            p_touch_data->slider = packet.slider;
             break;
         case RELEASE_EVENT:
-            ptr->buttons &= ~( 1 << packet.index );
-            ptr->prev_slider = ptr->slider;
-            ptr->slider = TOUCH_SLIDER_NULL;
+            p_touch_data->buttons &= ~( 1 << packet.index );
+            p_touch_data->prev_slider = p_touch_data->slider;
+            p_touch_data->slider = TOUCH_SLIDER_NULL;
             break;
         default:
             break;

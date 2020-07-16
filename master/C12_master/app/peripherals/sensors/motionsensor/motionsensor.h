@@ -9,7 +9,7 @@
 #ifndef motionsensor_h
 #define motionsensor_h
 
-#include "../../../application/tau/kinetic/qmath/quaternion.h"
+#include "quaternion.h"
 #include "BNO080.h"
 
 #define IMU_DEFAULT_COMPONENT_PROTOCOL SYSTEM_COMPONENT_PROTOCOLSPI

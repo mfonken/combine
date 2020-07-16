@@ -114,78 +114,78 @@ typedef struct
 //    } data;
 //{ return (i2c_event_t){ (i2c_host_t *)host, I2C_WRITE_REG_EVENT, STC3100_REG_MODE,             STC3100_REG_LEN,    .data.buffer = b }; }
 /* I2C Events */
-static inline i2c_event_t STC3100SetModeEvent(    comm_host_t * host, stc3100_reg_mode_t   data )  { return I2C_WR_REG( host, STC3100_REG_MODE,            data ); }
-static inline i2c_event_t STC3100GetModeEvent(    comm_host_t * host, stc3100_reg_mode_t * data )  { return I2C_RD_REG( host, STC3100_REG_MODE,            data ); }
-static inline i2c_event_t STC3100SetControlEvent( comm_host_t * host, stc3100_reg_ctrl_t   data )  { return I2C_WR_REG( host, STC3100_REG_CTRL,            data ); }
-static inline i2c_event_t STC3100GetControlEvent( comm_host_t * host, stc3100_reg_ctrl_t * data )  { return I2C_RD_REG( host, STC3100_REG_CTRL,            data ); }
-static inline i2c_event_t STC3100GetIDEvent(          comm_host_t * host, uint8_t * data )         { return I2C_RD_REG( host, STC3100_REG_ID0,             data ); }
-static inline i2c_event_t STC3100GetRAMEvent(         comm_host_t * host, uint8_t * data )         { return I2C_RD_REG( host, STC3100_REG_RAM_START,       data ); }
-static inline i2c_event_t STC3100GetChargeEvent(      comm_host_t * host, uint8_t * data )         { return I2C_RD_WD(  host, STC3100_REG_CHARGE_LOW,      data ); }
-static inline i2c_event_t STC3100GetCounterEvent(     comm_host_t * host, uint8_t * data )         { return I2C_RD_WD(  host, STC3100_REG_COUNTER_LOW,     data ); }
-static inline i2c_event_t STC3100GetCurrentEvent(     comm_host_t * host, uint8_t * data )         { return I2C_RD_WD(  host, STC3100_REG_CURRENT_LOW,     data ); }
-static inline i2c_event_t STC3100GetVoltageEvent(     comm_host_t * host, uint8_t * data )         { return I2C_RD_WD(  host, STC3100_REG_VOLTAGE_LOW,     data ); }
-static inline i2c_event_t STC3100GetTemperatureEvent( comm_host_t * host, uint8_t * data )         { return I2C_RD_WD(  host, STC3100_REG_TEMPERATURE_LOW, data ); }
+static inline i2c_event_t STC3100SetModeEvent(    comm_host_t * p_host, stc3100_reg_mode_t   data )  { return I2C_WR_REG( p_host, STC3100_REG_MODE,            data ); }
+static inline i2c_event_t STC3100GetModeEvent(    comm_host_t * p_host, stc3100_reg_mode_t * p_data )  { return I2C_RD_REG( p_host, STC3100_REG_MODE,            p_data ); }
+static inline i2c_event_t STC3100SetControlEvent( comm_host_t * p_host, stc3100_reg_ctrl_t   data )  { return I2C_WR_REG( p_host, STC3100_REG_CTRL,            data ); }
+static inline i2c_event_t STC3100GetControlEvent( comm_host_t * p_host, stc3100_reg_ctrl_t * p_data )  { return I2C_RD_REG( p_host, STC3100_REG_CTRL,            p_data ); }
+static inline i2c_event_t STC3100GetIDEvent(          comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_REG( p_host, STC3100_REG_ID0,             p_data ); }
+static inline i2c_event_t STC3100GetRAMEvent(         comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_REG( p_host, STC3100_REG_RAM_START,       p_data ); }
+static inline i2c_event_t STC3100GetChargeEvent(      comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_WD(  p_host, STC3100_REG_CHARGE_LOW,      p_data ); }
+static inline i2c_event_t STC3100GetCounterEvent(     comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_WD(  p_host, STC3100_REG_COUNTER_LOW,     p_data ); }
+static inline i2c_event_t STC3100GetCurrentEvent(     comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_WD(  p_host, STC3100_REG_CURRENT_LOW,     p_data ); }
+static inline i2c_event_t STC3100GetVoltageEvent(     comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_WD(  p_host, STC3100_REG_VOLTAGE_LOW,     p_data ); }
+static inline i2c_event_t STC3100GetTemperatureEvent( comm_host_t * p_host, uint8_t * p_data )         { return I2C_RD_WD(  p_host, STC3100_REG_TEMPERATURE_LOW, p_data ); }
 
-static void STC3100SetMode( comm_host_t * host, stc3100_reg_mode_t data )
+static void STC3100SetMode( comm_host_t * p_host, stc3100_reg_mode_t data )
 {
-    PerformI2CEvent(STC3100SetModeEvent( host, data ));
+    PerformI2CEvent(STC3100SetModeEvent( p_host, data ));
 }
-static stc3100_reg_mode_t STC3100GetMode( comm_host_t * host )
+static stc3100_reg_mode_t STC3100GetMode( comm_host_t * p_host )
 {
     stc3100_reg_mode_t mode;
-    PerformI2CEvent(STC3100GetModeEvent( host, &mode ) );
+    PerformI2CEvent(STC3100GetModeEvent( p_host, &mode ) );
     return mode;
 }
-static void STC3100SetControl( comm_host_t * host, stc3100_reg_ctrl_t data )
+static void STC3100SetControl( comm_host_t * p_host, stc3100_reg_ctrl_t data )
 {
-    PerformI2CEvent(STC3100SetControlEvent( host, data ));
+    PerformI2CEvent(STC3100SetControlEvent( p_host, data ));
 }
-static stc3100_reg_ctrl_t STC3100GetControl( comm_host_t * host )
+static stc3100_reg_ctrl_t STC3100GetControl( comm_host_t * p_host )
 {
     stc3100_reg_ctrl_t reg_ctrl;
-    PerformI2CEvent(STC3100GetControlEvent( host, &reg_ctrl ));
+    PerformI2CEvent(STC3100GetControlEvent( p_host, &reg_ctrl ));
     return reg_ctrl;
 }
-static uint8_t STC3100GetID( comm_host_t * host )
+static uint8_t STC3100GetID( comm_host_t * p_host )
 {
     uint8_t IDE;
-    PerformI2CEvent(STC3100GetIDEvent( host, &IDE ));
+    PerformI2CEvent(STC3100GetIDEvent( p_host, &IDE ));
     return IDE;
 }
-static uint8_t STC3100GetRAM( comm_host_t * host )
+static uint8_t STC3100GetRAM( comm_host_t * p_host )
 {
     uint8_t RAM;
-    PerformI2CEvent(STC3100GetRAMEvent( host, &RAM ) );
+    PerformI2CEvent(STC3100GetRAMEvent( p_host, &RAM ) );
     return RAM;
 }
-static uint8_t STC3100GetCharge( comm_host_t * host )
+static uint8_t STC3100GetCharge( comm_host_t * p_host )
 {
     uint8_t charge;
-    PerformI2CEvent(STC3100GetChargeEvent( host, &charge ) );
+    PerformI2CEvent(STC3100GetChargeEvent( p_host, &charge ) );
     return charge;
 }
-static uint8_t STC3100GetCounter( comm_host_t * host )
+static uint8_t STC3100GetCounter( comm_host_t * p_host )
 {
     uint8_t counter;
-    PerformI2CEvent(STC3100GetCounterEvent( host, &counter ) );
+    PerformI2CEvent(STC3100GetCounterEvent( p_host, &counter ) );
     return counter;
 }
-static uint8_t STC3100GetCurrent( comm_host_t * host )
+static uint8_t STC3100GetCurrent( comm_host_t * p_host )
 {
     uint8_t current;
-    PerformI2CEvent(STC3100GetCurrentEvent( host, &current ) );
+    PerformI2CEvent(STC3100GetCurrentEvent( p_host, &current ) );
     return current;
 }
-static uint8_t STC3100GetVoltage( comm_host_t * host )
+static uint8_t STC3100GetVoltage( comm_host_t * p_host )
 {
     uint8_t voltage;
-    PerformI2CEvent(STC3100GetVoltageEvent( host, &voltage ) );
+    PerformI2CEvent(STC3100GetVoltageEvent( p_host, &voltage ) );
     return voltage;
 }
-static uint8_t STC3100GetTemperature( comm_host_t * host )
+static uint8_t STC3100GetTemperature( comm_host_t * p_host )
 {
     uint8_t temperature;
-    PerformI2CEvent(STC3100GetTemperatureEvent( host, &temperature ) );
+    PerformI2CEvent(STC3100GetTemperatureEvent( p_host, &temperature ) );
     return temperature;
 }
 

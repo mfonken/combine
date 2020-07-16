@@ -38,43 +38,43 @@ void PAPIInterace_GPIO_Clear( gpio_t )
 #endif /* GPIO_SERVICE */
 
 #ifndef I2C_SERVICE
-bool PAPIInterface_I2C_Init( i2c_event_t * event ) { return true; }
-void PAPIInterface_I2C_Enable( i2c_event_t * event ) {}
-i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * event ) { return false; }
-i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * event ) { return false; }
-i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event ) { return false; }
+bool PAPIInterface_I2C_Init( i2c_event_t * p_event ) { return true; }
+void PAPIInterface_I2C_Enable( i2c_event_t * p_event ) {}
+i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * p_event ) { return false; }
+i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * p_event ) { return false; }
+i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t p_event ) { return false; }
 #else
-bool PAPIInterface_I2C_Init( i2c_event_t * event )
+bool PAPIInterface_I2C_Init( i2c_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel %p:0x%02x\n", event->host->device, event->host->address);
-    return PAPI_SPECIFIC(PAPIInterface_I2C_Init)(event);
+    LOG_PAPI(PAPI_DEBUG, "Initializing I2C on channel %p:0x%02x\n", p_event->host->device, p_event->host->address);
+    return PAPI_SPECIFIC(PAPIInterface_I2C_Init)( p_event );
 }
 
-void PAPIInterface_I2C_Enable( i2c_event_t * event )
+void PAPIInterface_I2C_Enable( i2c_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Enabling I2C on channel %p:0x%02x\n", event->host->device, event->host->address);
-    PAPI_SPECIFIC(PAPIInterface_I2C_Enable)(event);
+    LOG_PAPI(PAPI_DEBUG, "Enabling I2C on channel %p:0x%02x\n", p_event->host->device, p_event->host->address);
+    PAPI_SPECIFIC(PAPIInterface_I2C_Enable)( p_event );
 }
 
-i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * event )
+i2c_transfer_return_t PAPIInterface_I2C_Read( i2c_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Reading I2C on channel %p:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
+    LOG_PAPI(PAPI_DEBUG, "Reading I2C on channel %p:0x%02x:0x%02x\n", p_event->host->device, p_event->host->address, p_event->reg);
     i2c_transfer_return_t ret;
-    if( event->length == 1 && event->reg != NO_REG)
-        ret = PAPI_SPECIFIC(PAPIInterface_I2C_ReadRegister)(event);
+    if( p_event->length == 1 && p_event->reg != NO_REG)
+        ret = PAPI_SPECIFIC(PAPIInterface_I2C_ReadRegister)( p_event );
     else
-        ret = PAPI_SPECIFIC(PAPIInterface_I2C_Read)(event);
+        ret = PAPI_SPECIFIC(PAPIInterface_I2C_Read)( p_event );
     return ret;
 }
 
-i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * event )
+i2c_transfer_return_t PAPIInterface_I2C_Write( i2c_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Writing I2C on channel %p:0x%02x:0x%02x\n", event->host->device, event->host->address, event->reg);
+    LOG_PAPI(PAPI_DEBUG, "Writing I2C on channel %p:0x%02x:0x%02x\n", p_event->host->device, p_event->host->address, p_event->reg);
     i2c_transfer_return_t ret;
-    if( event->length == 1 && event->reg != NO_REG)
-        ret = PAPI_SPECIFIC(PAPIInterface_I2C_WriteRegister)(event);
+    if( p_event->length == 1 && p_event->reg != NO_REG)
+        ret = PAPI_SPECIFIC(PAPIInterface_I2C_WriteRegister)( p_event );
     else
-        ret = PAPI_SPECIFIC(PAPIInterface_I2C_Write)(event);
+        ret = PAPI_SPECIFIC(PAPIInterface_I2C_Write)( p_event );
     return ret;
 }
 
@@ -98,39 +98,39 @@ i2c_transfer_return_t PAPIInterface_I2C_Perform( i2c_event_t event )
 
 #ifndef SPI_SERVICE
 /// TODO look into "weak" across compilers
-bool PAPIInterface_SPI_Init( spi_event_t * event ) { return true; }
-void PAPIInterface_SPI_Enable( spi_event_t * event ) {}
-spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * event ) { return false; }
-spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * event ) { return false; }
+bool PAPIInterface_SPI_Init( spi_event_t * p_event ) { return true; }
+void PAPIInterface_SPI_Enable( spi_event_t * p_event ) {}
+spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * p_event ) { return false; }
+spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * p_event ) { return false; }
 spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t event ) { return false; }
 #else
-bool PAPIInterface_SPI_Init( spi_event_t * event )
+bool PAPIInterface_SPI_Init( spi_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Initializing SPI on channel %d\n", event->host.device);
-    return PAPI_SPECIFIC(PAPIInterface_SPI_Init)(event);
+    LOG_PAPI(PAPI_DEBUG, "Initializing SPI on channel %d\n", p_event->host.device);
+    return PAPI_SPECIFIC(PAPIInterface_SPI_Init)( p_event );
 }
 
-void PAPIInterface_SPI_Enable( spi_event_t * event )
+void PAPIInterface_SPI_Enable( spi_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Enabling SPI on channel %d\n", event->host.device);
-    PAPI_SPECIFIC(PAPIInterface_SPI_Enable)(event);
+    LOG_PAPI(PAPI_DEBUG, "Enabling SPI on channel %d\n", p_event->host.device);
+    PAPI_SPECIFIC(PAPIInterface_SPI_Enable)( p_event );
 }
 
-spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * event )
+spi_transfer_return_t PAPIInterface_SPI_Read( spi_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Reading SPI on channel %d\n", event->host.device);
-    return PAPI_SPECIFIC(PAPIInterface_SPI_Read)(event);
+    LOG_PAPI(PAPI_DEBUG, "Reading SPI on channel %d\n", p_event->host.device);
+    return PAPI_SPECIFIC(PAPIInterface_SPI_Read)( p_event );
 }
 
-spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * event )
+spi_transfer_return_t PAPIInterface_SPI_Write( spi_event_t * p_event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Writing SPI on channel %d\n", event->host.device);
-    return PAPI_SPECIFIC(PAPIInterface_SPI_Write)(event);
+    LOG_PAPI(PAPI_DEBUG, "Writing SPI on channel %d\n", p_event->host.device);
+    return PAPI_SPECIFIC(PAPIInterface_SPI_Write)( p_event );
 }
 
 spi_transfer_return_t PAPIInterface_SPI_Perform( spi_event_t event )
 {
-    LOG_PAPI(PAPI_DEBUG, "Performing SPI event on channel %d\n", event->host.device);
+    LOG_PAPI(PAPI_DEBUG, "Performing SPI event on channel %d\n", event.host.device);
     switch(event.type)
     {
         case I2C_READ_REG_EVENT:

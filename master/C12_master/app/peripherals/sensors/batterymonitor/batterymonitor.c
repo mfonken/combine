@@ -9,21 +9,21 @@
 #include <stdio.h>
 #include "batterymonitor.h"
 
-void GetBatteryMonitorBasicBase( comm_host_t * host )
+void GetBatteryMonitorBasicBase( comm_host_t * p_host )
 {
-    BatteryMonitor.GetBasic( host, host->generic_comm_host.buffer );
+    BatteryMonitor.GetBasic( p_host, p_host->generic_comm_host.buffer );
 }
 
-void GetBatteryMonitorBasic( comm_host_t * host, battery_monitor_basic_t * buffer )
+void GetBatteryMonitorBasic( comm_host_t * p_host, battery_monitor_basic_t * p_buffer )
 {
-    buffer->charge  = STC3100Functions.GetCharge(  host );
-    buffer->counter = STC3100Functions.GetCounter( host );
-    buffer->current = STC3100Functions.GetCurrent( host );
-    buffer->voltage = STC3100Functions.GetVoltage( host );
+    p_buffer->charge  = STC3100Functions.GetCharge(  p_host );
+    p_buffer->counter = STC3100Functions.GetCounter( p_host );
+    p_buffer->current = STC3100Functions.GetCurrent( p_host );
+    p_buffer->voltage = STC3100Functions.GetVoltage( p_host );
 }
 
-void SetBatteryMonitorMode( comm_host_t * host )
+void SetBatteryMonitorMode( comm_host_t * p_host )
 {
-    uint8_t mode = *(uint8_t *)host->generic_comm_host.buffer;
+    uint8_t mode = *(uint8_t *)p_host->generic_comm_host.buffer;
     printf("Setting to %d\n", mode);
 }

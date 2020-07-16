@@ -13,14 +13,14 @@
 #include "timestamp.h"
 #include "systemmanager.h"
 
-void SystemBehavior_PerformSelfCheck(void);
-void SystemBehavior_PerformConfirmInit(void);
-void SystemBehavior_PerformWaitForWake(void);
-void SystemBehavior_PerformProbeSend( system_task_id_t );
-void SystemBehavior_PerformProbeReceive( system_task_id_t );
-void SystemBehavior_PerformSchedulerSchedule( system_task_id_t, uint32_t );
-void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t );
-void SystemBehavior_PerformInterrupterSend( system_task_id_t );
+//void SystemBehavior_PerformSelfCheck(void);
+//void SystemBehavior_PerformConfirmInit(void);
+//void SystemBehavior_PerformWaitForWake(void);
+//void SystemBehavior_PerformProbeSend( system_task_id_t );
+//void SystemBehavior_PerformProbeReceive( system_task_id_t );
+//void SystemBehavior_PerformSchedulerSchedule( system_task_id_t, uint32_t );
+//void SystemBehavior_PerformSchedulerDeschedule( system_task_id_t );
+//void SystemBehavior_PerformInterrupterSend( system_task_id_t );
 void SystemBehavior_PerformInterrupterReceive( system_task_id_t, hw_event_message_t );
 void SystemBehavior_PerformInterrupterPerform( system_task_id_t );
 void SystemBehavior_PerformComponentInterrupt( port_t, pin_t, hw_edge_t );
@@ -29,12 +29,12 @@ void InitTask( system_task_id_t );
 
 typedef struct
 {
-    void (*SelfCheck)(void);
-    void (*ConfirmInit)(void);
-    void (*WaitForWake)(void);
+//    void (*SelfCheck)(void);
+//    void (*ConfirmInit)(void);
+//    void (*WaitForWake)(void);
     void (*ComponentInterrupt)( port_t, pin_t, hw_edge_t);
-    system_probe_functions Probe;
-    system_scheduler_functions Scheduler;
+//    system_probe_functions Probe;
+//    system_scheduler_functions Scheduler;
     system_interrupter_functions Interrupter;
 } system_behavior_perform_functions;
 
@@ -46,14 +46,14 @@ typedef struct
 
 static system_behavior_functions SystemBehavior =
 {
-    .Perform.SelfCheck              = SystemBehavior_PerformSelfCheck,
-    .Perform.ConfirmInit            = SystemBehavior_PerformConfirmInit,
-    .Perform.WaitForWake            = SystemBehavior_PerformWaitForWake,
-    .Perform.Probe.Send             = SystemBehavior_PerformProbeSend,
-    .Perform.Probe.Receive          = SystemBehavior_PerformProbeReceive,
-    .Perform.Scheduler.Schedule     = SystemBehavior_PerformSchedulerSchedule,
-    .Perform.Scheduler.Deschedule   = SystemBehavior_PerformSchedulerDeschedule,
-    .Perform.Interrupter.Send       = SystemBehavior_PerformInterrupterSend,
+//    .Perform.SelfCheck              = SystemBehavior_PerformSelfCheck,
+//    .Perform.ConfirmInit            = SystemBehavior_PerformConfirmInit,
+//    .Perform.WaitForWake            = SystemBehavior_PerformWaitForWake,
+//    .Perform.Probe.Send             = SystemBehavior_PerformProbeSend,
+//    .Perform.Probe.Receive          = SystemBehavior_PerformProbeReceive,
+//    .Perform.Scheduler.Schedule     = SystemBehavior_PerformSchedulerSchedule,
+//    .Perform.Scheduler.Deschedule   = SystemBehavior_PerformSchedulerDeschedule,
+//    .Perform.Interrupter.Send       = SystemBehavior_PerformInterrupterSend,
     .Perform.Interrupter.Receive    = SystemBehavior_PerformInterrupterReceive,
     .Perform.Interrupter.Perform    = SystemBehavior_PerformInterrupterPerform,
     .Perform.ComponentInterrupt     = SystemBehavior_PerformComponentInterrupt

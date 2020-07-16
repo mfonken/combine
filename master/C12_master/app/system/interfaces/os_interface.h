@@ -9,13 +9,14 @@
 #ifndef os_interface_h
 #define os_interface_h
 
-#include "profilemanager.h"
+#include "systemtypes.h"
 
 bool TaskHasValidTimer( os_task_data_t * );
 
-void OSInterface_Init(void);
-void OSInterface_Start(void);
+void OSInterface_Init( void );
+void OSInterface_Start( void );
 void OSInterface_DelayMs( uint32_t ms );
+uint32_t OSInterface_Timestamp( void );
 
 void OSInterface_CreateTask( os_task_data_t * );
 void OSInterface_ResumeTask( os_task_data_t * );
@@ -71,6 +72,7 @@ typedef struct
     void (*Init)(void);
     void (*Start)(void);
     void (*DelayMs)(uint32_t);
+    uint32_t (*Timestamp)(void);
     system_os_interface_task_functions Task;
     system_os_interface_queue_functions Queue;
     system_os_interface_timer_functions Timer;

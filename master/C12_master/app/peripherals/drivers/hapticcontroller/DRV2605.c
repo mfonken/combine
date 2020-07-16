@@ -6,7 +6,7 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include <drivers/hapticcontroller/DRV2605.h>
+#include "DRV2605.h"
 
 bool DRV2605_Start( comm_host_t * host )
 {

@@ -17,6 +17,10 @@
 #include "C12_profile.h"
 
 
+<<<<<<< Updated upstream
+=======
+//#define __MICRIUM__
+>>>>>>> Stashed changes
 #define __PAPI__ 		EMLIB
 #define __PLATFORM__ 	EFR32
 #ifdef __MICRIUM__

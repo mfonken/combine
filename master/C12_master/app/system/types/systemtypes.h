@@ -13,6 +13,9 @@
 #include "application_debug.h"
 #include "global_config.h"
 
+#define GECKO 1
+#define XCODE 2
+
 #if __OS__ == MICRIUM
 #include "micrium_interface.h"
 #else
@@ -31,6 +34,7 @@
 
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
+#define FOR( TYPE, NAME, LEN ) for( TYPE NAME = 0; NAME < LEN; NAME++ )
 
 #warning ///TODO: SPOOF!
 /* Port spoof */

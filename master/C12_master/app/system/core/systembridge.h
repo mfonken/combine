@@ -9,10 +9,11 @@
 #ifndef systembridge_h
 #define systembridge_h
 
-#include "application.h"
+#include "profilemanager.h"
 
 void Start(void)
 {
+    ProfileFunctions.Init();
     OS.Init();
     AppFunctions.Init();
     
@@ -31,6 +32,3 @@ static bridge_functions Bridge =
 };
 
 #endif /* systembridge_h */
-
-
-

@@ -91,9 +91,9 @@ void mul3( floating_t m, vec3_t * v, vec3_t * r )
 /* Cross product of two vectors */
 void cross3( vec3_t * u, vec3_t * v, vec3_t * r )
 {
-    r->i = u->j*v->k - u->k*v->j;
-    r->j = u->k*v->i - u->i*v->k;
-    r->k = u->i*v->j - u->j*v->i;
+    r->i = u->j * v->k - u->k * v->j;
+    r->j = u->k * v->i - u->i * v->k;
+    r->k = u->i * v->j - u->j * v->i;
 }
 
 /* Add two vectors */

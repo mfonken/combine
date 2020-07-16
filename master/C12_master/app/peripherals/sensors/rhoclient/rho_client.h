@@ -87,8 +87,8 @@ typedef struct
     comm_event_t (*GetReceiveEvent)( comm_host_t *, rho_packet_t * );
 } rho_functions;
 
-static comm_event_t RhoGetSendEvent( comm_host_t * host, rho_setting_t * s ) { return (comm_event_t)(generic_comm_event_t){ host, COMM_WRITE_REG, (uint8_t)sizeof(rho_setting_t), (uint8_t *)s }; }
-static comm_event_t RhoGetReceiveEvent( comm_host_t * host, rho_packet_t * p ) { return (comm_event_t)(generic_comm_event_t){ host, COMM_READ_REG, (uint8_t)sizeof(rho_packet_t), (uint8_t *)p }; }
+static comm_event_t RhoGetSendEvent( comm_host_t * p_host, rho_setting_t * p_settings ) { return (comm_event_t)(generic_comm_event_t){ p_host, COMM_WRITE_REG, (uint8_t)sizeof(rho_setting_t), (uint8_t *)p_settings }; }
+static comm_event_t RhoGetReceiveEvent( comm_host_t * p_host, rho_packet_t * p_packet ) { return (comm_event_t)(generic_comm_event_t){ p_host, COMM_READ_REG, (uint8_t)sizeof(rho_packet_t), (uint8_t *)p_packet }; }
 
 static rho_functions RhoFunctions =
 {

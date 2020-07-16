@@ -10,6 +10,7 @@
 #define DRV2605_h
 
 #include "peripheralbridge.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 

@@ -9,31 +9,21 @@
 #ifndef profilemanager_h
 #define profilemanager_h
 
-#include "systemtypes.h"
+#include "application.h"
 
-void InitProfile( system_profile_t * );
-
-void FetchProfile(void);
-void PerformProfile(void);
-void UpdateProfile(void);
-void StoreProfile(void);
+void InitProfile(void);
+void LoadProfile( system_profile_t * );
 
 typedef struct
 {
-    void (*Init)( system_profile_t * );
-    void (*Fetch)(void);
-    void (*Perform)(void);
-    void (*Update)(void);
-    void (*Store)(void);
+    void (*Init)(void);
+    void (*Load)( system_profile_t * );
 } profile_functions;
 
 static profile_functions ProfileFunctions =
 {
     .Init = InitProfile,
-    .Fetch = FetchProfile,
-    .Perform = PerformProfile,
-    .Update = UpdateProfile,
-    .Store = StoreProfile
+    .Load = LoadProfile
 };
 
 #endif /* profilemanager_h */

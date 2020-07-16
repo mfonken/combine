@@ -76,7 +76,7 @@ typedef struct
 protocol_id_base_index_t
     protocol_id_base_indeces;
 system_master_t *
-    system;
+    p_system;
 sysioctl_tables
     tables;
 } sysioctl_t;

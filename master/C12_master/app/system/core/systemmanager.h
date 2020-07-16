@@ -57,6 +57,7 @@ int8_t SystemManager_GetSystemComponentNumber( component_id_t );
 component_id_t SystemManager_GetComponentIdFromPortPin( port_t, pin_t );
 //void_handler_t GetHandlerByComponent( component_t * );
 void SystemManager_PopulateTaskDataOfTask( system_task_t * );
+bool SystemManager_IsTaskAssignedToComponent( system_task_id_t, int8_t );
 
 void SystemManager_InstateTaskShelfEntry( system_task_shelf_entry_id_t );
 void SystemManager_InstateStateProfile( system_state_profile_t * );
@@ -77,6 +78,7 @@ typedef struct
     void (*ExitState)( void );
     void (*InjectCommHostIntoTaskData)( void **, component_id_t );
     void (*PopulateTaskData)( system_task_t * );
+    bool (*TaskComponentCheck)( system_task_id_t, int8_t );
     void (*CycleQueue)( os_queue_data_t * );
     void (*CycleQueues)( void );
 } system_perform_functions;
@@ -136,6 +138,7 @@ static system_functions SystemFunctions =
     .Perform.ExitState          = SystemManager_PerformExitState,
     .Perform.InjectCommHostIntoTaskData = SystemManager_InjectCommHostIntoTaskData,
     .Perform.PopulateTaskData   = SystemManager_PopulateTaskDataOfTask,
+    .Perform.TaskComponentCheck = SystemManager_IsTaskAssignedToComponent,
     .Perform.CycleQueue         = SystemManager_PerformCycleQueue,
     .Perform.CycleQueues        = SystemManager_PerformCycleQueues,
     
@@ -144,7 +147,7 @@ static system_functions SystemFunctions =
     .Register.TaskShelf         = SystemManager_RegisterTaskShelf,
 //    .Register.SubactivityMap    = SystemManager_RegisterSubactivityMap,
     .Register.Profile           = SystemManager_RegisterProfile,
-    .Register.Task      = SystemManager_RegisterTask,
+    .Register.Task              = SystemManager_RegisterTask,
     .Register.StateProfileList  = SystemManager_RegisterStateProfileList,
     .Register.State             = SystemManager_RegisterState,
     .Register.ExitState         = SystemManager_RegisterExitState,

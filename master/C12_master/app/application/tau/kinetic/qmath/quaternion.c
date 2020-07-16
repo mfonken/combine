@@ -38,16 +38,16 @@ void toEuler( quaternion_t * q, ang3_t * a )
 {
     floating_t w = q->w, x = q->x, y = q->y, z = q->z, m, n;
     
-    m = 2*(w*x+y*z);
-    n = 1-2*(x*x+y*y);
-    a->x = atan2(m, n);
+    m = 2 * ( w * x + y * z );
+    n = 1 - 2 * ( x * x + y * y );
+    a->x = atan2( m, n );
     
-    m = 2*(w*y-x*z);
+    m =  2 * ( w * y - x * z );
     a->y = RASIN(m);
     
-    m = 2*(w*z+x*y);
-    n = 1-2*(y*y+z*z);
-    a->z = atan2(m, n);
+    m = 2 * ( w * z + x * y );
+    n = 1 - 2 * ( y * y + z * z);
+    a->z = atan2( m, n );
 }
 
 //void toMatrix(quaternion_t * q, mat3x3_t * m)

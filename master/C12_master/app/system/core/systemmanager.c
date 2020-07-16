@@ -11,29 +11,28 @@
 sysioctl_t SysIOCtl = { 0 };
 system_master_t System = { DEFAULT_SYSTEM_STATE, 0 };
 
-void SystemManager_Init( system_profile_t * profile )
+void SystemManager_Init( system_profile_t * p_profile )
 {
     LOG_SYSTEM(SYSTEM_DEBUG, "Initializing System Manager\n");
-    SystemFunctions.Register.Profile( profile );
-    
+    SystemFunctions.Register.Profile( p_profile );
     SystemFunctions.Register.State(STATE_NAME_STARTUP);
     SystemFunctions.Register.Error(DEFAULT_SYSTEM_ERROR);
     SystemFunctions.Register.Consumption(SYSTEM_CONSUMPTION_NONE);
     SystemFunctions.Register.MinImmediateHandlePriority(DEFAULT_SYSTEM_MIN_IMMEDIATE_HANDLE_PRIORITY);
 }
 
-void SystemManager_PerformRoutine( system_activity_routine_t * routine )
+void SystemManager_PerformRoutine( system_activity_routine_t * p_routine )
 {
-    SystemFunctions.Register.Activity(routine->activity);
-    SystemFunctions.Perform.Subactivities( routine->subactivities, routine->num_subactivities );
-    SystemFunctions.Register.ExitState( routine->exit_state );
+    SystemFunctions.Register.Activity( p_routine->activity );
+    SystemFunctions.Perform.Subactivities( p_routine->subactivities, p_routine->num_subactivities );
+    SystemFunctions.Register.ExitState( p_routine->exit_state );
 }
 
-void SystemManager_PerformRoutineSubactivities( system_subactivity_id_t * subactivities, uint8_t len )
+void SystemManager_PerformRoutineSubactivities( system_subactivity_id_t * p_subactivities, uint8_t len )
 {
-    for( uint8_t i = 0; i < len; i++ )
+    FOR( uint8_t, i, len )
     {
-        system_subactivity_id_t subactivity = subactivities[i];
+        system_subactivity_id_t subactivity = p_subactivities[i];
         SystemFunctions.Perform.Subactivity( subactivity );
     }
 }
@@ -42,22 +41,22 @@ void SystemManager_PerformSubactivity( system_subactivity_id_t subactivity )
 {
     uint8_t id = subactivity;
     LOG_SYSTEM(SYSTEM_DEBUG, "Performing subactivity: %s(%d)\n", SYSTEM_SUBACTIVITY_ID_STRINGS[id], id);
-    system_subactivity_t * entry = SystemFunctions.Get.SubactivityMapEntry(id);
-    if( entry == NULL ) return;
+    system_subactivity_t * p_entry = SystemFunctions.Get.SubactivityMapEntry(id);
+    if( p_entry == NULL ) return;
     
-    if( entry->function == NULL ) return;
+    if( p_entry->function == NULL ) return;
     else
     {
 #warning fix for multiple components
-        if( entry->num_component_id > 0 && entry->data != &System)
+        if( p_entry->num_component_id > 0 && p_entry->data != &System)
         {
             uint8_t temp_byte;
-            if( (uint32_t)entry->data < ( 1 << 7 ) )
-                temp_byte = (uint8_t)entry->data;
-            entry->data = &temp_byte;
-            SystemFunctions.Perform.InjectCommHostIntoTaskData( &entry->data, entry->component_id[0] );
+            if( (uint32_t)p_entry->data < ( 1 << 7 ) )
+                temp_byte = (uint8_t)p_entry->data;
+            p_entry->data = &temp_byte;
+            SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_entry->data, p_entry->component_id[0] );
         }
-        entry->function( entry->data );
+        p_entry->function( p_entry->data );
     }
 }
 
@@ -66,13 +65,13 @@ void SystemManager_PerformEnableTaskState( system_task_id_t task_id )
     LOG_SYSTEM(SYSTEM_DEBUG, "Enabling profile entry state: %s(%d)\n", SYSTEM_TASK_ID_STRINGS[task_id], task_id);
 //    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_ENABLED;
     
-    system_task_t * task = SystemFunctions.Get.TaskById( task_id );
-    if( task == NULL ) return;
+    system_task_t * p_task = SystemFunctions.Get.TaskById( task_id );
+    if( p_task == NULL ) return;
     
 //    if( TaskHasValidTimer( task_data ) )
 //        OS.Task.Resume(task_data);
 //    else
-        OS.Task.Create(&task->os_task_data);
+        OS.Task.Create(&p_task->os_task_data);
 }
 
 void SystemManager_PerformExitState( void )
@@ -93,66 +92,72 @@ void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
     LOG_SYSTEM(SYSTEM_DEBUG, "Disabling profile entry state: %s(%d)\n", SYSTEM_TASK_ID_STRINGS[task_id], task_id);
 //    entry->header.state = SYSTEM_PROFILE_ENTRY_STATE_DISABLED;
     
-    system_task_t * task = SystemFunctions.Get.TaskById( task_id );
+    system_task_t * p_task = SystemFunctions.Get.TaskById( task_id );
 //    if( TaskHasValidTimer( task_data ) )
 //        OS.Task.Suspend(task_data);
 //    else
-        OS.Task.Delete( &task->os_task_data );
+        OS.Task.Delete( &p_task->os_task_data );
 }
 
-void SystemManager_PerformCycleQueue( os_queue_data_t * queue_data )
+void SystemManager_PerformCycleQueue( os_queue_data_t * p_queue_data )
 {
-    LOG_SYSTEM(SYSTEM_DEBUG_QUEUE, "Performing cycle on queue: %s\n", QUEUE_ID_STRINGS[queue_data->ID]);
+    LOG_SYSTEM(SYSTEM_DEBUG_QUEUE, "Performing cycle on queue: %s\n", QUEUE_ID_STRINGS[p_queue_data->ID]);
 //    ASSERT(queue_data->msg_size, sizeof(hw_event_message_t));
-    hw_event_message_t * message = (hw_event_message_t *)queue_data->p_void;
+    hw_event_message_t * p_message = (hw_event_message_t *)p_queue_data->p_void;
     
-    system_task_t * task = SystemFunctions.Get.TaskById( (system_task_id_t)message->handle_id );
-    if( task != NULL )
-        OS.Task.Resume( &task->os_task_data );
+    system_task_t * p_task = SystemFunctions.Get.TaskById( (system_task_id_t)p_message->handle_id );
+    if( p_task != NULL )
+        OS.Task.Resume( &p_task->os_task_data );
 }
 
 void SystemManager_PerformCycleQueues( void )
 {
-    for( uint8_t i = 0; i < System.profile->queue_list.num_entries; i++ )
+    FOR( uint8_t, i, System.profile->queue_list.num_entries )
     {
         SystemFunctions.Perform.CycleQueue( &System.profile->queue_list.entries[i] );
     }
 }
 
-void SystemManager_PopulateTaskDataOfTask( system_task_t * task )
+void SystemManager_PopulateTaskDataOfTask( system_task_t * p_task )
 {
-    task->os_task_data.ID = task->ID;
-    task->os_task_data.p_name = SYSTEM_TASK_ID_STRINGS[ task->ID ];
-    task->os_task_data.p_task = task->function;
-    task->os_task_data.p_arg = task->object;
-    task->os_task_data.prio = task->PRIORITY;
-    task->os_task_data.p_err = task->error;
+    p_task->os_task_data.ID = p_task->ID;
+    p_task->os_task_data.p_name = SYSTEM_TASK_ID_STRINGS[ p_task->ID ];
+    p_task->os_task_data.p_task = p_task->function;
+    p_task->os_task_data.p_arg = p_task->object;
+    p_task->os_task_data.prio = p_task->PRIORITY;
+    p_task->os_task_data.p_err = p_task->error;
     
-    task->os_task_data.stk_limit = (CPU_STK_SIZE)DEFAULT_STACK_SIZE / DEFAULT_TASK_STACK_LIMIT_FACTOR;
-    task->os_task_data.stk_size = (CPU_STK_SIZE)DEFAULT_STACK_SIZE; /* Stack size */
-    task->os_task_data.q_size = DEFAULT_QUEUE_SIZE; /* Max messages that can be received through queue */
-    task->os_task_data.time_quanta = 0;
-    task->os_task_data.p_ext = NULL;
-    task->os_task_data.opt = (OS_OPT)DEFAULT_TASK_OS_OPTIONS;
+    p_task->os_task_data.stk_limit = (CPU_STK_SIZE)DEFAULT_STACK_SIZE / DEFAULT_TASK_STACK_LIMIT_FACTOR;
+    p_task->os_task_data.stk_size = (CPU_STK_SIZE)DEFAULT_STACK_SIZE; /* Stack size */
+    p_task->os_task_data.q_size = DEFAULT_QUEUE_SIZE; /* Max messages that can be received through queue */
+    p_task->os_task_data.time_quanta = 0;
+    p_task->os_task_data.p_ext = NULL;
+    p_task->os_task_data.opt = (OS_OPT)DEFAULT_TASK_OS_OPTIONS;
 }
 
-void SystemManager_RegisterTaskShelf( system_task_shelf_t * shelf )
+bool SystemManager_IsTaskAssignedToComponent( system_task_id_t task_id, int8_t component_number )
 {
-    for(uint8_t i = 0; i < shelf->num_tasks; i++)
+    return System.registration.component_tasks[component_number][task_id];
+}
+
+void SystemManager_RegisterTaskShelf( system_task_shelf_t * p_shelf )
+{
+    FOR( uint8_t, i, p_shelf->num_tasks )
     {
-        system_task_shelf_entry_t * entry = &(shelf->tasks[i]);
-        for( uint8_t j = 0; j < entry->num_interrupts; j++ )
+        system_task_shelf_entry_t * p_entry = &(p_shelf->tasks[i]);
+
+        FOR( uint8_t, j, p_entry->num_interrupts )
             SystemFunctions.Register.Task( System.profile->shelf.tasks[i].interrupts[j], false );
-        for( uint8_t j = 0; j < entry->num_scheduled; j++ )
+        FOR( uint8_t, j, p_entry->num_scheduled )
             SystemFunctions.Register.Task( System.profile->shelf.tasks[i].scheduled[j], true );
     }
 }
 
-void SystemManager_RegisterProfile( system_profile_t * profile )
+void SystemManager_RegisterProfile( system_profile_t * p_profile )
 {
-    System.profile = profile;
-    SystemFunctions.Register.TaskShelf( &profile->shelf );
-    SystemFunctions.Register.StateProfileList( &profile->state_profiles);
+    System.profile = p_profile;
+    SystemFunctions.Register.TaskShelf( &p_profile->shelf );
+    SystemFunctions.Register.StateProfileList( &p_profile->state_profiles);
 }
 
 void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
@@ -165,31 +170,31 @@ void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
     LOG_SYSTEM( SYSTEM_DEBUG, "Registering profile entry %s(%d).\n", SYSTEM_TASK_ID_STRINGS[task_id], task_id);
     System.registration.tasks[task_id] = true;
     
-    system_task_t * task = SystemFunctions.Get.TaskById( task_id );
-    if( task == NULL ) return;
+    system_task_t * p_task = SystemFunctions.Get.TaskById( task_id );
+    if( p_task == NULL ) return;
 
-    if(task->function != NULL)
-        SystemFunctions.Perform.InjectCommHostIntoTaskData( &task->function, task->component_id[0]);
+    if( p_task->function != NULL )
+        SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_task->function, p_task->component_id[0]);
     
-    SystemFunctions.Perform.PopulateTaskData( task );
+    SystemFunctions.Perform.PopulateTaskData( p_task );
     
     // Create OS utilities with task_data
-    if( scheduled && task->ACTION == TASK_ACTION_SCHEDULE)
+    if( scheduled && p_task->ACTION == TASK_ACTION_SCHEDULE)
     {
-        task->os_task_data.tmr_opt = OS_OPT_TMR_PERIODIC;
-        task->os_task_data.period = HZ_TO_TICK(task->data.schedule);
+        p_task->os_task_data.tmr_opt = OS_OPT_TMR_PERIODIC;
+        p_task->os_task_data.period = HZ_TO_TICK(p_task->data.schedule);
         
-        os_task_data_t * task_data = &task->os_task_data;
-        os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( task_data );
+        os_task_data_t * p_task_data = &p_task->os_task_data;
+        os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( p_task_data );
         OS.Timer.Create( &timer_data );
     }
-    else if( task->ACTION == TASK_ACTION_INTERRUPT )
+    else if( p_task->ACTION == TASK_ACTION_INTERRUPT )
     {
-        for( uint8_t i = 0; i < task->num_component_id; i++ )
+        FOR( uint8_t, i, p_task->num_component_id )
         {
-            int8_t component_number = SystemFunctions.Get.ComponentNumber(task->component_id[i]);
+            int8_t component_number = SystemFunctions.Get.ComponentNumber(p_task->component_id[i]);
             if(component_number >= 0 && component_number < System.profile->component_list.num_entries)
-                System.registration.component_tasks[component_number][task->ID] = true;
+                System.registration.component_tasks[component_number][p_task->ID] = true;
             else
                 LOG_SYSTEM( SYSTEM_DEBUG, "Provided component is invalid!\n");
         }
@@ -198,32 +203,32 @@ void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
 
 int8_t SystemManager_GetSystemComponentNumber( component_id_t component_id )
 {
-    for( uint8_t i = 0; i < System.profile->component_list.num_entries; i++ )
+    FOR( uint8_t, i, System.profile->component_list.num_entries )
     {
-        component_t * check = &System.profile->component_list.entries[i];
-        if( check->ID == component_id ) return i;
+        component_t * p_check = &System.profile->component_list.entries[i];
+        if( p_check->ID == component_id ) return i;
     }
     return -1;
 }
 
-void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state_profiles )
+void SystemManager_RegisterStateProfileList( system_state_profile_list_t * p_state_profiles )
 {
 //    for( uint8_t i = 0; i < NUM_SYSTEM_STATES; i++ )
 //    {
-//        for( uint8_t j = 0; j < state_profiles[i]->routine.num_subactivities; j++ )
+//        for( uint8_t j = 0; j < p_state_profiles[i]->routine.num_subactivities; j++ )
 //        {
-//            system_subactivity_id_t subactivity_id = state_profiles[i]->routine.subactivities[j];
+//            system_subactivity_id_t subactivity_id = p_state_profiles[i]->routine.subactivities[j];
 //
-//            component_id_t * component_id_to_assign = NULL;
-//            for( uint8_t k = 0; k < state_profiles[i]->num_entries; k++ )
+//            component_id_t * p_component_id_to_assign = NULL;
+//            for( uint8_t k = 0; k < p_state_profiles[i]->num_entries; k++ )
 //            {
-//                system_task_shelf_entry_id_t task_shelf_entry_id = state_profiles[i]->entries[k];
-//                system_task_shelf_entry_t * task_shelf_entry = SystemFunctions.Get.TaskShelfEntry( task_shelf_entry_id );
+//                system_task_shelf_entry_id_t task_shelf_entry_id = p_state_profiles[i]->entries[k];
+//                system_task_shelf_entry_t * p_task_shelf_entry = SystemFunctions.Get.TaskShelfEntry( task_shelf_entry_id );
 //                if( task_shelf_entry == NULL ) continue;
-//                for( uint8_t l = 0; l < task_shelf_entry->num_interrupts; l++ )
+//                for( uint8_t l = 0; l < p_task_shelf_entry->num_interrupts; l++ )
 //                {
-//                    system_task_t * task = task_shelf_entry->interrupts[l];
-//                    if( task->handler_id == subactivity_id )
+//                    system_task_t * p_task = p_task_shelf_entry->interrupts[l];
+//                    if( p_task->handler_id == subactivity_id )
 //                    {
 #warning fix for multiple component
 ////                        component_id_to_assign = &profile_entry->components.ids[0];
@@ -234,8 +239,8 @@ void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state
 //                {
 //                    for( uint8_t l = 0; l < task_shelf_entry->num_scheduled; l++ )
 //                    {
-//                        system_task_t * task = task_shelf_entry->scheduled[l];
-//                        if( task->handler_id == subactivity_id )
+//                        system_task_t * p_task = task_shelf_entry->scheduled[l];
+//                        if( p_task->handler_id == subactivity_id )
 //                        {
 //#warning fix for multiple component
 ////                            component_id_to_assign = &profile_entry->components.ids[0];
@@ -246,10 +251,10 @@ void SystemManager_RegisterStateProfileList( system_state_profile_list_t * state
 //
 //                if( component_id_to_assign != NULL)
 //                {
-//                    system_subactivity_t * subactivity = SystemFunctions.Get.SubactivityMapEntry( subactivity_id );
-//                    if( subactivity != NULL )
+//                    system_subactivity_t * p_subactivity = SystemFunctions.Get.SubactivityMapEntry( subactivity_id );
+//                    if( p_subactivity != NULL )
 //#warning fix for multiple component
-//                        subactivity->components.ids[0] = *component_id_to_assign;
+//                        p_subactivity->components.ids[0] = *component_id_to_assign;
 //                    break;
 //                }
 //            }
@@ -305,22 +310,22 @@ void SystemManager_RegisterMinImmediateHandlePriority( system_task_priority_t pr
 
 system_subactivity_t * SystemManager_GetSubactivityMapEntryById( system_subactivity_id_t entry_id )
 {
-    for( uint8_t i = 0; i < NUM_SYSTEM_SUBACTIVITY_ID; i++ )
+    FOR( uint8_t, i, NUM_SYSTEM_SUBACTIVITY_ID )
     {
-        system_subactivity_t * entry = &System.profile->subactivity_map.entry[i];
-        if( entry == NULL ) continue;
-        if( entry->ID == entry_id )
-            return entry;
+        system_subactivity_t * p_entry = &System.profile->subactivity_map.entry[i];
+        if( p_entry == NULL ) continue;
+        if( p_entry->ID == entry_id )
+            return p_entry;
     }
     return NULL;
 }
 system_task_shelf_entry_t * SystemManager_GetTaskShelfEntryById( system_task_shelf_entry_id_t entry_id )
 {
-    for( uint8_t i = 0; i < MAX_TASK_SHELF_ENTRIES; i++ )
+    FOR( uint8_t, i, MAX_TASK_SHELF_ENTRIES )
     {
-        system_task_shelf_entry_t * entry = &System.profile->shelf.tasks[i];
-        if( entry == NULL ) continue;
-        if( entry->ID == entry_id ) return entry;
+        system_task_shelf_entry_t * p_entry = &System.profile->shelf.tasks[i];
+        if( p_entry == NULL ) continue;
+        if( p_entry->ID == entry_id ) return p_entry;
     }
     return NULL;
 }
@@ -332,21 +337,21 @@ system_task_shelf_entry_t * SystemManager_GetTaskShelfEntryById( system_task_she
 
 system_task_t * SystemManager_GetTaskById( system_task_id_t task_id )
 {
-    for( uint8_t i = 0; i < NUM_SYSTEM_TASK_ID; i++ )
+    FOR( uint8_t, i, NUM_SYSTEM_TASK_ID )
     {
-        system_task_t * task = &System.profile->task_list.entries[i];
-        if( task == NULL ) continue;
-        if( task->ID == task_id ) return task;
+        system_task_t * p_task = &System.profile->task_list.entries[i];
+        if( p_task == NULL ) continue;
+        if( p_task->ID == task_id ) return p_task;
     }
     return NULL;
 }
 
 os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t component_id )
 {
-    for( uint8_t i = 0; i < NUM_SYSTEM_TASK_ID; i++ )
+    FOR( uint8_t, i, NUM_SYSTEM_TASK_ID )
     {
-        system_task_t * task = SystemFunctions.Get.TaskById(i);
-        if( task == NULL ) continue;
+        system_task_t * p_task = SystemFunctions.Get.TaskById(i);
+        if( p_task == NULL ) continue;
         SystemFunctions.Get.ComponentNumber( component_id );
         ///TODO: Finish
     }
@@ -355,7 +360,7 @@ os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t componen
 
 component_id_t SystemManager_GetComponentIdFromPortPin( port_t port, pin_t pin )
 {
-    for( uint8_t i = 0; i < System.profile->component_list.num_entries; i++ )
+    FOR( uint8_t, i, System.profile->component_list.num_entries )
     {
         component_t * check = &System.profile->component_list.entries[i];
         if( check->port == port && check->pin == pin ) return check->ID;
@@ -369,31 +374,31 @@ void SystemManager_InstateTaskShelfEntry( system_task_shelf_entry_id_t entry_id 
     
     uint8_t id  = entry_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Instating task shelf entry: %s(%d)\n", SYSTEM_TASK_SHELF_ENTRY_ID_STRINGS[id], id);
-    system_task_shelf_entry_t * entry = SystemFunctions.Get.TaskShelfEntry( entry_id );
-    if( entry == NULL ) return;
-    for( uint8_t i = 0; i < entry->num_interrupts; i++ )
-        SystemFunctions.Perform.EnableTask( entry->interrupts[i] );
-    for( uint8_t i = 0; i < entry->num_scheduled; i++ )
-        SystemFunctions.Perform.EnableTask( entry->scheduled[i] );
+    system_task_shelf_entry_t * p_entry = SystemFunctions.Get.TaskShelfEntry( entry_id );
+    if( p_entry == NULL ) return;
+    FOR( uint8_t, i, p_entry->num_interrupts )
+        SystemFunctions.Perform.EnableTask( p_entry->interrupts[i] );
+    FOR( uint8_t, i, p_entry->num_scheduled )
+        SystemFunctions.Perform.EnableTask( p_entry->scheduled[i] );
 }
 
-void SystemManager_InstateStateProfile( system_state_profile_t * state_profile )
+void SystemManager_InstateStateProfile( system_state_profile_t * p_state_profile )
 {
-    uint8_t id = state_profile->state_id;
+    uint8_t id = p_state_profile->state_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Instating state profile: %s(%d)\n", SYSTEM_STATE_STRINGS[id], id);
     
-    if( SysIOCtl.system != NULL )
+    if( SysIOCtl.p_system != NULL )
     {
         /* Enable active families */
         uint16_t active = 0;
-        for( uint8_t i = 0; i < NUM_SYSTEM_COMPONENT_FAMILY ; i++ )
+        FOR( uint8_t, i, NUM_SYSTEM_COMPONENT_FAMILY )
         {
-            system_family_t family = state_profile->families[i];
+            system_family_t family = p_state_profile->families[i];
             SysIOCtlFunctions.EnableFamily( family );
             active |= ( 1 << family );
         }
         /* Disable inactive families */
-        for( uint8_t i = 0; i < NUM_SYSTEM_COMPONENT_FAMILY; i++ )
+        FOR( uint8_t, i, NUM_SYSTEM_COMPONENT_FAMILY )
         {
             if( active & ( 1 << i ) ) continue;
             SysIOCtlFunctions.DisableFamily( (system_family_t)i );
@@ -408,20 +413,20 @@ void SystemManager_InstateStateProfile( system_state_profile_t * state_profile )
     }
 
     /* Enable tasks */
-    for( uint8_t i = 0; i < state_profile->num_entries; i++ )
-        SystemFunctions.Instate.TaskShelfEntry( state_profile->entries[i] );
+    FOR( uint8_t, i, p_state_profile->num_entries )
+        SystemFunctions.Instate.TaskShelfEntry( p_state_profile->entries[i] );
 
-    SystemFunctions.Perform.Routine( &state_profile->routine );
+    SystemFunctions.Perform.Routine( &p_state_profile->routine );
 }
 
-void SystemManager_TerminateStateProfile( system_state_profile_t * state_profile )
+void SystemManager_TerminateStateProfile( system_state_profile_t * p_state_profile )
 {
-    uint8_t id = state_profile->state_id;
+    uint8_t id = p_state_profile->state_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Terminating state profile: %s(%d)\n", SYSTEM_STATE_STRINGS[id], id);
     
     /* Enable tasks */
-    for( uint8_t i = 0; i < state_profile->num_entries; i++ )
-        SystemFunctions.Terminate.TaskShelfEntry( state_profile->entries[i] );
+    FOR( uint8_t, i, p_state_profile->num_entries )
+        SystemFunctions.Terminate.TaskShelfEntry( p_state_profile->entries[i] );
 }
 
 void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t entry_id )
@@ -430,12 +435,12 @@ void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t entry_i
     
     uint8_t id = entry_id;
     LOG_SYSTEM(SYSTEM_DEBUG, "Terminating task shelf entry: %s(%d)\n", SYSTEM_TASK_SHELF_ENTRY_ID_STRINGS[id], id);
-    system_task_shelf_entry_t * entry = SystemFunctions.Get.TaskShelfEntry( entry_id );
-    if( entry == NULL ) return;
-    for( uint8_t i = 0; i < entry->num_interrupts; i++ )
-        SystemFunctions.Perform.DisableTask( entry->interrupts[i] );
-    for( uint8_t i = 0; i < entry->num_scheduled; i++ )
-        SystemFunctions.Perform.DisableTask( entry->scheduled[i] );
+    system_task_shelf_entry_t * p_entry = SystemFunctions.Get.TaskShelfEntry( entry_id );
+    if( p_entry == NULL ) return;
+    FOR( uint8_t, i, p_entry->num_interrupts )
+        SystemFunctions.Perform.DisableTask( p_entry->interrupts[i] );
+    FOR( uint8_t, i, p_entry->num_scheduled )
+        SystemFunctions.Perform.DisableTask( p_entry->scheduled[i] );
 }
 
 comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_id )
@@ -444,22 +449,22 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
     if( component_number < 0 )
         return NULL_HOST;
     
-    component_t * component = &System.profile->component_list.entries[component_number];
+    component_t * p_component = &System.profile->component_list.entries[component_number];
     
-    comm_host_t comm_host = { component->protocol };
+    comm_host_t comm_host = { p_component->protocol };
     I2C_Channel * I2C_Channels[] = CHANNEL_I2C;
     SPI_Channel * SPI_Channels[] = CHANNEL_SPI;
     
-    switch(component->protocol)
+    switch(p_component->protocol)
     {
         case COMPONENT_PROTOCOL_I2C:
-            comm_host.i2c_host.address = component->addr;
-            comm_host.i2c_host.device = I2C_Channels[component->route - 1];
+            comm_host.i2c_host.address = p_component->addr;
+            comm_host.i2c_host.device = I2C_Channels[p_component->route - 1];
             break;
         case COMPONENT_PROTOCOL_SPI:
-            comm_host.spi_host.cs.gpio.pin = component->pin;
-            comm_host.spi_host.cs.gpio.port = component->port;
-            comm_host.spi_host.device = SPI_Channels[component->route - 1];
+            comm_host.spi_host.cs.gpio.pin = p_component->pin;
+            comm_host.spi_host.cs.gpio.port = p_component->port;
+            comm_host.spi_host.device = SPI_Channels[p_component->route - 1];
             break;
         default:
             break;
@@ -468,14 +473,14 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
     return comm_host;
 }
 
-void SystemManager_InjectCommHostIntoTaskData( void ** data, component_id_t component_id )
+void SystemManager_InjectCommHostIntoTaskData( void ** pp_data, component_id_t component_id )
 {
-    if(*data == NULL) return;
+    if( *pp_data == NULL ) return;
     int8_t component_number = SystemFunctions.Get.ComponentNumber(component_id);
     if( component_number >= 0 )
     { /* If component is included, populate communication host */
         System.registration.comm_hosts[component_number] = SystemFunctions.Get.CommHostForComponentById( component_id );
-        System.registration.comm_hosts[component_number].generic_comm_host.buffer = *data; // Slide argument to buffer part of comm_host
-        *data = &System.registration.comm_hosts[component_number];
+        System.registration.comm_hosts[component_number].generic_comm_host.buffer = *pp_data; // Slide argument to buffer part of comm_host
+        *pp_data = &System.registration.comm_hosts[component_number];
     }
 }

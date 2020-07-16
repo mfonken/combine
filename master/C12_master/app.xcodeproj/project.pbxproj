@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3431DBF923E60F9A00392FD4 /* papi_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 3431DBF823E60F9A00392FD4 /* papi_interface.c */; };
+		347D9BFE24AE9362006C9FC4 /* DRV2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 347D9BFD24AE9362006C9FC4 /* DRV2605.c */; };
 		3491A35D23C57815008010C8 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31023C57814008010C8 /* main.c */; };
 		3491A35E23C57815008010C8 /* systembehavior.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31A23C57815008010C8 /* systembehavior.c */; };
 		3491A36023C57815008010C8 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31C23C57815008010C8 /* systemmanager.c */; };
@@ -21,7 +22,6 @@
 		3491A36823C57815008010C8 /* shtp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A34F23C57815008010C8 /* shtp.c */; };
 		3491A36923C57815008010C8 /* BNO080.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35023C57815008010C8 /* BNO080.c */; };
 		3491A36A23C57815008010C8 /* batterymonitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35323C57815008010C8 /* batterymonitor.c */; };
-		3491A36B23C57815008010C8 /* DRV2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A35923C57815008010C8 /* DRV2605.c */; };
 		3491A38523C57877008010C8 /* kalman.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37023C57877008010C8 /* kalman.c */; };
 		3491A38723C57877008010C8 /* kinetic.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37623C57877008010C8 /* kinetic.c */; };
 		3491A38823C57877008010C8 /* matvec.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37A23C57877008010C8 /* matvec.c */; };
@@ -47,6 +47,9 @@
 		3431DBF723E60F9A00392FD4 /* papi_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = papi_interface.h; sourceTree = "<group>"; };
 		3431DBF823E60F9A00392FD4 /* papi_interface.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = papi_interface.c; sourceTree = "<group>"; };
 		3431DBFA23E6104800392FD4 /* emlib_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emlib_interface.h; sourceTree = "<group>"; };
+		347D9BFB24AE9362006C9FC4 /* DRV2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRV2605.h; sourceTree = "<group>"; };
+		347D9BFC24AE9362006C9FC4 /* hapticcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
+		347D9BFD24AE9362006C9FC4 /* DRV2605.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DRV2605.c; sourceTree = "<group>"; };
 		347F720B23D381E900427FD0 /* micrium_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = micrium_interface.h; sourceTree = "<group>"; };
 		347F720C23D383C200427FD0 /* application_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application_types.h; sourceTree = "<group>"; };
 		347F720D23D3A34400427FD0 /* application.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application.h; sourceTree = "<group>"; };
@@ -85,9 +88,6 @@
 		3491A35223C57815008010C8 /* STC3100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STC3100.h; sourceTree = "<group>"; };
 		3491A35323C57815008010C8 /* batterymonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = batterymonitor.c; sourceTree = "<group>"; };
 		3491A35423C57815008010C8 /* batterymonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterymonitor.h; sourceTree = "<group>"; };
-		3491A35723C57815008010C8 /* DRV2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRV2605.h; sourceTree = "<group>"; };
-		3491A35823C57815008010C8 /* hapticcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
-		3491A35923C57815008010C8 /* DRV2605.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DRV2605.c; sourceTree = "<group>"; };
 		3491A35A23C57815008010C8 /* peripheralbridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = peripheralbridge.h; sourceTree = "<group>"; };
 		3491A35C23C57815008010C8 /* C12_profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = C12_profile.h; sourceTree = "<group>"; };
 		3491A36F23C57877008010C8 /* kalman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kalman.h; sourceTree = "<group>"; };
@@ -121,6 +121,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		347D9BF924AE9362006C9FC4 /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				347D9BFA24AE9362006C9FC4 /* hapticcontroller */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
+		347D9BFA24AE9362006C9FC4 /* hapticcontroller */ = {
+			isa = PBXGroup;
+			children = (
+				347D9BFB24AE9362006C9FC4 /* DRV2605.h */,
+				347D9BFD24AE9362006C9FC4 /* DRV2605.c */,
+				347D9BFC24AE9362006C9FC4 /* hapticcontroller.h */,
+			);
+			path = hapticcontroller;
+			sourceTree = "<group>";
+		};
 		347F720E23D3A45600427FD0 /* application */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,7 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				3491A35A23C57815008010C8 /* peripheralbridge.h */,
-				3491A35523C57815008010C8 /* drivers */,
+				347D9BF924AE9362006C9FC4 /* drivers */,
 				3491A33223C57815008010C8 /* sensors */,
 			);
 			path = peripherals;
@@ -317,24 +335,6 @@
 				3491A35323C57815008010C8 /* batterymonitor.c */,
 			);
 			path = batterymonitor;
-			sourceTree = "<group>";
-		};
-		3491A35523C57815008010C8 /* drivers */ = {
-			isa = PBXGroup;
-			children = (
-				3491A35623C57815008010C8 /* hapticontroller */,
-			);
-			path = drivers;
-			sourceTree = "<group>";
-		};
-		3491A35623C57815008010C8 /* hapticontroller */ = {
-			isa = PBXGroup;
-			children = (
-				3491A35723C57815008010C8 /* DRV2605.h */,
-				3491A35923C57815008010C8 /* DRV2605.c */,
-				3491A35823C57815008010C8 /* hapticcontroller.h */,
-			);
-			path = hapticontroller;
 			sourceTree = "<group>";
 		};
 		3491A36C23C57877008010C8 /* kinetic */ = {
@@ -438,12 +438,12 @@
 				3491A36323C57815008010C8 /* os_interface.c in Sources */,
 				3491A36423C57815008010C8 /* profilemanager.c in Sources */,
 				3491A38B23C57877008010C8 /* quaternion.c in Sources */,
-				3491A36B23C57815008010C8 /* DRV2605.c in Sources */,
 				3491A36523C57815008010C8 /* communicationmanager.c in Sources */,
 				3491A36723C57815008010C8 /* motionsensor.c in Sources */,
 				3431DBF923E60F9A00392FD4 /* papi_interface.c in Sources */,
 				3491A38723C57877008010C8 /* kinetic.c in Sources */,
 				3491A36A23C57815008010C8 /* batterymonitor.c in Sources */,
+				347D9BFE24AE9362006C9FC4 /* DRV2605.c in Sources */,
 				34C44286249EDB710022D6DB /* application.c in Sources */,
 				3491A36223C57815008010C8 /* taumanager.c in Sources */,
 				3491A35E23C57815008010C8 /* systembehavior.c in Sources */,
@@ -578,7 +578,9 @@
 					"__OS__=MICRIUM",
 					"__PAPI__=EMLIB",
 					"__PLATFORM__=EFR32",
+					"APP_MAIN=1",
 					"$(inherited)",
+					"__BUILD__=XCODE",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

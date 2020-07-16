@@ -9,7 +9,7 @@
 #ifndef timestamp_h
 #define timestamp_h
 
-#if __OS__ == MICRIUM
+#if __OS__ == MICRIUM && defined(__MICRIUM__)
 #include "systemmanager.h"
 
 static double TIMESTAMP(void)
@@ -18,7 +18,11 @@ static double TIMESTAMP(void)
 }
 #else
 #include <sys/time.h>
+<<<<<<< Updated upstream
 
+=======
+#include <stdbool.h>
+>>>>>>> Stashed changes
 static double TIMESTAMP(void)
 {
     struct timeval stamp;

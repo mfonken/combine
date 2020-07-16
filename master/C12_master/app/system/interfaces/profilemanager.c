@@ -8,27 +8,16 @@
 
 #include "profilemanager.h"
 
-void InitProfile( system_profile_t * profile )
+void InitProfile()
 {
+    system_profile_t init_profile = PROFILE_TEMPLATE;
+    ProfileFunctions.Load( &init_profile );
     
+    /* Init System using profile */
+    SystemFunctions.Init( &Profile );
 }
 
-void FetchProfile(void)
+void LoadProfile( system_profile_t * p_loaded_profile )
 {
-    
-}
-
-void PerformProfile(void)
-{
-    
-}
-
-void UpdateProfile(void)
-{
-    
-}
-
-void StoreProfile(void)
-{
-    
+    memcpy(  &Profile , p_loaded_profile, sizeof(system_profile_t));
 }

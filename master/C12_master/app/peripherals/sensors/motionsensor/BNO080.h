@@ -90,12 +90,12 @@ typedef BNO080_CLASSIFIER bno080_classifier_t;
 typedef BNO080_DETECTOR bno080_detector_t;
 typedef uint8_t bno080_feature_t;
 
-static void BNO080GenerateSH2Client( shtp_client_t * client, uint8_t ID, void * data )
+static void BNO080GenerateSH2Client( shtp_client_t * p_client, uint8_t ID, void * data )
 {
     shtp_client_buffer buffer = { 0 };
     shtp_client_product_id product = { 0 };
     shtp_client_output output = { 0 };
-    SHTPFunctions.GenerateClient( client, ID, 0, &buffer, &product, &output, data );
+    SHTPFunctions.GenerateClient( p_client, ID, 0, &buffer, &product, &output, data );
 }
 
 bool BNO080EnableFeature( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );

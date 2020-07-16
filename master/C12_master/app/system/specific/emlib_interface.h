@@ -140,18 +140,18 @@ typedef SPI_TransferReturn_TypeDef EMLIB_SPI_TRANSFER_RETURN_T;
 
 static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV )
 {
-    typedef struct
-    {
-            EMU_PowerConfig_TypeDef powerConfig;
-            EMU_DcdcMode_TypeDef dcdcMode;
-            uint16_t mVout;
-            uint16_t em01LoadCurrent_mA;
-            uint16_t em234LoadCurrent_uA;
-            uint16_t maxCurrent_mA;
-            EMU_DcdcAnaPeripheralPower_TypeDef anaPeripheralPower;
-            EMU_DcdcLnReverseCurrentControl_TypeDef reverseCurrentControl;
-            EMU_DcdcLnCompCtrl_TypeDef dcdcLnCompCtrl;
-    } EMU_DCDCInit_TypeDef;
+//    typedef struct
+//    {
+//            EMU_PowerConfig_TypeDef powerConfig;
+//            EMU_DcdcMode_TypeDef dcdcMode;
+//            uint16_t mVout;
+//            uint16_t em01LoadCurrent_mA;
+//            uint16_t em234LoadCurrent_uA;
+//            uint16_t maxCurrent_mA;
+//            EMU_DcdcAnaPeripheralPower_TypeDef anaPeripheralPower;
+//            EMU_DcdcLnReverseCurrentControl_TypeDef reverseCurrentControl;
+//            EMU_DcdcLnCompCtrl_TypeDef dcdcLnCompCtrl;
+//    } EMU_DCDCInit_TypeDef;
     
     EMU_DCDCInit_TypeDef dcdcInit = EMU_DCDCINIT_DEFAULT;
     dcdcInit.mVout = mV;

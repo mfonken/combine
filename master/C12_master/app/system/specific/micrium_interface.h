@@ -10,6 +10,7 @@
 #define micrium_interface_h
 
 #include "globaltypes.h"
+#include "timestamp.h"
 //#include <unistd.h>
 
 /// SPOOF START
