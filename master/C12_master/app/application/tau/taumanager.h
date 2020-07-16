@@ -9,7 +9,7 @@
 #ifndef taumanager_h
 #define taumanager_h
 
-#include "../../application/tau/kinetic/kinetic_master.h"
+#include "kinetic_master.h"
 #include "globaltypes.h"
 
 #define TAU_MAX_ACTIONS_PER_STATE 3

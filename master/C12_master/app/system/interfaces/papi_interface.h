@@ -9,7 +9,7 @@
 #ifndef papi_interface_h
 #define papi_interface_h
 
-#include "os_interface.h"
+#include "timestamp.h"
 
 void PAPIInterface_DCDC_Init( uint16_t );
 

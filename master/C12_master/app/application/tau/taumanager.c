@@ -7,7 +7,6 @@
 //
 
 #include "taumanager.h"
-#include "timestamp.h"
 
 #define TAU_ID 0xef
 

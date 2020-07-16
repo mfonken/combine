@@ -121,8 +121,8 @@ void SystemManager_PerformCycleQueues( void )
 void SystemManager_PopulateTaskDataOfTask( system_task_t * p_task )
 {
     p_task->os_task_data.ID = p_task->ID;
-    p_task->os_task_data.p_name = SYSTEM_TASK_ID_STRINGS[ p_task->ID ];
-    p_task->os_task_data.p_task = p_task->function;
+    p_task->os_task_data.p_name = (char *)SYSTEM_TASK_ID_STRINGS[ p_task->ID ];
+    p_task->os_task_data.p_task = (OS_TASK_PTR)p_task->function;
     p_task->os_task_data.p_arg = p_task->object;
     p_task->os_task_data.prio = p_task->PRIORITY;
     p_task->os_task_data.p_err = p_task->error;

@@ -10,16 +10,12 @@
 #define micrium_interface_h
 
 #include "globaltypes.h"
-#include "timestamp.h"
 //#include <unistd.h>
 
 /// SPOOF START
 #ifdef __MICRIUM__
-#include <kernel/include/os.h>
-#ifndef OS_ERR
-#define OS_ERR RTOS_ERR
-#define OS_ERR_NONE RTOS_ERR_NONE
-#endif
+#include <uCOS-III/Source/os.h>
+
 #else
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
@@ -152,7 +148,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 }
 
 #ifndef __MICRIUM__
-
+/* Stubs */
 static void MICRIUM_OSInterface_Init( void ) {}
 static void MICRIUM_OSInterface_Start( void ) {}
 static void MICRIUM_OSInterface_DelayMs( uint32_t ms ) { usleep(ms * 1000); }
@@ -179,7 +175,7 @@ static bool MICRIUM_OSInterface_StopTimer( micrium_os_timer_data_t * timer_data 
 
 static inline void MICRIUM_OSInterface_Init( void )
 {
-    RTOS_ERR  err;
+    OS_ERR  err;
 
     CMU_ClockEnable(cmuClock_PRS, true);
 
@@ -198,7 +194,7 @@ static inline void MICRIUM_OSInterface_Init( void )
 
 static inline void MICRIUM_OSInterface_Start( void )
 {
-    RTOS_ERR  err;
+	OS_ERR  err;
     
     /* Start the kernel.                                    */
     OSStart(&err);
@@ -209,7 +205,7 @@ static inline void MICRIUM_OSInterface_Start( void )
  
 static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
 {
-    RTOS_ERR  err;
+	OS_ERR  err;
 
     OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
 
@@ -218,7 +214,7 @@ static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
 
 static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
 {
-    RTOS_ERR  err;
+	OS_ERR  err;
 
     OS_TICK ticks = OSTimeGet(&err);
 
@@ -234,7 +230,7 @@ static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task
                  task_data->p_task,
                  task_data->p_arg,
                  task_data->prio,
-                 &task_data->stk_base,
+                 task_data->stk_base,
                  task_data->stk_limit,
                  task_data->stk_size,
                  task_data->q_size,
@@ -247,19 +243,19 @@ static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task
 
 static inline void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskResume(task_data->tcb,
+    OSTaskResume(&task_data->tcb,
                  task_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_SuspendTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskSuspend(task_data->tcb,
+    OSTaskSuspend(&task_data->tcb,
                   task_data->p_err);
 }
 
 static inline void MICRIUM_OSInterface_DeleteTask( micrium_os_task_data_t * task_data )
 {
-    OSTaskDel(task_data->tcb,
+    OSTaskDel(&task_data->tcb,
               task_data->p_err);
 }
 
@@ -291,7 +287,7 @@ static inline void MICRIUM_OSInterface_PendQueue( micrium_os_queue_data_t * queu
     OSQPend(&queue_data->q,
             queue_data->timeout,
             queue_data->opt,
-            queue_data->msg_size,
+            &queue_data->msg_size,
             queue_data->p_ts,
             queue_data->p_err);
 }

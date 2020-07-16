@@ -16,7 +16,6 @@
 
 #include "peripheralbridge.h"
 #include "sh2.h"
-#include "timestamp.h"
 
 #define SHTP_CLIENT_BUFFER_LEN 100
 

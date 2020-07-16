@@ -15,7 +15,6 @@
 
 #define GECKO 1
 #define XCODE 2
-
 #if __OS__ == MICRIUM
 #include "micrium_interface.h"
 #else
@@ -377,12 +376,11 @@ typedef struct
     void (*Perform)(system_task_id_t);
 } system_interrupter_functions;
 
-typedef OS_ERR RTOS_ERR;
 typedef struct
 {
 system_error_t
     type;
-RTOS_ERR
+OS_ERR
     system,
     peripheral,
     interrupt,

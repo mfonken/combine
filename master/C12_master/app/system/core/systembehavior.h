@@ -10,7 +10,6 @@
 #define systembehavior_h
 
 #include <stdio.h>
-#include "timestamp.h"
 #include "systemmanager.h"
 
 //void SystemBehavior_PerformSelfCheck(void);

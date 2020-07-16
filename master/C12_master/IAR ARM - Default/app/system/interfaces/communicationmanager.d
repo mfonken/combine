@@ -8,17 +8,16 @@ app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Syst
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Config_Normal.h
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product.h
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ysizet.h
-app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\sysiocontroller.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papi_interface.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
+app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdbool.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\os_interface.h
-app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\profilemanager.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\types\systemtypes.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\globaltypes.h
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdint.h
-app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdbool.h
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\string.h
 app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product_string.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\C12_profile.h
@@ -26,6 +25,16 @@ app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\m
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\genlog.h
 app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\micrium_interface.h
-app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\kernel\include\os.h
-app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu.h
-app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\micrium_os\cpu\include\cpu_def.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Source\os.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Cfg\Template\os_cfg.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-CPU-master\ARM-Cortex-M\ARMv7-M\IAR\cpu.h
+app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\intrinsics.h
+app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iccarm_builtin.h
+app/system/interfaces/communicationmanager.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iar_intrinsics_common.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-CPU-master\cpu_def.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-CPU-master\Cfg\Template\cpu_cfg.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-CPU-master\cpu_core.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB-master\lib_def.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Source\os_type.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h
+app/system/interfaces/communicationmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\emlib_interface.h

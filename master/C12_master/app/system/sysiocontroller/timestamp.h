@@ -9,8 +9,10 @@
 #ifndef timestamp_h
 #define timestamp_h
 
+#include <stdbool.h>
+
 #if __OS__ == MICRIUM && defined(__MICRIUM__)
-#include "systemmanager.h"
+#include "os_interface.h"
 
 static double TIMESTAMP(void)
 {
@@ -18,7 +20,6 @@ static double TIMESTAMP(void)
 }
 #else
 #include <sys/time.h>
-#include <stdbool.h>
 static double TIMESTAMP(void)
 {
     struct timeval stamp;
