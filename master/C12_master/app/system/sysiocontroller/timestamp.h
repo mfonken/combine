@@ -18,11 +18,7 @@ static double TIMESTAMP(void)
 }
 #else
 #include <sys/time.h>
-<<<<<<< Updated upstream
-
-=======
 #include <stdbool.h>
->>>>>>> Stashed changes
 static double TIMESTAMP(void)
 {
     struct timeval stamp;
