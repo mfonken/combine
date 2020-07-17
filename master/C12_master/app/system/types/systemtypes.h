@@ -15,16 +15,21 @@
 
 #define GECKO 1
 #define XCODE 2
+
+#if __PAPI__ == EMLIB
+#include "emlib_interface.h"
+#define ASSERT EFM_ASSERT
+#else
+#error "No peripheral API defined."
+#endif
 #if __OS__ == MICRIUM
 #include "micrium_interface.h"
 #else
 #error "No OS defined."
 #endif
 
-#if __PAPI__ == EMLIB
-#include "emlib_interface.h"
-#else
-#error "No peripheral API defined."
+#ifndef ASSERT
+#define ASSERT ((void)0)
 #endif
 
 #include "globaltypes.h"

@@ -70,6 +70,7 @@ void InitializeMeta(void);
 void Application_Init( void );
 void Application_Start( void );
 void Application_Tick( void );
+void Application_IMUSetState( bool );
 void Application_InitComponent( component_t * );
 void RhoInputHandler( comm_host_t * );
 void RhoOutputHandler( comm_host_t * );
@@ -106,6 +107,7 @@ typedef struct
     void (*InitComponent)( component_t * );
     void (*Start)(void);
     void (*Tick)(void);
+    void (*MotionState)(bool);
     application_handler_functions Handler;
 } application_functions;
 
@@ -115,6 +117,7 @@ static application_functions AppFunctions =
     .InitComponent = Application_InitComponent,
     .Start = Application_Start,
     .Tick = Application_Tick,
+    .MotionState = Application_IMUSetState,
     .Handler.Input.Rho          = RhoInputHandler,
     .Handler.Output.Rho         = RhoOutputHandler,
     .Handler.Input.Motion       = MotionInputHandler,

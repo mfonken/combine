@@ -414,8 +414,22 @@ function generateJSON(print_json_string) {
     if(print_json_string == true) {
         var json_txt = JSON.stringify(full_parse);
         console.log(json_txt);
+
+        textPopupWithCopyClose("var profile = \n" + json_txt);
     }
     return full_parse;
+}
+
+function textPopupWithCopyClose(text) {
+  $(".main_div").append('<textarea class="full_text" style="color:white">' + text + '</textarea>');
+  $(".main_div").append('<p class="text_display">' + text.replace(/\n/g,"<br>") + '</p>');
+  $(".text_display").on("click", function() {
+      $(".full_text").select();
+      console.log(document.execCommand("copy"));
+
+      $(".full_text").remove();
+      $(".text_display").remove();
+  });
 }
 
 function today() {
@@ -809,15 +823,7 @@ function generateC() {
 
     full_text += section_text;
     console.log(full_text);
-    $(".main_div").append('<p class="full_text" style="color:white">' + full_text + '</p>');
-    $(".main_div").append('<p class="text_display">' + full_text.replace(/\n/g,"<br>") + '</p>');
-    $(".text_display").on("click", function() {
-        $(".full_text").select();
-        console.log(document.execCommand("copy"));
-
-        $(".full_text").remove();
-        $(".text_display").remove();
-    });
+    textPopupWithCopyClose(full_text);
 }
 
 function generateOptions() {

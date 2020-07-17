@@ -10,7 +10,7 @@
 
 bool TaskHasValidTimer( os_task_data_t * p_task_data )
 {
-    return ( p_task_data->tmr != NULL && p_task_data->period != 0 );
+    return ( p_task_data->tmr.NamePtr != NULL && p_task_data->period != 0 );
 }
 
 void OSInterface_Init(void)

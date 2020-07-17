@@ -10,13 +10,13 @@
 #define micrium_interface_h
 
 #include "globaltypes.h"
-//#include <unistd.h>
 
 /// SPOOF START
 #ifdef __MICRIUM__
-#include <uCOS-III/Source/os.h>
+#include <os.h>
 
 #else
+#include <unistd.h>
 typedef void            (*OS_TASK_PTR)(void *p_arg);
 typedef void            * OS_TCB, * OS_Q, * OS_TMR, * OS_TMR_CALLBACK_PTR;
 typedef const char      CPU_CHAR;
@@ -137,7 +137,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 #define TIMER_FROM_SCHEDULED_TASK(p_task_data) \
 { \
     p_task_data->ID, \
-    p_task_data->tmr, \
+    &p_task_data->tmr, \
     p_task_data->p_name, \
     0, \
     p_task_data->period, \
@@ -152,7 +152,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
 static void MICRIUM_OSInterface_Init( void ) {}
 static void MICRIUM_OSInterface_Start( void ) {}
 static void MICRIUM_OSInterface_DelayMs( uint32_t ms ) { usleep(ms * 1000); }
-static CPU_TS MICRIUM_OSInterface_Timestamp( void ) { return (uint32_t)TIMESTAMP(); }
+static CPU_TS MICRIUM_OSInterface_Timestamp( void ) { return 0; } //(uint32_t)TIMESTAMP(); }
 static void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data ) {}
 static void MICRIUM_OSInterface_SuspendTask( micrium_os_task_data_t * task_data ) {}
@@ -176,20 +176,12 @@ static bool MICRIUM_OSInterface_StopTimer( micrium_os_timer_data_t * timer_data 
 static inline void MICRIUM_OSInterface_Init( void )
 {
     OS_ERR  err;
-
-    CMU_ClockEnable(cmuClock_PRS, true);
-
-    /* Initialize CPU and make all interrupts Kernel Aware. */
-    BSP_CPUInit();
     
     /* Initialize the Kernel.                               */
     OSInit(&err);
     
     /*   Check error code.                                  */
-    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
-    
-    /*   Check error code.                                  */
-    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
+    ASSERT(err == OS_ERR_NONE);
 }
 
 static inline void MICRIUM_OSInterface_Start( void )
@@ -200,7 +192,7 @@ static inline void MICRIUM_OSInterface_Start( void )
     OSStart(&err);
     
     /* Check error code.                                    */
-    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
+    ASSERT(err == OS_ERR_NONE);
 }
  
 static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
@@ -209,7 +201,7 @@ static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
 
     OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
 
-    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
+    ASSERT(err == OS_ERR_NONE);
 }
 
 static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
@@ -218,7 +210,7 @@ static inline CPU_TS MICRIUM_OSInterface_Timestamp( void )
 
     OS_TICK ticks = OSTimeGet(&err);
 
-    APP_RTOS_ASSERT_DBG((OS_ERR_CODE_GET(err) == OS_ERR_NONE), 1);
+    ASSERT(err == OS_ERR_NONE);
     
     return TICK_TO_MS(ticks);
 }
@@ -269,16 +261,16 @@ static inline void MICRIUM_OSInterface_CreateQueue( micrium_os_queue_data_t * qu
               queue_data->p_err);
 }
 
-static inline void MICRIUM_OSInterface_DeleteQueue( micrium_os_queue_data_t * queue_data )
+static inline OS_OBJ_QTY MICRIUM_OSInterface_DeleteQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQDel(&queue_data->q,
+    return OSQDel(&queue_data->q,
            queue_data->opt,
            queue_data->p_err);
 }
 
-static inline void MICRIUM_OSInterface_FlushQueue( micrium_os_queue_data_t * queue_data )
+static inline OS_MSG_QTY MICRIUM_OSInterface_FlushQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQFlush(&queue_data->q,
+    return OSQFlush(&queue_data->q,
              queue_data->p_err);
 }
 
@@ -292,9 +284,9 @@ static inline void MICRIUM_OSInterface_PendQueue( micrium_os_queue_data_t * queu
             queue_data->p_err);
 }
 
-static inline void MICRIUM_OSInterface_PendAbortQueue( micrium_os_queue_data_t * queue_data )
+static inline OS_OBJ_QTY MICRIUM_OSInterface_PendAbortQueue( micrium_os_queue_data_t * queue_data )
 {
-    OSQPendAbort(&queue_data->q,
+    return OSQPendAbort(&queue_data->q,
                  queue_data->opt,
                  queue_data->p_err);
 }

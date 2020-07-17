@@ -1,13 +1,12 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 3/15/2020
+// Created by Combine Profile Generator v0.1 on 7/16/2020
 // Copyright © Marbl. All rights reserved.
 
 #ifndef C12_profile_h
 #define C12_profile_h
 
-#define APPLICATION C12
 #define NONE 0
 
 typedef enum
@@ -235,6 +234,7 @@ typedef enum
     TASK_ACTION_NONE = 0,
     TASK_ACTION_INTERRUPT,
     TASK_ACTION_SCHEDULE,
+    TASK_ACTION_QUEUE,
     NUM_TASK_ACTION
 } TASK_ACTION, APPLICATION_TASK_ACTION, application_task_action_t;
 #define NUM_APPLICATION_TASK_ACTION NUM_TASK_ACTION
@@ -267,7 +267,8 @@ static const char * TASK_ACTION_STRINGS[] =
 {
     "TASK_ACTION_NONE",
     "TASK_ACTION_INTERRUPT",
-    "TASK_ACTION_SCHEDULE"
+    "TASK_ACTION_SCHEDULE",
+    "TASK_ACTION_QUEUE"
 };
 #define APPLICATION_TASK_ACTION_STRINGS TASK_ACTION_STRINGS
 #endif
@@ -440,7 +441,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
     .ID = SUBACTIVITIY_ID_ACTIVATE_MOTION_SENSOR, \
     .component_id = { COMPONENT_ID_MOTION_SENSOR }, \
     .num_component_id = 1, \
-    .function = IMUFunctions.Start, \
+    .function = AppFunctions.MotionState, \
     .data = ACTIVE \
 }
 
@@ -448,7 +449,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
     .ID = SUBACTIVITIY_ID_DEACTIVATE_MOTION_SENSOR, \
     .component_id = { COMPONENT_ID_MOTION_SENSOR }, \
     .num_component_id = 1, \
-    .function = IMUFunctions.Stop, \
+    .function = AppFunctions.MotionState, \
     .data = INACTIVE \
 }
 
@@ -604,8 +605,8 @@ static const char * STATE_ACTIVITY_STRINGS[] =
             { \
                 STATE_ACTIVITY_STARTUP, /* STATE_ACTIVITY */ \
                 { /* SUBACTIVITIES */ \
-                    SUBACTIVITIY_ID_INIT_COMMUNICATION, \
-                    SUBACTIVITIY_ID_INIT_SYSIOCTL \
+                    SUBACTIVITIY_ID_INIT_SYSIOCTL, \
+                    SUBACTIVITIY_ID_INIT_COMMUNICATION \
                 }, \
                 2, /* num_SUBACTIVITIES */ \
                 STATE_NAME_ACTIVE, /* EXIT_STATE */ \
@@ -621,8 +622,8 @@ static const char * STATE_ACTIVITY_STRINGS[] =
             { \
                 STATE_ACTIVITY_ACTIVATE, /* STATE_ACTIVITY */ \
                 { /* SUBACTIVITIES */ \
-                    SUBACTIVITIY_ID_ACTIVATE_MOTION_SENSOR, \
-                    SUBACTIVITIY_ID_ACTIVATE_BATTERY_MONITOR \
+                    SUBACTIVITIY_ID_ACTIVATE_BATTERY_MONITOR, \
+                    SUBACTIVITIY_ID_ACTIVATE_MOTION_SENSOR \
                 }, \
                 2, /* num_SUBACTIVITIES */ \
                 STATE_NAME_ASLEEP, /* EXIT_STATE */ \
@@ -630,9 +631,9 @@ static const char * STATE_ACTIVITY_STRINGS[] =
             STATE_NAME_ACTIVE, /* STATE_NAME */ \
             FAMILY_ALL, /* FAMILIES */ \
             { /* TASK_SHELF */ \
-                TASK_SHELF_ID_SENSOR_MOTION, \
+                TASK_SHELF_ID_DUAL_BLE_RADIO, \
                 TASK_SHELF_ID_SENSOR_BATTERY_MONITOR, \
-                TASK_SHELF_ID_DUAL_BLE_RADIO \
+                TASK_SHELF_ID_SENSOR_MOTION \
             }, \
             3, /* num_TASK_SHELF */ \
         }, \
@@ -640,8 +641,8 @@ static const char * STATE_ACTIVITY_STRINGS[] =
             { \
                 STATE_ACTIVITY_SLEEP, /* STATE_ACTIVITY */ \
                 { /* SUBACTIVITIES */ \
-                    SUBACTIVITIY_ID_DEACTIVATE_MOTION_SENSOR, \
-                    SUBACTIVITIY_ID_DEACTIVATE_BATTERY_MONITOR \
+                    SUBACTIVITIY_ID_DEACTIVATE_BATTERY_MONITOR, \
+                    SUBACTIVITIY_ID_DEACTIVATE_MOTION_SENSOR \
                 }, \
                 2, /* num_SUBACTIVITIES */ \
                 STATE_NAME_IDLE, /* EXIT_STATE */ \

@@ -21,6 +21,8 @@ typedef enum
 } emlib_i2c_transfer_type_t, EMLIB_I2C_TRANSFER_TYPE_T;
 
 #ifndef __EMLIB__
+#include <assert.h>
+#define EFM_ASSERT assert
 typedef void I2C_TypeDef;
 typedef void SPI_TypeDef;
 typedef void USART_TypeDef;

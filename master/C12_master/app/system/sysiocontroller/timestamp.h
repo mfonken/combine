@@ -10,34 +10,19 @@
 #define timestamp_h
 
 #include <stdbool.h>
-
-#if __OS__ == MICRIUM && defined(__MICRIUM__)
 #include "os_interface.h"
 
-static double TIMESTAMP(void)
-{
-    return (double)OS.Timestamp() / 1000.0;
-}
-#else
-#include <sys/time.h>
-static double TIMESTAMP(void)
-{
-    struct timeval stamp;
-    gettimeofday(&stamp, NULL);
-    return stamp.tv_sec + stamp.tv_usec/1000000.0;
-}
-#endif
+double TIMESTAMP(void);
+double SECONDSSINCE( double check );
+bool ISTIMEDOUT( double check, double time_out );
 
-static double SECONDSSINCE( double check )
+typedef struct
 {
-    return TIMESTAMP() - check;
-}
+    double (*Stamp)(void);
+    double (*SecondsSince)(double);
+    bool (*IsTimedOut)(double, double);
+} time_functions;
 
-static bool ISTIMEDOUT( double check, double time_out )
-{
-    double diff = SECONDSSINCE(check);
-//    printf("∆%f c%f t%f\n", diff, check, time_out);
-    return (diff > time_out);
-}
+extern time_functions Time;
 
 #endif /* timestamp_h */

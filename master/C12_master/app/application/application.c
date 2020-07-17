@@ -34,6 +34,11 @@ void InitializeMeta(void)
     SysIOCtlFunctions.InitComponent = AppFunctions.InitComponent;
 }
 
+void Application_IMUSetState(bool active)
+{
+    // TODO: Finish IMU state setter...
+}
+
 void Application_InitComponent( component_t * p_component )
 {
     LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", p_component->name, p_component->ID);

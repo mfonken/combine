@@ -329,6 +329,7 @@ var all_options =
         "Init",
         "Start",
         "Tick",
+        "MotionState",
         {
           "Handler": [
             {
