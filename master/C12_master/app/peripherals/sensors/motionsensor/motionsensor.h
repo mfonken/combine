@@ -33,7 +33,8 @@ typedef struct
 } imu_t;
 
 bool Init_IMU( imu_t *, component_id_t, uint8_t, comm_protocol, imu_chip_t );
-bool Set_IMU_RotVec( imu_t * );
+bool Resume_IMU_RotVec( imu_t * );
+bool Pause_IMU_RotVec( imu_t * );
 
 static void RotVecToQuaternion( rotation_vector_t * r, quaternion_t * q )
 {
@@ -50,7 +51,8 @@ typedef struct
     bool (*Stop)( shtp_client_t *, imu_feature_t );
     bool (*Read)( shtp_client_t * );
     bool (*Refresh)( shtp_client_t * );
-    bool (*RotVec)( imu_t * );
+    bool (*ResumeRotVec)( imu_t * );
+    bool (*PauseRotVec)( imu_t * );
     void (*GenerateClient)( shtp_client_t *, uint8_t, void * );
 } imu_functions;
 
@@ -61,7 +63,8 @@ static const imu_functions IMUFunctions =
     .Stop = BNO080DisableFeature,
     .Read = BNO080Read,
     .Refresh = BNO080Refresh,
-    .RotVec = Set_IMU_RotVec,
+    .ResumeRotVec = Resume_IMU_RotVec,
+    .PauseRotVec = Pause_IMU_RotVec,
     .GenerateClient = BNO080GenerateSH2Client
 };
 

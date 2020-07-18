@@ -70,7 +70,7 @@ void InitializeMeta(void);
 void Application_Init( void );
 void Application_Start( void );
 void Application_Tick( void );
-void Application_IMUSetState( bool );
+void Application_IMUSetState( TEMPLATED_TYPE(bool) );
 void Application_InitComponent( component_t * );
 void RhoInputHandler( comm_host_t * );
 void RhoOutputHandler( comm_host_t * );

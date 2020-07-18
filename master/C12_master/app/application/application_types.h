@@ -12,8 +12,8 @@
 #include "globaltypes.h"
 
 #define SUB_VREG_MV 2200
-#define ACTIVE true
-#define INACTIVE false
+#define ACTIVE      (1)
+#define INACTIVE    (0)
 
 #define INTERRUPT_CHANNEL QUEUE_ID_HW_INTERRUPTS
 #ifndef COMPONENT_FAMILY_0

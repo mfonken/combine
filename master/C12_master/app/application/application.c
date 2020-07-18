@@ -34,10 +34,9 @@ void InitializeMeta(void)
     SysIOCtlFunctions.InitComponent = AppFunctions.InitComponent;
 }
 
-void Application_IMUSetState(bool active)
-{
-    // TODO: Finish IMU state setter...
-}
+TEMPLATED_CALLBACK(Application_IMUSetState, bool, active, active
+                   ? IMUFunctions.ResumeRotVec(&App.objects.IMU)
+                   : IMUFunctions.PauseRotVec(&App.objects.IMU));
 
 void Application_InitComponent( component_t * p_component )
 {

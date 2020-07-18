@@ -40,6 +40,12 @@
 #define PAPI_SPECIFIC(NAME) NAME_BUILDER(__PAPI__, NAME)
 #define APP_SPECIFIC(NAME) NAME_BUILDER(APPLICATION, NAME)
 
+#define TEMPLATED_TYPE(T) void*
+#define TEMPLATED_CALLBACK(function_name, T, name, content) \
+void function_name(TEMPLATED_TYPE(T) NAME_BUILDER(name,T)) { \
+    T name = (T)NAME_BUILDER(name,T); \
+    content; }
+
 #define CALL_OS_PARENT(X) OS_SPECIFIC(__LINE__)(X)
 
 #define IS_VALID_PTR(X) ((long)X>=0x0000000100000000)
@@ -51,6 +57,19 @@
 
 typedef void (*void_handler_t)(void);
 typedef void_handler_t generic_function_t;
+typedef void * void_p_function_data_t;
+typedef void (*void_p_function_t)(void_p_function_data_t);
+
+
+//typedef union
+//{
+//    void *(*void_p_void_p)(void *);
+//    void *(*void_p_bool)(bool);
+//    void *(*void_p_uint8_t)(uint8_t);
+//    void *(*void_p_uint16_t)(uint16_t);
+//    void *(*void_p_uint32_t)(uint32_t);
+//} generic_function_t;
+
 typedef uint16_t event_id;
 typedef int8_t generic_id_t;
 typedef uint16_t qty_t;

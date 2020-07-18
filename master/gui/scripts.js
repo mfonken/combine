@@ -557,6 +557,7 @@ function generateC() {
                                     group_name = item;
                                     element_name = '"' + element_name.split('_').slice(-1)[0] + '"';
                                 }
+                                // console.log(group_name, item_key, element_name);
                                 section_text += "#define " + group_name + "_" + item_key + " " + element_name + "\n";
                                 group_item_names[i++] = (group_name + "_" + item_key);
                             // }
@@ -566,6 +567,7 @@ function generateC() {
                         }
                     });
                     if(group_name == "") return;
+                    // console.log(group_name, group_key);
                     section_text += "#define " + group_name + "_" + group_key + " { ";
                     $.each(group_item_names, function (i, group_item) {
                         section_text += group_item;
@@ -620,6 +622,7 @@ function generateC() {
                             if(item_key == "ID") {
                                 id = item;
                                 var macro_name = item.replace("_ID", "");
+                                // console.log(group_key, macro_name);
                                 section_text += "#define " + group_key + "_" + macro_name + " ";
                                 if(wrap != "") {
                                     section_text += group_key + "(";
@@ -641,6 +644,7 @@ function generateC() {
                                 section_text += item;
                             }
                             else {
+                                // console.log(group_key, item_key, item);
                                 if(item_key == item_key.toUpperCase()) section_text +=  group_key + "_" + item_key + "_";
                                 section_text += item;
                             }
@@ -822,7 +826,7 @@ function generateC() {
     section_text += "\n#endif \/*" + profile_name + "_h *\/";
 
     full_text += section_text;
-    console.log(full_text);
+    // console.log(full_text);
     textPopupWithCopyClose(full_text);
 }
 

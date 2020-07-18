@@ -219,8 +219,8 @@ typedef struct
     uint8_t ID;
     component_id_t component_id[MAX_COMPONENTS];
     uint8_t num_component_id;
-    void (*function)(void *);
-    void * data;
+    void_p_function_t function;
+    void_p_function_data_t data;
 } system_subactivity_t;
 
 typedef struct
