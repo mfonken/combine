@@ -64,7 +64,7 @@ typedef struct
 typedef struct
 {
     system_papi_interface_energy_functions Energy;
-    system_papi_interface_gpio_functions GPIO;
+    system_papi_interface_gpio_functions IO;
     system_papi_interface_i2c_functions I2C;
     system_papi_interface_spi_functions SPI;
 } system_papi_interface_functions;
@@ -73,8 +73,8 @@ static system_papi_interface_functions PAPI =
 {
     .Energy.InitDCDC = PAPIInterface_DCDC_Init,
     
-    .GPIO.Set = PAPIInterace_GPIO_Set,
-    .GPIO.Clear = PAPIInterace_GPIO_Clear,
+    .IO.Set = PAPIInterace_GPIO_Set,
+    .IO.Clear = PAPIInterace_GPIO_Clear,
     
     .I2C.Init = PAPIInterface_I2C_Init,
     .I2C.Enable = PAPIInterface_I2C_Enable,

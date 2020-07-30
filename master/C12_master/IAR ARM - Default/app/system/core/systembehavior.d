@@ -23,6 +23,7 @@ app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techinc
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\debug\application_debug.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\genlog.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\emlib_interface.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\micrium_interface.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Source\os.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Cfg\Template\os_cfg.h
@@ -36,4 +37,3 @@ app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techinc
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB-master\lib_def.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Source\os_type.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uCOS-III\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\specific\emlib_interface.h

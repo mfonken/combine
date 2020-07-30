@@ -8,6 +8,10 @@
 
 #include "communicationmanager.h"
 
+#warning "Temporary fix for compilation"
+/* Flag for indicating DFU Reset must be performed */
+static uint8_t boot_to_dfu = 0;
+
 void CommunicationManagerInit(void)
 {
     LOG_COMM(DEBUG_1, "Initializing communication manager.\n");

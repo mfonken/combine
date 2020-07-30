@@ -10,13 +10,24 @@
 #define emlib_interface_h
 
 #ifdef __EMLIB__
-#define DCDC_SERVICE
+//#define DCDC_SERVICE
 #define I2C_SERVICE
+#define USART_SERVICE
 #endif /* __EMLIB__ */
+
 
 
 #ifdef __EMLIB__
 #define ASSERT EFM_ASSERT
+
+#ifdef I2C_SERVICE
+#include <em_i2c.h>
+#endif
+
+#ifdef USART_SERVICE
+#include <em_usart.h>
+#endif
+
 #else
 #include <assert.h>
 #define EFM_ASSERT assert
@@ -30,17 +41,25 @@ typedef uint8_t GPIO_Port_TypeDef;
 #define SPI2 2
 #endif
 
-typedef enum : bool
+typedef USART_TypeDef SPI_TypeDef;
+
+typedef enum
 {
     I2C_READ_REG_EVENT = 0,
     I2C_WRITE_REG_EVENT
 } emlib_i2c_transfer_type_t, EMLIB_I2C_TRANSFER_TYPE_T;
 
-typedef enum : bool
+typedef enum
 {
     EMLIB_GPIO_STATE_LOW = 0,
     EMLIB_GPIO_STATE_HIGH
 } EMLIB_GPIO_STATE_T, emlib_gpio_state_t;
+
+typedef enum
+{
+    EMLIB_GPIO_NCS_ACTIVE = 0,
+    EMLIB_GPIO_NCS_INACTIVE,
+} EMLIB_GPIO_STATE_T, emlib_gpio_ncs_t;
 
 typedef struct
 {
@@ -98,8 +117,14 @@ emlib_spi_host_t *
     host;
 uint8_t
     reg,
-    length,
-    *buffer;
+    length;
+	union _data
+	{
+		uint8_t
+			byte;
+		void *
+			buffer;
+	} data;
 } emlib_spi_event_t, EMLIB_SPI_EVENT_T;
 
 #ifndef __EMLIB__
@@ -108,7 +133,9 @@ typedef bool EMLIB_I2C_TRANSFER_RETURN_T;
 typedef bool emlib_spi_transfer_return_t;
 typedef bool EMLIB_SPI_TRANSFER_RETURN_T;
 
+#ifdef DCDC_SERVICE
 static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV ) {};
+#endif
 static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event ) { return true; };
 static void EMLIB_PAPIInterface_I2C_Enable( emlib_i2c_event_t * event ) {};
 static void EMLIB_PAPIInterface_I2C_Disable( emlib_i2c_event_t * event ) {};
@@ -128,9 +155,12 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Write( emlib_spi_even
 typedef I2C_TransferReturn_TypeDef emlib_i2c_transfer_return_t;
 typedef I2C_TransferReturn_TypeDef EMLIB_I2C_TRANSFER_RETURN_T;
 
-typedef SPI_TransferReturn_TypeDef emlib_spi_transfer_return_t;
-typedef SPI_TransferReturn_TypeDef EMLIB_SPI_TRANSFER_RETURN_T;
+typedef uint32_t emlib_spi_transfer_return_t;
+typedef uint32_t EMLIB_SPI_TRANSFER_RETURN_T;
+//typedef USART_TransferReturn_TypeDef emlib_spi_transfer_return_t;
+//typedef USART_TransferReturn_TypeDef EMLIB_SPI_TRANSFER_RETURN_T;
 
+#ifdef DCDC_SERVICE
 static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV )
 {
 //    typedef struct
@@ -150,12 +180,13 @@ static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV )
     dcdcInit.mVout = mV;
     EMU_DCDCInit(&dcdcInit);
 }
+#endif
 
 static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t state )
 {
     switch( state )
     {
-        case EMLIB_GPIO_STATE_LOW:
+		case EMLIB_GPIO_STATE_LOW:
             GPIO_PinOutClear( gpio.port, gpio.pin );
             break;
         case EMLIB_GPIO_STATE_HIGH:
@@ -175,7 +206,7 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
 static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event )
 {
     I2C_Init_TypeDef initType = I2C_INIT_DEFAULT;
-    I2C_Init( evenet->host.device, &initType );
+    I2C_Init( event->host.device, &initType );
     return true;
 };
 
@@ -194,7 +225,7 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_ReadRegister( emlib_i
     I2C_TransferSeq_TypeDef    seq;
     emlib_i2c_transfer_return_t ret;
 
-    seq.addr  = event->addr;
+    seq.addr  = event->host->address;
     seq.flags = I2C_FLAG_WRITE_READ;
     /* Select command to issue */
     seq.buf[0].len    = event->length;
@@ -215,11 +246,11 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event
     I2C_TransferSeq_TypeDef    seq;
     emlib_i2c_transfer_return_t ret;
 
-    seq.addr  = event->addr;
+    seq.addr  = event->host->address;
     seq.flags = I2C_FLAG_READ;
     
     /* Select location/length of data to be read */
-    seq.buf[0].data = event->buffer;
+    seq.buf[0].data = event->data.buffer;
     seq.buf[0].len  = event->length;
 
     ret = I2C_TransferInit(I2C0, &seq);
@@ -233,8 +264,8 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_WriteRegister( emlib_i2c_event_t * event )
 {
     event->length = 1;
-    event->buffer = event->reg;
-    return EMLIB_PAPIInterface_I2C_Write(data);
+    event->reg = event->reg;
+    return EMLIB_PAPIInterface_I2C_Write(event->data.byte);
 }
 
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_event_t * event )
@@ -243,11 +274,11 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
     emlib_i2c_transfer_return_t ret;
     //uint8_t                    i2c_read_data[1];
 
-    seq.addr  = event->addr;
+    seq.addr  = event->host->address;
     seq.flags = I2C_FLAG_WRITE;
     
     /* Select command to issue */
-    seq.buf[0].data   = event->buffer;
+    seq.buf[0].data   = event->data.buffer;
     seq.buf[0].len    = event->length;
 
     ret = I2C_TransferInit(event->host.device, &seq);
@@ -261,7 +292,7 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
 static bool EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event )
 {
     USART_InitSync_TypeDef initType = USART_INITASYNC_DEFAULT;
-    USART_InitSync( evenet->host.device, &initType );
+    USART_InitSync( event->host.device, &initType );
     return true;
 };
 
@@ -277,10 +308,10 @@ static void EMLIB_PAPIInterface_SPI_Disable( emlib_spi_event_t * event )
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_spi_event_t * event )
 {
-    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, event->host.cs.active );
+    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
     event->data.byte = USART_SpiTransfer( event->host.device, event->reg );
-    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, !event->host.cs.active );
+    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }
 
@@ -296,11 +327,11 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Read( emlib_spi_event
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_WriteRegister( emlib_spi_event_t * event )
 {
-    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, event->host.cs.active );
+    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
     USART_SpiTransfer( event->host.device, event->reg );
     USART_SpiTransfer( event->host.device, event->data );
-    EMLIB_PAPIInterface_GPIO_Set( event->host.cs.gpio, !event->host.cs.active );
+    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }
 

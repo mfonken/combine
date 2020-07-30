@@ -60,6 +60,7 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
         case INTERRUPT_ACTION_IMMEDIATE:
             if( p_task != NULL )
                 OS.Task.Resume( &p_task->os_task_data );
+            /* Intentional fall through */
         case INTERRUPT_ACTION_IGNORE:
         default:
             handled = true;

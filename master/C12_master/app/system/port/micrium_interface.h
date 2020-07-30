@@ -13,6 +13,9 @@
 
 #ifdef __MICRIUM__
 #include <os.h>
+#include "bg_types.h"
+#include "native_gecko.h"
+#include "gatt_db.h"
 #else
 #include <unistd.h>
 typedef void            (*OS_TASK_PTR)(void *p_arg);

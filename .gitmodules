@@ -1,0 +1,6 @@
+[submodule "master/C12_master/app/rtos/uC-CPU"]
+	url = https://github.com/SiliconLabs/uC-CPU.git
+[submodule "master/C12_master/app/rtos/uC-LIB"]
+	url = https://github.com/SiliconLabs/uC-LIB.git
+[submodule "master/C12_master/app/rtos/uC-OS3"]
+	url = https://github.com/SiliconLabs/uC-OS3.git

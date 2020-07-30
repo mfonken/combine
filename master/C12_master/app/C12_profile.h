@@ -367,7 +367,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 
 /* Channels */
 #define CHANNEL_I2C { I2C1 }
-#define CHANNEL_SPI { SPI1 }
+#define CHANNEL_SPI { USART1 }
 #define CHANNEL_USART { USART1 }
 
 /* Components */
