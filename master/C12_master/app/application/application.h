@@ -67,30 +67,34 @@ static system_profile_t Profile;
 
 void InitializeMeta(void);
 //
+
+TEMPLATED_PROTOTYPE(Application_IMUSetState, bool);
+TEMPLATED_PROTOTYPE(RhoInputHandler, p_comm_host_t);
+TEMPLATED_PROTOTYPE(RhoOutputHandler, p_comm_host_t);
+TEMPLATED_PROTOTYPE(HostInputHandler, p_comm_packet_t);
+TEMPLATED_PROTOTYPE(TouchInterruptHandler, p_comm_host_t);
+
 void Application_Init( void );
 void Application_Start( void );
 void Application_Tick( void );
-void Application_IMUSetState( TEMPLATED_TYPE(bool) );
 void Application_InitComponent( component_t * );
-void RhoInputHandler( comm_host_t * );
-void RhoOutputHandler( comm_host_t * );
+//void RhoInputHandler( comm_host_t * );
+//void RhoOutputHandler( comm_host_t * );
 void MotionOutputHandler( imu_feature_t, uint32_t );
 void MotionInputHandler( void );
 void HostOutputHandler( comm_packet_t * );
-void HostInputHandler( comm_packet_t * );
-void TouchInterruptHandler( comm_host_t * );
 
 typedef struct
 {
-    void (*Rho)( comm_host_t * );
+    void (*Rho)( void * ); // comm_host_t * );
     void (*Motion)(void);
-    void (*Host)( comm_packet_t * );
-    void (*Touch)( comm_host_t * );
+    void (*Host)( void * ); // comm_packet_t * );
+    void (*Touch)( void * ); // comm_host_t * );
 } application_handler_input_functions;
 
 typedef struct
 {
-    void (*Rho)( comm_host_t * );
+    void (*Rho)( void * ); // comm_host_t * );
     void (*Motion)( imu_feature_t, uint32_t );
     void (*Host)( comm_packet_t * );
 } application_handler_output_functions;
@@ -107,7 +111,7 @@ typedef struct
     void (*InitComponent)( component_t * );
     void (*Start)(void);
     void (*Tick)(void);
-    void (*MotionState)(bool);
+    void (*MotionState)( void * ); // bool);
     application_handler_functions Handler;
 } application_functions;
 
@@ -117,7 +121,7 @@ static application_functions AppFunctions =
     .InitComponent = Application_InitComponent,
     .Start = Application_Start,
     .Tick = Application_Tick,
-    .MotionState = Application_IMUSetState,
+    .MotionState                = Application_IMUSetState,
     .Handler.Input.Rho          = RhoInputHandler,
     .Handler.Output.Rho         = RhoOutputHandler,
     .Handler.Input.Motion       = MotionInputHandler,

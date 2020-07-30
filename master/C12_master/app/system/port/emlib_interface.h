@@ -14,11 +14,6 @@
 #define I2C_SERVICE
 #endif /* __EMLIB__ */
 
-typedef enum
-{
-    I2C_READ_REG_EVENT = 1,
-    I2C_WRITE_REG_EVENT
-} emlib_i2c_transfer_type_t, EMLIB_I2C_TRANSFER_TYPE_T;
 
 #ifdef __EMLIB__
 #define ASSERT EFM_ASSERT
@@ -34,6 +29,12 @@ typedef uint8_t GPIO_Port_TypeDef;
 #define SPI1 1
 #define SPI2 2
 #endif
+
+typedef enum : bool
+{
+    I2C_READ_REG_EVENT = 0,
+    I2C_WRITE_REG_EVENT
+} emlib_i2c_transfer_type_t, EMLIB_I2C_TRANSFER_TYPE_T;
 
 typedef enum : bool
 {
@@ -54,8 +55,8 @@ typedef struct
 typedef struct
 {
 uint8_t
-    protocol:8,
-    address:8;
+    protocol,
+    address;
 I2C_TypeDef *
     device;
 void *
@@ -78,11 +79,6 @@ uint8_t
             buffer;
     } data;
 } emlib_i2c_event_t, EMLIB_I2C_EVENT_T;
-
-//typedef enum
-//{
-//    SPI_READ_REG_EVENT = 1,
-//} emlib_spi_transfer_type_t, EMLIB_SPI_TRANSFER_TYPE_T;
 
 typedef struct
 {
@@ -113,7 +109,6 @@ typedef bool emlib_spi_transfer_return_t;
 typedef bool EMLIB_SPI_TRANSFER_RETURN_T;
 
 static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV ) {};
-
 static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event ) { return true; };
 static void EMLIB_PAPIInterface_I2C_Enable( emlib_i2c_event_t * event ) {};
 static void EMLIB_PAPIInterface_I2C_Disable( emlib_i2c_event_t * event ) {};
@@ -150,7 +145,7 @@ static void EMLIB_PAPIInterface_DCDC_Init( uint16_t mV )
 //            EMU_DcdcLnReverseCurrentControl_TypeDef reverseCurrentControl;
 //            EMU_DcdcLnCompCtrl_TypeDef dcdcLnCompCtrl;
 //    } EMU_DCDCInit_TypeDef;
-
+    
     EMU_DCDCInit_TypeDef dcdcInit = EMU_DCDCINIT_DEFAULT;
     dcdcInit.mVout = mV;
     EMU_DCDCInit(&dcdcInit);
@@ -222,7 +217,7 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event
 
     seq.addr  = event->addr;
     seq.flags = I2C_FLAG_READ;
-
+    
     /* Select location/length of data to be read */
     seq.buf[0].data = event->buffer;
     seq.buf[0].len  = event->length;
@@ -250,7 +245,7 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
 
     seq.addr  = event->addr;
     seq.flags = I2C_FLAG_WRITE;
-
+    
     /* Select command to issue */
     seq.buf[0].data   = event->buffer;
     seq.buf[0].len    = event->length;

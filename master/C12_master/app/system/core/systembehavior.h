@@ -58,20 +58,4 @@ static system_behavior_functions SystemBehavior =
     .Perform.ComponentInterrupt     = SystemBehavior_PerformComponentInterrupt
 };
 
-//static generic_function_t BehaviorScheduledTasks[] =
-//{
-//    NullFunction, /* SYSTEM_SCHEDULER_ID_NONE = 0 */
-//    NullFunction, /* SYSTEM_SCHEDULER_ID_TAU_DATA_TRANFER */
-//    TauManagerTick, /* SYSTEM_SCHEDULER_ID_TAU_PERFORM */
-//    NullFunction /* SYSTEM_SCHEDULER_ID_TAU_PACKET_QUEUE */
-//};
-//
-//static generic_function_t BehaviorInterruptTasks[] =
-//{
-//    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PERFORM */
-//    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_RHO_RECEIVE */
-//    NullFunction, /* SYSTEM_INTERRUPTER_ID_TAU_PACKET_GENERATE */
-//    NullFunction /* SYSTEM_INTERRUPTER_ID_HAPTIC_PACKET_GENERATE */
-//};
-
 #endif /* systembehavior_h */

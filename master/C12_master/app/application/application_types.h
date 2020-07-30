@@ -9,7 +9,7 @@
 #ifndef application_types_h
 #define application_types_h
 
-#include "globaltypes.h"
+#include "global_types.h"
 
 #define SUB_VREG_MV 2200
 #define ACTIVE      (1)

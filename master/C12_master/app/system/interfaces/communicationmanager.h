@@ -32,6 +32,7 @@ typedef struct
 {
     uint8_t tmp;
 } comm_packet_t;
+typedef comm_packet_t * p_comm_packet_t;
 
 void CommunicationManagerInit(void);
 generic_comm_return_t CommunicationManager_PerformEvent( comm_event_t );

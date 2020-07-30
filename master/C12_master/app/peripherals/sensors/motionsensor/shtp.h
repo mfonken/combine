@@ -101,19 +101,19 @@ typedef struct
     shtp_client_t shtp_client;
 } shtp_client_comm_host_t;
 
-static void SHTP_GenerateSH2Client( shtp_client_comm_host_t * p_host,
+static void SHTP_GenerateSH2Client( shtp_client_t * p_client,
                                     uint8_t ID, uint8_t sequence_number,
                                     shtp_client_buffer * p_buffer,
                                     shtp_client_product_id * p_product,
                                     shtp_client_output * p_output,
                                     void * p_data)
 {
-    p_host->shtp_client.ID = ID;
-    p_host->shtp_client.sequence_number = sequence_number;
-    memcpy( (void *)&p_host->shtp_client.buffer, p_buffer, sizeof(shtp_client_buffer) );
-    memcpy( (void *)&p_host->shtp_client.product, p_product, sizeof(shtp_client_product_id) );
-    memcpy( (void *)&p_host->shtp_client.output, p_output, sizeof(shtp_client_output) );
-    p_host->shtp_client.data = p_data;
+    p_client->ID = ID;
+    p_client->sequence_number = sequence_number;
+    memcpy( (void *)&p_client->buffer, p_buffer, sizeof(shtp_client_buffer) );
+    memcpy( (void *)&p_client->product, p_product, sizeof(shtp_client_product_id) );
+    memcpy( (void *)&p_client->output, p_output, sizeof(shtp_client_output) );
+    p_client->data = p_data;
 }
 
 static shtp_client_comm_host_t * p_active_client;

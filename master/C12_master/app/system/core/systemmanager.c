@@ -462,8 +462,8 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
             comm_host.i2c_host.device = I2C_Channels[p_component->route - 1];
             break;
         case COMPONENT_PROTOCOL_SPI:
-            comm_host.spi_host.cs.gpio.pin = p_component->pin;
-            comm_host.spi_host.cs.gpio.port = p_component->port;
+            comm_host.spi_host.gpio.pin = p_component->pin;
+            comm_host.spi_host.gpio.port = p_component->port;
             comm_host.spi_host.device = SPI_Channels[p_component->route - 1];
             break;
         default:

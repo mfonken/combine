@@ -67,18 +67,16 @@ void Application_InitComponent( component_t * p_component )
 }
 
 /* Rho In */
-void RhoInputHandler( comm_host_t * p_host )
+TEMPLATED_CALLBACK(RhoInputHandler, p_comm_host_t, p_host,
 {
     RhoFunctions.Receive( p_host, &App.objects.Rho );
     RhoPointToKPoint( &App.objects.Rho.packet.primary, &App.buffers.rho.data[0] );
     RhoPointToKPoint( &App.objects.Rho.packet.secondary, &App.buffers.rho.data[1] );
     rho_get_confidence( &App.objects.Rho, App.buffers.rho.confidence );
-}
+});
 
-/* Rho In */
-void RhoOutputHandler( comm_host_t * p_host )
-{
-}
+/* Rho Out */
+TEMPLATED_CALLBACK(RhoOutputHandler, p_comm_host_t, p_host, DO_NOTHING);
 
 /* Motion Out */
 void MotionOutputHandler( imu_feature_t feature, uint32_t interval )
@@ -117,13 +115,10 @@ void HostOutputHandler( comm_packet_t * p_packet )
 }
 
 /* BLE In */
-void HostInputHandler( comm_packet_t * p_packet )
-{
-    CommFunctions.Perform.Receive( p_packet );
-}
+TEMPLATED_CALLBACK(HostInputHandler, p_comm_packet_t, p_packet, CommFunctions.Perform.Receive( p_packet ));
 
 /* Touch In */
-void TouchInterruptHandler( comm_host_t * p_host )
+TEMPLATED_CALLBACK(TouchInterruptHandler, p_comm_host_t, p_host,
 {
     touch_data_t * p_touch_data = &App.buffers.touch;
     touch_packet_t packet = TouchController.Read( p_host );
@@ -143,4 +138,4 @@ void TouchInterruptHandler( comm_host_t * p_host )
         default:
             break;
     }
-}
+});

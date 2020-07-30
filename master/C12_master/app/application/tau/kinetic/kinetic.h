@@ -19,7 +19,7 @@
 
 #include "matvec.h"
 #include "qmath.h"
-#include "global_config.h"
+#include "global_types.h"
 
 /* Math headers */
 

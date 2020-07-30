@@ -21,7 +21,6 @@ void SYSIOCTL_Init( system_master_t * p_system )
         SysIOCtlFunctions.Push( p_component );
         SysIOCtlFunctions.DisableFamily( p_component->family );
     }
-//    SysIOCtlFunctions.EnableFamily( SYSTEM_FAMILY_0 );
     
     SysIOCtlFunctions.CompleteComponentTransients();
 }

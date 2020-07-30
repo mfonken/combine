@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "global_config.h"
+#include "global_types.h"
 
 #define MATVEC_LIB
 

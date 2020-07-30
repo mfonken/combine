@@ -11,6 +11,12 @@
 
 #include "systemtypes.h"
 
+static void TimerArgumentIntermediary( void *p_tmr, void *p_arg )
+{
+    os_task_data_t * os_task_data = (os_task_data_t *)p_arg;
+    os_task_data->p_task(os_task_data->p_arg);
+}
+
 bool TaskHasValidTimer( os_task_data_t * );
 
 void OSInterface_Init( void );

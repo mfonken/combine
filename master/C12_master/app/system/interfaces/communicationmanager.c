@@ -10,12 +10,13 @@
 
 void CommunicationManagerInit(void)
 {
-    
+    LOG_COMM(DEBUG_1, "Initializing communication manager.\n");
 }
 
 generic_comm_return_t CommunicationManager_PerformEvent( comm_event_t event )
 {
     generic_comm_return_t ret = false;
+    LOG_COMM(DEBUG_1, "Perform %s event.\n", COMPONENT_PROTOCOL_STRINGS[event.generic_comm_event.host->generic_comm_host.protocol] );
     switch( event.generic_comm_event.host->generic_comm_host.protocol )
     {
         case COMPONENT_PROTOCOL_I2C:
