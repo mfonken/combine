@@ -179,7 +179,7 @@ void *
 #define I2C_RD_WD( HOST, REG, BYTE ) I2C_ACTION( HOST, I2C_READ_REG_EVENT, REG, 2, .data.buffer = bp(BYTE) )
 #define I2C_WR_REG( HOST, REG, BYTE ) I2C_ACTION( HOST, I2C_WRITE_REG_EVENT, REG, 1, .data.byte = b(BYTE) )
 
-#define NULL_HOST (comm_host_t)(generic_comm_host_t){ 0, 0, NULL, NULL }
+#define NULL_HOST (comm_host_t){ 0, 0, NULL, NULL }
 
 typedef union
 {

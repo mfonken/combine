@@ -13,7 +13,7 @@ static void TriggerWake(void)
 static void TriggerTick(void)
 {}
 
-void SetSHTPActiveClient( shtp_client_t * p_client) { p_active_client = p_client; };
+void SetSHTPActiveHost( shtp_client_comm_host_t * p_host) { p_active_host = p_host; };
 
 static void CopyAxis3ToByteArray( axis3_t * p_data, uint8_t * p_array )
 {
@@ -156,7 +156,7 @@ bool ReceiveSHTPHeader( shtp_packet_header_t * p_header )
 bool ReceiveSHTPPacket(void)
 {
     if(!ReceiveSHTPHeader( &local.header )) return false;
-    PerformCommEvent(SHTPFunctions.GetPacketReceiveEvent(local.header.length, &local.data));
+    PerformCommEvent(SHTPFunctions.GetPacketReceiveEvent(local.header.length, local.data));
     switch( local.data[0] )
     {
         case SH2_BATCHING_BASE_TIMESTAMP_REFERENCE:
@@ -246,21 +246,21 @@ bool ParseSHTPConfigurationFRSWriteResponse(void)
 void ParseSHTPConfigurationProductIDResponse(void)
 {
     sh2_product_id_response * response = (sh2_product_id_response *)local.data;
-    p_active_client->shtp_client.product.reset_cause = response->reset_cause;
-    p_active_client->shtp_client.product.sw_version_major = response->sw_version_major;
-    p_active_client->shtp_client.product.sw_version_minor = response->sw_version_minor;
-    p_active_client->shtp_client.product.sw_part_number = response->sw_part_number;
-    p_active_client->shtp_client.product.sw_build_number = response->sw_build_number;
-    p_active_client->shtp_client.product.sw_version_patch = response->sw_version_patch;
+    p_active_host->shtp_client.product.reset_cause = response->reset_cause;
+    p_active_host->shtp_client.product.sw_version_major = response->sw_version_major;
+    p_active_host->shtp_client.product.sw_version_minor = response->sw_version_minor;
+    p_active_host->shtp_client.product.sw_part_number = response->sw_part_number;
+    p_active_host->shtp_client.product.sw_build_number = response->sw_build_number;
+    p_active_host->shtp_client.product.sw_version_patch = response->sw_version_patch;
 }
 
 void ParseSHTPInputReport(void)
 {
     void * p_report = (sh2_report_header_t *)(local.data+sizeof(sh2_base_timestamp_reference_record));
     sh2_report_header_t * p_packet_header = (sh2_report_header_t *)p_report;
-//    shtp_client_buffer * p_buffer = &p_active_client->buffer;
-    p_active_client->shtp_client.output.type = p_packet_header->report_ID;
-    p_active_client->shtp_client.sequence_number = p_packet_header->sequence_number;
+//    shtp_client_buffer * p_buffer = &p_active_host->shtp_client.buffer;
+    p_active_host->shtp_client.output.type = p_packet_header->report_ID;
+    p_active_host->shtp_client.sequence_number = p_packet_header->sequence_number;
     switch(p_packet_header->report_ID)
     {
         case SH2_SENSOR_REPORT_ACCELEROMETER:
@@ -391,42 +391,42 @@ inline void ParseSHTPConfigurationReportCommandResponse(sh2_command_response * p
 }
 inline void ParseAccelerometerReport(sh2_accelerometer_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseGyroscopeCalibratedReport(sh2_gyroscope_calibrated_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseMagneticFieldCalibratedReport(sh2_magnetic_field_calibrated_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseLinearAccelerationReport(sh2_linear_acceleration_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseRotationVectorReport(sh2_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
-    p_active_client->shtp_client.output.accuracy = p_report->accuracy;
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
+    p_active_host->shtp_client.output.accuracy = p_report->accuracy;
 }
 inline void ParseGravityReport(sh2_gravity_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->x, &p_active_client->shtp_client.output.rotation_vector);
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->x, &p_active_host->shtp_client.output.rotation_vector);
 }
 inline void ParseGyroscopeUncalibratedReport(sh2_gyroscope_uncalibrated_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.bias3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.bias3 );
 }
 inline void ParseGameRotationVectorReport(sh2_game_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
 }
 inline void ParseGeomagneticRotationVectorReport(sh2_geomagnetic_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
-    p_active_client->shtp_client.output.accuracy = p_report->accuracy;
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
+    p_active_host->shtp_client.output.accuracy = p_report->accuracy;
 }
 inline void ParsePressureReport(sh2_pressure_input_report * p_report )
 {
@@ -450,7 +450,7 @@ inline void ParseTemperatureReport(sh2_temperature_input_report * p_report )
 }
 inline void ParseMagneticFieldUncalibratedReport(sh2_magnetic_field_uncalibrated_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseTapDetectorReport(sh2_tap_detector_input_report * p_report )
 {
@@ -474,12 +474,12 @@ inline void ParseRawAccelerometerReport(sh2_raw_accelerometer_input_report * p_r
 }
 inline void ParseRawGyroscopeReport(sh2_raw_gyroscope_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
-    p_active_client->shtp_client.output.temperature = p_report->temperature;
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
+    p_active_host->shtp_client.output.temperature = p_report->temperature;
 }
 inline void ParseRawMagnetometerReport(sh2_raw_magnetometer_input_report * p_report )
 {
-    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_client->shtp_client.output.axis3 );
+    CopyByteArrayToAxis3( (uint8_t *)&p_report->x, &p_active_host->shtp_client.output.axis3 );
 }
 inline void ParseStepDetectorReport(sh2_step_detector_input_report * p_report )
 {
@@ -527,17 +527,17 @@ inline void ParseHeartRateMonitorReport(sh2_heart_rate_monitor_input_report * p_
 }
 inline void ParseStabilizedRotationVectorReport(sh2_arvr_stabilized_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
-    p_active_client->shtp_client.output.accuracy = p_report->accuracy;
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
+    p_active_host->shtp_client.output.accuracy = p_report->accuracy;
 }
 inline void ParseStabilizedGameRotationVectorReport(sh2_arvr_stabilized_game_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
 }
 inline void ParseGyroIntegratedRotationVectorReport(sh2_gyro_integrated_rotation_vector_input_report * p_report )
 {
-    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_client->shtp_client.output.rotation_vector);
-    CopyByteArrayToAxis3((uint8_t *)&p_report->x_angular_velocity, &p_active_client->shtp_client.output.axis3);
+    CopyByteArrayToRotationVector((uint8_t *)&p_report->i, &p_active_host->shtp_client.output.rotation_vector);
+    CopyByteArrayToAxis3((uint8_t *)&p_report->x_angular_velocity, &p_active_host->shtp_client.output.axis3);
 }
 inline void ParseFlushCompletedReport(sh2_sensor_flush * p_report )
 {

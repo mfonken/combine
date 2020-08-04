@@ -23,9 +23,9 @@ typedef struct
 
 typedef union
 {
+    generic_comm_event_t generic_comm_event;
     i2c_event_t i2c_event;
     spi_event_t spi_event;
-    generic_comm_event_t generic_comm_event;
 } comm_event_t;
 
 typedef struct

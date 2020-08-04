@@ -15,10 +15,9 @@
 #define USART_SERVICE
 #endif /* __EMLIB__ */
 
-
-
 #ifdef __EMLIB__
 #define ASSERT EFM_ASSERT
+#include "em_gpio.h"
 
 #ifdef I2C_SERVICE
 #include <em_i2c.h>
@@ -208,18 +207,18 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
 static bool EMLIB_PAPIInterface_I2C_Init( emlib_i2c_event_t * event )
 {
     I2C_Init_TypeDef initType = I2C_INIT_DEFAULT;
-    I2C_Init( event->host.device, &initType );
+    I2C_Init( event->host->device, &initType );
     return true;
 };
 
 static void EMLIB_PAPIInterface_I2C_Enable( emlib_i2c_event_t * event )
 {
-    I2C_Enable( event->host.device, true );
+    I2C_Enable( event->host->device, true );
 };
 
 static void EMLIB_PAPIInterface_I2C_Disable( emlib_i2c_event_t * event )
 {
-    I2C_Enable( event->host.device, false );
+    I2C_Enable( event->host->device, false );
 };
 
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_ReadRegister( emlib_i2c_event_t * event )
@@ -232,13 +231,13 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_ReadRegister( emlib_i
     /* Select command to issue */
     seq.buf[0].len    = event->length;
     /* Select location/length of data to be read */
-    seq.buf[1].data = event->data;
+    seq.buf[1].data = &event->data.byte;
     seq.buf[1].len  = event->length;
 
-    ret = I2C_TransferInit(event->host.device, &seq);
+    ret = I2C_TransferInit(event->host->device, &seq);
     while (ret == i2cTransferInProgress)
     {
-        ret = I2C_Transfer(event->host.device);
+        ret = I2C_Transfer(event->host->device);
     }
     return ret;
 }
@@ -263,12 +262,6 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Read( emlib_i2c_event
     return ret;
 };
 
-static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_WriteRegister( emlib_i2c_event_t * event )
-{
-    event->length = 1;
-    event->reg = event->reg;
-    return EMLIB_PAPIInterface_I2C_Write(event->data.byte);
-}
 
 static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_event_t * event )
 {
@@ -283,36 +276,42 @@ static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_Write( emlib_i2c_even
     seq.buf[0].data   = event->data.buffer;
     seq.buf[0].len    = event->length;
 
-    ret = I2C_TransferInit(event->host.device, &seq);
+    ret = I2C_TransferInit(event->host->device, &seq);
     while (ret == i2cTransferInProgress)
     {
-        ret = I2C_Transfer(event->host.device);
+        ret = I2C_Transfer(event->host->device);
     }
     return ret;
 };
 
+static emlib_i2c_transfer_return_t EMLIB_PAPIInterface_I2C_WriteRegister( emlib_i2c_event_t * event )
+{
+    event->length = 1;
+    return EMLIB_PAPIInterface_I2C_Write(event);
+}
+
 static bool EMLIB_PAPIInterface_SPI_Init( emlib_spi_event_t * event )
 {
-    USART_InitSync_TypeDef initType = USART_INITASYNC_DEFAULT;
-    USART_InitSync( event->host.device, &initType );
+    USART_InitSync_TypeDef initType = USART_INITSYNC_DEFAULT;
+    USART_InitSync( event->host->device, &initType );
     return true;
 };
 
 static void EMLIB_PAPIInterface_SPI_Enable( emlib_spi_event_t * event )
 {
-    USART_Enable( event->host.device, usartEnable);
+    USART_Enable( event->host->device, usartEnable);
 };
 
 static void EMLIB_PAPIInterface_SPI_Disable( emlib_spi_event_t * event )
 {
-    USART_Enable( event->host.device, usartDisable);
+    USART_Enable( event->host->device, usartDisable);
 };
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_spi_event_t * event )
 {
     EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
-    event->data.byte = USART_SpiTransfer( event->host.device, event->reg );
+    event->data.byte = USART_SpiTransfer( event->host->device, event->reg );
     EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }
@@ -331,8 +330,8 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_WriteRegister( emlib_
 {
     EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
-    USART_SpiTransfer( event->host.device, event->reg );
-    USART_SpiTransfer( event->host.device, event->data );
+    USART_SpiTransfer( event->host->device, event->reg );
+    USART_SpiTransfer( event->host->device, event->data.byte );
     EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }

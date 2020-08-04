@@ -71,12 +71,8 @@ void function_name(TEMPLATED_TYPE(T) NAME_BUILDER(name,T)) { \
 
 #define NO_DATA NULL
 
-#define UNLOCK 0
-#define LOCK 1
-
-#ifndef ASSERT
-#define ASSERT(X) ((void)0)
-#endif
+#define APP_LOCK
+#define APP_UNLOCK
 
 #define NO_REG 0xff
 
@@ -185,7 +181,7 @@ uint32_t
     timestamp;
 } touch_data_t;
 
-typedef enum : bool
+typedef enum
 {
     HW_EDGE_RISING = 0,
     HW_EDGE_FALLING,

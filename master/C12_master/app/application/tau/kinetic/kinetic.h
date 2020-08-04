@@ -39,11 +39,6 @@
 #define MOTION_SENSOR_UNCERTAINTY  0.01
 #endif
 
-#ifndef M_PI
-#define M_PI 	3.14159265358979323846
-#define M_PI_2 	1.57079632679489661923
-#endif
-
 #define ROTATION_MAX               (2. * M_PI)
 #define ROTATION_MIN               (-ROTATION_MAX)
 #define POSITION_MIN               -100

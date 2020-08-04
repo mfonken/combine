@@ -10,7 +10,7 @@
 
 void InitProfile()
 {
-    system_profile_t init_profile = PROFILE_TEMPLATE;
+    system_profile_t init_profile = {0}; // PROFILE_TEMPLATE;
     ProfileFunctions.Load( &init_profile );
     
     /* Init System using profile */

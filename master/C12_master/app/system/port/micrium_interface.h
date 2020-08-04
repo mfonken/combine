@@ -14,8 +14,6 @@
 #ifdef __MICRIUM__
 #include <os.h>
 #ifdef __GECKO__
-#warning "A"
-
 #include "bg_types.h"
 #include "native_gecko.h"
 #include "gatt_db.h"
@@ -155,7 +153,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
     TimerArgumentIntermediary, \
     p_task_data->p_arg, \
     p_task_data->p_err, \
-    p_task_data->p_task \
+    &p_task_data->p_task \
 }
 
 #ifndef __MICRIUM__

@@ -116,7 +116,8 @@ static void SHTP_GenerateSH2Client( shtp_client_t * p_client,
     p_client->data = p_data;
 }
 
-static shtp_client_comm_host_t * p_active_client;
+static shtp_client_comm_host_t * p_active_host;
+//static shtp_client_t * p_active_client;
 
 typedef enum
 {
@@ -178,7 +179,7 @@ typedef struct
 
 static shtp_t local;
 
-void SetSHTPActiveClient( shtp_client_t * client);
+void SetSHTPActiveHost( shtp_client_comm_host_t * p_host);
 void SetSHTPRotationVector( uint32_t );
 
 void SendSHTPPacket(void);
@@ -205,14 +206,14 @@ bool ParseSHTPConfigurationFRSReadResponse(void);
 bool ParseSHTPConfigurationFRSWriteResponse(void);
 void ParseSHTPConfigurationProductIDResponse(void);
 
-static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &p_active_client->comm_host, COMM_READ_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &p_active_client->comm_host, COMM_READ_REG, l, d }; }
-static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t)(generic_comm_event_t){ &p_active_client->comm_host, COMM_WRITE_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
-static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t)(generic_comm_event_t){ &p_active_client->comm_host, COMM_WRITE_REG, l, d }; }
+static comm_event_t GetSHTPHeaderReceiveEvent(shtp_packet_header_t * h) { return (comm_event_t){ &p_active_host->comm_host, COMM_READ_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketReceiveEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ &p_active_host->comm_host, COMM_READ_REG, l, d }; }
+static comm_event_t GetSHTPHeaderSendEvent(shtp_packet_header_t * h) { return (comm_event_t){ &p_active_host->comm_host, COMM_WRITE_REG, SHTP_HEADER_LENGTH, (uint8_t *)h }; }
+static comm_event_t GetSHTPPacketSendEvent(uint8_t l, uint8_t * d) { return (comm_event_t){ &p_active_host->comm_host, COMM_WRITE_REG, l, d }; }
 
 typedef struct
 {
-    void (*SetActiveClient)( shtp_client_t * );
+    void (*SetActiveHost)( shtp_client_comm_host_t * );
     void (*SendPacket)(void);
     void (*SendExecutableCommand)(SHTP_EXECUTABLE_COMMAND command);
     void (*SendConfigurationReportCommandRequest)(void);
@@ -253,7 +254,7 @@ typedef struct
 
 static const shtp_functions SHTPFunctions =
 {
-    .SetActiveClient = SetSHTPActiveClient,
+    .SetActiveHost = SetSHTPActiveHost,
     .SendPacket = SendSHTPPacket,
     .SendExecutableCommand = SendSHTPExecutableCommand,
     .SendConfigurationReportCommandRequest = SendSHTPConfigurationReportCommandRequest,

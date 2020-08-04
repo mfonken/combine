@@ -32,14 +32,14 @@ void TauManagerInit(void)
 {
     Tau.header.ID = TAU_ID;
     
-    Tau.locks.packet = LOCK;
-    Tau.locks.kinetic = LOCK;
+    Tau.locks.packet = APP_LOCK;
+    Tau.locks.kinetic = APP_LOCK;
     
     TauFunctions.RegisterState( TAU_STATE_START );
     KineticFunctions.DefaultInit( &Tau.kinetic );
     
-    Tau.locks.kinetic = UNLOCK;
-    Tau.locks.packet = UNLOCK;
+    Tau.locks.kinetic = APP_UNLOCK;
+    Tau.locks.packet = APP_UNLOCK;
 }
 
 void TauManagerDoNothing(void)
@@ -58,26 +58,26 @@ void TauManagerPause(void)
 
 void TauManagerStop(void)
 {
-    Tau.locks.kinetic = UNLOCK;
-    Tau.locks.packet = UNLOCK;
+    Tau.locks.kinetic = APP_UNLOCK;
+    Tau.locks.packet = APP_UNLOCK;
 }
 
 void TauManagerPerformKinetic(void)
 {
-    Tau.locks.kinetic = LOCK;
+    Tau.locks.kinetic = APP_LOCK;
     KineticFunctions.UpdatePosition( &Tau.kinetic, &Tau.orientation.data, &Tau.rho.data[0], &Tau.rho.data[1] );
-    Tau.locks.kinetic = UNLOCK;
+    Tau.locks.kinetic = APP_UNLOCK;
 }
 
 void TauManagerGeneratePacket(void)
 {
-    Tau.locks.packet = LOCK;
+    Tau.locks.packet = APP_LOCK;
     Tau.packet.ID = Tau.header.ID;
     Tau.packet.state = Tau.header.state;
     for( uint8_t i = 0; i < 3; i++ )
         Tau.packet.data[i] = TauManagerGetElementFromKalman( &Tau.kinetic.filters.position[i] );
     Tau.packet.timestamp = TIMESTAMP();
-    Tau.locks.packet = UNLOCK;
+    Tau.locks.packet = APP_UNLOCK;
 }
 void TauManagerAnalyzeCycle(void)
 {

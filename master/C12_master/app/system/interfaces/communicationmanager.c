@@ -11,6 +11,9 @@
 #warning "Temporary fix for compilation"
 /* Flag for indicating DFU Reset must be performed */
 static uint8_t boot_to_dfu = 0;
+#define initLog()
+#define flushLog()
+#define printLog(...)
 
 void CommunicationManagerInit(void)
 {
@@ -70,7 +73,7 @@ void CommunicationManager_PerformReceive( comm_packet_t * p_packet )
        * Here the system is set to start advertising immediately after boot procedure. */
       case gecko_evt_system_boot_id:
 
-        bootMessage(&(evt->data.evt_system_boot));
+//        bootMessage(&(evt->data.evt_system_boot));
         printLog("boot event - starting advertising\r\n");
 
         /* Set advertising parameters. 100ms advertisement interval.

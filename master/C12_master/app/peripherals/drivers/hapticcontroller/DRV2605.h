@@ -72,8 +72,8 @@ void DRV2605_UseLRA( comm_host_t * );
 uint8_t DRV2605_ReadRegister(comm_host_t *, uint8_t);
 void DRV2605_WriteRegister(comm_host_t *, uint8_t, uint8_t);
 
-static i2c_event_t DRV2605_GetReadEvent( comm_host_t * host, uint8_t reg, uint8_t * data) { return (i2c_event_t){ (i2c_host_t*)host, I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, data }; }
-static i2c_event_t DRV2605_GetWriteEvent( comm_host_t * host, uint8_t reg, uint8_t * data ) { return (i2c_event_t){ (i2c_host_t*)host, I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, data }; }
+static i2c_event_t DRV2605_GetReadEvent( comm_host_t * host, uint8_t reg, uint8_t * data) { return (i2c_event_t){ (i2c_host_t*)host, I2C_READ_REG_EVENT, reg, DRV2605_COMM_LEN, .data.buffer = data }; }
+static i2c_event_t DRV2605_GetWriteEvent( comm_host_t * host, uint8_t reg, uint8_t * data ) { return (i2c_event_t){ (i2c_host_t*)host, I2C_WRITE_REG_EVENT, reg, DRV2605_COMM_LEN, .data.buffer = data }; }
 
 
 #endif /* DRV2605_h */
