@@ -50,7 +50,7 @@ void CommunicationManager_PerformTransmit( comm_packet_t * p_packet )
 }
 void CommunicationManager_PerformReceive( comm_packet_t * p_packet )
 {
-#if __BUILD__ == GECKO
+#ifdef __GECKO__
     /* Event pointer for handling events */
     struct gecko_cmd_packet* evt;
 

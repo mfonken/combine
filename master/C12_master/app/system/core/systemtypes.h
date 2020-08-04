@@ -14,9 +14,6 @@
 #include "global_types.h"
 #include "port_master.h"
 
-#define GECKO 1
-#define XCODE 2
-
 #warning ///TODO: SPOOF!
 /* Port spoof */
 #define PORT0 0

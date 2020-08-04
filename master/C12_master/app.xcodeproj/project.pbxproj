@@ -880,7 +880,7 @@
 					"__PLATFORM__=EFR32",
 					"APP_MAIN=1",
 					"$(inherited)",
-					"__BUILD__=XCODE",
+					__XCODE__,
 					__MICRIUM__,
 				);
 				HEADER_SEARCH_PATHS = "app/rtos/**";

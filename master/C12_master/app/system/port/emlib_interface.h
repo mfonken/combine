@@ -39,6 +39,8 @@ typedef uint8_t GPIO_Port_TypeDef;
 #define I2C2 2
 #define SPI1 1
 #define SPI2 2
+#define USART1 1
+#define USART2 2
 #endif
 
 typedef USART_TypeDef SPI_TypeDef;
@@ -59,7 +61,7 @@ typedef enum
 {
     EMLIB_GPIO_NCS_ACTIVE = 0,
     EMLIB_GPIO_NCS_INACTIVE,
-} EMLIB_GPIO_STATE_T, emlib_gpio_ncs_t;
+} EMLIB_GPIO_NCS_T, emlib_gpio_ncs_t;
 
 typedef struct
 {
@@ -118,7 +120,7 @@ emlib_spi_host_t *
 uint8_t
     reg,
     length;
-	union _data
+	union 
 	{
 		uint8_t
 			byte;
