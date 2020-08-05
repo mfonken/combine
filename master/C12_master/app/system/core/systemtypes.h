@@ -14,15 +14,6 @@
 #include "global_types.h"
 #include "port_master.h"
 
-#warning ///TODO: SPOOF!
-/* Port spoof */
-#define PORT0 0
-#define PORTA 0
-#define PORTB 0
-#define PORTC 0
-#define PORTD 0
-#define PORTF 0
-
 #define INTERNAL 0xff
 
 #define COMM_PORT_NONE 0xff
@@ -75,10 +66,6 @@ typedef OS_Q queue_t;
 /***                               Enums Start                                    ***/
 /************************************************************************************/
 
-typedef application_comm_protocol_t system_comm_protocol_t;
-typedef application_state_t system_state_t;
-typedef application_activity_t system_activity_t;
-typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
 
 typedef enum
 {
@@ -149,9 +136,12 @@ typedef bool generic_comm_return_t;
 //typedef os_task_data_t os_task_list_t[NUM_SYSTEM_TASK_ID];
 //typedef os_queue_data_t os_queue_list_t[NUM_SYSTEM_QUEUE_ID];
 
+typedef application_comm_protocol_t system_comm_protocol_t;
+typedef application_state_t system_state_t;
+typedef application_activity_t system_activity_t;
+typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
 typedef application_subactivity_id_t system_subactivity_id_t;
 typedef application_task_id_t system_task_id_t;
-typedef application_task_shelf_entry_id_t system_task_shelf_entry_id_t;
 typedef application_task_priority_t system_task_priority_t;
 typedef application_task_action_t system_task_action_t;
 //typedef application_objects_t system_objects_t;
@@ -277,7 +267,7 @@ system_activity_routine_t
     routine;
 system_state_t
     state_id;
-uint8_t
+system_family_t
     families[NUM_SYSTEM_COMPONENT_FAMILY];
 system_task_shelf_entry_id_t
     entries[MAX_STATE_PROFILE_ENTRIES];

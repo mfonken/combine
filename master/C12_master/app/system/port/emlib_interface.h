@@ -198,6 +198,11 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
     }
 }
 
+static void EMLIB_PAPIInterface_GPIO_NSelect( emlib_gpio_t gpio, emlib_gpio_ncs_t nc_state )
+{
+	EMLIB_PAPIInterface_GPIO_Set( gpio, (emlib_gpio_state_t)nc_state );
+}
+
 #define DEFAULT_I2C_CLOCKHLR        i2cClockHLRStandard
 #define DEFAULT_I2C_ENABLE_ON_INIT  true
 #define DEFAULT_I2C_FREQUENCY       100
@@ -309,10 +314,10 @@ static void EMLIB_PAPIInterface_SPI_Disable( emlib_spi_event_t * event )
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_ReadRegister( emlib_spi_event_t * event )
 {
-    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
+	EMLIB_PAPIInterface_GPIO_NSelect( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
     event->data.byte = USART_SpiTransfer( event->host->device, event->reg );
-    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
+    EMLIB_PAPIInterface_GPIO_NSelect( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }
 
@@ -328,20 +333,21 @@ static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Read( emlib_spi_event
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_WriteRegister( emlib_spi_event_t * event )
 {
-    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
+	EMLIB_PAPIInterface_GPIO_NSelect( event->host->gpio, EMLIB_GPIO_NCS_ACTIVE );
     event->length = 1;
     USART_SpiTransfer( event->host->device, event->reg );
     USART_SpiTransfer( event->host->device, event->data.byte );
-    EMLIB_PAPIInterface_GPIO_Set( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
+    EMLIB_PAPIInterface_GPIO_NSelect( event->host->gpio, EMLIB_GPIO_NCS_INACTIVE );
     return true;
 }
 
 static emlib_spi_transfer_return_t EMLIB_PAPIInterface_SPI_Write( emlib_spi_event_t * event )
 {
+	/// TODO: Finish implementing
 //    SPI_TransferSeq_TypeDef    seq;
-//    emlib_spi_transfer_return_t ret;
-//
-//    return ret;
+    emlib_spi_transfer_return_t ret = { 0 };
+
+    return ret;
 };
 
 #endif /* __EMLIB__ */

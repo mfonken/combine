@@ -90,7 +90,7 @@ typedef struct
     shtp_client_product_id product;
     shtp_client_output output;
     void * data;
-    uint8_t
+    generic_id_t
         ID,
         sequence_number;
 } shtp_client_t;

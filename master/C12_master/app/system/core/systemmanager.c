@@ -41,7 +41,7 @@ void SystemManager_PerformSubactivity( system_subactivity_id_t subactivity )
 {
     uint8_t id = subactivity;
     LOG_SYSTEM(SYSTEM_DEBUG, "Performing subactivity: %s(%d)\n", SYSTEM_SUBACTIVITY_ID_STRINGS[id], id);
-    system_subactivity_t * p_entry = SystemFunctions.Get.SubactivityMapEntry(id);
+    system_subactivity_t * p_entry = SystemFunctions.Get.SubactivityMapEntry(subactivity);
     if( p_entry == NULL ) return;
     
     if( p_entry->function == NULL ) return;
@@ -52,7 +52,7 @@ void SystemManager_PerformSubactivity( system_subactivity_id_t subactivity )
         {
             uint8_t temp_byte;
             if( (uint32_t)p_entry->data < ( 1 << 7 ) )
-                temp_byte = (uint8_t)p_entry->data;
+                temp_byte = *(uint8_t*)&p_entry->data;
             p_entry->data = &temp_byte;
             SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_entry->data, p_entry->component_id[0] );
         }
@@ -350,7 +350,7 @@ os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t componen
 {
     FOR( uint8_t, i, NUM_SYSTEM_TASK_ID )
     {
-        system_task_t * p_task = SystemFunctions.Get.TaskById(i);
+        system_task_t * p_task = SystemFunctions.Get.TaskById((system_task_id_t)i);
         if( p_task == NULL ) continue;
         SystemFunctions.Get.ComponentNumber( component_id );
         ///TODO: Finish
@@ -463,7 +463,7 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
             break;
         case COMPONENT_PROTOCOL_SPI:
             comm_host.spi_host.gpio.pin = p_component->pin;
-            comm_host.spi_host.gpio.port = p_component->port;
+            comm_host.spi_host.gpio.port = (GPIO_Port_TypeDef)p_component->port;
             comm_host.spi_host.device = SPI_Channels[p_component->route - 1];
             break;
         default:

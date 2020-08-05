@@ -71,8 +71,8 @@ void function_name(TEMPLATED_TYPE(T) NAME_BUILDER(name,T)) { \
 
 #define NO_DATA NULL
 
-#define APP_LOCK
-#define APP_UNLOCK
+#define APP_LOCK 1
+#define APP_UNLOCK 0
 
 #define NO_REG 0xff
 
@@ -88,7 +88,9 @@ typedef int8_t generic_id_t;
 typedef uint16_t qty_t;
 typedef uint32_t tick_t;
 typedef float frequency_t;
+typedef double floating_t;
 
+#warning Use Micrium versions
 #ifndef OS_STATE
 typedef enum
 {

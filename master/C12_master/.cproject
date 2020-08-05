@@ -143,7 +143,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/system/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/system/interfaces}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/system/sysiocontroller}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/application/tau}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/application}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/application/debug}&quot;"/>
@@ -167,6 +166,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/uC-CPU/Cfg/Template}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/rtos/uC-LIB/Cfg/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/app/system/utilities}&quot;"/>
 								</option>
 								<option id="iar.arm.toolchain.compiler.option.defines.v5.4.0.1061833428" name="Defined Symbols:" superClass="iar.arm.toolchain.compiler.option.defines.v5.4.0" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAL_CONFIG=1"/>

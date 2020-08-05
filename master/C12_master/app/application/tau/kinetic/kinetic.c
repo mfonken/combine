@@ -104,7 +104,7 @@ static void KineticUpdateRotation( kinetic_t * k,
 #endif
 }
 
-static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoint_t * B )
+static void KineticUpdatePosition( kinetic_t * k, quaternion_t * n, kpoint_t * A, kpoint_t * B )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
@@ -119,7 +119,7 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, kpoint_t * A, kpoi
     KineticFunctions.R( k );
     
     /* Step 5B: Update Position Using Non-gravitational Data */
-    KineticFunctions.Nongrav( k, n );
+//    KineticFunctions.Nongrav( k, n );
     
     LOG_KIN(KIN_DEBUG, "Yaw: %4d | Nu: %4dº | Up: %4dº | Sig: %4dº | Chi: %4dº | Mu: %4dº | Gamma: %4dº |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
     

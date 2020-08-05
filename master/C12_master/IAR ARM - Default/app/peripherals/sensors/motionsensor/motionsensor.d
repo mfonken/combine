@@ -13,25 +13,25 @@ app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IA
 app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdint.h
 app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\math.h
 app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_float_setup.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\BNO080.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\shtp.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h
 app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\string.h
 app/peripherals/sensors/motionsensor/motionsensor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product_string.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\peripheralbridge.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\communicationmanager.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systembehavior.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\sysiocontroller.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papi_interface.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\os_interface.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
-app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_log.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\master.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\C12_profile.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\BNO080.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\shtp.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\peripheralbridge.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\communicationmanager.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systembehavior.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\sysiocontroller.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papiinterface.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\utilities\timestamp.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\osinterface.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
+app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\debug\application_debug.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\port_master.h
 app/peripherals/sensors/motionsensor/motionsensor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\emlib_interface.h

@@ -6,18 +6,18 @@
 //  Copyright © 2018 Marbl. All rights reserved.
 //
 
-#include "profilemanager.h"
+#include <profilemanager.h>
 
 void InitProfile()
 {
-    system_profile_t init_profile = {0}; // PROFILE_TEMPLATE;
+    system_profile_t init_profile = PROFILE_TEMPLATE;
     ProfileFunctions.Load( &init_profile );
     
-    /* Init System using profile */
+    /* Initialize System using profile */
     SystemFunctions.Init( &Profile );
 }
 
 void LoadProfile( system_profile_t * p_loaded_profile )
 {
-    memcpy(  &Profile , p_loaded_profile, sizeof(system_profile_t));
+    memcpy( &Profile, p_loaded_profile, sizeof(system_profile_t));
 }

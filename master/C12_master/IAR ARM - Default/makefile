@@ -18,7 +18,7 @@ RM := rm -rf
 -include platform/Device/SiliconLabs/EFR32BG13P/Source/subdir.mk
 -include hardware/kit/common/drivers/subdir.mk
 -include hardware/kit/common/bsp/subdir.mk
--include app/system/sysiocontroller/subdir.mk
+-include app/system/utilities/subdir.mk
 -include app/system/interfaces/subdir.mk
 -include app/system/core/subdir.mk
 -include app/rtos/uC-OS3/TLS/NewLib/subdir.mk
@@ -28,7 +28,6 @@ RM := rm -rf
 -include app/rtos/uC-OS3/Ports/ARM-Cortex-M/ARMv7-M/IAR/subdir.mk
 -include app/rtos/uC-OS3/Ports/ARM-Cortex-M/ARMv7-M/subdir.mk
 -include app/rtos/uC-OS3/Cfg/Template/subdir.mk
--include app/rtos/uC-LIB/Ports/ARM-Cortex-M4/IAR/subdir.mk
 -include app/rtos/uC-LIB/subdir.mk
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR/subdir.mk
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/subdir.mk

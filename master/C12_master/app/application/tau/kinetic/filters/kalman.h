@@ -3,10 +3,11 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "../../../../system/utilities/timestamp.h"
 
 #include "global_types.h"
 
-//#define MATVEC_LIB
+#define MATVEC_LIB
 
 #ifdef MATVEC_LIB
 #include "matvec.h"

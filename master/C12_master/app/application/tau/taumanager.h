@@ -9,6 +9,7 @@
 #ifndef taumanager_h
 #define taumanager_h
 
+#include "../../system/utilities/timestamp.h"
 #include "kinetic_master.h"
 #include "global_types.h"
 
@@ -166,7 +167,7 @@ uint8_t
     ID;
 tau_state_t
     state;
-uint32_t
+floating_t
     timestamp;
 tau_data_element_t
     data[3];

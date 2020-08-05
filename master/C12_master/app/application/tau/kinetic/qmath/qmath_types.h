@@ -14,12 +14,12 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "global_types.h"
+
 #ifndef M_PI
 #define M_PI 	3.14159265358979323846
 #define M_PI_2 	1.57079632679489661923
 #endif
-
-typedef double floating_t;
 
 /*! Simple 3d Vector */
 typedef struct _vec3_t

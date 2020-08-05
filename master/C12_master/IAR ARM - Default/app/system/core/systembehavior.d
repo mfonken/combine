@@ -8,11 +8,11 @@ app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product.h
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ysizet.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\sysiocontroller.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papi_interface.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\sysiocontroller.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papiinterface.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\utilities\timestamp.h
 app/system/core/systembehavior.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdbool.h
-app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\os_interface.h
+app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\osinterface.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
 app/system/core/systembehavior.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h

@@ -98,17 +98,17 @@ static void BNO080GenerateSH2Client( shtp_client_t * p_client, uint8_t ID, void 
     SHTPFunctions.GenerateClient( p_client, ID, 0, &buffer, &product, &output, data );
 }
 
-bool BNO080EnableFeature( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );
-bool BNO080DisableFeature( shtp_client_t *, bno080_feature_t );
-bool BNO080Refresh( shtp_client_t * );
-bool BNO080Read( shtp_client_t * );
+bool BNO080EnableFeature( shtp_client_comm_host_t *, bno080_feature_t, uint32_t, uint32_t );
+bool BNO080DisableFeature( shtp_client_comm_host_t *, bno080_feature_t );
+bool BNO080Refresh( shtp_client_comm_host_t * );
+bool BNO080Read( shtp_client_comm_host_t * );
 bool BNO080AttemptGet( uint32_t );
 
 typedef struct
 {
-    bool (*EnableFeature)( shtp_client_t *, bno080_feature_t, uint32_t, uint32_t );
-    bool (*Refresh)( shtp_client_t * );
-    bool (*Read)( shtp_client_t * );
+    bool (*EnableFeature)( shtp_client_comm_host_t *, bno080_feature_t, uint32_t, uint32_t );
+    bool (*Refresh)( shtp_client_comm_host_t * );
+    bool (*Read)( shtp_client_comm_host_t * );
     bool (*AttemptGet)( uint32_t );
     void (*GenerateClient)( shtp_client_t *, uint8_t, void * );
 } bno080_functions;

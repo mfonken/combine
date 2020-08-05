@@ -41,14 +41,15 @@ TEMPLATED_CALLBACK(Application_IMUSetState, bool, active, active
 void Application_InitComponent( component_t * p_component )
 {
     LOG_IO_CTL(IO_CTL_DEBUG, "Initializing component: %s(0x%02x)\n", p_component->name, p_component->ID);
-    generic_id_t ID = PROTOCOL_ID_NULL;
+    generic_id_t shtp_ID = PROTOCOL_ID_NULL;
     switch( p_component->ID)
     {
         case COMPONENT_ID_MOTION_SENSOR:
-            ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
-            if( ID != PROTOCOL_ID_NULL )
+        	shtp_ID = SysIOCtlFunctions.GenerateID(PROTOCOL_ID_SH2);
+            if( shtp_ID != PROTOCOL_ID_NULL )
             {
-                IMUFunctions.Init( &App.objects.IMU, p_component->ID, ID, p_component->protocol, IMU_CHIP_BNO080 );
+            	App.objects.IMU.comm_host = SystemFunctions.Get.CommHostForComponentById(p_component->ID);
+                IMUFunctions.Init( &App.objects.IMU, shtp_ID, IMU_CHIP_BNO080 );
             }
             break;
         
@@ -81,16 +82,16 @@ TEMPLATED_CALLBACK(RhoOutputHandler, p_comm_host_t, p_host, DO_NOTHING);
 /* Motion Out */
 void MotionOutputHandler( imu_feature_t feature, uint32_t interval )
 {
-    IMUFunctions.Start( &App.objects.IMU.client, feature, interval, App.objects.IMU.chip );
+    IMUFunctions.Start( (shtp_client_comm_host_t *)&App.objects.IMU.client, feature, interval, App.objects.IMU.chip );
 }
 /* Motion In */
 void MotionInputHandler( void )
 {
-    shtp_client_t * p_client = &App.objects.IMU.client;
+	shtp_client_comm_host_t * p_host = (shtp_client_comm_host_t *)&App.objects.IMU.comm_host;
     
-    if( IMUFunctions.Refresh( p_client ) )
+    if( IMUFunctions.Refresh( p_host ) )
     {
-        switch( p_client->output.type )
+        switch( p_host->shtp_client.output.type )
         {
             case SH2_SENSOR_REPORT_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_GRAVITY:
@@ -99,8 +100,8 @@ void MotionInputHandler( void )
             case SH2_SENSOR_REPORT_STABILIZED_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_STABILIZED_GAME_ROTATION_VECTOR:
             case SH2_SENSOR_REPORT_GYRO_INTEGRATED_ROTATION_VECTOR:
-                RotVecToQuaternion( &p_client->output.rotation_vector, &App.buffers.orientation.data );
-                App.buffers.orientation.timestamp = p_client->output.rotation_vector.timestamp;
+                RotVecToQuaternion( &p_host->shtp_client.output.rotation_vector, &App.buffers.orientation.data );
+                App.buffers.orientation.timestamp = p_host->shtp_client.output.rotation_vector.timestamp;
                 break;
             default:
                 break;

@@ -11,12 +11,12 @@
 
 #include "profilemanager.h"
 
-void Start(void)
+static void Start(void)
 {
     ProfileFunctions.Init();
     OS.Init();
     AppFunctions.Init();
-    
+
     OS.Start();
     AppFunctions.Start();
 }

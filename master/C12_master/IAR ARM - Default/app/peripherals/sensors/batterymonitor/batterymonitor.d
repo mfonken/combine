@@ -12,11 +12,11 @@ app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonke
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\communicationmanager.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systembehavior.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
-app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\sysiocontroller.h
-app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papi_interface.h
-app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\sysiocontroller\timestamp.h
+app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\sysiocontroller.h
+app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papiinterface.h
+app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\utilities\timestamp.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdbool.h
-app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\os_interface.h
+app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\osinterface.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
 app/peripherals/sensors/batterymonitor/batterymonitor.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h

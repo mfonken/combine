@@ -29,9 +29,9 @@ typedef unsigned short  OS_MSG_QTY, OS_OPT, OS_MSG_SIZE;
 
 #endif /* __MICRIUM__ */
 
-#ifndef OSTaskDel
-void OSTaskDel(OS_TCB *p_tcb, OS_ERR *p_err) {}
-#endif
+//#ifndef OSTaskDel
+//void OSTaskDel(OS_TCB *p_tcb, OS_ERR *p_err) {}
+//#endif
 
 #define DEFAULT_TASK_STACK_LIMIT_FACTOR 10u
 
