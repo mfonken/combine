@@ -1,7 +1,7 @@
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application.c
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\communicationmanager.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systembehavior.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdio.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ycheck.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\yvals.h
@@ -9,8 +9,16 @@ app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ W
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Config_Normal.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ysizet.h
-app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdint.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\sysiocontroller.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papiinterface.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\utilities\timestamp.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdbool.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\osinterface.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\application_types.h
+app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_types.h
+app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdint.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\string.h
 app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product_string.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_config.h
@@ -18,10 +26,6 @@ app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\master.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\C12_profile.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\debug\application_debug.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\taumanager.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\utilities\timestamp.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\osinterface.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemtypes.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\port_master.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\emlib_interface.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_gpio.h
@@ -110,33 +114,3 @@ app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\protocol\bluetooth\ble_stack\inc\common\bg_gattdb_def.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\protocol\bluetooth\ble_stack\inc\common\bg_errorcodes.h
 app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\gatt_db.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\kinetic_master.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\kinetic.h
-app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\math.h
-app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_float_setup.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\matvec.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\qmath_types.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\qmath.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\point.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\quaternion.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\qmath\vector.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\tau\kinetic\filters\kalman.h
-app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdlib.h
-app/application/application.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product_stdlib.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\drivers\hapticcontroller\hapticcontroller.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\drivers\hapticcontroller\DRV2605.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\peripheralbridge.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\communicationmanager.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systembehavior.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\systemmanager.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\core\sysiocontroller.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\interfaces\papiinterface.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\motionsensor.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\BNO080.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\shtp.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\motionsensor\sh2.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\rhoclient\rho_client.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\batterymonitor\batterymonitor.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\batterymonitor\STC3100.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\touchcontroller\touchcontroller.h
-app/application/application.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\peripherals\sensors\touchcontroller\CPT112S.h

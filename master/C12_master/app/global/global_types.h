@@ -81,7 +81,7 @@ void function_name(TEMPLATED_TYPE(T) NAME_BUILDER(name,T)) { \
 typedef void (*void_handler_t)(void);
 typedef void_handler_t generic_function_t;
 typedef void * void_p_function_data_t;
-typedef void (*void_p_function_t)(void_p_function_data_t);
+typedef void (*void_p_function_t)();
 
 typedef uint16_t event_id;
 typedef int8_t generic_id_t;

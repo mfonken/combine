@@ -11,7 +11,7 @@
 
 #include "global_log.h"
 
-//#define __MICRIUM__
+#define __MICRIUM__
 #define __PAPI__         EMLIB
 #define __PLATFORM__     EFR32
 #ifdef __MICRIUM__

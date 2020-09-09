@@ -220,8 +220,6 @@ component_id_t
     component_id[MAX_COMPONENTS];
 uint8_t
     num_component_id;
-//system_profile_header
-//    header;
     union
     {
         frequency_t
@@ -230,8 +228,8 @@ uint8_t
         info[4];
     } data;
     system_task_action_t ACTION;
-    void          *function; /* Pointer to task */
-    void          *object; /* Argument */
+    void_p_function_t function; /* Pointer to task */
+    void_p_function_data_t object; /* Argument */
     system_task_priority_t PRIORITY; /* Priority */
     OS_ERR        *error;
 //system_subactivity_id_t
@@ -244,14 +242,14 @@ typedef struct
 {
 system_task_shelf_entry_id_t
     ID;
-uint8_t
-    num_interrupts;
 system_task_id_t
     interrupts[MAX_INTERRUPTS];
 uint8_t
-    num_scheduled;
+    num_interrupts;
 system_task_id_t
     scheduled[MAX_SCHEDULED];
+uint8_t
+    num_scheduled;
 } system_task_shelf_entry_t;
 
 typedef struct

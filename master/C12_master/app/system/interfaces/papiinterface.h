@@ -15,6 +15,7 @@ void PAPIInterface_DCDC_Init( uint16_t );
 
 void PAPIInterace_GPIO_Set( gpio_t );
 void PAPIInterace_GPIO_Clear( gpio_t );
+void PAPIInterace_GPIO_Toggle( gpio_t );
 
 bool PAPIInterface_I2C_Init( i2c_event_t * );
 void PAPIInterface_I2C_Enable( i2c_event_t * );
@@ -39,6 +40,7 @@ typedef struct
 {
     void (*Set)( gpio_t );
     void (*Clear)( gpio_t );
+    void (*Toggle)( gpio_t );
 } system_papi_interface_gpio_functions;
 
 typedef struct
@@ -75,6 +77,7 @@ static system_papi_interface_functions PAPI =
     
     .IO.Set = PAPIInterace_GPIO_Set,
     .IO.Clear = PAPIInterace_GPIO_Clear,
+    .IO.Toggle = PAPIInterace_GPIO_Toggle,
     
     .I2C.Init = PAPIInterface_I2C_Init,
     .I2C.Enable = PAPIInterface_I2C_Enable,

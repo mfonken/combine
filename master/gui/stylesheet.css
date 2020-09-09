@@ -1,5 +1,4 @@
 .text_display {
-    /* margin: 20%; */
     padding: 12px;
     position: absolute;
     top: 48px;
@@ -35,18 +34,10 @@
 .entry_group {
     display: inline-block;
 }
-/* input {
-    display: none !important;
-} */
-/*
-.icon_btn_list_item {
-    display: table;
-} */
 
 .icon_btn {
     border: none;
     padding: 2px 8px;
-    /* font-size: 24px; */
     cursor: pointer;
 }
 
@@ -65,26 +56,15 @@
 .add_btn_div {
     width: 100%;
     float: left;
-    /* padding: 10px 0px; */
     margin: 6px 6px 6px 42px;
 }
-/* .generated_div_title {
-    float: left;
-} */
-
-.group_title {
-    /* height: 24px; */
-}
-
 .entry_array {
     display: inline-block;
     padding-left: 0px;
-    /* height: 24px; */
     overflow: hidden;
 }
 
 .entry_array_element {
-    /* float:left; */
     max-width: 350px;
     overflow: scroll;
 }
@@ -98,9 +78,6 @@
 
 .entry_box_div {
     margin: 10px;
-    /* max-width: 500px; */
-    /* height: 360px; */
-    /* border: 1px solid black; */
     background-color: #B5E6FF;
     display: table;
     table-layout: fixed;
@@ -136,10 +113,6 @@
     display: inline;
     margin-left: 4px;
     max-width: 230px;
-}
-
-.option_dropdown a {
-    /* font-size: 2.0rem; */
 }
 
 .entry_text {
@@ -179,10 +152,6 @@ h2 {
     margin-top: 0px !important;
 }
 
-.dropdown-toggle {
-    /* border-radius: 0px !important; */
-}
-
 .dropbtn {
     background-color: white;
     color: white;
@@ -204,7 +173,6 @@ h2 {
 
 .dropdown-content {
   display: none;
-  /* position: absolute; */
   background-color: #f1f1f1;
   min-width: 160px;
   overflow: auto;
@@ -218,10 +186,8 @@ h2 {
 }
 
 .dropdown-menu {
-    /* position: relative !important; */
     z-index: 5;
     top: -4px !important;
-    /* left: 100px !important; */
     display:none;
 }
 

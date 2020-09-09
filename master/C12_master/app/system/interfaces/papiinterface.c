@@ -23,6 +23,7 @@ void PAPIInterface_DCDC_Init( uint16_t mV )
 #ifndef GPIO_SERVICE
 void PAPIInterace_GPIO_Set( gpio_t gpio ) {}
 void PAPIInterace_GPIO_Clear( gpio_t gpio ) {}
+void PAPIInterace_GPIO_Toggle( gpio_t gpio ) {}
 #else
 void PAPIInterace_GPIO_Set( gpio_t gpio )
 {

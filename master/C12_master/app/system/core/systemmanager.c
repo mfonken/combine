@@ -174,7 +174,7 @@ void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
     if( p_task == NULL ) return;
 
     if( p_task->function != NULL )
-        SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_task->function, p_task->component_id[0]);
+        SystemFunctions.Perform.InjectCommHostIntoTaskData( (void_p_function_data_t*)p_task->function, p_task->component_id[0]);
     
     SystemFunctions.Perform.PopulateTaskData( p_task );
     
@@ -452,20 +452,28 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
     component_t * p_component = &System.profile->component_list.entries[component_number];
     
     comm_host_t comm_host = { p_component->protocol };
+#ifdef CHANNEL_I2C
     I2C_Channel * I2C_Channels[] = CHANNEL_I2C;
+#endif
+#ifdef CHANNEL_SPI
     SPI_Channel * SPI_Channels[] = CHANNEL_SPI;
+#endif
     
     switch(p_component->protocol)
     {
+#ifdef CHANNEL_I2C
         case COMPONENT_PROTOCOL_I2C:
             comm_host.i2c_host.address = p_component->addr;
             comm_host.i2c_host.device = I2C_Channels[p_component->route - 1];
             break;
+#endif
+#ifdef CHANNEL_SPI
         case COMPONENT_PROTOCOL_SPI:
             comm_host.spi_host.gpio.pin = p_component->pin;
             comm_host.spi_host.gpio.port = (GPIO_Port_TypeDef)p_component->port;
             comm_host.spi_host.device = SPI_Channels[p_component->route - 1];
             break;
+#endif
         default:
             break;
     }
@@ -473,7 +481,7 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
     return comm_host;
 }
 
-void SystemManager_InjectCommHostIntoTaskData( void ** pp_data, component_id_t component_id )
+void SystemManager_InjectCommHostIntoTaskData( void_p_function_data_t* pp_data, component_id_t component_id )
 {
     if( *pp_data == NULL ) return;
     int8_t component_number = SystemFunctions.Get.ComponentNumber(component_id);

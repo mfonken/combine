@@ -66,7 +66,7 @@ void SystemManager_TerminateTaskShelfEntry( system_task_shelf_entry_id_t );
 void SystemManager_TerminateStateProfile( system_state_profile_t * );
 
 comm_host_t SystemManager_GetCommHostForComponentById( component_id_t );
-void SystemManager_InjectCommHostIntoTaskData( void **, component_id_t );
+void SystemManager_InjectCommHostIntoTaskData( void_p_function_data_t*, component_id_t );
 
 typedef struct
 {
@@ -76,7 +76,7 @@ typedef struct
     void (*EnableTask)( system_task_id_t );
     void (*DisableTask)( system_task_id_t );
     void (*ExitState)( void );
-    void (*InjectCommHostIntoTaskData)( void **, component_id_t );
+    void (*InjectCommHostIntoTaskData)( void_p_function_data_t*, component_id_t );
     void (*PopulateTaskData)( system_task_t * );
     bool (*TaskComponentCheck)( system_task_id_t, int8_t );
     void (*CycleQueue)( os_queue_data_t * );

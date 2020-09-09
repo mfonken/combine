@@ -10,10 +10,11 @@
 #define application_types_h
 
 #include "global_types.h"
+#include "C12_profile.h"
 
 #define SUB_VREG_MV 2200
-#define ACTIVE      (1)
-#define INACTIVE    (0)
+#define ACTIVE      (void*)(1)
+#define INACTIVE    (void*)(0)
 
 #define INTERRUPT_CHANNEL QUEUE_ID_HW_INTERRUPTS
 #ifndef COMPONENT_FAMILY_0

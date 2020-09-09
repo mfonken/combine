@@ -1,0 +1,347 @@
+var all_options =
+{
+  "FAMILY": [
+    {
+      "title": "Families",
+      "options": "list",
+      "IDLE": [
+        "array:.COMPONENT.FAMILY"
+      ],
+      "ALL": [
+        "array:.COMPONENT.FAMILY"
+      ],
+      "ERROR": [
+        "array:.COMPONENT.FAMILY"
+      ]
+    }
+  ],
+  "CHANNEL": [
+    {
+      "title": "Channels",
+      "options": "list",
+      "I2C": [
+        "array",
+        "I2C1",
+        "I2C2"
+      ],
+      "SPI": [
+        "array",
+        "SPI1",
+        "SPI2",
+        "SPI3"
+      ],
+      "USART": [
+        "array",
+        "USART1",
+        "USART2",
+        "USART3",
+        "USART4",
+        "USART5"
+      ]
+    }
+  ],
+  "COMPONENT": [
+    {
+      "title": "Components",
+      "options": "group:~",
+      "NAME": [
+        "enter name"
+      ],
+      "ID": [
+        "NONE",
+        "COMPONENT_A_GPIO",
+        "COMPONENT_B_I2C",
+        {
+          "assign": "APPLICATION_COMPONENT_ID:t"
+        }
+      ],
+      "FAMILY": [
+        "array",
+        "NONE",
+        "0",
+        "A",
+        "B",
+        {
+          "assign": "APPLICATION_COMPONENT_FAMILY:t"
+        }
+      ],
+      "PROTOCOL": [
+        "NONE",
+        "I2C",
+        "GPIO",
+        "SPI",
+        "UART",
+        "BLE",
+        "SUB",
+        {
+          "assign": "APPLICATION_COMM_PROTOCOL:t"
+        }
+      ],
+      "ADDR": [
+        "enter address",
+        "NONE"
+      ],
+      "PORT": [
+        "PORT0",
+        "PORTA",
+        "PORTB",
+        "PORTC",
+        "PORTD",
+        "PORTF",
+        "NONE",
+        {
+          "assign": "APPLICATION_PORT:t"
+        }
+      ],
+      "PIN": [
+        "enter pin number",
+        "INTERNAL"
+      ],
+      "STATE": [
+        "OFF",
+        "ON",
+        "INTERRUPT",
+        "ENABLING",
+        "DISABLING",
+        {
+          "assign": "APPLICATION_COMPONENT_STATE:t"
+        }
+      ]
+    }
+  ],
+  "SUBACTIVITIY": [
+    {
+      "title": "Subactivities",
+      "options": "struct:~",
+      "ID": [
+        "NONE",
+        "INIT",
+        "SET_GPIO_COMPONENT_A",
+        "CLEAR_GPIO_COMPONENT_A",
+        "POLL_COMPONENT_A_GPIO",
+        {
+          "assign": "APPLICATION_SUBACTIVITY_ID:t"
+        }
+      ],
+      "component_id": [
+        "NONE",
+        "array:.COMPONENT.ID"
+      ],
+      "function": [
+        ":.FUNCTION."
+      ],
+      "data": [
+        ":.OBJECT.",
+        "NONE",
+        "ACTIVE",
+        "INACTIVE",
+        "enter"
+      ]
+    }
+  ],
+  "QUEUE": [
+    {
+      "title": "Queues",
+      "options": "struct:~QUEUE",
+      "ID": [
+        "HW_INTERRUPTS",
+        "COMM_MESSAGES",
+        "RUNTIME_MESSAGES",
+        "APPLICATION_MESSAGES",
+        {
+          "assign": "APPLICATION_QUEUE_ID:t"
+        }
+      ],
+      "max_quantity": [
+        "DEFAULT_QUEUE_MAX_QTY",
+        "enter"
+      ],
+      "timeout": [
+        "DEFAULT_QUEUE_TIMEOUT_MS",
+        "enter"
+      ],
+      "error": [
+        ":.ERROR."
+      ]
+    }
+  ],
+  "TASK": [
+    {
+      "title": "Tasks",
+      "options": "struct:~",
+      "ID": [
+        "NONE",
+        "BLINK_GPIO_COMPONENT_A",
+        "POLL_COMPONENT_A_GPIO",
+        {
+          "assign": "APPLICATION_TASK_ID:t"
+        }
+      ],
+      "component_id": [
+        "NONE",
+        "array:.COMPONENT.ID"
+      ],
+      "data": [
+        "NONE",
+        "enter data"
+      ],
+      "ACTION": [
+        "NONE",
+        "INTERRUPT",
+        "SCHEDULE",
+        "QUEUE",
+        {
+          "assign": "APPLICATION_TASK_ACTION:t"
+        }
+      ],
+      "function": [
+        ":.FUNCTION."
+      ],
+      "object": [
+        ":.OBJECT."
+      ],
+      "PRIORITY": [
+        "EXECUTIVE",
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "PASSIVE",
+        "QUARANTINE",
+        {
+          "assign": "APPLICATION_TASK_PRIORITY:t"
+        }
+      ],
+      "error": [
+        ":.ERROR."
+      ]
+    }
+  ],
+  "TASK_SHELF": [
+    {
+      "title": "Task Shelf",
+      "options": "struct:~",
+      "ID": [
+        "NONE",
+        "GPIO_ONLY",
+        "ALL",
+        {
+          "assign": "APPLICATION_TASK_SHELF_ENTRY_ID:t"
+        }
+      ],
+      "interrupts": [
+        "array:.TASK.ID"
+      ],
+      "scheduled": [
+        "array:.TASK.ID"
+      ]
+    }
+  ],
+  "STATE": [
+    {
+      "title": "States",
+      "options": "nested",
+      "NAME": [
+        "STARTUP",
+        "IDLE",
+        "ACTIVE",
+        "ASLEEP",
+        "ERROR",
+        "RECOVERY",
+        "UNKNOWN",
+        {
+          "assign": "APPLICATION_STATE:t"
+        }
+      ],
+      "ACTIVITY": [
+        {
+          "options": ">"
+        },
+        "NONE",
+        "STARTUP",
+        "ACTIVATE",
+        "WAIT",
+        "SLEEP",
+        {
+          "assign": "APPLICATION_ACTIVITY:t"
+        }
+      ],
+      "SUBACTIVITIES": [
+        {
+          "options": ">"
+        },
+        "array:.SUBACTIVITIY.ID"
+      ],
+      "EXIT_STATE": [
+        {
+          "options": ">"
+        },
+        ":.STATE.NAME"
+      ],
+      "TASK_SHELF": [
+        "array:.TASK_SHELF.ID"
+      ]
+    }
+  ],
+  "FUNCTION": [
+    {
+      "options": "hidden",
+      "PAPI": [
+        {
+          "IO": [
+            "Set",
+            "Clear",
+            "Toggle"
+          ]
+        }
+      ],
+      "CommFunctions": [
+        "Init",
+        {
+          "Perform": [
+            "Event",
+            "Transmit",
+            "Receive"
+          ]
+        }
+      ],
+      "SysIOCtlFunctions": [
+        "Init",
+        "InitComponent"
+      ],
+      "AppFunctions": [
+        "Init",
+        "Start",
+        "Tick"
+      ]
+    }
+  ],
+  "OBJECT": [
+    {
+      "options": "hidden",
+      "&App": [
+        {
+          "buffers": [
+            "config"
+          ]
+        }
+      ]
+    }
+  ],
+  "ERROR": [
+    {
+      "options": "hidden",
+      "&System": [
+        {
+          "error": [
+            "system",
+            "peripheral",
+            "interrupt",
+            "messaging",
+            "runtime",
+            "recovery"
+          ]
+        }
+      ]
+    }
+  ]
+};

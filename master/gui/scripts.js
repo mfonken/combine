@@ -162,17 +162,18 @@ function createDropdownElement(element, key, list) {
     option_list_element.append('<a class="btn dropdown-toggle entry_text" id="' + btn_id + '" type="button" data-toggle="dropdown">+</a>');
 
     var tie_check = list_head.indexOf(":.");
-
     if(tie_check >= 0) {
         var valid_tie = false;
         var ii = 0;
         var tie_path = list_head.substring(tie_check+2, list_head.length).split(".");
-        while(!valid_tie && ii < 2) {
+        overcount = 3
+        while(!valid_tie && ii < 2 && overcount-- > 0) {
             var sub_list = all_options;
             var last_path_key = "";
-            // console.log(valid_tie, ii, tie_path);
+            console.log(overcount, valid_tie, ii, tie_path);
             var need_break = false;
             $.each(tie_path, function (i, path_key) {
+                console.log( sub_list)
                 if(need_break) return;
 
                 if(path_key == "") {
@@ -189,23 +190,25 @@ function createDropdownElement(element, key, list) {
                 }
                 else {
                     // console.log("Path key", i, path_key);
-                    if(sub_list[path_key] == undefined) return;
-                    sub_list = sub_list[path_key];
-                    if(i < tie_path.length - 1 && sub_list[0] != undefined) {
-                        sub_list = sub_list[0];
-                    }
-                    if(sub_list[0] != undefined && $.type(sub_list[0]) == "string" && sub_list[0].includes(":.")) {
+                    if(sub_list[path_key] != undefined)
+                    {
+                        sub_list = sub_list[path_key];
+                        if(i < tie_path.length - 1 && sub_list[0] != undefined) {
+                            sub_list = sub_list[0];
+                        }
+                        if(sub_list[0] != undefined && $.type(sub_list[0]) == "string" && sub_list[0].includes(":.")) {
 
-                        tie_check = sub_list[0].indexOf(":.");
-                        // console.log("!!!", sub_list[0], tie_check);
-                        tie_path = sub_list[0].substring(tie_check+2, sub_list[0].length).split(".");
-                        ii++;
-                        need_break = true;
-                        valid_tie = false;
-                    }
-                    else {
-                        last_path_key = path_key;
-                        valid_tie = true;
+                            tie_check = sub_list[0].indexOf(":.");
+                            // console.log("!!!", sub_list[0], tie_check);
+                            tie_path = sub_list[0].substring(tie_check+2, sub_list[0].length).split(".");
+                            ii++;
+                            need_break = true;
+                            valid_tie = false;
+                        }
+                        else {
+                            last_path_key = path_key;
+                            valid_tie = true;
+                        }
                     }
                 }
                 // console.log("!!", valid_tie);
@@ -264,6 +267,7 @@ function createDropdown(element, key, list, btn_id, is_array) {
 }
 
 $(document).ready(function() {
+    console.log("loading");
     $( ".main_div" ).each(function( index ) {
         createMain(index);
     });
