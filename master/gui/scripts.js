@@ -103,6 +103,7 @@ function entryClick(sender, text, is_array)
 
 function generateRecursiveListCall(source, key, layer) {
     var list = "";
+    var joiner_char = key[0] == '&' ? '.' : '_';
     // console.log("Key", key);
     if(source == undefined) return list;
     $.each(source, function (sub_key, group) {
@@ -110,12 +111,12 @@ function generateRecursiveListCall(source, key, layer) {
         if($.type(group) == "string") {
             // console.log(">", key + "." + group, group);
             list += "," + key;
-            if(group != "" ) list += "." + group;
+            if(group != "" ) list += joiner_char + group;
         }
         else {
             var next_key = sub_key;
             if($.isNumeric(sub_key)) next_key = key;
-            else if(key != "") next_key = key + "." + next_key;
+            else if(key != "") next_key = key + joiner_char + next_key;
             // console.log(">>", next_key);
             list += generateRecursiveListCall(group, next_key, layer + 1);
         }
@@ -170,10 +171,10 @@ function createDropdownElement(element, key, list) {
         while(!valid_tie && ii < 2 && overcount-- > 0) {
             var sub_list = all_options;
             var last_path_key = "";
-            console.log(overcount, valid_tie, ii, tie_path);
+            // console.log(overcount, valid_tie, ii, tie_path);
             var need_break = false;
             $.each(tie_path, function (i, path_key) {
-                console.log( sub_list)
+                // console.log( sub_list)
                 if(need_break) return;
 
                 if(path_key == "") {

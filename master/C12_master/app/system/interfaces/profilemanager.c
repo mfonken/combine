@@ -8,10 +8,11 @@
 
 #include <profilemanager.h>
 
+static system_profile_t init_profile = PROFILE_TEMPLATE;
+
 void InitProfile()
 {
-    system_profile_t init_profile = PROFILE_TEMPLATE;
-    ProfileFunctions.Load( &init_profile );
+	ProfileFunctions.Load( &init_profile );
     
     /* Initialize System using profile */
     SystemFunctions.Init( &Profile );

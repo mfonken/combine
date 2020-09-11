@@ -56,6 +56,7 @@ os_task_data_t * SystemManager_GetTaskDataByComponentId( component_id_t );
 int8_t SystemManager_GetSystemComponentNumber( component_id_t );
 component_id_t SystemManager_GetComponentIdFromPortPin( port_t, pin_t );
 //void_handler_t GetHandlerByComponent( component_t * );
+void SystemManager_PopulateQueueDataOfQueue( queue_data_t *, os_queue_data_t * );
 void SystemManager_PopulateTaskDataOfTask( system_task_t * );
 bool SystemManager_IsTaskAssignedToComponent( system_task_id_t, int8_t );
 
@@ -81,6 +82,7 @@ typedef struct
     bool (*TaskComponentCheck)( system_task_id_t, int8_t );
     void (*CycleQueue)( os_queue_data_t * );
     void (*CycleQueues)( void );
+    void (*PopulateQueueData)( queue_data_t *, os_queue_data_t * );
 } system_perform_functions;
 typedef struct
 {
@@ -137,6 +139,7 @@ static system_functions SystemFunctions =
     .Perform.DisableTask = SystemManager_PerformDisableTaskState,
     .Perform.ExitState          = SystemManager_PerformExitState,
     .Perform.InjectCommHostIntoTaskData = SystemManager_InjectCommHostIntoTaskData,
+	.Perform.PopulateQueueData	= SystemManager_PopulateQueueDataOfQueue,
     .Perform.PopulateTaskData   = SystemManager_PopulateTaskDataOfTask,
     .Perform.TaskComponentCheck = SystemManager_IsTaskAssignedToComponent,
     .Perform.CycleQueue         = SystemManager_PerformCycleQueue,

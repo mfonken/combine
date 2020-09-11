@@ -1,7 +1,7 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 9/8/2020
+// Created by Combine Profile Generator v0.1 on 9/10/2020
 // Copyright © Marbl. All rights reserved.
 
 #ifndef C12_profile_h
@@ -40,6 +40,14 @@ typedef enum
 	NUM_COMPONENT_PROTOCOL
 } COMPONENT_PROTOCOL, APPLICATION_COMM_PROTOCOL, application_comm_protocol_t;
 #define NUM_APPLICATION_COMM_PROTOCOL NUM_COMPONENT_PROTOCOL
+
+typedef enum
+{
+	COMPONENT_ROUTE_NONE = 0,
+	COMPONENT_ROUTE_PRIMARY,
+	NUM_COMPONENT_ROUTE
+} COMPONENT_ROUTE, APPLICATION_COMM_ROUTE, application_comm_route_t;
+#define NUM_APPLICATION_COMM_ROUTE NUM_COMPONENT_ROUTE
 
 typedef enum
 {
@@ -110,6 +118,15 @@ static const char * COMPONENT_PROTOCOL_STRINGS[] =
 	"COMPONENT_PROTOCOL_SUB"
 };
 #define APPLICATION_COMM_PROTOCOL_STRINGS COMPONENT_PROTOCOL_STRINGS
+#endif
+
+#ifdef DEBUG
+static const char * COMPONENT_ROUTE_STRINGS[] =
+{
+	"COMPONENT_ROUTE_NONE",
+	"COMPONENT_ROUTE_PRIMARY"
+};
+#define APPLICATION_COMM_ROUTE_STRINGS COMPONENT_ROUTE_STRINGS
 #endif
 
 #ifdef DEBUG
@@ -344,18 +361,19 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 #define A_ID COMPONENT_ID_COMPONENT_A_GPIO
 #define A_FAMILY COMPONENT_FAMILY_A
 #define A_PROTOCOL COMPONENT_PROTOCOL_GPIO
+#define A_ROUTE COMPONENT_ROUTE_PRIMARY
 #define A_ADDR NONE
 #define A_PORT COMPONENT_PORT_D
 #define A_PIN 13
 #define A_STATE COMPONENT_STATE_OFF
-#define A_COMPONENT { A_NAME, A_ID, A_FAMILY, A_PROTOCOL, A_ADDR, A_PORT, A_PIN, A_STATE }
+#define A_COMPONENT { A_NAME, A_ID, A_FAMILY, A_PROTOCOL, A_ROUTE, A_ADDR, A_PORT, A_PIN, A_STATE }
 
 /* Subactivities */
 #define SUBACTIVITIY_SET_GPIO_COMPONENT_A { \
 	.ID = SUBACTIVITIY_ID_SET_GPIO_COMPONENT_A, \
 	.component_id = { COMPONENT_ID_COMPONENT_A_GPIO }, \
 	.num_component_id = 1, \
-	.function = PAPI.IO.Set, \
+	.function = PAPIInterface_GPIO_Set, \
 	.data = ACTIVE \
 }
 
@@ -363,7 +381,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 	.ID = SUBACTIVITIY_ID_CLEAR_GPIO_COMPONENT_A, \
 	.component_id = { COMPONENT_ID_COMPONENT_A_GPIO }, \
 	.num_component_id = 1, \
-	.function = PAPI.IO.Clear, \
+	.function = PAPIInterface_GPIO_Clear, \
 	.data = INACTIVE \
 }
 
@@ -371,17 +389,17 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 	.ID = SUBACTIVITIY_ID_INIT, \
 	.component_id = { COMPONENT_ID_COMPONENT_A_GPIO }, \
 	.num_component_id = 1, \
-	.function = CommFunctions.Init, \
+	.function = CommunicationManager_Init, \
 	.data = &App.buffers.config \
 }
 
 /* Queues */
-#define QUEUE_APPLICATION_MESSAGES QUEUE( \
-	QUEUE_ID_APPLICATION_MESSAGES, \
-	DEFAULT_QUEUE_MAX_QTY, \
-	DEFAULT_QUEUE_TIMEOUT_MS, \
-	&System.error.system \
-)
+#define QUEUE_APPLICATION_MESSAGES { \
+	.ID = QUEUE_ID_APPLICATION_MESSAGES, \
+	.max_qty = NONE, \
+	.timeout = DEFAULT_QUEUE_TIMEOUT_MS, \
+	.error = &System.error.system \
+}
 
 /* Tasks */
 #define TASK_BLINK_GPIO_COMPONENT_A { \
@@ -390,7 +408,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 	.num_component_id = 1, \
 	.data = 1, \
 	.ACTION = TASK_ACTION_SCHEDULE, \
-	.function = PAPI.IO.Toggle, \
+	.function = PAPIInterface_GPIO_Toggle, \
 	.object = &App.buffers.config, \
 	.PRIORITY = TASK_PRIORITY_HIGH, \
 	.error = &System.error.runtime \
@@ -451,6 +469,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 				STATE_NAME_ACTIVE, /* EXIT_STATE */ \
 			}, \
 			STATE_NAME_STARTUP, /* STATE_NAME */ \
+			FAMILY_ALL, /* FAMILIES */ \
 			{ /* TASK_SHELF */ \
 				TASK_SHELF_ID_NONE \
 			}, \
@@ -466,6 +485,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 				STATE_NAME_IDLE, /* EXIT_STATE */ \
 			}, \
 			STATE_NAME_ACTIVE, /* STATE_NAME */ \
+			FAMILY_ALL, /* FAMILIES */ \
 			{ /* TASK_SHELF */ \
 				TASK_SHELF_ID_GPIO_ONLY \
 			}, \
@@ -481,6 +501,7 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 				STATE_NAME_IDLE, /* EXIT_STATE */ \
 			}, \
 			STATE_NAME_IDLE, /* STATE_NAME */ \
+			FAMILY_IDLE, /* FAMILIES */ \
 			{ /* TASK_SHELF */ \
 				TASK_SHELF_ID_NONE \
 			}, \

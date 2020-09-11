@@ -99,6 +99,17 @@ void SystemManager_PerformDisableTaskState( system_task_id_t task_id )
         OS.Task.Delete( &p_task->os_task_data );
 }
 
+void SystemManager_PopulateQueueDataOfQueue( queue_data_t * p_queue_data, os_queue_data_t * p_os_queue_data_t )
+{
+	p_os_queue_data_t->ID = p_queue_data->ID;
+	p_os_queue_data_t->p_name = (CPU_CHAR*)QUEUE_ID_STRINGS[p_queue_data->ID];
+	p_os_queue_data_t->max_qty = p_queue_data->max_qty;
+	p_os_queue_data_t->p_err = p_queue_data->error;
+    p_os_queue_data_t->opt = DEFAULT_OS_Q_OPT;
+	p_os_queue_data_t->timeout = (OS_TICK)MS_TO_TICK(p_queue_data->timeout);
+	p_os_queue_data_t->msg_size = 0;
+}
+
 void SystemManager_PerformCycleQueue( os_queue_data_t * p_queue_data )
 {
     LOG_SYSTEM(SYSTEM_DEBUG_QUEUE, "Performing cycle on queue: %s\n", QUEUE_ID_STRINGS[p_queue_data->ID]);
@@ -112,9 +123,11 @@ void SystemManager_PerformCycleQueue( os_queue_data_t * p_queue_data )
 
 void SystemManager_PerformCycleQueues( void )
 {
+	os_queue_data_t * p_queue_data;
     FOR( uint8_t, i, System.profile->queue_list.num_entries )
     {
-        SystemFunctions.Perform.CycleQueue( &System.profile->queue_list.entries[i] );
+    	SystemFunctions.Perform.PopulateQueueData(&System.profile->queue_list.entries[i], p_queue_data);
+        SystemFunctions.Perform.CycleQueue(p_queue_data);
     }
 }
 

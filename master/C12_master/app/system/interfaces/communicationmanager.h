@@ -34,7 +34,7 @@ typedef struct
 } comm_packet_t;
 typedef comm_packet_t * p_comm_packet_t;
 
-void CommunicationManagerInit(void);
+void CommunicationManager_Init(void);
 generic_comm_return_t CommunicationManager_PerformEvent( comm_event_t );
 void CommunicationManager_PerformTransmit(comm_packet_t *);
 void CommunicationManager_PerformReceive(comm_packet_t *);
@@ -52,9 +52,9 @@ typedef struct
     comm_perform_functions Perform;
 } comm_functions;
 
-static comm_functions CommFunctions =
+static const comm_functions CommFunctions =
 {
-    .Init = CommunicationManagerInit,
+    .Init = CommunicationManager_Init,
     .Perform.Event = CommunicationManager_PerformEvent,
     .Perform.Transmit = CommunicationManager_PerformTransmit,
     .Perform.Receive = CommunicationManager_PerformReceive

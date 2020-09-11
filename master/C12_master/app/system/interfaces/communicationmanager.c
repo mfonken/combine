@@ -15,7 +15,7 @@ static uint8_t boot_to_dfu = 0;
 #define flushLog()
 #define printLog(...)
 
-void CommunicationManagerInit(void)
+void CommunicationManager_Init(void)
 {
     LOG_COMM(DEBUG_1, "Initializing communication manager.\n");
 }

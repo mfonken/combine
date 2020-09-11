@@ -77,6 +77,13 @@ var all_options =
           "assign": "APPLICATION_COMM_PROTOCOL:t"
         }
       ],
+      "ROUTE": [
+        "NONE",
+        "PRIMARY",
+        {
+          "assign": "APPLICATION_COMM_ROUTE:t"
+        }
+      ],
       "ADDR": [
         "enter address",
         "NONE"
@@ -142,7 +149,7 @@ var all_options =
   "QUEUE": [
     {
       "title": "Queues",
-      "options": "struct:~QUEUE",
+      "options": "struct:~",
       "ID": [
         "HW_INTERRUPTS",
         "COMM_MESSAGES",
@@ -152,7 +159,7 @@ var all_options =
           "assign": "APPLICATION_QUEUE_ID:t"
         }
       ],
-      "max_quantity": [
+      "max_qty": [
         "DEFAULT_QUEUE_MAX_QTY",
         "enter"
       ],
@@ -277,6 +284,9 @@ var all_options =
         },
         ":.STATE.NAME"
       ],
+      "FAMILIES": [
+        ":.FAMILY"
+      ],
       "TASK_SHELF": [
         "array:.TASK_SHELF.ID"
       ]
@@ -285,16 +295,16 @@ var all_options =
   "FUNCTION": [
     {
       "options": "hidden",
-      "PAPI": [
+      "PAPIInterface": [
         {
-          "IO": [
+          "GPIO": [
             "Set",
             "Clear",
             "Toggle"
           ]
         }
       ],
-      "CommFunctions": [
+      "CommunicationManager": [
         "Init",
         {
           "Perform": [

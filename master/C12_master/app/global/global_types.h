@@ -41,8 +41,6 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#define MAX_COMPONENTS 3
-
 #define NAME_STRINGIFY(x,y) x ## _ ## y
 #define NAME_BUILDER(x,y) NAME_STRINGIFY(x,y)
 

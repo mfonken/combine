@@ -21,17 +21,17 @@ void PAPIInterface_DCDC_Init( uint16_t mV )
 #endif /* DCDC_SERVICE */
 
 #ifndef GPIO_SERVICE
-void PAPIInterace_GPIO_Set( gpio_t gpio ) {}
-void PAPIInterace_GPIO_Clear( gpio_t gpio ) {}
-void PAPIInterace_GPIO_Toggle( gpio_t gpio ) {}
+void PAPIInterface_GPIO_Set( gpio_t gpio ) {}
+void PAPIInterface_GPIO_Clear( gpio_t gpio ) {}
+void PAPIInterface_GPIO_Toggle( gpio_t gpio ) {}
 #else
-void PAPIInterace_GPIO_Set( gpio_t gpio )
+void PAPIInterface_GPIO_Set( gpio_t gpio )
 {
     LOG_PAPI(PAPI_DEBUG, "Set GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
     PAPI_SPECIFIC(PAPIInterace_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_HIGH));
 }
 
-void PAPIInterace_GPIO_Clear( gpio_t )
+void PAPIInterface_GPIO_Clear( gpio_t )
 {
     LOG_PAPI(PAPI_DEBUG, "Clearing GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
     PAPI_SPECIFIC(PAPIInterace_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_LOW));

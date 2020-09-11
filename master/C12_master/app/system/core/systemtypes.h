@@ -182,7 +182,7 @@ typedef comm_host_t * p_comm_host_t;
 typedef struct
 {
     uint8_t ID;
-    component_id_t component_id[MAX_COMPONENTS];
+    component_id_t component_id[NUM_SYSTEM_COMPONENT_ID];
     uint8_t num_component_id;
     void_p_function_t function;
     void_p_function_data_t data;
@@ -217,7 +217,7 @@ typedef struct
 system_task_id_t
     ID;
 component_id_t
-    component_id[MAX_COMPONENTS];
+    component_id[NUM_SYSTEM_COMPONENT_ID];
 uint8_t
     num_component_id;
     union
@@ -295,14 +295,22 @@ typedef struct
 uint8_t
     num_entries;
 component_t
-    entries[MAX_COMPONENTS];
+    entries[NUM_SYSTEM_COMPONENT_ID];
 } component_list_t;
+
+typedef struct
+{
+    generic_id_t   ID;
+    OS_MSG_QTY     max_qty;
+    OS_TICK        timeout;
+    OS_ERR        *error;
+} queue_data_t;
 
 typedef struct
 {
 uint8_t
     num_entries;
-os_queue_data_t
+queue_data_t
     entries[NUM_SYSTEM_TASK_ID];
 } queue_list_t;
 
@@ -360,8 +368,8 @@ OS_ERR
 typedef struct
 {
     bool                    tasks[NUM_SYSTEM_TASK_ID];
-    bool                    component_tasks[MAX_COMPONENTS][NUM_SYSTEM_TASK_ID];
-    comm_host_t             comm_hosts[MAX_COMPONENTS];
+    bool                    component_tasks[NUM_SYSTEM_COMPONENT_ID][NUM_SYSTEM_TASK_ID];
+    comm_host_t             comm_hosts[NUM_SYSTEM_COMPONENT_ID];
 } system_registration_log_t;
 
 typedef struct

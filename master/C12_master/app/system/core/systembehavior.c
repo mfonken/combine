@@ -71,7 +71,8 @@ void SystemBehavior_PerformInterrupterReceive( system_task_id_t task_id, hw_even
     }
     if( !handled )
     {
-        os_queue_data_t * p_queue_data = &System.profile->queue_list.entries[INTERRUPT_CHANNEL];
+        os_queue_data_t * p_queue_data;
+        SystemFunctions.Perform.PopulateQueueData(&System.profile->queue_list.entries[INTERRUPT_CHANNEL], p_queue_data);
         p_queue_data->p_void = (void*)&message;
         p_queue_data->msg_size = sizeof(hw_event_message_t);
         OS.Queue.Post( p_queue_data );
