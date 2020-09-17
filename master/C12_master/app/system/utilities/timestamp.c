@@ -5,7 +5,7 @@
 //  Created by Matthew Fonken on 7/16/20.
 //
 
-#include <system/utilities/timestamp.h>
+#include <timestamp.h>
 
 #if __OS__ == MICRIUM && defined(__MICRIUM__)
 double TIMESTAMP(void)

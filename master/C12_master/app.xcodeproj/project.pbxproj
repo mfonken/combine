@@ -32,16 +32,17 @@
 		342CA05E24C9273D0063DC5A /* os_stat.c in Sources */ = {isa = PBXBuildFile; fileRef = 342C9EAE24C9273C0063DC5A /* os_stat.c */; };
 		342CA05F24C9273D0063DC5A /* os_app_hooks.c in Sources */ = {isa = PBXBuildFile; fileRef = 342C9EB124C9273C0063DC5A /* os_app_hooks.c */; };
 		342CA06624C9273D0063DC5A /* os_cpu_c.c in Sources */ = {isa = PBXBuildFile; fileRef = 342C9ECE24C9273C0063DC5A /* os_cpu_c.c */; };
-		3431DBF923E60F9A00392FD4 /* papi_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 3431DBF823E60F9A00392FD4 /* papi_interface.c */; };
+		345DA2782513057700D8F453 /* timestamp.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA2602513057700D8F453 /* timestamp.c */; };
+		345DA2792513057700D8F453 /* osinterface.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA2692513057700D8F453 /* osinterface.c */; };
+		345DA27A2513057700D8F453 /* papiinterface.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA26A2513057700D8F453 /* papiinterface.c */; };
+		345DA27B2513057700D8F453 /* profilemanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA26B2513057700D8F453 /* profilemanager.c */; };
+		345DA27C2513057700D8F453 /* communicationmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA26C2513057700D8F453 /* communicationmanager.c */; };
+		345DA27D2513057700D8F453 /* sysiocontroller.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA2722513057700D8F453 /* sysiocontroller.c */; };
+		345DA27E2513057700D8F453 /* systembehavior.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA2742513057700D8F453 /* systembehavior.c */; };
+		345DA27F2513057700D8F453 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 345DA2762513057700D8F453 /* systemmanager.c */; };
 		347D9BFE24AE9362006C9FC4 /* DRV2605.c in Sources */ = {isa = PBXBuildFile; fileRef = 347D9BFD24AE9362006C9FC4 /* DRV2605.c */; };
 		3491A35D23C57815008010C8 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31023C57814008010C8 /* main.c */; };
-		3491A35E23C57815008010C8 /* systembehavior.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31A23C57815008010C8 /* systembehavior.c */; };
-		3491A36023C57815008010C8 /* systemmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A31C23C57815008010C8 /* systemmanager.c */; };
-		3491A36123C57815008010C8 /* sysiocontroller.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A32123C57815008010C8 /* sysiocontroller.c */; };
 		3491A36223C57815008010C8 /* taumanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A32723C57815008010C8 /* taumanager.c */; };
-		3491A36323C57815008010C8 /* os_interface.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A32823C57815008010C8 /* os_interface.c */; };
-		3491A36423C57815008010C8 /* profilemanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A32A23C57815008010C8 /* profilemanager.c */; };
-		3491A36523C57815008010C8 /* communicationmanager.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A32D23C57815008010C8 /* communicationmanager.c */; };
 		3491A36623C57815008010C8 /* rho_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A34823C57815008010C8 /* rho_client.c */; };
 		3491A36723C57815008010C8 /* motionsensor.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A34A23C57815008010C8 /* motionsensor.c */; };
 		3491A36823C57815008010C8 /* shtp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A34F23C57815008010C8 /* shtp.c */; };
@@ -53,7 +54,6 @@
 		3491A38923C57877008010C8 /* vector.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37C23C57877008010C8 /* vector.c */; };
 		3491A38A23C57877008010C8 /* point.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A37F23C57877008010C8 /* point.c */; };
 		3491A38B23C57877008010C8 /* quaternion.c in Sources */ = {isa = PBXBuildFile; fileRef = 3491A38323C57877008010C8 /* quaternion.c */; };
-		34959B1D24C1345200DF3357 /* timestamp.c in Sources */ = {isa = PBXBuildFile; fileRef = 34959B1C24C1345200DF3357 /* timestamp.c */; };
 		34C44286249EDB710022D6DB /* application.c in Sources */ = {isa = PBXBuildFile; fileRef = 34C44285249EDB710022D6DB /* application.c */; };
 /* End PBXBuildFile section */
 
@@ -70,7 +70,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		342C963224C38A170063DC5A /* port_master.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = port_master.h; sourceTree = "<group>"; };
 		342C963724C392340063DC5A /* master.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = master.h; sourceTree = "<group>"; };
 		342C9CD724C9273C0063DC5A /* lib_ascii.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lib_ascii.h; sourceTree = "<group>"; };
 		342C9CD824C9273C0063DC5A /* lib_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lib_math.h; sourceTree = "<group>"; };
@@ -125,35 +124,37 @@
 		342C9EB624C9273C0063DC5A /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		342C9ECD24C9273C0063DC5A /* os_cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_cpu.h; sourceTree = "<group>"; };
 		342C9ECE24C9273C0063DC5A /* os_cpu_c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = os_cpu_c.c; sourceTree = "<group>"; };
-		3431DBF723E60F9A00392FD4 /* papi_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = papi_interface.h; sourceTree = "<group>"; };
-		3431DBF823E60F9A00392FD4 /* papi_interface.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = papi_interface.c; sourceTree = "<group>"; };
-		3431DBFA23E6104800392FD4 /* emlib_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = emlib_interface.h; sourceTree = "<group>"; };
+		345DA2602513057700D8F453 /* timestamp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp.c; sourceTree = "<group>"; };
+		345DA2612513057700D8F453 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
+		345DA2632513057700D8F453 /* emlib_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emlib_interface.h; sourceTree = "<group>"; };
+		345DA2642513057700D8F453 /* port_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = port_master.h; sourceTree = "<group>"; };
+		345DA2652513057700D8F453 /* micrium_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = micrium_interface.h; sourceTree = "<group>"; };
+		345DA2672513057700D8F453 /* profilemanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profilemanager.h; sourceTree = "<group>"; };
+		345DA2682513057700D8F453 /* communicationmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = communicationmanager.h; sourceTree = "<group>"; };
+		345DA2692513057700D8F453 /* osinterface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = osinterface.c; sourceTree = "<group>"; };
+		345DA26A2513057700D8F453 /* papiinterface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = papiinterface.c; sourceTree = "<group>"; };
+		345DA26B2513057700D8F453 /* profilemanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = profilemanager.c; sourceTree = "<group>"; };
+		345DA26C2513057700D8F453 /* communicationmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = communicationmanager.c; sourceTree = "<group>"; };
+		345DA26D2513057700D8F453 /* papiinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = papiinterface.h; sourceTree = "<group>"; };
+		345DA26E2513057700D8F453 /* osinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = osinterface.h; sourceTree = "<group>"; };
+		345DA2702513057700D8F453 /* systembehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systembehavior.h; sourceTree = "<group>"; };
+		345DA2712513057700D8F453 /* systemmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemmanager.h; sourceTree = "<group>"; };
+		345DA2722513057700D8F453 /* sysiocontroller.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysiocontroller.c; sourceTree = "<group>"; };
+		345DA2732513057700D8F453 /* systembridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
+		345DA2742513057700D8F453 /* systembehavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systembehavior.c; sourceTree = "<group>"; };
+		345DA2752513057700D8F453 /* systemtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
+		345DA2762513057700D8F453 /* systemmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemmanager.c; sourceTree = "<group>"; };
+		345DA2772513057700D8F453 /* sysiocontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysiocontroller.h; sourceTree = "<group>"; };
 		347D9BFB24AE9362006C9FC4 /* DRV2605.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRV2605.h; sourceTree = "<group>"; };
 		347D9BFC24AE9362006C9FC4 /* hapticcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hapticcontroller.h; sourceTree = "<group>"; };
 		347D9BFD24AE9362006C9FC4 /* DRV2605.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DRV2605.c; sourceTree = "<group>"; };
-		347F720B23D381E900427FD0 /* micrium_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = micrium_interface.h; sourceTree = "<group>"; };
 		347F720C23D383C200427FD0 /* application_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application_types.h; sourceTree = "<group>"; };
 		347F720D23D3A34400427FD0 /* application.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application.h; sourceTree = "<group>"; };
 		3491A30623C577DD008010C8 /* app */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3491A31023C57814008010C8 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		3491A31323C57815008010C8 /* systemtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemtypes.h; sourceTree = "<group>"; };
 		3491A31423C57815008010C8 /* global_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global_types.h; sourceTree = "<group>"; };
-		3491A31723C57815008010C8 /* systembehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systembehavior.h; sourceTree = "<group>"; };
-		3491A31823C57815008010C8 /* systemmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemmanager.h; sourceTree = "<group>"; };
-		3491A31923C57815008010C8 /* systembridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systembridge.h; sourceTree = "<group>"; };
-		3491A31A23C57815008010C8 /* systembehavior.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systembehavior.c; sourceTree = "<group>"; };
-		3491A31C23C57815008010C8 /* systemmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemmanager.c; sourceTree = "<group>"; };
-		3491A32123C57815008010C8 /* sysiocontroller.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sysiocontroller.c; sourceTree = "<group>"; };
-		3491A32323C57815008010C8 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
-		3491A32423C57815008010C8 /* sysiocontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysiocontroller.h; sourceTree = "<group>"; };
-		3491A32623C57815008010C8 /* profilemanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profilemanager.h; sourceTree = "<group>"; };
 		3491A32723C57815008010C8 /* taumanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taumanager.c; sourceTree = "<group>"; };
-		3491A32823C57815008010C8 /* os_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = os_interface.c; sourceTree = "<group>"; };
-		3491A32923C57815008010C8 /* communicationmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = communicationmanager.h; sourceTree = "<group>"; };
-		3491A32A23C57815008010C8 /* profilemanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = profilemanager.c; sourceTree = "<group>"; };
-		3491A32B23C57815008010C8 /* os_interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_interface.h; sourceTree = "<group>"; };
 		3491A32C23C57815008010C8 /* taumanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = taumanager.h; sourceTree = "<group>"; };
-		3491A32D23C57815008010C8 /* communicationmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = communicationmanager.c; sourceTree = "<group>"; };
 		3491A32F23C57815008010C8 /* application_debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = application_debug.h; sourceTree = "<group>"; };
 		3491A33423C57815008010C8 /* touchcontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = touchcontroller.h; sourceTree = "<group>"; };
 		3491A33523C57815008010C8 /* CPT112S.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPT112S.h; sourceTree = "<group>"; };
@@ -188,7 +189,6 @@
 		3491A38323C57877008010C8 /* quaternion.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quaternion.c; sourceTree = "<group>"; };
 		3491A38C23C578F5008010C8 /* global_log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = global_log.h; sourceTree = "<group>"; };
 		3491A38D23C57CB0008010C8 /* global_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = global_config.h; sourceTree = "<group>"; };
-		34959B1C24C1345200DF3357 /* timestamp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = timestamp.c; path = /Users/matthew/Desktop/marbl/Techincal/combine/master/C12_master/app/system/sysiocontroller/timestamp.c; sourceTree = "<absolute>"; };
 		34C44285249EDB710022D6DB /* application.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = application.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -392,6 +392,55 @@
 			path = GNU;
 			sourceTree = "<group>";
 		};
+		345DA25F2513057700D8F453 /* utilities */ = {
+			isa = PBXGroup;
+			children = (
+				345DA2602513057700D8F453 /* timestamp.c */,
+				345DA2612513057700D8F453 /* timestamp.h */,
+			);
+			path = utilities;
+			sourceTree = "<group>";
+		};
+		345DA2622513057700D8F453 /* port */ = {
+			isa = PBXGroup;
+			children = (
+				345DA2632513057700D8F453 /* emlib_interface.h */,
+				345DA2642513057700D8F453 /* port_master.h */,
+				345DA2652513057700D8F453 /* micrium_interface.h */,
+			);
+			path = port;
+			sourceTree = "<group>";
+		};
+		345DA2662513057700D8F453 /* interfaces */ = {
+			isa = PBXGroup;
+			children = (
+				345DA2672513057700D8F453 /* profilemanager.h */,
+				345DA2682513057700D8F453 /* communicationmanager.h */,
+				345DA2692513057700D8F453 /* osinterface.c */,
+				345DA26A2513057700D8F453 /* papiinterface.c */,
+				345DA26B2513057700D8F453 /* profilemanager.c */,
+				345DA26C2513057700D8F453 /* communicationmanager.c */,
+				345DA26D2513057700D8F453 /* papiinterface.h */,
+				345DA26E2513057700D8F453 /* osinterface.h */,
+			);
+			path = interfaces;
+			sourceTree = "<group>";
+		};
+		345DA26F2513057700D8F453 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				345DA2702513057700D8F453 /* systembehavior.h */,
+				345DA2712513057700D8F453 /* systemmanager.h */,
+				345DA2722513057700D8F453 /* sysiocontroller.c */,
+				345DA2732513057700D8F453 /* systembridge.h */,
+				345DA2742513057700D8F453 /* systembehavior.c */,
+				345DA2752513057700D8F453 /* systemtypes.h */,
+				345DA2762513057700D8F453 /* systemmanager.c */,
+				345DA2772513057700D8F453 /* sysiocontroller.h */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
 		347D9BF924AE9362006C9FC4 /* drivers */ = {
 			isa = PBXGroup;
 			children = (
@@ -443,16 +492,6 @@
 			path = global;
 			sourceTree = "<group>";
 		};
-		348D188F23D8135A002271B6 /* port */ = {
-			isa = PBXGroup;
-			children = (
-				342C963224C38A170063DC5A /* port_master.h */,
-				347F720B23D381E900427FD0 /* micrium_interface.h */,
-				3431DBFA23E6104800392FD4 /* emlib_interface.h */,
-			);
-			path = port;
-			sourceTree = "<group>";
-		};
 		3491A2FD23C577DD008010C8 = {
 			isa = PBXGroup;
 			children = (
@@ -486,51 +525,12 @@
 		3491A31123C57815008010C8 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				348D188F23D8135A002271B6 /* port */,
-				3491A31523C57815008010C8 /* core */,
-				3491A31F23C57815008010C8 /* sysiocontroller */,
-				3491A32523C57815008010C8 /* interfaces */,
+				345DA26F2513057700D8F453 /* core */,
+				345DA2662513057700D8F453 /* interfaces */,
+				345DA2622513057700D8F453 /* port */,
+				345DA25F2513057700D8F453 /* utilities */,
 			);
 			path = system;
-			sourceTree = "<group>";
-		};
-		3491A31523C57815008010C8 /* core */ = {
-			isa = PBXGroup;
-			children = (
-				3491A31323C57815008010C8 /* systemtypes.h */,
-				3491A31923C57815008010C8 /* systembridge.h */,
-				3491A31723C57815008010C8 /* systembehavior.h */,
-				3491A31A23C57815008010C8 /* systembehavior.c */,
-				3491A31823C57815008010C8 /* systemmanager.h */,
-				3491A31C23C57815008010C8 /* systemmanager.c */,
-			);
-			path = core;
-			sourceTree = "<group>";
-		};
-		3491A31F23C57815008010C8 /* sysiocontroller */ = {
-			isa = PBXGroup;
-			children = (
-				3491A32423C57815008010C8 /* sysiocontroller.h */,
-				3491A32123C57815008010C8 /* sysiocontroller.c */,
-				3491A32323C57815008010C8 /* timestamp.h */,
-				34959B1C24C1345200DF3357 /* timestamp.c */,
-			);
-			path = sysiocontroller;
-			sourceTree = "<group>";
-		};
-		3491A32523C57815008010C8 /* interfaces */ = {
-			isa = PBXGroup;
-			children = (
-				3491A32923C57815008010C8 /* communicationmanager.h */,
-				3491A32D23C57815008010C8 /* communicationmanager.c */,
-				3491A32623C57815008010C8 /* profilemanager.h */,
-				3491A32A23C57815008010C8 /* profilemanager.c */,
-				3491A32B23C57815008010C8 /* os_interface.h */,
-				3491A32823C57815008010C8 /* os_interface.c */,
-				3431DBF723E60F9A00392FD4 /* papi_interface.h */,
-				3431DBF823E60F9A00392FD4 /* papi_interface.c */,
-			);
-			path = interfaces;
 			sourceTree = "<group>";
 		};
 		3491A32E23C57815008010C8 /* debug */ = {
@@ -708,44 +708,44 @@
 				3491A38523C57877008010C8 /* kalman.c in Sources */,
 				3491A36823C57815008010C8 /* shtp.c in Sources */,
 				3491A38923C57877008010C8 /* vector.c in Sources */,
-				3491A36323C57815008010C8 /* os_interface.c in Sources */,
-				3491A36423C57815008010C8 /* profilemanager.c in Sources */,
 				3491A38B23C57877008010C8 /* quaternion.c in Sources */,
 				342C9FF524C9273D0063DC5A /* cpu_c.c in Sources */,
-				3491A36523C57815008010C8 /* communicationmanager.c in Sources */,
+				345DA2792513057700D8F453 /* osinterface.c in Sources */,
 				342CA05324C9273D0063DC5A /* os_mutex.c in Sources */,
+				345DA27B2513057700D8F453 /* profilemanager.c in Sources */,
 				342CA05F24C9273D0063DC5A /* os_app_hooks.c in Sources */,
 				3491A36723C57815008010C8 /* motionsensor.c in Sources */,
+				345DA27F2513057700D8F453 /* systemmanager.c in Sources */,
 				342CA05C24C9273D0063DC5A /* os_tmr.c in Sources */,
+				345DA27C2513057700D8F453 /* communicationmanager.c in Sources */,
 				342CA05724C9273D0063DC5A /* os_task.c in Sources */,
 				342CA05524C9273D0063DC5A /* os_time.c in Sources */,
-				3431DBF923E60F9A00392FD4 /* papi_interface.c in Sources */,
 				342C9FE624C9273D0063DC5A /* lib_math.c in Sources */,
+				345DA27D2513057700D8F453 /* sysiocontroller.c in Sources */,
 				342CA05E24C9273D0063DC5A /* os_stat.c in Sources */,
 				3491A38723C57877008010C8 /* kinetic.c in Sources */,
 				342CA05624C9273D0063DC5A /* os_core.c in Sources */,
 				3491A36A23C57815008010C8 /* batterymonitor.c in Sources */,
+				345DA2782513057700D8F453 /* timestamp.c in Sources */,
 				342CA05024C9273D0063DC5A /* os_var.c in Sources */,
 				347D9BFE24AE9362006C9FC4 /* DRV2605.c in Sources */,
-				34959B1D24C1345200DF3357 /* timestamp.c in Sources */,
 				34C44286249EDB710022D6DB /* application.c in Sources */,
 				342CA04E24C9273D0063DC5A /* __dbg_uCOS-III.c in Sources */,
 				3491A36223C57815008010C8 /* taumanager.c in Sources */,
-				3491A35E23C57815008010C8 /* systembehavior.c in Sources */,
 				342CA06624C9273D0063DC5A /* os_cpu_c.c in Sources */,
 				342CA05924C9273D0063DC5A /* os_prio.c in Sources */,
 				3491A38823C57877008010C8 /* matvec.c in Sources */,
 				342CA05124C9273D0063DC5A /* os_q.c in Sources */,
 				342CA05224C9273D0063DC5A /* os_cfg_app.c in Sources */,
 				342CA05D24C9273D0063DC5A /* os_mem.c in Sources */,
-				3491A36123C57815008010C8 /* sysiocontroller.c in Sources */,
 				3491A38A23C57877008010C8 /* point.c in Sources */,
 				3491A35D23C57815008010C8 /* main.c in Sources */,
 				342CA05B24C9273D0063DC5A /* os_flag.c in Sources */,
 				3491A36923C57815008010C8 /* BNO080.c in Sources */,
 				3491A36623C57815008010C8 /* rho_client.c in Sources */,
 				342C9FE524C9273D0063DC5A /* lib_ascii.c in Sources */,
-				3491A36023C57815008010C8 /* systemmanager.c in Sources */,
+				345DA27E2513057700D8F453 /* systembehavior.c in Sources */,
+				345DA27A2513057700D8F453 /* papiinterface.c in Sources */,
 				342C9FE324C9273D0063DC5A /* lib_mem.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -883,7 +883,10 @@
 					__XCODE__,
 					__MICRIUM__,
 				);
-				HEADER_SEARCH_PATHS = "app/rtos/**";
+				HEADER_SEARCH_PATHS = (
+					"app/rtos/**",
+					"app/system/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -892,7 +895,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				HEADER_SEARCH_PATHS = "app/rtos/**";
+				HEADER_SEARCH_PATHS = (
+					"app/rtos/**",
+					"app/system/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
