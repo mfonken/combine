@@ -11,12 +11,14 @@
 void Application_Init( void )
 {
     InitializeMeta();
+    SystemFunctions.Perform.EnableTask(TASK_ID_BLINK_GPIO_COMPONENT_A);
 }
 
 void Application_Start( void )
 {
     SystemFunctions.Perform.ExitState();
-    OS.DelayMs(1000);
+    OS.DelayMs(10000);
+
     SystemFunctions.Register.State( STATE_NAME_ACTIVE );
 //    SystemBehavior.Perform.ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
 }

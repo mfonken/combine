@@ -11,6 +11,7 @@
 
 #ifdef __EMLIB__
 //#define DCDC_SERVICE
+#define GPIO_SERVICE
 #define I2C_SERVICE
 #define USART_SERVICE
 #endif /* __EMLIB__ */
@@ -196,6 +197,11 @@ static void EMLIB_PAPIInterface_GPIO_Set( emlib_gpio_t gpio, emlib_gpio_state_t 
         default:
             break;
     }
+}
+
+static void EMLIB_PAPIInterface_GPIO_Toggle( emlib_gpio_t gpio )
+{
+	GPIO_PinOutToggle( gpio.port, gpio.pin );
 }
 
 static void EMLIB_PAPIInterface_GPIO_NSelect( emlib_gpio_t gpio, emlib_gpio_ncs_t nc_state )

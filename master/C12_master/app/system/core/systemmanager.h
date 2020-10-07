@@ -135,8 +135,8 @@ static system_functions SystemFunctions =
     .Perform.Routine            = SystemManager_PerformRoutine,
     .Perform.Subactivities      = SystemManager_PerformRoutineSubactivities,
     .Perform.Subactivity        = SystemManager_PerformSubactivity,
-    .Perform.EnableTask = SystemManager_PerformEnableTaskState,
-    .Perform.DisableTask = SystemManager_PerformDisableTaskState,
+    .Perform.EnableTask         = SystemManager_PerformEnableTaskState,
+    .Perform.DisableTask        = SystemManager_PerformDisableTaskState,
     .Perform.ExitState          = SystemManager_PerformExitState,
     .Perform.InjectCommHostIntoTaskData = SystemManager_InjectCommHostIntoTaskData,
 	.Perform.PopulateQueueData	= SystemManager_PopulateQueueDataOfQueue,
@@ -144,7 +144,7 @@ static system_functions SystemFunctions =
     .Perform.TaskComponentCheck = SystemManager_IsTaskAssignedToComponent,
     .Perform.CycleQueue         = SystemManager_PerformCycleQueue,
     .Perform.CycleQueues        = SystemManager_PerformCycleQueues,
-    
+
 //    .Register.TaskList          = SystemManager_RegisterTaskList,
 //    .Register.QueueList         = SystemManager_RegisterQueueList,
     .Register.TaskShelf         = SystemManager_RegisterTaskShelf,
@@ -159,13 +159,13 @@ static system_functions SystemFunctions =
     .Register.Error             = SystemManager_RegisterError,
     .Register.Consumption       = SystemManager_RegisterConsumption,
     .Register.MinImmediateHandlePriority = SystemManager_RegisterMinImmediateHandlePriority,
-    
+
     .Instate.TaskShelfEntry     = SystemManager_InstateTaskShelfEntry,
     .Instate.StateProfile       = SystemManager_InstateStateProfile,
-    
+
     .Terminate.TaskShelfEntry   = SystemManager_TerminateTaskShelfEntry,
     .Terminate.StateProfile     = SystemManager_TerminateStateProfile,
-    
+
     .Get.SubactivityMapEntry    = SystemManager_GetSubactivityMapEntryById,
     .Get.TaskShelfEntry         = SystemManager_GetTaskShelfEntryById,
     .Get.TaskById               = SystemManager_GetTaskById,

@@ -12,7 +12,6 @@
 #include "global_types.h"
 #include "C12_profile.h"
 
-#define SUB_VREG_MV 2200
 #define ACTIVE      (void*)(1)
 #define INACTIVE    (void*)(0)
 

@@ -22,9 +22,6 @@ app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techinca
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\global_log.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\global\master.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\C12_profile.h
-app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\debug\application_debug.h
-app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\port_master.h
-app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\emlib_interface.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_gpio.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\Device\SiliconLabs\EFR32BG13P\Include\em_device.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p632f512gm48.h
@@ -82,6 +79,9 @@ app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techinca
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_af_pins.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_bus.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_assert.h
+app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\application\debug\application_debug.h
+app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\port_master.h
+app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\emlib_interface.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_i2c.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_usart.h
 app/system/core/systemmanager.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\micrium_interface.h

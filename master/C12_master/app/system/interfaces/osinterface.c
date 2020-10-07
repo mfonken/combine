@@ -44,16 +44,16 @@ uint32_t OSInterface_Timestamp( void )
 void OSInterface_CreateTask( os_task_data_t * p_task_data )
 {
     if( p_task_data->ID == SYSTEM_ACTION_ID_NONE ) return;
-    LOG_OSI(OSI_DEBUG, "Creating OS Task: %s", SYSTEM_TASK_ID_STRINGS[(uint8_t)p_task_data->ID]);
+    LOG_OSI(OSI_DEBUG, "Creating OS Task: %s\n", SYSTEM_TASK_ID_STRINGS[(uint8_t)p_task_data->ID]);
     OS_SPECIFIC(OSInterface_CreateTask)( p_task_data );
     
     if( TaskHasValidTimer( p_task_data ) )
     {
         os_timer_data_t timer_data = TIMER_FROM_SCHEDULED_TASK( p_task_data );
-        LOG_OSI_BARE(OSI_DEBUG, " with schedule of %.2fHz", TICK_TO_HZ(timer_data.period));
+        LOG_OSI_BARE(OSI_DEBUG, " - with schedule of %.2fHz\n", TICK_TO_HZ(timer_data.period));
         OS_SPECIFIC(OSInterface_CreateTimer)( &timer_data );
     }
-    LOG_OSI_BARE(OSI_DEBUG, "\n");
+//    LOG_OSI_BARE(OSI_DEBUG, "\n");
 }
 
 void OSInterface_ResumeTask( os_task_data_t * p_task_data )

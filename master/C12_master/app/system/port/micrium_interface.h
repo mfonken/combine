@@ -40,15 +40,15 @@ typedef unsigned short  OS_MSG_QTY, OS_OPT, OS_MSG_SIZE;
 #else
 #define COMPLETE_TASK
 #endif
-#define DEFAULT_STACK_SIZE (100 / sizeof(CPU_STK))
+#define DEFAULT_STACK_SIZE OS_CFG_STK_SIZE_MIN
 #define DEFAULT_QUEUE_SIZE 1
 
 /// SPOOF END
 
-#define HZ_TO_TICK(X)   ( (OS_TICK)( (double)X * (double)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
-#define TICK_TO_HZ(X)   ( (double)X / (double)OS_CFG_TICK_RATE_HZ )                          /// <--- Double Check
-#define MS_TO_TICK(X)   ( (OS_TICK)( ( (double)X / 1000. ) * (double)OS_CFG_TICK_RATE_HZ ) ) /// <--- Double Check
-#define TICK_TO_MS(X)   ( (CPU_TS)( ( (double)X * 1000. ) / (double)OS_CFG_TICK_RATE_HZ ) )/// <--- Double Check
+#define HZ_TO_TICK(X)   ( (OS_TICK)( (float)X * (float)OS_CFG_TICK_RATE_HZ ) )             /// <--- Double Check
+#define TICK_TO_HZ(X)   ( (float)X / (float)OS_CFG_TICK_RATE_HZ )                          /// <--- Double Check
+#define MS_TO_TICK(X)   ( (OS_TICK)( ( (float)X / 1000. ) * (float)OS_CFG_TICK_RATE_HZ ) ) /// <--- Double Check
+#define TICK_TO_MS(X)   ( (CPU_TS)( ( (float)X * 1000. ) / (float)OS_CFG_TICK_RATE_HZ ) )/// <--- Double Check
 
 typedef struct
 {
@@ -199,7 +199,7 @@ static inline void MICRIUM_OSInterface_Start( void )
     
     /* Start the kernel.                                    */
     OSStart(&err);
-    
+
     /* Check error code.                                    */
     ASSERT(err == OS_ERR_NONE);
 }
@@ -239,7 +239,9 @@ static inline void MICRIUM_OSInterface_CreateTask( micrium_os_task_data_t * task
                  task_data->p_ext,
                  task_data->opt,
                  task_data->p_err);
-    task_data->p_task(task_data->p_arg);
+
+    ASSERT(task_data->p_err == OS_ERR_NONE);
+//    task_data->p_task(task_data->p_arg);
 }
 
 static inline void MICRIUM_OSInterface_ResumeTask( micrium_os_task_data_t * task_data )

@@ -28,8 +28,16 @@ S79_UPPER_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 app/application \
+app/application/tau/kinetic/filters \
+app/application/tau/kinetic \
+app/application/tau/kinetic/qmath \
+app/application/tau \
 app/bluetooth/common/util \
 app \
+app/peripherals/drivers/hapticcontroller \
+app/peripherals/sensors/batterymonitor \
+app/peripherals/sensors/motionsensor \
+app/peripherals/sensors/rhoclient \
 app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR \
 app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M \
 app/rtos/uC-CPU \

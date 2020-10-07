@@ -50,7 +50,7 @@
 #endif
 
 #ifdef PAPI_DEBUG
-#define LOG_PAPI(L,...)          LOG(L,"<PAP> " __VA_ARGS__)
+#define LOG_PAPI(L,...)          LOG(L,"<Periph> " __VA_ARGS__)
 #define LOG_PAPI_BARE(L,...)     LOG_BARE(L, __VA_ARGS__)
 #else
 #define LOG_PAPI(...)
@@ -58,7 +58,7 @@
 #endif
 
 #ifdef OSI_DEBUG
-#define LOG_OSI(L,...)          LOG(L,"<OSI> " __VA_ARGS__)
+#define LOG_OSI(L,...)          LOG(L,"<OS>     " __VA_ARGS__)
 #define LOG_OSI_BARE(L,...)     LOG_BARE(L, __VA_ARGS__)
 #else
 #define LOG_OSI(...)
@@ -72,8 +72,8 @@
 #endif
 
 #ifdef COMM_DEBUG
-#define LOG_COMM(L,...)       LOG(L,"<COMM> " __VA_ARGS__)
-#define LOG_COMM_BARE(L,...)     LOG_BARE(L, __VA_ARGS__)
+#define LOG_COMM(L,...)       	LOG(L,"<COMM>   " __VA_ARGS__)
+#define LOG_COMM_BARE(L,...)    LOG_BARE(L, __VA_ARGS__)
 #else
 #define LOG_COMM(...)
 #define LOG_COMM_BARE(L,...)

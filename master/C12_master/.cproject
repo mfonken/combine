@@ -176,6 +176,7 @@
 									<listOptionValue builtIn="false" value="NULL=0"/>
 									<listOptionValue builtIn="false" value="__EMLIB__"/>
 									<listOptionValue builtIn="false" value="__GECKO__=1"/>
+									<listOptionValue builtIn="false" value="RETARGET_VCOM"/>
 								</option>
 								<inputType id="iar.arm.toolchain.compiler.inputType.c.v6.12.0.81332682" name="IAR C/C++ Compiler Input Type" superClass="iar.arm.toolchain.compiler.inputType.c.v6.12.0"/>
 							</tool>

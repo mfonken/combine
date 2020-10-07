@@ -40,7 +40,6 @@ static application_t App;
 static system_profile_t Profile;
 
 void InitializeMeta(void);
-//
 
 void Application_Init( void );
 void Application_Start( void );

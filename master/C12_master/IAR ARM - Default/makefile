@@ -30,7 +30,15 @@ RM := rm -rf
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR/subdir.mk
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/subdir.mk
 -include app/rtos/uC-CPU/subdir.mk
+-include app/peripherals/sensors/rhoclient/subdir.mk
+-include app/peripherals/sensors/motionsensor/subdir.mk
+-include app/peripherals/sensors/batterymonitor/subdir.mk
+-include app/peripherals/drivers/hapticcontroller/subdir.mk
 -include app/bluetooth/common/util/subdir.mk
+-include app/application/tau/kinetic/qmath/subdir.mk
+-include app/application/tau/kinetic/filters/subdir.mk
+-include app/application/tau/kinetic/subdir.mk
+-include app/application/tau/subdir.mk
 -include app/application/subdir.mk
 -include app/subdir.mk
 -include subdir.mk

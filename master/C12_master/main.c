@@ -107,6 +107,7 @@ int main(void)
   /* Initialize application */
   initApp();
   initVcomEnable();
+  printd("Starting\n");
   /* Start application */
   appMain(&config);
 }
