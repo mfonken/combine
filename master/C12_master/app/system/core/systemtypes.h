@@ -121,6 +121,7 @@ typedef OS_SPECIFIC(OS_QUEUE_DATA_T) os_queue_data_t;
 typedef OS_SPECIFIC(OS_TIMER_DATA_T) os_timer_data_t;
 
 typedef PAPI_SPECIFIC(GPIO_T) gpio_t;
+typedef PAPI_SPECIFIC(GPIO_HOST_T) gpio_host_t;
 
 typedef PAPI_SPECIFIC(I2C_EVENT_T) i2c_event_t;
 typedef PAPI_SPECIFIC(I2C_HOST_T) i2c_host_t;
@@ -175,6 +176,7 @@ typedef union
 {
     i2c_host_t i2c_host;
     spi_host_t spi_host;
+    gpio_host_t gpio_host;
     generic_comm_host_t generic_comm_host;
 } comm_host_t;
 typedef comm_host_t * p_comm_host_t;

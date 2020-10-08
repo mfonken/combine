@@ -99,7 +99,7 @@ void SYSIOCTL_EnableComponent( component_t * p_component )
     if( p_component->state == COMPONENT_STATE_ON
        || p_component->state == COMPONENT_STATE_ENABLING ) return;
     LOG_IO_CTL(IO_CTL_DEBUG, "Enabling component: 0x%02x\n", p_component->ID);
-    PAPI.IO.Set( (gpio_t){ p_component->pin, (GPIO_Port_TypeDef)p_component->port } );
+//    PAPI.IO.Set( (gpio_t){ p_component->pin, (GPIO_Port_TypeDef)p_component->port } );
     p_component->state = COMPONENT_STATE_ENABLING;
 }
 
@@ -108,7 +108,7 @@ void SYSIOCTL_DisableComponent( component_t * p_component )
     if( p_component->state == COMPONENT_STATE_OFF
        || p_component->state == COMPONENT_STATE_DISABLING ) return;
     LOG_IO_CTL(IO_CTL_DEBUG, "Disabling component: 0x%02x\n", p_component->ID);
-    PAPI.IO.Clear( (gpio_t){ p_component->pin, (GPIO_Port_TypeDef)p_component->port } );
+//    PAPI.IO.Clear( (gpio_t){ p_component->pin, (GPIO_Port_TypeDef)p_component->port } );
     p_component->state = COMPONENT_STATE_DISABLING;
 }
 

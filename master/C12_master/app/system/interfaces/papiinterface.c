@@ -25,22 +25,22 @@ void PAPIInterface_GPIO_Set( gpio_t gpio ) {}
 void PAPIInterface_GPIO_Clear( gpio_t gpio ) {}
 void PAPIInterface_GPIO_Toggle( gpio_t gpio ) {}
 #else
-void PAPIInterface_GPIO_Set( gpio_t gpio )
+void PAPIInterface_GPIO_Set( gpio_host_t * gpio_host )
 {
-    LOG_PAPI(PAPI_DEBUG, "Set GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
-    PAPI_SPECIFIC(PAPIInterface_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_HIGH));
+    LOG_PAPI(PAPI_DEBUG, "Set GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio_host->gpio.port], gpio_host->gpio.pin);
+    PAPI_SPECIFIC(PAPIInterface_GPIO_Set)(gpio_host->gpio, PAPI_SPECIFIC(GPIO_STATE_HIGH));
 }
 
-void PAPIInterface_GPIO_Clear( gpio_t gpio )
+void PAPIInterface_GPIO_Clear( gpio_host_t * gpio_host )
 {
-    LOG_PAPI(PAPI_DEBUG, "Clearing GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
-    PAPI_SPECIFIC(PAPIInterface_GPIO_Set)(gpio, PAPI_SPECIFIC(GPIO_STATE_LOW));
+    LOG_PAPI(PAPI_DEBUG, "Clearing GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio_host->gpio.port], gpio_host->gpio.pin);
+    PAPI_SPECIFIC(PAPIInterface_GPIO_Set)(gpio_host->gpio, PAPI_SPECIFIC(GPIO_STATE_LOW));
 }
 
-void PAPIInterface_GPIO_Toggle( gpio_t gpio )
+void PAPIInterface_GPIO_Toggle( gpio_host_t * gpio_host )
 {
-    LOG_PAPI(PAPI_DEBUG, "Toggling GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio.port], gpio.pin);
-    PAPI_SPECIFIC(PAPIInterface_GPIO_Toggle)(gpio);
+    LOG_PAPI(PAPI_DEBUG, "Toggling GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio_host->gpio.port], gpio_host->gpio.pin);
+    PAPI_SPECIFIC(PAPIInterface_GPIO_Toggle)(gpio_host->gpio);
 }
 #endif /* GPIO_SERVICE */
 

@@ -129,6 +129,18 @@ uint8_t
 	} data;
 } emlib_spi_event_t, EMLIB_SPI_EVENT_T;
 
+typedef struct
+{
+uint8_t
+    protocol;
+emlib_gpio_t
+    gpio;
+void *
+    device;
+void *
+    buffer;
+} emlib_gpio_host_t, EMLIB_GPIO_HOST_T;
+
 #ifndef __EMLIB__
 typedef bool emlib_i2c_transfer_return_t;
 typedef bool EMLIB_I2C_TRANSFER_RETURN_T;

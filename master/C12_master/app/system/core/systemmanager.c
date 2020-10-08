@@ -54,7 +54,7 @@ void SystemManager_PerformSubactivity( system_subactivity_id_t subactivity )
             if( (uint32_t)p_entry->data < ( 1 << 7 ) )
                 temp_byte = *(uint8_t*)&p_entry->data;
             p_entry->data = &temp_byte;
-            SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_entry->data, p_entry->component_id[0] );
+            SystemFunctions.Perform.InjectCommHostIntoTaskData( &p_entry->data, p_entry->component_id[0] - 1 );
         }
         p_entry->function( p_entry->data );
     }
@@ -136,7 +136,7 @@ void SystemManager_PopulateTaskDataOfTask( system_task_t * p_task )
     p_task->os_task_data.ID = p_task->ID;
     p_task->os_task_data.p_name = (char *)SYSTEM_TASK_ID_STRINGS[ p_task->ID ];
     p_task->os_task_data.p_task = (OS_TASK_PTR)p_task->function;
-    p_task->os_task_data.p_arg = p_task->object;
+    p_task->os_task_data.p_arg = *(void**)&p_task->data;
     p_task->os_task_data.prio = p_task->PRIORITY;
     p_task->os_task_data.p_err = p_task->error;
     
@@ -184,13 +184,14 @@ void SystemManager_RegisterTask( system_task_id_t task_id, bool scheduled )
     System.registration.tasks[task_id] = true;
     
     system_task_t * p_task = SystemFunctions.Get.TaskById( task_id );
+//    comm_host_t c = SystemFunctions.Get.CommHostForComponentById( p_task->component_id[0] );
     if( p_task == NULL ) return;
 
-    if( p_task->function != NULL )
-        SystemFunctions.Perform.InjectCommHostIntoTaskData( (void_p_function_data_t*)p_task->function, p_task->component_id[0]);
-    
+    if( p_task->function != NULL ) /// TODO: Fix for multiple components
+        SystemFunctions.Perform.InjectCommHostIntoTaskData( (void_p_function_data_t*)&p_task->data, p_task->component_id[0]);
+
     SystemFunctions.Perform.PopulateTaskData( p_task );
-    
+
     // Create OS utilities with task_data
     if( scheduled && p_task->ACTION == TASK_ACTION_SCHEDULE)
     {
@@ -219,7 +220,8 @@ int8_t SystemManager_GetSystemComponentNumber( component_id_t component_id )
     FOR( uint8_t, i, System.profile->component_list.num_entries )
     {
         component_t * p_check = &System.profile->component_list.entries[i];
-        if( p_check->ID == component_id ) return i;
+        if( p_check->ID == component_id )
+        	return i;
     }
     return -1;
 }
@@ -483,10 +485,14 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
 #ifdef CHANNEL_SPI
         case COMPONENT_PROTOCOL_SPI:
             comm_host.spi_host.gpio.pin = p_component->pin;
-            comm_host.spi_host.gpio.port = (GPIO_Port_TypeDef)p_component->port;
+            comm_host.spi_host.gpio.port = (GPIO_Port_TypeDef)(p_component->port - 1);
             comm_host.spi_host.device = SPI_Channels[p_component->route - 1];
             break;
 #endif
+        case COMPONENT_PROTOCOL_GPIO:
+			comm_host.gpio_host.gpio.pin = p_component->pin;
+			comm_host.gpio_host.gpio.port = (GPIO_Port_TypeDef)(p_component->port - 1);
+			break;
         default:
             break;
     }

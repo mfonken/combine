@@ -13,9 +13,9 @@
 
 void PAPIInterface_DCDC_Init( uint16_t );
 
-void PAPIInterface_GPIO_Set( gpio_t );
-void PAPIInterface_GPIO_Clear( gpio_t );
-void PAPIInterface_GPIO_Toggle( gpio_t );
+void PAPIInterface_GPIO_Set( gpio_host_t * );
+void PAPIInterface_GPIO_Clear( gpio_host_t * );
+void PAPIInterface_GPIO_Toggle( gpio_host_t * );
 
 bool PAPIInterface_I2C_Init( i2c_event_t * );
 void PAPIInterface_I2C_Enable( i2c_event_t * );
@@ -38,9 +38,9 @@ typedef struct
 
 typedef struct
 {
-    void (*Set)( gpio_t );
-    void (*Clear)( gpio_t );
-    void (*Toggle)( gpio_t );
+    void (*Set)( gpio_host_t * );
+    void (*Clear)( gpio_host_t * );
+    void (*Toggle)( gpio_host_t * );
 } system_papi_interface_gpio_functions;
 
 typedef struct
