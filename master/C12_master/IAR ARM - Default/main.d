@@ -112,6 +112,7 @@ main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_mast
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_i2c.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_usart.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\micrium_interface.h
+main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_app_hooks.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_cfg.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_cfg_app.h
@@ -125,3 +126,5 @@ main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_mast
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os_type.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h
 main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os_trace.h
+main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB\lib_mem.h
+main.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB\Cfg\Template\lib_cfg.h

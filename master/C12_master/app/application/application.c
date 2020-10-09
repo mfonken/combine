@@ -11,22 +11,26 @@
 void Application_Init( void )
 {
     InitializeMeta();
-//    SystemFunctions.Perform.EnableTask(TASK_ID_BLINK_GPIO_COMPONENT_A);
+    SystemFunctions.Perform.EnableTask(TASK_ID_MONITOR);
 }
 
 void Application_Start( void )
 {
-    SystemFunctions.Perform.ExitState();
-    OS.DelayMs(1000000);
-
-    SystemFunctions.Register.State( STATE_NAME_ACTIVE );
+	Application_Tick();
+//    SystemFunctions.Perform.ExitState();
+//
+//    SystemFunctions.Register.State( STATE_NAME_ACTIVE );
 //    SystemBehavior.Perform.ComponentInterrupt( BNO080_PORT, BNO080_PIN, HW_EDGE_FALLING );
 }
 
 void Application_Tick( void )
 {
-    
-COMPLETE_TASK }
+	while(1)
+	{
+		LOG_SYSTEM(SYSTEM_DEBUG, "Tick.\n");
+		OS.DelayMs(10000);
+	}
+}
 
 
 /* [Meta] */

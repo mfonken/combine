@@ -89,7 +89,6 @@ var all_options =
         "NONE"
       ],
       "PORT": [
-        "PORT0",
         "PORTA",
         "PORTB",
         "PORTC",
@@ -178,6 +177,7 @@ var all_options =
       "options": "struct:~",
       "ID": [
         "NONE",
+        "MONITOR",
         "BLINK_GPIO_COMPONENT_A",
         "POLL_COMPONENT_A_GPIO",
         {
@@ -229,6 +229,7 @@ var all_options =
       "options": "struct:~",
       "ID": [
         "NONE",
+        "SYS",
         "GPIO_ONLY",
         "ALL",
         {
@@ -318,7 +319,7 @@ var all_options =
         "Init",
         "InitComponent"
       ],
-      "AppFunctions": [
+      "Application": [
         "Init",
         "Start",
         "Tick"

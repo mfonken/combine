@@ -12,7 +12,10 @@
 #include "global_types.h"
 
 #ifdef __MICRIUM__
+#include  "os_app_hooks.h"
 #include <os.h>
+#include <cpu.h>
+#include  <lib_mem.h>
 #ifdef __GECKO__
 #include "bg_types.h"
 #include "native_gecko.h"
@@ -149,7 +152,7 @@ TASK_ADV( ID_, PTR_, ARGS_, PRIORITY_, DEFAULT_STACK_SIZE, 0u, 0u, 0u, DEFAULT_T
     p_task_data->p_name, \
     0, \
     p_task_data->period, \
-    p_task_data->opt, \
+	OS_OPT_TMR_PERIODIC, \
     TimerArgumentIntermediary, \
     p_task_data->p_arg, \
     p_task_data->p_err, \
@@ -185,12 +188,18 @@ static bool MICRIUM_OSInterface_StopTimer( micrium_os_timer_data_t * timer_data 
 static inline void MICRIUM_OSInterface_Init( void )
 {
     OS_ERR  err;
+
+    Mem_Init();                                                 /* Initialize Memory Managment Module
+	CPU_IntDis();                                               /* Disable all Interrupts                               */
+	CPU_Init();
     
     /* Initialize the Kernel.                               */
     OSInit(&err);
-    
+
     /*   Check error code.                                  */
     ASSERT(err == OS_ERR_NONE);
+
+    App_OS_SetAllHooks();
 }
 
 static inline void MICRIUM_OSInterface_Start( void )
@@ -208,7 +217,19 @@ static inline void MICRIUM_OSInterface_DelayMs( uint32_t ms )
 {
 	OS_ERR  err;
 
-    OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
+//	uint16_t H, M, s;
+//	s = ms / 1000;
+//	M = s / 60;
+//	H = M / 60;
+//	printd("%d %d %d %d", H % 100, M % 60, s % 60, ms % 1000);
+	OSTimeDlyHMSM(0,0,0,ms, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+//			H % 100,
+//			M % 60,
+//			s % 60,
+//			ms % 1000,
+//			OS_OPT_TIME_DLY,
+//			&err);
+//    OSTimeDly(MS_TO_TICK(ms), OS_OPT_TIME_DLY, &err);
 
     ASSERT(err == OS_ERR_NONE);
 }
@@ -320,6 +341,7 @@ static inline void MICRIUM_OSInterface_CreateTimer( micrium_os_timer_data_t * ti
                 timer_data->p_callback,
                 timer_data->p_callback_arg,
                 timer_data->p_err);
+    ASSERT(timer_data->p_err == OS_ERR_NONE);
 }
 
 static inline bool MICRIUM_OSInterface_DeleteTimer( micrium_os_timer_data_t * timer_data )

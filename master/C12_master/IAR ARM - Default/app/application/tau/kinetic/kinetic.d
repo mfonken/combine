@@ -94,6 +94,7 @@ app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Te
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_i2c.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\platform\emlib\inc\em_usart.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\system\port\micrium_interface.h
+app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_app_hooks.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_cfg.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Cfg\Template\os_cfg_app.h
@@ -107,6 +108,8 @@ app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Te
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os_type.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Ports\ARM-Cortex-M\ARMv7-M\IAR\os_cpu.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-OS3\Source\os_trace.h
+app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB\lib_mem.h
+app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\app\rtos\uC-LIB\Cfg\Template\lib_cfg.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\protocol\bluetooth\ble_stack\inc\common\bg_types.h
 app/application/tau/kinetic/kinetic.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stddef.h
 app/application/tau/kinetic/kinetic.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C12_master\protocol\bluetooth\ble_stack\inc\soc\native_gecko.h

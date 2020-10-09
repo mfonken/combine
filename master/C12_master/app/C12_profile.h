@@ -1,8 +1,8 @@
 // ********************** DO NOT EDIT - AUTO-GENERATED ********************** //
 // C12_profile.h
 
-// Created by Combine Profile Generator v0.1 on 9/10/2020
-// Copyright Â© Marbl. All rights reserved.
+// Created by Combine Profile Generator v0.1 on 10/8/2020
+// Copyright © Marbl. All rights reserved.
 
 #ifndef C12_profile_h
 #define C12_profile_h
@@ -57,8 +57,7 @@ typedef enum
 
 typedef enum
 {
-	COMPONENT_PORT_0 = 0,
-	COMPONENT_PORT_A,
+	COMPONENT_PORT_A = 0,
 	COMPONENT_PORT_B,
 	COMPONENT_PORT_C,
 	COMPONENT_PORT_D,
@@ -139,7 +138,6 @@ static const char * COMPONENT_ADDR_STRINGS[] =
 #ifdef DEBUG
 static const char * COMPONENT_PORT_STRINGS[] =
 {
-//	"COMPONENT_PORT_0",
 	"COMPONENT_PORT_A",
 	"COMPONENT_PORT_B",
 	"COMPONENT_PORT_C",
@@ -216,6 +214,7 @@ static const char * QUEUE_ID_STRINGS[] =
 typedef enum
 {
 	TASK_ID_NONE = 0,
+	TASK_ID_MONITOR,
 	TASK_ID_BLINK_GPIO_COMPONENT_A,
 	TASK_ID_POLL_COMPONENT_A_GPIO,
 	NUM_TASK_ID
@@ -248,6 +247,7 @@ typedef enum
 static const char * TASK_ID_STRINGS[] =
 {
 	"TASK_ID_NONE",
+	"TASK_ID_MONITOR",
 	"TASK_ID_BLINK_GPIO_COMPONENT_A",
 	"TASK_ID_POLL_COMPONENT_A_GPIO"
 };
@@ -281,6 +281,7 @@ static const char * TASK_PRIORITY_STRINGS[] =
 typedef enum
 {
 	TASK_SHELF_ID_NONE = 0,
+	TASK_SHELF_ID_SYS,
 	TASK_SHELF_ID_GPIO_ONLY,
 	TASK_SHELF_ID_ALL,
 	NUM_TASK_SHELF_ID
@@ -291,6 +292,7 @@ typedef enum
 static const char * TASK_SHELF_ID_STRINGS[] =
 {
 	"TASK_SHELF_ID_NONE",
+	"TASK_SHELF_ID_SYS",
 	"TASK_SHELF_ID_GPIO_ONLY",
 	"TASK_SHELF_ID_ALL"
 };
@@ -402,6 +404,18 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 }
 
 /* Tasks */
+#define TASK_MONITOR { \
+	.ID = TASK_ID_MONITOR, \
+	.component_id = { COMPONENT_ID_NONE }, \
+	.num_component_id = 1, \
+	.data = NONE, \
+	.ACTION = TASK_ACTION_NONE, \
+	.function = Application_Start, \
+	.object = &App.buffers.config, \
+	.PRIORITY = TASK_PRIORITY_EXECUTIVE, \
+	.error = &System.error.system \
+}
+
 #define TASK_BLINK_GPIO_COMPONENT_A { \
 	.ID = TASK_ID_BLINK_GPIO_COMPONENT_A, \
 	.component_id = { COMPONENT_ID_COMPONENT_A_GPIO }, \
@@ -415,6 +429,14 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 }
 
 /* Task Shelf */
+#define TASK_SHELF_SYS { \
+	.ID = TASK_SHELF_ID_SYS, \
+	.interrupts = NONE, \
+	.num_interrupts = NONE, \
+	.scheduled = { TASK_ID_MONITOR }, \
+	.num_scheduled = 1 \
+}
+
 #define TASK_SHELF_GPIO_ONLY { \
 	.ID = TASK_SHELF_ID_GPIO_ONLY, \
 	.interrupts = { TASK_ID_NONE }, \
@@ -447,14 +469,16 @@ static const char * STATE_ACTIVITY_STRINGS[] =
 		} \
 	},  \
 	{ /* TASK */ \
-		1, \
+		2, \
 		{ \
+			TASK_MONITOR, \
 			TASK_BLINK_GPIO_COMPONENT_A \
 		} \
 	},  \
 	{ /* TASK_SHELF */ \
-		1, \
+		2, \
 		{ \
+			TASK_SHELF_SYS, \
 			TASK_SHELF_GPIO_ONLY \
 		} \
 	},  \

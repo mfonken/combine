@@ -18,7 +18,7 @@ static void Start(void)
     AppFunctions.Init();
 
     OS.Start();
-    AppFunctions.Start();
+	while(1);
 }
 
 typedef struct
