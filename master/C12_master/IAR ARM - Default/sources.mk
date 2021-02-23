@@ -41,6 +41,7 @@ app/peripherals/sensors/rhoclient \
 app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR \
 app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M \
 app/rtos/uC-CPU \
+app/rtos/uC-LIB/Ports/ARM-Cortex-M4/IAR \
 app/rtos/uC-LIB \
 app/rtos/uC-OS3/Cfg/Template \
 app/rtos/uC-OS3/Ports/ARM-Cortex-M/ARMv7-M/IAR \

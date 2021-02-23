@@ -25,7 +25,6 @@
 /* Camera Config */
 //#define RHO_WIDTH               1280
 //#define RHO_HEIGHT              800
-
 #define CAPTURE_WIDTH           CAMERA_WIDTH_F
 #define CAPTURE_HEIGHT          CAMERA_HEIGHT_F
 #endif

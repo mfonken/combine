@@ -92,8 +92,8 @@ void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t *
   Master.IOs.UART_Primary = usart;
 
 #warning "TODO: Figure out better capure DMA initializer"
-  STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
-
+  STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, (uint16_t)CAPTURE_BUFFER_SIZE, true );
+HAL_GPIO_WritePin(GPIOB, LED_Pin|DEBUG_Pin, GPIO_PIN_SET);
   MasterFunctions.Init();
 }
 

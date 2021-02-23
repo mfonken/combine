@@ -11,7 +11,7 @@
 void Application_Init( void )
 {
     InitializeMeta();
-    SystemFunctions.Perform.EnableTask(TASK_ID_MONITOR);
+    SystemFunctions.Perform.EnableTask(TASK_ID_BLINK_GPIO_COMPONENT_A);//TASK_ID_MONITOR);//
 }
 
 void Application_Start( void )
@@ -25,10 +25,13 @@ void Application_Start( void )
 
 void Application_Tick( void )
 {
+	OS_ERR  err;
 	while(1)
 	{
 		LOG_SYSTEM(SYSTEM_DEBUG, "Tick.\n");
-		OS.DelayMs(10000);
+		OSTimeDlyHMSM(0,0,10,0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+	    ASSERT(err == OS_ERR_NONE);
+//		OS.DelayMs(10000);
 	}
 }
 

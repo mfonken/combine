@@ -15,8 +15,8 @@
 /************************************************************************
  *                             Settings                                 *
  ***********************************************************************/
-#define OV9712_1280x800_CONFIG
-#define USE_RGGB_G_SKIP
+//#define OV9712_1280x800_CONFIG
+//#define USE_RGGB_G_SKIP
 
 /************************************************************************
  *                      Application Configuration                       *
@@ -43,7 +43,7 @@
 #define DEFAULT_PERCENT_ACTIVE      PERCENT_ACTIVE_APPLICATION
 #define DEFAULT_FRAME_RATE          DEFAULT_FRAME_APPLICATION
 
-#define MAX_FRAME_RATE              30
+#define MAX_FRAME_RATE              15
 #define MAX_PCLK_RATE               42000000
 #define BASE_FRAME_SCALE            ( (double)MAX_PCLK_RATE / (double)MAX_FRAME_RATE )
 #define PCLK(X)                     ( (double)X * BASE_FRAME_SCALE )

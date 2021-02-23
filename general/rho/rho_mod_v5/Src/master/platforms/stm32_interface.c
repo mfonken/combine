@@ -18,6 +18,7 @@ master_t Master;
 /************************************************************************
  *                           Interrupt Handlers                         *
  ***********************************************************************/
+//static int hrefs = 0;
 inline void STM_InterruptHandler( uint16_t GPIO_Pin )
 {
     /* Applicaiton Specific */
@@ -27,9 +28,15 @@ inline void STM_InterruptHandler( uint16_t GPIO_Pin )
   {
     case VSYNC_Pin:
         Platform.CameraFlags.Frame = !(flag_t)( VSYNC_GPIO_Port->IDR & VSYNC_Pin );
+//        if(!Platform.CameraFlags.Frame)
+//          Platform.CameraFlags.IRQ = false;
+//        else
+//          hrefs = 0;
         break;
     case HREF_Pin:
         Platform.CameraFlags.Row = (flag_t)( HREF_GPIO_Port->IDR & HREF_Pin );
+//        if(Platform.CameraFlags.Frame && Platform.CameraFlags.Row)
+//          HAL_GPIO_WritePin(GPIOB, LED_Pin|DEBUG_Pin, GPIO_PIN_SET);
         /* Row capture is callback connected on HREF=HIGH */
         if( !Platform.CameraFlags.Row
          && Platform.CameraFlags.Capture.Flag

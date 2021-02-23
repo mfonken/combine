@@ -50,7 +50,7 @@ static index_t _thresh_buffer_internal[THRESH_BUFFER_SIZE];
  ***********************************************************************/
 typedef struct
 {
-  uint32_t
+uint32_t
   CameraPort,                     /* Parallel port register to camera */
   HostTxPort;                     /* Output channel to host */
 

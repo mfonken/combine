@@ -26,6 +26,7 @@ RM := rm -rf
 -include app/rtos/uC-OS3/Ports/ARM-Cortex-M/ARMv7-M/IAR/subdir.mk
 -include app/rtos/uC-OS3/Ports/ARM-Cortex-M/ARMv7-M/subdir.mk
 -include app/rtos/uC-OS3/Cfg/Template/subdir.mk
+-include app/rtos/uC-LIB/Ports/ARM-Cortex-M4/IAR/subdir.mk
 -include app/rtos/uC-LIB/subdir.mk
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/IAR/subdir.mk
 -include app/rtos/uC-CPU/ARM-Cortex-M/ARMv7-M/subdir.mk

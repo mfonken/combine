@@ -92,6 +92,8 @@ void Error_Handler(void);
 #define PCLK_GPIO_Port GPIOB
 #define LED_Pin GPIO_PIN_4
 #define LED_GPIO_Port GPIOB
+#define DEBUG_Pin GPIO_PIN_5
+#define DEBUG_GPIO_Port GPIOB
 #define UTX_Pin GPIO_PIN_6
 #define UTX_GPIO_Port GPIOB
 #define URX_Pin GPIO_PIN_7

@@ -100,6 +100,7 @@ void CaptureAndProcessFrame( void )
     /* Manually start First Row Capture */
     while(!RhoSystem.Variables.Flags->Frame);
     EnableCaptureCallback();
+    while(1) {}
 
     uint32_t TopLeft = 0, TopRight = 0, BtmLeft = 0, BtmRight = 0;
     ProcessFrameSectionControl( RhoSystem.Variables.Utility.Cy, &TopLeft, &TopRight );
@@ -130,10 +131,16 @@ void CaptureRowCallback( void )
 #else
     RhoSystem.Variables.Utility.Thresh = 0xef;
     RhoSystem.Variables.Utility.Subsample = 0x01;
-   RhoSystem.Variables.Addresses.CaptureEnd = RhoSystem.Functions.Platform.DMA.GetFillAddr();
+    RhoSystem.Variables.Addresses.CaptureEnd = RhoSystem.Functions.Platform.DMA.GetFillAddr();
 #endif
-
-    RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
+    HAL_GPIO_WritePin(GPIOB, LED_Pin|DEBUG_Pin, GPIO_PIN_RESET);
+    uint32_t l = (uint32_t)RhoSystem.Variables.Addresses.CaptureEnd - (uint32_t)RhoSystem.Variables.Buffers.Capture;
+    char l_str[15];
+    uint32_t L = CAPTURE_BUFFER_SIZE;
+    L++;
+    sprintf(l_str, "%d | %d\r\n", l, L);
+    print(l_str);
+     RhoSystem.Variables.Addresses.CaptureIndex = (address_t)((uint32_t)RhoSystem.Variables.Buffers.Capture + (uint32_t)RhoSystem.Variables.Flags->EvenRowToggle);
 
     RhoSystem.Variables.Addresses.ThreshIndex = CaptureRow(
         (uint8_t *)RhoSystem.Variables.Addresses.CaptureIndex,
@@ -201,7 +208,7 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
         "r"(capture_end),       // %3
         "r"(thresh_value),      // %4
         "r"(capture_buffer),    // %5
-        "r"(thresh_address),    // %6
+        "r"(thresh_address)     // %6
     );
 #endif
     return (address_t)thresh_address;
@@ -367,8 +374,8 @@ void InitializeRhoSystem( uint32_t CameraPort, uint32_t HostTxPort )
     RhoSystem.Variables.Addresses.CameraPort  = CameraPort;
     RhoSystem.Variables.Addresses.HostTxPort  = HostTxPort;
 
-#warning "TODO: Figure out better capure DMA initializer - should go here"
-    //RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
+//#warning "TODO: Figure out better capure DMA initializer - should go here"
+//    RhoSystem.Functions.Platform.DMA.Init( RhoSystem.Variables.Addresses.CameraPort, (uint32_t)RhoSystem.Variables.Buffers.Capture, CAPTURE_BUFFER_SIZE, true );
 
     /* Connect capture and processing buffers */
     RhoSystem.Variables.Addresses.CaptureEnd  = (address_t)RhoSystem.Variables.Buffers.Capture;

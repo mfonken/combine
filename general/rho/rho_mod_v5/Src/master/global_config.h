@@ -49,6 +49,4 @@
 #define USB_Handle_t    PCD_HandleTypeDef
 #endif /* __STM32__ */
 
-
-
 #endif /* global_config_h */

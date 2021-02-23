@@ -40,7 +40,16 @@ void PAPIInterface_GPIO_Clear( gpio_host_t * gpio_host )
 void PAPIInterface_GPIO_Toggle( gpio_host_t * gpio_host )
 {
     LOG_PAPI(PAPI_DEBUG, "Toggling GPIO: %s%d\n", COMPONENT_PORT_STRINGS[gpio_host->gpio.port], gpio_host->gpio.pin);
-    PAPI_SPECIFIC(PAPIInterface_GPIO_Toggle)(gpio_host->gpio);
+
+
+	OS_ERR  err;
+	while(1)
+	{
+	    PAPI_SPECIFIC(PAPIInterface_GPIO_Toggle)(gpio_host->gpio);
+		OSTimeDlyHMSM(0,0,10,0, OS_OPT_TIME_HMSM_NON_STRICT, &err);
+	    ASSERT(err == OS_ERR_NONE);
+	}
+//    PAPI_SPECIFIC(PAPIInterface_GPIO_Toggle)(gpio_host->gpio);
 }
 #endif /* GPIO_SERVICE */
 

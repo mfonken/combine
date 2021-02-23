@@ -189,10 +189,21 @@ static inline void MICRIUM_OSInterface_Init( void )
 {
     OS_ERR  err;
 
-    Mem_Init();                                                 /* Initialize Memory Managment Module
+    Mem_Init();                                                 /* Initialize Memory Managment Module					*/
 	CPU_IntDis();                                               /* Disable all Interrupts                               */
 	CPU_Init();
-    
+#if (OS_CFG_DYN_TICK_EN != DEF_ENABLED)
+    CPU_INT32U  cpu_freq = BSP_CLK_HFXO_FREQ;
+    CPU_SR_ALLOC();
+
+    CPU_CRITICAL_ENTER();
+    OS_CPU_SysTickInitFreq(cpu_freq);                           /* Init uC/OS periodic time src (SysTick).              */
+//    BSP_OS_TickDisable();                                       /* See Note #2.                                         */
+    CPU_CRITICAL_EXIT();
+#else
+    BSP_OS_DynamicTickInit();                                   /* Initialize dynamic tick.                             */
+#endif
+
     /* Initialize the Kernel.                               */
     OSInit(&err);
 

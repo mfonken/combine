@@ -491,7 +491,8 @@ comm_host_t SystemManager_GetCommHostForComponentById( component_id_t component_
 #endif
         case COMPONENT_PROTOCOL_GPIO:
 			comm_host.gpio_host.gpio.pin = p_component->pin;
-			comm_host.gpio_host.gpio.port = (GPIO_Port_TypeDef)(p_component->port - 1);
+			comm_host.gpio_host.gpio.port = (GPIO_Port_TypeDef)(p_component->port);
+			GPIO_PinModeSet(comm_host.gpio_host.gpio.port, comm_host.gpio_host.gpio.pin, gpioModePushPull, 1);
 			break;
         default:
             break;

@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>2030960348</Checksum>
+        <Checksum>2605501227</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -132,8 +132,10 @@
         <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_usart.c}.2122.12" 0 0 1 "" 0 "" 0</Bp4>
         <Bp5>_ 0 "EMUL_CODE" "0x08008992" 0 0 1 "" 0 "" 0</Bp5>
         <Bp6>_ 0 "EMUL_CODE" "0x0800892E" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\Src\master\platforms\stm32_interface.c}.84.9" 0 0 1 "" 0 "" 0</Bp7>
-        <Count>8</Count>
+        <Bp7>_ 0 "EMUL_CODE" "0x080078CA" 0 0 1 "" 0 "" 0</Bp7>
+        <Bp8>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\Src\master\master.c}.47.3" 0 0 1 "" 0 "" 0</Bp8>
+        <Bp9>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\Src\rho\core\rho_client.c}.143.6" 0 0 1 "" 0 "" 0</Bp9>
+        <Count>10</Count>
     </Breakpoints2>
     <Aliases>
         <Count>0</Count>
