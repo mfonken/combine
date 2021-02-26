@@ -75,7 +75,6 @@ void initBoard(void)
   MX25_DP();
   // We must disable SPI communication
   MX25_deinit();
-
 }
 
 void initVcomEnable(void)

@@ -1,0 +1,61 @@
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Source\system_efr32bg13p.c
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\stdint.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\ycheck.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\yvals.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Defaults.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Config_Normal.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\DLib_Product.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\em_device.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p632f512gm48.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\CMSIS\Include\core_cm4.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\CMSIS\Include\cmsis_version.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\CMSIS\Include\cmsis_compiler.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\CMSIS\Include\cmsis_iccarm.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: c:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.1\arm\inc\c\iccarm_builtin.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\CMSIS\Include\mpu_armv7.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\system_efr32bg13p.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_msc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_emu.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_rmu.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_crypto.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_gpio_p.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_gpio.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_prs_ch.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_prs.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_ldma_ch.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_ldma.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_fpueh.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_gpcrc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_timer_cc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_timer.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_usart.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_leuart.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_letimer.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_cryotimer.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_pcnt.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_i2c.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_adc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_acmp.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_vdac_opa.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_vdac.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_csen.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_lesense_st.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_lesense_buf.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_lesense_ch.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_lesense.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_rtcc_cc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_rtcc_ret.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_rtcc.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_wdog_pch.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_wdog.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_etm.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_idac.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_smu.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_trng.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_dma_descriptor.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_devinfo.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_romtable.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_prs_signals.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_dmareq.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_af_ports.h
+platform/Device/SiliconLabs/EFR32BG13P/Source/system_efr32bg13p.o: C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\master\C13_master\platform\Device\SiliconLabs\EFR32BG13P\Include\efr32bg13p_af_pins.h

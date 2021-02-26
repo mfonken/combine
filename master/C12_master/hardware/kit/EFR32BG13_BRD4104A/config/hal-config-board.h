@@ -193,7 +193,7 @@
 
 // $[PA]
 
-#define BSP_PA_VOLTAGE                                (1800U)
+#define BSP_PA_VOLTAGE                                (3300U)
 // [PA]$
 
 // $[PCNT0]
@@ -203,9 +203,9 @@
 // [PORTIO]$
 
 // $[PRS]
-#define PORTIO_PRS_CH4_PIN                            (13U)
-#define PORTIO_PRS_CH4_PORT                           (gpioPortD)
-#define PORTIO_PRS_CH4_LOC                            (4U)
+//#define PORTIO_PRS_CH4_PIN                            (13U)
+//#define PORTIO_PRS_CH4_PORT                           (gpioPortD)
+//#define PORTIO_PRS_CH4_LOC                            (4U)
 
 // [PRS]$
 

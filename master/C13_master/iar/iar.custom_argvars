@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<iarUserArgVars>
+  <group active="true" name="BLE SDK">
+    <variable>
+      <name>BGBUILD_EXECUTABLE_PATH</name>
+      <value>C:\SiliconLabs\SimplicityStudio\v4\developer\sdks\gecko_sdk_suite\v2.7\protocol\bluetooth\bin\bgbuild.exe</value>
+    </variable>
+  </group>
+</iarUserArgVars>
