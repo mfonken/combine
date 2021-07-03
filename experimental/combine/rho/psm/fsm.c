@@ -8,26 +8,26 @@
 
 #include "fsm.h"
 
-void InitializeFSMMap( transition_matrix_t * P )
+void FiniteStateMachine_InitializeMap( transition_matrix_t * P )
 {
     for(uint8_t i = 0; i < NUM_STATES; i++ )
         FSMFunctions.Map.ResetState( P, i );
 }
 
-void ResetFSMState( transition_matrix_t * P, uint8_t i )
+void FiniteStateMachine_ResetState( transition_matrix_t * P, uint8_t i )
 {
     for( uint8_t j = 0; j < NUM_STATES; j++ )
         (*P)[i][j] = 0.0;
     (*P)[i][i] = 1.0;
 }
 
-void NormalizeFSMMap( transition_matrix_t * P )
+void FiniteStateMachine_NormalizeMap( transition_matrix_t * P )
 {
     for( uint8_t i = 0; i < NUM_STATES; i++ )
         FSMFunctions.Map.NormalizeState( P, i );
 }
 
-uint8_t NormalizeFSMState( transition_matrix_t * P, uint8_t i )
+uint8_t FiniteStateMachine_NormalizeState( transition_matrix_t * P, uint8_t i )
 {
     uint8_t max_index = i, j;
     double total = 0, invtotal, curr, max = 0;
@@ -55,7 +55,7 @@ uint8_t NormalizeFSMState( transition_matrix_t * P, uint8_t i )
     return max_index;
 }
 
-void InitializeFSMSystem( fsm_system_t * sys, const char * name, transition_matrix_t * P, state_t initial_state )
+void FiniteStateMachine_InitializeSystem( fsm_system_t * sys, const char * name, transition_matrix_t * P, state_t initial_state )
 {
     sys->name               = name;
     sys->state              = initial_state;
@@ -71,7 +71,7 @@ void InitializeFSMSystem( fsm_system_t * sys, const char * name, transition_matr
         FSMFunctions.Map.Initialize( sys->P );
 }
 
-void DecayInactiveFSMSystem( fsm_system_t * sys )
+void FiniteStateMachine_DecayInactiveSystem( fsm_system_t * sys )
 {
     state_t c = sys->state;
     if( c == UNKNOWN_STATE ) return;
@@ -86,7 +86,7 @@ void DecayInactiveFSMSystem( fsm_system_t * sys )
     }
 }
 
-void UpdateFSMSystem( fsm_system_t * sys, double p[NUM_STATES] )
+void FiniteStateMachine_UpdateSystem( fsm_system_t * sys, double p[NUM_STATES] )
 {
     FSMFunctions.Sys.UpdateProbabilities( sys, p );
     
@@ -100,7 +100,7 @@ void UpdateFSMSystem( fsm_system_t * sys, double p[NUM_STATES] )
     sys->stability.state.timestamp = TIMESTAMP();
 }
 
-void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
+void FiniteStateMachine_UpdateProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
 {
     state_t c = sys->state;
 
@@ -119,7 +119,7 @@ void UpdateFSMProbabilities( fsm_system_t * sys, double p[NUM_STATES] )
     Kalman.Step( &sys->stability.state, p[sys->state], state_change_rate );
 }
 
-void UpdateFSMState( fsm_system_t * sys )
+void FiniteStateMachine_UpdateState( fsm_system_t * sys )
 {
     /* State change */
 
@@ -142,7 +142,7 @@ void UpdateFSMState( fsm_system_t * sys )
     }
 }
 
-void PrintFSMSys( fsm_system_t * sys )
+void FiniteStateMachine_PrintSystem( fsm_system_t * sys )
 {
 #ifdef FSM_DEBUG_PRINT
     LOG_FSM(FSM_DEBUG_PRINT, "%s:\n", sys->name );

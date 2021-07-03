@@ -10,27 +10,27 @@
 
 rho_variables RhoVariables = { 0 };
 
-void RIM_INIT_FROM_CORE( rho_core_t * core )
+void RhoInterruptModel_InitFromCore( rho_core_t * core )
 {
     /* Connect to Interrupt Model variable structure */
     //printf(">>%d:%p\n", core->DensityMapPair.y.length, core->DensityMapPair.y.map);
-    RhoVariables.ram.Dx      =  core->DensityMapPair.x.map;
-    RhoVariables.ram.Dy      =  core->DensityMapPair.y.map;
-    RhoVariables.ram.Q       =  core->Q;
-    RhoVariables.ram.CX_ADDR = &core->Centroid.x;
-    RhoVariables.ram.CY_ADDR = &core->Centroid.y;
+    RhoVariables.ram.Dx      =  core->density_map_pair.x.map;
+    RhoVariables.ram.Dy      =  core->density_map_pair.y.map;
+    RhoVariables.ram.Q       =  core->quadrant;
+    RhoVariables.ram.CX_ADDR = &core->centroid.x;
+    RhoVariables.ram.CY_ADDR = &core->centroid.y;
     RhoVariables.ram.C_FRAME =  core->cframe;
-    RhoVariables.ram.THRESH_ADDR = (density_t *)&core->ThreshByte;
+    RhoVariables.ram.THRESH_ADDR = (density_t *)&core->thresh_byte;
 
-    RhoVariables.global.C_FRAME_MAX = C_FRAME_SIZE;
+    RhoVariables.global.c_frame_max = C_FRAME_SIZE;
     RhoVariables.global.y_delimiter = Y_DEL;
-    RhoVariables.global.W    =  core->Width;
-    RhoVariables.global.H    =  core->Height;
+    RhoVariables.global.W    =  core->width;
+    RhoVariables.global.H    =  core->height;
 
     RhoVariables.connected = true;
 }
 
-void RIM_FRAME_START( void )
+void RhoInterruptModel_FrameStart( void )
 {
     RhoVariables.registers.x    = 0;
     RhoVariables.registers.p    = 0;
@@ -41,7 +41,7 @@ void RIM_FRAME_START( void )
     RhoVariables.ram.QN         = 0;
     RhoVariables.ram.QN_        = 0;
     RhoVariables.ram.QT         = 0;
-    RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.C_FRAME_MAX;
+    RhoVariables.ram.C_FRAME_END = RhoVariables.ram.C_FRAME + RhoVariables.global.c_frame_max;
 
 //    memset(RhoVariables.ram.C_FRAME, 0, sizeof(char)*RhoVariables.global.C_FRAME_MAX);
     //printf(">>%d:%p | %d\n", RhoVariables.global.W, RhoVariables.ram.Dy, (int)sizeof(density_map_unit_t));
@@ -54,17 +54,17 @@ void RIM_FRAME_START( void )
     RhoVariables.registers.Cy   = *RhoVariables.ram.CY_ADDR;
     RhoVariables.registers.wr   = RhoVariables.ram.C_FRAME;
     RhoVariables.registers.rd   = RhoVariables.ram.C_FRAME;
-    RhoVariables.registers.THRESH = (uint8_t)*RhoVariables.ram.THRESH_ADDR;
+    RhoVariables.registers.thresh = (uint8_t)*RhoVariables.ram.THRESH_ADDR;
 }
 
-void RIM_FRAME_END( void )
+void RhoInterruptModel_FrameEnd( void )
 {
 }
 
 #define RPC(X,T) if(X&T)
 #define RPCB(X,Y,N,T) {RPC(X,T){Q##Y++;N[x]++;}}
 
-void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
+void RhoInterruptModel_RhoFunction( const cimage_t image )
 {
     if(!RhoVariables.connected) return;
     index_t w = image.width, h = image.height;
@@ -72,11 +72,11 @@ void RIM_PERFORM_RHO_FUNCTION( const cimage_t image )
     index_t y = 0, x;
     uint32_t p = 0;
 
-    RhoInterrupts.FRAME_START();
+    RhoInterrupts.FrameStart();
     
     RhoVariables.ram.QT = 0;
     density_2d_t Q0 = 0, Q1 = 0, Q2 = 0, Q3 = 0, QT = 0, QP = 0;
-    uint8_t THRESH = RhoVariables.registers.THRESH;
+    uint8_t THRESH = RhoVariables.registers.thresh;
     for(; y < RhoVariables.registers.Cy; y++ )
     {
         for( x = 0; x < RhoVariables.registers.Cx; x++, p++ )

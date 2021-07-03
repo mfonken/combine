@@ -29,27 +29,27 @@ extern "C" {
     
     typedef struct
     {
-        floating_t Kp, Ki, Kd, Ku, Pu;
+        floating_t kp, ki, kd, ku, pu;
     } pid_gain_t;
     
     typedef struct
     {
       pid_gain_t
-        Gain;
+        gain;
       floating_t
-        Pv,
-        Iv,
-        Dv,
-        Value,
-        Bias,
-        Dt,
-        Timestamp,
-        PrevError,
-        Error,
-        DeltaError,
-        TotalError,
-        MinValue,
-        MaxValue;
+        pv,
+        iv,
+        dv,
+        value,
+        bias,
+        dt,
+        timestamp,
+        prev_error,
+        error,
+        delta_error,
+        total_error,
+        min_value,
+        max_value;
     } pid_filter_t;
     
     typedef struct

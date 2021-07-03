@@ -41,14 +41,14 @@ double Rho::Perform( cimage_t & img, GlobalPacket * p )
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
-    if(core.Q[0] + core.Q[1] + core.Q[2] + core.Q[3])
+    if(core.quadrant[0] + core.quadrant[1] + core.quadrant[2] + core.quadrant[3])
         RhoCore.Perform( &core, backgrounding_event );
     gettimeofday( &b, NULL);
 
     /* * * * * * * * * * */
     
     pthread_mutex_unlock(&density_map_pair_mutex);
-    memcpy((byte_t *)p, (byte_t*)&core.Packet, sizeof(packet_t));
+    memcpy((byte_t *)p, (byte_t*)&core.packet, sizeof(packet_t));
     backgrounding_event = false; // Generate background always and only once
     pthread_mutex_unlock(&c_mutex);
     
@@ -60,24 +60,24 @@ void Rho::Decouple( const cimage_t image, bool backgrounding )
 {
     if( backgrounding )
     {
-        RhoVariables.ram.Dx      =  core.DensityMapPair.x.background;
-        RhoVariables.ram.Dy      =  core.DensityMapPair.y.background;
-        RhoVariables.ram.CX_ADDR = &core.Secondary.y;
-        RhoVariables.ram.CY_ADDR = &core.Secondary.x;
-        RhoVariables.ram.Q       =  core.Qb;
+        RhoVariables.ram.Dx      =  core.density_map_pair.x.background;
+        RhoVariables.ram.Dy      =  core.density_map_pair.y.background;
+        RhoVariables.ram.CX_ADDR = &core.secondary.y;
+        RhoVariables.ram.CY_ADDR = &core.secondary.x;
+        RhoVariables.ram.Q       =  core.quadrant_background;
     }
     
-    RhoInterrupts.RHO_FUNCTION( image );
+    RhoInterrupts.RhoFunction( image );
     
     if( backgrounding )
     {
-        RhoVariables.ram.Dx      =  core.DensityMapPair.x.map;
-        RhoVariables.ram.Dy      =  core.DensityMapPair.y.map;
-        RhoVariables.ram.CX_ADDR = &core.Centroid.x;
-        RhoVariables.ram.CY_ADDR = &core.Centroid.y;
-        RhoVariables.ram.Q       =  core.Q;
-        core.DensityMapPair.x.has_background = true;
-        core.DensityMapPair.y.has_background = true;
+        RhoVariables.ram.Dx      =  core.density_map_pair.x.map;
+        RhoVariables.ram.Dy      =  core.density_map_pair.y.map;
+        RhoVariables.ram.CX_ADDR = &core.centroid.x;
+        RhoVariables.ram.CY_ADDR = &core.centroid.y;
+        RhoVariables.ram.Q       =  core.quadrant;
+        core.density_map_pair.x.has_background = true;
+        core.density_map_pair.y.has_background = true;
     }
 }
 

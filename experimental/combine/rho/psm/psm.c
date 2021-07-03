@@ -11,7 +11,7 @@
 #include "psm.h"
 //#include "statistics.h"
 
-void InitializePSM( psm_t * model, const char * name )
+void ProbabilisticStateModel_Initialize( psm_t * model, const char * name )
 {
     model->name = (char *)name;
     FSMFunctions.Sys.Initialize( &model->fsm, name, &model->hmm.A, UNDER_POPULATED );
@@ -33,7 +33,7 @@ void InitializePSM( psm_t * model, const char * name )
     KumaraswamyFunctions.Initialize( &model->kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
 }
 static int c = 0;
-void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
+void ProbabilisticStateModel_ReportObservations( psm_t * model, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
     /* Report tracking observations & update state band knowledge  */
     if( observation_list->length == 0 ) return;
@@ -61,7 +61,7 @@ void ReportObservationsPSM( psm_t * model, observation_list_t * observation_list
     /// TODO: Analyze value
 }
 
-void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
+void ProbabilisticStateModel_UpdateStateIntervals( psm_t * model )//, floating_t nu )
 {
     floating_t cumulative = 0., current = 0.;
     LOG_PSM(PSM_DEBUG_UPDATE, "Hidden:");
@@ -89,7 +89,7 @@ void UpdateStateIntervalsPSM( psm_t * model )//, floating_t nu )
     LOG_PSM_BARE(PSM_DEBUG_UPDATE, "\n");
 }
 
-void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
+void ProbabilisticStateModel_Update( psm_t * model )//, observation_list_t * observation_list, floating_t nu, uint8_t thresh )
 {
     /* Update state path prediction to best cluster */
     HMMFunctions.BaumWelchSolve( &model->hmm, HMM_UPDATE_DELTA );
@@ -110,7 +110,7 @@ void UpdatePSM( psm_t * model )//, observation_list_t * observation_list, floati
     PSMFunctions.GenerateProposals( model );
 }
 
-void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
+void ProbabilisticStateModel_UpdateStateBand( band_list_t * band_list, uint8_t i, int8_t c, gaussian2d_t * band_gaussian )
 {
     if( i > band_list->length ) i = band_list->length - 1;
     if( c == 0 )
@@ -144,7 +144,7 @@ void UpdateStateBandPSM( band_list_t * band_list, uint8_t i, int8_t c, gaussian2
 //    printf("\tTrue center [%d] is (%7.3f, %7.3f)\n", i, band_list->band[i].true_center.a, band_list->band[i].true_center.b);
 }
 
-void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
+void ProbabilisticStateModel_DiscoverStateBands( psm_t * model, band_list_t * band_list )
 {
 //    for(uint32_t i = 0; i < model->gmm.num_clusters; i++)
 //    {
@@ -332,7 +332,7 @@ void DiscoverStateBandsPSM( psm_t * model, band_list_t * band_list )
 
 
 /// TODO: Fix this, HMM order may be scrabbled and/or incomplete
-uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, floating_t * confidence )
+uint8_t ProbabilisticStateModel_FindMostLikelyHiddenState( psm_t * model, uint8_t observation_state, floating_t * confidence )
 {
     /* Determine target observation band */
     emission_t * state_emission = &model->hmm.B[observation_state];//GetProbabilityFromEmission( &model->hmm.B[observation_state],  );
@@ -350,7 +350,7 @@ uint8_t FindMostLikelyHiddenStatePSM( psm_t * model, uint8_t observation_state, 
 #endif
 }
 
-void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
+void ProbabilisticStateModel_UpdateBestCluster( psm_t * model, band_list_t * band_list )
 {
     floating_t
     lower_bound = band_list->band[model->best_state].lower_boundary,
@@ -375,7 +375,7 @@ void UpdateBestClusterPSM( psm_t * model, band_list_t * band_list )
     model->best_cluster_weight = best_cluster_weight;
 }
 
-uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
+uint8_t ProbabilisticStateModel_GetCurrentBand( psm_t * model, band_list_t * band_list )
 {
     uint8_t state = 0;
     for( ; state < band_list->length-1; state++ )
@@ -389,7 +389,7 @@ uint8_t GetCurrentBandPSM( psm_t * model, band_list_t * band_list )
 //#define MIN_VALID_TARGET_BAND_VARIANCE 3
 //#define MAX_VALID_TARGET_BAND_VARIANCE 7
 
-void GenerateProposalsPSM( psm_t * model )
+void ProbabilisticStateModel_GenerateProposals( psm_t * model )
 {
     if( !model->gmm.num_clusters ) return;
 

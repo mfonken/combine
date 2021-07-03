@@ -27,24 +27,24 @@ typedef struct
     double bands[KUMARASWAMY_NUM_BANDS];
 } kumaraswamy_t;
 
-static void InitializeKumaraswamy( kumaraswamy_t * k, double beta, double * bands )
+static void Kumaraswamy_Initialize( kumaraswamy_t * k, double beta, double * bands )
 {
     k->beta = beta;
     memcpy( &k->bands, bands, sizeof(double[KUMARASWAMY_NUM_BANDS]) );
 }
 
-static inline double PerformKumaraswamyCDF( kumaraswamy_t * k, double x )
+static inline double Kumaraswamy_PerformCDF( kumaraswamy_t * k, double x )
 {
     return KUMARASWAMY_CDF( x, k->alpha, k->beta );
 }
 
-static void GetKumaraswamyVector( kumaraswamy_t * k, double alpha, double * interval )
+static void Kumaraswamy_GetVector( kumaraswamy_t * k, double alpha, double * interval )
 {
     k->alpha = alpha;
     double curr_CDF, prev_CDF = 0.;
     for( uint8_t i = 0; i < KUMARASWAMY_NUM_BANDS; i++ )
     {
-        curr_CDF = PerformKumaraswamyCDF( k, k->bands[i] );
+        curr_CDF = Kumaraswamy_PerformCDF( k, k->bands[i] );
         if( curr_CDF < prev_CDF )
             interval[i] = 0.;
         else
@@ -64,9 +64,9 @@ typedef struct
 
 static const kumaraswamy_functions_t KumaraswamyFunctions =
 {
-    .Initialize = InitializeKumaraswamy,
-    .PerformCDF = PerformKumaraswamyCDF,
-    .GetVector = GetKumaraswamyVector
+    .Initialize = Kumaraswamy_Initialize,
+    .PerformCDF = Kumaraswamy_PerformCDF,
+    .GetVector = Kumaraswamy_GetVector
 };
     
 #ifdef __cplusplus

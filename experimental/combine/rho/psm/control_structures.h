@@ -25,25 +25,25 @@ typedef floating_t state_vector_t[NUM_STATES];
     typedef struct
     {
         gaussian2d_t
-        gaussian_in,
-        gaussian_out;
+            gaussian_in,
+            gaussian_out;
         floating_t
-        mahalanobis_sq,
-        log_gaussian_norm_factor,
-        probability_of_in,
-        probability_condition_input,
-        score, weight;
+            mahalanobis_sq,
+            log_gaussian_norm_factor,
+            probability_of_in,
+            probability_condition_input,
+            score, weight;
         mat2x2
-        inv_covariance_in,
-        llt_in;
+            inv_covariance_in,
+            llt_in;
         label_manager_t labels;
         floating_t
-        max_y,
-        min_y,
-        timestamp;
+            max_y,
+            min_y,
+            timestamp;
         uint8_t
-        primary_id,
-        secondary_id;
+            primary_id,
+            secondary_id;
     } gaussian_mixture_cluster_t;
     
     typedef struct

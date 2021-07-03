@@ -13,27 +13,27 @@
 #define HMM_ERROR_PADDING 1e-4
 #define SOFTEN(X) (X==1?(1-HMM_ERROR_PADDING):(X==0?HMM_ERROR_PADDING:X))
 
-void InitializeHMM( hidden_markov_model_t * model, const char * name )
+void HiddenMarkovModel_Initialize( hidden_markov_model_t * model, const char * name )
 {
     memset( model, 0, sizeof(hidden_markov_model_t) );
     model->name = name;
     
     KumaraswamyFunctions.Initialize( &model->k_dist, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
-    HMMFunctions.InitializeTransitionMatrix( model );
+    HiddenMarkovModel_.InitializeTransitionMatrix( model );
     
     memcpy( &model->B, (emission_t[])DEFAULT_OBSERVATION_LIST, sizeof((emission_t[])DEFAULT_OBSERVATION_LIST) );
     memcpy( &model->pi, (state_vector_t)DEFAULT_STATE_VECTOR, sizeof(state_vector_t) );
     
-    HMMFunctions.Print( model );
+    HiddenMarkovModel_.Print( model );
 }
 
-void InitializeTransitionMatrixHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_InitializeTransitionMatrix( hidden_markov_model_t * model )
 {
     for( uint8_t i = 0; i < NUM_STATES; i++ )
         KumaraswamyFunctions.GetVector( &model->k_dist, i + 1, model->A[i] );
 }
 
-uint8_t ReportObservationToHMM( hidden_markov_model_t * model, hmm_observation_t o )
+uint8_t HiddenMarkovModel_ReportObservationTo( hidden_markov_model_t * model, hmm_observation_t o )
 {
 #ifdef HMM_2D_EMISSIONS
     LOG_HMM(HMM_REPORT, "Reporting: {%.4f, %.4f} - [%d]\n", o.a, o.b, model->O.index.next);
@@ -43,20 +43,20 @@ uint8_t ReportObservationToHMM( hidden_markov_model_t * model, hmm_observation_t
     return PushToObservationBuffer( &model->O, o );
 }
 
-floating_t UpdateAllHMM( hidden_markov_model_t * model )
+floating_t HiddenMarkovModel_UpdateAll( hidden_markov_model_t * model )
 {
-    HMMFunctions.Update.Alpha(  model );
-    HMMFunctions.Update.Beta(   model );
-    HMMFunctions.Update.Gamma(  model );
-    HMMFunctions.Update.Xi(     model );
-    floating_t new_P = HMMFunctions.Update.Probability( model ),
+    HiddenMarkovModel_.Update.Alpha(  model );
+    HiddenMarkovModel_.Update.Beta(   model );
+    HiddenMarkovModel_.Update.Gamma(  model );
+    HiddenMarkovModel_.Update.Xi(     model );
+    floating_t new_P = HiddenMarkovModel_.Update.Probability( model ),
     delta_P = model->P - new_P;
     model->P = new_P;
 //    LOG_HMM(HMM_DEBUG, "Update %s probability ∆: %.4f\n", model->name, delta_P);
     return delta_P;
 }
 
-void UpdateAlphaHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateAlpha( hidden_markov_model_t * model )
 {
     memset( model->alpha, 0., sizeof(model->alpha) );
     uint8_t T = model->O.length;
@@ -86,7 +86,7 @@ void UpdateAlphaHMM( hidden_markov_model_t * model )
     }
 }
 
-void UpdateBetaHMM(hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateBeta(hidden_markov_model_t * model )
 {
     memset( model->beta, 0., sizeof(model->beta) );
     uint8_t T = model->O.length;
@@ -115,7 +115,7 @@ void UpdateBetaHMM(hidden_markov_model_t * model )
     }
 }
 
-void UpdateGammaHMM(hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateGamma(hidden_markov_model_t * model )
 {
     memset( model->gamma, 0., sizeof(model->gamma) );
     uint8_t T = model->O.length;
@@ -136,7 +136,7 @@ void UpdateGammaHMM(hidden_markov_model_t * model )
     }
 }
 
-void UpdateXiHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateXi( hidden_markov_model_t * model )
 {
     memset( model->xi, 0., sizeof(model->xi) );
     uint8_t T = model->O.length;
@@ -165,7 +165,7 @@ void UpdateXiHMM( hidden_markov_model_t * model )
     }
 }
 
-floating_t UpdateProbabilityHMM( hidden_markov_model_t * model )
+floating_t HiddenMarkovModel_UpdateProbability( hidden_markov_model_t * model )
 {
     /* Source - http://www.utstat.toronto.edu/*rsalakhu/sta4273/notes/Lecture11.pdf - Computing Likelihood */
     floating_t sum = 0;
@@ -177,7 +177,7 @@ floating_t UpdateProbabilityHMM( hidden_markov_model_t * model )
     return sum;
 }
 
-void UpdateInitialProbabilitiesHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateInitialProbabilities( hidden_markov_model_t * model )
 {
     /* Source - https://en.wikipedia.org/wiki/Baum–Welch_algorithm#cite_note-6 */
     /* π_i^* = γ_i(0) */
@@ -192,7 +192,7 @@ void UpdateInitialProbabilitiesHMM( hidden_markov_model_t * model )
     /// TODO: Add better failure case
 }
 
-void UpdateTransitionProbabilitiesHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateTransitionProbabilities( hidden_markov_model_t * model )
 {
     uint8_t T = model->O.length;
     floating_t n = 0, d = 0;
@@ -220,7 +220,7 @@ void UpdateTransitionProbabilitiesHMM( hidden_markov_model_t * model )
     }
 }
 
-void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_UpdateEmissionProbabilities( hidden_markov_model_t * model )
 {
 #ifdef HMM_GAUSSIAN_EMISSIONS
     /* Source - https://sambaiga.github.io/ml/hmm/2017/06/12/hmm-gausian.html */
@@ -312,23 +312,23 @@ void UpdateEmissionProbabilitiesHMM( hidden_markov_model_t * model )
 #endif
 }
 
-void BaumWelchSolveHMM( hidden_markov_model_t * model, floating_t DELTA )
+void HiddenMarkovModel_BaumWelchSolve( hidden_markov_model_t * model, floating_t DELTA )
 {
     if( model->O.length < MAX_OBSERVATIONS - 1 ) return;
-    HMMFunctions.Update.All( model );
+    HiddenMarkovModel_.Update.All( model );
     do
     {
-        HMMFunctions.Update.Pi( model );
-        HMMFunctions.Update.A( model );
-        HMMFunctions.Update.B( model );
+        HiddenMarkovModel_.Update.Pi( model );
+        HiddenMarkovModel_.Update.A( model );
+        HiddenMarkovModel_.Update.B( model );
 #ifdef HMM_DEBUG
-        HMMFunctions.Print( model );
+        HiddenMarkovModel_.Print( model );
 #endif
-    } while( HMMFunctions.Update.All( model ) > DELTA );
+    } while( HiddenMarkovModel_.Update.All( model ) > DELTA );
     model->O.length = 0;
 }
 
-void PrintHMM( hidden_markov_model_t * model )
+void HiddenMarkovModel_Print( hidden_markov_model_t * model )
 {
     LOG_HMM(HMM_DEBUG, "%s:\n", model->name );
     LOG_HMM_BARE(HMM_DEBUG, "A:\n");

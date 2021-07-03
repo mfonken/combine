@@ -18,34 +18,34 @@
 extern "C" {
 #endif
 
-    void RIM_PERFORM_RHO_FUNCTION( cimage_t );
+    void RhoInterruptModel_RhoFunction( cimage_t );
 
-    void RIM_INIT_FROM_CORE( rho_core_t * );
-    void RIM_FRAME_INIT(  void );
-    void RIM_FRAME_START( void );
-    void RIM_FRAME_END(   void );
+    void RhoInterruptModel_InitFromCore( rho_core_t * );
+    void RhoInterruptModel_FrameInit(  void );
+    void RhoInterruptModel_FrameStart( void );
+    void RhoInterruptModel_FrameEnd(   void );
 
     typedef struct rho_interrupts rho_interrupts;
     struct rho_interrupts
     {
-        void (*INIT_FROM_CORE)( rho_core_t * );
-        void (*FRAME_START)( void );
-        void (*FRAME_END)(   void );
-        void (*RHO_FUNCTION)( const cimage_t );
+        void (*InitFromCore)( rho_core_t * );
+        void (*FrameStart)( void );
+        void (*FrameEnd)(   void );
+        void (*RhoFunction)( const cimage_t );
     };
     static const rho_interrupts RhoInterrupts =
     {
-        .INIT_FROM_CORE = RIM_INIT_FROM_CORE,
-        .FRAME_START = RIM_FRAME_START,
-        .FRAME_END   = RIM_FRAME_END,
-        .RHO_FUNCTION = RIM_PERFORM_RHO_FUNCTION
+        .InitFromCore = RhoInterruptModel_InitFromCore,
+        .FrameStart = RhoInterruptModel_FrameStart,
+        .FrameEnd   = RhoInterruptModel_FrameEnd,
+        .RhoFunction = RhoInterruptModel_RhoFunction
     };
 
     typedef struct
     {
-        uint32_t
-        C_FRAME_MAX;
-        index_t
+    uint32_t
+        c_frame_max;
+    index_t
         counter,
         y_delimiter,
         W,
@@ -63,7 +63,7 @@ extern "C" {
         *wr,
         *rd;
         byte_t
-        THRESH;
+        thresh;
         byte_t
         QS,
         PTOG;

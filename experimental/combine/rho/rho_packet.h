@@ -107,7 +107,7 @@ address_t
 typedef struct
 {
 byte_t
-    ID,
+    id,
     includes;
 timestamp_t
     timestamp;

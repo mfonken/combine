@@ -45,12 +45,12 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
     RhoUtility.Initialize.Filters( core );
     
     /* Density Data */
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.x, X_INSTANCE_NAME, height, core->Centroid.y );
-    RhoUtility.Initialize.DensityMap( &core->DensityMapPair.y, Y_INSTANCE_NAME, width, core->Centroid.x  );
+    RhoUtility.Initialize.DensityMap( &core->density_map_pair.x, X_INSTANCE_NAME, height, core->centroid.y );
+    RhoUtility.Initialize.DensityMap( &core->density_map_pair.y, Y_INSTANCE_NAME, width, core->centroid.x  );
 
     /* Prediction Structures */
-    RhoUtility.Initialize.Prediction( &core->PredictionPair.x, X_INSTANCE_NAME, core->Height );
-    RhoUtility.Initialize.Prediction( &core->PredictionPair.y, Y_INSTANCE_NAME, core->Width  );
+    RhoUtility.Initialize.Prediction( &core->prediction_pair.x, X_INSTANCE_NAME, core->height );
+    RhoUtility.Initialize.Prediction( &core->prediction_pair.y, Y_INSTANCE_NAME, core->width  );
 
 #ifdef __USE_DETECTION_MAP__
     /* Detection map */
@@ -58,7 +58,7 @@ void InitializeRhoCore( rho_core_t * core, index_t width, index_t height )
 #endif
 #ifdef __USE_DECOUPLING__
     /* Frame Conversion Model Connection */
-    RhoInterrupts.INIT_FROM_CORE( core );
+    RhoInterrupts.InitFromCore( core );
 #endif
 #ifdef __PSM__
     PSMFunctions.Initialize( &core->PredictiveStateModelPair.x, X_INSTANCE_NAME );
@@ -85,9 +85,9 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
     LOG_RHO(RHO_DEBUG_2, "Detecting %s Map:\n", density_map->name );   
     static rho_detection_variables _;
     RhoUtility.Reset.Detect( &_, density_map, prediction );
-    core->TotalCoverage = 0;
-    core->FilteredCoverage = 0;
-    _.target_density = core->TargetFilter.value * (floating_t)TOTAL_RHO_PIXELS;
+    core->total_coverage = 0;
+    core->filtered_coverage = 0;
+    _.target_density = core->target_filter.value * (floating_t)TOTAL_RHO_PIXELS;
 
     /* Perform detect */
     LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
@@ -98,27 +98,27 @@ void DetectRhoCore( rho_core_t * core, density_map_t * density_map, prediction_t
     RhoUtility.Detect.CalculateFrameStatistics( &_, prediction );
 
     /* Update core */
-    core->TotalCoverage     += _.total_density;// target_density;
-    core->FilteredCoverage  += _.filtered_density;
+    core->total_coverage     += _.total_density;// target_density;
+    core->filtered_coverage  += _.filtered_density;
 }
 
 void DetectRhoCorePairs( rho_core_t * core )
 {
     LOG_RHO(RHO_DEBUG_2,"Filtering and selecting pairs.\n");
-    RhoCore.Detect( core, &core->DensityMapPair.x, &core->PredictionPair.x );
-    RhoCore.Detect( core, &core->DensityMapPair.y, &core->PredictionPair.y );
+    RhoCore.Detect( core, &core->density_map_pair.x, &core->prediction_pair.x );
+    RhoCore.Detect( core, &core->density_map_pair.y, &core->prediction_pair.y );
 
     /* Calculate accumulated filtered percentage from both axes */
-    core->FilteredPercentage        = ZDIV( (floating_t)core->FilteredCoverage, (floating_t)TOTAL_RHO_PIXELS );
-    core->TotalPercentage           = ZDIV( (floating_t)core->TotalCoverage, (floating_t)TOTAL_RHO_PIXELS );
-    core->PredictionPair.NumRegions = MAX( core->PredictionPair.x.NumRegions, core->PredictionPair.y.NumRegions );
-    core->PredictionPair.NuRegions  = MAX( core->PredictionPair.x.NuRegions, core->PredictionPair.y.NuRegions );
+    core->filtered_percentage        = ZDIV( (floating_t)core->filtered_coverage, (floating_t)TOTAL_RHO_PIXELS );
+    core->total_percentage           = ZDIV( (floating_t)core->total_coverage, (floating_t)TOTAL_RHO_PIXELS );
+    core->prediction_pair.num_regions = MAX( core->prediction_pair.x.num_regions, core->prediction_pair.y.num_regions );
+    core->prediction_pair.nu_regions  = MAX( core->prediction_pair.x.nu_regions, core->prediction_pair.y.nu_regions );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */
 void UpdateRhoCorePrediction( prediction_t * prediction )
 {
-    LOG_RHO(RHO_DEBUG_PREDICT,"Updating %s Map:\n", prediction->Name);
+    LOG_RHO(RHO_DEBUG_PREDICT,"Updating %s Map:\n", prediction->name);
     
     /* Step predictions of all Kalmans */
     RhoUtility.Predict.TrackingFilters( prediction );
@@ -128,8 +128,8 @@ void UpdateRhoCorePrediction( prediction_t * prediction )
 void UpdateRhoCorePredictions( rho_core_t * core )
 {
     LOG_RHO(RHO_DEBUG_2,"Updating predictions.\n");
-    RhoCore.UpdatePrediction( &core->PredictionPair.x );
-    RhoCore.UpdatePrediction( &core->PredictionPair.y );
+    RhoCore.UpdatePrediction( &core->prediction_pair.x );
+    RhoCore.UpdatePrediction( &core->prediction_pair.y );
     
 #ifdef __USE_DETECTION_MAP__
     RhoUtility.Predict.ReportObservationLists( core );
@@ -137,22 +137,22 @@ void UpdateRhoCorePredictions( rho_core_t * core )
 #endif
     
 #ifdef __PSM__
-    if( ISTIMEDOUT( core->Timestamp, PSM_UPDATE_PERIOD ) )
+    if( ISTIMEDOUT( core->timestamp, PSM_UPDATE_PERIOD ) )
     { /* Process both dimensions' predictive state */
         LOG_PSM(PSM_DEBUG, "Updating PSM\n");
         RhoUtility.Predict.UpdatePredictiveStateModelPair( core );
-        core->Timestamp = TIMESTAMP();
+        core->timestamp = TIMESTAMP();
     }
 #endif
     
     double state_intervals[NUM_STATE_GROUPS];
-    KumaraswamyFunctions.GetVector( &core->Kumaraswamy, core->PredictionPair.NuRegions, state_intervals );
-    FSMFunctions.Sys.Update( &core->StateMachine, state_intervals );
+    KumaraswamyFunctions.GetVector( &core->kumaraswamy, core->prediction_pair.nu_regions, state_intervals );
+    FSMFunctions.Sys.Update( &core->state_machine, state_intervals );
 
     prediction_predict_variables _;
-    RhoUtility.Reset.Prediction( &_, &core->PredictionPair, core->Centroid );
+    RhoUtility.Reset.Prediction( &_, &core->prediction_pair, core->centroid );
     RhoUtility.Predict.CorrectAmbiguity( &_, core );
-    RhoUtility.Predict.CombineProbabilities( &core->PredictionPair );
+    RhoUtility.Predict.CombineProbabilities( &core->prediction_pair );
     RhoUtility.Predict.UpdateCorePredictionData( &_, core );
 }
 
@@ -167,5 +167,5 @@ void GenerateRhoCorePacket( rho_core_t * core )
 {
     LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
     RhoUtility.Generate.Packet( core );
-    RhoUtility.Print.Packet( &core->Packet, DEFAULT_PACKET_LENGTH );
+    RhoUtility.Print.Packet( &core->packet, DEFAULT_PACKET_LENGTH );
 }

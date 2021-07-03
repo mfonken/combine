@@ -59,4 +59,4 @@ public:
     std::string read(int);
 };
 
-#endif /* bluetooth_serial_hpp */
+#endif /* serial_wrapper_hpp */

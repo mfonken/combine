@@ -12,52 +12,52 @@
 #include "timestamp.h"
 #endif
 
-void RhoPIDInitialize( pid_filter_t * PID, pid_gain_t K )
+void RhoPIDInitialize( pid_filter_t * pid, pid_gain_t k )
 {
     /* Zero Entire PID */
-    memset( PID, 0, sizeof(pid_filter_t) );
+    memset( pid, 0, sizeof(pid_filter_t) );
     
-    if( !K.Kp && !K.Ki && !K.Kd )
+    if( !k.kp && !k.ki && !k.kd )
     {
-        K.Pu = 1.;
-        PID->Gain.Kp = DEFAULT_PROPORTIONAL_FACTOR * K.Ku;
-        PID->Gain.Ki = DEFAULT_INTEGRAL_FACTOR * ( PID->Gain.Kp / K.Pu );
-        PID->Gain.Kd = DEFAULT_DERIVATIVE_FACTOR * ( PID->Gain.Kd * K.Pu );
+        k.pu = 1.;
+        pid->gain.kp = DEFAULT_PROPORTIONAL_FACTOR * k.ku;
+        pid->gain.ki = DEFAULT_INTEGRAL_FACTOR * ( pid->gain.kp / k.pu );
+        pid->gain.kd = DEFAULT_DERIVATIVE_FACTOR * ( pid->gain.kd * k.pu );
     }
     else
     {
-        PID->Gain.Kp = K.Kp;
-        PID->Gain.Ki = K.Ki;
-        PID->Gain.Kd = K.Kd;
+        pid->gain.kp = k.kp;
+        pid->gain.ki = k.ki;
+        pid->gain.kd = k.kd;
     }
-    PID->Timestamp = TIMESTAMP();
+    pid->timestamp = TIMESTAMP();
 }
 
-void RhoPIDUpdate( pid_filter_t * PID, floating_t actual, floating_t target )
+void RhoPIDUpdate( pid_filter_t * pid, floating_t actual, floating_t target )
 {
-    PID->Error = actual - target;
+    pid->error = actual - target;
     
-    PID->Pv = PID->Error * PID->Gain.Kp;
+    pid->pv = pid->error * pid->gain.kp;
     
-    PID->Dt = TIMESTAMP() - PID->Timestamp;
-    PID->TotalError += PID->Error * PID->Dt;
-    PID->Iv = PID->Gain.Ki * PID->TotalError;
+    pid->dt = TIMESTAMP() - pid->timestamp;
+    pid->total_error += pid->error * pid->dt;
+    pid->iv = pid->gain.ki * pid->total_error;
     
-    PID->DeltaError = PID->PrevError - PID->Error;
-    PID->Dv = ZDIV( ( PID->Gain.Kd * PID->DeltaError ), PID->Dt);
+    pid->delta_error = pid->prev_error - pid->error;
+    pid->dv = ZDIV( ( pid->gain.kd * pid->delta_error ), pid->dt);
     
-    PID->Value = PID->Pv + PID->Iv + PID->Dv + PID->Bias;
+    pid->value = pid->pv + pid->iv + pid->dv + pid->bias;
     
-    if( PID->MaxValue > 0 )
-        PID->Value = BOUND(PID->Value, PID->MinValue, PID->MaxValue);
+    if( pid->max_value > 0 )
+        pid->value = BOUND(pid->value, pid->min_value, pid->max_value);
     
-    PID->PrevError = PID->Error;
+    pid->prev_error = pid->error;
 
-    PID->TotalError *= 0.9;
+    pid->total_error *= 0.9;
 }
 
-void RhoPIDPrint( pid_filter_t * PID )
+void RhoPIDPrint( pid_filter_t * pid )
 {
     printf("\tValue:%3.4f\tBias:%3.4f\tError:%3.4f\tTotalError:%3.4f\t[P%3.2f\tI%3.2f\tD%3.2f]",
-           PID->Value, PID->Bias, PID->Error, PID->TotalError, PID->Pv, PID->Iv, PID->Dv);
+           pid->value, pid->bias, pid->error, pid->total_error, pid->pv, pid->iv, pid->dv);
 }

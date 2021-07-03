@@ -154,4 +154,7 @@ typedef uint32_t        address_t;
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
+#define NAME_BUILDER_FUNCTION_STRINGIFY(x,y) x ## _ ## y
+#define NAME_BUILDER(x,y) NAME_BUILDER_FUNCTION_STRINGIFY(x,y)
+
 #endif /* rho_global_h */

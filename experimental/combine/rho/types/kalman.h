@@ -60,6 +60,7 @@ extern "C" {
     void       ResetKalman( kalman_filter_t *, floating_t );
     void     PredictKalman( kalman_filter_t *, floating_t );
     void      UpdateKalman( kalman_filter_t *, floating_t );
+    floating_t  TickKalman( kalman_filter_t *, floating_t );
     floating_t  StepKalman( kalman_filter_t *, floating_t, floating_t );
     bool   IsKalmanExpired( kalman_filter_t * );
     floating_t ScoreKalman( kalman_filter_t * );
@@ -74,6 +75,7 @@ extern "C" {
         void (*      Reset)( kalman_filter_t *, floating_t );
         void (*    Predict)( kalman_filter_t *, floating_t );
         void (*     Update)( kalman_filter_t *, floating_t );
+        floating_t (* Tick)( kalman_filter_t *, floating_t );
         floating_t (* Step)( kalman_filter_t *, floating_t, floating_t );
         bool (*  IsExpired)( kalman_filter_t * );
         floating_t (*Score)( kalman_filter_t * );
@@ -90,6 +92,7 @@ extern "C" {
         .Reset = ResetKalman,
         .Predict = PredictKalman,
         .Update = UpdateKalman,
+        .Tick = TickKalman,
         .Step = StepKalman,
         .IsExpired = IsKalmanExpired,
         .Score = ScoreKalman,

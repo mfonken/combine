@@ -59,9 +59,9 @@ void AddRegionSetToPredictionMap( detection_map_t * map, prediction_pair_t * pp 
     prediction_t * pair[2] = { &pp->x, &pp->y };
     for( ; p < 2; p++ )
     {
-        for( i = 0; i < pair[p]->ObservationList.length; i++ )
+        for( i = 0; i < pair[p]->observation_list.length; i++ )
         {
-            observation_t * o = &pair[p]->ObservationList.observations[i];
+            observation_t * o = &pair[p]->observation_list.observations[i];
             
             int ar = SHAKE_INJECTION==0?0:rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;
             int br = SHAKE_INJECTION==0?0:rand() % (2*SHAKE_INJECTION) - SHAKE_INJECTION;

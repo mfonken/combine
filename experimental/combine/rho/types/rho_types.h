@@ -101,34 +101,33 @@ typedef struct
 
 typedef struct
 {
-    const char *    Name;
-    kalman_filter_t TrackingFilters[MAX_TRACKING_FILTERS];
-    uint8_t         TrackingFiltersOrder[MAX_TRACKING_FILTERS];
-    region_t        Regions[MAX_REGIONS];
-    order_t         RegionsOrder[MAX_REGIONS];
-    uint8_t         NumRegions;
-    density_t       PreviousPeak[2],
-                    PreviousCentroid;
-    density_2d_t    PreviousDensity[2],
-                    TotalDensity,
-                    FilterDensity[2];
-    floating_t      NuRegions,
-                    Primary,
-                    Secondary,
-                    AverageDensity;
-    observation_list_t ObservationList;
-    prediction_probabilities Probabilities;
+    const char *    name;
+    kalman_filter_t tracking_filters[MAX_TRACKING_FILTERS];
+    uint8_t         tracking_filters_order[MAX_TRACKING_FILTERS];
+    region_t        regions[MAX_REGIONS];
+    order_t         regions_order[MAX_REGIONS];
+    uint8_t         num_regions;
+    density_t       previous_peak[2],
+                    previous_centroid;
+    density_2d_t    previous_density[2],
+                    total_density;
+    floating_t      nu_regions,
+                    primary,
+                    secondary,
+                    average_density;
+    observation_list_t observation_list;
+    prediction_probabilities probabilities;
 } prediction_t;
 
 typedef struct
 {
     prediction_t    x,y;
-    prediction_probabilities Probabilities;
+    prediction_probabilities probabilities;
 
-    floating_t      NuRegions,
-                    NumRegions,
+    floating_t      nu_regions,
+                    num_regions,
 //                    BestConfidence,
-                    AverageDensity;
+                    average_density;
 } prediction_pair_t;
 
 typedef struct
@@ -180,7 +179,6 @@ typedef struct
     density_2d_t area[9];
     density_2d_t a, b, c, d, l, l_, p, q, x, y;
 } redistribution_variables;
-extern const density_redistribution_lookup_t rlookup;
 
 typedef struct
 {
@@ -254,9 +252,9 @@ typedef struct
 typedef struct
 {
     index_pair_t
-        Primary,
-        Secondary,
-        Centroid;
+        primary,
+        secondary,
+        centroid;
     int8_t quadrant_check;
 } prediction_predict_variables;
 
@@ -288,53 +286,84 @@ typedef detection_ring_buffer_t detection_map_t;
 
 typedef struct
 {
-    density_map_pair_t  DensityMapPair;
+    density_map_pair_t  density_map_pair;
     index_t
-        Width,
-        Height,
-        Subsample,
-        RowsLeft;
+        width,
+        height,
+        subsample,
+        rows_left;
     index_pair_t
-        Primary,
-        Secondary,
-        Centroid,
-        BackgroundCentroid;
+        primary,
+        secondary,
+        centroid,
+        background_centroid;
     byte_t
-        ThreshByte,
-        BackgroundCounter;
+        thresh_byte,
+        background_counter;
     density_2d_t
-        Q[4], Qb[4], Qf[4], QbT,
-        TotalCoverage,
-        FilteredCoverage,
-        TargetCoverage,
-        BackgroundPeriod;
+        quadrant[4], quadrant_background[4], quadrant_final[4], quadrant_background_total,
+        total_coverage,
+        filtered_coverage,
+        target_coverage,
+        background_period;
     floating_t
-        TotalPercentage,
-        FilteredPercentage,
-        TargetCoverageFactor,
-        CoverageFactor,
-        VarianceFactor,
-        PreviousThreshFilterValue,
-        Thresh;
-    rho_tune_t          Tune;
-    prediction_pair_t   PredictionPair;
-    pid_filter_t        ThreshFilter;
-    kalman_filter_t     TargetFilter;
-    detection_map_t     DetectionMap;
+        total_percentage,
+        filtered_percentage,
+        target_coverage_factor,
+        coverage_factor,
+        variance_factor,
+        previous_thresh_filter_value,
+        thresh;
+    rho_tune_t          tune;
+    prediction_pair_t   prediction_pair;
+    pid_filter_t        thresh_filter;
+    kalman_filter_t     target_filter;
+    detection_map_t     detection_map;
 
 #ifdef __PSM__
-    psm_pair_t          PredictiveStateModelPair;
+    psm_pair_t          predictive_state_model_pair;
 #endif
-    transition_matrix_t StateTransitions;
-    kumaraswamy_t       Kumaraswamy;
-    fsm_system_t        StateMachine;
-    packet_t            Packet;
+    transition_matrix_t state_transitions;
+    kumaraswamy_t       kumaraswamy;
+    fsm_system_t        state_machine;
+    packet_t            packet;
 
 #ifdef __USE_DECOUPLING__
     uint8_t             cframe[C_FRAME_SIZE];
 #endif
     
-    double             Timestamp;
+    double              timestamp;
 } rho_core_t;
+
+/* Quadrant density redistribution lookup table */
+static const density_redistribution_lookup_t rlookup =
+{
+    {
+        {
+            { { 0, 1, 3, 4 }, { 2, 5 }, { 6, 7 }, { 8 } },
+            { { 0 }, { 1, 2 }, { 3, 6 }, { 4, 5, 7, 8 } },
+            { { 0, 1, 2, 3 }, { 1, 3 }, { 2, 3 }, { 3 } },
+            { 4, 2, 2, 1 }
+        },
+        {
+            { { 0, 3 }, { 1, 2, 4, 5 }, { 6 }, { 7, 8 } },
+            { { 0, 1 }, { 2 }, { 3, 4, 6, 7 }, { 5, 8 } },
+            { { 0, 2 }, { 0, 1, 2, 3 }, { 2 }, { 2, 3 } },
+            { 2, 4, 1, 2 }
+        },
+        {
+            { { 0, 1 }, { 2 }, { 3, 4, 6, 7 }, { 5, 8 } },
+            { { 0, 3 }, { 1, 2, 4, 5 }, { 6 }, { 7, 8 } },
+            { { 0, 1 }, { 1 }, { 0, 1, 2, 3 }, { 1, 3 } },
+            { 2, 1, 4, 2 }
+        },
+        {
+            { { 0 }, { 1, 2 }, { 3, 6 }, { 4, 5, 7, 8 } },
+            { { 0, 1, 3, 4 }, { 2, 5 }, { 6, 7 }, { 8 } },
+            { { 0 }, { 0, 1 }, { 0, 2 }, { 0, 1, 2, 3 } },
+            { 1, 2, 2, 4 }
+        }
+    }
+};
 
 #endif /* rho_c_types_h */

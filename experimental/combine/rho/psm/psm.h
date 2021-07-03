@@ -33,16 +33,16 @@ extern "C" {
 #endif
     
     
-    void InitializePSM(                     psm_t *, const char * );
-    void ReportObservationsPSM(             psm_t *, observation_list_t *, floating_t, uint8_t );
-    void UpdateStateIntervalsPSM(           psm_t * );//, floating_t );
-    void UpdatePSM(                         psm_t * );//, observation_list_t *, floating_t, uint8_t );
-    void UpdateStateBandPSM(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
-    void DiscoverStateBandsPSM(             psm_t *, band_list_t * );
-    uint8_t FindMostLikelyHiddenStatePSM(   psm_t *, uint8_t, floating_t * );
-    void UpdateBestClusterPSM(              psm_t *, band_list_t * );
-    uint8_t GetCurrentBandPSM(              psm_t *, band_list_t * );
-    void GenerateProposalsPSM(              psm_t * );
+    void ProbabilisticStateModel_Initialize(                     psm_t *, const char * );
+    void ProbabilisticStateModel_ReportObservations(             psm_t *, observation_list_t *, floating_t, uint8_t );
+    void ProbabilisticStateModel_UpdateStateIntervals(           psm_t * );//, floating_t );
+    void ProbabilisticStateModel_Update(                         psm_t * );//, observation_list_t *, floating_t, uint8_t );
+    void ProbabilisticStateModel_UpdateStateBand(                band_list_t *, uint8_t, int8_t, gaussian2d_t * );
+    void ProbabilisticStateModel_DiscoverStateBands(             psm_t *, band_list_t * );
+    uint8_t ProbabilisticStateModel_FindMostLikelyHiddenState(   psm_t *, uint8_t, floating_t * );
+    void ProbabilisticStateModel_UpdateBestCluster(              psm_t *, band_list_t * );
+    uint8_t ProbabilisticStateModel_GetCurrentBand(              psm_t *, band_list_t * );
+    void ProbabilisticStateModel_GenerateProposals(              psm_t * );
     
     typedef struct
     {
@@ -60,16 +60,16 @@ extern "C" {
     
     static const psm_functions_t PSMFunctions =
     {
-        .Initialize                 = InitializePSM,
-        .ReportObservations         = ReportObservationsPSM,
-        .UpdateStateIntervals       = UpdateStateIntervalsPSM,
-        .Update                     = UpdatePSM,
-        .UpdateStateBand            = UpdateStateBandPSM,
-        .DiscoverStateBands         = DiscoverStateBandsPSM,
-        .FindMostLikelyHiddenState  = FindMostLikelyHiddenStatePSM,
-        .UpdateBestCluster          = UpdateBestClusterPSM,
-        .GetCurrentBand             = GetCurrentBandPSM,
-        .GenerateProposals          = GenerateProposalsPSM,
+        .Initialize                 = ProbabilisticStateModel_Initialize,
+        .ReportObservations         = ProbabilisticStateModel_ReportObservations,
+        .UpdateStateIntervals       = ProbabilisticStateModel_UpdateStateIntervals,
+        .Update                     = ProbabilisticStateModel_Update,
+        .UpdateStateBand            = ProbabilisticStateModel_UpdateStateBand,
+        .DiscoverStateBands         = ProbabilisticStateModel_DiscoverStateBands,
+        .FindMostLikelyHiddenState  = ProbabilisticStateModel_FindMostLikelyHiddenState,
+        .UpdateBestCluster          = ProbabilisticStateModel_UpdateBestCluster,
+        .GetCurrentBand             = ProbabilisticStateModel_GetCurrentBand,
+        .GenerateProposals          = ProbabilisticStateModel_GenerateProposals
     };
     
 #ifdef __cplusplus

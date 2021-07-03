@@ -178,9 +178,9 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
     DrawDensityGraph(M);
     DrawDensityMaps(M);
     
-    density_2d_t    Qv[] = { rho.core.Q[0],  rho.core.Q[1],  rho.core.Q[2],  rho.core.Q[3]  },
-                    Qb[] = { rho.core.Qb[0], rho.core.Qb[1], rho.core.Qb[2], rho.core.Qb[3] },
-                    Qf[] = { rho.core.Qf[0], rho.core.Qf[1], rho.core.Qf[2], rho.core.Qf[3] };
+    density_2d_t    Qv[] = { rho.core.quadrant[0],  rho.core.quadrant[1],  rho.core.quadrant[2],  rho.core.quadrant[3]  },
+                    Qb[] = { rho.core.quadrant_background[0], rho.core.quadrant_background[1], rho.core.quadrant_background[2], rho.core.quadrant_background[3] },
+                    Qf[] = { rho.core.quadrant_final[0], rho.core.quadrant_final[1], rho.core.quadrant_final[2], rho.core.quadrant_final[3] };
 
     putText(M, to_string(Qv[0]), Point(inseta_, insetb_),                       FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
     putText(M, to_string(Qv[1]), Point(w-insetb_-RHO_MAPS_INSET, insetb_),      FONT_HERSHEY_PLAIN, fontsize_, fontcolora_, 4);
@@ -199,13 +199,13 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
     
     putText(M, "Thresh: " + to_string(utility.thresh), Point(0, 14), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,255), 2);
 #ifdef __PSM__
-    putText(M, "State: " + string(stateString(rho.core.PredictiveStateModelPair.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
+    putText(M, "State: " + string(stateString(rho.core.predictive_state_model_pair.current_state)), Point(0, 28), FONT_HERSHEY_PLAIN, 1, Vec3b(255,0,155), 2);
 #endif
     putText(M, "X", Point(utility.pCx-9, utility.pCy+10), FONT_HERSHEY_PLAIN, 2, greyish, 4);
-    line(M, Point(rho.core.Centroid.x, rho.core.Centroid.y), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
-    putText(M, "X (" + to_string(rho.core.Centroid.x) + ", " + to_string(rho.core.Centroid.y) + ")", Point(rho.core.Centroid.x-9, rho.core.Centroid.y+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
-    putText(M, "o", Point(rho.core.Primary.x-9, rho.core.Primary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
-    putText(M, "o", Point(rho.core.Secondary.x-9, rho.core.Secondary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
+    line(M, Point(rho.core.centroid.x, rho.core.centroid.y), Point(utility.pCx, utility.pCy), Scalar(0,255,255));
+    putText(M, "X (" + to_string(rho.core.centroid.x) + ", " + to_string(rho.core.centroid.y) + ")", Point(rho.core.centroid.x-9, rho.core.centroid.y+10), FONT_HERSHEY_PLAIN, 2, yellowish, 4);
+    putText(M, "o", Point(rho.core.primary.x-9, rho.core.primary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
+    putText(M, "o", Point(rho.core.secondary.x-9, rho.core.secondary.y+12), FONT_HERSHEY_PLAIN, 2, orangish, 4);
     
     double dnow = now();
     rectangle(M, Point(W-SIDEBAR_WIDTH,H-SIDEBAR_WIDTH*2), Point(W,H), Scalar(0,0,0), FILLED);
@@ -229,10 +229,10 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     int u, v, vv, w = width, h = height;
     
     int x1 = w, x2 = w, y1 = h, y2 = h,
-    rangex[3] = { w, (int)rho.core.Centroid.x, 0 },
-    rangey[3] = { h, (int)rho.core.Centroid.y, 0 },
-    Bx = rho.core.Secondary.x,
-    By = rho.core.Secondary.y;
+    rangex[3] = { w, (int)rho.core.centroid.x, 0 },
+    rangey[3] = { h, (int)rho.core.centroid.y, 0 },
+    Bx = rho.core.secondary.x,
+    By = rho.core.secondary.y;
     line(M, Point(rangex[1],0),   Point(rangex[1],H), redish);
     line(M, Point(0,rangey[1]),   Point(W,rangey[1]), redish);
     
@@ -243,8 +243,8 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         bool pT = 1;
 //        bool first = 1;
         /* Kalman Values */
-        kalman_filter_t yk = rho.core.DensityMapPair.x.kalmans[i], xk = rho.core.DensityMapPair.y.kalmans[i];
-        int mYv = rho.core.DensityMapPair.x.kalmans[i].variance, mXv = rho.core.DensityMapPair.y.kalmans[i].variance;
+        kalman_filter_t yk = rho.core.density_map_pair.x.kalmans[i], xk = rho.core.density_map_pair.y.kalmans[i];
+        int mYv = rho.core.density_map_pair.x.kalmans[i].variance, mXv = rho.core.density_map_pair.y.kalmans[i].variance;
        
         int m = OP_ALIGN((xk.value/DENSITY_SCALE),h), n = OP_ALIGN((yk.value/DENSITY_SCALE),w);
         int mv1 = OP_ALIGN((mXv/DENSITY_SCALE),m), mv2 = OP_ALIGN(-(mXv/DENSITY_SCALE),m), nv1 = OP_ALIGN((mYv/DENSITY_SCALE),n), nv2 = OP_ALIGN(-(mYv/DENSITY_SCALE),n);
@@ -273,16 +273,16 @@ void TauDrawer::DrawDensityGraph(Mat &M)
         for( y1 = rangey[i]; y1 > rangey[j];  )
         {
             --y1;
-            dX[y1] = INR(rho.core.DensityMapPair.x.map[y1], h);
-            fX[y1] = INR(rho.core.DensityMapPair.x.background[y1], h);
-            bX[y1] = INRLH(rho.core.DensityMapPair.x.bound[y1], -h, h);
+            dX[y1] = INR(rho.core.density_map_pair.x.map[y1], h);
+            fX[y1] = INR(rho.core.density_map_pair.x.background[y1], h);
+            bX[y1] = INRLH(rho.core.density_map_pair.x.bound[y1], -h, h);
         }
         for( x1 = rangex[i]; x1 > rangex[j];  )
         {
             --x1;
-            dY[x1] = INR(rho.core.DensityMapPair.y.map[x1], w);
-            fY[x1] = INR(rho.core.DensityMapPair.y.background[x1], w);
-            bY[x1] = INRLH(rho.core.DensityMapPair.y.bound[x1], -w, w);
+            dY[x1] = INR(rho.core.density_map_pair.y.map[x1], w);
+            fY[x1] = INR(rho.core.density_map_pair.y.background[x1], w);
+            bY[x1] = INRLH(rho.core.density_map_pair.y.bound[x1], -w, w);
         }
         pthread_mutex_unlock(&rho.density_map_pair_mutex);
         
@@ -405,30 +405,30 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     
     
     // Draw regions
-    for( int i = 0; i < rho.core.PredictionPair.y.NumRegions; i++ )
+    for( int i = 0; i < rho.core.prediction_pair.y.num_regions; i++ )
     {
-        int o = rho.core.PredictionPair.y.RegionsOrder[i].index;
-        int v = rho.core.PredictionPair.y.Regions[o].location;
+        int o = rho.core.prediction_pair.y.regions_order[i].index;
+        int v = rho.core.prediction_pair.y.regions[o].location;
         line(M, Point(v,0),Point(v,h), bluish);
     }
-    for( int i = 0; i < rho.core.PredictionPair.x.NumRegions; i++ )
+    for( int i = 0; i < rho.core.prediction_pair.x.num_regions; i++ )
     {
-        int o = rho.core.PredictionPair.x.RegionsOrder[i].index;
-        int v = rho.core.PredictionPair.x.Regions[o].location;
+        int o = rho.core.prediction_pair.x.regions_order[i].index;
+        int v = rho.core.prediction_pair.x.regions[o].location;
         line(M, Point(0,v),Point(w,v), bluish);
     }
     
     // Draw tracking predictions
     for( int i = 0; i < 2; i++ )
     {
-        int o = rho.core.PredictionPair.y.TrackingFiltersOrder[i];
-        int v = rho.core.PredictionPair.y.TrackingFilters[o].value;
+        int o = rho.core.prediction_pair.y.tracking_filters_order[i];
+        int v = rho.core.prediction_pair.y.tracking_filters[o].value;
         line(M, Point(v,0),Point(v,h), greyish);
     }
     for( int i = 0; i < 2; i++ )
     {
-        int o = rho.core.PredictionPair.x.TrackingFiltersOrder[i];
-        int v = rho.core.PredictionPair.x.TrackingFilters[o].value;
+        int o = rho.core.prediction_pair.x.tracking_filters_order[i];
+        int v = rho.core.prediction_pair.x.tracking_filters[o].value;
         line(M, Point(0,v),Point(w,v), greyish);
     }
 }
@@ -436,13 +436,13 @@ void TauDrawer::DrawDensityGraph(Mat &M)
 void TauDrawer::DrawDensityMaps(Mat& M)
 {
     Vec3b c(0,0,0);
-    int x = 0, y = 0, rangex[2] = { (int)rho.core.Centroid.x, w }, rangey[2] = { (int)rho.core.Centroid.y, h };
+    int x = 0, y = 0, rangex[2] = { (int)rho.core.centroid.x, w }, rangey[2] = { (int)rho.core.centroid.y, h };
     for( int i = 0; i < 2; i++ )
     {
-        int mX = rho.core.DensityMapPair.x.max[1-i], mY = rho.core.DensityMapPair.y.max[1-i];
+        int mX = rho.core.density_map_pair.x.max[1-i], mY = rho.core.density_map_pair.y.max[1-i];
         if(!mX) mX = 1;
         if(!mY) mY = 1;
-        density_map_unit_t *dX = rho.core.DensityMapPair.x.map, *dY = rho.core.DensityMapPair.y.map;
+        density_map_unit_t *dX = rho.core.density_map_pair.x.map, *dY = rho.core.density_map_pair.y.map;
         
         for(; y < rangey[i]; y++ )
         {
@@ -547,18 +547,18 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     
     /* Gather data */
     pthread_mutex_lock(&rho.c_mutex);
-    floating_t total_cvg_percent = (floating_t)rho.core.TotalCoverage/(rho.core.Width*rho.core.Height),
-    filtered_cvg_percent = rho.core.FilteredPercentage;
+    floating_t total_cvg_percent = (floating_t)rho.core.total_coverage/(rho.core.width*rho.core.height),
+    filtered_cvg_percent = rho.core.filtered_percentage;
     floating_t X_kumaraswamy[NUM_STATE_GROUPS] = { 0. },
     Y_kumaraswamy[NUM_STATE_GROUPS] = { 0. },
     C_kumaraswamy[NUM_STATE_GROUPS] = { 0. };
-    memcpy(X_kumaraswamy, rho.core.PredictionPair.x.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
-    memcpy(Y_kumaraswamy, rho.core.PredictionPair.y.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
-    memcpy(C_kumaraswamy, rho.core.PredictionPair.Probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memcpy(X_kumaraswamy, rho.core.prediction_pair.x.probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memcpy(Y_kumaraswamy, rho.core.prediction_pair.y.probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
+    memcpy(C_kumaraswamy, rho.core.prediction_pair.probabilities.P, sizeof(floating_t)*NUM_STATE_GROUPS);
     floating_t
     state_P[NUM_STATES] = { 0. },
-    x_nu = rho.core.PredictionPair.x.NuRegions,
-    y_nu = rho.core.PredictionPair.y.NuRegions;
+    x_nu = rho.core.prediction_pair.x.nu_regions,
+    y_nu = rho.core.prediction_pair.y.nu_regions;
 #ifdef __PSM__
 //    state_t state = rho.core.PredictiveStateModelPair.y.hmm.A.state;
 //    for(int i = 0; i < NUM_STATES; i++)
@@ -566,8 +566,8 @@ Mat& TauDrawer::DrawRhoFrame(Mat&M)
     state_t state = UNKNOWN_STATE;
 #endif
     
-    floating_t target_cvg_percent = rho.core.TargetCoverageFactor;
-    pid_data[pid_data_x] = rho.core.TargetFilter.value;
+    floating_t target_cvg_percent = rho.core.target_coverage_factor;
+    pid_data[pid_data_x] = rho.core.target_filter.value;
     pid_data_target[pid_data_x] = target_cvg_percent;
     pthread_mutex_unlock(&rho.c_mutex);
     
@@ -808,15 +808,15 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     floating_t *pDlv = (dimension==X_DIMENSION)?x_peak_data_lv:y_peak_data_lv;
     floating_t *pDlt = (dimension==X_DIMENSION)?x_peak_data_lt:y_peak_data_lt;
     
-    density_map_t &map = (dimension==X_DIMENSION)?rho.core.DensityMapPair.x:rho.core.DensityMapPair.y;
-    prediction_t &prediction = (dimension==X_DIMENSION)?rho.core.PredictionPair.x:rho.core.PredictionPair.y;
+    density_map_t &map = (dimension==X_DIMENSION)?rho.core.density_map_pair.x:rho.core.density_map_pair.y;
+    prediction_t &prediction = (dimension==X_DIMENSION)?rho.core.prediction_pair.x:rho.core.prediction_pair.y;
     string filename =(dimension==X_DIMENSION)?X_DIM_FILENAME:Y_DIM_FILENAME;
     int &iteration = (dimension==X_DIMENSION)?x_detection_i:y_detection_i;
     
     floating_t c_percent = (floating_t)(map.centroid)/(floating_t)(map.length);
     
-    pDu[pX] = prediction.PreviousPeak[0];
-    pDl[pX] = prediction.PreviousPeak[1];
+    pDu[pX] = prediction.previous_peak[0];
+    pDl[pX] = prediction.previous_peak[1];
     pDuv[pX] = map.kalmans[0].variance;
     pDlv[pX] = map.kalmans[1].variance;
     pDut[pX] = map.kalmans[0].value;
@@ -824,7 +824,7 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     region_t regions[MAX_REGIONS];
     for(int i = 0; i < MAX_REGIONS; i++)
-        memcpy(&regions[i], &prediction.Regions[prediction.RegionsOrder[i].index], sizeof(region_t));
+        memcpy(&regions[i], &prediction.regions[prediction.regions_order[i].index], sizeof(region_t));
     
     
 #define MATCH_DATA_WIDTH 3
@@ -847,9 +847,9 @@ Mat& TauDrawer::DrawRhoDetection(int dimension, Mat&M)
     {
         if(i < num_tracks)
         {
-            int c = prediction.TrackingFiltersOrder[i];
+            int c = prediction.tracking_filters_order[i];
             MATCH_ENCODE(match_value, i, c);
-            memcpy(&tracking_filters[i], &prediction.TrackingFilters[c], sizeof(kalman_filter_t));
+            memcpy(&tracking_filters[i], &prediction.tracking_filters[c], sizeof(kalman_filter_t));
             tracking_filters_order[i] = c;
         }
         else

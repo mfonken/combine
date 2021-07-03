@@ -106,22 +106,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A2499090-9551-43D2-9510-24352C67C0C0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "xprm/detection_map.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
-            landmarkName = "AddRegionSetToPredictionMap(map, pp)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "6499A28F-245A-4EB7-B7FB-9600848C2670"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -131,7 +115,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "55"
             endingLineNumber = "55"
-            landmarkName = "ReportObservationsPSM(model, observation_list, nu, thresh)"
+            landmarkName = "ProbabilisticStateMachine_ReportObservations(model, observation_list, nu, thresh)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -147,7 +131,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "114"
             endingLineNumber = "114"
-            landmarkName = "UpdateFSMProbabilities(sys, p)"
+            landmarkName = "FiniteStateMachine_UpdateProbabilities(sys, p)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -200,22 +184,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E9E74DBD-7FE4-4F4C-B327-F35635DE26C2"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "utilities/io/file_writer.cpp"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
-            landmarkName = "FileWriter::init(header)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "08D4921A-AD34-41A8-8F92-F9C32507EEF5"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -257,7 +225,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "424"
             endingLineNumber = "424"
-            landmarkName = "GenerateProposalsPSM(model)"
+            landmarkName = "ProbabilisticStateMachine_GenerateProposals(model)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -337,7 +305,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "323"
             endingLineNumber = "323"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -369,7 +337,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "206"
             endingLineNumber = "206"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -385,7 +353,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "160"
             endingLineNumber = "160"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
             <Locations>
                <Location
@@ -449,7 +417,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "249"
             endingLineNumber = "249"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -465,7 +433,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "229"
             endingLineNumber = "229"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -481,7 +449,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "239"
             endingLineNumber = "239"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -497,7 +465,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "115"
             endingLineNumber = "115"
-            landmarkName = "UpdateStateBandPSM(band_list, i, c, band_gaussian)"
+            landmarkName = "ProbabilisticStateMachine_UpdateStateBand(band_list, i, c, band_gaussian)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -513,7 +481,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "225"
             endingLineNumber = "225"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -529,7 +497,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "223"
             endingLineNumber = "223"
-            landmarkName = "DiscoverStateBandsPSM(model, band_list)"
+            landmarkName = "ProbabilisticStateMachine_DiscoverStateBands(model, band_list)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -547,22 +515,6 @@
             endingLineNumber = "109"
             landmarkName = "RhoDrawer::PostProcess(psm)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "AC884F44-B7CB-40F3-B0AC-87095EA0678B"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "utilities/io/sercom.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
-            landmarkName = "tokenifyPacket(a, n, d)"
-            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -593,7 +545,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "214"
             endingLineNumber = "214"
-            landmarkName = "UpdateTransitionProbabilitiesHMM(model)"
+            landmarkName = "HiddenMarkovModel_UpdateTransitionProbabilities(model)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -609,7 +561,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1037"
             endingLineNumber = "1037"
-            landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
+            landmarkName = "RhoUtility_DetectRegion(_, density_map, prediction)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -641,7 +593,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "323"
             endingLineNumber = "323"
-            landmarkName = "BaumWelchSolveHMM(model, DELTA)"
+            landmarkName = "HiddenMarkovModel_BaumWelchSolve(model, DELTA)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -657,23 +609,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "317"
             endingLineNumber = "317"
-            landmarkName = "BaumWelchSolveHMM(model, DELTA)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "65C548C0-3489-43E0-B74D-2F0BDB1CC0D6"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "utilities/algorithm/statistics.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "GetVarianceFromStatistic(stat)"
+            landmarkName = "HiddenMarkovModel_BaumWelchSolve(model, DELTA)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -696,22 +632,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A9B0C4C6-960D-4EF9-964C-4DD4B3A9DB0D"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "utilities/algorithm/statistics.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "44"
-            endingLineNumber = "44"
-            landmarkName = "CumulateAverageStandardDeviationStatistics(new_val, stat)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "3FFBCD56-BBE1-4C51-958E-60E7B1446D13"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -721,23 +641,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "499"
             endingLineNumber = "499"
-            landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "B93602ED-BAA9-4C7D-9C29-43B73CC689D1"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "rho/core/rho_utility.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "972"
-            endingLineNumber = "972"
-            landmarkName = "DetectRegionRhoUtility(_, density_map, prediction)"
+            landmarkName = "RhoUtility_DetectRegion(_, density_map, prediction)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

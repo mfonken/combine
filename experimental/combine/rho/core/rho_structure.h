@@ -14,13 +14,13 @@ for(A = B, D = 0, F = 0; A > C; --A, D = E[A], F = G[A] )
 
 #define PACKET_ADDRESS_INITIALIZER(r)               \
 {                                                   \
-(address_t)&r.y.TrackingFilters[0].value, /* px */  \
-(address_t)&r.x.TrackingFilters[0].value, /* py */  \
-(address_t)&r.y.TrackingFilters[1].value, /* sx */  \
-(address_t)&r.x.TrackingFilters[1].value, /* sy */  \
-(address_t)&r.Probabilities.P[1],         /* pp */  \
-(address_t)&r.Probabilities.P[2],         /* ap */  \
-(address_t)&r.Probabilities.P[3]          /* ap */  \
+(address_t)&r.y.tracking_filters[0].value, /* px */  \
+(address_t)&r.x.tracking_filters[0].value, /* py */  \
+(address_t)&r.y.tracking_filters[1].value, /* sx */  \
+(address_t)&r.x.tracking_filters[1].value, /* sy */  \
+(address_t)&r.probabilities.P[1],         /* pp */  \
+(address_t)&r.probabilities.P[2],         /* ap */  \
+(address_t)&r.probabilities.P[3]          /* ap */  \
 }
 
 #endif /* rho_structure_h */

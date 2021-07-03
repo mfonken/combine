@@ -101,6 +101,11 @@ void UpdateKalman( kalman_filter_t * k, floating_t value_new )
     LOG_KALMAN(KALMAN_DEBUG_2, "Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
 };
 
+floating_t TickKalman( kalman_filter_t * k, floating_t value_new )
+{
+    return Kalman.Step( k, value_new, k->velocity );
+}
+
 floating_t StepKalman( kalman_filter_t * k, floating_t value_new, floating_t rate_new )
 {
     LOG_KALMAN(KALMAN_DEBUG_2, "Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);

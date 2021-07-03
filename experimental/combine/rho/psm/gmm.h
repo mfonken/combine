@@ -18,24 +18,24 @@ extern "C" {
 #include "fsm.h"
 
 /* Cluster functions */
-void InitializeGaussianMixtureCluster(                 gaussian_mixture_cluster_t *, observation_t *, vec2_t * );
-void UpdateGaussianMixtureCluster(                     gaussian_mixture_cluster_t *, observation_t *, vec2_t * );
-void GetScoreOfGaussianMixtureCluster(                 gaussian_mixture_cluster_t *, vec2_t *);
-void UpdateNormalOfGaussianMixtureCluster(             gaussian_mixture_cluster_t * );
-void UpdateInputProbabilityOfGaussianMixtureCluster(   gaussian_mixture_cluster_t *, double );
-void ContributeToOutputOfGaussianMixtureCluster(       gaussian_mixture_cluster_t *, vec2_t *, vec2_t * );
-void UpdateLimitsOfGaussianMixtureCluster(             gaussian_mixture_cluster_t * );
-void WeighGaussianMixtureCluster(                      gaussian_mixture_cluster_t * );
+void GaussianMixtureCluster_Initialize(                 gaussian_mixture_cluster_t *, observation_t *, vec2_t * );
+void GaussianMixtureCluster_Update(                     gaussian_mixture_cluster_t *, observation_t *, vec2_t * );
+void GaussianMixtureCluster_GetScore(                   gaussian_mixture_cluster_t *, vec2_t *);
+void GaussianMixtureCluster_UpdateNormal(               gaussian_mixture_cluster_t * );
+void GaussianMixtureCluster_UpdateInputProbability(     gaussian_mixture_cluster_t *, double );
+void GaussianMixtureCluster_ContributeToOutput(         gaussian_mixture_cluster_t *, vec2_t *, vec2_t * );
+void GaussianMixtureCluster_UpdateLimits(               gaussian_mixture_cluster_t * );
+void GaussianMixtureCluster_Weigh(                      gaussian_mixture_cluster_t * );
 
 /* Model functions */
-void InitializeGaussianMixtureModel(                   gaussian_mixture_model_t *, const char * );
-double GetScoreSumOfClustersInGaussianMixtureModel(    gaussian_mixture_model_t *, vec2_t * );
-double GetOutputAndBestDistanceOfGaussianMixtureModel( gaussian_mixture_model_t *, double, vec2_t *, vec2_t * );
-double GetMaxErrorOfGaussianMixtureModel(              gaussian_mixture_model_t *, vec2_t *, vec2_t *, vec2_t * );
-void AddClusterToGaussianMixtureModel(                 gaussian_mixture_model_t *, observation_t *, vec2_t * );
-void UpdateGaussianMixtureModel(                       gaussian_mixture_model_t *, observation_t *, vec2_t * );
-void AddValueToGaussianMixtureModel(                   gaussian_mixture_model_t *, observation_t *, vec2_t * );
-void RemoveClusterFromGaussianMixtureModel(             gaussian_mixture_model_t *, uint16_t );
+void GaussianMixtureModel_Initialize(                   gaussian_mixture_model_t *, const char * );
+double GaussianMixtureModel_GetScoreSumOfClusters(      gaussian_mixture_model_t *, vec2_t * );
+double GaussianMixtureModel_GetOutputAndBestDistance(   gaussian_mixture_model_t *, double, vec2_t *, vec2_t * );
+double GaussianMixtureModel_GetMaxError(                gaussian_mixture_model_t *, vec2_t *, vec2_t *, vec2_t * );
+void GaussianMixtureModel_AddCluster(                   gaussian_mixture_model_t *, observation_t *, vec2_t * );
+void GaussianMixtureModel_Update(                       gaussian_mixture_model_t *, observation_t *, vec2_t * );
+void GaussianMixtureModel_AddValue(                     gaussian_mixture_model_t *, observation_t *, vec2_t * );
+void GaussianMixtureModel_RemoveCluster(                gaussian_mixture_model_t *, uint16_t );
 
 typedef struct
 {
@@ -69,23 +69,23 @@ typedef struct
 
 static gaussian_mixture_functions GMMFunctions =
 {
-    .Cluster.Initialize             = InitializeGaussianMixtureCluster,
-    .Cluster.Update                 = UpdateGaussianMixtureCluster,
-    .Cluster.GetScore               = GetScoreOfGaussianMixtureCluster,
-    .Cluster.UpdateNormal           = UpdateNormalOfGaussianMixtureCluster,
-    .Cluster.UpdateInputProbability = UpdateInputProbabilityOfGaussianMixtureCluster,
-    .Cluster.ContributeToOutput     = ContributeToOutputOfGaussianMixtureCluster,
-    .Cluster.UpdateLimits           = UpdateLimitsOfGaussianMixtureCluster,
-    .Cluster.Weigh                  = WeighGaussianMixtureCluster,
+    .Cluster.Initialize             = GaussianMixtureCluster_Initialize,
+    .Cluster.Update                 = GaussianMixtureCluster_Update,
+    .Cluster.GetScore               = GaussianMixtureCluster_GetScore,
+    .Cluster.UpdateNormal           = GaussianMixtureCluster_UpdateNormal,
+    .Cluster.UpdateInputProbability = GaussianMixtureCluster_UpdateInputProbability,
+    .Cluster.ContributeToOutput     = GaussianMixtureCluster_ContributeToOutput,
+    .Cluster.UpdateLimits           = GaussianMixtureCluster_UpdateLimits,
+    .Cluster.Weigh                  = GaussianMixtureCluster_Weigh,
     
-    .Model.Initialize               = InitializeGaussianMixtureModel,
-    .Model.GetScoreSumOfClusters    = GetScoreSumOfClustersInGaussianMixtureModel,
-    .Model.GetOutputAndBestDistance = GetOutputAndBestDistanceOfGaussianMixtureModel,
-    .Model.GetMaxError              = GetMaxErrorOfGaussianMixtureModel,
-    .Model.AddCluster               = AddClusterToGaussianMixtureModel,
-    .Model.Update                   = UpdateGaussianMixtureModel,
-    .Model.AddValue                 = AddValueToGaussianMixtureModel,
-    .Model.RemoveCluster            = RemoveClusterFromGaussianMixtureModel
+    .Model.Initialize               = GaussianMixtureModel_Initialize,
+    .Model.GetScoreSumOfClusters    = GaussianMixtureModel_GetScoreSumOfClusters,
+    .Model.GetOutputAndBestDistance = GaussianMixtureModel_GetOutputAndBestDistance,
+    .Model.GetMaxError              = GaussianMixtureModel_GetMaxError,
+    .Model.AddCluster               = GaussianMixtureModel_AddCluster,
+    .Model.Update                   = GaussianMixtureModel_Update,
+    .Model.AddValue                 = GaussianMixtureModel_AddValue,
+    .Model.RemoveCluster            = GaussianMixtureModel_RemoveCluster
 };
 
 #ifdef __cplusplus

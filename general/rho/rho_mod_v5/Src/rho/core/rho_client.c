@@ -164,7 +164,7 @@ void CaptureRowCallback( void )
 }
 
 //__attribute__((naked))
-address_t CaptureRow( register byte_t * capture_address,   // capture buffer index
+inline address_t CaptureRow( register byte_t * capture_address,   // capture buffer index
                  register index_t * thresh_address,    // address of thresh buffer
                  const register byte_t thresh_value,
                  const register byte_t sub_sample,
@@ -178,7 +178,7 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
     {
         working_register = *(capture_address);
         capture_address += sub_sample;
-        if((uint32_t)capture_address > (uint32_t)capture_end) break;
+        if((uint32_t)capture_address >= (uint32_t)capture_end) break;
 
         if(working_register > thresh_value )
         {
@@ -216,18 +216,18 @@ address_t CaptureRow( register byte_t * capture_address,   // capture buffer ind
 void ProcessFrameSectionControl( const index_t rows, uint32_t * left, uint32_t * right )
 {
     uint32_t Left = 0, Right = 0, Fill = 0, Complete = 0;
-    do{
+    do
+    {
       while( ProcessingBufferHasUpdate() != true );
       AcknowledgeProcessingBufferUpdate();
       ProcessFrameSection( rows, &Left, &Right, &Fill, &Complete );
       RhoSystem.Variables.Addresses.ProcessIndex = Fill;
       RhoSystem.Variables.Addresses.DensityMapGenIndex += CBW;
       *left += Left; *right += Right;
-      EnableCaptureCallback();
     } while( Complete != true );
 }
 
-void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right, uint32_t * fill, uint32_t * complete )
+inline void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right, uint32_t * fill, uint32_t * complete )
 {
     register uint32_t
         value_register      = 0,
@@ -310,7 +310,7 @@ void ProcessFrameSection( const index_t rows, uint32_t * left, uint32_t * right,
         "r"(Q_right)            // %11
     );
 #endif
-    *complete = !!( Dx_i >= Dx_end );
+    *complete = ( Dx_i >= Dx_end );
     *left = Q_left;
     *right = Q_right;
     *fill = t_addr;

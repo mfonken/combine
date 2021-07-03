@@ -18,6 +18,9 @@
 #include "rho_structure.h"
 #include "rho_types.h"
 
+#define RHO_UTILITY_NAME "RhoUtility"
+#define RHO_UTILITY_NAME_BUILDER(DATA) NAME_BUILDER(RHO_UTILITY_NAME, DATA)
+
 #ifdef __USE_DECOUPLING__
 #include "rho_deco.h"
 #endif
@@ -48,57 +51,57 @@ extern "C" {
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                       Function Declarations                          *
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-    void InitializeDataRhoUtility( rho_core_t *, index_t, index_t );
-    void InitializeFiltersRhoUtility( rho_core_t * );
-    void InitializePredictionRhoUtility( prediction_t *, const char *, index_t );
-    void InitializeDensityMapRhoUtility( density_map_t *, const char *, index_t, index_t );
+    void RhoUtility_InitializeData( rho_core_t *, index_t, index_t );
+    void RhoUtility_InitializeFilters( rho_core_t * );
+    void RhoUtility_InitializePrediction( prediction_t *, const char *, index_t );
+    void RhoUtility_InitializeDensityMap( density_map_t *, const char *, index_t, index_t );
 
-    void ResetForDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void ResetForPredictionRhoUtility( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
-    void ResetDensityMapPairKalmansRhoUtility( rho_core_t * );
+    void RhoUtility_ResetForDetect( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_ResetForPrediction( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
+    void RhoUtility_ResetDensityMapPairKalmans( rho_core_t * );
 
-    void PredictPeakFilterRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void PredictTrackingFiltersRhoUtility( prediction_t * );
-    index_t CalculateValidTracksRhoUtility( prediction_t * );
-    void SortTrackingFiltersRhoUtility( prediction_t * );
-    void PredictTrackingProbabilitiesRhoUtility( prediction_t * );
+    void RhoUtility_PredictPeakFilter( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_PredictTrackingFilters( prediction_t * );
+    index_t RhoUtility_CalculateValidTracks( prediction_t * );
+    void RhoUtility_SortTrackingFilters( prediction_t * );
+    void RhoUtility_PredictTrackingProbabilities( prediction_t * );
 
-    void PerformDetectRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    bool CalculateBandLowerBoundRhoUtility( rho_detection_variables * );
-    void DetectRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void DetectRegionRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_PerformDetect( rho_detection_variables *, density_map_t *, prediction_t * );
+    bool RhoUtility_CalculateBandLowerBound( rho_detection_variables * );
+    void RhoUtility_DetectRegions( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_DetectRegion( rho_detection_variables *, density_map_t *, prediction_t * );
 #ifdef __USE_ZSCORE_THRESHOLD__
-    index_t ZscoreLowerBoundRhoUtility( rho_detection_variables * );
-    bool ZscoreRegionRhoUtility( rho_detection_variables *, bool );
+    index_t RhoUtility_ZscoreLowerBound( rho_detection_variables * );
+    bool RhoUtility_ZscoreRegion( rho_detection_variables *, bool );
 #endif
-    void SubtractBackgroundForDetectionRhoUtility( rho_detection_variables * );
-    void CalculateChaosRhoUtility( rho_detection_variables *, prediction_t * );
-    void ScoreRegionsRhoUtility( rho_detection_variables *, density_map_t *, prediction_t * );
-    void SortRegionsRhoUtility( rho_detection_variables *, prediction_t * );
-    void CalculatedFrameStatisticsRhoUtility( rho_detection_variables *, prediction_t * );
+    void RhoUtility_SubtractBackgroundForDetection( rho_detection_variables * );
+    void RhoUtility_CalculateChaos( rho_detection_variables *, prediction_t * );
+    void RhoUtility_ScoreRegions( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_SortRegions( rho_detection_variables *, prediction_t * );
+    void RhoUtility_CalculatedFrameStatistics( rho_detection_variables *, prediction_t * );
 
-    void CorrectPredictionAmbiguityRhoUtility( prediction_predict_variables *, rho_core_t * );
-    void RedistributeDensitiesRhoUtility( rho_core_t * );
-    void CombineAxisProbabilitesRhoUtility( prediction_pair_t * );
-    void UpdateCorePredictionDataRhoUtility( prediction_predict_variables *, rho_core_t * );
+    void RhoUtility_CorrectPredictionAmbiguity( prediction_predict_variables *, rho_core_t * );
+    void RhoUtility_RedistributeDensities( rho_core_t * );
+    void RhoUtility_CombineAxisProbabilites( prediction_pair_t * );
+    void RhoUtility_UpdateCorePredictionData( prediction_predict_variables *, rho_core_t * );
 
-    index_t CalculatePredictionCenterRhoUtility( index_t, index_t, index_t );
-    void CalculateTuneRhoUtility( rho_core_t * );
-    void CalculateBackgroundTuneFactorRhoUtility( rho_core_t * );
-    void CalculateStateTuneFactorRhoUtility( rho_core_t * );
-    void CalculateTargetTuneFactorRhoUtility( rho_core_t * );
-    void CalculateTargetCoverageFactorRhoUtility( rho_core_t * core );
+    index_t RhoUtility_CalculatePredictionCenter( index_t, index_t, index_t );
+    void RhoUtility_CalculateTune( rho_core_t * );
+    void RhoUtility_CalculateBackgroundTuneFactor( rho_core_t * );
+    void RhoUtility_CalculateStateTuneFactor( rho_core_t * );
+    void RhoUtility_CalculateTargetTuneFactor( rho_core_t * );
+    void RhoUtility_CalculateTargetCoverageFactor( rho_core_t * core );
 
-    void GenerateRegionScoreRhoUtility( region_t *, density_t, byte_t );
-    density_2d_t GenerateCentroidRhoUtility( density_map_unit_t *, index_t, index_t *, density_t );
-    void PrintPacketRhoUtility( packet_t *, index_t );
-    void GenerateBackgroundRhoUtility( rho_core_t * );
-    void GeneratePacketRhoUtility( rho_core_t * );
+    void RhoUtility_GenerateRegionScore( region_t *, density_t, byte_t );
+    density_2d_t RhoUtility_GenerateCentroid( density_map_unit_t *, index_t, index_t *, density_t );
+    void RhoUtility_PrintPacket( packet_t *, index_t );
+    void RhoUtility_GenerateBackground( rho_core_t * );
+    void RhoUtility_GeneratePacket( rho_core_t * );
 
-    void GenerateObservationListFromPredictionsRhoUtility( prediction_t *, uint8_t );
-    void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * );
-    void ReportObservationListsFromPredictionsRhoUtility( rho_core_t * );
-    void UpdatePredictiveStateModelPairRhoUtility( rho_core_t * );
+    void RhoUtility_GenerateObservationListFromPredictions( prediction_t *, uint8_t );
+    void RhoUtility_GenerateObservationListsFromPredictions( rho_core_t * );
+    void RhoUtility_ReportObservationListsFromPredictions( rho_core_t * );
+    void RhoUtility_UpdatePredictiveStateModelPair( rho_core_t * );
 
     typedef struct
     {
@@ -192,61 +195,61 @@ extern "C" {
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     static const rho_utility_functions RhoUtility =
     {
-        .Initialize.Data = InitializeDataRhoUtility,
-        .Initialize.Filters = InitializeFiltersRhoUtility,
-        .Initialize.Prediction = InitializePredictionRhoUtility,
-        .Initialize.DensityMap = InitializeDensityMapRhoUtility,
+        .Initialize.Data = RhoUtility_InitializeData,
+        .Initialize.Filters = RhoUtility_InitializeFilters,
+        .Initialize.Prediction = RhoUtility_InitializePrediction,
+        .Initialize.DensityMap = RhoUtility_InitializeDensityMap,
 
-        .Reset.Detect = ResetForDetectRhoUtility,
-        .Reset.Prediction = ResetForPredictionRhoUtility,
-        .Reset.DensityMapPairKalmans = ResetDensityMapPairKalmansRhoUtility,
+        .Reset.Detect = RhoUtility_ResetForDetect,
+        .Reset.Prediction = RhoUtility_ResetForPrediction,
+        .Reset.DensityMapPairKalmans = RhoUtility_ResetDensityMapPairKalmans,
 
-        .Predict.PeakFilter = PredictPeakFilterRhoUtility,
-        .Predict.TrackingFilters = PredictTrackingFiltersRhoUtility,
-        .Predict.CalculateValidTracks = CalculateValidTracksRhoUtility,
-        .Predict.SortFilters = SortTrackingFiltersRhoUtility,
-        .Predict.TrackingProbabilities = PredictTrackingProbabilitiesRhoUtility,
-        .Predict.CorrectAmbiguity = CorrectPredictionAmbiguityRhoUtility,
-        .Predict.CombineProbabilities = CombineAxisProbabilitesRhoUtility,
-        .Predict.RedistributeDensities = RedistributeDensitiesRhoUtility,
-        .Predict.UpdateCorePredictionData = UpdateCorePredictionDataRhoUtility,
-        .Predict.GenerateObservationList = GenerateObservationListFromPredictionsRhoUtility,
-        .Predict.GenerateObservationLists = GenerateObservationListsFromPredictionsRhoUtility,
-        .Predict.ReportObservationLists = ReportObservationListsFromPredictionsRhoUtility,
+        .Predict.PeakFilter = RhoUtility_PredictPeakFilter,
+        .Predict.TrackingFilters = RhoUtility_PredictTrackingFilters,
+        .Predict.CalculateValidTracks = RhoUtility_CalculateValidTracks,
+        .Predict.SortFilters = RhoUtility_SortTrackingFilters,
+        .Predict.TrackingProbabilities = RhoUtility_PredictTrackingProbabilities,
+        .Predict.CorrectAmbiguity = RhoUtility_CorrectPredictionAmbiguity,
+        .Predict.CombineProbabilities = RhoUtility_CombineAxisProbabilites,
+        .Predict.RedistributeDensities = RhoUtility_RedistributeDensities,
+        .Predict.UpdateCorePredictionData = RhoUtility_UpdateCorePredictionData,
+        .Predict.GenerateObservationList = RhoUtility_GenerateObservationListFromPredictions,
+        .Predict.GenerateObservationLists = RhoUtility_GenerateObservationListsFromPredictions,
+        .Predict.ReportObservationLists = RhoUtility_ReportObservationListsFromPredictions,
         
-        .Predict.UpdatePredictiveStateModelPair = UpdatePredictiveStateModelPairRhoUtility,
+        .Predict.UpdatePredictiveStateModelPair = RhoUtility_UpdatePredictiveStateModelPair,
 
-        .Detect.Perform = PerformDetectRhoUtility,
-        .Detect.LowerBound = CalculateBandLowerBoundRhoUtility,
-        .Detect.Regions = DetectRegionsRhoUtility,
-        .Detect.Region = DetectRegionRhoUtility,
+        .Detect.Perform = RhoUtility_PerformDetect,
+        .Detect.LowerBound = RhoUtility_CalculateBandLowerBound,
+        .Detect.Regions = RhoUtility_DetectRegions,
+        .Detect.Region = RhoUtility_DetectRegion,
 #ifdef __USE_ZSCORE_THRESHOLD__
-        .Detect.ZLower = ZscoreLowerBoundRhoUtility,
-        .Detect.ZRegion = ZscoreRegionRhoUtility,
+        .Detect.ZLower = RhoUtility_ZscoreLowerBound,
+        .Detect.ZRegion = RhoUtility_ZscoreRegion,
 #endif
-        .Detect.SubtractBackground = SubtractBackgroundForDetectionRhoUtility,
-        .Detect.CalculateChaos = CalculateChaosRhoUtility,
-        .Detect.ScoreRegions = ScoreRegionsRhoUtility,
-        .Detect.SortRegions = SortRegionsRhoUtility,
-        .Detect.CalculateFrameStatistics = CalculatedFrameStatisticsRhoUtility,
+        .Detect.SubtractBackground = RhoUtility_SubtractBackgroundForDetection,
+        .Detect.CalculateChaos = RhoUtility_CalculateChaos,
+        .Detect.ScoreRegions = RhoUtility_ScoreRegions,
+        .Detect.SortRegions = RhoUtility_SortRegions,
+        .Detect.CalculateFrameStatistics = RhoUtility_CalculatedFrameStatistics,
 
-        .Calculate.PredictionCenter = CalculatePredictionCenterRhoUtility,
-        .Calculate.Tune = CalculateTuneRhoUtility,
-        .Calculate.BackgroundTuneFactor = CalculateBackgroundTuneFactorRhoUtility,
-        .Calculate.StateTuneFactor = CalculateStateTuneFactorRhoUtility,
-        .Calculate.TargetTuneFactor = CalculateTargetTuneFactorRhoUtility,
-        .Calculate.TargetCoverageFactor = CalculateTargetCoverageFactorRhoUtility,
+        .Calculate.PredictionCenter = RhoUtility_CalculatePredictionCenter,
+        .Calculate.Tune = RhoUtility_CalculateTune,
+        .Calculate.BackgroundTuneFactor = RhoUtility_CalculateBackgroundTuneFactor,
+        .Calculate.StateTuneFactor = RhoUtility_CalculateStateTuneFactor,
+        .Calculate.TargetTuneFactor = RhoUtility_CalculateTargetTuneFactor,
+        .Calculate.TargetCoverageFactor = RhoUtility_CalculateTargetCoverageFactor,
         
         .Generate.CumulativeMoments = GenerateCumulativeMomentsStatistics,
         .Generate.CumulativeAverage = GenerateCumulativeAverageStatistics,
         .Generate.CumulateAverageStandardDeviation = CumulateAverageStandardDeviationStatistics,
         .Generate.Variance = GetVarianceFromStatistic,
-        .Generate.RegionScore = GenerateRegionScoreRhoUtility,
-        .Generate.Centroid = GenerateCentroidRhoUtility,
-        .Generate.Packet = GeneratePacketRhoUtility,
-        .Generate.Background = GenerateBackgroundRhoUtility,
+        .Generate.RegionScore = RhoUtility_GenerateRegionScore,
+        .Generate.Centroid = RhoUtility_GenerateCentroid,
+        .Generate.Packet = RhoUtility_GeneratePacket,
+        .Generate.Background = RhoUtility_GenerateBackground,
         
-        .Print.Packet = PrintPacketRhoUtility,
+        .Print.Packet = RhoUtility_PrintPacket,
     };
 
 #ifdef __cplusplus

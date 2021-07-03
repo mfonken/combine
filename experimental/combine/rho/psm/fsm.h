@@ -63,17 +63,17 @@ extern "C" {
      */
 
     
-    void InitializeFSMMap(          transition_matrix_t *                 );
-    void ResetFSMState(             transition_matrix_t *,       uint8_t  );
-    void NormalizeFSMMap(           transition_matrix_t *                 );
-    uint8_t NormalizeFSMState(      transition_matrix_t *,       uint8_t  );
+    void FiniteStateMachine_InitializeMap(          transition_matrix_t *                 );
+    void FiniteStateMachine_ResetState(             transition_matrix_t *,       uint8_t  );
+    void FiniteStateMachine_NormalizeMap(           transition_matrix_t *                 );
+    uint8_t FiniteStateMachine_NormalizeState(      transition_matrix_t *,       uint8_t  );
 
-    void InitializeFSMSystem(       fsm_system_t *, const char *, transition_matrix_t *, state_t );
-    void DecayInactiveFSMSystem(    fsm_system_t *                        );
-    void UpdateFSMSystem(           fsm_system_t *,    double[NUM_STATES] );
-    void UpdateFSMProbabilities(    fsm_system_t *,    double[NUM_STATES] );
-    void UpdateFSMState(            fsm_system_t *                        );
-    void PrintFSMSys(               fsm_system_t *                        );
+    void FiniteStateMachine_InitializeSystem(       fsm_system_t *, const char *, transition_matrix_t *, state_t );
+    void FiniteStateMachine_DecayInactiveSystem(    fsm_system_t *                        );
+    void FiniteStateMachine_UpdateSystem(           fsm_system_t *,    double[NUM_STATES] );
+    void FiniteStateMachine_UpdateProbabilities(    fsm_system_t *,    double[NUM_STATES] );
+    void FiniteStateMachine_UpdateState(            fsm_system_t *                        );
+    void FiniteStateMachine_PrintSystem(            fsm_system_t *                        );
     
     typedef struct
     {
@@ -102,18 +102,18 @@ extern "C" {
     static const fsm_functions_t FSMFunctions =
     {
         { /* Map functions */
-            .Initialize             = InitializeFSMMap,
-            .Normalize              = NormalizeFSMMap,
-            .NormalizeState         = NormalizeFSMState,
-            .ResetState             = ResetFSMState
+            .Initialize             = FiniteStateMachine_InitializeMap,
+            .Normalize              = FiniteStateMachine_NormalizeMap,
+            .NormalizeState         = FiniteStateMachine_NormalizeState,
+            .ResetState             = FiniteStateMachine_ResetState
         },
         { /* System functions */
-            .Initialize             = InitializeFSMSystem,
-            .DecayInactive          = DecayInactiveFSMSystem,
-            .Update                 = UpdateFSMSystem,
-            .UpdateProbabilities    = UpdateFSMProbabilities,
-            .UpdateState            = UpdateFSMState,
-            .Print                  = PrintFSMSys
+            .Initialize             = FiniteStateMachine_InitializeSystem,
+            .DecayInactive          = FiniteStateMachine_DecayInactiveSystem,
+            .Update                 = FiniteStateMachine_UpdateSystem,
+            .UpdateProbabilities    = FiniteStateMachine_UpdateProbabilities,
+            .UpdateState            = FiniteStateMachine_UpdateState,
+            .Print                  = FiniteStateMachine_PrintSystem
         }
     };
     

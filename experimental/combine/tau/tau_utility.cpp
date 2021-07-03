@@ -35,7 +35,7 @@ Tau::~Tau() {}
 
 void Tau::Init( void )
 {
-    rho.core.Thresh = DEFAULT_THRESH;
+    rho.core.thresh = DEFAULT_THRESH;
     count = 0;
     accuracy_count = 0;
     avg = 0;
@@ -65,7 +65,7 @@ void Tau::Trigger( void )
     }
 //    if(( up && rho.core.Thresh > THRESH_MAX ) || (!up && rho.core.Thresh < THRESH_MIN)) up = !up;
 //    rho.core.Thresh += sweep_speed*(up?1:-1); ///TEST
-    rho.core.ThreshByte = (byte_t)rho.core.Thresh;
+    rho.core.thresh_byte = (byte_t)rho.core.thresh;
     
 #ifdef __PSM__
     rho_drawer.DrawDetectionMap( &rho.core.DetectionMap, rho.core.ThreshByte );
@@ -132,8 +132,8 @@ double Tau::Perform( cimage_t &img )
 
 #ifdef CV_TRACK_BLOBS
 #else
-    double Cx = utility.pCx-rho.core.Centroid.x,
-    Cy = utility.pCy-rho.core.Centroid.y;
+    double Cx = utility.pCx-rho.core.centroid.x,
+    Cy = utility.pCy-rho.core.centroid.y;
     current_accuracy = sqrt( DISTANCE_SQ( Cx, Cy ) );
 #endif
     
@@ -143,7 +143,7 @@ double Tau::Perform( cimage_t &img )
 
 void Tau::UpdateThresh()
 {
-    utility.thresh = rho.core.ThreshByte;
+    utility.thresh = rho.core.thresh_byte;
 }
 
 void Tau::UpdatePrediction()
