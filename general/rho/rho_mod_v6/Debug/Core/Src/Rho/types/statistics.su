@@ -1,5 +1,0 @@
-statistics.c:15:6:GenerateCumulativeMomentsStatistics	48	static
-statistics.c:28:6:GenerateCumulativeAverageStatistics	32	static
-statistics.c:33:13:CumulateAverageStatistics	24	static
-statistics.c:38:13:CumulateAverageStandardDeviationStatistics	56	static
-statistics.c:49:19:GetVarianceFromStatistic	24	static
