@@ -55,17 +55,17 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Src/Rho/core/../types/../psm/../../UniSM/platform.h \
  ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/global_config.h \
  ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/global_types.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/platform_interface_master.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/stm32_interface.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/stm32_config.h \
+ ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/platform_interface_master.h \
+ ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/stm32_interface.h \
+ ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/stm32_config.h \
  ../Core/Src/App/../App/global_config.h \
  ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/states.h \
  ../Core/Src/Rho/core/../types/../psm/../../UniLog/unilog.h \
  ../Core/Src/Rho/core/../types/../psm/../../App/states.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712_calc.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712_regs.h \
- ../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/../platform.h
+ ../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712.h \
+ ../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712_calc.h \
+ ../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712_regs.h \
+ ../Core/Src/App/../UniSM/platform.h
 
 ../Core/Inc/main.h:
 
@@ -187,11 +187,11 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/global_types.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/platform_interface_master.h:
+../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/platform_interface_master.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/stm32_interface.h:
+../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/stm32_interface.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/platforms/stm32_config.h:
+../Core/Src/Rho/core/../types/../psm/../../UniSM/../App/platform_interface/stm32_config.h:
 
 ../Core/Src/App/../App/global_config.h:
 
@@ -201,10 +201,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Src/Rho/core/../types/../psm/../../App/states.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712.h:
+../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712_calc.h:
+../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712_calc.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/OV9712_regs.h:
+../Core/Src/Rho/core/../types/../psm/../../App/OV9712/OV9712_regs.h:
 
-../Core/Src/Rho/core/../types/../psm/../../UniSM/OV9712/../platform.h:
+../Core/Src/App/../UniSM/platform.h:

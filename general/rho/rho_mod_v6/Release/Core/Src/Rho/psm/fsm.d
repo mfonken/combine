@@ -15,9 +15,9 @@ Core/Src/Rho/psm/fsm.o: ../Core/Src/Rho/psm/fsm.c \
  ../Core/Src/Rho/psm/../../UniSM/platform.h \
  ../Core/Src/Rho/psm/../../UniSM/../App/global_config.h \
  ../Core/Src/Rho/psm/../../UniSM/../App/global_types.h \
- ../Core/Src/Rho/psm/../../UniSM/platforms/platform_interface_master.h \
- ../Core/Src/Rho/psm/../../UniSM/platforms/stm32_interface.h \
- ../Core/Src/Rho/psm/../../UniSM/platforms/stm32_config.h \
+ ../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/platform_interface_master.h \
+ ../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/stm32_interface.h \
+ ../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/stm32_config.h \
  ../Core/Inc/main.h ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
@@ -53,10 +53,10 @@ Core/Src/Rho/psm/fsm.o: ../Core/Src/Rho/psm/fsm.c \
  ../Core/Src/Rho/psm/../../UniSM/../App/states.h \
  ../Core/Src/Rho/psm/../../UniLog/unilog.h \
  ../Core/Src/Rho/psm/../../App/states.h \
- ../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712.h \
- ../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712_calc.h \
- ../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712_regs.h \
- ../Core/Src/Rho/psm/../../UniSM/OV9712/../platform.h
+ ../Core/Src/Rho/psm/../../App/OV9712/OV9712.h \
+ ../Core/Src/Rho/psm/../../App/OV9712/OV9712_calc.h \
+ ../Core/Src/Rho/psm/../../App/OV9712/OV9712_regs.h \
+ c:\users\matthew\ fonken\desktop\marbl\techincal\combine\general\rho\rho_mod_v6\core\src\unism\platform.h
 
 ../Core/Src/Rho/psm/fsm.h:
 
@@ -98,11 +98,11 @@ c:\users\matthew\ fonken\desktop\marbl\techincal\combine\general\rho\rho_mod_v6\
 
 ../Core/Src/Rho/psm/../../UniSM/../App/global_types.h:
 
-../Core/Src/Rho/psm/../../UniSM/platforms/platform_interface_master.h:
+../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/platform_interface_master.h:
 
-../Core/Src/Rho/psm/../../UniSM/platforms/stm32_interface.h:
+../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/stm32_interface.h:
 
-../Core/Src/Rho/psm/../../UniSM/platforms/stm32_config.h:
+../Core/Src/Rho/psm/../../UniSM/../App/platform_interface/stm32_config.h:
 
 ../Core/Inc/main.h:
 
@@ -176,10 +176,10 @@ c:\users\matthew\ fonken\desktop\marbl\techincal\combine\general\rho\rho_mod_v6\
 
 ../Core/Src/Rho/psm/../../App/states.h:
 
-../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712.h:
+../Core/Src/Rho/psm/../../App/OV9712/OV9712.h:
 
-../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712_calc.h:
+../Core/Src/Rho/psm/../../App/OV9712/OV9712_calc.h:
 
-../Core/Src/Rho/psm/../../UniSM/OV9712/OV9712_regs.h:
+../Core/Src/Rho/psm/../../App/OV9712/OV9712_regs.h:
 
-../Core/Src/Rho/psm/../../UniSM/OV9712/../platform.h:
+c:\users\matthew\ fonken\desktop\marbl\techincal\combine\general\rho\rho_mod_v6\core\src\unism\platform.h:

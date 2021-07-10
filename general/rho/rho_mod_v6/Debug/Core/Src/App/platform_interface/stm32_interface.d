@@ -1,7 +1,7 @@
-Core/Src/UniSM/platforms/stm32_interface.o: \
- ../Core/Src/UniSM/platforms/stm32_interface.c \
- ../Core/Src/UniSM/platforms/stm32_interface.h \
- ../Core/Src/UniSM/platforms/stm32_config.h ../Core/Inc/main.h \
+Core/Src/App/platform_interface/stm32_interface.o: \
+ ../Core/Src/App/platform_interface/stm32_interface.c \
+ ../Core/Src/App/platform_interface/stm32_interface.h \
+ ../Core/Src/App/platform_interface/stm32_config.h ../Core/Inc/main.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
@@ -36,9 +36,9 @@ Core/Src/UniSM/platforms/stm32_interface.o: \
  ../Core/Src/App/../App/global_config.h \
  ../Core/Src/App/../App/global_types.h
 
-../Core/Src/UniSM/platforms/stm32_interface.h:
+../Core/Src/App/platform_interface/stm32_interface.h:
 
-../Core/Src/UniSM/platforms/stm32_config.h:
+../Core/Src/App/platform_interface/stm32_config.h:
 
 ../Core/Inc/main.h:
 

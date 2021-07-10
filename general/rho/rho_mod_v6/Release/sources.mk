@@ -20,13 +20,13 @@ OBJCOPY_BIN :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+Core/Src/App/OV9712 \
 Core/Src/App \
+Core/Src/App/platform_interface \
 Core/Src/Rho/core \
 Core/Src/Rho/psm \
 Core/Src/Rho/types \
-Core/Src/UniSM/OV9712 \
 Core/Src/UniSM \
-Core/Src/UniSM/platforms \
 Core/Src/UniSM/templates \
 Core/Src \
 Core/Startup \

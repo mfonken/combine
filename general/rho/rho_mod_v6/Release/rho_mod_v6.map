@@ -145,7 +145,7 @@ hdma_dma_generator0
                     0x60              Core/Src/main.o
 errno               0x4               c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-reent.o)
 hi2c1               0x4c              Core/Src/main.o
-Master              0xc               Core/Src/UniSM/platforms/stm32_interface.o
+Master              0xc               Core/Src/App/platform_interface/stm32_interface.o
 capture_buffer      0x4               Core/Src/Rho/core/rho_client.o
 uwTick              0x4               Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
 __lock___env_recursive_mutex
@@ -177,9 +177,17 @@ Discarded input sections
  .ARM.exidx     0x0000000000000000       0x10 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
  .ARM.attributes
                 0x0000000000000000       0x1c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
+ .text          0x0000000000000000        0x0 Core/Src/App/OV9712/OV9712.o
+ .data          0x0000000000000000        0x0 Core/Src/App/OV9712/OV9712.o
+ .bss           0x0000000000000000        0x0 Core/Src/App/OV9712/OV9712.o
+ .text.OV9712_Disable
+                0x0000000000000000       0x1e Core/Src/App/OV9712/OV9712.o
  .text          0x0000000000000000        0x0 Core/Src/App/master.o
  .data          0x0000000000000000        0x0 Core/Src/App/master.o
  .bss           0x0000000000000000        0x0 Core/Src/App/master.o
+ .text          0x0000000000000000        0x0 Core/Src/App/platform_interface/stm32_interface.o
+ .data          0x0000000000000000        0x0 Core/Src/App/platform_interface/stm32_interface.o
+ .bss           0x0000000000000000        0x0 Core/Src/App/platform_interface/stm32_interface.o
  .text          0x0000000000000000        0x0 Core/Src/Rho/core/rho_client.o
  .data          0x0000000000000000        0x0 Core/Src/Rho/core/rho_client.o
  .bss           0x0000000000000000        0x0 Core/Src/Rho/core/rho_client.o
@@ -514,11 +522,6 @@ Discarded input sections
  .comment       0x0000000000000000       0x54 Core/Src/Rho/types/statistics.o
  .ARM.attributes
                 0x0000000000000000       0x34 Core/Src/Rho/types/statistics.o
- .text          0x0000000000000000        0x0 Core/Src/UniSM/OV9712/OV9712.o
- .data          0x0000000000000000        0x0 Core/Src/UniSM/OV9712/OV9712.o
- .bss           0x0000000000000000        0x0 Core/Src/UniSM/OV9712/OV9712.o
- .text.OV9712_Disable
-                0x0000000000000000       0x1e Core/Src/UniSM/OV9712/OV9712.o
  .text          0x0000000000000000        0x0 Core/Src/UniSM/platform.o
  .data          0x0000000000000000        0x0 Core/Src/UniSM/platform.o
  .bss           0x0000000000000000        0x0 Core/Src/UniSM/platform.o
@@ -543,9 +546,6 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 Core/Src/UniSM/system.o
  .text.NextStateSystem
                 0x0000000000000000       0x14 Core/Src/UniSM/system.o
- .text          0x0000000000000000        0x0 Core/Src/UniSM/platforms/stm32_interface.o
- .data          0x0000000000000000        0x0 Core/Src/UniSM/platforms/stm32_interface.o
- .bss           0x0000000000000000        0x0 Core/Src/UniSM/platforms/stm32_interface.o
  .text          0x0000000000000000        0x0 Core/Src/UniSM/templates/master_template.o
  .data          0x0000000000000000        0x0 Core/Src/UniSM/templates/master_template.o
  .bss           0x0000000000000000        0x0 Core/Src/UniSM/templates/master_template.o
@@ -2055,7 +2055,9 @@ Linker script and memory map
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crti.o
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/crt0.o
+LOAD Core/Src/App/OV9712/OV9712.o
 LOAD Core/Src/App/master.o
+LOAD Core/Src/App/platform_interface/stm32_interface.o
 LOAD Core/Src/Rho/core/rho_client.o
 LOAD Core/Src/Rho/core/rho_core.o
 LOAD Core/Src/Rho/core/rho_utility.o
@@ -2067,11 +2069,9 @@ LOAD Core/Src/Rho/types/kalman.o
 LOAD Core/Src/Rho/types/matvec.o
 LOAD Core/Src/Rho/types/pid.o
 LOAD Core/Src/Rho/types/statistics.o
-LOAD Core/Src/UniSM/OV9712/OV9712.o
 LOAD Core/Src/UniSM/platform.o
 LOAD Core/Src/UniSM/printers.o
 LOAD Core/Src/UniSM/system.o
-LOAD Core/Src/UniSM/platforms/stm32_interface.o
 LOAD Core/Src/UniSM/templates/master_template.o
 LOAD Core/Src/main.o
 LOAD Core/Src/stm32g4xx_hal_msp.o
@@ -2147,176 +2147,176 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x00000000080005f4                __aeabi_idiv0
                 0x00000000080005f4                __aeabi_ldiv0
  *(.text*)
- .text.InitializePlatform
-                0x00000000080005f8       0x1c Core/Src/App/master.o
-                0x00000000080005f8                InitializePlatform
- .text.ConnectToHost
-                0x0000000008000614        0x2 Core/Src/App/master.o
-                0x0000000008000614                ConnectToHost
- *fill*         0x0000000008000616        0x2 
- .text.ConfigureApplication
-                0x0000000008000618       0x50 Core/Src/App/master.o
-                0x0000000008000618                ConfigureApplication
- .text.ApplicationCore
-                0x0000000008000668       0x10 Core/Src/App/master.o
-                0x0000000008000668                ApplicationCore
- .text.Master_Init
-                0x0000000008000678       0x38 Core/Src/App/master.o
-                0x0000000008000678                Master_Init
- .text.Master_Run
-                0x00000000080006b0       0x18 Core/Src/App/master.o
-                0x00000000080006b0                Master_Run
- .text.Master_Connect
-                0x00000000080006c8       0x50 Core/Src/App/master.o
-                0x00000000080006c8                Master_Connect
- .text.SystemError
-                0x0000000008000718       0x38 Core/Src/App/master.o
-                0x0000000008000718                SystemError
- .text.ExitInitialization
-                0x0000000008000750       0x34 Core/Src/App/master.o
-                0x0000000008000750                ExitInitialization
- .text.ActivateRhoSystem
-                0x0000000008000784       0x1c Core/Src/Rho/core/rho_client.o
-                0x0000000008000784                ActivateRhoSystem
- .text.DeactivateRhoSystem
-                0x00000000080007a0       0x1c Core/Src/Rho/core/rho_client.o
-                0x00000000080007a0                DeactivateRhoSystem
- .text.TransmitRhoSystemPacket
-                0x00000000080007bc        0x2 Core/Src/Rho/core/rho_client.o
-                0x00000000080007bc                TransmitRhoSystemPacket
- *fill*         0x00000000080007be        0x2 
- .text.InitializeRhoSystem
-                0x00000000080007c0       0x28 Core/Src/Rho/core/rho_client.o
-                0x00000000080007c0                InitializeRhoSystem
- .text.ConnectRhoSystemPlatformInterface
-                0x00000000080007e8       0x20 Core/Src/Rho/core/rho_client.o
-                0x00000000080007e8                ConnectRhoSystemPlatformInterface
- .text.ZeroRhoSystemMemory
-                0x0000000008000808       0x28 Core/Src/Rho/core/rho_client.o
-                0x0000000008000808                ZeroRhoSystemMemory
- .text.PerformRhoSystemProcess
-                0x0000000008000830       0x1c Core/Src/Rho/core/rho_client.o
-                0x0000000008000830                PerformRhoSystemProcess
- .text.CaptureRow
-                0x000000000800084c       0x22 Core/Src/Rho/core/rho_client.o
-                0x000000000800084c                CaptureRow
- *fill*         0x000000000800086e        0x2 
- .text.CaptureRowCallback
-                0x0000000008000870       0x94 Core/Src/Rho/core/rho_client.o
-                0x0000000008000870                CaptureRowCallback
- .text.ProcessFrameSection
-                0x0000000008000904       0x60 Core/Src/Rho/core/rho_client.o
-                0x0000000008000904                ProcessFrameSection
- .text.CaptureAndProcessFrame
-                0x0000000008000964       0x90 Core/Src/Rho/core/rho_client.o
-                0x0000000008000964                CaptureAndProcessFrame
- .text.ProcessRhoSystemFrameCapture
-                0x00000000080009f4       0x28 Core/Src/Rho/core/rho_client.o
-                0x00000000080009f4                ProcessRhoSystemFrameCapture
  .text.OV9712_Write
-                0x0000000008000a1c       0x20 Core/Src/UniSM/OV9712/OV9712.o
-                0x0000000008000a1c                OV9712_Write
+                0x00000000080005f8       0x20 Core/Src/App/OV9712/OV9712.o
+                0x00000000080005f8                OV9712_Write
  .text.OV9712_Enable
-                0x0000000008000a3c       0x1e Core/Src/UniSM/OV9712/OV9712.o
-                0x0000000008000a3c                OV9712_Enable
- *fill*         0x0000000008000a5a        0x2 
+                0x0000000008000618       0x1e Core/Src/App/OV9712/OV9712.o
+                0x0000000008000618                OV9712_Enable
+ *fill*         0x0000000008000636        0x2 
  .text.OV9712_Init
-                0x0000000008000a5c       0x38 Core/Src/UniSM/OV9712/OV9712.o
-                0x0000000008000a5c                OV9712_Init
- .text.InitPlatform
-                0x0000000008000a94        0x6 Core/Src/UniSM/platform.o
-                0x0000000008000a94                InitPlatform
- .text.PerformHostCommand
-                0x0000000008000a9a       0x4e Core/Src/UniSM/platform.o
-                0x0000000008000a9a                PerformHostCommand
- .text.TransmitToHost
-                0x0000000008000ae8       0x10 Core/Src/UniSM/platform.o
-                0x0000000008000ae8                TransmitToHost
- .text.ReceiveFromHost
-                0x0000000008000af8       0x10 Core/Src/UniSM/platform.o
-                0x0000000008000af8                ReceiveFromHost
- .text.WritePin
-                0x0000000008000b08        0xa Core/Src/UniSM/platform.o
-                0x0000000008000b08                WritePin
- .text.SetPortMode
-                0x0000000008000b12        0xa Core/Src/UniSM/platform.o
-                0x0000000008000b12                SetPortMode
- .text.InitSystem
-                0x0000000008000b1c        0x8 Core/Src/UniSM/system.o
-                0x0000000008000b1c                InitSystem
- .text.GetStateSystem
-                0x0000000008000b24        0x6 Core/Src/UniSM/system.o
-                0x0000000008000b24                GetStateSystem
- .text.PerformStateSystem
-                0x0000000008000b2a       0x12 Core/Src/UniSM/system.o
-                0x0000000008000b2a                PerformStateSystem
- .text.EnterStateSystem
-                0x0000000008000b3c       0x12 Core/Src/UniSM/system.o
-                0x0000000008000b3c                EnterStateSystem
- .text.IsInStateSystem
-                0x0000000008000b4e       0x12 Core/Src/UniSM/system.o
-                0x0000000008000b4e                IsInStateSystem
- .text.GetStateFromListSystem
-                0x0000000008000b60       0x1c Core/Src/UniSM/system.o
-                0x0000000008000b60                GetStateFromListSystem
- .text.SetStateSystem
-                0x0000000008000b7c       0x2c Core/Src/UniSM/system.o
-                0x0000000008000b7c                SetStateSystem
+                0x0000000008000638       0x38 Core/Src/App/OV9712/OV9712.o
+                0x0000000008000638                OV9712_Init
+ .text.InitializePlatform
+                0x0000000008000670       0x1c Core/Src/App/master.o
+                0x0000000008000670                InitializePlatform
+ .text.ConnectToHost
+                0x000000000800068c        0x2 Core/Src/App/master.o
+                0x000000000800068c                ConnectToHost
+ *fill*         0x000000000800068e        0x2 
+ .text.ConfigureApplication
+                0x0000000008000690       0x50 Core/Src/App/master.o
+                0x0000000008000690                ConfigureApplication
+ .text.ApplicationCore
+                0x00000000080006e0       0x10 Core/Src/App/master.o
+                0x00000000080006e0                ApplicationCore
+ .text.Master_Init
+                0x00000000080006f0       0x38 Core/Src/App/master.o
+                0x00000000080006f0                Master_Init
+ .text.Master_Run
+                0x0000000008000728       0x18 Core/Src/App/master.o
+                0x0000000008000728                Master_Run
+ .text.Master_Connect
+                0x0000000008000740       0x50 Core/Src/App/master.o
+                0x0000000008000740                Master_Connect
+ .text.SystemError
+                0x0000000008000790       0x38 Core/Src/App/master.o
+                0x0000000008000790                SystemError
+ .text.ExitInitialization
+                0x00000000080007c8       0x34 Core/Src/App/master.o
+                0x00000000080007c8                ExitInitialization
  .text.HAL_GPIO_EXTI_Callback
-                0x0000000008000ba8       0x64 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000ba8                HAL_GPIO_EXTI_Callback
+                0x00000000080007fc       0x64 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080007fc                HAL_GPIO_EXTI_Callback
  .text.STM_InterruptEnable
-                0x0000000008000c0c       0x12 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c0c                STM_InterruptEnable
+                0x0000000008000860       0x12 Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000860                STM_InterruptEnable
  .text.STM_InterruptDisable
-                0x0000000008000c1e       0x12 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c1e                STM_InterruptDisable
+                0x0000000008000872       0x12 Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000872                STM_InterruptDisable
  .text.STM_PauseDMA
-                0x0000000008000c30       0x1c Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c30                STM_PauseDMA
+                0x0000000008000884       0x1c Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000884                STM_PauseDMA
  .text.STM_ResumeDMA
-                0x0000000008000c4c       0x18 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c4c                STM_ResumeDMA
+                0x00000000080008a0       0x18 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008a0                STM_ResumeDMA
  .text.STM_ResetDMA
-                0x0000000008000c64       0x18 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c64                STM_ResetDMA
+                0x00000000080008b8       0x18 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008b8                STM_ResetDMA
  .text.STM_InitDMA
-                0x0000000008000c7c        0x2 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c7c                STM_InitDMA
+                0x00000000080008d0        0x2 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008d0                STM_InitDMA
  .text.STM_GetDMAFillAddress
-                0x0000000008000c7e        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c7e                STM_GetDMAFillAddress
+                0x00000000080008d2        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008d2                STM_GetDMAFillAddress
  .text.STM_UartTxDMA
-                0x0000000008000c82        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c82                STM_UartTxDMA
+                0x00000000080008d6        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008d6                STM_UartTxDMA
  .text.STM_UartRxDMA
-                0x0000000008000c86        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c86                STM_UartRxDMA
+                0x00000000080008da        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008da                STM_UartRxDMA
  .text.STM_I2CMasterTx
-                0x0000000008000c8a        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c8a                STM_I2CMasterTx
+                0x00000000080008de        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008de                STM_I2CMasterTx
  .text.STM_SetPortMode
-                0x0000000008000c8e       0x1a Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000c8e                STM_SetPortMode
+                0x00000000080008e2       0x1a Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008e2                STM_SetPortMode
  .text.STM_ReadPort
-                0x0000000008000ca8        0x6 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000ca8                STM_ReadPort
+                0x00000000080008fc        0x6 Core/Src/App/platform_interface/stm32_interface.o
+                0x00000000080008fc                STM_ReadPort
  .text.STM_WritePin
-                0x0000000008000cae        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000cae                STM_WritePin
+                0x0000000008000902        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000902                STM_WritePin
  .text.STM_Timestamp
-                0x0000000008000cb2        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000cb2                STM_Timestamp
+                0x0000000008000906        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000906                STM_Timestamp
  .text.STM_Wait
-                0x0000000008000cb6        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000cb6                STM_Wait
+                0x000000000800090a        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x000000000800090a                STM_Wait
  .text.STM_SysClockFreq
-                0x0000000008000cba        0x4 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000cba                STM_SysClockFreq
- *fill*         0x0000000008000cbe        0x2 
+                0x000000000800090e        0x4 Core/Src/App/platform_interface/stm32_interface.o
+                0x000000000800090e                STM_SysClockFreq
+ *fill*         0x0000000008000912        0x2 
  .text.STM_Reset
-                0x0000000008000cc0       0x24 Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000008000cc0                STM_Reset
+                0x0000000008000914       0x24 Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000008000914                STM_Reset
+ .text.ActivateRhoSystem
+                0x0000000008000938       0x1c Core/Src/Rho/core/rho_client.o
+                0x0000000008000938                ActivateRhoSystem
+ .text.DeactivateRhoSystem
+                0x0000000008000954       0x1c Core/Src/Rho/core/rho_client.o
+                0x0000000008000954                DeactivateRhoSystem
+ .text.TransmitRhoSystemPacket
+                0x0000000008000970        0x2 Core/Src/Rho/core/rho_client.o
+                0x0000000008000970                TransmitRhoSystemPacket
+ *fill*         0x0000000008000972        0x2 
+ .text.InitializeRhoSystem
+                0x0000000008000974       0x28 Core/Src/Rho/core/rho_client.o
+                0x0000000008000974                InitializeRhoSystem
+ .text.ConnectRhoSystemPlatformInterface
+                0x000000000800099c       0x20 Core/Src/Rho/core/rho_client.o
+                0x000000000800099c                ConnectRhoSystemPlatformInterface
+ .text.ZeroRhoSystemMemory
+                0x00000000080009bc       0x28 Core/Src/Rho/core/rho_client.o
+                0x00000000080009bc                ZeroRhoSystemMemory
+ .text.PerformRhoSystemProcess
+                0x00000000080009e4       0x1c Core/Src/Rho/core/rho_client.o
+                0x00000000080009e4                PerformRhoSystemProcess
+ .text.CaptureRow
+                0x0000000008000a00       0x22 Core/Src/Rho/core/rho_client.o
+                0x0000000008000a00                CaptureRow
+ *fill*         0x0000000008000a22        0x2 
+ .text.CaptureRowCallback
+                0x0000000008000a24       0x94 Core/Src/Rho/core/rho_client.o
+                0x0000000008000a24                CaptureRowCallback
+ .text.ProcessFrameSection
+                0x0000000008000ab8       0x60 Core/Src/Rho/core/rho_client.o
+                0x0000000008000ab8                ProcessFrameSection
+ .text.CaptureAndProcessFrame
+                0x0000000008000b18       0x90 Core/Src/Rho/core/rho_client.o
+                0x0000000008000b18                CaptureAndProcessFrame
+ .text.ProcessRhoSystemFrameCapture
+                0x0000000008000ba8       0x28 Core/Src/Rho/core/rho_client.o
+                0x0000000008000ba8                ProcessRhoSystemFrameCapture
+ .text.InitPlatform
+                0x0000000008000bd0        0x6 Core/Src/UniSM/platform.o
+                0x0000000008000bd0                InitPlatform
+ .text.PerformHostCommand
+                0x0000000008000bd6       0x4e Core/Src/UniSM/platform.o
+                0x0000000008000bd6                PerformHostCommand
+ .text.TransmitToHost
+                0x0000000008000c24       0x10 Core/Src/UniSM/platform.o
+                0x0000000008000c24                TransmitToHost
+ .text.ReceiveFromHost
+                0x0000000008000c34       0x10 Core/Src/UniSM/platform.o
+                0x0000000008000c34                ReceiveFromHost
+ .text.WritePin
+                0x0000000008000c44        0xa Core/Src/UniSM/platform.o
+                0x0000000008000c44                WritePin
+ .text.SetPortMode
+                0x0000000008000c4e        0xa Core/Src/UniSM/platform.o
+                0x0000000008000c4e                SetPortMode
+ .text.InitSystem
+                0x0000000008000c58        0x8 Core/Src/UniSM/system.o
+                0x0000000008000c58                InitSystem
+ .text.GetStateSystem
+                0x0000000008000c60        0x6 Core/Src/UniSM/system.o
+                0x0000000008000c60                GetStateSystem
+ .text.PerformStateSystem
+                0x0000000008000c66       0x12 Core/Src/UniSM/system.o
+                0x0000000008000c66                PerformStateSystem
+ .text.EnterStateSystem
+                0x0000000008000c78       0x12 Core/Src/UniSM/system.o
+                0x0000000008000c78                EnterStateSystem
+ .text.IsInStateSystem
+                0x0000000008000c8a       0x12 Core/Src/UniSM/system.o
+                0x0000000008000c8a                IsInStateSystem
+ .text.GetStateFromListSystem
+                0x0000000008000c9c       0x1c Core/Src/UniSM/system.o
+                0x0000000008000c9c                GetStateFromListSystem
+ .text.SetStateSystem
+                0x0000000008000cb8       0x2c Core/Src/UniSM/system.o
+                0x0000000008000cb8                SetStateSystem
  .text.SystemClock_Config
                 0x0000000008000ce4       0x94 Core/Src/main.o
                 0x0000000008000ce4                SystemClock_Config
@@ -2911,119 +2911,121 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x0000000008004900                . = ALIGN (0x4)
                 0x0000000008004900                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000     0x1e64 load address 0x0000000008004900
+.data           0x0000000020000000     0x1e68 load address 0x0000000008004900
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
  *(.data*)
- .data.Default_OV9712_Pins
-                0x0000000020000000       0x10 Core/Src/App/master.o
- .data.OV9712   0x0000000020000010        0xc Core/Src/App/master.o
- .data.PlatformFunctions
-                0x000000002000001c       0x5c Core/Src/App/master.o
- .data.System   0x0000000020000078        0x8 Core/Src/App/master.o
- .data.global_states_list
-                0x0000000020000080       0x48 Core/Src/App/master.o
- .data.RhoSystem
-                0x00000000200000c8     0x1d10 Core/Src/Rho/core/rho_client.o
-                0x00000000200000c8                RhoSystem
  .data.OV9712_regs
-                0x0000000020001dd8       0x1c Core/Src/UniSM/OV9712/OV9712.o
+                0x0000000020000000       0x1c Core/Src/App/OV9712/OV9712.o
+ .data.Default_OV9712_Pins
+                0x000000002000001c       0x10 Core/Src/App/master.o
+ .data.OV9712   0x000000002000002c        0xc Core/Src/App/master.o
+ .data.PlatformFunctions
+                0x0000000020000038       0x5c Core/Src/App/master.o
+ .data.System   0x0000000020000094        0x8 Core/Src/App/master.o
+ .data.global_states_list
+                0x000000002000009c       0x48 Core/Src/App/master.o
+ *fill*         0x00000000200000e4        0x4 
+ .data.RhoSystem
+                0x00000000200000e8     0x1d10 Core/Src/Rho/core/rho_client.o
+                0x00000000200000e8                RhoSystem
  .data.SystemCoreClock
-                0x0000000020001df4        0x4 Core/Src/system_stm32g4xx.o
-                0x0000000020001df4                SystemCoreClock
+                0x0000000020001df8        0x4 Core/Src/system_stm32g4xx.o
+                0x0000000020001df8                SystemCoreClock
  .data.uwTickFreq
-                0x0000000020001df8        0x4 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
-                0x0000000020001df8                uwTickFreq
- .data.uwTickPrio
                 0x0000000020001dfc        0x4 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
-                0x0000000020001dfc                uwTickPrio
+                0x0000000020001dfc                uwTickFreq
+ .data.uwTickPrio
+                0x0000000020001e00        0x4 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
+                0x0000000020001e00                uwTickPrio
  .data._impure_ptr
-                0x0000000020001e00        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-impure.o)
-                0x0000000020001e00                _impure_ptr
+                0x0000000020001e04        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-impure.o)
+                0x0000000020001e04                _impure_ptr
  .data.impure_data
-                0x0000000020001e04       0x60 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-impure.o)
+                0x0000000020001e08       0x60 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-impure.o)
  *(.RamFunc)
  *(.RamFunc*)
-                0x0000000020001e64                . = ALIGN (0x4)
-                0x0000000020001e64                _edata = .
+                0x0000000020001e68                . = ALIGN (0x4)
+                0x0000000020001e68                _edata = .
 
-.igot.plt       0x0000000020001e64        0x0 load address 0x0000000008006764
- .igot.plt      0x0000000020001e64        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
-                0x0000000020001e64                . = ALIGN (0x4)
+.igot.plt       0x0000000020001e68        0x0 load address 0x0000000008006768
+ .igot.plt      0x0000000020001e68        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
+                0x0000000020001e68                . = ALIGN (0x4)
 
-.bss            0x0000000020001e64     0x207c load address 0x0000000008006764
-                0x0000000020001e64                _sbss = .
-                0x0000000020001e64                __bss_start__ = _sbss
+.bss            0x0000000020001e68     0x207c load address 0x0000000008006768
+                0x0000000020001e68                _sbss = .
+                0x0000000020001e68                __bss_start__ = _sbss
  *(.bss)
- .bss           0x0000000020001e64       0x1c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
+ .bss           0x0000000020001e68       0x1c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
  *(.bss*)
  .bss.CameraFlags
-                0x0000000020001e80       0x10 Core/Src/App/master.o
- .bss.BACKGROUND_DENSITY_MAP_X
-                0x0000000020001e90       0xc8 Core/Src/Rho/core/rho_client.o
- .bss.BACKGROUND_DENSITY_MAP_Y
-                0x0000000020001f58      0x140 Core/Src/Rho/core/rho_client.o
- .bss.FOREGROUND_DENSITY_MAP_X
-                0x0000000020002098       0xc8 Core/Src/Rho/core/rho_client.o
- .bss.FOREGROUND_DENSITY_MAP_Y
-                0x0000000020002160      0x140 Core/Src/Rho/core/rho_client.o
- .bss._capture_buffer_internal
-                0x00000000200022a0       0xa2 Core/Src/Rho/core/rho_client.o
- .bss._thresh_buffer_internal
-                0x0000000020002342     0x19cc Core/Src/Rho/core/rho_client.o
- *fill*         0x0000000020003d0e        0x2 
+                0x0000000020001e84       0x10 Core/Src/App/master.o
  .bss.CameraFlags
-                0x0000000020003d10       0x10 Core/Src/UniSM/platforms/stm32_interface.o
+                0x0000000020001e94       0x10 Core/Src/App/platform_interface/stm32_interface.o
+ .bss.BACKGROUND_DENSITY_MAP_X
+                0x0000000020001ea4       0xc8 Core/Src/Rho/core/rho_client.o
+ .bss.BACKGROUND_DENSITY_MAP_Y
+                0x0000000020001f6c      0x140 Core/Src/Rho/core/rho_client.o
+ .bss.FOREGROUND_DENSITY_MAP_X
+                0x00000000200020ac       0xc8 Core/Src/Rho/core/rho_client.o
+ .bss.FOREGROUND_DENSITY_MAP_Y
+                0x0000000020002174      0x140 Core/Src/Rho/core/rho_client.o
+ .bss._capture_buffer_internal
+                0x00000000200022b4       0xa2 Core/Src/Rho/core/rho_client.o
+ .bss._thresh_buffer_internal
+                0x0000000020002356     0x19cc Core/Src/Rho/core/rho_client.o
+ *fill*         0x0000000020003d22        0x2 
  .bss.__sbrk_heap_end
-                0x0000000020003d20        0x4 Core/Src/sysmem.o
+                0x0000000020003d24        0x4 Core/Src/sysmem.o
  .bss.__malloc_free_list
-                0x0000000020003d24        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-nano-mallocr.o)
-                0x0000000020003d24                __malloc_free_list
- .bss.__malloc_sbrk_start
                 0x0000000020003d28        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-nano-mallocr.o)
-                0x0000000020003d28                __malloc_sbrk_start
+                0x0000000020003d28                __malloc_free_list
+ .bss.__malloc_sbrk_start
+                0x0000000020003d2c        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-nano-mallocr.o)
+                0x0000000020003d2c                __malloc_sbrk_start
  *(COMMON)
- COMMON         0x0000000020003d2c        0x4 Core/Src/Rho/core/rho_client.o
-                0x0000000020003d2c                capture_buffer
- COMMON         0x0000000020003d30        0x8 Core/Src/UniSM/platform.o
-                0x0000000020003d30                Platform
- COMMON         0x0000000020003d38        0xc Core/Src/UniSM/platforms/stm32_interface.o
-                0x0000000020003d38                Master
- COMMON         0x0000000020003d44      0x188 Core/Src/main.o
-                0x0000000020003d44                htim8
-                0x0000000020003d90                hdma_dma_generator0
-                0x0000000020003df0                hi2c1
-                0x0000000020003e3c                huart1
- COMMON         0x0000000020003ecc        0x4 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
-                0x0000000020003ecc                uwTick
- COMMON         0x0000000020003ed0        0x9 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-lock.o)
-                0x0000000020003ed0                __lock___atexit_recursive_mutex
-                0x0000000020003ed1                __lock___arc4random_mutex
-                0x0000000020003ed2                __lock___env_recursive_mutex
-                0x0000000020003ed3                __lock___sinit_recursive_mutex
-                0x0000000020003ed4                __lock___malloc_recursive_mutex
-                0x0000000020003ed5                __lock___at_quick_exit_mutex
-                0x0000000020003ed6                __lock___dd_hash_mutex
-                0x0000000020003ed7                __lock___tz_mutex
-                0x0000000020003ed8                __lock___sfp_recursive_mutex
- *fill*         0x0000000020003ed9        0x3 
- COMMON         0x0000000020003edc        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-reent.o)
-                0x0000000020003edc                errno
-                0x0000000020003ee0                . = ALIGN (0x4)
-                0x0000000020003ee0                _ebss = .
-                0x0000000020003ee0                __bss_end__ = _ebss
+ COMMON         0x0000000020003d30        0xc Core/Src/App/platform_interface/stm32_interface.o
+                0x0000000020003d30                Master
+ COMMON         0x0000000020003d3c        0x4 Core/Src/Rho/core/rho_client.o
+                0x0000000020003d3c                capture_buffer
+ COMMON         0x0000000020003d40        0x8 Core/Src/UniSM/platform.o
+                0x0000000020003d40                Platform
+ COMMON         0x0000000020003d48      0x188 Core/Src/main.o
+                0x0000000020003d48                htim8
+                0x0000000020003d94                hdma_dma_generator0
+                0x0000000020003df4                hi2c1
+                0x0000000020003e40                huart1
+ COMMON         0x0000000020003ed0        0x4 Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.o
+                0x0000000020003ed0                uwTick
+ COMMON         0x0000000020003ed4        0x9 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-lock.o)
+                0x0000000020003ed4                __lock___atexit_recursive_mutex
+                0x0000000020003ed5                __lock___arc4random_mutex
+                0x0000000020003ed6                __lock___env_recursive_mutex
+                0x0000000020003ed7                __lock___sinit_recursive_mutex
+                0x0000000020003ed8                __lock___malloc_recursive_mutex
+                0x0000000020003ed9                __lock___at_quick_exit_mutex
+                0x0000000020003eda                __lock___dd_hash_mutex
+                0x0000000020003edb                __lock___tz_mutex
+                0x0000000020003edc                __lock___sfp_recursive_mutex
+ *fill*         0x0000000020003edd        0x3 
+ COMMON         0x0000000020003ee0        0x4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard\libc_nano.a(lib_a-reent.o)
+                0x0000000020003ee0                errno
+                0x0000000020003ee4                . = ALIGN (0x4)
+                0x0000000020003ee4                _ebss = .
+                0x0000000020003ee4                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x0000000020003ee0      0x600 load address 0x0000000008006764
-                0x0000000020003ee0                . = ALIGN (0x8)
+                0x0000000020003ee4      0x604 load address 0x0000000008006768
+                0x0000000020003ee8                . = ALIGN (0x8)
+ *fill*         0x0000000020003ee4        0x4 
                 [!provide]                        PROVIDE (end = .)
-                0x0000000020003ee0                PROVIDE (_end = .)
-                0x00000000200040e0                . = (. + _Min_Heap_Size)
- *fill*         0x0000000020003ee0      0x200 
-                0x00000000200044e0                . = (. + _Min_Stack_Size)
- *fill*         0x00000000200040e0      0x400 
-                0x00000000200044e0                . = ALIGN (0x8)
+                0x0000000020003ee8                PROVIDE (_end = .)
+                0x00000000200040e8                . = (. + _Min_Heap_Size)
+ *fill*         0x0000000020003ee8      0x200 
+                0x00000000200044e8                . = (. + _Min_Stack_Size)
+ *fill*         0x00000000200040e8      0x400 
+                0x00000000200044e8                . = ALIGN (0x8)
 
 /DISCARD/
  libc.a(*)
@@ -3038,17 +3040,17 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .ARM.attributes
                 0x000000000000001e       0x34 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard/crtbegin.o
  .ARM.attributes
-                0x0000000000000052       0x34 Core/Src/App/master.o
+                0x0000000000000052       0x34 Core/Src/App/OV9712/OV9712.o
  .ARM.attributes
-                0x0000000000000086       0x34 Core/Src/Rho/core/rho_client.o
+                0x0000000000000086       0x34 Core/Src/App/master.o
  .ARM.attributes
-                0x00000000000000ba       0x34 Core/Src/UniSM/OV9712/OV9712.o
+                0x00000000000000ba       0x34 Core/Src/App/platform_interface/stm32_interface.o
  .ARM.attributes
-                0x00000000000000ee       0x34 Core/Src/UniSM/platform.o
+                0x00000000000000ee       0x34 Core/Src/Rho/core/rho_client.o
  .ARM.attributes
-                0x0000000000000122       0x34 Core/Src/UniSM/system.o
+                0x0000000000000122       0x34 Core/Src/UniSM/platform.o
  .ARM.attributes
-                0x0000000000000156       0x34 Core/Src/UniSM/platforms/stm32_interface.o
+                0x0000000000000156       0x34 Core/Src/UniSM/system.o
  .ARM.attributes
                 0x000000000000018a       0x34 Core/Src/main.o
  .ARM.attributes
@@ -3170,13 +3172,13 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/9.3.1/thumb/v7e-m+fp/hard\libgcc.a
 
 .comment        0x0000000000000000       0x53
- .comment       0x0000000000000000       0x53 Core/Src/App/master.o
+ .comment       0x0000000000000000       0x53 Core/Src/App/OV9712/OV9712.o
                                          0x54 (size before relaxing)
+ .comment       0x0000000000000053       0x54 Core/Src/App/master.o
+ .comment       0x0000000000000053       0x54 Core/Src/App/platform_interface/stm32_interface.o
  .comment       0x0000000000000053       0x54 Core/Src/Rho/core/rho_client.o
- .comment       0x0000000000000053       0x54 Core/Src/UniSM/OV9712/OV9712.o
  .comment       0x0000000000000053       0x54 Core/Src/UniSM/platform.o
  .comment       0x0000000000000053       0x54 Core/Src/UniSM/system.o
- .comment       0x0000000000000053       0x54 Core/Src/UniSM/platforms/stm32_interface.o
  .comment       0x0000000000000053       0x54 Core/Src/main.o
  .comment       0x0000000000000053       0x54 Core/Src/stm32g4xx_hal_msp.o
  .comment       0x0000000000000053       0x54 Core/Src/stm32g4xx_it.o

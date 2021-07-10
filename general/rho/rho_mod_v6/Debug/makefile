@@ -12,12 +12,12 @@ RM := rm -rf
 -include Drivers/STM32G4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/UniSM/templates/subdir.mk
--include Core/Src/UniSM/platforms/subdir.mk
--include Core/Src/UniSM/OV9712/subdir.mk
 -include Core/Src/UniSM/subdir.mk
 -include Core/Src/Rho/types/subdir.mk
 -include Core/Src/Rho/psm/subdir.mk
 -include Core/Src/Rho/core/subdir.mk
+-include Core/Src/App/platform_interface/subdir.mk
+-include Core/Src/App/OV9712/subdir.mk
 -include Core/Src/App/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk

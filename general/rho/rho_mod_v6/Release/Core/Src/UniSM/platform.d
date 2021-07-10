@@ -1,10 +1,10 @@
 Core/Src/UniSM/platform.o: ../Core/Src/UniSM/platform.c \
  ../Core/Src/UniSM/platform.h ../Core/Src/UniSM/../App/global_config.h \
- ../Core/Src/UniSM/../App/global_types.h ../Core/Src/UniSM/system_types.h \
- ../Core/Src/UniSM/platforms/platform_interface_master.h \
- ../Core/Src/UniSM/platforms/stm32_interface.h \
- ../Core/Src/UniSM/platforms/stm32_config.h ../Core/Inc/main.h \
- ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
+ ../Core/Src/UniSM/../App/global_types.h \
+ ../Core/Src/UniSM/../App/platform_interface/platform_interface_master.h \
+ ../Core/Src/UniSM/../App/platform_interface/stm32_interface.h \
+ ../Core/Src/UniSM/../App/platform_interface/stm32_config.h \
+ ../Core/Inc/main.h ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_def.h \
@@ -35,7 +35,7 @@ Core/Src/UniSM/platform.o: ../Core/Src/UniSM/platform.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Src/App/../App/global_config.h
+ ../Core/Src/App/../App/global_config.h ../Core/Src/UniSM/system_types.h
 
 ../Core/Src/UniSM/platform.h:
 
@@ -43,13 +43,11 @@ Core/Src/UniSM/platform.o: ../Core/Src/UniSM/platform.c \
 
 ../Core/Src/UniSM/../App/global_types.h:
 
-../Core/Src/UniSM/system_types.h:
+../Core/Src/UniSM/../App/platform_interface/platform_interface_master.h:
 
-../Core/Src/UniSM/platforms/platform_interface_master.h:
+../Core/Src/UniSM/../App/platform_interface/stm32_interface.h:
 
-../Core/Src/UniSM/platforms/stm32_interface.h:
-
-../Core/Src/UniSM/platforms/stm32_config.h:
+../Core/Src/UniSM/../App/platform_interface/stm32_config.h:
 
 ../Core/Inc/main.h:
 
@@ -116,3 +114,5 @@ Core/Src/UniSM/platform.o: ../Core/Src/UniSM/platform.c \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
 
 ../Core/Src/App/../App/global_config.h:
+
+../Core/Src/UniSM/system_types.h:
