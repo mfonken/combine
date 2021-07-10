@@ -1,0 +1,9 @@
+master.c:16:6:InitializePlatform	8	static
+master.c:22:6:ConnectToHost	0	static
+master.c:33:6:ConfigureApplication	8	static
+master.c:45:6:ExitInitialization	8	static
+master.c:57:6:ApplicationCore	8	static
+master.c:93:6:Master_Init	8	static
+master.c:114:6:Master_Run	8	static
+master.c:81:6:Master_Connect	16	static
+master.c:67:6:SystemError	8	static

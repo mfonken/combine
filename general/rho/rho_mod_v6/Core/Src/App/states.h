@@ -1,5 +1,5 @@
-#ifndef core_system_h
-#define core_system_h
+#ifndef STATE_H_
+#define STATE_H_
 
 #define CUSTOM_SYSTEM_STATES
 
@@ -29,4 +29,4 @@ static const char * system_state_enum_strings[] =
   "UNKNOWN"
 };
 
-#endif
+#endif /* STATE_H_ */

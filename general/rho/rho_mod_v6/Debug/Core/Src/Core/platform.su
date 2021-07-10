@@ -1,6 +1,0 @@
-platform.c:19:6:InitPlatform	32	static
-platform.c:24:6:WritePin	16	static
-platform.c:29:6:SetPortMode	16	static
-platform.c:34:22:PerformHostCommand	24	static
-platform.c:72:9:TransmitToHost	16	static
-platform.c:85:10:ReceiveFromHost	16	static

@@ -5,13 +5,9 @@
  *      Author: Matthew
  */
 
-#ifndef SRC_APP_APP_H_
-#define SRC_APP_APP_H_
+#ifndef APP_H_
+#define APP_H_
 
-//#define GLOBAL_CONFIG
-//#include "global_config.h"
-#include "states.h"
-#include "app_types.h"
-#include "rho_master.h"
+#include "../Rho/rho_master.h"
 
-#endif /* SRC_APP_APP_H_ */
+#endif /* APP_H_ */

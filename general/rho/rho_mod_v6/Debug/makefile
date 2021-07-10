@@ -68,8 +68,11 @@ all: main-build
 # Main-build Target
 main-build: rho_mod_v6.elf secondary-outputs
 
+dependents:
+	-cd C:/Users/Matthew\ Fonken/Desktop/marbl/Techincal/combine/general/rho/rho_mod_v6/Release && $(MAKE) all
+
 # Tool invocations
-rho_mod_v6.elf: $(OBJS) $(USER_OBJS) C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v6\STM32G431K6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+rho_mod_v6.elf: $(OBJS) $(USER_OBJS) C:/Users/Matthew\ Fonken/Desktop/marbl/Techincal/combine/general/rho/rho_mod_v6/Release/rho_mod_v6.elf C:\Users\Matthew\ Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v6\STM32G431K6TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	arm-none-eabi-gcc -o "rho_mod_v6.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Matthew Fonken\Desktop\marbl\Techincal\combine\general\rho\rho_mod_v6\STM32G431K6TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rho_mod_v6.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
@@ -105,5 +108,6 @@ warn-no-linker-script-specified:
 
 .PHONY: all clean dependents fail-specified-linker-script-missing warn-no-linker-script-specified
 .SECONDARY:
+C:/Users/Matthew\ Fonken/Desktop/marbl/Techincal/combine/general/rho/rho_mod_v6/Release/rho_mod_v6.elf:
 
 -include ../makefile.targets

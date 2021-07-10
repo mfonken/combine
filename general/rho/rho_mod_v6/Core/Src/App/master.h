@@ -3,9 +3,8 @@
  *  Group: Rho Core
  ***********************************************************************/
 
-#ifndef master_h
-#define master_h
-
+#ifndef MASTER_H_
+#define MASTER_H_
 /***************************************************************************************/
 /*                                    Includes                                         */
 /***************************************************************************************/
@@ -42,7 +41,7 @@ void InitializePlatform( void );
 void ConnectToHost( void );
 void ConfigureApplication( void );
 void ExitInitialization( void );
-inline void ApplicationCore( void );
+void ApplicationCore( void );
 void SystemError( void );
 
 /***************************************************************************************/
@@ -50,11 +49,12 @@ void SystemError( void );
 /***************************************************************************************/
 static system_states_list_t global_states_list =
 {
-  { INITIALIZING,       CONNECTING_TO_HOST, InitializePlatform    },\
+  { INITIALIZING,       CONNECTING_TO_HOST, InitializePlatform    },
+  { CONNECTING_TO_HOST, CONFIGURING,        ConnectToHost         },
   { CONFIGURING,        READY,              ConfigureApplication  },
   { READY,              ACTIVE,             ExitInitialization    },
   { ACTIVE,             IDLE,               ApplicationCore       },
   { SYS_ERROR,          IDLE,               SystemError           }
 };
 
-#endif
+#endif /* MASTER_H_ */

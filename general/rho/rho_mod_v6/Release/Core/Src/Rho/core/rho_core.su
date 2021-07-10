@@ -1,0 +1,8 @@
+rho_core.c:39:6:InitializeRhoCore	24	static
+rho_core.c:83:6:DetectRhoCore	24	static
+rho_core.c:105:6:DetectRhoCorePairs	32	static
+rho_core.c:119:6:UpdateRhoCorePrediction	8	static
+rho_core.c:128:6:UpdateRhoCorePredictions	104	static
+rho_core.c:160:6:UpdateRhoCoreThreshold	8	static
+rho_core.c:166:6:GenerateRhoCorePacket	8	static
+rho_core.c:69:6:PerformRhoCore	8	static

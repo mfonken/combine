@@ -18,19 +18,34 @@ void InitializePlatform( void )
     PlatformFunctions.Init( &Platform, HOST_COMMUNICATION_PROTOCOL, (generic_handle_t)Master.IOs.HOST_DEFAULT_CHANNEL );
 }
 
+/* CONNECTING_TO_HOST State Routine */
+void ConnectToHost( void )
+{
+#ifdef PERFORM_HOST_PING_FOR_INIT
+  while( PlatformFunctions.Host.Command( PING_HOST, NEEDED ) != OK )
+  {
+    PlatformFunctions.Wait( HOST_COMMAND_WAIT_TIME );
+  }
+#endif
+}
+
 /* CONFIGURING State Routine */
 void ConfigureApplication( void )
 {
-#ifdef __YOUR_APP__
-  /// Initialize your application
+#ifdef __OV9712__
+  OV9712_Functions.Init( &OV9712, Master.IOs.CAMERA_COMMUNICATION_CHANNEL, &Default_OV9712_Pins );
+#endif
+#ifdef __RHO__
+  RhoSystem.Functions.Perform.ConnectToInterface( &PlatformFunctions, &CameraFlags );
+  RhoSystem.Functions.Perform.Initialize( CAMERA_PORT, UART_TX_PORT );
 #endif
 }
 
 /* READY State Routine */
 void ExitInitialization( void )
 {
-#ifdef __YOUR_APP__
-  /// Activate your application
+#ifdef __RHO__
+  RhoSystem.Functions.Perform.Activate();
 #endif
   if( SystemFunctions.State.IsIn( &System, READY ) )
     MasterFunctions.Run();
@@ -39,10 +54,10 @@ void ExitInitialization( void )
 }
 
 /* ACTIVE State Routine */
-static inline void ApplicationCore( void )
+void ApplicationCore( void )
 {
-#ifdef __YOUR_APP__
-    /// Run your application core
+#ifdef __RHO__
+    RhoSystem.Functions.Perform.CoreProcess();
 #else
 #warning "No application core."
 #endif
@@ -65,6 +80,13 @@ void SystemError( void )
 /***************************************************************************************/
 void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t * usart )
 {
+  Master.IOs.I2C_Primary = i2c;
+  Master.Utilities.Timer_Primary = timer;
+  Master.IOs.UART_Primary = usart;
+
+#warning "TODO: Figure out better capure DMA initializer"
+  STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, (uint16_t)CAPTURE_BUFFER_SIZE, true );
+  PlatformFunctions.GPIO.Write(&(GPIO_t){ LED_GPIO_Port, LED_Pin }, GPIO_PIN_SET);
   MasterFunctions.Init();
 }
 
@@ -75,6 +97,9 @@ void Master_Init( void )
 
   /* Initialize core platform */
   SystemFunctions.State.Enter( &System, INITIALIZING );
+
+  /* Connect to host, this is critical for finishing initialization hence endless loop */
+  SystemFunctions.State.Enter( &System, CONNECTING_TO_HOST );
 
   /* Configure application items */
   SystemFunctions.State.Enter( &System, CONFIGURING );

@@ -1,7 +1,0 @@
-OV9712_calc.h:250:13:SetSubsample	16	static
-OV9712_calc.h:255:13:SetPercentActive	16	static
-OV9712_calc.h:263:13:SetFrameRate	16	static
-OV9712.c:40:6:OV9712_Init	32	static
-OV9712.c:55:6:OV9712_Write	40	static
-OV9712.c:61:6:OV9712_Enable	16	static
-OV9712.c:70:6:OV9712_Disable	16	static

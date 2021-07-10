@@ -3,6 +3,7 @@
 	<name>rho_mod_v6</name>
 	<comment></comment>
 	<projects>
+		<project>rho_mod_v6</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
