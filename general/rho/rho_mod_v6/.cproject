@@ -82,6 +82,8 @@
                                     <listOptionValue builtIn="false" value="GLOBAL_LOG_LEVEL=TEST"/>
                                     									
                                     <listOptionValue builtIn="false" value="__RHO__"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="__OV9712__"/>
                                     								
                                 </option>
                                 								
@@ -107,11 +109,9 @@
                                     									
                                     <listOptionValue builtIn="false" value="__STM32__"/>
                                     									
-                                    <listOptionValue builtIn="false" value="__OV9712__"/>
-                                    									
                                     <listOptionValue builtIn="false" value="GLOBAL_LOG_LEVEL=TEST"/>
                                     									
-                                    <listOptionValue builtIn="false" value="__RHO__"/>
+                                    <listOptionValue builtIn="false" value="__OV9712__"/>
                                     								
                                 </option>
                                 								
@@ -388,6 +388,8 @@
                                     <listOptionValue builtIn="false" value="GLOBAL_LOG_LEVEL=TEST"/>
                                     									
                                     <listOptionValue builtIn="false" value="__RHO__"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="__OV9712__"/>
                                     								
                                 </option>
                                 								

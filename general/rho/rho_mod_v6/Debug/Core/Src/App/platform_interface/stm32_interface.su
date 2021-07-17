@@ -1,4 +1,4 @@
-stm32_interface.c:20:13:HAL_GPIO_EXTI_Callback	8	static
+stm32_interface.c:20:13:HAL_GPIO_EXTI_Callback	0	static
 stm32_interface.c:57:6:STM_InterruptEnable	8	static
 stm32_interface.c:63:6:STM_InterruptDisable	8	static
 stm32_interface.c:73:13:STM_PauseDMA	8	static

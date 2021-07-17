@@ -67,7 +67,7 @@ void ApplicationCore( void )
 void SystemError( void )
 {
     LOG( ALWAYS, "System error! Resetting in" );
-    for( byte_t i = 3 ; i > 0; i-- )
+    for( uint8_t i = 3 ; i > 0; i-- )
     {
         LOG_BARE( ALWAYS, " %d", i );
         PlatformFunctions.Wait(1000);
@@ -80,12 +80,15 @@ void SystemError( void )
 /***************************************************************************************/
 void Master_Connect( I2C_Handle_t * i2c, TIMER_Handle_t * timer, UART_Handle_t * usart )
 {
+  printf("Connecting master..."ENDL);
   Master.IOs.I2C_Primary = i2c;
   Master.Utilities.Timer_Primary = timer;
   Master.IOs.UART_Primary = usart;
 
-#warning "TODO: Figure out better capure DMA initializer"
+#ifdef __RHO__
+#warning "TODO: Figure out better capture DMA initializer"
   STM_InitDMA( (uint32_t)&CAMERA_PORT, (uint32_t)RhoSystem.Variables.Buffers.Capture, (uint16_t)CAPTURE_BUFFER_SIZE, true );
+#endif
   PlatformFunctions.GPIO.Write(&(GPIO_t){ LED_GPIO_Port, LED_Pin }, GPIO_PIN_SET);
   MasterFunctions.Init();
 }

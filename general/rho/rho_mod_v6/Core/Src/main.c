@@ -64,7 +64,11 @@ static void MX_TIM8_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int _write(int file, char *ptr, int len)
+{
+	HAL_StatusTypeDef status = HAL_UART_Transmit(&huart1, (uint8_t*)ptr, len, 1000);
+	return (int)status;
+}
 /* USER CODE END 0 */
 
 /**
@@ -81,7 +85,6 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -100,6 +103,8 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
+//  _write(0, "ABC\n", 4);
+  printf("Starting...\r\n");
   MasterFunctions.Connect( &hi2c1, &htim8, &huart1 );
   /* USER CODE END 2 */
 
