@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "App/master.h"
+#include "master.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,8 +56,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_TIM8_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -78,13 +78,13 @@ int _write(int file, char *ptr, int len)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -100,11 +100,9 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
-  MX_USART1_UART_Init();
   MX_TIM8_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-//  _write(0, "ABC\n", 4);
-  printf("Starting...\r\n");
   MasterFunctions.Connect( &hi2c1, &htim8, &huart1 );
   /* USER CODE END 2 */
 

@@ -1,8 +1,0 @@
-system.c:9:6:InitSystem	8	static
-system.c:17:6:NextStateSystem	8	static
-system.c:22:18:GetStateSystem	8	static
-system.c:34:6:PerformStateSystem	8	static
-system.c:40:6:EnterStateSystem	8	static
-system.c:46:6:IsInStateSystem	8	static
-system.c:51:18:GetStateFromListSystem	4	static
-system.c:27:6:SetStateSystem	16	static

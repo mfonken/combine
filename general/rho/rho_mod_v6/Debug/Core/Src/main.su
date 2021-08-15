@@ -1,9 +1,0 @@
-main.c:425:13:MX_GPIO_Init	48	static
-main.c:67:5:_write	8	static
-main.c:509:6:Error_Handler	0	static,ignoring_inline_asm
-main.c:364:13:MX_DMA_Init	48	static
-main.c:182:13:MX_I2C1_Init	8	static
-main.c:316:13:MX_USART1_UART_Init	8	static
-main.c:228:13:MX_TIM8_Init	136	static
-main.c:126:6:SystemClock_Config	152	static
-main.c:78:5:main	8	static

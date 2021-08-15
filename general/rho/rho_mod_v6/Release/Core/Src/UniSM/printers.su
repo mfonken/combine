@@ -1,4 +1,0 @@
-printers.c:12:13:print	8	static
-printers.c:20:6:DrawCurve	56	static
-printers.c:59:6:PrintBuffer	24	static
-printers.c:50:6:PrintDualBuffer	32	static
