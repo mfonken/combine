@@ -3,10 +3,11 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "rho_global.h"
 
-#define MATVEC_LIB
+//#define MATVEC_LIB
 
 #ifdef MATVEC_LIB
 #include "matvec.h"
@@ -15,6 +16,9 @@
 #define KALMAN_PUNISH_FACTOR  0.7
 #define MIN_KALMAN_GAIN       0.001
 #define KALMAN_MATURATION     3 // Seconds
+
+//typedef double floating_t;
+//typedef int16_t uint16_t;
 
 #ifdef __cplusplus
 extern "C" {

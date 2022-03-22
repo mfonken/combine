@@ -8,6 +8,8 @@
 
 #include "image_utility.hpp"
 
+#define FRAME_IMAGE_SOURCE_NUM_FRAMES 1
+
 using namespace cv;
 using namespace std;
 

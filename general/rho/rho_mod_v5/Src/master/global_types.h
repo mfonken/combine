@@ -15,7 +15,7 @@ typedef struct
 {
   uint8_t Address;
   uint8_t Value;
-} register_t;
+} hw_register_t;
 
 typedef volatile bool flag_t;
 typedef struct

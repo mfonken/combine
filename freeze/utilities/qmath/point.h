@@ -23,8 +23,7 @@ extern "C" {
         double x, y, z, the, phi;
     } kpoint_t;
     
-    typedef struct kpoint kpoint;
-    struct kpoint
+    typedef struct
     {
         void (*init)( kpoint_t *, double, double, double, double );
         double (*dist)( kpoint_t * );
@@ -33,8 +32,8 @@ extern "C" {
         double (*anga)( kpoint_t * );
         void   (*copy)( kpoint_t *, kpoint_t * );
         void (*toVec3)( kpoint_t *, vec3_t * );
-    };
-    extern const kpoint KPoint;
+    } kpoint_functions;
+    extern const kpoint_functions KPoint;
     
 #ifdef __cplusplus
 }

@@ -83,7 +83,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "445"
             endingLineNumber = "445"
-            landmarkName = "TauDrawer::DrawDensityMaps(M)"
+            landmarkName = "TauDrawer::DrawCurves(M)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -149,7 +149,7 @@
             endingLineNumber = "437">
             <Locations>
                <Location
-                  uuid = "7B6F334F-B647-4E69-ACA7-DEFD96A317F4 - 233234d35bb97740"
+                  uuid = "7B6F334F-B647-4E69-ACA7-DEFD96A317F4 - a93f1e45fcf1d918"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -164,7 +164,7 @@
                   offsetFromSymbolStart = "348">
                </Location>
                <Location
-                  uuid = "7B6F334F-B647-4E69-ACA7-DEFD96A317F4 - 233234d35bb97740"
+                  uuid = "7B6F334F-B647-4E69-ACA7-DEFD96A317F4 - a93f1e45fcf1d918"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -245,7 +245,7 @@
             landmarkType = "9">
             <Locations>
                <Location
-                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - 267199e9bda61a60"
+                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - a39f91024d996e7c"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -260,7 +260,7 @@
                   offsetFromSymbolStart = "104">
                </Location>
                <Location
-                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - 267199e9bda61a60"
+                  uuid = "6822F978-24EB-4A22-A7EF-7C815715E281 - a39f91024d996e7c"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -357,7 +357,7 @@
             landmarkType = "9">
             <Locations>
                <Location
-                  uuid = "31800CF8-7ABF-4113-A47A-F5740D7FFA06 - 6f13670bc9a8cb9f"
+                  uuid = "31800CF8-7ABF-4113-A47A-F5740D7FFA06 - e51e4d9d6ee04c69"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -372,7 +372,7 @@
                   offsetFromSymbolStart = "19">
                </Location>
                <Location
-                  uuid = "31800CF8-7ABF-4113-A47A-F5740D7FFA06 - 6f13670bc9a8cb9f"
+                  uuid = "31800CF8-7ABF-4113-A47A-F5740D7FFA06 - e51e4d9d6ee04c69"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -744,38 +744,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "82BC3895-9119-4202-9FB1-68EF47E8A5E9"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "combine/main.cpp"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "run(instructions, FRAME_WIDTH, FRAME_HEIGHT)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "28EFEB1D-6BF8-4C8C-85FD-8A5C9858D4D0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "combine/main.cpp"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "55"
-            endingLineNumber = "55"
-            landmarkName = "run(instructions, FRAME_WIDTH, FRAME_HEIGHT)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "CF0F3307-2BD3-4553-8C62-6C35E73B1E5F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -787,6 +755,22 @@
             endingLineNumber = "20"
             landmarkName = "unknown"
             landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BABCED78-D23D-447E-B215-6D502E1C024F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "combine/main.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
+            landmarkName = "main(argc, argv)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

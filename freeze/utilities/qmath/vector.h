@@ -56,6 +56,7 @@ extern "C" {
         void    (*mul3)(   double m,   vec3_t * v, vec3_t * r );
         void    (*cross3)( vec3_t * u, vec3_t * v, vec3_t * r );
         void    (*add33)(  vec3_t * u, vec3_t * v, vec3_t * w, vec3_t * r);
+        void    (*copy3)(  vec3_t * u, vec3_t * v );
     };
     
     extern const kvector Vector;

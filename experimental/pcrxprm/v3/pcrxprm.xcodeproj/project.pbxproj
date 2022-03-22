@@ -91,7 +91,7 @@
 		34001AA0220A92B50060DC03 /* timestamp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp.c; sourceTree = "<group>"; };
 		34001AA1220A92B50060DC03 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
 		34001AA4220A92B50060DC03 /* environment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = environment.cpp; sourceTree = "<group>"; };
-		34001AA5220A92B50060DC03 /* environment_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = environment_master.h; sourceTree = "<group>"; };
+		34001AA5220A92B50060DC03 /* environment_master.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = environment_master.hpp; sourceTree = "<group>"; };
 		34001AA6220A92B50060DC03 /* environment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = environment.hpp; sourceTree = "<group>"; };
 		34001AA8220A92B50060DC03 /* utility_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility_master.h; sourceTree = "<group>"; };
 		34001AC3220A93630060DC03 /* test_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_config.h; sourceTree = "<group>"; };
@@ -294,7 +294,7 @@
 		34001AA3220A92B50060DC03 /* environment */ = {
 			isa = PBXGroup;
 			children = (
-				34001AA5220A92B50060DC03 /* environment_master.h */,
+				34001AA5220A92B50060DC03 /* environment_master.hpp */,
 				34001AA6220A92B50060DC03 /* environment.hpp */,
 				34001AA4220A92B50060DC03 /* environment.cpp */,
 			);

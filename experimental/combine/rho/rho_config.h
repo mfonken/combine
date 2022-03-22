@@ -8,6 +8,20 @@
 
 #include "rho_global.h"
 
+#include "types/maths_master.h"
+#include "rho_packet.h"
+
+extern double TIMESTAMP( void );
+
+#ifdef __OV9712__
+#include "../App/OV9712/OV9712.h"
+#else
+#define FRAME_WIDTH_BASE 0
+#define FRAME_HEIGHT 0
+#define CAPTURE_BUFFER_LENGTH 0
+#define THRESH_BUFFER_LENGTH 0
+#endif
+
 //#define SPOOF_STATE_BANDS
 #ifndef AUTOMATION_RUN
 //#define __USE_DETECTION_MAP__
@@ -20,22 +34,23 @@
 
 //#define __USE_ZSCORE_THRESHOLD__ /* Detect regions using z-scoring - account for variance and overly aggressive banding */
 //#define __USE_REGION_BOUNDARY_OFFSET__ /* Bump proposed center if true centroid is within a region to nearest edge (+ gap margin) */
-#define __USE_RUNNING_AVERAGE__ /* Actively calculate running average as opposed to raw sum and count - ALT NOT FULLY IMPLEMENTED */
+#define __USE_RUNNING_AVERAGE__ /* Actively calculate running average as opposed to raw sum and count - ALT NOT FULLY IMPLEMENTED */\
 
-#define CAPTURE_DIV             0
-#define RHO_WIDTH               FRAME_WIDTH
-#define RHO_HEIGHT              FRAME_HEIGHT
+#define CAPTURE_WIDTH           FRAME_WIDTH_BASE
+#define CAPTURE_HEIGHT          FRAME_HEIGHT
+#define TOTAL_RHO_PIXELS    	( CAPTURE_WIDTH * CAPTURE_HEIGHT )
 
-#define CAPTURE_WIDTH           (RHO_WIDTH>>CAPTURE_DIV)
-#define CAPTURE_HEIGHT          (RHO_HEIGHT>>CAPTURE_DIV)
-#define FRAME_SIZE              (CAPTURE_WIDTH*CAPTURE_HEIGHT)
+#define CAPTURE_BUFFER_SIZE 	CAPTURE_BUFFER_LENGTH
+#define THRESH_BUFFER_SIZE      THRESH_BUFFER_LENGTH
+#define THRESH_BUFFER_MAX       THRESH_BUFFER_LENGTH
+#define CAPTURE_SUB_SAMPLE 1
 
 #ifdef __CAM__
 #define DENSITY_MAP_W_SIZE       CAPTURE_WIDTH
 #define DENSITY_MAP_H_SIZE       CAPTURE_HEIGHT
 #else
-#define DENSITY_MAP_W_SIZE       RHO_WIDTH
-#define DENSITY_MAP_H_SIZE       RHO_HEIGHT
+#define DENSITY_MAP_W_SIZE       CAPTURE_WIDTH
+#define DENSITY_MAP_H_SIZE       CAPTURE_HEIGHT
 #endif
 
 #define DEFAULT_THRESH          170//250 //THRESH_MIN
@@ -43,7 +58,7 @@
 #define FILTERED_COVERAGE_TARGET   0.007
 #define MAX_COVERAGE            1
 #define C_FRAME_SIZE            ((int)(MAX_COVERAGE * FRAME_SIZE))
-#define Y_DEL                   0xaaaa
+#define CAPTURE_ROW_END         CAPTURE_BUFFER_SIZE
 
 //#define USE_STATIC_BACKGROUNDING    
 
@@ -95,7 +110,6 @@
 #define FRAME_QUADRANT_BTM_LEFT_INDEX   2
 #define FRAME_QUADRANT_BTM_RIGHT_INDEX  3
 
-#define TOTAL_RHO_PIXELS    ( CAPTURE_WIDTH * CAPTURE_HEIGHT )
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /*                              FILTER PARAMETERS                                      */
@@ -131,7 +145,7 @@
 
 #define MIN_STATE_CONFIDENCE        0.01 //0.5
 #define BACKGROUND_PERCENT_MIN      0.02
-#define BACKGROUND_COVERAGE_MIN     ((int)(BACKGROUND_PERCENT_MIN*FRAME_SIZE))
+#define BACKGROUND_COVERAGE_MIN     ((int)(BACKGROUND_PERCENT_MIN * TOTAL_RHO_PIXELS))
 #define BACKGROUND_TUNE_MAX         2
 #define BACKGROUND_TUNE_EXPONENT    3
 //#define BACKGROUND_COVERAGE_TOL_PR   0.001
@@ -139,7 +153,10 @@
 
 #define DEFAULT_KUMARASWAMY_BANDS   { 0.25, 0.45, 0.6, 1.0 }
 
-#define DEFAULT_PACKET_LENGTH       3
+//#define DEFAULT_PACKET_LENGTH       3
+
+#define BEACON_PACKET_ID 0x11
+#define BEACON_DEFAULT_PERIOD 20 // cycles
 
 //#define SPOOF_STATE_BANDS           { 0.2, 0.5, 0.75, 1.0 }
 

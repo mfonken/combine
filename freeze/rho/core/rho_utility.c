@@ -866,25 +866,25 @@ void GeneratePacketRhoUtility( rho_core_t * core )
     RhoUtility.PrintPacket( &core->Packet, 3 );
 }
 
-void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t thresh )
-{
-    index_t i = 0;
-    for( ; i < r->NumRegions && i < MAX_OBSERVATIONS; i++ )
-    {
-        index_t io = r->TrackingFiltersOrder[i];
-        if( io >= MAX_TRACKING_FILTERS ) continue;
-        floating_t x = r->TrackingFilters[io].value;
-        io = r->RegionsOrder[i];
-        region_t * b = &r->Regions[io];
-        bool below_centroid = (density_t)x < r->PreviousCentroid;
-
-        index_t density =  (index_t)b->den + (index_t)r->PreviousPeak[(uint8_t)below_centroid];
-        density = BOUNDU( density, MAX_REGION_HEIGHT );
-        LOG_RHO_BARE(RHO_DEBUG_2, "\t\t(%d) <%d %d %d>\n", i, density, thresh, io);
-        r->ObservationList.observations[i] = (observation_t){ density, thresh, io };
-    }
-    r->ObservationList.length = i;
-}
+//void GenerateObservationListFromPredictionsRhoUtility( prediction_t * r, uint8_t thresh )
+//{
+//    index_t i = 0;
+//    for( ; i < r->NumRegions && i < MAX_OBSERVATIONS; i++ )
+//    {
+//        index_t io = r->TrackingFiltersOrder[i];
+//        if( io >= MAX_TRACKING_FILTERS ) continue;
+//        floating_t x = r->TrackingFilters[io].value;
+//        io = r->RegionsOrder[i];
+//        region_t * b = &r->Regions[io];
+//        bool below_centroid = (density_t)x < r->PreviousCentroid;
+//
+//        index_t density =  (index_t)b->den + (index_t)r->PreviousPeak[(uint8_t)below_centroid];
+//        density = BOUNDU( density, MAX_REGION_HEIGHT );
+//        LOG_RHO_BARE(RHO_DEBUG_2, "\t\t(%d) <%d %d %d>\n", i, density, thresh, io);
+//        r->ObservationList.observations[i] = (observation_t){ density, thresh, io };
+//    }
+//    r->ObservationList.length = i;
+//}
 void GenerateObservationListsFromPredictionsRhoUtility( rho_core_t * core )
 {
     if(core->PredictionPair.x.NumRegions > 0)

@@ -13,7 +13,16 @@
 #include <stdbool.h>
 #include <sys/time.h>
 
-double TIMESTAMP( void );
-bool ISTIMEDOUT( double, double );
+static double TIMESTAMP(void)
+{
+    struct timeval stamp;
+    gettimeofday(&stamp, NULL);
+    return stamp.tv_sec + stamp.tv_usec/1000000.0;
+}
+
+static bool ISTIMEDOUT( double check, double time_out )
+{
+    return ( TIMESTAMP() - check ) > time_out;
+}
 
 #endif /* timestamp_h */

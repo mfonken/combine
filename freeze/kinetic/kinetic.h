@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "test_setup.h"
+//#include "test_setup.h"
 
 /* Math headers */
 #include "qmath.h"
@@ -84,37 +84,35 @@ typedef struct _kinetic_t
 {
     kinetic_values_t values;
     kinetic_filters_t filters;
-    kpoint_t
-    A,
-    B;
-    double  omega,
-    sigmaA,
-    sigmaR,
-    nu,
-    upsilon,
-    chi,
-    mu,
-    gamma;
-    int     W,
-    H;
-    double  f_l,
-    d_l,
-    d__l,
-    r_l;
-    ang3_t  raw,
-            e;
-    vec3_t  r,
-    n;
-    quaternion_t
-    qd,
-    qd_,
-    qs,
-    qs_,
-    qc,
-    qc_,
-    qr,
-    qg,
-    qa;
+    kpoint_t A;
+    kpoint_t B;
+    double omega;
+    double sigmaA;
+    double sigmaR;
+    double nu;
+    double upsilon;
+    double chi;
+    double mu;
+    double gamma;
+    int W;
+    int H;
+    double f_l;
+    double d_l;
+    double d__l;
+    double r_l;
+    ang3_t raw;
+    ang3_t e;
+    vec3_t r;
+    vec3_t n;
+    quaternion_t qd;
+    quaternion_t qd_;
+    quaternion_t qs;
+    quaternion_t qs_;
+    quaternion_t qc;
+    quaternion_t qc_;
+    quaternion_t qr;
+    quaternion_t qg;
+    quaternion_t qa;
 } kinetic_t;
 
 typedef struct _serial_kinetic_t
@@ -126,8 +124,16 @@ typedef struct _serial_kinetic_t
 
 typedef struct
 {
-    void  (*DefaultInit)(kinetic_t * );
-    void  (*Init)( kinetic_t *, int, int, double, double);
+    int width;
+    int height;
+    double focal_length;
+    double beacon_distance;
+} kinetic_config_t;
+
+typedef struct
+{
+    void (*DefaultInit)(kinetic_t * );
+    void (*Init)( kinetic_t *, kinetic_config_t );
     void (*UpdatePosition)( kinetic_t *, vec3_t *, quaternion_t *, kpoint_t * , kpoint_t * );
     
     void (*MinorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );

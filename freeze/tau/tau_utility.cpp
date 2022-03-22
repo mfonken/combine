@@ -10,7 +10,7 @@
 
 using namespace cv;
 
-static void printPacket( GlobalPacket * p, int l )
+static void PrintPacket( GlobalPacket * p, int l )
 {
 #ifdef TAU_DEBUG
     printf("Packet Size > %lubytes\n", sizeof(GlobalPacket));

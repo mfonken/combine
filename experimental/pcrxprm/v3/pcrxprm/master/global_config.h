@@ -2,6 +2,7 @@
 #define global_config_h
 
 #include "global_types.h"
+#include "main.h"
 
 #define THIS_ID           0x01
 
@@ -22,9 +23,6 @@
 #define HOST_COMMAND_RETRY_TIME     1000
 
 #ifdef __STM32__
-
-#include "stm32l4xx_it.h"
-#include "stm32l4xx_hal.h"
 #define _PLATFORM_ STM
 
 /* DMA Config */

@@ -16,9 +16,5 @@ typedef struct
     pixel_base_t * pixels;
 } cimage_t;
 
-typedef struct
-{
-    double x, y, z, the, phi;
-} kpoint_t;
 
 #endif /* image_types_h */

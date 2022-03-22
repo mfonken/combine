@@ -21,6 +21,10 @@
 
 #include "serial_wrapper.hpp"
 
+#include "unilog.h"
+
+#define ENV_DEBUG
+
 #ifndef LOG
 #define LOG(L,...) printf(__VA_ARGS__)
 #endif
@@ -38,6 +42,9 @@
 
 #define MAX_EVENTS 6
 
+#define LOCK(m) Lock _tmp_lock(m);
+//#define LOCK2(m1, m2) Lock _tmp_lock1(m1); Lock _tmp_lock2(m2);
+
 using namespace std;
 
 static inline long getTime( struct timeval tv )
@@ -46,13 +53,29 @@ static inline long getTime( struct timeval tv )
     return long(tv.tv_usec + tv.tv_sec*1000000);
 }
 
+class Lock
+{
+    pthread_mutex_t * _mutex;
+public:
+    Lock(pthread_mutex_t * mutex)
+    {
+        _mutex = mutex;
+        pthread_mutex_lock(_mutex);
+    }
+    ~Lock()
+    {
+        pthread_mutex_unlock(_mutex);
+    }
+};
+
 class TestInterface
 {
 public:
     int id;
     const char * name;
-    virtual void  init( void ) = 0;
-    virtual void  trigger( void ) = 0;
+    pthread_mutex_t mutex;
+    virtual void init( void ) = 0;
+    virtual void trigger( void ) = 0;
     virtual string serialize( void ) = 0;
 };
 
@@ -99,6 +122,7 @@ class Environment
 private:
     pthread_mutex_t lock;
     pthread_cond_t  condition;
+    string name;
     
     void controlTick();
 public:
@@ -106,8 +130,9 @@ public:
     EventList events;
     pthread_t thread;
     
-    Environment( TestInterface*, int );
-    Environment( TestInterface*, SerialWriter*, int );
+    Environment( string );
+    Environment( string, TestInterface*, int );
+    Environment( string, TestInterface*, SerialWriter*, int );
     ~Environment();
     
     void addTest( TestInterface*, int );

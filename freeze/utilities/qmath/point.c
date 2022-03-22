@@ -56,7 +56,7 @@ static void toVec3( kpoint_t * p, vec3_t * v )
     v->k = p->z;
 }
 
-const kpoint KPoint =
+const kpoint_functions KPoint =
 {
     .init = init,
     .dist = dist,

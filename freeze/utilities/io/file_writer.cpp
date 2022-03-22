@@ -17,6 +17,7 @@ FileWriter::FileWriter( const char * name )
 
 void FileWriter::init( const char * name )
 {
+    if(name == NULL) return;
     file_name = name;
     std::ofstream outfile;
     outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);

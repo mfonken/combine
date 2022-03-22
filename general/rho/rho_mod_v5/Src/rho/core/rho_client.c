@@ -77,7 +77,7 @@ void ProcessRhoSystemFrameCapture( void )
     RhoSystem.Functions.Platform.Interrupt.Enable();
     CaptureAndProcessFrame();
     RhoSystem.Functions.Platform.Interrupt.Disable();
-    PrintDensityMaps( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH, RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
+    PrintDualBuffer( RhoSystem.Variables.Utility.DensityMapPair.y.map, CAPTURE_WIDTH, RhoSystem.Variables.Utility.DensityMapPair.x.map, CAPTURE_HEIGHT );
 }
 
 void CaptureAndProcessFrame( void )

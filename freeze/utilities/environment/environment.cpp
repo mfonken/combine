@@ -8,14 +8,16 @@
 
 #include "environment.hpp"
 
-Environment::Environment( TestInterface * test, int rate ) : Environment(test, NULL, rate) {}
+Environment::Environment( string name ) : Environment(name, NULL, NULL, 0) {}
 
-Environment::Environment( TestInterface * test, SerialWriter * sercom, int rate )
+Environment::Environment( string name, TestInterface * test, int rate ) : Environment(name, test, NULL, rate) {}
+
+Environment::Environment( string name, TestInterface * test, SerialWriter * sercom, int rate )
 {
-    LOG_ENV("Initializing Test Environment.\n");
-    if (pthread_mutex_init(&lock, NULL) != 0) {LOG_ENV("\n mutex init failed\n");}
-    if(events.add( &lock, test, sercom, rate ))
-        test->init();
+    this->name = name;
+    LOG_ENV(DEBUG_2, "Initializing Test Environment %s.\n", name.c_str());
+    if (pthread_mutex_init(&lock, NULL) != 0) {LOG_ENV(DEBUG_2, "\n mutex init failed\n");}
+    if(test != NULL) addTest(test, rate);
     status = INITIALIZED;
 }
 
@@ -43,19 +45,19 @@ void Environment::start()
 
 void Environment::pause()
 {
-    LOG_ENV("Pausing environment\n");
+    LOG_ENV(DEBUG_2, "Pausing environment\n");
     pthread_mutex_unlock(&lock);
     status = PAUSED;
 }
 
 void Environment::resume()
 {
-    LOG_ENV("Resuming environment\n");
+    LOG_ENV(DEBUG_2, "Resuming environment\n");
     pthread_mutex_lock(&lock);
     for( int i = 0; i < events.length(); i++ )
     {
         Event * e = events.get(i);
-        pthread_create(&thread, NULL, &e->worker, (void*)e);
+        pthread_create(&e->thread, NULL, &e->worker, (void*)e);
     }
     status = LIVE;
 }
@@ -77,16 +79,16 @@ Event::Event( pthread_mutex_t * mutex, TestInterface * test, SerialWriter * serc
 void * Event::worker( void * data )
 {
     Event e = *(Event*)data;
-//    const char * n = e.test->name;
+    const char * n = e.test->name;
     if( e.mutex == NULL)
     {
-        LOG_ENV("ALERT: Event %s has no mutex!\n", n);
+        LOG_ENV(DEBUG_2, "ALERT: Event %s has no mutex!\n", n);
         return NULL;
     }
     
     if( e.rate <= 0)
     {
-        LOG_ENV("ALERT: Event %s has invalid rate.\n", n);
+        LOG_ENV(DEBUG_2, "ALERT: Event %s has invalid rate.\n", n);
         return NULL;
     }
     int sl = 1000000/e.rate;
@@ -106,7 +108,7 @@ void * Event::worker( void * data )
         while( (curr_time = getTime(time)) < end_time );
     }
     pthread_mutex_unlock(e.mutex);
-    LOG_ENV("Event %s has triggered %d times\n", e.test->name, e.id);
+    LOG_ENV(DEBUG_2, "Event %s has triggered %d times\n", e.test->name, e.id);
     return NULL;
 }
 

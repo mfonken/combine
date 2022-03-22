@@ -17,7 +17,7 @@ inline void print( char * Buf )
 #define MAX_PRINT_INDEX 40
 #define DENSITY_PRINT_SMOOTH_THRESH 1
 #define DENSITY_PRINT_SHARP_THRESH 4
-void DrawDensityMap( uint8_t * a, int32_t l )
+void DrawCurve( uint8_t * a, int32_t l )
 {
     uint8_t curr, prev = 0;
     int32_t diff = 0, vert = 0;
@@ -47,7 +47,7 @@ void DrawDensityMap( uint8_t * a, int32_t l )
     }
 }
 
-void PrintDensityMaps( uint8_t * x, int32_t lx, uint8_t * y, int32_t ly )
+void PrintDualBuffer( uint8_t * x, int32_t lx, uint8_t * y, int32_t ly )
 {
   uint16_t del = UNIVERSAL_DELIMITER;
   print((char *)&del);

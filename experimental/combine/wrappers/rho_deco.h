@@ -6,6 +6,8 @@
 #ifndef rho_deco_h
 #define rho_deco_h
 
+#ifdef __USE_DECOUPLING__
+
 #include <stdio.h>
 #include <string.h>
 
@@ -104,5 +106,7 @@ extern "C" {
 }
 #endif
 
+#endif
 
 #endif /* rho_interrupt_h */
+

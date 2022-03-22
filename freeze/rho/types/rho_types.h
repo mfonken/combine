@@ -204,7 +204,7 @@ typedef struct
     density_2d_t    PreviousDensity[2],
                     TotalDensity,
                     FilterDensity[2];
-    observation_list_t ObservationList;
+//    observation_list_t ObservationList;
     prediction_probabilities Probabilities;
 } prediction_t;
 

@@ -5,6 +5,8 @@
 
 #include "rho_deco.h"
 
+#ifdef __USE_DECOUPLING__
+
 #define BURN_ROWS 0
 #define BURN_COLS 0
 
@@ -132,3 +134,5 @@ void RhoInterruptModel_RhoFunction( const cimage_t image )
     LOG_RHO(DEBUG_0, "# Total coverage is %.3f%%\n", ((double)RhoVariables.ram.QT)/((double)w*h)*100);
     LOG_RHO(DEBUG_0, "\t\t\t\tQT %d\n", RhoVariables.ram.QT);
 }
+
+#endif

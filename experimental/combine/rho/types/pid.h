@@ -10,13 +10,16 @@
 #define pid_h
 
 #include <string.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
 #include "rho_global.h"
-    
+
+typedef double floating_t;
+
     /* PID Filter Configs */
 #define PID_SCALE   1//10
 #define PID_DRIFT   1.1

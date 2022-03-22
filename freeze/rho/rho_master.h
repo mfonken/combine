@@ -9,6 +9,8 @@
 #ifndef rho_master_h
 #define rho_master_h
 
+#include USE_INTERRUPT_MODEL 
+
 #if defined __linux || defined __APPLE__
 #include "rho_core.h"
 #else

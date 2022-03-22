@@ -14,15 +14,16 @@
  **************************************************************************************************/
 void KineticDefaultInit( kinetic_t * k )
 {
-    KineticFunctions.Init( k, KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED );
+    kinetic_config_t config = { KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED };
+    KineticFunctions.Init( k, config );
 }
 
-void KineticInit( kinetic_t * k, int W, int H, double F, double L )
+void KineticInit( kinetic_t * k, kinetic_config_t config )
 {
-    k->W = W;
-    k->H = H;
-    k->f_l = F;
-    k->d_l = L;
+    k->W = config.width;
+    k->H = config.height;
+    k->f_l = config.focal_length;
+    k->d_l = config.beacon_distance;
     Camera_Rotation_Init(k);
     Reference_Rotation_Init(k);
     Filters_Init(k);
@@ -43,13 +44,13 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, quaternion_t * O, 
     KineticFunctions.R( k );
     
     /* Step 5A: Update position values for tests */
-    k->values.position[1] = -k->r.i;
-    k->values.position[0] =  k->r.j;
-    k->values.position[2] =  k->r.k;
+    k->values.position[0] = k->r.i;
+    k->values.position[1] = k->r.j;
+    k->values.position[2] = k->r.k;
     
-    Kalman.update( &k->filters.position[1], -k->r.i, 0, VELOCITY );
-    Kalman.update( &k->filters.position[0],  k->r.j, 0, VELOCITY );
-    Kalman.update( &k->filters.position[2],  k->r.k, 0, VELOCITY );
+    Kalman.update( &k->filters.position[0], k->r.i, 0, VELOCITY );
+    Kalman.update( &k->filters.position[1], k->r.j, 0, VELOCITY );
+    Kalman.update( &k->filters.position[2], k->r.k, 0, VELOCITY );
     
 //    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;

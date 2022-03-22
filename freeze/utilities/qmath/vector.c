@@ -78,6 +78,13 @@ void add33( vec3_t * u, vec3_t * v, vec3_t * w, vec3_t * r)
     r->k = u->k + v->k + w->k;
 }
 
+void copy3( vec3_t * u, vec3_t * v )
+{
+    v->i = u->i;
+    v->j = u->j;
+    v->k = u->k;
+}
+
 const struct kvector Vector =
 {
     .sub3 = sub3,
@@ -87,7 +94,8 @@ const struct kvector Vector =
     .dot3 = dot3,
     .mul3 = mul3,
     .add33 = add33,
-    .cross3 = cross3
+    .cross3 = cross3,
+    .copy3 = copy3
 };
 
 /** @} (end addtogroup kinetic) */

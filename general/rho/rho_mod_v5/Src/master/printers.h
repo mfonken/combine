@@ -38,8 +38,8 @@ enum LogLevel
 #define STATE_DEBUG             DEBUG_2
 
 void print( char * Buf );
-void DrawDensityMap( uint8_t * a, int32_t l );
-void PrintDensityMaps( uint8_t * x, int32_t lx, uint8_t * y, int32_t ly );
+void DrawCurve( uint8_t * a, int32_t l );
+void PrintDualBuffer( uint8_t * x, int32_t lx, uint8_t * y, int32_t ly );
 void PrintBuffer( uint8_t * a, int32_t l );
 
 #endif

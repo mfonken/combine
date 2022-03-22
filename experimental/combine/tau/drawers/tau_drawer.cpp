@@ -176,7 +176,7 @@ void TauDrawer::GetDensitiesFrame( Mat& M )
     utility.outframe.copyTo(M(Rect(0, 0, w, h)));
     pthread_mutex_unlock(&utility.outframe_mutex);
     DrawDensityGraph(M);
-    DrawDensityMaps(M);
+    DrawCurves(M);
     
     density_2d_t    Qv[] = { rho.core.quadrant[0],  rho.core.quadrant[1],  rho.core.quadrant[2],  rho.core.quadrant[3]  },
                     Qb[] = { rho.core.quadrant_background[0], rho.core.quadrant_background[1], rho.core.quadrant_background[2], rho.core.quadrant_background[3] },
@@ -433,7 +433,7 @@ void TauDrawer::DrawDensityGraph(Mat &M)
     }
 }
 
-void TauDrawer::DrawDensityMaps(Mat& M)
+void TauDrawer::DrawCurves(Mat& M)
 {
     Vec3b c(0,0,0);
     int x = 0, y = 0, rangex[2] = { (int)rho.core.centroid.x, w }, rangey[2] = { (int)rho.core.centroid.y, h };

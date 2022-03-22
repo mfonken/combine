@@ -17,12 +17,13 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "environment_master.h"
+#include "environment_master.hpp"
 
 #include "opencv_master.h"
 #include "image_config.h"
 #include "image_cpp_types.h"
 #include "unfisheye.hpp"
+#include "point.h"
 
 #ifdef __TAU__
 //#include "tau_structures.hpp"

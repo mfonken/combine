@@ -61,7 +61,7 @@ public:
     Mat DrawAll(void);
     void GetDensitiesFrame(Mat&);
     void DrawDensityGraph(Mat&);
-    void DrawDensityMaps(Mat&);
+    void DrawCurves(Mat&);
     void DrawRhoProbabilities(Mat&);
     Vec3b densityColor( int );
     int pixelDensity( Vec3b );

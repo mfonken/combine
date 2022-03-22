@@ -18,18 +18,21 @@
 
 #define BUFFER_LENGTH   (1 << 7)
 
-#define PACKET_DEL '\r'
+#define PACKET_DEL '\n'
 
 double mag_cal[] = { -2.396, 38.040, 1.093 };
 char line[BUFFER_LENGTH];
 
-static int init( imu_t * imu )
+static int init( imu_t * imu, void * channel )
 {
     switch(imu->channel.interface)
     {
         default:
         case SERCOM:
-            imu->channel.descriptor = Init_SERCOM_Default();
+            if(channel == NULL)
+                imu->channel.descriptor = Init_SERCOM_Default();
+            else
+                imu->channel.descriptor = Init_SERCOM((SERCOM_Channel *)channel);
             return (int)SERCOM;
             break;
     }
@@ -59,9 +62,10 @@ void IMU_Update_All(imu_t * a)
 //    IMU_Update_Pitch(a);
 //    IMU_Update_Yaw(a);
 }
-void IMU_Update_Orientation(imu_t * a)
+void IMU_Update_Orientation(imu_t * imu)
 {
-    Read_SERCOM_IMU_Orientation(a);
+    Write_SERCOM_Bytes(imu->channel.descriptor, "o\n", 2);
+    Read_SERCOM_IMU_Orientation(imu);
 }
 
 void IMU_Normalize_All( imu_t * imu )
@@ -134,7 +138,7 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
 {
     char buffer[BUFFER_LENGTH];
     int bytes_read = -1, ptr = 0, isnl = 0;
-    while( !isnl && ptr < BUFFER_LENGTH-1)
+    while( !isnl && ptr < BUFFER_LENGTH - 1 )
     {
         bytes_read = 0;
         while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
@@ -192,7 +196,7 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     {
         bytes_read = 0;
         while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
-        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+//        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -224,8 +228,8 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
 #endif
     
     imu->pitch  =  v[0];
-    imu->roll   = -v[1];
-    imu->yaw    =  360-v[2];
+    imu->roll   =  v[1];
+    imu->yaw    =  v[2];
     
     imu->accel_raw[0] = v[3];
     imu->accel_raw[1] = v[4];

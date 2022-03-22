@@ -9,7 +9,7 @@
 #ifndef rho_drawer_xprm_hpp
 #define rho_drawer_xprm_hpp
 
-#include "rho_master.h"
+//#include "rho_master.h"
 #include "opencv_master.h"
 #include <string.h>
 
