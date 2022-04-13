@@ -45,8 +45,7 @@ extern "C" {
         double    kk;               /**< \$f\hat{kk}\$f value */
     } mat3x3_t;
     
-    typedef struct kvector kvector;
-    struct kvector
+    typedef struct
     {
         double  (*len3)(   vec3_t * v );
         void    (*nrm3)(   vec3_t * v );
@@ -57,9 +56,9 @@ extern "C" {
         void    (*cross3)( vec3_t * u, vec3_t * v, vec3_t * r );
         void    (*add33)(  vec3_t * u, vec3_t * v, vec3_t * w, vec3_t * r);
         void    (*copy3)(  vec3_t * u, vec3_t * v );
-    };
+    } kvector3;
     
-    extern const kvector Vector;
+    extern const kvector3 Vector3;
     
 #ifdef __cplusplus
 }

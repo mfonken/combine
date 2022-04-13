@@ -78,7 +78,7 @@ static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
     vec3_t Av, Bv;
     KPoint.toVec3( &k->A, &Av );
     KPoint.toVec3( &k->B, &Bv );
-    k->sigmaR = Vector.ang3( &Av, &Bv );
+    k->sigmaR = Vector3.ang3( &Av, &Bv );
 }
 
 static void KineticQuaternions( kinetic_t * k, quaternion_t * O )
@@ -217,12 +217,13 @@ kinetic_functions KineticFunctions =
  **************************************************************************************************/
 void Filters_Init( kinetic_t * k )
 {
-    Kalman.init(&k->filters.rotation[0], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.rotation[1], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.rotation[2], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[1], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
-    Kalman.init(&k->filters.position[2], 0.0, MOTION_MAX_KALMAN_LIFE, MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY );
+    kalman_uncertainty_c motion_uncertainty = { MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY };
+    Kalman.init(&k->filters.rotation[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    Kalman.init(&k->filters.rotation[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    Kalman.init(&k->filters.rotation[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    Kalman.init(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    Kalman.init(&k->filters.position[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    Kalman.init(&k->filters.position[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
 }
 
 void Camera_Rotation_Init( kinetic_t * k )

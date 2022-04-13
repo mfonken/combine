@@ -6,7 +6,7 @@
 **************************************************************************************************/
 
 /* Own header */
-#include "vector.h"
+#include "vector3.h"
 
 double len3( vec3_t * v )
 {
@@ -85,7 +85,7 @@ void copy3( vec3_t * u, vec3_t * v )
     v->k = u->k;
 }
 
-const struct kvector Vector =
+const kvector3 Vector3 =
 {
     .sub3 = sub3,
     .len3 = len3,

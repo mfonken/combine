@@ -7,14 +7,7 @@
 #define TIMELESS
 #endif
 
-static double timestamp(void)
-{
-    struct timeval stamp;
-    gettimeofday(&stamp, NULL);
-    return stamp.tv_sec + stamp.tv_usec/1000000.0;
-}
-
-void init( kalman_t * k, double v, double ls, double v_u, double b_u, double s_u )
+void init( kalman_t * k, double value, double lifespan, kalman_uncertainty_c uncertainty )
 {
     k->K[0]        = 0;
     k->K[1]        = 0;
@@ -24,25 +17,26 @@ void init( kalman_t * k, double v, double ls, double v_u, double b_u, double s_u
     k->P[1][1]     = 0;
     k->rate        = 0;
     k->bias        = 0;
-    k->value       = v;
+    k->value       = value;
     k->prev        = 0;
     k->velocity    = 0;
     k->density     = 0;
 
-    k->lifespan    = ls;
-    k->uncertainty.value   = v_u;
-    k->uncertainty.bias    = b_u;
-    k->uncertainty.sensor  = s_u;
+    k->lifespan    = lifespan;
+    k->uncertainty.value   = uncertainty.value;
+    k->uncertainty.bias    = uncertainty.bias;
+    k->uncertainty.sensor  = uncertainty.sensor;
 }
 
 void update( kalman_t * k, double value_new, double rate_new, update_type_c type )
 {
-    double delta_time = timestamp() - k->timestamp;
+    double now = TIMESTAMP();
+    double delta_time = now - k->timestamp;
 
     /* Quick expiration check */
     if(delta_time > k->lifespan)
     {
-        k->timestamp = timestamp();
+        k->timestamp = now;
         return;
     }
     k->prev       = k->value;
@@ -81,15 +75,15 @@ void update( kalman_t * k, double value_new, double rate_new, update_type_c type
     k->P[1][1] -= k->K[1] * k->P[0][1];
 
     k->velocity = k->rate;
-    k->timestamp = timestamp();
+    k->timestamp = now;
 };
 
 int isExpired( kalman_t * k)
 {
-    return ((timestamp() - k->timestamp) > k->lifespan);
+    return ((TIMESTAMP() - k->timestamp) > k->lifespan);
 }
 
-const struct kalman Kalman =
+const struct kalman_functions Kalman =
 {
     .init = init,
     .update = update,

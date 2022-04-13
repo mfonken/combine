@@ -37,7 +37,7 @@ void KineticUtility::trigger()
 
 void KineticUtility::UpdateIMUDate( vec3_t * n, quaternion_t * o )
 { LOCK(&mutex)
-    Vector.copy3( n, &this->n );
+    Vector3.copy3( n, &this->n );
     Quaternion.copy( o, &O );
 }
 

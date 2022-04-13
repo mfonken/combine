@@ -84,11 +84,11 @@ void rotVec(vec3_t * v, quaternion_t * q, vec3_t * r)
     double s = q->w;
     vec3_t a, b, c, t;
     
-    Vector.mul3  (  2, &u, &a );
-    Vector.cross3( &a,  v, &t );
-    Vector.cross3( &u, &t, &b );
-    Vector.mul3  (  s, &t, &c );
-    Vector.add33 (  v, &b, &c, r );
+    Vector3.mul3  (  2, &u, &a );
+    Vector3.cross3( &a,  v, &t );
+    Vector3.cross3( &u, &t, &b );
+    Vector3.mul3  (  s, &t, &c );
+    Vector3.add33 (  v, &b, &c, r );
 }
 
 /* Double quaternion Hamilton multiplication (Generic) */
