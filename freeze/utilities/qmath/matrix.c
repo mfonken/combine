@@ -7,7 +7,7 @@
 
 #include "matrix.h"
 
-void eyemat( floatp *m, uint8_t rows, uint8_t cols )
+void Matrix_Eye( floatp *m, uint8_t rows, uint8_t cols )
 {
     uint8_t x, y, yx = 0;
     for( y = 0 ; y < rows; y++)
@@ -15,7 +15,7 @@ void eyemat( floatp *m, uint8_t rows, uint8_t cols )
             m[yx] = x == y ? 1 : 0;
 }
 
-void dotmat( floatp a[], floatp b[], bool T_b, floatp r[], uint8_t rows, uint8_t cols, uint8_t inner )
+void Matrix_Dot( floatp a[], floatp b[], bool T_b, floatp r[], uint8_t rows, uint8_t cols, uint8_t inner )
 {
     int8_t x, y = 0, i;
     uint8_t yi = 0, xi = 0, yx = 0;
@@ -34,15 +34,15 @@ void dotmat( floatp a[], floatp b[], bool T_b, floatp r[], uint8_t rows, uint8_t
             {
                 floatp r = a[yi] * b[xi];
                 s += r;
-                printf("%.1f[%d] x %.1f[%d] = %.1f [%.1f]\n", a[yi], yi, b[xi], xi, r, s );
+                LOG_MTX(DEBUG_2, "%.1f[%d] x %.1f[%d] = %.1f [%.1f]\n", a[yi], yi, b[xi], xi, r, s );
             }
             r[yx] = s;
-            printf("\n");
+            LOG_MTX(DEBUG_2, "\n");
         }
     }
 }
 
-void addsubmat( floatp a[], floatp b[], floatp r[], uint8_t rows, uint8_t cols, bool add )
+void Matrix_AddSub( floatp a[], floatp b[], floatp r[], uint8_t rows, uint8_t cols, bool add )
 {
     int8_t x, y = rows - 1;
     floatp *ap = a, *bp = b, *rp = r;
@@ -51,7 +51,7 @@ void addsubmat( floatp a[], floatp b[], floatp r[], uint8_t rows, uint8_t cols, 
             *(rp++) = *(ap++) + *(bp++) * ( add ? 1 : -1 );
 }
 
-void zpadmat( floatp m[], uint8_t rows_in, uint8_t cols_in, floatp r[], uint8_t rows_out, uint8_t cols_out)
+void Matrix_ZPad( floatp m[], uint8_t rows_in, uint8_t cols_in, floatp r[], uint8_t rows_out, uint8_t cols_out)
 {
     if( ( cols_in > cols_out ) || ( rows_in > rows_out ) ) return;
     int8_t x, y = 0;
@@ -66,7 +66,7 @@ void zpadmat( floatp m[], uint8_t rows_in, uint8_t cols_in, floatp r[], uint8_t 
     memset( rp, 0, cols_out * ( rows_out - y ) );
 }
 
-void inv22( floatp m[2][2], floatp r[2][2])
+void Matrix_Inv22( floatp m[2][2], floatp r[2][2])
 {
     floatp det = ( m[0][0] * m[1][1] ) - ( m[1][0] * m[0][1] );
     if( det == 0 )
@@ -83,9 +83,9 @@ void inv22( floatp m[2][2], floatp r[2][2])
 
 const matrix_functions Matrix =
 {
-    .eye = eyemat,
-    .dot = dotmat,
-    .addsub = addsubmat,
-    .zpad = zpadmat,
-    .inv22 = inv22
+    .eye = Matrix_Eye,
+    .dot = Matrix_Dot,
+    .addsub = Matrix_AddSub,
+    .zpad = Matrix_ZPad,
+    .inv22 = Matrix_Inv22
 };

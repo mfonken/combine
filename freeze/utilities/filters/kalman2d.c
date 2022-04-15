@@ -7,15 +7,20 @@
 
 #include "kalman2d.h"
 
-void Kalman2D_Init( kalman2d_t * k, floatp process_noise )
+void Kalman2D_Init( kalman2d_t * k, floatp process_noise, floatp x_std_meas, floatp y_std_meas )
 {
     memset(&k->state, 0, sizeof(k->state));
-    for(int i = 0; i < 4; i++) ((floatp*)&k->state.px)[i] = i + 1;
-    k->state.ax = 1;
-    k->state.ay = 1;
+//    for(int i = 0; i < 4; i++) ((floatp*)&k->state.px)[i] = i + 1;
+//    k->state.ax = 1;
+//    k->state.ay = 1;
     memset(&k->meas_var, 0, 2 * sizeof(floatp));
     memset(&k->B, 0, 4 * 2 * sizeof(floatp));
     memset(&k->Q, 0, 4 * 4 * sizeof(floatp));
+    
+    k->R[0][0] = x_std_meas;
+    k->R[0][1] = 0;
+    k->R[1][0] = 0;
+    k->R[1][1] = y_std_meas;
     
     Matrix.eye( (floatp*)k->A, 4, 4 );
     Matrix.eye( (floatp*)k->P, 4, 4 );
@@ -23,15 +28,16 @@ void Kalman2D_Init( kalman2d_t * k, floatp process_noise )
     
     k->process_noise_sq = process_noise * process_noise;
     
-    k->t = 0;//(floatp)TIMESTAMP();
+    k->t = (floatp)TIMESTAMP();
 }
 
 void Kalman2D_Predict( kalman2d_t * k )// , int l )
 {
 //    int8_t ll = l * l;
     // Time update
-    floatp t_ = 1;//(floatp)TIMESTAMP();
+    floatp t_ = (floatp)TIMESTAMP();
     floatp dt = t_ - k->t;
+    k->t = t_;
     floatp dt_sq = dt * dt;
     floatp dt_hfsq = dt_sq / 2;
     
@@ -55,49 +61,47 @@ void Kalman2D_Predict( kalman2d_t * k )// , int l )
     
     // Predict next state
     floatp r1[4], r2[4], *x = (floatp*)&k->state.px, *Ap = (floatp*)k->A;
-    printf("A.x:\n");
+    LOG_K2(DEBUG_2, "A.x:\n");
     Matrix.dot( Ap, x, false, r1, 4, 1, 4 );
-    printf("B.a:\n");
+    LOG_K2(DEBUG_2, "B.a:\n");
     Matrix.dot( (floatp*)k->B, (floatp*)&k->state.ax, false, r2, 4, 1, 2 );
     Matrix.addsub( r1, r2, x, 1, 4, true );
     
     // Update error covariance
     floatp r3[4][4], r4[4][4];
     floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4;
-    printf("A.P:\n");
+    LOG_K2(DEBUG_2, "A.P:\n");
     Matrix.dot( Ap, (floatp*)k->P, false, r3p, 4, 4, 4);
-    printf("(A.P).AT:\n");
+    LOG_K2(DEBUG_2, "(A.P).AT:\n");
     Matrix.dot( r3p, Ap, true, r4p, 4, 4, 4);
     Matrix.addsub( r4p, (floatp*)k->Q, (floatp*)k->P, 4, 4, true );
-
-    k->t = t_;
 }
 
 void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
 {
     floatp PHT[4][2], *Hp = (floatp*)k->H;
     floatp *PHTp = (floatp*)PHT;
-    printf("P.HT\n");
+    LOG_K2(DEBUG_2, "P.HT\n");
     Matrix.dot( (floatp*)k->P, Hp, true, PHTp, 4, 2, 4 );
     
     floatp S[2][2];
     floatp *Sp = (floatp*)S;
-    printf("H.(P.HT)\n");
+    LOG_K2(DEBUG_2, "H.(P.HT)\n");
     Matrix.dot( Hp, PHTp, false, Sp, 2, 2, 4 );
-    printf("H.(P.HT) + R\n");
+    LOG_K2(DEBUG_2, "H.(P.HT) + R\n");
     Matrix.addsub( Sp, (floatp*)k->R, Sp, 2, 2, true );
     
     floatp K[4][2], Sinv[2][2];
     floatp *Kp  = (floatp*)K;
     Matrix.inv22( S, Sinv );
-    printf("(P.HT).Sinv\n");
+    LOG_K2(DEBUG_2, "(P.HT).Sinv\n");
     Matrix.dot( PHTp, (floatp*)Sinv, false, Kp, 4, 2, 2 );
     
     floatp r3[2], r4[4], *x = (floatp*)&k->state.px;
-    printf("H.x\n");
+    LOG_K2(DEBUG_2, "H.x\n");
     Matrix.dot( (floatp*)k->H, x, false, r3, 2, 1, 4 );
     Matrix.addsub( z, r3, r3, 2, 2, false );
-    printf("K.z...\n");
+    LOG_K2(DEBUG_2, "K.z...\n");
     Matrix.dot( Kp, r3, false, r4, 4, 1, 2 );
     Matrix.addsub( x, r4, x, 1, 4, true );
     
@@ -109,13 +113,13 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
     floatp K44[4][4], H44[4][4];
     Matrix.zpad( (floatp*)K, 4, 2, (floatp*)K44, 4, 4);
     Matrix.zpad( (floatp*)k->H, 2, 4, (floatp*)H44, 4, 4);
-    printf("K.H\n");
+    LOG_K2(DEBUG_2, "K.H\n");
     Matrix.dot( (floatp*)K44, (floatp*)H44, false, r6p, 4, 4, 4);
     Matrix.addsub( r5p, r6p, r5p, 4, 4, false );
     
     floatp r7[4][4];
     floatp *r7p = (floatp*)r7;
-    printf("(I - K.H).P\n");
+    LOG_K2(DEBUG_2, "(I - K.H).P\n");
     Matrix.dot( r5p, (floatp*)k->P, false, r7p, 4, 4, 4);
     memcpy( k->P, r7p, 4 * 4 * sizeof(floatp));
 }

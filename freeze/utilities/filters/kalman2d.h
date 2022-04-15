@@ -13,6 +13,15 @@
 
 #include "matrix.h"
 #include "timestamp.h"
+#include "unilog.h"
+
+//#define DEBUG_KALMAN2D
+
+#ifdef DEBUG_KALMAN2D
+#define LOG_K2(L, ...) LOG(L, "<Kalman2d> " __VA_ARGS__)
+#else
+#define LOG_K2(L, ...)
+#endif
 
 typedef double floatp;
 
@@ -43,7 +52,7 @@ typedef struct
 
 struct kalman2d_functions
 {
-    void (*init)( kalman2d_t *, floatp process_noise );
+    void (*init)( kalman2d_t *, floatp process_noise, floatp x_std_meas, floatp y_std_meas );
     void (*predict)( kalman2d_t * );
     void (*update)( kalman2d_t *, floatp z[2] );
 };
