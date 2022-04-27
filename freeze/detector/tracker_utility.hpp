@@ -10,26 +10,34 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/video/tracking.hpp"
-#include <features2d.hpp>
+#include "kalman2d.h"
 #include "environment_master.hpp"
+#include <algorithm>
 
-#define MAX_TRACKERS    5
+#define MAX_TRACKERS    2
 
-#define TRACKER_MAX_KALMAN_LIFE     10.0
-#define TRACKER_VALUE_UNCERTAINTY   0.01
-#define TRACKER_BIAS_UNCERTAINTY    0.003
-#define TRACKER_SENSOR_UNCERTAINTY  0.02
+#define TRACKER_PROCESS_NOISE     1e-5
+#define TRACKER_X_STD_MEAS        1e-2
+#define TRACKER_Y_STD_MEAS        1e-2
+
+#define TRACKER_MAX_DELTA         100
+
+//class Tracker
+//{
+//public:
+//    kalman2d_t kalman;
+//    bool claimed;
+//}
 
 class TrackerUtility
 {
     string name;
-//    kalman_uncertainty_c tracker_uncertainty;
-    std::vector<cv::KalmanFilter> trackers;
+    kalman2d_t trackers[MAX_TRACKERS] = {0};
     
 public:
     TrackerUtility( string name = "TrackerUtil" );
-    void Update(std::vector<cv::Point2f> pts);
+    std::vector<cv::Point2f> Update(std::vector<cv::Point2f> pts);
+    std::vector<cv::Point2f> UpdateTrack(std::vector<cv::Point2f> pts);
 };
 
 #endif /* tracker_utility_hpp */

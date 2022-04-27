@@ -16,8 +16,10 @@
 #include <features2d.hpp>
 #include "environment_master.hpp"
 #include "tracker_utility.hpp"
+#include <algorithm>
 
 #define KEYPOINTS_COLOR Scalar(0,0,255)
+#define BLOBS_COLOR Scalar(255,255,0)
 #define DEFAULT_COVERAGE        60
 
 class RhoDetector// : public TestInterface
@@ -33,6 +35,8 @@ public:
     std::vector<cv::KeyPoint> keypoints;
     cv::Ptr<cv::SimpleBlobDetector> detector;
     TrackerUtility tracker;
+    
+    int threshold_value;
     
     int Cx;
     int Cy;

@@ -39,6 +39,8 @@ public:
     
     void trigger( void );
     cv::Mat GetFrame();
+    
+    std::function<void(cv::Mat)> OnFrame;
 };
 
 #endif /* webcam_utility_hpp */

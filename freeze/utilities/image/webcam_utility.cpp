@@ -62,6 +62,9 @@ void WebcamUtility::trigger()
 #ifdef GREYSCALE
     cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
 #endif
+    
+    if( OnFrame != NULL )
+        OnFrame( frame );
 }
 
 std::string WebcamUtility::serialize()

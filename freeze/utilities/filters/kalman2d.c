@@ -28,15 +28,50 @@ void Kalman2D_Init( kalman2d_t * k, floatp process_noise, floatp x_std_meas, flo
     
     k->process_noise_sq = process_noise * process_noise;
     
-    k->t = (floatp)TIMESTAMP();
+    k->t =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+    (floatp)TIMESTAMP() * 1e-3;
+#endif
+}
+
+void Kalman2D_Test( kalman2d_t * k, floatp x_new[4], bool update_A )
+{
+    if(update_A)
+    {
+        floatp dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        ((floatp)TIMESTAMP() * 1e-3) - k->t;
+#endif
+        k->A[0][2] = dt;
+        k->A[1][3] = dt;
+    }
+    
+    // Predict next state:
+    // x = A.x_ + B.u_ where u = [[ax], [ay]]
+    floatp r1[4], r2[4], *x = (floatp*)&k->state.px, *Ap = (floatp*)k->A;
+    LOG_K2(DEBUG_2, "A.x:\n");
+    Matrix.dot( Ap, x, false, r1, 4, 1, 4 );
+    LOG_K2(DEBUG_2, "B.a:\n");
+    Matrix.dot( (floatp*)k->B, (floatp*)&k->state.ax, false, r2, 4, 1, 2 );
+    Matrix.addsub( r1, r2, x_new, 1, 4, true );
 }
 
 void Kalman2D_Predict( kalman2d_t * k )// , int l )
 {
 //    int8_t ll = l * l;
     // Time update
-    floatp t_ = (floatp)TIMESTAMP();
-    floatp dt = t_ - k->t;
+    floatp t_ = (floatp)TIMESTAMP() * 1e-3;
+    floatp dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        t_ - k->t;
+#endif
+//    printf("∆t: %2fms\n", dt);
     k->t = t_;
     floatp dt_sq = dt * dt;
     floatp dt_hfsq = dt_sq / 2;
@@ -59,17 +94,14 @@ void Kalman2D_Predict( kalman2d_t * k )// , int l )
     k->Q[3][1] = k->Q[0][2];
     k->Q[3][3] = dt_sq * k->process_noise_sq;
     
-    // Predict next state
-    floatp r1[4], r2[4], *x = (floatp*)&k->state.px, *Ap = (floatp*)k->A;
-    LOG_K2(DEBUG_2, "A.x:\n");
-    Matrix.dot( Ap, x, false, r1, 4, 1, 4 );
-    LOG_K2(DEBUG_2, "B.a:\n");
-    Matrix.dot( (floatp*)k->B, (floatp*)&k->state.ax, false, r2, 4, 1, 2 );
-    Matrix.addsub( r1, r2, x, 1, 4, true );
+    // Predict next state:
+    // x = A.x_ + B.u_ where u = [[ax], [ay]]
+    Kalman2D.test( k, (floatp*)&k->state.px, false );
     
-    // Update error covariance
+    // Update error covariance:
+    // P = A.P.AT + Q
     floatp r3[4][4], r4[4][4];
-    floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4;
+    floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4, *Ap = (floatp*)k->A;;
     LOG_K2(DEBUG_2, "A.P:\n");
     Matrix.dot( Ap, (floatp*)k->P, false, r3p, 4, 4, 4);
     LOG_K2(DEBUG_2, "(A.P).AT:\n");
@@ -127,6 +159,7 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
 const struct kalman2d_functions Kalman2D =
 {
     .init = Kalman2D_Init,
+    .test = Kalman2D_Test,
     .predict = Kalman2D_Predict,
     .update = Kalman2D_Update
 };

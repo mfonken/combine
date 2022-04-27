@@ -20,6 +20,7 @@ IMUUtility::~IMUUtility()
 
 void IMUUtility::init()
 {
+    LOG_IMU(DEBUG_2, "Initializing IMU: %s @ %d\n", channel->port, channel->baud);
     IMU.init(&imu, channel);
     
     if( pthread_mutex_init(&mutex, NULL) != 0 )
