@@ -30,7 +30,7 @@ vector<Point2f> TrackerUtility::Update(vector<Point2f> pts)
         // Check if uninitialzed
         if( tr->t == 0 )
         {
-            Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_X_STD_MEAS, TRACKER_Y_STD_MEAS );
+            Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
             tr->state.px = pts[i].x;
             tr->state.py = pts[i].y;
             r_pts.push_back(Point2f(pts[i].x, pts[i].y));
@@ -92,7 +92,7 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
                 kalman2d_t * tr = &trackers[i];
                 if( tr->t == 0 )
                 {
-                    Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_X_STD_MEAS, TRACKER_Y_STD_MEAS );
+                    Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
                     tr->state.px = pt.x;
                     tr->state.py = pt.y;
                     matched[i] = Point2f(pt.x, pt.y);

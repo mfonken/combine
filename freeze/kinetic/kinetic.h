@@ -74,16 +74,10 @@ typedef struct _kinetic_values_t
     double     rotation[3];             /**< Raw rotation */
 } kinetic_values_t;
 
-typedef struct _kinetic_filters_t
-{
-    kalman_t position[3];             /**< Raw position */
-    kalman_t rotation[3];             /**< Raw rotation */
-} kinetic_filters_t;
-
 typedef struct _kinetic_t
 {
     kinetic_values_t values;
-    kinetic_filters_t filters;
+//    kinetic_filters_t filters;
     kpoint_t A;
     kpoint_t B;
     double omega;
@@ -134,7 +128,7 @@ typedef struct
 {
     void (*DefaultInit)(kinetic_t * );
     void (*Init)( kinetic_t *, kinetic_config_t );
-    void (*UpdatePosition)( kinetic_t *, vec3_t *, quaternion_t *, kpoint_t * , kpoint_t * );
+    void (*UpdatePosition)( kinetic_t *, quaternion_t *, kpoint_t * , kpoint_t * );
     
     void (*MinorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );
     void (*Quaternions)( kinetic_t *, quaternion_t * );
@@ -149,7 +143,6 @@ typedef struct
 
 extern kinetic_functions KineticFunctions;
 
-void Filters_Init( kinetic_t *);
 void Camera_Rotation_Init( kinetic_t *);
 void Reference_Rotation_Init( kinetic_t *);
 

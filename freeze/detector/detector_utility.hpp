@@ -28,21 +28,21 @@ class RhoDetector// : public TestInterface
     const std::string name;
 //    void init( void );
 //    string serialize( void );
-    pthread_mutex_t mutex;
     
 public:
     cv::SimpleBlobDetector::Params params;
     std::vector<cv::KeyPoint> keypoints;
     cv::Ptr<cv::SimpleBlobDetector> detector;
     TrackerUtility tracker;
+    pthread_mutex_t pts_mutex;
     
     int threshold_value;
     
-    int Cx;
-    int Cy;
-    int Q[4];
-    int QT;
-    double QF, FT;
+//    int Cx;
+//    int Cy;
+//    int Q[4];
+//    int QT;
+//    double QF, FT;
     
     cv::Mat image;
     std::vector<cv::Point2f> pts;

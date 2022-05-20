@@ -46,9 +46,9 @@ IMUUtility::imu_data_t IMUUtility::FetchIMUData( void )
         imu.pitch,
         imu.yaw,
         
-        imu.accel[0],
-        imu.accel[1],
-        imu.accel[2]
+        imu.accel_raw[0],
+        imu.accel_raw[1],
+        imu.accel_raw[2]
     };
     return data;
 }

@@ -43,7 +43,6 @@
 #define MAX_EVENTS 6
 
 #define LOCK(m) Lock _tmp_lock(m);
-//#define LOCK2(m1, m2) Lock _tmp_lock1(m1); Lock _tmp_lock2(m2);
 
 using namespace std;
 
