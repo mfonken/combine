@@ -53,67 +53,83 @@ RhoDetector::RhoDetector( string name )
 //}
 
 static bool sizeSort( KeyPoint a, KeyPoint b ) { return a.size > b.size; }
+static bool brightenssSort( keypoint_ext_t a, keypoint_ext_t b ) { return a.brightness > b.brightness; }
 
-//static int KeyPointBrightness(Mat M, KeyPoint k)
-//{
-//    int b = 0, c = 0;
-//    int l = (int)(k.size * 0.707);
-//    for(int yi = 0, y = max((int)(k.pt.y - l/2), 0); yi < l && y < M.rows; yi++, y++ )
-//    {
-//        for(int xi = 0, x = max((int)(k.pt.x - l/2), 0); xi < l && x < M.cols; xi++, x++ )
-//        {
-//            auto p = M.at<Vec3b>(y, x);
-//            auto pb = p[0] + p[2];
-//            b += (pb - b) / ++c;
-//        }
-//    }
-//    return b;
-//}
+static int KeyPointBrightness(Mat M, KeyPoint k)
+{
+    int b = 0, c = 0;
+    int l = (int)(k.size * 0.707);
+    for(int yi = 0, y = max((int)(k.pt.y - l/2), 0); yi < l && y < M.rows; yi++, y++ )
+    {
+        for(int xi = 0, x = max((int)(k.pt.x - l/2), 0); xi < l && x < M.cols; xi++, x++ )
+        {
+            Vec3b p = M.at<Vec3b>(y, x);
+            int pb = ((int)p[0] + (int)p[2]) / 2;
+            b += (pb - b) / ++c;
+//            M.at<Vec3b>(y, x) = Vec3b(b, b, b);
+        }
+    }
+    return b;
+}
 //
-//static vector<int> GetBrightnessOfKeyPoints(Mat M, vector<KeyPoint> kpts)
-//{
-//    vector<int> brightnesses;
-//    for(auto &k : kpts)
-//    {
-//        int b = KeyPointBrightness(M, k);
-//        brightnesses.push_back(b);
-//        k.size = b;
-//    }
-//    return brightnesses;
-//}
+static vector<keypoint_ext_t> GetBrightnessOfKeyPoints(Mat M, vector<KeyPoint> kpts, int min_size, int n = 100)
+{
+    vector<keypoint_ext_t> brightnesses;
+    for(auto &k : kpts)
+    {
+        if(k.size < min_size) continue;
+        int b = KeyPointBrightness(M, k);
+        keypoint_ext_t ke = { k, b };
+        brightnesses.push_back(ke);
+        if(--n <= 0) break;
+    }
+    return brightnesses;
+}
 
 void RhoDetector::perform( Mat M )
 {
     vector<KeyPoint> points;
-    Mat Mb;
+//    Mat Mb;
     detector->detect( M, points );
     
     size_t num_points = points.size();
     
     if( num_points < 2 ) return;
-//    vector<int> brightnesses = GetBrightnessOfKeyPoints(M, points);
-    sort( points.begin(), points.end(), sizeSort );
+//    sort( points.begin(), points.end(), sizeSort );
+    vector<keypoint_ext_t> kps = GetBrightnessOfKeyPoints(M, points, 25, 40);
+    if(kps.size() < 2) return;
+    sort( kps.begin(), kps.end(), brightenssSort );
+//    sort( points.begin(), points.end(), sizeSort );
     
 //    float total_size = DEFAULT_COVERAGE;
 //    for( size_t i = 0; i < num_points; i++ )
 //        total_size += points.at(i).size;
 
     keypoints.clear();
-    keypoints.push_back(points[0]);
-    keypoints.push_back(points[1]);
+    keypoints.push_back(kps[0].kp);
+    keypoints.push_back(kps[1].kp);
     
     std::vector<cv::Point2f> pts_;
-    for(int i = 0; i < keypoints.size(); i++)
+    int n = 2;
+    for(auto &kp : kps)
     {
-        pts_.push_back(keypoints[i].pt);
+        pts_.push_back(kp.kp.pt);
+        if(--n <= 0) break;
     }
     { LOCK(&pts_mutex)
         pts = tracker.UpdateTrack(pts_);
-        
-        for(int i = 0; i < pts.size(); i++)
+
+        t_points.clear();
+        for(int i = 0; i < pts.size() && i < keypoints.size(); i++)
         {
             keypoints[i].pt.x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
             keypoints[i].pt.y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
+            
+            invfisheye(&pts[i], M.cols, M.rows, UNFISHEYE_SCALE, 1.0);
+            
+            pts[i].x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
+            pts[i].y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
+            t_points.push_back(Point2f(pts[i].x, pts[i].y));
         }
     }
 }
@@ -121,7 +137,15 @@ void RhoDetector::perform( Mat M )
 #define radius 10
 void RhoDetector::draw(cv::Mat M)
 {
+    LOG_DET(DEBUG_1, "draw - %d\n", (int)keypoints.size());
     if(keypoints.size() == 0) return;
+    for(int i = 0; i < keypoints.size(); i++)
+    {
+        if( keypoints[i].size <= 0 )
+            keypoints[i].size = 0.01;
+        else if( keypoints[i].size > 1000 )
+            keypoints[i].size = 1000;
+    }
     
     vector<Point2f> pts;
     drawKeypoints( M, keypoints, M, BLOBS_COLOR, DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
@@ -129,8 +153,12 @@ void RhoDetector::draw(cv::Mat M)
     {
         keypoints[i].size = radius;
         pts.push_back(keypoints[i].pt);
+        
+        line( M, (Point)t_points[i], (Point)keypoints[i].pt, Scalar(0, 25, 200));
+        circle( M, (Point)t_points[i], 3, Scalar(0, 50, 255), -1);
     }
     drawKeypoints( M, keypoints, M, KEYPOINTS_COLOR, DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    
     
 //    vector<Point2f> u_pts = tracker.Update(pts);
 //    int markerSize = 10;

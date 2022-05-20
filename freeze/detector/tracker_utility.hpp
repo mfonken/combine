@@ -14,13 +14,13 @@
 #include "environment_master.hpp"
 #include <algorithm>
 
-#define MAX_TRACKERS    2
+#define MAX_TRACKERS    3
 
-#define TRACKER_PROCESS_NOISE   1e-5
+#define TRACKER_PROCESS_NOISE   10
 #define TRACKER_STD_MEAS        1e-2
 
 #define TRACKER_MAX_DELTA       100
-
+#define TRACKER_MAX_LIFESPAN_S  1
 //class Tracker
 //{
 //public:

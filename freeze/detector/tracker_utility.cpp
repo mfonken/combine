@@ -10,9 +10,33 @@
 using namespace cv;
 using namespace std;
 
-double static dist(double a, double b)
+static double dist(double a, double b)
 {
     return sqrt(pow(a,2) + pow(b,2));
+}
+
+
+static vector<int> min_path(vector<vector<double>> g, int xl, int yl )
+{
+    double min_cost = MAXFLOAT;
+    vector<int> min_path(yl);
+    vector<int> xs(xl);
+    bool valid = false;
+    for( int x = 0; x < xl; x++ ) xs[x] = x;
+    do
+    {
+        double cost = 0;
+        for( int y = 0; y < yl; y++ )
+            cost += g[y][xs[y]];
+        if( cost < min_cost )
+        {
+            min_cost = cost;
+            for( int x = 0; x < xl; x++ )
+                min_path[x] = xs[x];
+            valid = true;
+        }
+    } while ( std::next_permutation(xs.begin(),xs.end()) );
+    return valid ? min_path : vector<int>();
 }
 
 TrackerUtility::TrackerUtility(string name)
@@ -49,73 +73,71 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
 {
     vector<Point2f> r_pts;
     vector<Point2f> matched(pts.size(), Point2f(-1.0, -1.0));
-    for(const auto& pt : pts)
+    
+    vector<vector<double>> graph;
+    
+    for( int ti = 0; ti < MAX_TRACKERS; ti++ )
+    { // Reset un-updated trackers
+        kalman2d_t * tr = &trackers[ti];
+        if( tr->t == 0 )
+            continue;
+        double lifespan_s = TIMESTAMP() * 1e-3 - tr->t;
+        if( lifespan_s > TRACKER_MAX_LIFESPAN_S )
+            tr->t = 0;
+    }
+    
+    for( int pi = 0; pi < pts.size(); pi++ )
     {
-        double min_d = MAXFLOAT;
-        int min_i = -1;
-        for( int i = 0; i < MAX_TRACKERS; i++ )
+        Point2f pt = pts[pi];
+        vector<double> ds(MAX_TRACKERS);
+        double d = MAXFLOAT;
+        bool claimed = false;
+        for( int ti = 0; ti < MAX_TRACKERS; ti++ )
         {
-            if(matched[i].x >= 0) continue;
-            kalman2d_t * tr = &trackers[i];
-            
-            // Check if uninitialzed
-            if( tr->t == 0 )
-                continue;
-            
-            physical_2d_t p;
-            Kalman2D.test( tr, (floatp*)&p.px, true );
-            double d = dist(pt.x - p.px, pt.y - p.py);
-            if(d > TRACKER_MAX_DELTA)
-                continue;
-            
-            if(d < min_d)
+            kalman2d_t * tr = &trackers[ti];
+            d = MAXFLOAT;
+            if( tr->t > 0)
             {
-                bool claimed = false;
-                for( int ii = 0; ii < matched.size(); ii++ )
-                {
-                    if(i == ii)
-                    {
-                        claimed = true;
-                        break;
-                    }
-                }
-                if(claimed)
-                    continue;
-                min_d = d;
-                min_i = i;
+                physical_2d_t p;
+                Kalman2D.test( tr, (floatp*)&p.px, true );
+                d = dist(pt.x - p.px, pt.y - p.py);
+                if( d > TRACKER_MAX_DELTA )
+                    d = MAXFLOAT;
+                else
+                    claimed = true;
             }
+            ds[ti] = d;
         }
-        if(min_d == MAXFLOAT)
+        if( !claimed )
         {
-            for( int i = 0; i < MAX_TRACKERS; i++ )
-            {
-                kalman2d_t * tr = &trackers[i];
+            for( int ti = 0; ti < MAX_TRACKERS; ti++ )
+            { // Initialize next tracker
+                kalman2d_t * tr = &trackers[ti];
                 if( tr->t == 0 )
                 {
                     Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
                     tr->state.px = pt.x;
                     tr->state.py = pt.y;
-                    matched[i] = Point2f(pt.x, pt.y);
+                    ds[ti] = 0;
                     break;
                 }
             }
         }
-        else if(min_i >= 0)
-        {
-            matched[min_i] = Point2f(pt.x, pt.y);
-        }
+        graph.push_back(ds);
     }
     
-    for( int i = 0; i < matched.size(); i++ )
+    vector<int> match = min_path(graph, MAX_TRACKERS, (int)pts.size());
+    for( int pi = 0; pi < match.size(); pi++ )
     {
-        if( matched[i].x >= 0 )
-        {
-            kalman2d_t * tr = &trackers[i];
-            floatp p[2] = { matched[i].x, matched[i].y };
-            Kalman2D.predict( tr );
-            Kalman2D.update( tr, p );
-            r_pts.push_back( Point2f(tr->state.px, tr->state.py) );
-        }
+        Point2f pt = pts[pi];
+        floatp p[2] = { pt.x, pt.y };
+        int ti = match[pi];
+        kalman2d_t * tr = &trackers[ti];
+        Kalman2D.predict( tr );
+        Kalman2D.update( tr, p );
+        r_pts.push_back( Point2f(tr->state.px, tr->state.py) );
+//        printf("%d ", match[pi]);
     }
+//    printf("\n");
     return r_pts;
 }

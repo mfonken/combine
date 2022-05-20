@@ -20,16 +20,14 @@
 
 #define IN(X,A,B) (X>=A&&X<B)
 
-using namespace cv;
-
 #define LOV_constant 0.414213562
 static inline double qdist(double ax, double ay) { return (ax > ay )? ax + ay*LOV_constant:ay + ax*LOV_constant; }
 static inline double qatanr_r( double x ) { return 1.0301 - x*(0.0663*x - 0.1784); }
 
-void quickUnfisheye(Mat I, Mat O);
-void unfisheye(Mat I, Mat O);
-void invfisheye(Mat I, Mat O);
+void quickUnfisheye(cv::Mat I, cv::Mat O);
+void unfisheye(cv::Mat I, cv::Mat O);
+void invfisheye(cv::Mat I, cv::Mat O);
 
-void invfisheye(Point2f * p, int w, int h, double s, double z);
+void invfisheye(cv::Point2f * p, int w, int h, double s, double z);
     
 #endif /* unfisheye_h */

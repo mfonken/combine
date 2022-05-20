@@ -24,11 +24,6 @@
 /* Filters */
 #include "kalman.h"
 
-/* Kalman Defaults */
-#define MOTION_MAX_KALMAN_LIFE     10.0
-#define MOTION_VALUE_UNCERTAINTY   0.01
-#define MOTION_BIAS_UNCERTAINTY    0.003
-#define MOTION_SENSOR_UNCERTAINTY  0.02
 
 /** Absolute value */
 #define     absl(x) x > 0 ? x:-x
@@ -77,7 +72,6 @@ typedef struct _kinetic_values_t
 typedef struct _kinetic_t
 {
     kinetic_values_t values;
-//    kinetic_filters_t filters;
     kpoint_t A;
     kpoint_t B;
     double omega;
@@ -127,7 +121,7 @@ typedef struct
 typedef struct
 {
     void (*DefaultInit)(kinetic_t * );
-    void (*Init)( kinetic_t *, kinetic_config_t );
+    void (*Init)( kinetic_t *, kinetic_config_t * );
     void (*UpdatePosition)( kinetic_t *, quaternion_t *, kpoint_t * , kpoint_t * );
     
     void (*MinorAngles)( kinetic_t *, kpoint_t * , kpoint_t * );

@@ -34,6 +34,7 @@ public:
         double yaw;
         
         double accel[3];
+        double gravity[3];
     } imu_data_t;
     
     SERCOM_Channel * channel;

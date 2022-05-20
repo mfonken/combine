@@ -10,7 +10,7 @@
 
 int Init_SERCOM_Default( void )
 {
-    SERCOM_Channel chan = {-1, DEFAULT_SERCOM_PORT, DEFAULT_SERCOM_PORT_ALT, B115200, CS8, 0};
+    SERCOM_Channel chan = {-1, DEFAULT_SERCOM_PORT, DEFAULT_SERCOM_PORT_ALT, B115200, CS8, DEFAULT_SERCOM_READ_TIMEOUT_SEC, 0, false};
     return Init_SERCOM(&chan);
 }
     
@@ -65,17 +65,37 @@ void Write_SERCOM_Byte( int filestream, char b )
 void Write_SERCOM_Bytes( int filestream, const char * a, int l )
 {
     int byte_written = -1;
-    while(byte_written <= 0) byte_written = (int)write(filestream, a, (size_t)l);
+    while(byte_written <= 0)
+        byte_written = (int)write(filestream, a, (size_t)l);
 }
 
-int Read_SERCOM_Bytes( int filestream, char * a, int l )
+int Read_SERCOM_Bytes( int filestream, char * a, int l, double timeout_sec )
 {
-    return (int)read(filestream, a, (size_t)l);
+    int ret = 0;
+//    if( Select_SERCOM_Bytes( filestream, a, l, timeout_sec ) )
+        ret = (int)read( filestream, a, (size_t)l ); /* there was data to read */
+    return ret;
 }
 
-int Read_SERCOM_Byte( int filestream, char * b )
+int Read_SERCOM_Byte( int filestream, char * b, double timeout_sec )
 {
-    return (int)read(filestream, b, 1);
+    return Read_SERCOM_Bytes(filestream, b, 1, timeout_sec );
+}
+
+int Select_SERCOM_Bytes( int filestream, char * a, int l, double timeout_sec )
+{
+    fd_set set;
+    struct timeval timeout;
+    timeout.tv_sec = (int)timeout_sec;
+    timeout.tv_usec = (int)((timeout_sec - timeout.tv_sec) * 1000000.0);
+    int rv = select(filestream + 1, &set, NULL, NULL, &timeout);
+    if(rv == -1)
+        perror("select"); /* an error accured */
+    else if(rv == 0)
+    {
+//        printf("timeout\n"); /* a timeout occured */
+    }
+    return rv;
 }
 
 int Test_SERCOM( int filestream )

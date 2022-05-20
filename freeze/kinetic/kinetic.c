@@ -15,15 +15,15 @@
 void KineticDefaultInit( kinetic_t * k )
 {
     kinetic_config_t config = { KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED };
-    KineticFunctions.Init( k, config );
+    KineticFunctions.Init( k, &config );
 }
 
-void KineticInit( kinetic_t * k, kinetic_config_t config )
+void KineticInit( kinetic_t * k, kinetic_config_t * config )
 {
-    k->W = config.width;
-    k->H = config.height;
-    k->f_l = config.focal_length;
-    k->d_l = config.beacon_distance;
+    k->W = config->width;
+    k->H = config->height;
+    k->f_l = config->focal_length;
+    k->d_l = config->beacon_distance;
     Camera_Rotation_Init(k);
     Reference_Rotation_Init(k);
 }
@@ -51,7 +51,7 @@ static void KineticUpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A
 //    Kalman.update( &k->filters.position[1], k->r.j, 0, VELOCITY );
 //    Kalman.update( &k->filters.position[2], k->r.k, 0, VELOCITY );
     
-//    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;
     
     /* Step 5B: Calculate Non-gravitational Data */

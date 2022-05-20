@@ -32,11 +32,13 @@ typedef struct
 {
     INTERFACE interface;
     int       descriptor;
+    void *    options;
 } channel_t;
 
 typedef struct
 {
     double 	accel_raw[3];
+    double  gravity[3];
     
     double 	accel[3];
     double 	gyro[3];

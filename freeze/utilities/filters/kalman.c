@@ -28,7 +28,7 @@ void init( kalman_t * k, double value, double lifespan, kalman_uncertainty_c unc
     k->uncertainty.sensor  = uncertainty.sensor;
 }
 
-void update( kalman_t * k, double value_new, double rate_new, update_type_c type )
+double update( kalman_t * k, double value_new, double rate_new, update_type_c type )
 {
     double now = TIMESTAMP();
     double delta_time = now - k->timestamp;
@@ -37,7 +37,7 @@ void update( kalman_t * k, double value_new, double rate_new, update_type_c type
     if(delta_time > k->lifespan)
     {
         k->timestamp = now;
-        return;
+        return k->value;
     }
     k->prev       = k->value;
     switch(type)
@@ -76,6 +76,8 @@ void update( kalman_t * k, double value_new, double rate_new, update_type_c type
 
     k->velocity = k->rate;
     k->timestamp = now;
+    
+    return k->value;
 };
 
 int isExpired( kalman_t * k)

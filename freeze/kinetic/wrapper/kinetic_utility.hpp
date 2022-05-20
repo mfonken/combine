@@ -10,6 +10,7 @@
 
 #include "environment_master.hpp"
 #include "kinetic.h"
+#include "orienter.h"
 
 #define DEBUG_KU
 
@@ -28,21 +29,23 @@ class KineticUtility : public TestInterface
     kinetic_t kin;
     kinetic_config_t * config;
     kalman_t position[3];
-    kalman_t rotation[3];
     vec3_t n;
     quaternion_t O;
     kpoint_t A;
     kpoint_t B;
+    
 
 public:
     pthread_mutex_t mutex;
     pthread_mutex_t point_data_mutex;
+    pthread_mutex_t orienter_data_mutex;
+    orienter_t orienter;
     
     KineticUtility( kinetic_config_t * config, string n = "kinetic" );
     ~KineticUtility();
     
     void trigger( void );
-    void UpdateIMUData( vec3_t * n, quaternion_t * o );
+    void UpdateIMUData( vec3_t * nong, vec3_t * ang );//, quaternion_t * o );
     void UpdatePointData( kpoint_t * a, kpoint_t * b );
     vec3_t GetPosition();
     void InitFilters();

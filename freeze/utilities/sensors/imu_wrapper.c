@@ -33,6 +33,7 @@ static int init( imu_t * imu, void * channel )
                 imu->channel.descriptor = Init_SERCOM_Default();
             else
                 imu->channel.descriptor = Init_SERCOM((SERCOM_Channel *)channel);
+            imu->channel.options = (SERCOM_Channel *)channel;
             return (int)SERCOM;
             break;
     }
@@ -137,12 +138,13 @@ void IMU_Update_Yaw( imu_t * imu )
 void Read_SERCOM_IMU_Packet( imu_t * imu )
 {
     char buffer[BUFFER_LENGTH];
-    int bytes_read = -1, ptr = 0, isnl = 0;
-    while( !isnl && ptr < BUFFER_LENGTH - 1 )
+    int bytes_read = -1, ptr = 0, isnl = 0, attempts = 5;
+    while( !isnl && ptr < BUFFER_LENGTH - 1 && attempts-- > 0)
     {
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
-        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+        SERCOM_Channel * ch = (SERCOM_Channel *)imu->channel.options;
+//        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(ch->filestream, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
+        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -190,13 +192,14 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
 
 void Read_SERCOM_IMU_Orientation( imu_t * imu )
 {
-    char buffer[BUFFER_LENGTH];
-    int bytes_read = -1, ptr = 0, isnl = 0;
-    while( !isnl && ptr < BUFFER_LENGTH-1)
+    char buffer[BUFFER_LENGTH] = { 0 };
+    int bytes_read = -1, ptr = 0, isnl = 0, attempts = 5;
+    while( !isnl && ptr < BUFFER_LENGTH-1 && attempts-- > 0)
     {
         bytes_read = 0;
-        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
-//        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH);
+        SERCOM_Channel * ch = (SERCOM_Channel *)imu->channel.options;
+        bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
+//        printf("Buffer: %s\n", buffer);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -217,7 +220,7 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     printf("\nR(%d): %s\n", ptr, line);
 #endif
     
-    double v[6];
+    double v[9];
     tokenifyPacket( line, ptr, 6, 'o', v );
     
     if( v[0] == 0xffff ) return;
@@ -227,11 +230,15 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     printf("\n");
 #endif
     
-    imu->pitch  =  v[0];
-    imu->roll   =  v[1];
+    imu->roll   =  v[0];
+    imu->pitch  =  v[1];
     imu->yaw    =  v[2];
     
     imu->accel_raw[0] = v[3];
     imu->accel_raw[1] = v[4];
     imu->accel_raw[2] = v[5];
+    
+//    imu->gravity[0] = v[6];
+//    imu->gravity[1] = v[7];
+//    imu->gravity[2] = v[8];
 }

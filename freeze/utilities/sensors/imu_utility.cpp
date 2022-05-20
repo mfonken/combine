@@ -29,7 +29,7 @@ void IMUUtility::init()
 
 void IMUUtility::trigger()
 { LOCK(&mutex)
-    LOG_IMU(DEBUG_1, "IMUUtility::trigger\n");
+    LOG_IMU(DEBUG_1, "trigger\n");
     IMU.update.orientation(&imu);
 }
 
@@ -39,7 +39,7 @@ std::string IMUUtility::serialize()
 }
 
 IMUUtility::imu_data_t IMUUtility::FetchIMUData( void )
-{ LOCK(&mutex)
+{
     IMUUtility::imu_data_t data =
     {
         imu.roll,
@@ -48,7 +48,11 @@ IMUUtility::imu_data_t IMUUtility::FetchIMUData( void )
         
         imu.accel_raw[0],
         imu.accel_raw[1],
-        imu.accel_raw[2]
+        imu.accel_raw[2],
+        
+        imu.gravity[0],
+        imu.gravity[1],
+        imu.gravity[2]
     };
     return data;
 }

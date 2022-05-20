@@ -10,17 +10,35 @@
 #define detector_utility_hpp
 
 #include <stdio.h>
+#include <algorithm>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <features2d.hpp>
+
 #include "environment_master.hpp"
 #include "tracker_utility.hpp"
-#include <algorithm>
+#include "unfisheye.hpp"
+
+#define DEBUG_DET
+
+#ifdef DEBUG_DET
+#define LOG_DET(L, ...) LOG(L, "<DetectorUtility> " __VA_ARGS__)
+#else
+#define DEBUG_DET(L, ...)
+#endif
 
 #define KEYPOINTS_COLOR Scalar(0,0,255)
 #define BLOBS_COLOR Scalar(255,255,0)
 #define DEFAULT_COVERAGE        60
+
+#define UNFISHEYE_SCALE 3
+
+typedef struct
+{
+    cv::KeyPoint kp;
+    int brightness;
+} keypoint_ext_t;
 
 class RhoDetector// : public TestInterface
 {
@@ -32,6 +50,7 @@ class RhoDetector// : public TestInterface
 public:
     cv::SimpleBlobDetector::Params params;
     std::vector<cv::KeyPoint> keypoints;
+    std::vector<cv::Point2f> t_points;
     cv::Ptr<cv::SimpleBlobDetector> detector;
     TrackerUtility tracker;
     pthread_mutex_t pts_mutex;

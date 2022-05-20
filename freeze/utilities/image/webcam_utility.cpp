@@ -48,7 +48,7 @@ void WebcamUtility::init()
 
 void WebcamUtility::trigger()
 {
-    LOG_WU(DEBUG_1, "WebcamUtility::trigger\n");
+    LOG_WU(DEBUG_1, "trigger\n");
     cam >> raw;
     if(raw.cols == 0) return;
     LOCK(&mutex);

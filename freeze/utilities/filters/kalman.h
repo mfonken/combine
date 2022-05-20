@@ -48,7 +48,7 @@ extern "C" {
     struct kalman_functions
     {
         void (*init)( kalman_t *, double value, double lifespan, kalman_uncertainty_c uncertainty );
-        void (*update)( kalman_t *, double, double, update_type_c );
+        double (*update)( kalman_t *, double, double, update_type_c );
         int  (*isExpired)( kalman_t * );
     };
     

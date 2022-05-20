@@ -20,9 +20,10 @@ void nrm3( vec3_t * v )
 {
     double length = len3( v );
     if(!length) return;
-    v->i /= length;
-    v->j /= length;
-    v->k /= length;
+    double inv_length = 1 / length;
+    v->i *= inv_length;
+    v->j *= inv_length;
+    v->k *= inv_length;
 }
 
 void sub3( vec3_t * x, vec3_t * y )
@@ -43,10 +44,10 @@ double ang3( vec3_t * u, vec3_t * v)
 {
     double lu, lv;
     lu = len3(u);
-    if( lu )
+    if( lu > 0 )
     {
         lv = len3(v);
-        if( lv )
+        if( lv > 0 )
         {
             return acos( dot3( u, v ) / ( lu * lv ) );
         }

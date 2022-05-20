@@ -12,6 +12,13 @@ KineticUtility::KineticUtility( kinetic_config_t * config, string n )
 {
     if( pthread_mutex_init(&mutex, NULL) != 0 ) printf( "mutex init failed\n" );
     if( pthread_mutex_init(&point_data_mutex, NULL) != 0 ) printf( "mutex init failed\n" );
+    if( pthread_mutex_init(&orienter_data_mutex, NULL) != 0 ) printf( "mutex init failed\n" );
+    
+    // Kinetic
+    KineticFunctions.Init( &kin, config );
+    
+    // Orienter
+    OrienterFunctions.Init( &orienter );
 }
 
 KineticUtility::~KineticUtility()
@@ -22,8 +29,9 @@ KineticUtility::~KineticUtility()
 
 void KineticUtility::init()
 {
-    KineticFunctions.Init(&kin, *config);
-}
+//    KineticFunctions.Init( &kin, *config );
+    OrienterFunctions.Init( &orienter );
+};
 
 string KineticUtility::serialize()
 {
@@ -31,14 +39,18 @@ string KineticUtility::serialize()
 }
 
 void KineticUtility::trigger()
-{ LOCK(&mutex)
+{ //LOCK(&mutex)
+    LOG_KU(DEBUG_1, "trigger\n");
     KineticFunctions.UpdatePosition( &kin, &O, &A, &B );
 }
 
-void KineticUtility::UpdateIMUData( vec3_t * n, quaternion_t * o )
-{ LOCK(&mutex)
-    Vector3.copy3( n, &this->n );
-    Quaternion.copy( o, &O );
+void KineticUtility::UpdateIMUData( vec3_t * nong, vec3_t * ang )//, vec3_t * rate )
+{ LOCK(&orienter_data_mutex)
+    OrienterFunctions.Update( &orienter, ang );//, rate );
+    ang3_t r;
+    Vector3.copy3( (vec3_t *)&orienter.rotation, (vec3_t *)&r );
+    Angle.degToRad( &r );
+    Quaternion.fromEuler( &r, &O );
 }
 
 void KineticUtility::UpdatePointData( kpoint_t * a, kpoint_t * b )
@@ -63,13 +75,10 @@ vec3_t KineticUtility::GetPosition()
  **************************************************************************************************/
 void KineticUtility::InitFilters()
 {
-    kalman_uncertainty_c motion_uncertainty = { MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY };
-    Kalman.init(&rotation[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&rotation[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&rotation[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&position[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&position[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&position[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+    
+//    Kalman.init(&position[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+//    Kalman.init(&position[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
+//    Kalman.init(&position[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
 }
 
 ///* Calculation and filtering of nongraviation data */

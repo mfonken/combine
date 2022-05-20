@@ -126,6 +126,6 @@ void SerialWriter::write( std::string data )
 std::string SerialWriter::read( int l )
 {
     char data[l];
-    Read_SERCOM_Bytes( channel.filestream, data, l );
+    Read_SERCOM_Bytes( channel.filestream, data, l, channel.read_timeout_sec );
     return std::string(data);
 }

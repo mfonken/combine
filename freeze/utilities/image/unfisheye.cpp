@@ -9,13 +9,16 @@
 #include "unfisheye.hpp"
 #include <highgui.hpp>
 
+using namespace cv;
+
 double strength = 0.1, zoom = 0.5;
 int strength_slider = 28, zoom_slider = 11, max_strength = 100, max_zoom = 20;
 
 void quickUnfisheye(Mat I, Mat O)
 {
-    cv::createTrackbar( "Strength", "Original", &strength_slider, max_strength );
-    cv::createTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    cv::createTrackbar( "Strength", "Demo", &strength_slider, max_strength, NULL );
+    cv::createTrackbar( "Zoom", "Demo", &zoom_slider, max_zoom, NULL );
+    
     strength = (double) strength_slider / 10;
     zoom = (double) zoom_slider / 10;
     
@@ -106,8 +109,8 @@ void unfisheye(Mat I, Mat O)
 
 void invfisheye(Mat I, Mat O)
 {
-    cv::createTrackbar( "Strength", "Original", &strength_slider, max_strength );
-    cv::createTrackbar( "Zoom", "Original", &zoom_slider, max_zoom );
+    cv::createTrackbar( "Strength", "Demo", &strength_slider, max_strength );
+    cv::createTrackbar( "Zoom", "Demo", &zoom_slider, max_zoom );
     
     strength = (double) strength_slider / 10;
     zoom = (double) zoom_slider / 10;
