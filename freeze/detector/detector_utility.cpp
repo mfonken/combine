@@ -33,7 +33,7 @@ RhoDetector::RhoDetector( string name )
     
     threshold_value = 127;
     
-    if( pthread_mutex_init(&mutex, NULL) != 0 )
+    if( pthread_mutex_init(&pts_mutex, NULL) != 0 )
         printf( "mutex init failed\n" );
 }
 
@@ -102,14 +102,14 @@ void RhoDetector::perform( Mat M )
     keypoints.push_back(points[0]);
     keypoints.push_back(points[1]);
     
-    { LOCK(&mutex)
-        pts.clear();
-        std::vector<cv::Point2f> pts_;
-        for(int i = 0; i < keypoints.size(); i++)
-        {
-            pts_.push_back(keypoints[i].pt);
-        }
+    std::vector<cv::Point2f> pts_;
+    for(int i = 0; i < keypoints.size(); i++)
+    {
+        pts_.push_back(keypoints[i].pt);
+    }
+    { LOCK(&pts_mutex)
         pts = tracker.UpdateTrack(pts_);
+        
         for(int i = 0; i < pts.size(); i++)
         {
             keypoints[i].pt.x = std::clamp(pts[i].x, 0.0f, (float)M.cols);

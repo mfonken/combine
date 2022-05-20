@@ -26,10 +26,9 @@ void KineticInit( kinetic_t * k, kinetic_config_t config )
     k->d_l = config.beacon_distance;
     Camera_Rotation_Init(k);
     Reference_Rotation_Init(k);
-    Filters_Init(k);
 }
 
-static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, quaternion_t * O, kpoint_t * A, kpoint_t * B )
+static void KineticUpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A, kpoint_t * B )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
@@ -48,9 +47,9 @@ static void KineticUpdatePosition( kinetic_t * k, vec3_t * n, quaternion_t * O, 
     k->values.position[1] = k->r.j;
     k->values.position[2] = k->r.k;
     
-    Kalman.update( &k->filters.position[0], k->r.i, 0, VELOCITY );
-    Kalman.update( &k->filters.position[1], k->r.j, 0, VELOCITY );
-    Kalman.update( &k->filters.position[2], k->r.k, 0, VELOCITY );
+//    Kalman.update( &k->filters.position[0], k->r.i, 0, VELOCITY );
+//    Kalman.update( &k->filters.position[1], k->r.j, 0, VELOCITY );
+//    Kalman.update( &k->filters.position[2], k->r.k, 0, VELOCITY );
     
 //    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;
@@ -182,20 +181,6 @@ static void KineticR( kinetic_t * k )
     Quaternion.rotVec( &r_u, &k->qa, &k->r );
 }
 
-/* Calculation and filtering of nongraviation data */
-static void KineticNongrav( kinetic_t * k, vec3_t * n )
-{
-    Quaternion.rotVec( n, &k->qd, &k->n );
-    
-    Kalman.update( &k->filters.position[1], k->r.i, k->n.i, ACCELERATION );
-    Kalman.update( &k->filters.position[0], k->r.j, k->n.j, ACCELERATION );
-    Kalman.update( &k->filters.position[2], k->r.k, k->n.k, ACCELERATION );
-    
-    k->values.position[0] = k->filters.position[0].value;
-    k->values.position[1] = k->filters.position[1].value;
-    k->values.position[2] = k->filters.position[2].value;
-}
-
 kinetic_functions KineticFunctions =
 {
     .DefaultInit = KineticDefaultInit,
@@ -209,22 +194,7 @@ kinetic_functions KineticFunctions =
     .Gamma = KineticGamma,
     .R_l = KineticR_l,
     .R = KineticR,
-    .Nongrav = KineticNongrav
 };
-
-/***************************************************************************************************
- *  \brief  Initialize Filters for Kinetic Data
- **************************************************************************************************/
-void Filters_Init( kinetic_t * k )
-{
-    kalman_uncertainty_c motion_uncertainty = { MOTION_VALUE_UNCERTAINTY, MOTION_BIAS_UNCERTAINTY, MOTION_SENSOR_UNCERTAINTY };
-    Kalman.init(&k->filters.rotation[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&k->filters.rotation[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&k->filters.rotation[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&k->filters.position[0], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&k->filters.position[1], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-    Kalman.init(&k->filters.position[2], 0.0, MOTION_MAX_KALMAN_LIFE, motion_uncertainty );
-}
 
 void Camera_Rotation_Init( kinetic_t * k )
 {

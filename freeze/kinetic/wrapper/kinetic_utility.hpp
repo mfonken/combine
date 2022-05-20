@@ -27,6 +27,8 @@ class KineticUtility : public TestInterface
     
     kinetic_t kin;
     kinetic_config_t * config;
+    kalman_t position[3];
+    kalman_t rotation[3];
     vec3_t n;
     quaternion_t O;
     kpoint_t A;
@@ -40,9 +42,10 @@ public:
     ~KineticUtility();
     
     void trigger( void );
-    void UpdateIMUDate( vec3_t * n, quaternion_t * o );
+    void UpdateIMUData( vec3_t * n, quaternion_t * o );
     void UpdatePointData( kpoint_t * a, kpoint_t * b );
     vec3_t GetPosition();
+    void InitFilters();
 };
 
 

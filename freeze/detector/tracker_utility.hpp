@@ -16,11 +16,10 @@
 
 #define MAX_TRACKERS    2
 
-#define TRACKER_PROCESS_NOISE     1e-5
-#define TRACKER_X_STD_MEAS        1e-2
-#define TRACKER_Y_STD_MEAS        1e-2
+#define TRACKER_PROCESS_NOISE   1e-5
+#define TRACKER_STD_MEAS        1e-2
 
-#define TRACKER_MAX_DELTA         100
+#define TRACKER_MAX_DELTA       100
 
 //class Tracker
 //{
