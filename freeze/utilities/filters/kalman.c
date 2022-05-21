@@ -26,6 +26,8 @@ void init( kalman_t * k, double value, double lifespan, kalman_uncertainty_c unc
     k->uncertainty.value   = uncertainty.value;
     k->uncertainty.bias    = uncertainty.bias;
     k->uncertainty.sensor  = uncertainty.sensor;
+    
+    k->timestamp = TIMESTAMP();
 }
 
 double update( kalman_t * k, double value_new, double rate_new, update_type_c type )

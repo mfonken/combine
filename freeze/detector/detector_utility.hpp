@@ -31,6 +31,7 @@
 #define KEYPOINTS_COLOR Scalar(0,0,255)
 #define BLOBS_COLOR Scalar(255,255,0)
 #define DEFAULT_COVERAGE        60
+#define DETECTION_MIN_SIZE 10
 
 #define UNFISHEYE_SCALE 3
 

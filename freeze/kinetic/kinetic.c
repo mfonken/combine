@@ -12,13 +12,13 @@
 /***********************************************************************************************//**
  *  \brief  Initialize Kinetic Sensors
  **************************************************************************************************/
-void KineticDefaultInit( kinetic_t * k )
+void Kinetic_DefaultInit( kinetic_t * k )
 {
     kinetic_config_t config = { KINETIC_CAMERA_WIDTH, KINETIC_CAMERA_HEIGHT, FOCAL_LENGTH, D_FIXED };
     KineticFunctions.Init( k, &config );
 }
 
-void KineticInit( kinetic_t * k, kinetic_config_t * config )
+void Kinetic_Init( kinetic_t * k, kinetic_config_t * config )
 {
     k->W = config->width;
     k->H = config->height;
@@ -28,7 +28,7 @@ void KineticInit( kinetic_t * k, kinetic_config_t * config )
     Reference_Rotation_Init(k);
 }
 
-static void KineticUpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A, kpoint_t * B )
+static void Kinetic_UpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A, kpoint_t * B, ang3_t * e )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
@@ -43,25 +43,27 @@ static void KineticUpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A
     KineticFunctions.R( k );
     
     /* Step 5A: Update position values for tests */
-    k->values.position[0] = k->r.i;
-    k->values.position[1] = k->r.j;
-    k->values.position[2] = k->r.k;
+//    k->values.position[0] = k->r.i;
+//    k->values.position[1] = k->r.j;
+//    k->values.position[2] = k->r.k;
     
 //    Kalman.update( &k->filters.position[0], k->r.i, 0, VELOCITY );
 //    Kalman.update( &k->filters.position[1], k->r.j, 0, VELOCITY );
 //    Kalman.update( &k->filters.position[2], k->r.k, 0, VELOCITY );
     
-    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 //    return;
     
     /* Step 5B: Calculate Non-gravitational Data */
 //    Kinetic.nongrav( k, n );
+    
+//    KineticFunctions.Print( k );
 }
 
-static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
+static void Kinetic_MinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 {
     KPoint.copy(A, &k->A);
     KPoint.copy(B, &k->B);
+    k->f_l = 350;
     /* Get distance between beacons and origin */
     KPoint.init( &k->A, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
     KPoint.init( &k->B, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
@@ -71,21 +73,25 @@ static void KineticMinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
     /* Get beacon tilt on camera plane */
     k->omega = KPoint.angl( &d_ );
     
-    /* Get angles between beacons */
+    /* Get angle from origin to A */
     k->sigmaA = KPoint.anga( &k->A );
     
+    /* Get angles between beacons */
     vec3_t Av, Bv;
     KPoint.toVec3( &k->A, &Av );
     KPoint.toVec3( &k->B, &Bv );
     k->sigmaR = Vector3.ang3( &Av, &Bv );
+    
+//    printf("d__l: %.2f om:%d sA:%d sR:%d\n", k->d__l, (int)(k->omega*RAD_TO_DEG), (int)(k->sigmaA*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG));
 }
 
-static void KineticQuaternions( kinetic_t * k, quaternion_t * O )
-{
+static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O, ang3_t * e )
+{    
     /* Get proper device angles from kinetic */
     Quaternion.copy( O, &k->qd );
+    Quaternion.toEuler( O, &k->e );
     
-    /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizonatl and vertical angle offset */
+    /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizontal and vertical angle offset */
     double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
     k->nu      = atan2( ( sin_ry * k->A.x + cos_ry * k->A.y ), k->f_l );
     k->upsilon = atan2( ( sin_ry * k->A.y - cos_ry * k->A.x ), k->f_l );
@@ -97,6 +103,7 @@ static void KineticQuaternions( kinetic_t * k, quaternion_t * O )
     
     ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
     Quaternion.fromEuler( &b, &k->qc_ );
+//    printf("o:%d <%d, %d, %d>\n", (int)(k->omega*RAD_TO_DEG), (int)(b.x*RAD_TO_DEG), (int)(b.y*RAD_TO_DEG), (int)(b.z*RAD_TO_DEG));
     
 /* OP1: Potential parallelization */
 //    Quaternion.fromEuler( &k->e, &k->qd );
@@ -105,7 +112,7 @@ static void KineticQuaternions( kinetic_t * k, quaternion_t * O )
 //    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
 }
 
-static void KineticMajorAngles( kinetic_t * k )
+static void Kinetic_MajorAngles( kinetic_t * k )
 {
     KineticFunctions.Chi( k );
     KineticFunctions.Mu(  k );
@@ -116,14 +123,17 @@ static void KineticMajorAngles( kinetic_t * k )
  * a - focal length
  * b - length of vec d'
  */
-static int KineticChi( kinetic_t * k )
+static int Kinetic_Chi( kinetic_t * k )
 {
-    double m, n;
+    double m, n, n_;
     if( ( fabs( k->sigmaA ) != M_PI_2 ) && ( k->d__l > 0 ) )
     {
         m = k->f_l / cos(k->sigmaA);
         n = m / k->d__l;
-        k->chi = asin( n * sin(k->sigmaR) );
+        n_ = n * sin(k->sigmaR);
+        if(n_ > 1.0) n_ = 1.0;
+        else if(n_ < -1.0) n_ = -1.0;
+        k->chi = asin( n_ );
         return 0;
     }
     else k->chi = M_PI_2;
@@ -134,15 +144,16 @@ static int KineticChi( kinetic_t * k )
  * a - quaternion x factor
  * b - quaternion z factor
  */
-static int KineticMu( kinetic_t * k )
+static int Kinetic_Mu( kinetic_t * k )
 {
-    double m, n, a = k->qc_.x, b = k->qc_.z;
+    double m, n;
+    double a = k->qc_.y, b = k->qc_.z;
     m = ( a * a ) + ( b * b );
     n = 1.0 - ( 2 * m );
     //OP2A: k->mu = -RASIN( n );
     if( fabs(n) < 1 )
     {
-        k->mu = asin( n );
+        k->mu = acos( n );
         return 1;
     }
     else k->mu = SIGN( n ) * M_PI_2;
@@ -150,7 +161,7 @@ static int KineticMu( kinetic_t * k )
 }
 
 /* Calculation of gammama */
-static void KineticGamma( kinetic_t * k )
+static void Kinetic_Gamma( kinetic_t * k )
 {
     //OP2B: k->gamma = k->chi - k->mu;
     k->gamma = k->chi + k->mu;
@@ -160,7 +171,7 @@ static void KineticGamma( kinetic_t * k )
  * a - sin sigmaR
  * b - d vec real length
  */
-static int KineticR_l( kinetic_t * k )
+static int Kinetic_R_l( kinetic_t * k )
 {
     double m;
     if( fabs(k->sigmaR) < 1 )
@@ -174,26 +185,32 @@ static int KineticR_l( kinetic_t * k )
 }
 
 /* Calculation of r vec */
-static void KineticR( kinetic_t * k )
+static void Kinetic_R( kinetic_t * k )
 {
     KineticFunctions.R_l(k);
     vec3_t r_u = { 0, k->r_l, 0 };
     Quaternion.rotVec( &r_u, &k->qa, &k->r );
 }
 
+static void Kinetic_Print( kinetic_t * k )
+{
+    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+}
+
 kinetic_functions KineticFunctions =
 {
-    .DefaultInit = KineticDefaultInit,
-    .Init = KineticInit,
-    .UpdatePosition = KineticUpdatePosition,
-    .MinorAngles = KineticMinorAngles,
-    .Quaternions = KineticQuaternions,
-    .MajorAngles = KineticMajorAngles,
-    .Chi = KineticChi,
-    .Mu = KineticMu,
-    .Gamma = KineticGamma,
-    .R_l = KineticR_l,
-    .R = KineticR,
+    .DefaultInit = Kinetic_DefaultInit,
+    .Init = Kinetic_Init,
+    .UpdatePosition = Kinetic_UpdatePosition,
+    .MinorAngles = Kinetic_MinorAngles,
+    .Quaternions = Kinetic_Quaternions,
+    .MajorAngles = Kinetic_MajorAngles,
+    .Chi = Kinetic_Chi,
+    .Mu = Kinetic_Mu,
+    .Gamma = Kinetic_Gamma,
+    .R_l = Kinetic_R_l,
+    .R = Kinetic_R,
+    .Print = Kinetic_Print
 };
 
 void Camera_Rotation_Init( kinetic_t * k )

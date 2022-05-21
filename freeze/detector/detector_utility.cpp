@@ -96,7 +96,7 @@ void RhoDetector::perform( Mat M )
     
     if( num_points < 2 ) return;
 //    sort( points.begin(), points.end(), sizeSort );
-    vector<keypoint_ext_t> kps = GetBrightnessOfKeyPoints(M, points, 25, 40);
+    vector<keypoint_ext_t> kps = GetBrightnessOfKeyPoints(M, points, DETECTION_MIN_SIZE);
     if(kps.size() < 2) return;
     sort( kps.begin(), kps.end(), brightenssSort );
 //    sort( points.begin(), points.end(), sizeSort );
@@ -147,6 +147,7 @@ void RhoDetector::draw(cv::Mat M)
             keypoints[i].size = 1000;
     }
     
+    char c = 'a';
     vector<Point2f> pts;
     drawKeypoints( M, keypoints, M, BLOBS_COLOR, DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
     for(int i = 0; i < keypoints.size(); i++)
@@ -156,6 +157,8 @@ void RhoDetector::draw(cv::Mat M)
         
         line( M, (Point)t_points[i], (Point)keypoints[i].pt, Scalar(0, 25, 200));
         circle( M, (Point)t_points[i], 3, Scalar(0, 50, 255), -1);
+        string s{c++};
+        putText(M, s, (Point)t_points[i], FONT_HERSHEY_DUPLEX, 1.0, Scalar(0, 50, 255));
     }
     drawKeypoints( M, keypoints, M, KEYPOINTS_COLOR, DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
     

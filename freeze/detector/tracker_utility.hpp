@@ -16,7 +16,7 @@
 
 #define MAX_TRACKERS    3
 
-#define TRACKER_PROCESS_NOISE   10
+#define TRACKER_PROCESS_NOISE   5
 #define TRACKER_STD_MEAS        1e-2
 
 #define TRACKER_MAX_DELTA       100
@@ -31,12 +31,13 @@
 class TrackerUtility
 {
     string name;
-    kalman2d_t trackers[MAX_TRACKERS] = {0};
+    vector<kalman2d_t> trackers;
     
 public:
     TrackerUtility( string name = "TrackerUtil" );
     std::vector<cv::Point2f> Update(std::vector<cv::Point2f> pts);
     std::vector<cv::Point2f> UpdateTrack(std::vector<cv::Point2f> pts);
+    void reorder();
 };
 
 #endif /* tracker_utility_hpp */

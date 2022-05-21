@@ -76,12 +76,12 @@ int Environment::resetTicks()
             ticks_per_sec *= r;
     }
     
-    printf("%.1f:\n", ticks_per_sec);
+//    printf("%.1f:\n", ticks_per_sec);
     for( int i = 0; i < events.length(); i++ )
     {
         Event * e = events.get(i);
         e->ticks = ticks_per_sec / e->rate;
-        printf("%d - %d\n", i, e->ticks);
+//        printf("%d - %d\n", i, e->ticks);
     }
     return ticks_per_sec;
 }

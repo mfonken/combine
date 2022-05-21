@@ -51,7 +51,7 @@
 #define     CAMERA_HALF_HEIGHT      FNL_RESIZE_H/2
 
 #define     UNITS                  "cm"
-#define     PIXEL_TO_UNIT           3e-6
+#define     PIXEL_TO_UNIT           1.0//3e-6
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
 
 #define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
@@ -133,6 +133,7 @@ typedef struct
     int  (*R_l)( kinetic_t * );
     void (*R)( kinetic_t * );
     void (*Nongrav)( kinetic_t *, vec3_t * );
+    void (*Print)( kinetic_t * );
 } kinetic_functions;
 
 extern kinetic_functions KineticFunctions;

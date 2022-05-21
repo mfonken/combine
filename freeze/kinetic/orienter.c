@@ -55,9 +55,9 @@ void Orienter_Tare( orienter_t * o )//, vec3_t * gravity )
 }
 void Orienter_Print( orienter_t * o )
 {
-        ang3_t * r = &o->rotation;
-        ang3_t * rr = &o->rotation_raw;
-        printf("Orienter: <%.2f, %.2f, %.2f> | <%.2f, %.2f, %.2f>\n", rr->x, rr->y, rr->z, r->x, r->y, r->z);
+    ang3_t * r = &o->rotation;
+    ang3_t * rr = &o->rotation_raw;
+    printf("Orienter: <%.2f, %.2f, %.2f> | <%.2f, %.2f, %.2f>\n", rr->x, rr->y, rr->z, r->x, r->y, r->z);
 }
 
 orienter_functions_t OrienterFunctions =

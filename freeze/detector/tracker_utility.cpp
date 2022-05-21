@@ -40,7 +40,7 @@ static vector<int> min_path(vector<vector<double>> g, int xl, int yl )
 }
 
 TrackerUtility::TrackerUtility(string name)
-: name( name )
+: name( name ), trackers(MAX_TRACKERS)
 {
 }
 
@@ -71,7 +71,7 @@ vector<Point2f> TrackerUtility::Update(vector<Point2f> pts)
 
 vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
 {
-    vector<Point2f> r_pts;
+    vector<Point2f> r_pts(pts.size());
     vector<Point2f> matched(pts.size(), Point2f(-1.0, -1.0));
     
     vector<vector<double>> graph;
@@ -135,9 +135,23 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
         kalman2d_t * tr = &trackers[ti];
         Kalman2D.predict( tr );
         Kalman2D.update( tr, p );
-        r_pts.push_back( Point2f(tr->state.px, tr->state.py) );
+        r_pts[ti] = Point2f(tr->state.px, tr->state.py);
 //        printf("%d ", match[pi]);
     }
 //    printf("\n");
     return r_pts;
+}
+
+void TrackerUtility::reorder()
+{
+    std::sort(trackers.begin(), trackers.end(), [](kalman2d_t a, kalman2d_t b) {
+        if( a.t > 0)
+        {
+            double da = sqrt( a.state.px * a.state.px + a.state.py * a.state.py );
+            double db = sqrt( b.state.px * b.state.px + b.state.py * b.state.py );
+            return da < db;
+        }
+        else
+            return false;
+    });
 }

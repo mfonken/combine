@@ -29,6 +29,11 @@ KineticUtility::~KineticUtility()
 
 void KineticUtility::init()
 {
+    kalman_uncertainty_c uncertainty = { 1e-4, 1e-4, 1e-4 };
+    for( int i = 0; i < 3; i++ )
+    {
+        Kalman.init( &position[i], 0, 50000, uncertainty );
+    }
 //    KineticFunctions.Init( &kin, *config );
     OrienterFunctions.Init( &orienter );
 };
@@ -42,6 +47,10 @@ void KineticUtility::trigger()
 { //LOCK(&mutex)
     LOG_KU(DEBUG_1, "trigger\n");
     KineticFunctions.UpdatePosition( &kin, &O, &A, &B );
+    for( int i = 0; i < 3; i++ )
+    {
+        Kalman.update( &position[i], ((double *)&kin.r.i)[i], 0, VELOCITY );
+    }
 }
 
 void KineticUtility::UpdateIMUData( vec3_t * nong, vec3_t * ang )//, vec3_t * rate )

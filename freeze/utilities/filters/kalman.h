@@ -31,7 +31,7 @@ extern "C" {
     typedef struct
     {
         /* Calibration */
-        double lifespan;
+        double      lifespan;
         kalman_uncertainty_c uncertainty;
         /* Data */
         double      K[2];               /** Gain matrix */
@@ -42,7 +42,7 @@ extern "C" {
         double      prev;               /** Previous value */
         double      density;            /** Density */
         double      velocity;           /** Velocity */
-        uint32_t    timestamp;          /** Timestamp */
+        double      timestamp;          /** Timestamp */
     } kalman_t;
     
     struct kalman_functions
