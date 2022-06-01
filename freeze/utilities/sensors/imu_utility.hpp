@@ -29,11 +29,14 @@ class IMUUtility : public TestInterface
 public:
     typedef struct
     {
+        double timestamp_ms;
+        
         double roll;
         double pitch;
         double yaw;
         
         double accel[3];
+        double gyro[3];
         double gravity[3];
     } imu_data_t;
     

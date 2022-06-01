@@ -5,13 +5,17 @@
 //  Created by Matthew Fonken on 3/8/22.
 //
 
+#include <opencv2/calib3d.hpp>
+
 #include "webcam_utility.hpp"
+#include "timestamp.h"
+#include "fisheye.h"
 
 using namespace cv;
 using namespace std;
 
-WebcamUtility::WebcamUtility(string n, int id, int width, int height)
-: name(n), id(id), size(width, height)
+WebcamUtility::WebcamUtility(string n, camera_intrinsics_t camera_intrinsics, int id, int width, int height)
+: name(n), id(id), size(width, height), intrinsics(camera_intrinsics)
 {
     if( pthread_mutex_init(&mutex, NULL) != 0 )
         printf( "mutex init failed\n" );
@@ -32,7 +36,7 @@ void WebcamUtility::init()
     }
     if(size.width > 0) cam.set(CAP_PROP_FRAME_WIDTH, size.width);
     if(size.height > 0) cam.set(CAP_PROP_FRAME_HEIGHT, size.height);
-    if(rate > 0) cam.set(CAP_PROP_FPS, rate);
+//    if(rate > 0) cam.set(CAP_PROP_FPS, rate);
     cam.read(raw);
     size.width = raw.cols;
     size.height = raw.rows;
@@ -50,6 +54,8 @@ void WebcamUtility::trigger()
 {
     LOG_WU(DEBUG_1, "trigger\n");
     cam >> raw;
+//    raw = Undistort(raw);
+    frame_time_ms = TIMESTAMP(TIME_MS);
     if(raw.cols == 0) return;
     LOCK(&mutex);
     resize(raw, frame, size, 1, 1);
@@ -64,7 +70,7 @@ void WebcamUtility::trigger()
 #endif
     
     if( OnFrame != NULL )
-        OnFrame( frame );
+        OnFrame( frame, frame_time_ms );
 }
 
 std::string WebcamUtility::serialize()
@@ -75,4 +81,17 @@ std::string WebcamUtility::serialize()
 Mat WebcamUtility::GetFrame()
 {
     return frame;
+}
+
+Mat WebcamUtility::Undistort(Mat m)
+{
+    Mat K = Mat(3, 3, CV_64FC1, &intrinsics.K);
+    Mat D = Mat(4, 1, CV_64FC1, &intrinsics.D);
+    
+    Mat map1, map2;
+    initUndistortRectifyMap(K, D, cv::Mat(), K, m.size(), CV_32FC1, map1, map2);
+    //create undistorted image
+    Mat u;
+    remap(m, u, map1, map2, cv::INTER_LINEAR);
+    return u;
 }

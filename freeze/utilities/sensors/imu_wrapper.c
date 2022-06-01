@@ -13,7 +13,7 @@
 #define FLSZ (1+1+3)
 #define BUFFSIZE(X) (int)(DEL+(int)X*(SEP+FLSZ))
 
-#define MIN_PACKET_LEN_RAW BUFFSIZE(9)
+#define MIN_PACKET_LEN_RAW BUFFSIZE(6)
 #define MIN_PACKET_LEN_ORI BUFFSIZE(6)
 
 #define BUFFER_LENGTH   (1 << 7)
@@ -55,14 +55,16 @@ const imu IMU =
     .normalize.mag = IMU_Normalize_Mag
 };
 
-void IMU_Update_All(imu_t * a)
+void IMU_Update_All(imu_t * imu)
 {
-    Read_SERCOM_IMU_Packet(a);
+    Write_SERCOM_Bytes(imu->channel.descriptor, "a\n", 2);
+    Read_SERCOM_IMU_Packet(imu);
 //    IMU_Normalize_All(a);
 //    IMU_Update_Roll(a);
 //    IMU_Update_Pitch(a);
 //    IMU_Update_Yaw(a);
 }
+
 void IMU_Update_Orientation(imu_t * imu)
 {
     Write_SERCOM_Bytes(imu->channel.descriptor, "o\n", 2);
@@ -139,12 +141,14 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
 {
     char buffer[BUFFER_LENGTH];
     int bytes_read = -1, ptr = 0, isnl = 0, attempts = 5;
+    double timestamp_ms = 0;
     while( !isnl && ptr < BUFFER_LENGTH - 1 && attempts-- > 0)
     {
         bytes_read = 0;
         SERCOM_Channel * ch = (SERCOM_Channel *)imu->channel.options;
 //        while(bytes_read <= 0) bytes_read = Read_SERCOM_Bytes(ch->filestream, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
-        Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
+        bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
+        timestamp_ms = TIMESTAMP(TIME_MS);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
             if(buffer[j] == PACKET_DEL)
@@ -165,12 +169,12 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
     printf("\nR(%d): %s\n", ptr, line);
 #endif
     
-    double v[9];
-    tokenifyPacket( line, ptr, 9, 'r', v);
+    double v[6];
+    tokenifyPacket( line, ptr, 6, 'a', v);
     
     if( v[0] == 0xffff ) return;
 #ifdef PACKET_DEBUG
-    for(int i = 0; i < 9; i++)
+    for(int i = 0; i < 6; i++)
         printf("(%d)%.2f ", i, v[i]);
     printf("\n");
 #endif
@@ -185,20 +189,24 @@ void Read_SERCOM_IMU_Packet( imu_t * imu )
     imu->gyro[0]  = v[3];
     imu->gyro[1]  = v[4];
     imu->gyro[2]  = v[5];
-    imu->mag[1]   = v[6] - mag_cal[0];
-    imu->mag[0]   = v[7] - mag_cal[1];
-    imu->mag[2]   =-(v[8] - mag_cal[2]);
+//    imu->mag[1]   = v[6] - mag_cal[0];
+//    imu->mag[0]   = v[7] - mag_cal[1];
+//    imu->mag[2]   = (v[8] - mag_cal[2]);
+    
+    imu->timestamp_ns = timestamp_ms;
 }
 
 void Read_SERCOM_IMU_Orientation( imu_t * imu )
 {
     char buffer[BUFFER_LENGTH] = { 0 };
     int bytes_read = -1, ptr = 0, isnl = 0, attempts = 5;
+    double timestamp_ms = 0;
     while( !isnl && ptr < BUFFER_LENGTH-1 && attempts-- > 0)
     {
         bytes_read = 0;
         SERCOM_Channel * ch = (SERCOM_Channel *)imu->channel.options;
         bytes_read = Read_SERCOM_Bytes(imu->channel.descriptor, buffer, (size_t)BUFFER_LENGTH, ch->read_timeout_sec);
+        timestamp_ms = TIMESTAMP(TIME_MS);
 //        printf("Buffer: %s\n", buffer);
         for(int i = ptr, j = 0; i < ptr + bytes_read; i++, j++)
         {
@@ -234,11 +242,13 @@ void Read_SERCOM_IMU_Orientation( imu_t * imu )
     imu->pitch  =  v[1];
     imu->yaw    =  v[2];
     
-    imu->accel_raw[0] = v[3];
-    imu->accel_raw[1] = v[4];
-    imu->accel_raw[2] = v[5];
+    imu->accel[0] = v[3];
+    imu->accel[1] = v[4];
+    imu->accel[2] = v[5];
     
 //    imu->gravity[0] = v[6];
 //    imu->gravity[1] = v[7];
 //    imu->gravity[2] = v[8];
+    
+    imu->timestamp_ns = timestamp_ms;
 }

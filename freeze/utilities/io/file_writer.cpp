@@ -33,10 +33,13 @@ void FileWriter::init( const char * name )
 #endif
 }
 
-void FileWriter::trigger( std::string data )
+void FileWriter::trigger( std::string data, bool append )
 {
     std::ofstream outfile;
-    outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
+    if(append)
+        outfile.open(file_name, std::ofstream::app );
+    else
+        outfile.open(file_name, std::ofstream::out | std::ofstream::trunc);
     outfile.write(data.c_str(),data.length());
     outfile.close();
 }

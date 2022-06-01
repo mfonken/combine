@@ -32,7 +32,7 @@ void Kalman2D_Init( kalman2d_t * k, floatp process_noise, floatp x_std_meas, flo
 #ifdef SET_DT_SEC
         SET_DT_SEC;
 #else
-    (floatp)TIMESTAMP() * 1e-3;
+    (floatp)TIMESTAMP(TIME_SEC);
 #endif
 }
 
@@ -44,7 +44,7 @@ void Kalman2D_Test( kalman2d_t * k, floatp x_new[4], bool update_A )
 #ifdef SET_DT_SEC
         SET_DT_SEC;
 #else
-        ((floatp)TIMESTAMP() * 1e-3) - k->t;
+        ((floatp)TIMESTAMP(TIME_SEC)) - k->t;
 #endif
         k->A[0][2] = dt;
         k->A[1][3] = dt;
@@ -64,7 +64,7 @@ void Kalman2D_Predict( kalman2d_t * k )// , int l )
 {
 //    int8_t ll = l * l;
     // Time update
-    floatp t_ = (floatp)TIMESTAMP() * 1e-3;
+    floatp t_ = (floatp)TIMESTAMP(TIME_SEC);
     floatp dt =
 #ifdef SET_DT_SEC
         SET_DT_SEC;

@@ -15,7 +15,8 @@ extern "C" {
     
 #include <stdio.h>
 #include <math.h>
-    
+
+#include "timestamp.h"
 #include "sercom.h"
     
 //#define PACKET_DEBUG
@@ -37,7 +38,8 @@ typedef struct
 
 typedef struct
 {
-    double 	accel_raw[3];
+    double timestamp_ns;
+    
     double  gravity[3];
     
     double 	accel[3];

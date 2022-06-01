@@ -18,25 +18,36 @@
 #define TIMESTAMP_IS_US     2
 
 #ifndef TIMESTAMP_UNITS
-#define TIMESTAMP_UNITS TIMESTAMP_IS_MS
+#define TIMESTAMP_UNITS TIME_MS
 #endif
 
-static double TIMESTAMP(void)
+typedef enum
+{
+    TIME_SEC = 0,
+    TIME_MS,
+    TIME_US
+//    TIME_NS
+} TIME_UNIT;
+
+static double TIMESTAMP(TIME_UNIT unit)
 {
     struct timeval stamp;
     gettimeofday(&stamp, NULL);
-#if TIMESTAMP_UNITS == TIMESTAMP_IS_SEC
-    return stamp.tv_sec + stamp.tv_usec * 0.000001;
-#elif TIMESTAMP_UNITS == TIMESTAMP_IS_MS
-    return stamp.tv_sec * 1000.0 + stamp.tv_usec * 0.001;
-#elif TIMESTAMP_UNITS == TIMESTAMP_IS_US
-    return stamp.tv_sec * 1000000.0 + stamp.tv_usec;
-#endif
+    double t = 0;
+    if( unit == TIME_SEC )
+        t = stamp.tv_sec + stamp.tv_usec * 1.0e-6;
+    else if( unit == TIME_MS )
+        t = stamp.tv_sec * 1.0e3 + stamp.tv_usec * 1.0e-3;
+    else if( unit == TIME_US )
+        t = stamp.tv_sec * 1.0e6 + stamp.tv_usec;
+//    else if( unit == TIME_NS )
+//        t = stamp.tv_sec * 1.0e9 + stamp.tv_usec * 1.0e3;
+    return t;
 }
 
-static bool ISTIMEDOUT( double check, double time_out )
+static bool ISTIMEDOUT( double check, double time_out, TIME_UNIT unit )
 {
-    return ( TIMESTAMP() - check ) > time_out;
+    return ( TIMESTAMP(unit) - check ) > time_out;
 }
 
 #endif /* timestamp_h */

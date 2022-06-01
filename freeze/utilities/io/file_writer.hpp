@@ -22,7 +22,7 @@ public:
     FileWriter( const char * name = NULL);
     
     void init( const char * );
-    void trigger( std::string data );
+    void trigger( std::string data, bool append = false );
 };
 
 #endif /* usb_serial_hpp */

@@ -81,7 +81,7 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
         kalman2d_t * tr = &trackers[ti];
         if( tr->t == 0 )
             continue;
-        double lifespan_s = TIMESTAMP() * 1e-3 - tr->t;
+        double lifespan_s = TIMESTAMP(TIME_SEC) - tr->t;
         if( lifespan_s > TRACKER_MAX_LIFESPAN_S )
             tr->t = 0;
     }

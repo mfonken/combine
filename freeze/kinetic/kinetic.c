@@ -28,7 +28,7 @@ void Kinetic_Init( kinetic_t * k, kinetic_config_t * config )
     Reference_Rotation_Init(k);
 }
 
-static void Kinetic_UpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A, kpoint_t * B, ang3_t * e )
+static void Kinetic_UpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * A, kpoint_t * B ) //, ang3_t * e )
 {
     /* Step 1: Calculate Minor Angles */
     KineticFunctions.MinorAngles( k, A, B );
@@ -56,14 +56,13 @@ static void Kinetic_UpdatePosition( kinetic_t * k, quaternion_t * O, kpoint_t * 
     /* Step 5B: Calculate Non-gravitational Data */
 //    Kinetic.nongrav( k, n );
     
-//    KineticFunctions.Print( k );
+    KineticFunctions.Print( k );
 }
 
 static void Kinetic_MinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 {
     KPoint.copy(A, &k->A);
     KPoint.copy(B, &k->B);
-    k->f_l = 350;
     /* Get distance between beacons and origin */
     KPoint.init( &k->A, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
     KPoint.init( &k->B, k->W/2, k->H/2, PIXEL_TO_UNIT, k->f_l );
@@ -85,7 +84,7 @@ static void Kinetic_MinorAngles( kinetic_t * k, kpoint_t * A, kpoint_t * B )
 //    printf("d__l: %.2f om:%d sA:%d sR:%d\n", k->d__l, (int)(k->omega*RAD_TO_DEG), (int)(k->sigmaA*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG));
 }
 
-static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O, ang3_t * e )
+static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O )//, ang3_t * e )
 {    
     /* Get proper device angles from kinetic */
     Quaternion.copy( O, &k->qd );
@@ -174,13 +173,13 @@ static void Kinetic_Gamma( kinetic_t * k )
 static int Kinetic_R_l( kinetic_t * k )
 {
     double m;
-    if( fabs(k->sigmaR) < 1 )
+//    if( fabs(k->sigmaR) < 1 )
     {
         m = sin( k->gamma ) / sin( k->sigmaR );
         k->r_l = m * k->d_l;
         return 1;
     }
-    else k->r_l = ZDIV_LNUM;
+//    else k->r_l = ZDIV_LNUM;
     return 0;
 }
 

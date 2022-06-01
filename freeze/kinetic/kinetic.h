@@ -58,7 +58,7 @@
 #define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
 
 #define     FOCAL_REFRACTION        2.4e-6//1.3e-6//  // units / units
-#define     FOCAL_LENGTH          ( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
+#define     FOCAL_LENGTH          463.7 //( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
 
 #define     D_FIXED                 5.0e-2
 

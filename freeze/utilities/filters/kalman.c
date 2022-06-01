@@ -27,12 +27,12 @@ void init( kalman_t * k, double value, double lifespan, kalman_uncertainty_c unc
     k->uncertainty.bias    = uncertainty.bias;
     k->uncertainty.sensor  = uncertainty.sensor;
     
-    k->timestamp = TIMESTAMP();
+    k->timestamp = TIMESTAMP(TIME_MS);
 }
 
 double update( kalman_t * k, double value_new, double rate_new, update_type_c type )
 {
-    double now = TIMESTAMP();
+    double now = TIMESTAMP(TIME_MS);
     double delta_time = now - k->timestamp;
 
     /* Quick expiration check */
@@ -84,7 +84,7 @@ double update( kalman_t * k, double value_new, double rate_new, update_type_c ty
 
 int isExpired( kalman_t * k)
 {
-    return ((TIMESTAMP() - k->timestamp) > k->lifespan);
+    return ((TIMESTAMP(TIME_MS) - k->timestamp) > k->lifespan);
 }
 
 const struct kalman_functions Kalman =
