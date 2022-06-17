@@ -18,7 +18,7 @@
 
 #include "environment_master.hpp"
 #include "tracker_utility.hpp"
-#include "unfisheye.hpp"
+#include "fisheye.h"
 
 #define DEBUG_DET
 
@@ -55,6 +55,7 @@ public:
     cv::Ptr<cv::SimpleBlobDetector> detector;
     TrackerUtility tracker;
     pthread_mutex_t pts_mutex;
+    camera_intrinsics_t * cam;
     
     int threshold_value;
     
@@ -68,7 +69,7 @@ public:
     std::vector<cv::Point2f> pts;
     std::vector<cv::Point2f> centroids;
     
-    RhoDetector( string name = "DetectorUtil" );
+    RhoDetector( camera_intrinsics_t * cam, string name = "DetectorUtil" );
 //    void trigger( void );
     void perform( cv::Mat );
     void calcCentroids(cv::Mat M);

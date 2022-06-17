@@ -17,8 +17,8 @@
 using namespace cv;
 using namespace std;
 
-RhoDetector::RhoDetector( string name )
-: name(name)
+RhoDetector::RhoDetector( camera_intrinsics_t * cam, string name )
+: cam(cam), name(name)
 {
     params.minDistBetweenBlobs  = 10; //Minimum distance between blobs
     params.filterByCircularity  = false;
@@ -116,6 +116,7 @@ void RhoDetector::perform( Mat M )
         pts_.push_back(kp.kp.pt);
         if(--n <= 0) break;
     }
+    if(pts_.size() < 2) return;
     { LOCK(&pts_mutex)
         pts = tracker.UpdateTrack(pts_);
 
@@ -125,7 +126,11 @@ void RhoDetector::perform( Mat M )
             keypoints[i].pt.x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
             keypoints[i].pt.y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
             
-            invfisheye(&pts[i], M.cols, M.rows, UNFISHEYE_SCALE, 1.0);
+            double x, y;
+            unfisheyePixel(pts[i].x, pts[i].y, cam, 300, &x, &y );
+            pts[i] = Point2f(x, y);
+            
+//            invfisheye(&pts[i], M.cols, M.rows, UNFISHEYE_SCALE, 1.0);
             
             pts[i].x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
             pts[i].y = std::clamp(pts[i].y, 0.0f, (float)M.rows);

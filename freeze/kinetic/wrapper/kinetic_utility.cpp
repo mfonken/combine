@@ -49,7 +49,8 @@ void KineticUtility::trigger()
     KineticFunctions.UpdatePosition( &kin, &O, &A, &B );
     for( int i = 0; i < 3; i++ )
     {
-        Kalman.update( &position[i], ((double *)&kin.r.i)[i], 0, VELOCITY );
+        position[i].value = ((double *)&kin.r.i)[i];
+//        Kalman.update( &position[i], ((double *)&kin.r.i)[i], 0, VELOCITY );
     }
 }
 
@@ -59,11 +60,14 @@ void KineticUtility::UpdateIMUData( vec3_t * nong, vec3_t * ang )//, vec3_t * ra
     ang3_t r;
     Vector3.copy3( (vec3_t *)&orienter.rotation, (vec3_t *)&r );
     Angle.degToRad( &r );
+    r.y = -r.y;
+    r.z = -r.z;
     Quaternion.fromEuler( &r, &O );
 }
 
 void KineticUtility::UpdatePointData( kpoint_t * a, kpoint_t * b )
 { LOCK(&point_data_mutex)
+//    LOG_KU(DEBUG_2, "A(%4d, %4d) B(%4d, %4d)\n", (int)a->x, (int)a->y, (int)b->x, (int)b->y);
     KPoint.copy( a, &A );
     KPoint.copy( b, &B );
 }

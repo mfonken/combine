@@ -14,7 +14,7 @@
 using namespace cv;
 using namespace std;
 
-WebcamUtility::WebcamUtility(string n, camera_intrinsics_t camera_intrinsics, int id, int width, int height)
+WebcamUtility::WebcamUtility(string n, camera_intrinsics_t * camera_intrinsics, int id, int width, int height)
 : name(n), id(id), size(width, height), intrinsics(camera_intrinsics)
 {
     if( pthread_mutex_init(&mutex, NULL) != 0 )
@@ -34,8 +34,8 @@ void WebcamUtility::init()
         LOG_WU(DEBUG_2, "Could not open or find camera.\n");
         cam = VideoCapture(id);
     }
-    if(size.width > 0) cam.set(CAP_PROP_FRAME_WIDTH, size.width);
-    if(size.height > 0) cam.set(CAP_PROP_FRAME_HEIGHT, size.height);
+//    if(size.width > 0) cam.set(CAP_PROP_FRAME_WIDTH, size.width);
+//    if(size.height > 0) cam.set(CAP_PROP_FRAME_HEIGHT, size.height);
 //    if(rate > 0) cam.set(CAP_PROP_FPS, rate);
     cam.read(raw);
     size.width = raw.cols;
@@ -83,15 +83,18 @@ Mat WebcamUtility::GetFrame()
     return frame;
 }
 
+Mat map1, map2;
+
 Mat WebcamUtility::Undistort(Mat m)
 {
-    Mat K = Mat(3, 3, CV_64FC1, &intrinsics.K);
-    Mat D = Mat(4, 1, CV_64FC1, &intrinsics.D);
+    Mat K = Mat(3, 3, CV_64FC1, &intrinsics->K);
+    Mat D = Mat(1, 4, CV_64FC1, &intrinsics->D);
     
-    Mat map1, map2;
-    initUndistortRectifyMap(K, D, cv::Mat(), K, m.size(), CV_32FC1, map1, map2);
-    //create undistorted image
-    Mat u;
-    remap(m, u, map1, map2, cv::INTER_LINEAR);
+    Mat u = m.clone();
+    if(map1.data == NULL)
+    {
+        cv::fisheye::initUndistortRectifyMap(K, D, Mat::eye(3, 3, CV_64FC1), K, m.size(), CV_16SC2, map1, map2);
+    }
+    remap(m, u, map1, map2, cv::INTER_LINEAR);//, CV_HAL_BORDER_CONSTANT);
     return u;
 }

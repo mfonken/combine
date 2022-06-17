@@ -35,9 +35,9 @@ public:
     double frame_time_ms;
     cv::Mat raw, frame;
     pthread_mutex_t mutex;
-    camera_intrinsics_t intrinsics;
+    camera_intrinsics_t * intrinsics;
     
-    WebcamUtility(string n = "webcam", camera_intrinsics_t camera_intrinsics = {0}, int id = 0, int width = -1, int height = -1);
+    WebcamUtility(string n = "webcam", camera_intrinsics_t * camera_intrinsics = NULL, int id = 0, int width = -1, int height = -1);
     ~WebcamUtility();
     
     void trigger( void );

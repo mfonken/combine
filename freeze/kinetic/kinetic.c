@@ -89,20 +89,27 @@ static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O )//, ang3_t * e
     /* Get proper device angles from kinetic */
     Quaternion.copy( O, &k->qd );
     Quaternion.toEuler( O, &k->e );
+//    printf("<%.2f, %.2f, %.2f>\n", k->e.x*RAD_TO_DEG, k->e.y*RAD_TO_DEG, k->e.z*RAD_TO_DEG);
     
     /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizontal and vertical angle offset */
-    double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
+    double cos_ry = cos(k->e.y), sin_ry = sin(k->e.y);
     k->nu      = atan2( ( sin_ry * k->A.x + cos_ry * k->A.y ), k->f_l );
     k->upsilon = atan2( ( sin_ry * k->A.y - cos_ry * k->A.x ), k->f_l );
     
     /* Generate Camera-Beacon quaternion */
-    ang3_t a = { k->e.x + k->nu, k->e.y + k->omega, k->e.z + k->upsilon };
-    Quaternion.fromEuler( &a, &k->qd_ );
-    Quaternion.combine( &k->qd_, &k->qc, &k->qa );
+    ang3_t a = { k->nu, 0.0/*k->omega*/, k->upsilon };
+//    printf("ν:%d | ω:%d | υ:%d\n", (int)(a.x*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG));
+    Quaternion.fromEuler( &a, &k->qc );
     
-    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
-    Quaternion.fromEuler( &b, &k->qc_ );
-//    printf("o:%d <%d, %d, %d>\n", (int)(k->omega*RAD_TO_DEG), (int)(b.x*RAD_TO_DEG), (int)(b.y*RAD_TO_DEG), (int)(b.z*RAD_TO_DEG));
+    k->e.y = 0.0;
+    Quaternion.fromEuler( &k->e, &k->qd );
+    Quaternion.combine( &k->qc, &k->qd, &k->qa );
+//    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
+    
+//    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
+//    Quaternion.fromEuler( &b, &k->qc_ );
+    Quaternion.toEuler( &k->qa, &a );
+//    printf("φ:%d | θ:%d | ψ:%d <|< ν:%d | ω:%d | υ:%d <|< <%.2f, %.2f, %.2f>\n", (int)(a.x*RAD_TO_DEG), (int)(a.y*RAD_TO_DEG), (int)(a.z*RAD_TO_DEG), (int)(a.x*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), k->e.x*RAD_TO_DEG, k->e.y*RAD_TO_DEG, k->e.z*RAD_TO_DEG);
     
 /* OP1: Potential parallelization */
 //    Quaternion.fromEuler( &k->e, &k->qd );
@@ -139,20 +146,21 @@ static int Kinetic_Chi( kinetic_t * k )
     return 0;
 }
 
-/* Calculation of mu - Real-visualized d vector offset angle
- * a - quaternion x factor
- * b - quaternion z factor
- */
+/* Calculation of mu - Real-visualized d vector offset angle */
 static int Kinetic_Mu( kinetic_t * k )
 {
-    double m, n;
-    double a = k->qc_.y, b = k->qc_.z;
-    m = ( a * a ) + ( b * b );
-    n = 1.0 - ( 2 * m );
+    double /*m,*/ n;
+//    double a = k->qa.y, b = k->qa.z;
+//    mat3x3_t ra;
+//    Quaternion.toMatrix( &k->qd, &ra);
+//    printf("xx%.2f xy%.2f xz%.2f yz%.2f yy%.2f yz%.2f zx%.2f zy%.2f zz%.2f\n", ra.ii, ra.ij, ra.ik, ra.ji, ra.jj, ra.jk, ra.ki, ra.kj, ra.kk);
+
+    n = ( k->qa.x * k->qa.y ) + ( k->qa.w * k->qa.z );
+//    n = ra.ij/2;//1.0 - ( 2 * m );
     //OP2A: k->mu = -RASIN( n );
     if( fabs(n) < 1 )
     {
-        k->mu = acos( n );
+        k->mu = asin( n );
         return 1;
     }
     else k->mu = SIGN( n ) * M_PI_2;
@@ -162,7 +170,6 @@ static int Kinetic_Mu( kinetic_t * k )
 /* Calculation of gammama */
 static void Kinetic_Gamma( kinetic_t * k )
 {
-    //OP2B: k->gamma = k->chi - k->mu;
     k->gamma = k->chi + k->mu;
 }
 
@@ -189,11 +196,15 @@ static void Kinetic_R( kinetic_t * k )
     KineticFunctions.R_l(k);
     vec3_t r_u = { 0, k->r_l, 0 };
     Quaternion.rotVec( &r_u, &k->qa, &k->r );
+    
+//    ang3_t va;
+//    Quaternion.toEuler( &k->qa, &va );
+//    printf("<%.2f, %.2f, %.2f>\n", va.x*RAD_TO_DEG, va.y*RAD_TO_DEG, va.z*RAD_TO_DEG);
 }
 
 static void Kinetic_Print( kinetic_t * k )
 {
-    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d |  | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
+    printf("Yaw:%4d | Nu:%4d | Up:%4d | Sig:%4d | Chi:%4d | Mu:%4d | Gamma:%4d | r_l: %.4f\n", (int)(k->e.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), (int)(k->sigmaR*RAD_TO_DEG), (int)(k->chi*RAD_TO_DEG), (int)(k->mu*RAD_TO_DEG), (int)(k->gamma*RAD_TO_DEG), /* H_a: <%4d,%4d,%4d> (int)(a.x), (int)(a.y), (int)(a.z),*/ k->r_l);
 }
 
 kinetic_functions KineticFunctions =
