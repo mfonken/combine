@@ -91,7 +91,6 @@ void RhoDetector::perform( Mat M )
     vector<KeyPoint> points;
 //    Mat Mb;
     detector->detect( M, points );
-    
     size_t num_points = points.size();
     
     if( num_points < 2 ) return;
@@ -106,13 +105,12 @@ void RhoDetector::perform( Mat M )
 //        total_size += points.at(i).size;
 
     keypoints.clear();
-    keypoints.push_back(kps[0].kp);
-    keypoints.push_back(kps[1].kp);
     
     std::vector<cv::Point2f> pts_;
-    int n = 2;
+    int n = MAX_TRACKERS;
     for(auto &kp : kps)
     {
+        keypoints.push_back(kp.kp);
         pts_.push_back(kp.kp.pt);
         if(--n <= 0) break;
     }
@@ -123,8 +121,9 @@ void RhoDetector::perform( Mat M )
         t_points.clear();
         for(int i = 0; i < pts.size() && i < keypoints.size(); i++)
         {
-            keypoints[i].pt.x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
-            keypoints[i].pt.y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
+            pts[i].x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
+            pts[i].y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
+            keypoints[i].pt = pts[i];
             
             double x, y;
             unfisheyePixel(pts[i].x, pts[i].y, cam, 300, &x, &y );
@@ -132,9 +131,9 @@ void RhoDetector::perform( Mat M )
             
 //            invfisheye(&pts[i], M.cols, M.rows, UNFISHEYE_SCALE, 1.0);
             
-            pts[i].x = std::clamp(pts[i].x, 0.0f, (float)M.cols);
-            pts[i].y = std::clamp(pts[i].y, 0.0f, (float)M.rows);
-            t_points.push_back(Point2f(pts[i].x, pts[i].y));
+            if(pts[i].x == 0 && pts[i].y == 0)
+                keypoints[i].size = 0;
+            t_points.push_back(pts[i]);
         }
     }
 }

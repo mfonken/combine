@@ -72,7 +72,6 @@ vector<Point2f> TrackerUtility::Update(vector<Point2f> pts)
 vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
 {
     vector<Point2f> r_pts(pts.size());
-    vector<Point2f> matched(pts.size(), Point2f(-1.0, -1.0));
     
     vector<vector<double>> graph;
     
@@ -136,6 +135,8 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
         Kalman2D.predict( tr );
         Kalman2D.update( tr, p );
         r_pts[ti] = Point2f(tr->state.px, tr->state.py);
+        if(tr->state.px < 10)
+            printf("%.2f\n", tr->state.px);
 //        printf("%d ", match[pi]);
     }
 //    printf("\n");

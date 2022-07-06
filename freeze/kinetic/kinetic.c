@@ -89,27 +89,42 @@ static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O )//, ang3_t * e
     /* Get proper device angles from kinetic */
     Quaternion.copy( O, &k->qd );
     Quaternion.toEuler( O, &k->e );
-//    printf("<%.2f, %.2f, %.2f>\n", k->e.x*RAD_TO_DEG, k->e.y*RAD_TO_DEG, k->e.z*RAD_TO_DEG);
+    printf("θ:%d | φ:%d | ψ:%d>\n", (int)(k->e.x*RAD_TO_DEG), (int)(k->e.y*RAD_TO_DEG), (int)(k->e.z*RAD_TO_DEG));
     
     /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizontal and vertical angle offset */
-    double cos_ry = cos(k->e.y), sin_ry = sin(k->e.y);
-    k->nu      = atan2( ( sin_ry * k->A.x + cos_ry * k->A.y ), k->f_l );
-    k->upsilon = atan2( ( sin_ry * k->A.y - cos_ry * k->A.x ), k->f_l );
+    double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
+    
+    double A_x = k->A.x * cos_ry - k->A.y * sin_ry;
+    double A_y = k->A.y * cos_ry + k->A.x * sin_ry;
+    
+//    printf("x:%d | y:%d | φ:%d\n", (int)A_x, (int)A_y, (int)(k->e.y*RAD_TO_DEG));
+    
+    k->upsilon = atan2( -A_x, k->f_l );
+    k->nu      = atan2( A_y, k->f_l );
     
     /* Generate Camera-Beacon quaternion */
-    ang3_t a = { k->nu, 0.0/*k->omega*/, k->upsilon };
-//    printf("ν:%d | ω:%d | υ:%d\n", (int)(a.x*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG));
-    Quaternion.fromEuler( &a, &k->qc );
+//    ang3_t c = { k->nu, k->e.y, k->upsilon };
+//    Quaternion.fromEuler( &c, &k->qc );
+    ang3_t d_ = { k->e.x, 0.0, k->e.z };
+//    printf("ν:%d | ω:%d | υ:%d\n", (int)(k->nu*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG));
+    Quaternion.fromEuler( &d_, &k->qd_ );
     
-    k->e.y = 0.0;
-    Quaternion.fromEuler( &k->e, &k->qd );
-    Quaternion.combine( &k->qc, &k->qd, &k->qa );
-//    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
+//    k->e.y = 0.0;
+    ang3_t a = { k->nu + k->e.x, k->e.y, k->upsilon + k->e.z };
+    Quaternion.fromEuler( &a, &k->qa );
+    
+    ang3_t d = { k->nu + k->e.x, 0.0, k->upsilon + k->e.z };
+    Quaternion.fromEuler( &d, &k->qd );
+    
+//    Quaternion.combine( &k->qc, &k->qd, &k->qa );
+//    ang3_t a;
+//    Quaternion.toEuler( &k->qa, &a );
+    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
     
 //    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
 //    Quaternion.fromEuler( &b, &k->qc_ );
-    Quaternion.toEuler( &k->qa, &a );
-//    printf("φ:%d | θ:%d | ψ:%d <|< ν:%d | ω:%d | υ:%d <|< <%.2f, %.2f, %.2f>\n", (int)(a.x*RAD_TO_DEG), (int)(a.y*RAD_TO_DEG), (int)(a.z*RAD_TO_DEG), (int)(a.x*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), k->e.x*RAD_TO_DEG, k->e.y*RAD_TO_DEG, k->e.z*RAD_TO_DEG);
+//    Quaternion.toEuler( &k->qa, &a );
+//    printf("φ:%d | θ:%d | ψ:%d <|< ν:%d | ω:%d | υ:%d <|< <%.2f, %.2f, %.2f>\n", (int)(a.x*RAD_TO_DEG), (int)(a.y*RAD_TO_DEG), (int)(a.z*RAD_TO_DEG), (int)(k->nu*RAD_TO_DEG), (int)(k->omega*RAD_TO_DEG), (int)(k->upsilon*RAD_TO_DEG), k->e.x*RAD_TO_DEG, k->e.y*RAD_TO_DEG, k->e.z*RAD_TO_DEG);
     
 /* OP1: Potential parallelization */
 //    Quaternion.fromEuler( &k->e, &k->qd );
@@ -151,16 +166,20 @@ static int Kinetic_Mu( kinetic_t * k )
 {
     double /*m,*/ n;
 //    double a = k->qa.y, b = k->qa.z;
-//    mat3x3_t ra;
-//    Quaternion.toMatrix( &k->qd, &ra);
-//    printf("xx%.2f xy%.2f xz%.2f yz%.2f yy%.2f yz%.2f zx%.2f zy%.2f zz%.2f\n", ra.ii, ra.ij, ra.ik, ra.ji, ra.jj, ra.jk, ra.ki, ra.kj, ra.kk);
+    mat3x3_t ra;
+    Quaternion.toMatrix( &k->qd_, &ra);
+//    printf("xx:%.2f xy:%.2f xz:%.2f yz:%.2f yy:%.2f yz:%.2f zx:%.2f zy:%.2f zz:%.2f\n", ra.ii, ra.ij, ra.ik, ra.ji, ra.jj, ra.jk, ra.ki, ra.kj, ra.kk);
+    ang3_t a;
+    Quaternion.toEuler( &k->qd_, &a );
+//    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
 
-    n = ( k->qa.x * k->qa.y ) + ( k->qa.w * k->qa.z );
+    n = 1 - 2 * ( ( k->qd_.y * k->qd_.y ) + ( k->qd_.z * k->qd_.z ) );
 //    n = ra.ij/2;//1.0 - ( 2 * m );
     //OP2A: k->mu = -RASIN( n );
     if( fabs(n) < 1 )
     {
-        k->mu = asin( n );
+        k->mu = acos( n );
+//        printf("x>x %.2f %.2fdeg\n", ra.ii, k->mu*RAD_TO_DEG);
         return 1;
     }
     else k->mu = SIGN( n ) * M_PI_2;
@@ -195,11 +214,11 @@ static void Kinetic_R( kinetic_t * k )
 {
     KineticFunctions.R_l(k);
     vec3_t r_u = { 0, k->r_l, 0 };
-    Quaternion.rotVec( &r_u, &k->qa, &k->r );
+    Quaternion.rotVec( &r_u, &k->qd, &k->r );
     
-//    ang3_t va;
-//    Quaternion.toEuler( &k->qa, &va );
-//    printf("<%.2f, %.2f, %.2f>\n", va.x*RAD_TO_DEG, va.y*RAD_TO_DEG, va.z*RAD_TO_DEG);
+    ang3_t d;
+    Quaternion.toEuler( &k->qd, &d );
+    printf("<%.2f, %.2f, %.2f>\n", d.x*RAD_TO_DEG, d.y*RAD_TO_DEG, d.z*RAD_TO_DEG);
 }
 
 static void Kinetic_Print( kinetic_t * k )

@@ -78,7 +78,8 @@ double update( kalman_t * k, double value_new, double rate_new, update_type_c ty
 
     k->velocity = k->rate;
     k->timestamp = now;
-    
+    if(k->value != k->value)
+        printf("!");
     return k->value;
 };
 
