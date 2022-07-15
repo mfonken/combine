@@ -12,6 +12,8 @@
 #include "kinetic.h"
 #include "orienter.h"
 
+#include <sstream>
+
 #define DEBUG_KU
 
 #ifdef DEBUG_KU
@@ -24,7 +26,6 @@ class KineticUtility : public TestInterface
 {
     const std::string name;
     void  init( void );
-    string serialize( void );
     
     kinetic_t kin;
     kinetic_config_t * config;
@@ -34,8 +35,8 @@ class KineticUtility : public TestInterface
     kpoint_t A;
     kpoint_t B;
     
-
 public:
+    string serialize( void );
     pthread_mutex_t mutex;
     pthread_mutex_t point_data_mutex;
     pthread_mutex_t orienter_data_mutex;

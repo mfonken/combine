@@ -89,7 +89,7 @@ static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O )//, ang3_t * e
     /* Get proper device angles from kinetic */
     Quaternion.copy( O, &k->qd );
     Quaternion.toEuler( O, &k->e );
-    printf("θ:%d | φ:%d | ψ:%d>\n", (int)(k->e.x*RAD_TO_DEG), (int)(k->e.y*RAD_TO_DEG), (int)(k->e.z*RAD_TO_DEG));
+//    printf("θ:%d | φ:%d | ψ:%d>\n", (int)(k->e.x*RAD_TO_DEG), (int)(k->e.y*RAD_TO_DEG), (int)(k->e.z*RAD_TO_DEG));
     
     /* Rotate beacon A around origin by roll(r.y) and calculate nu and upsilon as horizontal and vertical angle offset */
     double cos_ry = cos(-k->e.y), sin_ry = sin(-k->e.y);
@@ -119,7 +119,7 @@ static void Kinetic_Quaternions( kinetic_t * k, quaternion_t * O )//, ang3_t * e
 //    Quaternion.combine( &k->qc, &k->qd, &k->qa );
 //    ang3_t a;
 //    Quaternion.toEuler( &k->qa, &a );
-    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
+//    printf("<%.2f, %.2f, %.2f>\n", a.x*RAD_TO_DEG, a.y*RAD_TO_DEG, a.z*RAD_TO_DEG);
     
 //    ang3_t b = { k->e.x, k->e.y + k->omega, k->e.z };
 //    Quaternion.fromEuler( &b, &k->qc_ );
@@ -216,9 +216,9 @@ static void Kinetic_R( kinetic_t * k )
     vec3_t r_u = { 0, k->r_l, 0 };
     Quaternion.rotVec( &r_u, &k->qd, &k->r );
     
-    ang3_t d;
-    Quaternion.toEuler( &k->qd, &d );
-    printf("<%.2f, %.2f, %.2f>\n", d.x*RAD_TO_DEG, d.y*RAD_TO_DEG, d.z*RAD_TO_DEG);
+//    ang3_t d;
+//    Quaternion.toEuler( &k->qd, &d );
+//    printf("<%.2f, %.2f, %.2f>\n", d.x*RAD_TO_DEG, d.y*RAD_TO_DEG, d.z*RAD_TO_DEG);
 }
 
 static void Kinetic_Print( kinetic_t * k )

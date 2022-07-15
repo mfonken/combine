@@ -117,9 +117,9 @@ int SerialWriter::isInitialized()
     else return 0;
 }
 
-void SerialWriter::write( std::string data )
+void SerialWriter::write( std::string data, bool append )
 {
-    if(type == SFILE) writer.trigger(data);
+    if(type == SFILE) writer.trigger(data, append);
     else Write_SERCOM_Bytes( channel.filestream, data.c_str(), (int)data.length() );
 }
 

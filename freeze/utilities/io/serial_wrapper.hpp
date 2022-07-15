@@ -55,7 +55,7 @@ public:
     SerialWriter_STATUS handshake( const char *, int, int );
     
     int isInitialized();
-    void write(std::string);
+    void write(std::string, bool append=true);
     std::string read(int);
 };
 

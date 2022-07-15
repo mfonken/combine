@@ -40,7 +40,15 @@ void KineticUtility::init()
 
 string KineticUtility::serialize()
 {
-    return this->name;
+    stringstream ss;
+    ss  << 'n' << ','
+        << kin.e.x << ','
+        << kin.e.y << ','
+        << kin.e.z << ','
+        << position[0].value << ','
+        << position[1].value << ','
+        << position[2].value;
+    return ss.str();
 }
 
 void KineticUtility::trigger()
