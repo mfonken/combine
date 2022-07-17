@@ -41,7 +41,7 @@ typedef struct
     int brightness;
 } keypoint_ext_t;
 
-class RhoDetector// : public TestInterface
+class BlobDetector// : public TestInterface
 {
 //    int id;
     const std::string name;
@@ -69,7 +69,7 @@ public:
     std::vector<cv::Point2f> pts;
     std::vector<cv::Point2f> centroids;
     
-    RhoDetector( camera_intrinsics_t * cam, string name = "DetectorUtil" );
+    BlobDetector( camera_intrinsics_t * cam, string name = "DetectorUtil" );
 //    void trigger( void );
     void perform( cv::Mat );
     void calcCentroids(cv::Mat M);

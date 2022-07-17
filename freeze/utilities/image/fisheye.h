@@ -14,14 +14,10 @@ extern "C" {
 
 #include <math.h>
 #include <stdbool.h>
+#include "image_types.h"
 
 #define FISHEYE_EPS 1e-8
 
-typedef struct
-{
-    double K[3][3];
-    double D[4];
-} camera_intrinsics_t;
 
 //static void populate_intrinsics( camera_intrinsics_t * intrinsics, double * fx, double * fy, double * cx, double * cy, double * k1, double * k2, double * p1, double * p2 )
 //{

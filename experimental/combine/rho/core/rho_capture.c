@@ -3,21 +3,27 @@
 index_t * RhoCapture_CaptureRow( register byte_t sub_sample,   // capture buffer index
 				 const register byte_t * capture_address,
                  const register byte_t thresh_value,    // address of thresh buffer
-				 register index_t * thresh_address)
+				 register index_t * thresh_address,
+                 const index_t length )
 {
     register uint32_t working_register = 0;
     register uint32_t capture_offset = 0;
-
+    int i = 0, j = 0;
 #ifndef __ASSEMBLY_RHO__
     while( 1 )
     {
         working_register = *( capture_address + capture_offset );
         capture_offset += sub_sample;
-        if( capture_offset >= CAPTURE_BUFFER_SIZE )
+        if( capture_offset >= length )
         	break;
         if( working_register >= thresh_value )
+        {
             *(thresh_address++) = capture_offset;
+            j++;
+        }
+        i++;
     }
+    printf(">>> %d | %d\n", i, j);
 #else
     __asm volatile
 	(
@@ -139,3 +145,9 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t rows,
 #endif
     return (section_process_t){ Q_left, Q_right, Dx_i >= Dx_end };
 }
+
+rho_capture_functions RhoCapture =
+{
+    .CaptureRow = RhoCapture_CaptureRow,
+    .ProcessFrameSection = RhoCapture_ProcessFrameSection
+};

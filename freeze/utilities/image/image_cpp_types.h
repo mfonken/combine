@@ -21,7 +21,7 @@ static void cimageInit( cimage_t& img, int width, int height )
 
 static void cimageFromMat( cv::Mat &mat, cimage_t& img )
 {
-    if(mat.cols != img.width)
+    if(mat.cols != img.width || mat.rows != img.height)
         return;
     int w = mat.cols, h = mat.rows, p = 0;
     for(int y = 0; y < h; y++ )

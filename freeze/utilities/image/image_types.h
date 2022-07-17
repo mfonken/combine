@@ -16,5 +16,10 @@ typedef struct
     pixel_base_t * pixels;
 } cimage_t;
 
+typedef struct
+{
+    double K[3][3];
+    double D[4];
+} camera_intrinsics_t;
 
 #endif /* image_types_h */

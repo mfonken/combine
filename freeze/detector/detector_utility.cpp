@@ -17,7 +17,7 @@
 using namespace cv;
 using namespace std;
 
-RhoDetector::RhoDetector( camera_intrinsics_t * cam, string name )
+BlobDetector::BlobDetector( camera_intrinsics_t * cam, string name )
 : cam(cam), name(name)
 {
     params.minDistBetweenBlobs  = 10; //Minimum distance between blobs
@@ -86,7 +86,7 @@ static vector<keypoint_ext_t> GetBrightnessOfKeyPoints(Mat M, vector<KeyPoint> k
     return brightnesses;
 }
 
-void RhoDetector::perform( Mat M )
+void BlobDetector::perform( Mat M )
 {
     vector<KeyPoint> points;
 //    Mat Mb;
@@ -139,7 +139,7 @@ void RhoDetector::perform( Mat M )
 }
 
 #define radius 10
-void RhoDetector::draw(cv::Mat M)
+void BlobDetector::draw(cv::Mat M)
 {
     LOG_DET(DEBUG_1, "draw - %d\n", (int)keypoints.size());
     if(keypoints.size() == 0) return;

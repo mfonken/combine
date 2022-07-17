@@ -9,7 +9,6 @@
 
 #include "webcam_utility.hpp"
 #include "timestamp.h"
-#include "fisheye.h"
 
 using namespace cv;
 using namespace std;

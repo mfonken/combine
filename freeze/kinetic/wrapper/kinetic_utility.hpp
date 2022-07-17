@@ -29,7 +29,8 @@ class KineticUtility : public TestInterface
     
     kinetic_t kin;
     kinetic_config_t * config;
-    kalman_t position[3];
+    vec3_t position;
+//    kalman_filter_t position[3];
     vec3_t n;
     quaternion_t O;
     kpoint_t A;

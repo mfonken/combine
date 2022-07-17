@@ -14,6 +14,7 @@
 #include <stdbool.h>
 
 #include "rho_structure.h"
+#include "../rho_config.h"
 #ifdef __PSM__
 #include "../psm/psm.h"
 #else
@@ -157,7 +158,7 @@ typedef struct
 //  uint8_t (*Transmit)( byte_t *, uint16_t);
 //} rho_platform_uart_interace_functions;
 
-#ifndef STAND_ALONE
+#ifndef __RHO_STAND_ALONE__
 #ifndef __USE_DECOUPLING__
 typedef struct
 {
@@ -287,13 +288,13 @@ typedef struct
     density_map_pair_t density_map_pair;
     index_t width;
 	index_t height;
+    byte_t subsample;
+    byte_t thresh_byte;
 	index_t rows_left;
 	index_pair_t primary;
 	index_pair_t secondary;
 	index_pair_t centroid;
 	index_pair_t background_centroid;
-    byte_t subsample;
-    byte_t thresh_byte;
     byte_t background_counter;
 	density_2d_t quadrant[4];
     density_2d_t quadrant_background[4];

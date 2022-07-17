@@ -6,7 +6,7 @@
 #ifndef rho_global_h
 #define rho_global_h
 
-#ifndef STAND_ALONE
+#ifndef __RHO_STAND_ALONE__
 #include "../UniSM/system_master.h"
 #include "../UniLog/unilog.h"
 #include "../App/states.h"
@@ -44,7 +44,7 @@ typedef uint32_t	    address_t;
 //#define USE_BACKGROUNDING
 // #define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define RHO_DEBUG               DEBUG_1
+#define RHO_DEBUG               DEBUG_2
 #define RHO_DEBUG_2             DEBUG_1
 #define RHO_DEBUG_INIT          DEBUG_1
 #define RHO_DEBUG_UPDATE        DEBUG_1

@@ -9,6 +9,10 @@
 #ifndef timestamp_h
 #define timestamp_h
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/time.h>
@@ -29,25 +33,12 @@ typedef enum
 //    TIME_NS
 } TIME_UNIT;
 
-static double TIMESTAMP(TIME_UNIT unit)
-{
-    struct timeval stamp;
-    gettimeofday(&stamp, NULL);
-    double t = 0;
-    if( unit == TIME_SEC )
-        t = stamp.tv_sec + stamp.tv_usec * 1.0e-6;
-    else if( unit == TIME_MS )
-        t = stamp.tv_sec * 1.0e3 + stamp.tv_usec * 1.0e-3;
-    else if( unit == TIME_US )
-        t = stamp.tv_sec * 1.0e6 + stamp.tv_usec;
-//    else if( unit == TIME_NS )
-//        t = stamp.tv_sec * 1.0e9 + stamp.tv_usec * 1.0e3;
-    return t;
-}
+double TIMESTAMP(TIME_UNIT unit);
+double TIMESTAMP_MS(void);
+bool ISTIMEDOUT( double check, double time_out, TIME_UNIT unit );
 
-static bool ISTIMEDOUT( double check, double time_out, TIME_UNIT unit )
-{
-    return ( TIMESTAMP(unit) - check ) > time_out;
+#ifdef __cplusplus
 }
+#endif
 
 #endif /* timestamp_h */

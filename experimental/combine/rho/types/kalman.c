@@ -1,7 +1,7 @@
 #include "kalman.h"
-#ifndef TIMESTAMP
+//#ifndef TIMESTAMP
 #include "timestamp.h"
-#endif
+//#endif
 /*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
 void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floating_t minv, floating_t maxv, kalman_uncertainty_c uncertainty )

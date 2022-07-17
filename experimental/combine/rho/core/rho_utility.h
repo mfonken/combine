@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include "../types/rho_types.h"
+#include "timestamp.h"
 
 #define RHO_UTILITY_NAME "RhoUtility"
 #define RHO_UTILITY_NAME_BUILDER(DATA) NAME_BUILDER(RHO_UTILITY_NAME, DATA)
@@ -28,7 +29,8 @@ extern "C" {
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                          Static Buffers                              *
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-  sdensity_t FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
+  static sdensity_t
+    FOREGROUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
     FOREGROUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE],
     BACKGROUND_DENSITY_MAP_Y[DENSITY_MAP_W_SIZE],
     BACKGROUND_DENSITY_MAP_X[DENSITY_MAP_H_SIZE],

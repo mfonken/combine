@@ -10,8 +10,8 @@
 
 #include "types/maths_master.h"
 #include "rho_packet.h"
-
-extern double TIMESTAMP( void );
+#include "timestamp.h"
+//extern double TIMESTAMP( void );
 
 #ifdef __OV9712__
 #include "../App/OV9712/OV9712.h"
@@ -19,7 +19,7 @@ extern double TIMESTAMP( void );
 #define FRAME_WIDTH_BASE 0
 #define FRAME_HEIGHT 0
 #define CAPTURE_BUFFER_LENGTH 0
-#define THRESH_BUFFER_LENGTH 0
+#define THRESH_BUFFER_LENGTH (1 << 18)
 #endif
 
 //#define SPOOF_STATE_BANDS
@@ -89,7 +89,6 @@ extern double TIMESTAMP( void );
 #define MAX_REGION_SCORE        10
 #define REGION_SCORE_FACTOR     0.5
 #define MAX_NU_REGIONS          NUM_STATE_GROUPS+1
-#define MAX_OBSERVATIONS        (1 << 4)
 #define MIN_CHAOS               1.0
 
 #define MAX_RHO_RECALCULATION_LEVEL 3

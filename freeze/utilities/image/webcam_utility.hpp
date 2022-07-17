@@ -11,6 +11,7 @@
 #include "environment_master.hpp"
 #include "opencv_master.h"
 #include "fisheye.h"
+#include "image_types.h"
 
 #define DEBUG_WU
 
@@ -28,10 +29,10 @@ class WebcamUtility : public TestInterface
     string serialize( void );
     
     int rate;
-    cv::Size size;
     cv::VideoCapture cam;
     
 public:
+    cv::Size size;
     double frame_time_ms;
     cv::Mat raw, frame;
     pthread_mutex_t mutex;

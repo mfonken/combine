@@ -29,11 +29,11 @@ KineticUtility::~KineticUtility()
 
 void KineticUtility::init()
 {
-    kalman_uncertainty_c uncertainty = { 1e-4, 1e-4, 1e-4 };
-    for( int i = 0; i < 3; i++ )
-    {
-        Kalman.init( &position[i], 0, 50000, uncertainty );
-    }
+//    kalman_uncertainty_c uncertainty = { 1e-4, 1e-4, 1e-4 };
+//    for( int i = 0; i < 3; i++ )
+//    {
+//        Kalman.init( &position[i], 0, 50000, uncertainty );
+//    }
 //    KineticFunctions.Init( &kin, *config );
     OrienterFunctions.Init( &orienter );
 };
@@ -45,9 +45,9 @@ string KineticUtility::serialize()
         << kin.e.x << ','
         << kin.e.y << ','
         << kin.e.z << ','
-        << position[0].value << ','
-        << position[1].value << ','
-        << position[2].value;
+        << position.i << ','
+        << position.j << ','
+        << position.k;
     return ss.str();
 }
 
@@ -55,11 +55,12 @@ void KineticUtility::trigger()
 { //LOCK(&mutex)
     LOG_KU(DEBUG_1, "trigger\n");
     KineticFunctions.UpdatePosition( &kin, &O, &A, &B );
-    for( int i = 0; i < 3; i++ )
-    {
-        position[i].value = ((double *)&kin.r.i)[i];
-//        Kalman.update( &position[i], ((double *)&kin.r.i)[i], 0, VELOCITY );
-    }
+    position = kin.r;
+//    for( int i = 0; i < 3; i++ )
+//    {
+//        position[i].value = ((double *)&kin.r.i)[i];
+////        Kalman.update( &position[i], ((double *)&kin.r.i)[i], 0, VELOCITY );
+//    }
 }
 
 void KineticUtility::UpdateIMUData( vec3_t * nong, vec3_t * ang )//, vec3_t * rate )
@@ -84,9 +85,9 @@ vec3_t KineticUtility::GetPosition()
 { LOCK(&mutex)
     vec3_t pos =
     {
-        position[0].value,
-        position[1].value,
-        position[2].value
+        position.i,
+        position.j,
+        position.k
     };
     return pos;
 }

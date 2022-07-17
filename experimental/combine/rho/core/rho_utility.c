@@ -52,7 +52,7 @@ void RhoUtility_InitializeData( rho_core_t * core, index_t width, index_t height
     KumaraswamyFunctions.Initialize( &core->kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
     FSMFunctions.Sys.Initialize( &core->state_machine, "A", &core->state_transitions, CHAOTIC );
 
-    core->timestamp = TIMESTAMP();
+    core->timestamp = TIMESTAMP_MS();
 }
 
 void RhoUtility_InitializeFilters( rho_core_t * core )
@@ -990,7 +990,7 @@ void RhoUtility_GeneratePacket( rho_core_t * core )
         (address_t*)&packet_value_lookup,
         0
     };
-    _.packet->header.timestamp = TIMESTAMP();
+    _.packet->header.timestamp = TIMESTAMP_MS();
     while( _.i++ < NUM_PACKET_ELEMENTS )
     {
         if( _.packet->header.includes & 0x01 )
