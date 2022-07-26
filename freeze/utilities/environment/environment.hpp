@@ -142,7 +142,6 @@ class Environment
 {
 private:
     pthread_cond_t  condition;
-    string name;
     
     int interval;
     
@@ -153,6 +152,7 @@ private:
     
     double  ticks_per_sec;
 public:
+    string name;
     pthread_mutex_t lock;
     int ticks;
     ENV_STATUS status;

@@ -19,10 +19,10 @@ static void cimageInit( cimage_t& img, int width, int height )
     img.pixels = (pixel_base_t *)malloc(sizeof(pixel_base_t)*width*height);
 }
 
-static void cimageFromMat( cv::Mat &mat, cimage_t& img )
+static bool cimageFromMat( cv::Mat &mat, cimage_t& img )
 {
     if(mat.cols != img.width || mat.rows != img.height)
-        return;
+        return false;
     int w = mat.cols, h = mat.rows, p = 0;
     for(int y = 0; y < h; y++ )
     {
@@ -32,6 +32,7 @@ static void cimageFromMat( cv::Mat &mat, cimage_t& img )
             img.pixels[p] = pixelDist(c);
         }
     }
+    return true;
 }
 static void cimageToMat( cimage_t& img, cv::Mat mat )
 {
@@ -48,6 +49,19 @@ static void cimageToMat( cimage_t& img, cv::Mat mat )
             cv::Vec3b c = {d,d,d};
             mat.at<cv::Vec3b>(y,x) = c;
         }
+    }
+}
+
+static void cimagePrint( const cimage_t& img )
+{
+    int i = 0;
+    for(int y = 0; y < img.height; y++)
+    {
+        for(int x = 0; x < img.width; x++)
+        {
+            printf(" %d", img.pixels[i++]);
+        }
+        printf("\n");
     }
 }
 

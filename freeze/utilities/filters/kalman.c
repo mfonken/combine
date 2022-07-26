@@ -12,7 +12,7 @@ void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floatin
     k->uncertainty.bias    = uncertainty.bias;
     k->uncertainty.sensor  = uncertainty.sensor;
     
-    k->origin    = TIMESTAMP_MS();
+    k->origin    = TIMESTAMP(TIME_SEC);
     k->timestamp = k->origin;
     
     k->min_value = minv;
@@ -39,17 +39,17 @@ void ResetKalman( kalman_filter_t * k, floating_t v )
     k->flag        = 0;
     k->score       = 0;
     k->value       = v;
-    k->origin      = TIMESTAMP_MS();
+    k->origin      = TIMESTAMP(TIME_SEC);
 }
 
 void PredictKalman( kalman_filter_t * k, floating_t rate_new )
 {
-    floating_t delta_time = TIMESTAMP_MS() - k->timestamp;
+    floating_t delta_time = TIMESTAMP(TIME_SEC) - k->timestamp;
     
     /* Quick expiration check */
     if(delta_time > k->lifespan)
     {
-        k->timestamp = TIMESTAMP_MS();
+        k->timestamp = TIMESTAMP(TIME_SEC);
         return;
     }
     
@@ -94,7 +94,7 @@ void UpdateKalman( kalman_filter_t * k, floating_t value_new )
     k->P[1][0]   -= k->K[1] * k->P[0][0];
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
-    k->timestamp  = TIMESTAMP_MS();
+    k->timestamp  = TIMESTAMP(TIME_SEC);
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
     
@@ -117,7 +117,7 @@ floating_t StepKalman( kalman_filter_t * k, floating_t value_new, floating_t rat
 
 bool IsKalmanExpired( kalman_filter_t * k )
 {
-    return ((TIMESTAMP_MS() - k->timestamp) > k->lifespan);
+    return ((TIMESTAMP(TIME_SEC) - k->timestamp) > k->lifespan);
 }
 
 inline floating_t ScoreKalman( kalman_filter_t * k )

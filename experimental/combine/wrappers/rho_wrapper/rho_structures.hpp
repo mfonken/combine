@@ -132,14 +132,16 @@ typedef struct
 {
     uint32_t     CameraPort;                     /* Parallel port register to camera */
     uint32_t     HostTxPort;                     /* Output channel to host */
-    address_t     CaptureEnd;                     /* Effective end address for capture buffer */
-    address_t     CaptureMax;                     /* Actual end address for capture buffer */
-    address_t     ThreshEnd;                      /* Actual end of thresh buffer */
-    address_t     ThreshMax;                      /* Shared address of threshold value */
-    address_t     PixelCount;                     /* Shared address of pixel count value */
-    address_t     ProcessIndex;                      /* Address threhold buffer is processed */
-    byte_t         *Capture;                       /* Address capture buffer is processed */
-    index_t     *Thresh;                        /* Address threshold buffer is filled */
+    address_t    CaptureEnd;                     /* Effective end address for capture buffer */
+    address_t    CaptureMax;                     /* Actual end address for capture buffer */
+    index_t     *ThreshEnd;                      /* Actual end of thresh buffer */
+    address_t    ThreshMax;                      /* Shared address of threshold value */
+    address_t    PixelCount;                     /* Shared address of pixel count value */
+    address_t    ProcessIndex;                      /* Address threhold buffer is processed */
+    byte_t      *Capture;                       /* Address capture buffer is processed */
+    index_t     *ThreshFill;                        /* Address threshold buffer is filled */
+    address_t   *DMapXI;
+    
 //    dma_info_t     *CameraDMA;                          /* Address to camera DMA info */
 } rho_system_address_variables;
 
@@ -147,8 +149,8 @@ typedef struct
 {
     capture_t      *Capture;                      /* Raw capture buffer for DMA */
     index_t      *Thresh;                       /* Threshold processing buffer */
-    sdensity_t   *DensityY;                     /* Processed density X array */
-    sdensity_t   *DensityX;                     /* Processed density Y array */
+//    sdensity_t   *DensityY;                     /* Processed density X array */
+//    sdensity_t   *DensityX;                     /* Processed density Y array */
     density_2d_t *Quadrant;                     /* Quadrant density array */
 //    packet_t      *BeaconPacket;                 /* Data packet for beacon comm */
 } rho_system_buffer_variables;

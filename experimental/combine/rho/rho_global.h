@@ -47,16 +47,15 @@ typedef uint32_t	    address_t;
 #define RHO_DEBUG               DEBUG_2
 #define RHO_DEBUG_2             DEBUG_1
 #define RHO_DEBUG_INIT          DEBUG_1
-#define RHO_DEBUG_UPDATE        DEBUG_1
-#define RHO_DEBUG_DETECT        DEBUG_1
-#define RHO_DEBUG_DETECT_2      DEBUG_1
-#define RHO_DEBUG_PREDICT       DEBUG_1
-#define RHO_DEBUG_PREDICT_2     DEBUG_1
+#define RHO_DEBUG_DETECT        DEBUG_2
+#define RHO_DEBUG_DETECT_2      DEBUG_2
+#define RHO_DEBUG_PREDICT       DEBUG_2
+#define RHO_DEBUG_PREDICT_2     DEBUG_2
 #define RHO_DEBUG_UPDATE        DEBUG_1
 #define RHO_DEBUG_UPDATE_2      DEBUG_1
 
-//#define KALMAN_DEBUG            RHO_DEBUG
-//#define KALMAN_DEBUG_2          RHO_DEBUG_2
+#define KALMAN_DEBUG            RHO_DEBUG
+#define KALMAN_DEBUG_2          RHO_DEBUG_2
 
 //#define PSM_DEBUG               DEBUG_2
 //#define PSM_DEBUG_2             DEBUG_1
@@ -80,12 +79,6 @@ typedef uint32_t	    address_t;
 #else
 #define LOG_RHO(...)
 #define LOG_RHO_BARE(L,...)
-#endif
-
-#ifdef KALMAN_DEBUG
-#define LOG_KALMAN(L,...)       LOG(L,"<Kalman> " __VA_ARGS__)
-#else
-#define LOG_KALMAN(...)
 #endif
 
 #ifdef PACKET_DEBUG

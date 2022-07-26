@@ -16,8 +16,8 @@
 
 void RhoWrapper::Init( int width, int height )
 {
-    width = width;
-    height = height;
+    this->width = width;
+    this->height = height;
     
     LOG_RW(RHO_DEBUG, "Initializing Rho Utility: %dx%d & [KTarg-%f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     
@@ -25,10 +25,15 @@ void RhoWrapper::Init( int width, int height )
 //    pthread_mutex_init(&c_mutex, NULL);
 
     cimageInit( cimage, width, height );
-    RhoSystem.Variables.Buffers.Thresh = (index_t *)malloc(sizeof(index_t) * THRESH_BUFFER_SIZE);
-    RhoSystem.Variables.Addresses.Thresh = RhoSystem.Variables.Buffers.Thresh;
     
-    RhoCore.Initialize(&core, width, height);
+    
+    RhoCore.Initialize(&RhoSystem.Variables.Utility, width, height);
+    RhoSystem.Variables.Utility.subsample = 1; /// TODO: Find a place for this
+    
+    RhoSystem.Variables.Buffers.Thresh = (index_t *)malloc(sizeof(index_t) * THRESH_BUFFER_SIZE);
+    RhoSystem.Variables.Addresses.ThreshFill = RhoSystem.Variables.Buffers.Thresh;
+    RhoSystem.Variables.Buffers.Quadrant = RhoSystem.Variables.Utility.quadrant;
+    
     backgrounding_event = false;
     
     PrintSizes();
@@ -36,7 +41,8 @@ void RhoWrapper::Init( int width, int height )
 
 double RhoWrapper::Perform( cv::Mat & mat )
 {    
-    cimageFromMat( mat, cimage );
+    if(!cimageFromMat( mat, cimage ))
+        return -1;
     return Perform( cimage );
 }
 
@@ -45,6 +51,10 @@ double RhoWrapper::Perform( cimage_t & img )
 //    pthread_mutex_lock(&c_mutex);
 //    pthread_mutex_lock(&density_map_pair_mutex);
     
+    rho_core_t * core = &RhoSystem.Variables.Utility;
+    
+    RhoUtility.Reset.DensityMapPairKalmans( core );
+    
     /* Core Rho Functions */
     struct timeval a,b;
     gettimeofday( &a, NULL);
@@ -52,53 +62,88 @@ double RhoWrapper::Perform( cimage_t & img )
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
-    if(core.quadrant[0] + core.quadrant[1] + core.quadrant[2] + core.quadrant[3])
-        RhoCore.Perform( &core, backgrounding_event );
+    if(core->quadrant[0] + core->quadrant[1] + core->quadrant[2] + core->quadrant[3])
+        RhoCore.Perform( core, backgrounding_event );
     gettimeofday( &b, NULL);
 
     /* * * * * * * * * * */
     
 //    pthread_mutex_unlock(&density_map_pair_mutex);
-    memcpy((byte_t *)&packet, (byte_t*)&core.packet, sizeof(packet_t));
+    memcpy((byte_t *)&packet, (byte_t*)&core->packet, sizeof(packet_t));
     backgrounding_event = false; // Generate background always and only once
 //    pthread_mutex_unlock(&c_mutex);
     
     return timeDiff(a,b);
 }
 
+void RhoWrapper::Reset()
+{
+    RhoSystem.Variables.Addresses.ThreshFill = RhoSystem.Variables.Buffers.Thresh;
+    
+    memset( RhoSystem.Variables.Utility.density_map_pair.x.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.x.length);
+    memset( RhoSystem.Variables.Utility.density_map_pair.y.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.y.length);
+}
+
 void RhoWrapper::Decouple( const cimage_t image, bool backgrounding )
 {
+    Reset();
 //    if(backgrounding) ToggleBackgrounding(true);
     
-    printf("Start: %p\n", RhoSystem.Variables.Addresses.Thresh);
     RhoSystem.Variables.Addresses.Capture = (byte_t *)image.pixels;
     for( index_t y = 0; y < image.height; y += RhoSystem.Variables.Utility.subsample )
     {
-        RhoSystem.Variables.Addresses.Thresh = RhoCapture.CaptureRow(RhoSystem.Variables.Utility.subsample,
+        RhoSystem.Variables.Addresses.ThreshFill = RhoCapture.CaptureRow(RhoSystem.Variables.Utility.subsample,
                               RhoSystem.Variables.Addresses.Capture,
                               RhoSystem.Variables.Utility.thresh_byte,
-                              RhoSystem.Variables.Addresses.Thresh,
+                              RhoSystem.Variables.Addresses.ThreshFill,
                               image.width );
-        *(RhoSystem.Variables.Addresses.Thresh++) = CAPTURE_ROW_END;
+        *(RhoSystem.Variables.Addresses.ThreshFill++) = CAPTURE_ROW_END;
+        RhoSystem.Variables.Addresses.Capture += image.width;
 //        RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
     }
-    printf("End %p\n", RhoSystem.Variables.Addresses.Thresh);
+    RhoSystem.Variables.Addresses.ThreshEnd = RhoSystem.Variables.Addresses.ThreshFill;
+//    for(int i = 0; i < RhoSystem.Variables.Addresses.ThreshFill - thresh_start; i++)
+//    {
+//        printf("0x%x ", *(thresh_start + i));
+//    }
+//    printf("\n");
     
     section_process_t ProcessedSectionData[2];
     uint16_t rows = RhoSystem.Variables.Utility.centroid.y;
+//    printf("%p | %p\n", RhoSystem.Variables.Utility.density_map_pair.x.map, RhoSystem.Variables.Utility.density_map_pair.y.map);
+    index_t thresh_proc = 0, rows_proc = 0;
     for( byte_t i = 0; i < 2; i++ )
     {
         do{ ProcessedSectionData[i] = RhoCapture.ProcessFrameSection( rows,
-                RhoSystem.Variables.Buffers.Thresh,
-                RhoSystem.Variables.Addresses.Thresh,
-                RhoSystem.Variables.Utility.centroid.x,
-                RhoSystem.Variables.Utility.density_map_pair.y.map,
-                RhoSystem.Variables.Utility.density_map_pair.x.map );
+                                                                     RhoSystem.Variables.Buffers.Thresh + thresh_proc,
+                                                                     RhoSystem.Variables.Addresses.ThreshEnd,
+                                                                     RhoSystem.Variables.Utility.centroid.x,
+                                                                     RhoSystem.Variables.Utility.density_map_pair.y.map,
+                                                                     RhoSystem.Variables.Utility.density_map_pair.x.map + rows_proc );
         } while( !ProcessedSectionData[i].complete );
-        rows = RhoSystem.Variables.Utility.height;
+        rows = RhoSystem.Variables.Utility.height - rows;
+        thresh_proc += ProcessedSectionData[i].thresh_proc;
+        rows_proc += ProcessedSectionData[i].rows_proc;
     }
     
+//    printf("%p | %p\n", RhoSystem.Variables.Utility.density_map_pair.x.map, RhoSystem.Variables.Utility.density_map_pair.y.map);
+    
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedSectionData[0].left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = ProcessedSectionData[0].right;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = ProcessedSectionData[1].left;
+    RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedSectionData[1].right;
+    
 //    if(backgrounding) ToggleBackgrounding(false);
+}
+
+std::vector<cv::Point2f> RhoWrapper::GetPredictions()
+{
+    rho_core_t * core = &RhoSystem.Variables.Utility;
+    
+    std::vector<cv::Point2f> pts(2);
+    pts[0] = cv::Point2d(core->primary.x, core->primary.y);
+    pts[1] = cv::Point2d(core->secondary.x, core->secondary.y);
+    return pts;
 }
 
 void RhoWrapper::ToggleBackgrounding(bool on)

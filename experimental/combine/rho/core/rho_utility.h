@@ -45,8 +45,8 @@ extern "C" {
     void RhoUtility_InitializePrediction( prediction_t *, const char *, uint16_t );
     void RhoUtility_InitializeDensityMap( density_map_t *, const char *, uint16_t, uint16_t );
 
-    void RhoUtility_ResetForDetect( rho_detection_variables *, density_map_t *, prediction_t * );
-    void RhoUtility_ResetForPrediction( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
+    void RhoUtility_ResetDetect( rho_detection_variables *, density_map_t *, prediction_t * );
+    void RhoUtility_ResetPrediction( prediction_predict_variables *, prediction_pair_t *, index_pair_t );
     void RhoUtility_ResetDensityMapPairKalmans( rho_core_t * );
 
     void RhoUtility_PredictPeakFilter( rho_detection_variables *, density_map_t *, prediction_t * );
@@ -55,13 +55,13 @@ extern "C" {
     void RhoUtility_SortTrackingFilters( prediction_t * );
     void RhoUtility_PredictTrackingProbabilities( prediction_t * );
 
-    void RhoUtility_PerformDetect( rho_detection_variables *, density_map_t *, prediction_t * );
-    bool RhoUtility_CalculateBandLowerBound( rho_detection_variables * );
+    void RhoUtility_DetectPerform( rho_detection_variables *, density_map_t *, prediction_t * );
+    bool RhoUtility_DetectLowerBound( rho_detection_variables * );
     void RhoUtility_DetectRegions( rho_detection_variables *, density_map_t *, prediction_t * );
     void RhoUtility_DetectRegion( rho_detection_variables *, density_map_t *, prediction_t * );
 #ifdef __USE_ZSCORE_THRESHOLD__
-    uint16_t RhoUtility_ZscoreLowerBound( rho_detection_variables * );
-    bool RhoUtility_ZscoreRegion( rho_detection_variables *, bool );
+    uint16_t RhoUtility_DetectZLower( rho_detection_variables * );
+    bool RhoUtility_DetectZRegion( rho_detection_variables *, bool );
 #endif
     void RhoUtility_SubtractBackgroundForDetection( rho_detection_variables * );
     void RhoUtility_CalculateChaos( rho_detection_variables *, prediction_t * );
@@ -189,8 +189,8 @@ extern "C" {
         .Initialize.Prediction = RhoUtility_InitializePrediction,
         .Initialize.DensityMap = RhoUtility_InitializeDensityMap,
 
-        .Reset.Detect = RhoUtility_ResetForDetect,
-        .Reset.Prediction = RhoUtility_ResetForPrediction,
+        .Reset.Detect = RhoUtility_ResetDetect,
+        .Reset.Prediction = RhoUtility_ResetPrediction,
         .Reset.DensityMapPairKalmans = RhoUtility_ResetDensityMapPairKalmans,
 
         .Predict.PeakFilter = RhoUtility_PredictPeakFilter,
@@ -208,13 +208,13 @@ extern "C" {
         
         .Predict.UpdatePredictiveStateModelPair = RhoUtility_UpdatePredictiveStateModelPair,
 
-        .Detect.Perform = RhoUtility_PerformDetect,
-        .Detect.LowerBound = RhoUtility_CalculateBandLowerBound,
+        .Detect.Perform = RhoUtility_DetectPerform,
+        .Detect.LowerBound = RhoUtility_DetectLowerBound,
         .Detect.Regions = RhoUtility_DetectRegions,
         .Detect.Region = RhoUtility_DetectRegion,
 #ifdef __USE_ZSCORE_THRESHOLD__
-        .Detect.ZLower = RhoUtility_ZscoreLowerBound,
-        .Detect.ZRegion = RhoUtility_ZscoreRegion,
+        .Detect.ZLower = RhoUtility_DetectZLower,
+        .Detect.ZRegion = RhoUtility_DetectZRegion,
 #endif
         .Detect.SubtractBackground = RhoUtility_SubtractBackgroundForDetection,
         .Detect.CalculateChaos = RhoUtility_CalculateChaos,

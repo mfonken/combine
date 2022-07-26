@@ -23,7 +23,6 @@ index_t * RhoCapture_CaptureRow( register byte_t sub_sample,   // capture buffer
         }
         i++;
     }
-    printf(">>> %d | %d\n", i, j);
 #else
     __asm volatile
 	(
@@ -61,6 +60,7 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t rows,
 				register sdensity_t * Dy,
 				register sdensity_t * Dx_i )
 {
+    if(rows == 0) return (section_process_t) { 0, 0, true };
     register uint32_t value_register 	= 0;
     const register sdensity_t * Dx_end  = Dx_i + rows;
 	register density_2d_t Q_total       = 0;
@@ -68,11 +68,13 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t rows,
 	register density_2d_t Q_left        = 0;
 	register density_2d_t Q_right       = 0;
     bool complete = false;
+    index_t thresh_proc = 0, rows_proc = 0;
 
 #ifndef __ASSEMBLY_RHO__
     while( thresh_address <= thresh_end )
     {
-        value_register = *thresh_address++;
+        value_register = *(thresh_address++);
+        thresh_proc++;
         if(value_register < CAPTURE_WIDTH)
         {
             if( value_register < Cx )
@@ -85,6 +87,7 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t rows,
         {
             Q_total = Q_left + Q_right;
             *(Dx_i++) = Q_total - Q_prev; /// Ensure Dx_i increments by proper width
+            rows_proc++;
             Q_prev = Q_total;
             if( Dx_i >= Dx_end )
             {
@@ -143,8 +146,57 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t rows,
 		[cap_s] "I" (CAPTURE_BUFFER_SIZE)
     );
 #endif
-    return (section_process_t){ Q_left, Q_right, Dx_i >= Dx_end };
+    return (section_process_t){ Q_left, Q_right, thresh_proc, rows_proc, Dx_i >= Dx_end };
 }
+
+//#define MAX_BLOBS 3
+
+//{ // xy pair
+//    index_t blob[MAX_BLOBS];
+//    typedef struct
+//    {
+//        byte_t * density_map;
+//    } density_map_stack_t;
+//}
+
+//typedef struct
+//{
+//    index_t x, y;
+//    index_t w, h;
+//    byte_t x_blob_i, y_blob_i;
+//} rect_t;
+//
+//density_2d_t DensityOfRect(rect_t rect)
+//{
+//
+//}
+//
+//void GetAmbiguousRects(index_t blobs_x[], index_t blobs_y[], byte_t n_)
+//{ // n_ is n blobs + 1 for end of last
+//    rect_t rect;
+//    byte_t i = 0, n = n_ - 1, x, x_ = 0, y;
+//    while( i-- > 0 )
+//    {
+//        density_2d_t den[n] = { 0 };
+//        for( y = 0; y < n; x_++, y++ )
+//        {
+//            x = x_ % n;
+//            rect.x = blobs_x[x];
+//            rect.y = blobs_y[y];
+//            rect.w = blobs_x[x+1] - rect.x;
+//            rect.h = blobs_y[y+1] - rect.y;
+//
+//            den[y] = DensityOfRect(rect);
+//        }
+//        density_2d_t sum = 0;
+//        for( y = 0; y < n; y++ )
+//        {
+//
+//        }
+//        x_++;
+//    }
+//}
+
 
 rho_capture_functions RhoCapture =
 {

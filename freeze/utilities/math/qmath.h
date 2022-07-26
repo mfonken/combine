@@ -1,6 +1,5 @@
 //
-//  imu_math.h
-//  IMU Math
+//  math.h
 //
 //  Created by Matthew Fonken on 12/18/17.
 //  Copyright © 2017 Marbl. All rights reserved.

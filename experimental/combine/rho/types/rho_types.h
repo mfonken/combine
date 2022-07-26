@@ -142,6 +142,7 @@ typedef struct
 typedef struct
 {
     density_2d_t left, right;       /* Direction density values */
+    index_t thresh_proc, rows_proc;
     bool complete;
 } section_process_t;
 

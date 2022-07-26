@@ -31,7 +31,7 @@ class RhoWrapper
 public:
     int                 width;
     int                 height;
-    rho_core_t          core;
+//    rho_core_t          core;
 //    pthread_mutex_t     c_mutex;
 //    pthread_mutex_t     density_map_pair_mutex;
     bool                backgrounding_event;
@@ -41,7 +41,9 @@ public:
     void Init( int, int );
     double Perform( cv::Mat& );
     double Perform( cimage_t& );
+    void Reset();
     void Decouple( const cimage_t, bool );
+    std::vector<cv::Point2f> GetPredictions();
     void ToggleBackgrounding( bool );
     void PrintSizes( void );
 };
