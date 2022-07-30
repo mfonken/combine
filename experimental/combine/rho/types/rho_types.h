@@ -125,6 +125,7 @@ typedef struct
                     num_regions,
 //                    BestConfidence,
                     average_density;
+    bool            descending;
 } prediction_pair_t;
 
 typedef struct
@@ -139,12 +140,6 @@ typedef struct
         proposed_avg_den;
 } psm_pair_t;
 
-typedef struct
-{
-    density_2d_t left, right;       /* Direction density values */
-    index_t thresh_proc, rows_proc;
-    bool complete;
-} section_process_t;
 
 //typedef struct
 //{

@@ -16,7 +16,7 @@
 #ifdef __OV9712__
 #include "../App/OV9712/OV9712.h"
 #else
-#define FRAME_WIDTH_BASE 1920 // 1280
+#define FRAME_WIDTH_BASE 1080 //1920 // 1280
 #define FRAME_HEIGHT 1080 // 720
 #define CAPTURE_BUFFER_LENGTH FRAME_WIDTH_BASE
 #define THRESH_BUFFER_LENGTH (1 << 18)
@@ -120,16 +120,16 @@
 #define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
 #define RHO_DEFAULT_LS      5.          // Lifespan
-#define RHO_DEFAULT_VU      0.2       // Value uncertainty
+#define RHO_DEFAULT_VU      1       // Value uncertainty
 #define RHO_DEFAULT_BU      0           // Bias uncertainty
 #define RHO_DEFAULT_SU      0.2        // Sensor uncertainty
 #define DEFAULT_KALMAN_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
 #define RHO_PREDICTION_LS   10.
-#define RHO_PREDICTION_VU   0.5
+#define RHO_PREDICTION_VU   1
 #define RHO_PREDICTION_BU   0
-#define RHO_PREDICTION_SU   0
+#define RHO_PREDICTION_SU   0.01
 #define DEFAULT_PREDICTION_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 

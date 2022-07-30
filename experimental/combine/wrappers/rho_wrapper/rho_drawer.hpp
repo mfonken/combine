@@ -14,6 +14,7 @@
 #include "rho_structures.hpp"
 #include "opencv_master.h"
 //#include "tau_utility.hpp"
+#include "rho_capture.h"
 
 #define SIDEBAR_WIDTH 25
 #define DENSITY_SCALE 1
@@ -64,8 +65,9 @@ public:
     int frame_rate_counter, frame_rate;
     
     rho_core_t * rho;
+    rho_capture_t * cap;
     
-    RhoDrawer( rho_core_t * rho );
+    RhoDrawer( rho_core_t * rho, rho_capture_t * cap );
     virtual ~RhoDrawer();
     Mat DrawAll(void);
     void GetDensitiesFrame(Mat&);

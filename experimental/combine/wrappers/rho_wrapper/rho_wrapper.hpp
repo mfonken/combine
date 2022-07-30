@@ -36,13 +36,17 @@ public:
 //    pthread_mutex_t     density_map_pair_mutex;
     bool                backgrounding_event;
     
+    rho_capture_t capture;
     rho_packet_t packet;
+    byte_t blob_padding = 50;
+    blob_t blobs[MAX_BLOBS];
+    byte_t active_blobs = 0;
     
     void Init( int, int );
     double Perform( cv::Mat& );
     double Perform( cimage_t& );
     void Reset();
-    void Decouple( const cimage_t, bool );
+    void Decouple( const cimage_t, bool, blob_t * blobs, byte_t n );
     std::vector<cv::Point2f> GetPredictions();
     void ToggleBackgrounding( bool );
     void PrintSizes( void );

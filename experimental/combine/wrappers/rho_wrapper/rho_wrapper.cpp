@@ -55,10 +55,37 @@ double RhoWrapper::Perform( cimage_t & img )
     
     RhoUtility.Reset.DensityMapPairKalmans( core );
     
+    // Create blobs if available
+    active_blobs = 0;
+    if( core->prediction_pair.num_regions >= 2)
+    {
+        for( byte_t i = 0; i < 2; i++ )
+        {
+            order_t * xi = &core->prediction_pair.x.regions_order[(i + (core->prediction_pair.descending ? 1 : 0)) % 2];
+            order_t * yi = &core->prediction_pair.y.regions_order[i];
+            if(!xi->valid || !yi->valid)
+            {
+                active_blobs = 0;
+                break;
+            }
+            
+            region_t * xr = &core->prediction_pair.x.regions[xi->index];
+            region_t * yr = &core->prediction_pair.y.regions[yi->index];
+            
+            /// Note: x and y are switched intentionally
+            blobs[i].x = MAX( 0, yr->location - yr->width / 2 - blob_padding );
+            blobs[i].y = MAX( 0, xr->location - xr->width / 2 - blob_padding );
+            blobs[i].w = yr->width + 2 * blob_padding;
+            blobs[i].h = xr->width + 2 * blob_padding;
+            
+            active_blobs++;
+        }
+    }
+    
     /* Core Rho Functions */
     struct timeval a,b;
     gettimeofday( &a, NULL);
-    Decouple( img, backgrounding_event );
+    Decouple( img, backgrounding_event, blobs, active_blobs );
 #ifdef DO_NOT_TIME_ACQUISITION
     gettimeofday( &a, NULL);
 #endif
@@ -84,19 +111,30 @@ void RhoWrapper::Reset()
     memset( RhoSystem.Variables.Utility.density_map_pair.y.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.y.length);
 }
 
-void RhoWrapper::Decouple( const cimage_t image, bool backgrounding )
+void RhoWrapper::Decouple( const cimage_t image, bool backgrounding, blob_t * blobs, byte_t n )
 {
     Reset();
 //    if(backgrounding) ToggleBackgrounding(true);
     
+    RhoCapture.ResetAll( &capture );
+    
+    // Prepare blobs
+    if( n > 0)
+    {
+        for( byte_t i = 0; i < n; i++ )
+            RhoCapture.AddBlob( &capture, blobs[i] );
+        RhoCapture.PrepareBlobsForCapture( &capture, image.height );
+    }
+    
     RhoSystem.Variables.Addresses.Capture = (byte_t *)image.pixels;
     for( index_t y = 0; y < image.height; y += RhoSystem.Variables.Utility.subsample )
     {
-        RhoSystem.Variables.Addresses.ThreshFill = RhoCapture.CaptureRow(RhoSystem.Variables.Utility.subsample,
+        RhoSystem.Variables.Addresses.ThreshFill = RhoCapture.CaptureRow(
                               RhoSystem.Variables.Addresses.Capture,
                               RhoSystem.Variables.Utility.thresh_byte,
                               RhoSystem.Variables.Addresses.ThreshFill,
-                              image.width );
+                              image.width,
+                              RhoSystem.Variables.Utility.subsample );
         *(RhoSystem.Variables.Addresses.ThreshFill++) = CAPTURE_ROW_END;
         RhoSystem.Variables.Addresses.Capture += image.width;
 //        RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;

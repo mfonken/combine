@@ -23,7 +23,7 @@ Vec3b blue     (255,   0,   0);
 
 Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
 
-RhoDrawer::RhoDrawer( rho_core_t * rho )
+RhoDrawer::RhoDrawer( rho_core_t * rho, rho_capture_t * cap )
 : frame(Size(rho->width + SIDEBAR_WIDTH,  rho->height + SIDEBAR_WIDTH), CV_8UC3, Scalar(0,0,0)),
 rho_frame(Size(PROBABILITIES_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)),
 rho_detection_x(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)),
@@ -35,6 +35,7 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)
 {
 //    LOG_RDR(DEBUG_2, "Initializing Rho Drawer.\n");
     this->rho = rho;
+    this->cap = cap;
     width = rho->width; height = rho->height;
     W = width + SIDEBAR_WIDTH; H = height + SIDEBAR_WIDTH;
     pid_data_x = 0; x_match_data_x = 0; y_match_data_x = 0; x_peak_data_x = 0; y_peak_data_x = 0; frame_i = 0; x_detection_i = 0; y_detection_i = 0;
@@ -349,6 +350,18 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
         int v = rho->prediction_pair.x.regions[o].location;
         line(M, Point(0,v),Point(width,v), bluish);
     }
+    
+    // Draw blobs
+    for( int i = 0; i < cap->num_blobs; i++ )
+    {
+        blob_t * blob = &cap->blobs[i];
+        Rect r(blob->x, blob->y, blob->w, blob->h);
+        rectangle(M, r, Scalar(0, 0, 255, 50), -1);
+    }
+    Point A(rho->primary.x, rho->primary.y);
+    Point B(rho->secondary.x, rho->secondary.y);
+    cv::circle(M, A, 10, Scalar(0, 0, 255, 100), -1);
+    cv::circle(M, B, 10, Scalar(255, 0, 0, 100), -1);
 }
 
 void RhoDrawer::DrawCurves(Mat& M)

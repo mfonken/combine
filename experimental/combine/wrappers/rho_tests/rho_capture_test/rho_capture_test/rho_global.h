@@ -34,11 +34,11 @@ typedef uint32_t *          address_t;
 typedef uint32_t	    address_t;
 #endif
 
-#define byte_t_max          ( (sizeof(byte_t)       << 3 ) - 1 )
-#define uint16_t_max        ( (sizeof(uint16_t)      << 3 ) - 1 )
-#define density_t_max       ( (sizeof(density_t)    << 3 ) - 1 )
-#define density_2d_t_max    ( (sizeof(density_2d_t) << 3 ) - 1 )
-#define sdensity_t_max      ( (sizeof(sdensity_t) << 3 ) - 1 )
+#define byte_t_max              ( (sizeof(byte_t)       << 3 ) - 1 )
+#define uint16_t_max             ( (sizeof(uint16_t)      << 3 ) - 1 )
+#define density_t_max           ( (sizeof(density_t)    << 3 ) - 1 )
+#define density_2d_t_max        ( (sizeof(density_2d_t) << 3 ) - 1 )
+#define sdensity_t_max  ( (sizeof(sdensity_t) << 3 ) - 1 )
 
 //#define __USE_DECOUPLING__
 //#define USE_BACKGROUNDING
@@ -47,10 +47,10 @@ typedef uint32_t	    address_t;
 #define RHO_DEBUG               DEBUG_2
 #define RHO_DEBUG_2             DEBUG_1
 #define RHO_DEBUG_INIT          DEBUG_1
-#define RHO_DEBUG_DETECT        DEBUG_1
-#define RHO_DEBUG_DETECT_2      DEBUG_1
-#define RHO_DEBUG_PREDICT       DEBUG_1
-#define RHO_DEBUG_PREDICT_2     DEBUG_1
+#define RHO_DEBUG_DETECT        DEBUG_2
+#define RHO_DEBUG_DETECT_2      DEBUG_2
+#define RHO_DEBUG_PREDICT       DEBUG_2
+#define RHO_DEBUG_PREDICT_2     DEBUG_2
 #define RHO_DEBUG_UPDATE        DEBUG_1
 #define RHO_DEBUG_UPDATE_2      DEBUG_1
 

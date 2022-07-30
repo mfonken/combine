@@ -739,6 +739,7 @@ void RhoUtility_ResetPrediction( prediction_predict_variables * _, prediction_pa
 
 void RhoUtility_CorrectPredictionAmbiguity( prediction_predict_variables * _, rho_core_t * core )
 {
+    core->prediction_pair.descending = true;
     /* Check if X or Y are ambiguous */
     if(   !( ( _->primary.x < _->centroid.x ) ^ ( _->secondary.x > _->centroid.x ) )
        || !( ( _->primary.y < _->centroid.y ) ^ ( _->secondary.y > _->centroid.y ) ) )
@@ -746,7 +747,10 @@ void RhoUtility_CorrectPredictionAmbiguity( prediction_predict_variables * _, rh
         RhoUtility.Predict.RedistributeDensities( core );
         _->quadrant_check = (  core->quadrant_final[0] > core->quadrant_final[1] ) + ( core->quadrant_final[2] < core->quadrant_final[3] ) - 1;
         if( ( _->primary.x > _->secondary.x ) ^ ( ( _->quadrant_check > 0 ) ^ ( _->primary.y < _->secondary.y ) ) )
+        {
             SWAP(_->primary.x, _->secondary.x);
+            core->prediction_pair.descending = false;
+        }
     }
 }
 
