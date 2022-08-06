@@ -61,7 +61,8 @@ double RhoWrapper::Perform( cimage_t & img )
     {
         for( byte_t i = 0; i < 2; i++ )
         {
-            order_t * xi = &core->prediction_pair.x.regions_order[(i + (core->prediction_pair.descending ? 1 : 0)) % 2];
+            /// TODO: Switch to using region.tracking_id to match x's and y's
+            order_t * xi = &core->prediction_pair.x.regions_order[i];
             order_t * yi = &core->prediction_pair.y.regions_order[i];
             if(!xi->valid || !yi->valid)
             {
@@ -79,19 +80,23 @@ double RhoWrapper::Perform( cimage_t & img )
             blobs[i].h = xr->width + 2 * blob_padding;
             
             active_blobs++;
+            
+//            printf("[%d (%d, %d) %dx%d]\n", i, blobs[i].x, blobs[i].y, blobs[i].w, blobs[i].h);
         }
     }
     
     /* Core Rho Functions */
-    struct timeval a,b;
-    gettimeofday( &a, NULL);
+    floating_t a = TIMESTAMP_MS();
+    
     Decouple( img, backgrounding_event, blobs, active_blobs );
+    
 #ifdef DO_NOT_TIME_ACQUISITION
-    gettimeofday( &a, NULL);
+    a = TIMESTAMP_MS();
 #endif
+    
     if(core->quadrant[0] + core->quadrant[1] + core->quadrant[2] + core->quadrant[3])
         RhoCore.Perform( core, backgrounding_event );
-    gettimeofday( &b, NULL);
+    floating_t b = TIMESTAMP_MS();
 
     /* * * * * * * * * * */
     
@@ -100,7 +105,7 @@ double RhoWrapper::Perform( cimage_t & img )
     backgrounding_event = false; // Generate background always and only once
 //    pthread_mutex_unlock(&c_mutex);
     
-    return timeDiff(a,b);
+    return b - a;
 }
 
 void RhoWrapper::Reset()

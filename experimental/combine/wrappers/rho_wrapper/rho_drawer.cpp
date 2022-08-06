@@ -21,7 +21,7 @@ Vec3b red      (  0,   0, 255);
 Vec3b green    (  0, 255,   0);
 Vec3b blue     (255,   0,   0);
 
-Vec3b blackish(25,25,25), greyish(100,90,90), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
+Vec3b blackish(25,25,25), greyish(150,150,150), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
 
 RhoDrawer::RhoDrawer( rho_core_t * rho, rho_capture_t * cap )
 : frame(Size(rho->width + SIDEBAR_WIDTH,  rho->height + SIDEBAR_WIDTH), CV_8UC3, Scalar(0,0,0)),
@@ -78,7 +78,7 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)
 //        file << "," << "Scr(" << region_id << ")";
 //        file << "," << "Flt(" << region_id << ")";
 //    }
-//    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+//    for(int i = 0; i < MAX_TRACKERS; i++)
 //    {
 //        string filter_id = "F" + to_string(i);
 //        file << "," << "Bias(" << filter_id << ")";
@@ -104,7 +104,7 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)
 //        file << "," << "Scr(" << region_id << ")";
 //        file << "," << "Flt(" << region_id << ")";
 //    }
-//    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+//    for(int i = 0; i < MAX_TRACKERS; i++)
 //    {
 //        string filter_id = "F" + to_string(i);
 //        file << "," << "Bias(" << filter_id << ")";
@@ -238,7 +238,7 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
     for( int i = 0, j = 1; i < 2; i++, j++ )
     {
         /* Kalman Values */
-        kalman_filter_t * k = &dmap->kalmans[i];
+        kalman_t * k = &dmap->kalmans[i];
         int m = OP_ALIGN((k->value/DENSITY_SCALE), height);
         int mv = dmap->kalmans[i].variance;
         int mv1 = OP_ALIGN((mv/DENSITY_SCALE), m), mv2 = OP_ALIGN(-(mv/DENSITY_SCALE), m);
@@ -304,6 +304,27 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
 
 void RhoDrawer::DrawDensityGraph(Mat &M)
 {
+    // Draw blobs
+    for( int i = 0; i < cap->num_blobs; i++ )
+    {
+        blob_t * blob = &cap->blobs[i];
+        Rect r(blob->x, blob->y, blob->w, blob->h);
+        rectangle(M, r, Scalar(30, 30, 150), 2);
+    }
+    Vec3d acolor(0, 50, 255), bcolor(255, 50, 0);
+    vector<Point> pts;
+    for( int i = 0; i < rho->prediction_pair.num_blobs; i++ )
+    {
+        index_pair_t * blob = &rho->prediction_pair.blobs[i];
+        int x = (int)rho->prediction_pair.x.trackers[blob->x].kalman.value;
+        int y = (int)rho->prediction_pair.y.trackers[blob->y].kalman.value;
+        pts.push_back(Point(x, y));
+    }
+    Point A = pts[0];
+    Point B = pts[1];
+    cv::circle(M, A, 10, acolor, -1);
+    cv::circle(M, B, 10, bcolor, -1);
+    
     int rangex[3] = { width, (int)rho->centroid.x, 0 };
     int rangey[3] = { height, (int)rho->centroid.y, 0 };
     int cross_l = 5;
@@ -326,15 +347,19 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     // Draw tracking predictions
     for( int i = 0; i < 2; i++ )
     {
-        int o = rho->prediction_pair.y.tracking_filters_order[i];
-        int v = rho->prediction_pair.y.tracking_filters[o].value;
-        line(M, Point(v,0),Point(v,height), greyish);
+        int o = rho->prediction_pair.y.trackers_order[i];
+        int v = rho->prediction_pair.y.trackers[i].kalman.value;
+        line(M, DimPt(0,v,Y_DIMENSION), DimPt(height,v,Y_DIMENSION), (i % 2 ? bcolor : acolor) * 0.5, 3);
+        int t = (int)Kalman.Test(&rho->prediction_pair.y.trackers[i].kalman, rho->prediction_pair.y.trackers[i].kalman.rate);
+        line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor), 3);
     }
     for( int i = 0; i < 2; i++ )
     {
-        int o = rho->prediction_pair.x.tracking_filters_order[i];
-        int v = rho->prediction_pair.x.tracking_filters[o].value;
-        line(M, Point(0,v),Point(width,v), greyish);
+        int o = rho->prediction_pair.x.trackers_order[i];
+        int v = rho->prediction_pair.x.trackers[i].kalman.value;
+        line(M, DimPt(0,v,X_DIMENSION), DimPt(width,v,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.5, 3);
+        int t = (int)Kalman.Test(&rho->prediction_pair.x.trackers[i].kalman, rho->prediction_pair.x.trackers[i].kalman.rate);
+        line(M, DimPt(0,t,X_DIMENSION), DimPt(height,t,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.5, 3);
     }
     
     // Draw regions
@@ -342,26 +367,15 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     {
         int o = rho->prediction_pair.y.regions_order[i].index;
         int v = rho->prediction_pair.y.regions[o].location;
-        line(M, Point(v,0), Point(v,height), bluish);
+        line(M, Point(v,0), Point(v,height), (i % 2 ? bcolor : acolor) * 0.5, 1);
     }
     for( int i = 0; i < rho->prediction_pair.x.num_regions; i++ )
     {
         int o = rho->prediction_pair.x.regions_order[i].index;
         int v = rho->prediction_pair.x.regions[o].location;
-        line(M, Point(0,v),Point(width,v), bluish);
+        line(M, Point(0,v),Point(width,v), (i % 2 ? bcolor : acolor) * 0.5, 1);
     }
-    
-    // Draw blobs
-    for( int i = 0; i < cap->num_blobs; i++ )
-    {
-        blob_t * blob = &cap->blobs[i];
-        Rect r(blob->x, blob->y, blob->w, blob->h);
-        rectangle(M, r, Scalar(0, 0, 255, 50), -1);
-    }
-    Point A(rho->primary.x, rho->primary.y);
-    Point B(rho->secondary.x, rho->secondary.y);
-    cv::circle(M, A, 10, Scalar(0, 0, 255, 100), -1);
-    cv::circle(M, B, 10, Scalar(255, 0, 0, 100), -1);
+    putText(M, (rho->prediction_pair.descending ? "\\" : "/"), Point(20, 20), FONT_HERSHEY_DUPLEX, 1, Scalar(0, 255, 255));
 }
 
 void RhoDrawer::DrawCurves(Mat& M)
@@ -772,26 +786,26 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     /* Gather data */
     int match_value = 0;
-    kalman_filter_t tracking_filters[MAX_TRACKING_FILTERS];
-    int tracking_filters_order[MAX_TRACKING_FILTERS] = {0};
-    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    kalman_t tracking_filters[MAX_TRACKERS];
+    int tracking_filters_order[MAX_TRACKERS] = {0};
+    for(int i = 0; i < MAX_TRACKERS; i++)
     {
         if(i < num_tracks)
         {
-            int c = prediction.tracking_filters_order[i];
+            int c = prediction.trackers_order[i];
             MATCH_ENCODE(match_value, i, c);
-            memcpy(&tracking_filters[i], &prediction.tracking_filters[c], sizeof(kalman_filter_t));
+            memcpy(&tracking_filters[i], &prediction.trackers[c], sizeof(kalman_t));
             tracking_filters_order[i] = c;
         }
         else
         {
-            MATCH_ENCODE(match_value, i, MAX_TRACKING_FILTERS);
+            MATCH_ENCODE(match_value, i, MAX_TRACKERS);
         }
         //        printf("%d %d %x\n", i, c, match_value);
     }
     mD[mX] = match_value;
     //    printf("\n");
-    //    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+    //    for(int i = 0; i < MAX_TRACKERS; i++)
     //    {
     //        printf("%d %d\n", i, MATCH_DECODE(match_value, i));
     //    }
@@ -806,7 +820,7 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
 //        region_t curr = regions[i];
 //        file << "," << curr.density << "," << curr.width << "," << curr.location << "," << curr.maximum << "," << curr.score << "," << tracking_filters_order[i];
 //    }
-//    for(int i = 0; i < MAX_TRACKING_FILTERS; i++)
+//    for(int i = 0; i < MAX_TRACKERS; i++)
 //    {
 //        kalman_filter_t curr = tracking_filters[i];
 //        file << "," << curr.bias << "," << curr.K[0] << "," << curr.K[1] << "," << curr.value << "," << curr.velocity << "," << curr.score;
@@ -892,7 +906,7 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
         Point matchOrigin(textOrigin.x+180, textOrigin.y);
         line(mat, matchOrigin, Point(matchOrigin.x, y+BL_IND_HEIGHT-RD_SPACE), RD_LINE_COLOR);
         
-        kalman_filter_t kalman = tracking_filters[tracking_filters_order[i]];
+        kalman_t kalman = tracking_filters[tracking_filters_order[i]];
         putText(mat, "Bi: " + to_stringn(kalman.bias,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "K0: " + to_stringn(kalman.K[0],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "Vl: " + to_stringn(kalman.value,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);

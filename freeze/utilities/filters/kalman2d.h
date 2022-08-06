@@ -18,6 +18,7 @@
 //#define SET_DT_SEC  (100 * 1e-3)
 
 //#define DEBUG_KALMAN2D
+#define DEBUG_KALMAN2D_PRIO DEBUG_2
 
 #ifdef DEBUG_KALMAN2D
 #define LOG_K2(L, ...) LOG(L, "<Kalman2d> " __VA_ARGS__)

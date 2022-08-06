@@ -157,7 +157,7 @@ extern "C" {
     /* Stability tracking for selections */
     typedef struct
     {
-        kalman_filter_t
+        kalman_t
             state,
             system;
     } stability_t;

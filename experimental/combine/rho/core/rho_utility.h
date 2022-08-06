@@ -70,7 +70,6 @@ extern "C" {
     void RhoUtility_CalculatedFrameStatistics( rho_detection_variables *, prediction_t * );
 
     void RhoUtility_CorrectPredictionAmbiguity( prediction_predict_variables *, rho_core_t * );
-    void RhoUtility_RedistributeDensities( rho_core_t * );
     void RhoUtility_CombineAxisProbabilites( prediction_pair_t * );
     void RhoUtility_UpdateCorePredictionData( prediction_predict_variables *, rho_core_t * );
 
@@ -116,7 +115,7 @@ extern "C" {
         void (*TrackingProbabilities)( prediction_t * );
         void (*CorrectAmbiguity)( prediction_predict_variables *, rho_core_t * );
         void (*CombineProbabilities)( prediction_pair_t * );
-        void (*RedistributeDensities)(  rho_core_t * );
+//        void (*RedistributeDensities)(  rho_core_t * );
         void (*UpdateCorePredictionData)( prediction_predict_variables *, rho_core_t * );
         void (*GenerateObservationList)( prediction_t *, uint8_t );
         void (*GenerateObservationLists)( rho_core_t * );
@@ -200,7 +199,7 @@ extern "C" {
         .Predict.TrackingProbabilities = RhoUtility_PredictTrackingProbabilities,
         .Predict.CorrectAmbiguity = RhoUtility_CorrectPredictionAmbiguity,
         .Predict.CombineProbabilities = RhoUtility_CombineAxisProbabilites,
-        .Predict.RedistributeDensities = RhoUtility_RedistributeDensities,
+//        .Predict.RedistributeDensities = RhoUtility_RedistributeDensities,
         .Predict.UpdateCorePredictionData = RhoUtility_UpdateCorePredictionData,
         .Predict.GenerateObservationList = RhoUtility_GenerateObservationListFromPredictions,
         .Predict.GenerateObservationLists = RhoUtility_GenerateObservationListsFromPredictions,

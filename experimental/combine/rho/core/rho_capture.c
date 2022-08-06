@@ -204,7 +204,7 @@ void RhoCapture_OrderEdges( blob_t * blobs, byte_t n, edge_t * edges, byte_t * o
         edge->i = i % 2 ? blobs[i_].y + blobs[i_].h : blobs[i_].y;
         edge->id = i_;
     }
-    PrintEdges(edges, order, n);
+//    PrintEdges(edges, order, n);
     for( byte_t i = 0; i < n * 2 - 1; i++ )
     {
         for( byte_t j = 0; j < n * 2 - i - 1; j++ )
@@ -217,19 +217,18 @@ void RhoCapture_OrderEdges( blob_t * blobs, byte_t n, edge_t * edges, byte_t * o
             }
         }
     }
-    PrintEdges(edges, order, n);
-    
+//    PrintEdges(edges, order, n);
     for( byte_t i = 0; i < n * 2; i++ )
     {
         edge_t * edge = &edges[order[i]];
         edge->i = MIN(edge->i, max_i);
     }
-    PrintEdges(edges, order, n);
+//    PrintEdges(edges, order, n);
 }
 
 void RhoCapture_AssignBlobsInThreshBuffer( index_t *thresh_blob_loc, blob_t * blob, byte_t n, edge_t * edges, byte_t * order)
 {
-    for( byte_t i = 0, f = 0; i < MAX_BLOBS * 2; i++ )
+    for( byte_t i = 0, f = 0; i < n * 2; i++ )
     {
         edge_t * edge = &edges[order[i]];
         if( !edge->open ) continue;
@@ -237,6 +236,9 @@ void RhoCapture_AssignBlobsInThreshBuffer( index_t *thresh_blob_loc, blob_t * bl
         if( f > 0 ) x += thresh_blob_loc[f - 1];
         thresh_blob_loc[f++] = x;
     }
+//    for( byte_t f = 0; f < n; f++ )
+//        printf("> %d ", thresh_blob_loc[f]);
+//    printf("\n");
 }
 
 void RhoCapture_PrepareBlobsForCapture( rho_capture_t * _, index_t max_y )

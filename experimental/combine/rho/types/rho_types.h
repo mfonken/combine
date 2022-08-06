@@ -32,6 +32,11 @@ typedef struct
 
 typedef struct
 {
+    byte_t x, y;
+} byte_pair_t;
+
+typedef struct
+{
 density_t
     maximum,
     density;
@@ -44,6 +49,18 @@ floating_t
 byte_t
     tracking_id;
 } region_t;
+
+typedef struct
+{
+    region_t * x, * y;
+} region_pair_t;
+
+typedef struct
+{
+    region_t * region;
+    kalman_t kalman;
+    bool valid;
+} tracker_t;
 
 /* Rho Structures* */
 typedef struct
@@ -59,7 +76,7 @@ typedef struct
         centroid;
     bool
         has_background;
-    kalman_filter_t
+    kalman_t
         kalmans[2];
     const char *
         name;
@@ -99,8 +116,8 @@ typedef struct
 typedef struct
 {
     const char *    name;
-    kalman_filter_t tracking_filters[MAX_TRACKING_FILTERS];
-    uint8_t         tracking_filters_order[MAX_TRACKING_FILTERS];
+    tracker_t       trackers[MAX_TRACKERS];
+    uint8_t         trackers_order[MAX_TRACKERS];
     region_t        regions[MAX_REGIONS];
     order_t         regions_order[MAX_REGIONS];
     uint8_t         num_regions;
@@ -126,6 +143,8 @@ typedef struct
 //                    BestConfidence,
                     average_density;
     bool            descending;
+    index_pair_t    blobs[MAX_REGIONS];
+    byte_t          num_blobs;
 } prediction_pair_t;
 
 typedef struct
@@ -246,9 +265,7 @@ typedef struct
 
 typedef struct
 {
-    index_pair_t
-        primary,
-        secondary,
+    index_pair_t pts[2],
         centroid;
     int8_t quadrant_check;
 } prediction_predict_variables;
@@ -286,9 +303,9 @@ typedef struct
 	index_t height;
     byte_t subsample;
     byte_t thresh_byte;
-	index_t rows_left;
-	index_pair_t primary;
-	index_pair_t secondary;
+//	index_t rows_left;
+    index_pair_t primary;
+    index_pair_t secondary;
 	index_pair_t centroid;
 	index_pair_t background_centroid;
     byte_t background_counter;
@@ -298,20 +315,20 @@ typedef struct
     density_2d_t quadrant_background_total;
 	density_2d_t total_coverage;
 	density_2d_t filtered_coverage;
-	density_2d_t target_coverage;
+//	density_2d_t target_coverage;
 	density_2d_t background_period;
 	floating_t total_percentage;
 	floating_t filtered_percentage;
 	floating_t target_coverage_factor;
-	floating_t coverage_factor;
-	floating_t variance_factor;
-	floating_t previous_thresh_filter_value;
+//	floating_t coverage_factor;
+//	floating_t variance_factor;
+//	floating_t previous_thresh_filter_value;
 	floating_t thresh;
     rho_tune_t          tune;
     prediction_pair_t   prediction_pair;
     pid_filter_t        thresh_filter;
-    kalman_filter_t     target_filter;
-    detection_map_t     detection_map;
+    kalman_t     target_filter;
+//    detection_map_t     detection_map;
 
 #ifdef __PSM__
     psm_pair_t          predictive_state_model_pair;

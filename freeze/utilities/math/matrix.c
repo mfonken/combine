@@ -34,10 +34,10 @@ void Matrix_Dot( floatp a[], floatp b[], bool T_b, floatp r[], uint8_t rows, uin
             {
                 floatp r = a[yi] * b[xi];
                 s += r;
-                LOG_MTX(DEBUG_2, "%.1f[%d] x %.1f[%d] = %.1f [%.1f]\n", a[yi], yi, b[xi], xi, r, s );
+                LOG_MTX(DEBUG_MATRIX_PRIO, "%.1f[%d] x %.1f[%d] = %.1f [%.1f]\n", a[yi], yi, b[xi], xi, r, s );
             }
             r[yx] = s;
-            LOG_MTX(DEBUG_2, "\n");
+            LOG_MTX(DEBUG_MATRIX_PRIO, "\n");
         }
     }
 }

@@ -40,6 +40,7 @@ void RhoCore_Initialize( rho_core_t * core, index_t width, index_t height )
 {
     /* Generic Data */
     RhoUtility.Initialize.Data( core, width, height );
+    printf("%p\n", &core->state_machine );
 
     /* Filters */
     RhoUtility.Initialize.Filters( core );
@@ -74,7 +75,7 @@ void RhoCore_Perform( rho_core_t * core, bool background_event )
     {
         RhoCore.DetectPairs( core );
         RhoCore.UpdatePredictions( core );
-        RhoCore.UpdateThreshold( core );
+//        RhoCore.UpdateThreshold( core );
 //        RhoCore.GeneratePacket( core );
     }
 }
@@ -140,10 +141,11 @@ void RhoCore_UpdatePredictions( rho_core_t * core )
     FSMFunctions.Sys.Update( &core->state_machine, state_intervals );
 
     prediction_predict_variables _;
-    RhoUtility.Reset.Prediction( &_, &core->prediction_pair, core->centroid );
-    RhoUtility.Predict.CorrectAmbiguity( &_, core );
+//    RhoUtility.Reset.Prediction( &_, &core->prediction_pair, core->centroid );
+//    RhoUtility.Predict.CorrectAmbiguity( &_, core );
     RhoUtility.Predict.CombineProbabilities( &core->prediction_pair );
     RhoUtility.Predict.UpdateCorePredictionData( &_, core );
+    RhoTrack.PairPredictions( core ); /// TODO Finish RhoTrack
 }
 
 /* Correct and factor predictions from variance band filtering into global model */

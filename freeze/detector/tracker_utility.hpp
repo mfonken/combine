@@ -14,7 +14,9 @@
 #include "environment_master.hpp"
 #include <algorithm>
 
-#define MAX_TRACKERS            2
+#ifndef MAX_TRACKERS
+#define MAX_TRACKERS 2
+#endif
 
 #define TRACKER_PROCESS_NOISE   5
 #define TRACKER_STD_MEAS        1e-2

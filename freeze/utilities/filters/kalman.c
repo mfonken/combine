@@ -5,7 +5,7 @@
 //#endif
 /*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
-void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floating_t minv, floating_t maxv, kalman_uncertainty_c uncertainty )
+void Kalman_Initialize( kalman_t * k, floating_t v, floating_t ls, floating_t minv, floating_t maxv, kalman_uncertainty_c uncertainty )
 {
     k->lifespan    = ls;
     k->uncertainty.value   = uncertainty.value;
@@ -13,17 +13,17 @@ void InitializeKalman( kalman_filter_t * k, floating_t v, floating_t ls, floatin
     k->uncertainty.sensor  = uncertainty.sensor;
     
     k->origin    = TIMESTAMP(TIME_SEC);
-    k->timestamp = k->origin;
+    k->t = k->origin;
     
     k->min_value = minv;
     k->max_value = maxv;
     
     k->acceleration_mode = false;
     
-    ResetKalman(k, v);
+    Kalman_Reset(k, v);
 }
 
-void ResetKalman( kalman_filter_t * k, floating_t v )
+void Kalman_Reset( kalman_t * k, floating_t v )
 {
     k->K[0]        = 0; /* Gain */
     k->K[1]        = 0;
@@ -42,14 +42,37 @@ void ResetKalman( kalman_filter_t * k, floating_t v )
     k->origin      = TIMESTAMP(TIME_SEC);
 }
 
-void PredictKalman( kalman_filter_t * k, floating_t rate_new )
+floating_t Kalman_Test( kalman_t * k, floating_t rate_new )
 {
-    floating_t delta_time = TIMESTAMP(TIME_SEC) - k->timestamp;
+    floating_t dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        ((floating_t)TIMESTAMP(TIME_SEC)) - k->t;
+#endif
+    
+    /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
+    floating_t velocity = k->value - k->prev;
+    floating_t rate     = k->acceleration_mode ?
+        dt * rate_new - k->bias + velocity
+        : rate_new - k->bias;
+    floating_t value   = k->value + dt * rate;
+    return BOUND(value, k->min_value, k->max_value);
+}
+
+void Kalman_Predict( kalman_t * k, floating_t rate_new )
+{
+    floating_t dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        ((floating_t)TIMESTAMP(TIME_SEC)) - k->t;
+#endif
     
     /* Quick expiration check */
-    if(delta_time > k->lifespan)
+    if(dt > k->lifespan)
     {
-        k->timestamp = TIMESTAMP(TIME_SEC);
+        k->t = TIMESTAMP(TIME_SEC);
         return;
     }
     
@@ -57,25 +80,25 @@ void PredictKalman( kalman_filter_t * k, floating_t rate_new )
     k->velocity = k->value - k->prev;
     k->prev     = k->value;
     k->rate     = k->acceleration_mode ?
-        delta_time * rate_new - k->bias + k->velocity
+        dt * rate_new - k->bias + k->velocity
         : rate_new - k->bias;
-    k->value   += delta_time * k->rate;
+    k->value   += dt * k->rate;
     k->value    = BOUND(k->value, k->min_value, k->max_value);
     
     /* P_{k\mid k-1} = F P_{k-1\mid k-1} F^T + Q_k */
-    floating_t dt_P_1_1 = delta_time * k->P[1][1];
-    k->P[0][0]   += delta_time * ( dt_P_1_1 -
+    floating_t dt_P_1_1 = dt * k->P[1][1];
+    k->P[0][0]   += dt * ( dt_P_1_1 -
                                   k->P[0][1] -
                                   k->P[1][0] +
                                   k->uncertainty.value );
     k->P[0][1]   -= dt_P_1_1;
     k->P[1][0]   -= dt_P_1_1;
-    k->P[1][1]   += k->uncertainty.bias * delta_time;
+    k->P[1][1]   += k->uncertainty.bias * dt;
     
 //    LOG_KALMAN(KALMAN_DEBUG_2, "Prediction - Value:%.2f Rate:%.2f Velocity:%.2f\n", k->value, k->rate, k->velocity);
 }
 
-void UpdateKalman( kalman_filter_t * k, floating_t value_new )
+void Kalman_Update( kalman_t * k, floating_t value_new )
 {
     /* S_k = H P_{k\mid k-1} H^T + R */
     floating_t S_ = 1. / ( k->P[0][0] + k->uncertainty.sensor );
@@ -94,7 +117,7 @@ void UpdateKalman( kalman_filter_t * k, floating_t value_new )
     k->P[1][0]   -= k->K[1] * k->P[0][0];
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
-    k->timestamp  = TIMESTAMP(TIME_SEC);
+    k->t  = TIMESTAMP(TIME_SEC);
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
     
@@ -102,25 +125,29 @@ void UpdateKalman( kalman_filter_t * k, floating_t value_new )
 //    LOG_KALMAN(KALMAN_DEBUG_2, "Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
 };
 
-floating_t TickKalman( kalman_filter_t * k, floating_t value_new )
+floating_t Kalman_Tick( kalman_t * k, floating_t value_new )
 {
     return Kalman.Step( k, value_new, k->velocity );
 }
 
-floating_t StepKalman( kalman_filter_t * k, floating_t value_new, floating_t rate_new )
+floating_t Kalman_Step( kalman_t * k, floating_t value_new, floating_t rate_new )
 {
 //    LOG_KALMAN(KALMAN_DEBUG_2, "Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);
-    PredictKalman(k, rate_new);
-    UpdateKalman(k, value_new);
+    Kalman_Predict(k, rate_new);
+    Kalman_Update(k, value_new);
     return k->value;
 }
 
-bool IsKalmanExpired( kalman_filter_t * k )
+bool Kalman_IsExpired( kalman_t * k )
 {
-    return ((TIMESTAMP(TIME_SEC) - k->timestamp) > k->lifespan);
+#ifdef SET_DT_SEC
+    return false;
+#else
+    return ((TIMESTAMP(TIME_SEC) - k->t) > k->lifespan);
+#endif
 }
 
-inline floating_t ScoreKalman( kalman_filter_t * k )
+inline floating_t Kalman_Score( kalman_t * k )
 {
     floating_t score = k->K[0];
     if(k->flag) score = 0.;
@@ -128,20 +155,20 @@ inline floating_t ScoreKalman( kalman_filter_t * k )
     return score;
 }
 
-void PunishKalman( kalman_filter_t * k )
+void Kalman_Punish( kalman_t * k )
 {
     k->K[0] *= KALMAN_PUNISH_FACTOR;
-    if( ScoreKalman(k) < MIN_KALMAN_GAIN )
-        ResetKalman(k, 0);
+    if( Kalman_Score(k) < MIN_KALMAN_GAIN )
+        Kalman_Reset(k, 0);
 }
 
-void PrintKalman( kalman_filter_t * k )
+void Kalman_Print( kalman_t * k )
 {
-//    LOG_KALMAN(KALMAN_DEBUG, "Val: %.4f | Rate: %.4f | Vel:%.4f\n", k->value, k->rate, k->velocity);
-//    LOG_KALMAN(KALMAN_DEBUG, "Bias: %.4f | Var: %.4f | Scr:%.4f\n", k->bias, k->variance, k->score);
-//    LOG_KALMAN(KALMAN_DEBUG, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
-//    LOG_KALMAN(KALMAN_DEBUG, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
-//    LOG_KALMAN(KALMAN_DEBUG, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "Val: %.4f | Rate: %.4f | Vel:%.4f\n", k->value, k->rate, k->velocity);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "Bias: %.4f | Var: %.4f | Scr:%.4f\n", k->bias, k->variance, k->score);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);
 }
 
 #ifdef MATVEC_LIB

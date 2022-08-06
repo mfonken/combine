@@ -53,9 +53,9 @@ void Kalman2D_Test( kalman2d_t * k, floatp x_new[4], bool update_A )
     // Predict next state:
     // x = A.x_ + B.u_ where u = [[ax], [ay]]
     floatp r1[4], r2[4], *x = (floatp*)&k->state.px, *Ap = (floatp*)k->A;
-    LOG_K2(DEBUG_2, "A.x:\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "A.x:\n");
     Matrix.dot( Ap, x, false, r1, 4, 1, 4 );
-    LOG_K2(DEBUG_2, "B.a:\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "B.a:\n");
     Matrix.dot( (floatp*)k->B, (floatp*)&k->state.ax, false, r2, 4, 1, 2 );
     Matrix.addsub( r1, r2, x_new, 1, 4, true );
 }
@@ -102,9 +102,9 @@ void Kalman2D_Predict( kalman2d_t * k )// , int l )
     // P = A.P.AT + Q
     floatp r3[4][4], r4[4][4];
     floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4, *Ap = (floatp*)k->A;;
-    LOG_K2(DEBUG_2, "A.P:\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "A.P:\n");
     Matrix.dot( Ap, (floatp*)k->P, false, r3p, 4, 4, 4);
-    LOG_K2(DEBUG_2, "(A.P).AT:\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "(A.P).AT:\n");
     Matrix.dot( r3p, Ap, true, r4p, 4, 4, 4);
     Matrix.addsub( r4p, (floatp*)k->Q, (floatp*)k->P, 4, 4, true );
 }
@@ -113,27 +113,27 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
 {
     floatp PHT[4][2], *Hp = (floatp*)k->H;
     floatp *PHTp = (floatp*)PHT;
-    LOG_K2(DEBUG_2, "P.HT\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "P.HT\n");
     Matrix.dot( (floatp*)k->P, Hp, true, PHTp, 4, 2, 4 );
     
     floatp S[2][2];
     floatp *Sp = (floatp*)S;
-    LOG_K2(DEBUG_2, "H.(P.HT)\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "H.(P.HT)\n");
     Matrix.dot( Hp, PHTp, false, Sp, 2, 2, 4 );
-    LOG_K2(DEBUG_2, "H.(P.HT) + R\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "H.(P.HT) + R\n");
     Matrix.addsub( Sp, (floatp*)k->R, Sp, 2, 2, true );
     
     floatp K[4][2], Sinv[2][2];
     floatp *Kp  = (floatp*)K;
     Matrix.inv22( S, Sinv );
-    LOG_K2(DEBUG_2, "(P.HT).Sinv\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "(P.HT).Sinv\n");
     Matrix.dot( PHTp, (floatp*)Sinv, false, Kp, 4, 2, 2 );
     
     floatp r3[2], r4[4], *x = (floatp*)&k->state.px;
-    LOG_K2(DEBUG_2, "H.x\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "H.x\n");
     Matrix.dot( (floatp*)k->H, x, false, r3, 2, 1, 4 );
     Matrix.addsub( z, r3, r3, 2, 2, false );
-    LOG_K2(DEBUG_2, "K.z...\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "K.z...\n");
     Matrix.dot( Kp, r3, false, r4, 4, 1, 2 );
     Matrix.addsub( x, r4, x, 1, 4, true );
     
@@ -145,13 +145,13 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
     floatp K44[4][4], H44[4][4];
     Matrix.zpad( (floatp*)K, 4, 2, (floatp*)K44, 4, 4);
     Matrix.zpad( (floatp*)k->H, 2, 4, (floatp*)H44, 4, 4);
-    LOG_K2(DEBUG_2, "K.H\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "K.H\n");
     Matrix.dot( (floatp*)K44, (floatp*)H44, false, r6p, 4, 4, 4);
     Matrix.addsub( r5p, r6p, r5p, 4, 4, false );
     
     floatp r7[4][4];
     floatp *r7p = (floatp*)r7;
-    LOG_K2(DEBUG_2, "(I - K.H).P\n");
+    LOG_K2(DEBUG_KALMAN2D_PRIO, "(I - K.H).P\n");
     Matrix.dot( r5p, (floatp*)k->P, false, r7p, 4, 4, 4);
     memcpy( k->P, r7p, 4 * 4 * sizeof(floatp));
 }

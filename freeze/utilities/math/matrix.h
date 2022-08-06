@@ -15,6 +15,7 @@
 #include "unilog.h"
 
 //#define DEBUG_MATRIX
+#define DEBUG_MATRIX_PRIO DEBUG_2
 
 #ifdef DEBUG_MATRIX
 #define LOG_MTX(L, ...) LOG(L, "<Matrix> " __VA_ARGS__)
