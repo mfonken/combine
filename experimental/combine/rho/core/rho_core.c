@@ -40,7 +40,6 @@ void RhoCore_Initialize( rho_core_t * core, index_t width, index_t height )
 {
     /* Generic Data */
     RhoUtility.Initialize.Data( core, width, height );
-    printf("%p\n", &core->state_machine );
 
     /* Filters */
     RhoUtility.Initialize.Filters( core );
@@ -145,7 +144,7 @@ void RhoCore_UpdatePredictions( rho_core_t * core )
 //    RhoUtility.Predict.CorrectAmbiguity( &_, core );
     RhoUtility.Predict.CombineProbabilities( &core->prediction_pair );
     RhoUtility.Predict.UpdateCorePredictionData( &_, core );
-    RhoTrack.PairPredictions( core ); /// TODO Finish RhoTrack
+    RhoTrack.PairPredictions( core );
 }
 
 /* Correct and factor predictions from variance band filtering into global model */

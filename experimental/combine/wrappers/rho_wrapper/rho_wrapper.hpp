@@ -29,6 +29,7 @@ class RhoWrapper
     cimage_t cimage;
     
 public:
+    byte_t blob_padding = 25;
     int                 width;
     int                 height;
 //    rho_core_t          core;
@@ -38,7 +39,6 @@ public:
     
     rho_capture_t capture;
     rho_packet_t packet;
-    byte_t blob_padding = 50;
     blob_t blobs[MAX_BLOBS];
     byte_t active_blobs = 0;
     

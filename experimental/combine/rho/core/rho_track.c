@@ -18,8 +18,8 @@ void RhoTrack_PairPredictions( rho_core_t * core )
     
     for( byte_t i = 0; i < MAX_TRACKERS; i++ )
     {
-        xo[i] = predictions->x.trackers_order[i];
-        yo[i] = predictions->y.trackers_order[i];
+        xo[i] = i;
+        yo[i] = i;
         if( !predictions->x.trackers[xo[i]].valid || !predictions->y.trackers[yo[i]].valid )
             break;
         n++;
@@ -51,26 +51,26 @@ void RhoTrack_PairPredictions( rho_core_t * core )
 void RhoTrack_DisambiguatePair( rho_core_t * core, byte_pair_t pts[2] )
 {
     prediction_pair_t * predictions = &core->prediction_pair;
-    index_pair_t centroid = core->centroid;
     
     floating_t x0 = predictions->x.trackers[pts[0].x].kalman.value;
     floating_t x1 = predictions->x.trackers[pts[1].x].kalman.value;
-    bool x_check = ( x0 < centroid.x ) ^ ( x1 > centroid.x );
     
     floating_t y0 = predictions->y.trackers[pts[0].y].kalman.value;
     floating_t y1 = predictions->y.trackers[pts[1].y].kalman.value;
-    bool y_check = ( y0 < centroid.y ) ^ ( y1 > centroid.x );
-    bool swap = false;
-    if( !x_check || !y_check)
-    {
-        RhoTrack.RedistributeDensities( core );
-        int8_t quadrant_check = (  core->quadrant_final[0] > core->quadrant_final[1] ) + ( core->quadrant_final[2] < core->quadrant_final[3] ) - 1;
-        swap = ( x0 > x1 ) ^ ( ( quadrant_check > 0 ) ^ ( y0 < y1 ) );
-    }
     
-    core->prediction_pair.descending = ( x0 < x1 ) ^ ( y0 > y1 );
+//    index_pair_t centroid = core->centroid;
+    /// TODO: Decide if centroid check is valid
+    RhoTrack.RedistributeDensities( core );
+    int8_t quadrant_check = (  core->quadrant_final[0] > core->quadrant_final[1] ) + ( core->quadrant_final[2] < core->quadrant_final[3] ) - 1;
+
+    if( quadrant_check == 0 )
+        printf("!"); /// TODO: Make case for quadrant_check == 0
+    else if( ( x0 < x1 ) ^ ( ( quadrant_check > 0 ) ^ ( y0 > y1 ) ) )
+        SWAP(pts[0].x, pts[1].x);
     
-    if(swap) SWAP(pts[0].y, pts[1].y);
+    core->prediction_pair.descending = quadrant_check > 0;
+    
+//    if(swap) SWAP(pts[0].y, pts[1].y);
     RhoTrack.PairXY( &core->prediction_pair, pts[0] );
     RhoTrack.PairXY( &core->prediction_pair, pts[1] );
 }

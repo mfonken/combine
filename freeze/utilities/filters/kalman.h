@@ -8,7 +8,7 @@
 //#include "rho_global.h"
 
 //#define MATVEC_LIB
-#define SET_DT_SEC 0.5
+//#define SET_DT_SEC 1
 
 typedef double floating_t;
 

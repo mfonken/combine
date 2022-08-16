@@ -61,23 +61,29 @@ double RhoWrapper::Perform( cimage_t & img )
     {
         for( byte_t i = 0; i < 2; i++ )
         {
-            /// TODO: Switch to using region.tracking_id to match x's and y's
-            order_t * xi = &core->prediction_pair.x.regions_order[i];
-            order_t * yi = &core->prediction_pair.y.regions_order[i];
-            if(!xi->valid || !yi->valid)
+            index_pair_t * blob = &core->prediction_pair.blobs[i];
+            kalman_t * fx = &core->prediction_pair.x.trackers[blob->x].kalman;
+            kalman_t * fy = &core->prediction_pair.y.trackers[blob->y].kalman;
+            byte_t tox = core->prediction_pair.x.trackers_order[blob->x];
+            byte_t toy = core->prediction_pair.y.trackers_order[blob->y];
+            order_t * rox = &core->prediction_pair.x.regions_order[tox];
+            order_t * roy = &core->prediction_pair.y.regions_order[toy];
+            if(!fx->valid || !fy->valid || !rox->valid || !roy->valid )
             {
                 active_blobs = 0;
                 break;
             }
             
-            region_t * xr = &core->prediction_pair.x.regions[xi->index];
-            region_t * yr = &core->prediction_pair.y.regions[yi->index];
+            region_t * rx = &core->prediction_pair.x.regions[rox->index];
+            region_t * ry = &core->prediction_pair.x.regions[roy->index];
             
             /// Note: x and y are switched intentionally
-            blobs[i].x = MAX( 0, yr->location - yr->width / 2 - blob_padding );
-            blobs[i].y = MAX( 0, xr->location - xr->width / 2 - blob_padding );
-            blobs[i].w = yr->width + 2 * blob_padding;
-            blobs[i].h = xr->width + 2 * blob_padding;
+            floating_t testA = Kalman.Test( fx, fx->rate * 2 );
+            floating_t testB = Kalman.Test( fy, fy->rate * 2 );
+            blobs[i].x = MAX( 0, testA - rx->width / 2 - blob_padding );
+            blobs[i].y = MAX( 0, testB - ry->width / 2 - blob_padding );
+            blobs[i].w = rx->width + 2 * blob_padding;
+            blobs[i].h = ry->width + 2 * blob_padding;
             
             active_blobs++;
             

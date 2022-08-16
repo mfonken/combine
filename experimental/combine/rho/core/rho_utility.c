@@ -51,7 +51,6 @@ void RhoUtility_InitializeData( rho_core_t * core, index_t width, index_t height
 
     KumaraswamyFunctions.Initialize( &core->kumaraswamy, NUM_STATES + 1, (floating_t[])DEFAULT_KUMARASWAMY_BANDS );
     FSMFunctions.Sys.Initialize( &core->state_machine, "A", &core->state_transitions, CHAOTIC );
-    printf("%p\n", &core->state_machine );
 
     core->timestamp = TIMESTAMP_MS();
 }
@@ -480,7 +479,7 @@ void RhoUtility_SortRegions( rho_detection_variables * _, prediction_t * predict
         prediction->regions_order[i].index = best_index;
         prediction->regions_order[best_index].valid = true;
         prediction->regions_order[best_index].index = i;
-        SWAP(prediction->trackers_order[i], prediction->trackers_order[best_index] );
+//        SWAP(prediction->trackers_order[i], prediction->trackers_order[best_index] );
         
         prediction->regions[i].sort = true;
 
@@ -556,22 +555,16 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
     while( m < ( valid_tracks - 1 ) && n < ( prediction->num_regions - 1 ) )
     { /* Update tracking filters in pairs following determinant */
         /* Retreive current region pair */
-        int8_t rAi = -1, rBi = -1;
-        for( ; v < MAX_REGIONS && !prediction->regions_order[v].valid; v++ );
-        rAi = prediction->regions_order[v++].index;
-        for( ; v < MAX_REGIONS && !prediction->regions_order[v].valid; v++ );
-        rBi = prediction->regions_order[v++].index;
-        if( rAi < 0 || rBi < 0 ) continue; /// May not be necessary
+        int8_t rAi = m, rBi = m+1, rAo = -1, rBo = -1;
+        rAo = prediction->regions_order[rAi].index;
+        rBo = prediction->regions_order[rBi].index;
         
-        region_t *regionA = &prediction->regions[rAi];
-        region_t *regionB = &prediction->regions[rBi];
+        region_t *regionA = &prediction->regions[rAo];
+        region_t *regionB = &prediction->regions[rBo];
         
         /* Retreive tracking filters pair */
-        byte_t fAi = prediction->trackers_order[rAi];
-        byte_t fBi = prediction->trackers_order[rBi];
-
-        kalman_t *filterA = &prediction->trackers[fAi].kalman;
-        kalman_t *filterB = &prediction->trackers[fBi].kalman;
+        kalman_t *filterA = &prediction->trackers[rAi].kalman;
+        kalman_t *filterB = &prediction->trackers[rBi].kalman;
 
         floating_t testA = Kalman.Test( filterA, filterA->rate );
         floating_t testB = Kalman.Test( filterB, filterB->rate );
@@ -582,7 +575,16 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
         ab = fabs(testA - regionB->location );
         ba = fabs(testB - regionA->location );
 
-        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> aa:%.3f ab:%.3f ba:%.3f bb:%.3f\n", prediction->name, m, n, aa, ab, ba, bb);
+        LOG_RHO(RHO_DEBUG_PREDICT, "%s(%d,%d)> aa:%.3f ab:%.3f ba:%.3f bb:%.3f\n", prediction->name, m, n, aa, ab, ba, bb);
+        
+        printf("R[");
+        for( int i = 0; i < MAX_TRACKERS; i++ )
+            printf("%d%c", prediction->regions_order[i].index, (i < MAX_TRACKERS -1 ? '|' : ']'));
+        printf("\n");
+        printf("T[");
+        for( int i = 0; i < MAX_TRACKERS; i++ )
+            printf("%d%c", prediction->trackers_order[i], (i < MAX_TRACKERS -1 ? '|' : ']'));
+        printf("\n");
 
         bool swapped = false;
         /* Swap on upward determinant */
@@ -595,7 +597,7 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
             swapped = true;
             curr_difference = ab + ba;
         }
-        LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", ab + ba);
+        LOG_RHO(RHO_DEBUG_PREDICT, "Predict ∆: %.2f\n", curr_difference);
         total_difference += curr_difference;
 
         if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
@@ -605,24 +607,24 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
             {
                 Kalman.Tick( filterA, regionB->location );
                 Kalman.Tick( filterB, regionA->location );
-                regionA->tracking_id = fBi;
-                regionB->tracking_id = fAi;
-                prediction->trackers_order[fAi] = rBi;
-                prediction->trackers_order[fBi] = rAi; /// TODO: Finish using tracking order to align with regions instead of alone
+                regionA->tracking_id = rBi;
+                regionB->tracking_id = rAi;
+                prediction->trackers_order[rAi] = rBo;
+                prediction->trackers_order[rBi] = rAo; /// TODO: Finish using tracking order to align with regions instead of alone
             }
             else
             {
                 Kalman.Tick( filterA, regionA->location );
                 Kalman.Tick( filterB, regionB->location );
-                regionA->tracking_id = fAi;
-                regionB->tracking_id = fBi;
-                prediction->trackers_order[fAi] = rAi;
-                prediction->trackers_order[fBi] = rBi;
+                regionA->tracking_id = rAi;
+                regionB->tracking_id = rBi;
+                prediction->trackers_order[rAi] = rAi;
+                prediction->trackers_order[rBi] = rBi;
             }
             updated += 2;
 
-            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fAi, filterA->value);
-            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", fBi, filterB->value);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rAi, filterA->value);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rBi, filterB->value);
         }
         m+=2; n+=2;
     }
@@ -630,40 +632,46 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
     /* Account for odd number and spare regions */
     if( m < valid_tracks && n < prediction->num_regions )
     {
-        kalman_t *filter = &prediction->trackers[prediction->trackers_order[m]].kalman;
-        int8_t ri = -1;
+        int8_t ri = -1, fi = -1;
         for( ; v < MAX_REGIONS && !prediction->regions_order[v].valid; v++ );
         ri = prediction->regions_order[v++].index;
         region_t *region = &prediction->regions[ri];
-
-        curr_difference = fabs(filter->value - region->location);
-        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s(%d,%d)> curr_difference:%.3f\n", prediction->name, m, n, curr_difference);
-
-        LOG_RHO(RHO_DEBUG_PREDICT, "∆: %.2f\n", curr_difference);
-        if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE )
+        
+        while( m < valid_tracks )
         {
-            region->tracking_id = prediction->trackers_order[m];
-            prediction->trackers_order[m] = ri;
+            fi = prediction->trackers_order[m];
+            kalman_t *filter = &prediction->trackers[fi].kalman;
+            floating_t test = Kalman.Test( filter, filter->rate );
+            curr_difference = fabs( region->location - test );
+            
+            LOG_RHO(RHO_DEBUG_PREDICT, "Odd %s(%d,%d)> ∆:%.3f\n", prediction->name, m, n, curr_difference);
 
-            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", region->tracking_id, filter->value);
-            Kalman.Update(filter, region->location);
+            if( curr_difference < MAX_TRACKING_MATCH_DIFFERENCE_SINGLE )
+            {
+                LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", region->tracking_id, filter->value);
+                Kalman.Tick(filter, region->location);
+                
+                region->tracking_id = fi;
+                prediction->trackers_order[m] = ri;
 
-            total_difference += curr_difference;
-            updated++;
+                total_difference += curr_difference;
+                updated++;
+            }
+            m++;
         }
-        m++; n++;
+        n++;
     }
 
     /* Activate new filters */
     for( ; n < prediction->num_regions && n < MAX_REGIONS; n++ )
     {
-        LOG_RHO( RHO_DEBUG_PREDICT_2, "Activating filter at index %d[%d] - %d\n", prediction->trackers_order[n], n, prediction->regions[prediction->regions_order[n].index].location );
         int8_t ri = prediction->regions_order[n].index;
-        prediction->trackers_order[ri] = ri;
-        tracker_t * tracker = &prediction->trackers[prediction->trackers_order[ri]];
+        prediction->trackers_order[n] = ri;
+        tracker_t * tracker = &prediction->trackers[ri];
         tracker->region = &prediction->regions[ri];
         tracker->valid = true;
         Kalman.Step( &tracker->kalman, tracker->region->location, 0. );
+        LOG_RHO( RHO_DEBUG_PREDICT, "Activating filter at index %d[%d] - %d\n", prediction->trackers_order[n], n, prediction->regions[ri].location );
     }
 
     /* Punish unused ones */
@@ -681,13 +689,11 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
         else prediction->probabilities.confidence = TRACKING_MATCH_TRUST * ( 1 - ( average_difference / MAX_TRACKING_MATCH_DIFFERENCE ) );
     }
 
-    for( byte_t i = 0; i < MAX_TRACKERS; i++ )
-    {
-        printf("(%d):[%d]>[%d] ", i, prediction->regions_order[i].index, prediction->trackers_order[i]);
-    }
-    printf("\n");
+//    for( byte_t i = 0; i < MAX_TRACKERS; i++ )
+//        printf("(%d):[%d]>[%d] ", i, prediction->regions_order[i].index, prediction->trackers_order[i]);
+//    printf("\n");
     
-    RhoUtility.Predict.SortFilters( prediction );
+//    RhoUtility.Predict.SortFilters( prediction );
 }
 
 void RhoUtility_SortTrackingFilters( prediction_t * prediction )
