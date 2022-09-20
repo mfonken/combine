@@ -23,13 +23,15 @@
 #define LOG_RW(L, ...)
 #endif
 
+#define RHO_BLOB_PADDING_PX 50
+#define RHO_MIN_BLOB_CONFIDENCE 0.8
 
 class RhoWrapper
 {
     cimage_t cimage;
     
 public:
-    byte_t blob_padding = 25;
+    byte_t blob_padding = RHO_BLOB_PADDING_PX;
     int                 width;
     int                 height;
 //    rho_core_t          core;
@@ -41,11 +43,15 @@ public:
     rho_packet_t packet;
     blob_t blobs[MAX_BLOBS];
     byte_t active_blobs = 0;
+    int active_blob_density = 0;
+    double active_blob_confidence = 0.0;
     
     void Init( int, int );
     double Perform( cv::Mat& );
     double Perform( cimage_t& );
     void Reset();
+    void DecoupleFull( const cimage_t );
+    void DecoupleBlobs( const cimage_t );
     void Decouple( const cimage_t, bool, blob_t * blobs, byte_t n );
     std::vector<cv::Point2f> GetPredictions();
     void ToggleBackgrounding( bool );

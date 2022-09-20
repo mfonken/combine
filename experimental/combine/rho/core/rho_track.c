@@ -64,7 +64,10 @@ void RhoTrack_DisambiguatePair( rho_core_t * core, byte_pair_t pts[2] )
     int8_t quadrant_check = (  core->quadrant_final[0] > core->quadrant_final[1] ) + ( core->quadrant_final[2] < core->quadrant_final[3] ) - 1;
 
     if( quadrant_check == 0 )
+    {
         printf("!"); /// TODO: Make case for quadrant_check == 0
+//        return;
+    }
     else if( ( x0 < x1 ) ^ ( ( quadrant_check > 0 ) ^ ( y0 > y1 ) ) )
         SWAP(pts[0].x, pts[1].x);
     
@@ -80,9 +83,10 @@ void RhoTrack_PairXY( prediction_pair_t * predictions, byte_pair_t pt )
     byte_t n = predictions->num_blobs;
     if( n >= MAX_REGIONS) return;
     
-    predictions->blobs[n].x = pt.x;
-    predictions->blobs[n].y = pt.y;
+    predictions->blobs_order[n].x = pt.x;
+    predictions->blobs_order[n].y = pt.y;
     predictions->num_blobs = n + 1;
+    /// TODO: Add use of 2D kalman!
 }
 
 /* Perform density redistribution from combining current frame and background */

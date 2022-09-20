@@ -132,13 +132,13 @@ typedef struct
 {
     uint32_t     CameraPort;                     /* Parallel port register to camera */
     uint32_t     HostTxPort;                     /* Output channel to host */
-    address_t    CaptureEnd;                     /* Effective end address for capture buffer */
-    address_t    CaptureMax;                     /* Actual end address for capture buffer */
     index_t     *ThreshEnd;                      /* Actual end of thresh buffer */
     address_t    ThreshMax;                      /* Shared address of threshold value */
     address_t    PixelCount;                     /* Shared address of pixel count value */
     address_t    ProcessIndex;                      /* Address threhold buffer is processed */
     byte_t      *Capture;                       /* Address capture buffer is processed */
+    byte_t      *CaptureEnd;                     /* Effective end address for capture buffer */
+    byte_t      *CaptureMax;                     /* Actual end address for capture buffer */
     index_t     *ThreshFill;                        /* Address threshold buffer is filled */
     address_t   *DMapXI;
     

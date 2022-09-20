@@ -20,6 +20,7 @@
 #else
 #include "../psm/fsm.h"
 #endif
+#include "kalman2d.h"
 
 //#ifndef MAX_OBSERVATIONS
 //#define MAX_OBSERVATIONS        (1 << 3) // Length of history
@@ -34,6 +35,13 @@ typedef struct
 {
     byte_t x, y;
 } byte_pair_t;
+
+typedef struct
+{
+    index_t x, y;
+    index_t w, h;
+//    kalman2d_t k;
+} blob_t;
 
 typedef struct
 {
@@ -143,7 +151,7 @@ typedef struct
 //                    BestConfidence,
                     average_density;
     bool            descending;
-    index_pair_t    blobs[MAX_REGIONS];
+    index_pair_t         blobs_order[MAX_REGIONS];
     byte_t          num_blobs;
 } prediction_pair_t;
 

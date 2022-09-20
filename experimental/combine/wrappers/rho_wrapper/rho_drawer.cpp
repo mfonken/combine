@@ -308,16 +308,16 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     for( int i = 0; i < cap->num_blobs; i++ )
     {
         blob_t * blob = &cap->blobs[i];
-        Rect r(blob->y, blob->x, blob->w, blob->h);
-        rectangle(M, r, Scalar(30, 30, 150), 2);
+        Rect r(blob->x, blob->y, blob->w, blob->h);
+        rectangle(M, r, Scalar(30, 150, 30), 2);
     }
     Vec3d acolor(0, 50, 255), bcolor(255, 50, 0);
     vector<Point> pts;
     for( int i = 0; i < rho->prediction_pair.num_blobs; i++ )
     {
-        index_pair_t * blob = &rho->prediction_pair.blobs[i];
-        int y = (int)rho->prediction_pair.x.trackers[blob->x].kalman.value;
-        int x = (int)rho->prediction_pair.y.trackers[blob->y].kalman.value;
+        index_pair_t * bo = &rho->prediction_pair.blobs_order[i];
+        int y = (int)rho->prediction_pair.x.trackers[bo->x].kalman.value;
+        int x = (int)rho->prediction_pair.y.trackers[bo->y].kalman.value;
         pts.push_back(Point(x, y));
     }
     if(pts.size() >= 2)
@@ -350,17 +350,17 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     {
 //        int o = rho->prediction_pair.y.trackers_order[i];
         int v = rho->prediction_pair.y.trackers[i].kalman.value;
-        line(M, DimPt(0,v,Y_DIMENSION), DimPt(height,v,Y_DIMENSION), (i % 2 ? bcolor : acolor) * 0.5, 3);
+        line(M, DimPt(0,v,Y_DIMENSION), DimPt(height,v,Y_DIMENSION), (i % 2 ? bcolor : acolor), 1);
         int t = (int)Kalman.Test(&rho->prediction_pair.y.trackers[i].kalman, rho->prediction_pair.y.trackers[i].kalman.rate);
-        line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor), 3);
+        line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
     }
     for( int i = 0; i < 2; i++ )
     {
 //        int o = rho->prediction_pair.x.trackers_order[i];
         int v = rho->prediction_pair.x.trackers[i].kalman.value;
-        line(M, DimPt(0,v,X_DIMENSION), DimPt(width,v,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.5, 3);
+        line(M, DimPt(0,v,X_DIMENSION), DimPt(width,v,X_DIMENSION), (i % 2 ? bcolor : acolor), 1);
         int t = (int)Kalman.Test(&rho->prediction_pair.x.trackers[i].kalman, rho->prediction_pair.x.trackers[i].kalman.rate);
-        line(M, DimPt(0,t,X_DIMENSION), DimPt(height,t,X_DIMENSION), (i % 2 ? bcolor : acolor), 3);
+        line(M, DimPt(0,t,X_DIMENSION), DimPt(width,t,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
     }
     
     // Draw regions

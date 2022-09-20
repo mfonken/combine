@@ -6,9 +6,10 @@
 #include <stdint.h>
 
 //#include "rho_global.h"
+#include "unilog.h"
 
 //#define MATVEC_LIB
-//#define SET_DT_SEC 1
+#define SET_DT_SEC 0.25
 
 typedef double floating_t;
 
@@ -34,6 +35,7 @@ typedef double floating_t;
 #define LOG_KALMAN(L, ...)
 #endif
 
+#define KALMAN_TIME_UNITS TIME_SEC
 //typedef double floating_t;
 //typedef int16_t uint16_t;
 

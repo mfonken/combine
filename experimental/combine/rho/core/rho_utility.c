@@ -577,14 +577,14 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
 
         LOG_RHO(RHO_DEBUG_PREDICT, "%s(%d,%d)> aa:%.3f ab:%.3f ba:%.3f bb:%.3f\n", prediction->name, m, n, aa, ab, ba, bb);
         
-        printf("R[");
+        LOG_RHO_BARE(RHO_DEBUG_PREDICT, "R[");
         for( int i = 0; i < MAX_TRACKERS; i++ )
-            printf("%d%c", prediction->regions_order[i].index, (i < MAX_TRACKERS -1 ? '|' : ']'));
-        printf("\n");
-        printf("T[");
+            LOG_RHO(RHO_DEBUG_PREDICT, "%d%c", prediction->regions_order[i].index, (i < MAX_TRACKERS -1 ? '|' : ']'));
+        LOG_RHO(RHO_DEBUG_PREDICT, "");
+        LOG_RHO(RHO_DEBUG_PREDICT, "T[");
         for( int i = 0; i < MAX_TRACKERS; i++ )
-            printf("%d%c", prediction->trackers_order[i], (i < MAX_TRACKERS -1 ? '|' : ']'));
-        printf("\n");
+            LOG_RHO(RHO_DEBUG_PREDICT, "%d%c", prediction->trackers_order[i], (i < MAX_TRACKERS -1 ? '|' : ']'));
+        LOG_RHO(RHO_DEBUG_PREDICT, "");
 
         bool swapped = false;
         /* Swap on upward determinant */
@@ -625,6 +625,8 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
 
             LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rAi, filterA->value);
             LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rBi, filterB->value);
+            
+            Kalman.Print( filterA );
         }
         m+=2; n+=2;
     }

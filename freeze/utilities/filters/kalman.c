@@ -2,6 +2,8 @@
 //#ifndef TIMESTAMP
 #include "timestamp.h"
 
+#define DEBUG_KALMAN_PRIO DEBUG_2
+
 //#endif
 /*~ SOURCE: http://preview.tinyurl.com/9djhrem */
 
@@ -12,7 +14,7 @@ void Kalman_Initialize( kalman_t * k, floating_t v, floating_t ls, floating_t mi
     k->uncertainty.bias    = uncertainty.bias;
     k->uncertainty.sensor  = uncertainty.sensor;
     
-    k->origin    = TIMESTAMP(TIME_SEC);
+    k->origin    = TIMESTAMP(KALMAN_TIME_UNITS);
     k->t = k->origin;
     
     k->min_value = minv;
@@ -39,7 +41,7 @@ void Kalman_Reset( kalman_t * k, floating_t v )
     k->flag        = 0;
     k->score       = 0;
     k->value       = v;
-    k->origin      = TIMESTAMP(TIME_SEC);
+    k->origin      = TIMESTAMP(KALMAN_TIME_UNITS);
 }
 
 floating_t Kalman_Test( kalman_t * k, floating_t rate_new )
@@ -52,7 +54,7 @@ floating_t Kalman_Test( kalman_t * k, floating_t rate_new )
 #endif
     
     /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
-    floating_t velocity = k->value - k->prev;
+    floating_t velocity = k->prev > 0 ? k->value - k->prev : 0.0;
     floating_t rate     = k->acceleration_mode ?
         dt * rate_new - k->bias + velocity
         : rate_new - k->bias;
@@ -66,22 +68,24 @@ void Kalman_Predict( kalman_t * k, floating_t rate_new )
 #ifdef SET_DT_SEC
         SET_DT_SEC;
 #else
-        ((floating_t)TIMESTAMP(TIME_SEC)) - k->t;
+        ((floating_t)TIMESTAMP(KALMAN_TIME_UNITS)) - k->t;
 #endif
     
     /* Quick expiration check */
     if(dt > k->lifespan)
     {
-        k->t = TIMESTAMP(TIME_SEC);
+        k->t = TIMESTAMP(KALMAN_TIME_UNITS);
         return;
     }
     
     /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
-    k->velocity = k->value - k->prev;
+    k->velocity = k->prev > 0 ? k->value - k->prev : 0.0;
     k->prev     = k->value;
     k->rate     = k->acceleration_mode ?
         dt * rate_new - k->bias + k->velocity
         : rate_new - k->bias;
+    if( k->rate > 101)
+        printf("!");
     k->value   += dt * k->rate;
     k->value    = BOUND(k->value, k->min_value, k->max_value);
     
@@ -117,7 +121,7 @@ void Kalman_Update( kalman_t * k, floating_t value_new )
     k->P[1][0]   -= k->K[1] * k->P[0][0];
     k->P[1][1]   -= k->K[1] * k->P[0][1];
     
-    k->t  = TIMESTAMP(TIME_SEC);
+    k->t  = TIMESTAMP(KALMAN_TIME_UNITS);
     
     k->value = BOUND(k->value, k->min_value, k->max_value);
     
@@ -143,7 +147,7 @@ bool Kalman_IsExpired( kalman_t * k )
 #ifdef SET_DT_SEC
     return false;
 #else
-    return ((TIMESTAMP(TIME_SEC) - k->t) > k->lifespan);
+    return ((TIMESTAMP(KALMAN_TIME_UNITS) - k->t) > k->lifespan);
 #endif
 }
 
