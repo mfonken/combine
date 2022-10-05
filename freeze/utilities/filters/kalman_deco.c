@@ -61,7 +61,7 @@ physical_2d_t * Kalman2D_Test( kalman2d_t * k, floatp x_new[4], bool update_A )
     }
     
     // Predict next state:
-    // x = A.x_ + B.u_ where x_ = [px, py, vx, vy]T and u = [ax, ay]T
+    // x = A.x_ + B.u_ where u = [[ax], [ay]]
     floatp r1[4], r2[4], *x = (floatp*)&k->x.px, *Ap = (floatp*)k->A;
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "A.x:\n");
     Matrix.Dot( Ap, x, false, r1, 4, 1, 4 );
@@ -122,13 +122,11 @@ void Kalman2D_Predict( kalman2d_t * k )
 
 void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
 {
-    // = P.HT
     floatp PHT[4][2], *Hp = (floatp*)k->H;
     floatp *PHTp = (floatp*)PHT;
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "P.HT\n");
     Matrix.Dot( (floatp*)k->P, Hp, true, PHTp, 4, 2, 4 );
     
-    // S = H.P.HT + R
     floatp S[2][2];
     floatp *Sp = (floatp*)S;
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "H.(P.HT)\n");
@@ -136,14 +134,12 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "H.(P.HT) + R\n");
     Matrix.AddSub( Sp, (floatp*)k->R, Sp, 2, 2, true );
     
-    // K = P.HT(H.P.HT + R)^-1
     floatp Sinv[2][2];
     floatp *Kp  = (floatp*)k->K;
     Matrix.inv22( S, Sinv );
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "(P.HT).Sinv\n");
     Matrix.Dot( PHTp, (floatp*)Sinv, false, Kp, 4, 2, 2 );
     
-    // = z - H.x
     floatp r3[2], r4[4], *x = (floatp*)&k->x.px;
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "H.x\n");
     Matrix.Dot( (floatp*)k->H, x, false, r3, 2, 1, 4 );
@@ -152,12 +148,12 @@ void Kalman2D_Update( kalman2d_t * k, floatp z[2] )
     Matrix.Dot( Kp, r3, false, r4, 4, 1, 2 );
     Matrix.AddSub( x, r4, x, 1, 4, true );
     
-    // P = (I - K.H)P
     floatp r5[4][4], r6[4][4];
     floatp *r5p = (floatp*)r5;
     floatp *r6p = (floatp*)r6;
-    floatp K44[4][4], H44[4][4];
     Matrix.Eye( (floatp*)r5, 4, 4 );
+    
+    floatp K44[4][4], H44[4][4];
     Matrix.ZPad( (floatp*)k->K, 4, 2, (floatp*)K44, 4, 4);
     Matrix.ZPad( (floatp*)k->H, 2, 4, (floatp*)H44, 4, 4);
     LOG_KALMAN2D(DEBUG_KALMAN2D_PRIO, "K.H\n");

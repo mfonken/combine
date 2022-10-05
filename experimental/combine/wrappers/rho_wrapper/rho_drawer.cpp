@@ -23,7 +23,7 @@ Vec3b blue     (255,   0,   0);
 
 Vec3b blackish(25,25,25), greyish(150,150,150), bluish(255,255,100), greenish(100,255,100), redish(50,100,255), orangish(100,150,255), yellowish(100,255,255), white(255,255,255);
 
-RhoDrawer::RhoDrawer( rho_core_t * rho, rho_capture_t * cap )
+RhoDrawer::RhoDrawer( rho_core_t * rho, rho_capture_t * cap, int w, int h )
 : frame(Size(rho->width + SIDEBAR_WIDTH,  rho->height + SIDEBAR_WIDTH), CV_8UC3, Scalar(0,0,0)),
 rho_frame(Size(PROBABILITIES_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)),
 rho_detection_x(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)),
@@ -36,7 +36,7 @@ rho_detection_y(Size(DETECTION_FRAME_WIDTH, rho->height), CV_8UC3, Scalar(0,0,0)
 //    LOG_RDR(DEBUG_2, "Initializing Rho Drawer.\n");
     this->rho = rho;
     this->cap = cap;
-    width = rho->width; height = rho->height;
+    width = w; height = h;
     W = width + SIDEBAR_WIDTH; H = height + SIDEBAR_WIDTH;
     pid_data_x = 0; x_match_data_x = 0; y_match_data_x = 0; x_peak_data_x = 0; y_peak_data_x = 0; frame_i = 0; x_detection_i = 0; y_detection_i = 0;
     pid_data = new double[width];
@@ -239,10 +239,10 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
     {
         /* Kalman Values */
         kalman_t * k = &dmap->kalmans[i];
-        int m = OP_ALIGN((k->value/DENSITY_SCALE), height);
-        int mv = dmap->kalmans[i].variance;
+        int m = OP_ALIGN((k->x.p/DENSITY_SCALE), height);
+        int mv = dmap->kalmans[i].K[0];
         int mv1 = OP_ALIGN((mv/DENSITY_SCALE), m), mv2 = OP_ALIGN(-(mv/DENSITY_SCALE), m);
-        double mdm = INR(OP_ALIGN(k->value/DENSITY_SCALE, height), height);
+        double mdm = INR(OP_ALIGN(k->x.p/DENSITY_SCALE, height), height);
         
         line(M, DimPt(range[i], m, dim), DimPt(range[j], m, dim), orangish);
         line(M, DimPt(range[i], mv1, dim), DimPt(range[j], mv1, dim), yellowish);
@@ -255,7 +255,7 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
             --y1;
             dX[y1] = INR(dmap->map[y1], l);
             fX[y1] = INR(dmap->background[y1], l);
-            bX[y1] = INRLH(dmap->bound[y1], -l, l);
+//            bX[y1] = INRLH(dmap->bound[y1], -l, l);
         }
         
         for(int x = range[i]; x > range[j];  )
@@ -316,8 +316,8 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     for( int i = 0; i < rho->prediction_pair.num_blobs; i++ )
     {
         index_pair_t * bo = &rho->prediction_pair.blobs_order[i];
-        int y = (int)rho->prediction_pair.x.trackers[bo->x].kalman.value;
-        int x = (int)rho->prediction_pair.y.trackers[bo->y].kalman.value;
+        int y = (int)rho->prediction_pair.x.trackers[bo->x].kalman.x.p;
+        int x = (int)rho->prediction_pair.y.trackers[bo->y].kalman.x.p;
         pts.push_back(Point(x, y));
     }
     if(pts.size() >= 2)
@@ -349,17 +349,17 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     for( int i = 0; i < 2; i++ )
     {
 //        int o = rho->prediction_pair.y.trackers_order[i];
-        int v = rho->prediction_pair.y.trackers[i].kalman.value;
+        int v = rho->prediction_pair.y.trackers[i].kalman.x.p;
         line(M, DimPt(0,v,Y_DIMENSION), DimPt(height,v,Y_DIMENSION), (i % 2 ? bcolor : acolor), 1);
-        int t = (int)Kalman.Test(&rho->prediction_pair.y.trackers[i].kalman, rho->prediction_pair.y.trackers[i].kalman.rate);
+        int t = (int)Kalman.TestPosition(&rho->prediction_pair.y.trackers[i].kalman, rho->prediction_pair.y.trackers[i].kalman.x.v, false);
         line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
     }
     for( int i = 0; i < 2; i++ )
     {
 //        int o = rho->prediction_pair.x.trackers_order[i];
-        int v = rho->prediction_pair.x.trackers[i].kalman.value;
+        int v = rho->prediction_pair.x.trackers[i].kalman.x.p;
         line(M, DimPt(0,v,X_DIMENSION), DimPt(width,v,X_DIMENSION), (i % 2 ? bcolor : acolor), 1);
-        int t = (int)Kalman.Test(&rho->prediction_pair.x.trackers[i].kalman, rho->prediction_pair.x.trackers[i].kalman.rate);
+        int t = (int)Kalman.TestPosition(&rho->prediction_pair.x.trackers[i].kalman, rho->prediction_pair.x.trackers[i].kalman.x.v, false);
         line(M, DimPt(0,t,X_DIMENSION), DimPt(width,t,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
     }
     
@@ -519,7 +519,7 @@ Mat& RhoDrawer::DrawRhoFrame(Mat& M)
 #endif
     
     double target_cvg_percent = rho->target_coverage_factor;
-    pid_data[pid_data_x] = rho->target_filter.value;
+    pid_data[pid_data_x] = rho->target_filter.x.p;
     pid_data_target[pid_data_x] = target_cvg_percent;
 //    pthread_mutex_unlock(&rho.c_mutex);
     
@@ -769,10 +769,10 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     pDu[pX] = prediction.previous_peak[0];
     pDl[pX] = prediction.previous_peak[1];
-    pDuv[pX] = map.kalmans[0].variance;
-    pDlv[pX] = map.kalmans[1].variance;
-    pDut[pX] = map.kalmans[0].value;
-    pDlt[pX] = map.kalmans[1].value;
+    pDuv[pX] = map.kalmans[0].K[0];
+    pDlv[pX] = map.kalmans[1].K[0];
+    pDut[pX] = map.kalmans[0].x.p;
+    pDlt[pX] = map.kalmans[1].x.p;
     
     region_t regions[MAX_REGIONS];
     for(int i = 0; i < MAX_REGIONS; i++)
@@ -914,12 +914,12 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
         line(mat, matchOrigin, Point(matchOrigin.x, y+BL_IND_HEIGHT-RD_SPACE), RD_LINE_COLOR);
         
         kalman_t kalman = tracking_filters[tracking_filters_order[i]];
-        putText(mat, "Bi: " + to_stringn(kalman.bias,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+//        putText(mat, "Bi: " + to_stringn(kalman.bias,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "K0: " + to_stringn(kalman.K[0],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[0]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Vl: " + to_stringn(kalman.value,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Vl: " + to_stringn(kalman.x.p,1), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
         putText(mat, "K1: " + to_stringn(kalman.K[1],2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[1]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Sc: " + to_stringn(kalman.score,2), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
-        putText(mat, "Ve: " + to_stringn(kalman.velocity,2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+//        putText(mat, "Sc: " + to_stringn(kalman.score,2), Point(matchOrigin.x+x_offset[0], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
+        putText(mat, "Ve: " + to_stringn(kalman.x.v,2), Point(matchOrigin.x+x_offset[1], matchOrigin.y+y_offset[2]), RD_FONT, RD_TEXT_SM, RD_TEXT_COLOR);
     }
     
     /* Matching */

@@ -69,10 +69,11 @@ index_t * RhoCapture_CaptureBlobs( rho_capture_t * _,
     if( _->num_active > 0 )
     {
         // Capture active blobs
+        bool blob_found = false;
         for( byte_t i = 0; i < MAX_BLOBS; i++ )
         {
             if( !_->blob_i_active[i] ) continue;
-            index_t x = _->blobs[i].x;
+            index_t x = _->blobs[i].x; // TODO: On shadow, wrong blob may start first
 //            byte_t * cap_x = (byte_t *)(capture_address + x);
 //            printf("cap_x - %p > %p\n", capture_address, cap_x);
             index_t l = _->blobs[i].w;
@@ -81,11 +82,45 @@ index_t * RhoCapture_CaptureBlobs( rho_capture_t * _,
             if( l <= 0 )
                 continue;
 //            printf("thesh - %p > ", thresh_address);
-            thresh_address = RhoCapture.CaptureRow( capture_address, thresh_value, thresh_address, x, l + x, sub_sample );
+            if(blob_found)
+                printf("!");
+            index_t * new_thresh_address = RhoCapture.CaptureRow( capture_address, thresh_value, thresh_address, x, l + x, sub_sample );
+            if( new_thresh_address != thresh_address )
+            {
+//                if(blob_found) --thresh_address;
+//                printf("[%d]\n", *thresh_address);
+                *thresh_address = CAPTURE_ROW_END * ( i + 1 + (blob_found ? 1 : 0) );
+//                printf("%p[%d] > %p\n", thresh_address, *thresh_address, new_thresh_address);
+//                for(int ii = 0; ii < new_thresh_address + 1 - thresh_address; ii++)
+//                {
+//                    printf("[%d] ", thresh_address[ii]);
+//                }
+//                printf("\n");
+                thresh_address = new_thresh_address + 1;
+                blob_found = true;
+            }
 //            printf("%p\n", thresh_address);
         }
     }
     return thresh_address;
+}
+
+static int8_t RhoCapture_GetBlobForPoint( index_t x, index_t y, rho_capture_t * capture )
+{
+    int8_t blob_i = -1;
+    for( byte_t i = 0; i < capture->num_blobs; i++ )
+    {
+        blob_t * b = &capture->blobs[capture->blobs_order[i]];
+        if( x >= b->x
+           && y >= b->y
+           && x <= b->x + b->w
+           && y <= b->y + b->h )
+        {
+            blob_i = i;
+            break;
+        }
+    }
+    return blob_i;
 }
 
 section_process_t RhoCapture_ProcessFrameSection( const index_t end_row,
@@ -94,43 +129,59 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t end_row,
 				const register density_t Cx,
 				register sdensity_t * Dy,
 				register sdensity_t * Dx,
-                register index_t rows_proc )
+                register index_t y,
+                rho_capture_t * capture )
 {
     if(end_row == 0) return (section_process_t) { 0, 0, true };
-    register uint32_t value_register 	= 0;
-//    const register sdensity_t * Dx_end  = Dx + rows;
-	register density_2d_t Q_total       = 0;
-	register density_2d_t Q_prev        = 0;
-	register density_2d_t Q_left        = 0;
-	register density_2d_t Q_right       = 0;
-    bool complete = false;
-    index_t thresh_proc = 0;//, rows_proc = 0;
-//    index_t rows_proc = 0;
+    register uint32_t v = 0; // Delimiters and column value
+    density_2d_t Q_total       = 0;
+    density_2d_t Q_prev        = 0;
+    density_2d_t Q_left        = 0;
+    density_2d_t Q_right       = 0;
+    index_t thresh_proc = 0;
+    int16_t x_offset = 0;
+    int16_t y_offset = 0;
+    int8_t curr_blob = -1;
 
 #ifndef __ASSEMBLY_RHO__
     while( thresh_address < thresh_end )
     {
-        value_register = *(thresh_address++);
+        v = *(thresh_address++);
         thresh_proc++;
-        if( value_register < CAPTURE_ROW_END )
+        if( v < CAPTURE_ROW_END )
         {
-            if( value_register < Cx )
+            if( v < Cx )
                 Q_left++;
             else
                 Q_right++;
-            Dy[value_register]++;
+            Dy[v + x_offset]++;
         }
         else
         {
             Q_total = Q_left + Q_right;
-            Dx[rows_proc] = Q_total - Q_prev;
+            Dx[y] = Q_total - Q_prev;
             Q_prev = Q_total;
-            rows_proc = value_register - CAPTURE_ROW_END;
-            if( rows_proc >= end_row )
+            
+            v -= CAPTURE_ROW_END;
+            if( v >= CAPTURE_ROW_END )
             {
-                complete = true;
-                break;
+                int8_t b = -1;
+                do
+                {
+                    v -= CAPTURE_ROW_END;
+                    b++;
+                } while ( v >= CAPTURE_ROW_END );
+                if( b != curr_blob && b >= 0 && capture != NULL )
+                {
+                    byte_t bi = capture->blobs_order[b]; // Watch out for possible need for edge_order instead
+                    x_offset = capture->thresh_blob_loc[b].x - capture->blobs[bi].x;
+                    y_offset = capture->thresh_blob_loc[b].y - capture->blobs[bi].y;
+                    curr_blob = b;
+                }
             }
+            if( y >= end_row )
+                break;
+            y = v + y_offset;
         }
     }
 #else
@@ -183,15 +234,14 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t end_row,
 		[cap_s] "I" (CAPTURE_BUFFER_SIZE)
     );
 #endif
-//    Dx[rows_proc] = Q_total - Q_prev;
-    return (section_process_t){ Q_left, Q_right, thresh_proc, rows_proc, value_register >= end_row };
+    return (section_process_t){ Q_left, Q_right, thresh_proc, y, v >= end_row };
 }
 
 void RhoCapture_RowEdgeTick( rho_capture_t * _, index_t row )
 {
     if( row >= _->curr_edge->i )
     {
-        _->blob_i_active[_->curr_edge->id] = _->curr_edge->open;
+        _->blob_i_active[_->blobs_order[_->curr_edge->id]] = _->curr_edge->open;
         _->num_active += _->curr_edge->open ? 1 : -1;
         _->edge_proc++;
         _->done = _->edge_proc >= _->num_blobs * 2;
@@ -253,7 +303,7 @@ void RhoCapture_OrderEdges( blob_t * blobs, byte_t * blobs_order, byte_t n, edge
     {
         for( byte_t j = 0; j < n * 2 - i - 1; j++ )
         {
-            if (edges[edges_order[j]].i > edges[edges_order[j+1]].i)
+            if( edges[edges_order[j]].i > edges[edges_order[j+1]].i )
             {
                 byte_t v = edges_order[j];
                 edges_order[j] = edges_order[j+1];
@@ -265,42 +315,52 @@ void RhoCapture_OrderEdges( blob_t * blobs, byte_t * blobs_order, byte_t n, edge
     for( byte_t i = 0; i < n * 2; i++ )
     {
         edge_t * edge = &edges[edges_order[i]];
-        edge->i = MIN(edge->i, max_i);
+        edge->i = MIN( edge->i, max_i-1 );
     }
     PrintEdges(edges, edges_order, n);
 }
 
-void RhoCapture_AssignBlobsInThreshBuffer( index_t *thresh_blob_loc, index_t thresh_max, blob_t * blobs, byte_t * n, edge_t * edges, byte_t * order )
+index_t RhoCapture_RealWidthOnAxis( blob_t * blob, index_t offset, index_t max, bool x_axis, byte_t * n )
 {
-    thresh_blob_loc[0] = 0;
+    index_t * dim = x_axis ? &blob->w : &blob->h;
+    index_t v = *dim + offset;
+    if( v > max )
+    {
+        *dim -= v - max;
+        if( *dim <= CAPTURE_THRESH_MIN_BLOB_DIM )
+            (*n)--; // Note elimination when blob doesn't fit
+        v = max;
+    }
+    return v;
+}
+
+void RhoCapture_AssignBlobsInThreshBuffer( index_pair_t * thresh_blob_loc, index_pair_t thresh_max, blob_t * blobs, byte_t * n, edge_t * edges, byte_t * edge_order )
+{
+    thresh_blob_loc[0].x = 0;
+    thresh_blob_loc[0].y = 0;
     for( byte_t i = 0, f = 1; i < *n * 2; i++ )
     {
-        edge_t * edge = &edges[order[i]];
+        edge_t * edge = &edges[edge_order[i]];
         if( !edge->open ) continue;
         blob_t * b = &blobs[edge->id];
-        index_t x = b->w;
-        if( f > 1 )
-            x += thresh_blob_loc[f - 1];
-        if( x > thresh_max )
-        {
-            b->w -= x - thresh_max;
-            if( b->w <= 0 )
-                (*n)--;
-            x = thresh_max;
-        }
-        thresh_blob_loc[f++] = x;
+        thresh_blob_loc[f].x = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[f - 1].x, thresh_max.x, true, n );
+        thresh_blob_loc[f].y = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[f - 1].y, thresh_max.y, false, n );
+        f++;
     }
-    printf("Assign Blobs: ");
+    printf("Assign Blobs:\n X -");
     for( byte_t f = 0; f < *n + 1; f++ )
-        printf("| %d[%d] ", f, thresh_blob_loc[f]);
+        printf("| %d[%d] ", f, thresh_blob_loc[f].x);
+    printf("|\n Y -");
+    for( byte_t f = 0; f < *n + 1; f++ )
+        printf("| %d[%d] ", f, thresh_blob_loc[f].y);
     printf("|\n");
 }
 
-void RhoCapture_PrepareBlobsForCapture( rho_capture_t * _, index_t max_y )
+void RhoCapture_PrepareBlobsForCapture( rho_capture_t * _ )
 {
     RhoCapture.OrderBlobs( _->blobs, _->blobs_order, _->num_blobs );
-    RhoCapture.OrderEdges( _->blobs, _->blobs_order, _->num_blobs, _->edges, _->edge_order, max_y );
-    RhoCapture.AssignBlobsInThreshBuffer( _->thresh_blob_loc, _->thresh_max, _->blobs, &_->num_blobs, _->edges, _->edge_order );
+    RhoCapture.OrderEdges( _->blobs, _->blobs_order, _->num_blobs, _->edges, _->edge_order, _->capture_size.y );
+    RhoCapture.AssignBlobsInThreshBuffer( _->thresh_blob_loc, _->capture_size, _->blobs, &_->num_blobs, _->edges, _->edge_order );
     
     _->curr_edge = &_->edges[_->edge_order[_->edge_proc]];
 }
@@ -314,7 +374,8 @@ void RhoCapture_ResetEdges( rho_capture_t * _ )
 {
     _->edge_proc = 0;
     _->num_active = 0;
-    _->thresh_max = CAPTURE_THRESH_MAX;
+    _->capture_size.x = CAPTURE_THRESH_X_MAX;
+    _->capture_size.y = CAPTURE_THRESH_Y_MAX;
     _->done = false;
     memset( _->edges, 0, sizeof(_->edges[0]) * MAX_BLOBS * 2);
     memset( _->edge_order, 0, sizeof(_->edge_order[0]) * MAX_BLOBS * 2);

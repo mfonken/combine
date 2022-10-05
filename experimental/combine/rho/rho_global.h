@@ -44,7 +44,7 @@ typedef uint32_t	    address_t;
 //#define USE_BACKGROUNDING
 // #define ALLOW_NEGATIVE_REDISTRIBUTION
 
-#define RHO_DEBUG               DEBUG_2
+#define RHO_DEBUG               DEBUG_1
 #define RHO_DEBUG_2             DEBUG_1
 #define RHO_DEBUG_INIT          DEBUG_1
 #define RHO_DEBUG_DETECT        DEBUG_1

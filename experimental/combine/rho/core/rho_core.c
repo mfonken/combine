@@ -18,20 +18,6 @@
 static const char * X_INSTANCE_NAME = "X";
 static const char * Y_INSTANCE_NAME = "Y";
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *                       Local Instance                                 *
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-const rho_core_functions RhoCore =
-{
-    .Initialize         = RhoCore_Initialize,
-    .Perform            = RhoCore_Perform,
-    .DetectPairs        = RhoCore_DetectPairs,
-    .Detect             = RhoCore_Detect,
-    .UpdatePrediction   = RhoCore_UpdatePrediction,
-    .UpdatePredictions  = RhoCore_UpdatePredictions,
-    .UpdateThreshold    = RhoCore_UpdateThreshold,
-    .GeneratePacket     = RhoCore_GeneratePacket
-};
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *                      Functions Declarations                          *
@@ -69,7 +55,7 @@ void RhoCore_Initialize( rho_core_t * core, index_t width, index_t height )
 void RhoCore_Perform( rho_core_t * core, bool background_event )
 {
     if(background_event)
-        RhoUtility.Generate.Background( core );
+        RhoUtility.Calculate.Background( core );
     else
     {
         RhoCore.DetectPairs( core );
@@ -100,12 +86,18 @@ void RhoCore_Detect( rho_core_t * core, density_map_t * density_map, prediction_
     RhoUtility.Reset.Detect( &_, density_map, prediction );
     core->total_coverage = 0;
     core->filtered_coverage = 0;
-    _.target_density = core->target_filter.value * (floating_t)TOTAL_RHO_PIXELS;
+    _.target_density = core->target_filter.x.p * (floating_t)TOTAL_RHO_PIXELS;
 
     /* Perform detect */
     LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
-    RhoUtility.Detect.Perform( &_, density_map, prediction );
+    RhoCore.DetectRegions( &_, density_map, prediction );
 
+    LOG_RHO(RHO_DEBUG_2, "Performing detect:\n");
+    RhoUtility.Detect.SortRegions( &_, prediction );
+    
+    LOG_RHO(RHO_DEBUG_2, "Updating centroid:\n");
+    RhoUtility.Detect.Centroid( &_, density_map );
+    
     /* Update frame statistics */
     LOG_RHO(RHO_DEBUG_2, "Calculating frame statistics:\n");
     RhoUtility.Detect.CalculateFrameStatistics( &_, prediction );
@@ -113,6 +105,56 @@ void RhoCore_Detect( rho_core_t * core, density_map_t * density_map, prediction_
     /* Update core */
     core->total_coverage     += _.total_density;// target_density;
     core->filtered_coverage  += _.filtered_density;
+}
+
+void RhoCore_DetectRegions( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
+{
+    _->raw_density_moment = 0;
+    _->total_density = 0;
+    _->filtered_density = 0;
+#ifdef __USE_ZSCORE_THRESHOLD__
+    _->z_thresh_factor = 5;
+    _->z_stat.max_n = 5;//density_map->length;
+#endif
+#ifdef __USE_REGION_BOUNDARY_OFFSET__
+    memset( _->region_boundaries, 0, sizeof(_->region_boundaries[0])*MAX_REGIONS*2);
+    _->region_boundary_index = 0;
+#endif
+
+    DUAL_FILTER_CYCLE(_->cycle)
+    {
+        _->maximum  = 0;
+        _->start    = _->range[_->cycle];
+        _->end      = _->range[_->cycle_];
+        _->offset   = density_map->offset[_->cycle];
+        _->recalculation_counter = 0;
+        _->recalculate = false;
+
+        RhoUtility.Predict.PeakFilter( _, density_map, prediction );
+        if( RhoUtility.Detect.LowerBound( _ ) )
+        {
+            do
+            {
+                LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Recalc: %d\n", prediction->name, _->cycle, _->recalculation_counter);
+                RhoUtility.Detect.Regions( _, density_map, prediction );
+                if( !_->recalculate )
+                  RhoUtility.Detect.CalculateChaos( _, prediction );
+                RhoUtility.Detect.ScoreRegions( _, density_map, prediction );
+                if(_->recalculation_counter == 0)
+                  _->first_filtered_density = _->filtered_density;
+            } while( _->recalculate && ++_->recalculation_counter < MAX_RHO_RECALCULATION_LEVEL );
+        }
+
+        prediction->previous_peak[_->cycle] = BOUNDU( _->maximum, _->len );
+        LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Peak: %d\n", prediction->name, _->cycle, prediction->previous_peak[_->cycle]);
+        prediction->previous_density[_->cycle] = _->first_filtered_density;
+        density_map->max[_->cycle] = _->maximum;
+    }
+    uint8_t valid_regions = 0;
+    for( uint8_t i = 0; i < _->total_regions; i++ )
+        if( prediction->regions_order[i].valid ) valid_regions++;
+    _->total_regions = valid_regions;
+    LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d\n", _->total_regions);
 }
 
 void RhoCore_UpdatePredictions( rho_core_t * core )
@@ -167,6 +209,19 @@ void RhoCore_UpdateThreshold( rho_core_t * core )
 void RhoCore_GeneratePacket( rho_core_t * core )
 {
     LOG_RHO(RHO_DEBUG_2,"Generating packets.\n");
-    RhoUtility.Generate.Packet( core );
+    RhoUtility.Calculate.Packet( core );
     RhoUtility.Print.Packet( &core->packet, PACKET_SIZE );
 }
+
+const rho_core_functions RhoCore =
+{
+    .Initialize         = RhoCore_Initialize,
+    .Perform            = RhoCore_Perform,
+    .DetectPairs        = RhoCore_DetectPairs,
+    .Detect             = RhoCore_Detect,
+    .DetectRegions      = RhoCore_DetectRegions,
+    .UpdatePrediction   = RhoCore_UpdatePrediction,
+    .UpdatePredictions  = RhoCore_UpdatePredictions,
+    .UpdateThreshold    = RhoCore_UpdateThreshold,
+    .GeneratePacket     = RhoCore_GeneratePacket
+};

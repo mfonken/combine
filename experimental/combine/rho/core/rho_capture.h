@@ -22,8 +22,9 @@
 //#define CAPTURE_WIDTH 100
 //#define MIN(A, B) (A < B ? A : B)
 
-#define MAX_BLOBS 3
-#define CAPTURE_THRESH_MAX CAPTURE_WIDTH
+#define CAPTURE_THRESH_X_MAX CAPTURE_WIDTH
+#define CAPTURE_THRESH_Y_MAX CAPTURE_HEIGHT
+#define CAPTURE_THRESH_MIN_BLOB_DIM 1
 
 typedef struct
 {
@@ -48,8 +49,8 @@ typedef struct
     byte_t edge_order[MAX_BLOBS * 2];
     blob_t blobs[MAX_BLOBS];
     byte_t blobs_order[MAX_BLOBS];
-    index_t thresh_max;
-    index_t thresh_blob_loc[MAX_BLOBS];
+    index_pair_t capture_size;
+    index_pair_t thresh_blob_loc[MAX_BLOBS];
     edge_t * curr_edge;
     bool blob_i_active[MAX_BLOBS];
     bool done;
@@ -74,13 +75,14 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t end_row,
                               const density_t Cx,
                               sdensity_t * Dy,
                               sdensity_t * Dx_i,
-                              index_t rows_proc );
+                              index_t rows_proc,
+                              rho_capture_t * );
 
 void RhoCapture_RowEdgeTick( rho_capture_t * _, index_t row );
 void RhoCapture_OrderBlobs( blob_t * blobs, byte_t * order, byte_t n);
 void RhoCapture_OrderEdges( blob_t * blobs, byte_t * blobs_order, byte_t n, edge_t * edges, byte_t * edges_order, index_t max_i );
-void RhoCapture_AssignBlobsInThreshBuffer( index_t *thresh_blob_loc, index_t thresh_max, blob_t * blob, byte_t * n, edge_t * edges, byte_t * order);
-void RhoCapture_PrepareBlobsForCapture( rho_capture_t * _, index_t max_y );
+void RhoCapture_AssignBlobYsInThreshBuffer( index_pair_t *thresh_blob_loc, index_pair_t thresh_max, blob_t * blob, byte_t * n, edge_t * edges, byte_t * edge_order );
+void RhoCapture_PrepareBlobsForCapture( rho_capture_t * _ );
 void RhoCapture_AddBlob( rho_capture_t * _, blob_t blob );
 void RhoCapture_ResetEdges( rho_capture_t * _ );
 void RhoCapture_ResetBlobs( rho_capture_t * _ );
@@ -90,12 +92,12 @@ typedef struct
 {
     index_t * (*CaptureRow)( const byte_t *, const byte_t, index_t *, index_t, index_t, byte_t );
     index_t * (*CaptureBlobs)( rho_capture_t *, index_t, const byte_t *, const byte_t, index_t *, const index_t, byte_t );
-    section_process_t (*ProcessFrameSection)( const index_t, index_t *, const index_t *, const density_t, sdensity_t *, sdensity_t *, index_t );
+    section_process_t (*ProcessFrameSection)( const index_t, index_t *, const index_t *, const density_t, sdensity_t *, sdensity_t *, index_t, rho_capture_t * );
     void (*RowEdgeTick)( rho_capture_t *, index_t row );
     void (*OrderBlobs)( blob_t * blobs, byte_t *, byte_t n );
     void (*OrderEdges)( blob_t * blobs, byte_t * blobs_order, byte_t n, edge_t * edges, byte_t * edges_order, index_t max_i );
-    void (*AssignBlobsInThreshBuffer)( index_t *thresh_blob_loc, index_t thresh_max, blob_t * blob, byte_t * n, edge_t * edges, byte_t * order);
-    void (*PrepareBlobsForCapture)( rho_capture_t * _, index_t max_y );
+    void (*AssignBlobsInThreshBuffer)( index_pair_t *thresh_blob_loc, index_pair_t thresh_max, blob_t * blob, byte_t * n, edge_t * edges, byte_t * edge_order );
+    void (*PrepareBlobsForCapture)( rho_capture_t * _ );
     void (*AddBlob)( rho_capture_t * _, blob_t blob );
     void (*ResetEdges)( rho_capture_t * _ );
     void (*ResetBlobs)( rho_capture_t * _ );

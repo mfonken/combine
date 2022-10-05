@@ -5,179 +5,189 @@
 #define DEBUG_KALMAN_PRIO DEBUG_2
 
 //#endif
-/*~ SOURCE: http://preview.tinyurl.com/9djhrem */
+/* Based on: https://tinyurl.com/39mx3pu3 */
 
-void Kalman_Initialize( kalman_t * k, floating_t v, floating_t ls, floating_t minv, floating_t maxv, kalman_uncertainty_c uncertainty )
+void Kalman_Init( kalman_t * k, floatp p, floatp process_noise, floatp std_meas, floatp lifespan, floatp p_min, floatp p_max )
 {
-    k->lifespan    = ls;
-    k->uncertainty.value   = uncertainty.value;
-    k->uncertainty.bias    = uncertainty.bias;
-    k->uncertainty.sensor  = uncertainty.sensor;
+    Kalman.Reset( k, p );
     
-    k->origin    = TIMESTAMP(KALMAN_TIME_UNITS);
-    k->t = k->origin;
-    
-    k->min_value = minv;
-    k->max_value = maxv;
-    
-    k->acceleration_mode = false;
-    
-    Kalman_Reset(k, v);
+    k->R = std_meas * std_meas;
+    k->process_noise_sq = process_noise * process_noise;
+
+//    k->lifespan = lifespan;
+//    k->p_min = p_min;
+//    k->p_max = p_max;
+//    k->valid = false;
 }
 
-void Kalman_Reset( kalman_t * k, floating_t v )
+void Kalman_Reset( kalman_t * k, floatp p )
 {
-    k->K[0]        = 0; /* Gain */
-    k->K[1]        = 0;
-    k->P[0][0]     = 0; /* Error covariance */
-    k->P[0][1]     = 0;
-    k->P[1][0]     = 0;
-    k->P[1][1]     = 0;
-    k->rate        = 0;
-    k->bias        = 0;
-    k->prev        = 0;
-    k->velocity    = 0;
-    k->variance    = 0;
-    k->flag        = 0;
-    k->score       = 0;
-    k->value       = v;
-    k->origin      = TIMESTAMP(KALMAN_TIME_UNITS);
+    memset( &k->x, 0, sizeof(k->x) );
+    memset( &k->B, 0, 2 * sizeof(floatp) );
+    memset( &k->Q, 0, 2 * 2 * sizeof(floatp) );
+    
+    Matrix.Eye( (floatp*)k->A, 2, 2 );
+    Matrix.Eye( (floatp*)k->P, 2, 2 );
+    Matrix.Eye( (floatp*)k->H, 1, 2 );
+
+    k->x.p = p;
 }
 
-floating_t Kalman_Test( kalman_t * k, floating_t rate_new )
+physical_t * Kalman_Test( kalman_t * k, floatp x_new[2], bool update_A )
 {
-    floating_t dt =
-#ifdef SET_DT_SEC
-        SET_DT_SEC;
-#else
-        ((floating_t)TIMESTAMP(TIME_SEC)) - k->t;
-#endif
-    
-    /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
-    floating_t velocity = k->prev > 0 ? k->value - k->prev : 0.0;
-    floating_t rate     = k->acceleration_mode ?
-        dt * rate_new - k->bias + velocity
-        : rate_new - k->bias;
-    floating_t value   = k->value + dt * rate;
-    return BOUND(value, k->min_value, k->max_value);
-}
-
-void Kalman_Predict( kalman_t * k, floating_t rate_new )
-{
-    floating_t dt =
-#ifdef SET_DT_SEC
-        SET_DT_SEC;
-#else
-        ((floating_t)TIMESTAMP(KALMAN_TIME_UNITS)) - k->t;
-#endif
-    
-    /* Quick expiration check */
-    if(dt > k->lifespan)
+    if(update_A)
     {
-        k->t = TIMESTAMP(KALMAN_TIME_UNITS);
-        return;
+        floatp dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        ((floatp)TIMESTAMP(TIME_SEC)) - k->t;
+#endif
+        k->A[0][1] = dt;
     }
     
-    /* \hat{x}_{k\mid k-1} = F \hat{x_{k-1\mid k-1}} + B \dot{\theta}_k */
-    k->velocity = k->prev > 0 ? k->value - k->prev : 0.0;
-    k->prev     = k->value;
-    k->rate     = k->acceleration_mode ?
-        dt * rate_new - k->bias + k->velocity
-        : rate_new - k->bias;
-    if( k->rate > 101)
-        printf("!");
-    k->value   += dt * k->rate;
-    k->value    = BOUND(k->value, k->min_value, k->max_value);
+    // Predict next state:
+    // x = A.x_ + B.u_ where u = [a]
+    floatp r1[2], r2[2], *x = (floatp*)&k->x.p, *Ap = (floatp*)k->A;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "A.x:\n");
+    Matrix.Dot( Ap, x, false, r1, 2, 1, 2 );
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "B.a:\n");
+    Matrix.Dot( (floatp*)k->B, (floatp*)&k->x.a, false, r2, 2, 1, 1 );
+    Matrix.AddSub( r1, r2, x_new, 1, 2, true );
     
-    /* P_{k\mid k-1} = F P_{k-1\mid k-1} F^T + Q_k */
-    floating_t dt_P_1_1 = dt * k->P[1][1];
-    k->P[0][0]   += dt * ( dt_P_1_1 -
-                                  k->P[0][1] -
-                                  k->P[1][0] +
-                                  k->uncertainty.value );
-    k->P[0][1]   -= dt_P_1_1;
-    k->P[1][0]   -= dt_P_1_1;
-    k->P[1][1]   += k->uncertainty.bias * dt;
-    
-//    LOG_KALMAN(KALMAN_DEBUG_2, "Prediction - Value:%.2f Rate:%.2f Velocity:%.2f\n", k->value, k->rate, k->velocity);
+    return &k->x;
 }
 
-void Kalman_Update( kalman_t * k, floating_t value_new )
+floatp Kalman_TestPosition( kalman_t * k, floatp p_new, bool update_A )
 {
-    /* S_k = H P_{k\mid k-1} H^T + R */
-    floating_t S_ = 1. / ( k->P[0][0] + k->uncertainty.sensor );
+    floatp x_new[2] = { p_new, 0. };
+    physical_t * x = Kalman.Test( k, x_new, update_A );
+    return x->p;
+}
+
+void Kalman_Predict( kalman_t * k )
+{
+    floatp t_ = (floatp)TIMESTAMP(TIME_SEC);
+    floatp dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        t_ - k->t;
+#endif
+//    printf("∆t: %2fms\n", dt);
+    k->t = t_;
     
-    /* K_k = P_{k\mid k-1} H^T S^{-1}_k */
-    k->K[0]       = k->P[0][0] * S_;
-    k->K[1]       = k->P[1][0] * S_;
+    floatp dt_sq = dt * dt;
+    floatp dt_hfsq = dt_sq / 2;
     
-    /* \tilde{y} = z_k - H \hat{x}_{k\mid k-1} */
-    floating_t delta_value = value_new - k->value;
-    k->value     += k->K[0] * delta_value;
-    k->bias      += k->K[1] * delta_value;
+    // Update matrices with dt
+    k->A[0][1] = dt;
     
-    k->P[0][0]   -= k->K[0] * k->P[0][0];
-    k->P[0][1]   -= k->K[0] * k->P[0][1];
-    k->P[1][0]   -= k->K[1] * k->P[0][0];
-    k->P[1][1]   -= k->K[1] * k->P[0][1];
+    k->B[0] = dt_hfsq;
+    k->B[1] = dt;
     
-    k->t  = TIMESTAMP(KALMAN_TIME_UNITS);
+    k->Q[0][0] = dt_hfsq * dt_hfsq * k->process_noise_sq;
+    k->Q[0][1] = dt_hfsq * dt * k->process_noise_sq;
+    k->Q[1][0] = k->Q[0][1];
+    k->Q[1][1] = dt_hfsq;
     
-    k->value = BOUND(k->value, k->min_value, k->max_value);
+    // Predict next state:
+    // x = A.x_ + B.u_ where u = [a]
+    Kalman.Test( k, (floatp*)&k->x.p, true );
     
-    k->estimation_error = k->value - value_new;
-//    LOG_KALMAN(KALMAN_DEBUG_2, "Update - Value:%.2f Bias:%.2f K:%.2f|%.2f\n", k->value, k->bias, k->K[0], k->K[1]);
+    // Update error covariance:
+    // P = A.P.AT + Q
+    floatp r3[2][2], r4[2][2];
+    floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4, *Ap = (floatp*)k->A;;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "A.P:\n");
+    Matrix.Dot( Ap, (floatp*)k->P, false, r3p, 2, 2, 2);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "(A.P).AT:\n");
+    Matrix.Dot( r3p, Ap, true, r4p, 2, 2, 2);
+    Matrix.AddSub( r4p, (floatp*)k->Q, (floatp*)k->P, 2, 2, true );
+}
+
+void Kalman_Update( kalman_t * k, floatp z )
+{
+    floatp PHT[2], *Hp = (floatp*)k->H;
+    floatp *PHTp = (floatp*)PHT;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "P.HT\n");
+    Matrix.Dot( (floatp*)k->P, Hp, true, PHTp, 2, 1, 2 );
+    
+    // S = H.P.HT + R
+    floatp S;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "S = H.(P.HT)\n");
+    Matrix.Dot( Hp, PHTp, false, &S, 1, 1, 2 );
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "S += R\n");
+    S += k->R;
+    
+    // K = P.HT.S^-1
+    floatp Sinv = 1 / S;
+    floatp *Kp  = (floatp*)k->K;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "(P.HT).Sinv\n");
+    Matrix.Dot( PHTp, (floatp*)&Sinv, false, Kp, 2, 1, 1 );
+    
+    floatp r3, r4[2], *x = (floatp*)&k->x.p;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "H.x\n");
+    Matrix.Dot( (floatp*)k->H, x, false, &r3, 1, 1, 2 );
+    r3 = z - r3;
+//    Matrix.AddSub( z, r3, r3, 2, 2, false );
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "K.z...\n");
+    Matrix.Dot( Kp, &r3, false, r4, 2, 1, 1 );
+    Matrix.AddSub( x, r4, x, 1, 2, true );
+    
+    floatp r5[2][2], r6[2][2];
+    floatp *r5p = (floatp*)r5;
+    floatp *r6p = (floatp*)r6;
+    Matrix.Eye( (floatp*)r5, 2, 2 );
+    
+    floatp K22[2][2], H22[2][2];
+    Matrix.ZPad( (floatp*)k->K, 2, 1, (floatp*)K22, 2, 2);
+    Matrix.ZPad( (floatp*)k->H, 1, 2, (floatp*)H22, 2, 2);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "K.H\n");
+    Matrix.Dot( (floatp*)K22, (floatp*)H22, false, r6p, 2, 2, 2);
+    Matrix.AddSub( r5p, r6p, r5p, 2, 2, false );
+    
+    floatp r7[2][2];
+    floatp *r7p = (floatp*)r7;
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "(I - K.H).P\n");
+    Matrix.Dot( r5p, (floatp*)k->P, false, r7p, 2, 2, 2);
+    memcpy( k->P, r7p, 2 * 2 * sizeof(floatp));
 };
 
-floating_t Kalman_Tick( kalman_t * k, floating_t value_new )
+physical_t * Kalman_Step( kalman_t * k, floatp z )
 {
-    return Kalman.Step( k, value_new, k->velocity );
-}
-
-floating_t Kalman_Step( kalman_t * k, floating_t value_new, floating_t rate_new )
-{
-//    LOG_KALMAN(KALMAN_DEBUG_2, "Step - Id:%p NewVal:%.2f NewRate:%.2f\n", k, value_new, rate_new);
-    Kalman_Predict(k, rate_new);
-    Kalman_Update(k, value_new);
-    return k->value;
-}
-
-bool Kalman_IsExpired( kalman_t * k )
-{
-#ifdef SET_DT_SEC
-    return false;
-#else
-    return ((TIMESTAMP(KALMAN_TIME_UNITS) - k->t) > k->lifespan);
-#endif
-}
-
-inline floating_t Kalman_Score( kalman_t * k )
-{
-    floating_t score = k->K[0];
-    if(k->flag) score = 0.;
-    k->score = score;
-    return score;
-}
-
-void Kalman_Punish( kalman_t * k )
-{
-    k->K[0] *= KALMAN_PUNISH_FACTOR;
-    if( Kalman_Score(k) < MIN_KALMAN_GAIN )
-        Kalman_Reset(k, 0);
+    Kalman_Predict( k );
+    Kalman_Update( k, z );
+    return &k->x;
 }
 
 void Kalman_Print( kalman_t * k )
 {
-    LOG_KALMAN(DEBUG_KALMAN_PRIO, "Val: %.4f | Rate: %.4f | Vel:%.4f\n", k->value, k->rate, k->velocity);
-    LOG_KALMAN(DEBUG_KALMAN_PRIO, "Bias: %.4f | Var: %.4f | Scr:%.4f\n", k->bias, k->variance, k->score);
+    LOG_KALMAN(DEBUG_KALMAN_PRIO, "p: %.4f | v: %.4f | a:%.4f\n", k->x.p, k->x.v, k->x.a);
+//    LOG_KALMAN(DEBUG_KALMAN_PRIO, "Bias: %.4f | Var: %.4f | Scr:%.4f\n", k->bias, k->variance, k->score);
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "K:\t[%.4f][%.4f]\n", k->K[0], k->K[1]);
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "P:\t[%.4f][%.4f]\n", k->P[0][0], k->P[0][1]);
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "  \t[%.4f][%.4f]\n", k->P[1][0], k->P[1][1]);
 }
 
-#ifdef MATVEC_LIB
-gaussian1d_t GetGaussian1DKalman( kalman_filter_t * k )
+//#ifdef MATVEC_LIB
+//gaussian1d_t GetGaussian1DKalman( kalman_filter_t * k )
+//{
+//    return (gaussian1d_t){ k->value, k->P[0][0] };
+//}
+//#endif
+
+const struct kalman_functions Kalman =
 {
-    return (gaussian1d_t){ k->value, k->P[0][0] };
-}
+    .Init = Kalman_Init,
+    .Reset = Kalman_Reset,
+    .Test = Kalman_Test,
+    .TestPosition = Kalman_TestPosition,
+    .Predict = Kalman_Predict,
+    .Update = Kalman_Update,
+    .Step = Kalman_Step,
+    .Print = Kalman_Print,
+#ifdef MATVEC_LIB
+    .Gaussian1D = GetGaussian1DKalman
 #endif
+};

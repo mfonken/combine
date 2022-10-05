@@ -14,7 +14,7 @@
 #include <stdbool.h>
 
 #include "rho_structure.h"
-#include "../rho_config.h"
+#include "rho_config.h"
 #ifdef __PSM__
 #include "../psm/psm.h"
 #else
@@ -68,6 +68,8 @@ typedef struct
     region_t * region;
     kalman_t kalman;
     bool valid;
+    floating_t score;
+    floating_t lifespan;
 } tracker_t;
 
 /* Rho Structures* */
@@ -76,10 +78,12 @@ typedef struct
     sdensity_t
         *map,
         *background,
-        *bound,
+//        *bound,
         max[2];
-    uint16_t
-        length;
+    index_t length;
+//#ifdef __USE_BLOB_TRACKING__
+    index_t offset[MAX_BLOBS];
+//#endif
     floating_t
         centroid;
     bool
@@ -146,13 +150,13 @@ typedef struct
     prediction_t    x,y;
     prediction_probabilities probabilities;
 
-    floating_t      nu_regions,
-                    num_regions,
-//                    BestConfidence,
-                    average_density;
-    bool            descending;
-    index_pair_t         blobs_order[MAX_REGIONS];
-    byte_t          num_blobs;
+    floating_t   nu_regions;
+    floating_t   num_regions;
+    floating_t   average_density;
+//  floating_t   BestConfidence,
+    bool         descending;
+    index_pair_t blobs_order[MAX_REGIONS];
+    byte_t       num_blobs;
 } prediction_pair_t;
 
 typedef struct
@@ -231,6 +235,9 @@ typedef struct
       region_boundary_index,
 #endif
       x,
+//#ifdef __USE_BLOB_TRACKING__ /// TODO: This ifdef isn't working
+      offset,
+//#endif
       start,
       end;
 #ifdef __USE_ZSCORE_THRESHOLD__
@@ -241,7 +248,6 @@ typedef struct
       filter_peak,
       filter_peak_2,
       filter_band_lower,
-      background_curr,
       maximum;
     sdensity_t
       curr;

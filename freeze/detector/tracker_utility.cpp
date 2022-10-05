@@ -54,16 +54,16 @@ vector<Point2f> TrackerUtility::Update(vector<Point2f> pts)
         // Check if uninitialzed
         if( tr->t == 0 )
         {
-            Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
-            tr->state.px = pts[i].x;
-            tr->state.py = pts[i].y;
+            Kalman2D.Init( tr, NULL, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
+            tr->x.px = pts[i].x;
+            tr->x.py = pts[i].y;
             r_pts.push_back(Point2f(pts[i].x, pts[i].y));
         }
         else
         {
-            Kalman2D.predict( tr );
-            Kalman2D.update( tr, (floatp[]){ (floatp)pts[i].x, (floatp)pts[i].y } );
-            r_pts.push_back(Point2f(tr->state.px, tr->state.py));
+            Kalman2D.Predict( tr );
+            Kalman2D.Update( tr, (floatp[]){ (floatp)pts[i].x, (floatp)pts[i].y } );
+            r_pts.push_back(Point2f(tr->x.px, tr->x.py));
         }
     }
     return r_pts;
@@ -98,7 +98,7 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
             if( tr->t > 0)
             {
                 physical_2d_t p;
-                Kalman2D.test( tr, (floatp*)&p.px, true );
+                Kalman2D.Test( tr, (floatp*)&p.px, true );
                 d = dist(pt.x - p.px, pt.y - p.py);
                 if( d > TRACKER_MAX_DELTA )
                     d = MAXFLOAT;
@@ -114,9 +114,9 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
                 kalman2d_t * tr = &trackers[ti];
                 if( tr->t == 0 )
                 {
-                    Kalman2D.init( tr, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
-                    tr->state.px = pt.x;
-                    tr->state.py = pt.y;
+                    Kalman2D.Init( tr, NULL, TRACKER_PROCESS_NOISE, TRACKER_STD_MEAS, TRACKER_STD_MEAS );
+                    tr->x.px = pt.x;
+                    tr->x.py = pt.y;
                     ds[ti] = 0;
                     break;
                 }
@@ -132,11 +132,11 @@ vector<Point2f> TrackerUtility::UpdateTrack(vector<Point2f> pts)
         floatp p[2] = { pt.x, pt.y };
         int ti = match[pi];
         kalman2d_t * tr = &trackers[ti];
-        Kalman2D.predict( tr );
-        Kalman2D.update( tr, p );
-        r_pts[ti] = Point2f(tr->state.px, tr->state.py);
-        if(tr->state.px < 10)
-            printf("%.2f\n", tr->state.px);
+        Kalman2D.Predict( tr );
+        Kalman2D.Update( tr, p );
+        r_pts[ti] = Point2f(tr->x.px, tr->x.py);
+        if(tr->x.px < 10)
+            printf("%.2f\n", tr->x.px);
 //        printf("%d ", match[pi]);
     }
 //    printf("\n");
@@ -148,8 +148,8 @@ void TrackerUtility::reorder()
     std::sort(trackers.begin(), trackers.end(), [](kalman2d_t a, kalman2d_t b) {
         if( a.t > 0)
         {
-            double da = sqrt( a.state.px * a.state.px + a.state.py * a.state.py );
-            double db = sqrt( b.state.px * b.state.px + b.state.py * b.state.py );
+            double da = sqrt( a.x.px * a.x.px + a.x.py * a.x.py );
+            double db = sqrt( b.x.px * b.x.px + b.x.py * b.x.py );
             return da < db;
         }
         else

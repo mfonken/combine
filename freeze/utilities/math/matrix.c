@@ -34,7 +34,7 @@ void Matrix_Dot( floatp a[], floatp b[], bool T_b, floatp r[], uint8_t rows, uin
             {
                 floatp r = a[yi] * b[xi];
                 s += r;
-                LOG_MTX(DEBUG_MATRIX_PRIO, "%.1f[%d] x %.1f[%d] = %.1f [%.1f]\n", a[yi], yi, b[xi], xi, r, s );
+                LOG_MTX(DEBUG_MATRIX_PRIO, "%.4f[%d] x %.4f[%d] = %.4f [%.4f]\n", a[yi], yi, b[xi], xi, r, s );
             }
             r[yx] = s;
             LOG_MTX(DEBUG_MATRIX_PRIO, "\n");
@@ -63,7 +63,7 @@ void Matrix_ZPad( floatp m[], uint8_t rows_in, uint8_t cols_in, floatp r[], uint
         for( ; x < cols_out; x++ )
             *(rp++) = 0;
     }
-    memset( rp, 0, cols_out * ( rows_out - y ) );
+    memset( rp, 0, sizeof(floatp) * cols_out * ( rows_out - y ) );
 }
 
 void Matrix_Inv22( floatp m[2][2], floatp r[2][2])
@@ -83,9 +83,9 @@ void Matrix_Inv22( floatp m[2][2], floatp r[2][2])
 
 const matrix_functions Matrix =
 {
-    .eye = Matrix_Eye,
-    .dot = Matrix_Dot,
-    .addsub = Matrix_AddSub,
-    .zpad = Matrix_ZPad,
+    .Eye = Matrix_Eye,
+    .Dot = Matrix_Dot,
+    .AddSub = Matrix_AddSub,
+    .ZPad = Matrix_ZPad,
     .inv22 = Matrix_Inv22
 };

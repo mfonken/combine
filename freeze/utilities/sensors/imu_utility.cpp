@@ -15,7 +15,7 @@ IMUUtility::IMUUtility(SERCOM_Channel * channel, string n)
 
 IMUUtility::~IMUUtility()
 {
-    pthread_mutex_destroy(&mutex);
+//    pthread_mutex_destroy(&mutex);
 }
 
 void IMUUtility::init()

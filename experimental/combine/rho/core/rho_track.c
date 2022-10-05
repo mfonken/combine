@@ -52,11 +52,11 @@ void RhoTrack_DisambiguatePair( rho_core_t * core, byte_pair_t pts[2] )
 {
     prediction_pair_t * predictions = &core->prediction_pair;
     
-    floating_t x0 = predictions->x.trackers[pts[0].x].kalman.value;
-    floating_t x1 = predictions->x.trackers[pts[1].x].kalman.value;
+    floating_t x0 = predictions->x.trackers[pts[0].x].kalman.x.p;
+    floating_t x1 = predictions->x.trackers[pts[1].x].kalman.x.p;
     
-    floating_t y0 = predictions->y.trackers[pts[0].y].kalman.value;
-    floating_t y1 = predictions->y.trackers[pts[1].y].kalman.value;
+    floating_t y0 = predictions->y.trackers[pts[0].y].kalman.x.p;
+    floating_t y1 = predictions->y.trackers[pts[1].y].kalman.x.p;
     
 //    index_pair_t centroid = core->centroid;
     /// TODO: Decide if centroid check is valid

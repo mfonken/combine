@@ -24,14 +24,17 @@
 /* Filters */
 #include "kalman.h"
 
+#include "unilog.h"
 
-/** Absolute value */
-#define     absl(x) x > 0 ? x:-x
+//#define DEBUG_KINETIC
+#define KINETIC_LOG_PRIO DEBUG_2
 
-/** Initial normal unit vector to beacon plane */
-#define     VISION_ZSTATE_I  0
-#define     VISION_ZSTATE_J  0
-#define     VISION_ZSTATE_K -1
+#ifdef DEBUG_KINETIC
+#define LOG_KINETIC(L, ...) LOG(L, "<Kinetic> " __VA_ARGS__)
+#else
+#define LOG_KINETIC(L, ...)
+#endif
+
 
 /* Camera Precalculated values */
 #define     CAMERA_OFFSET_ANGLE_X   0       // radians
@@ -54,11 +57,7 @@
 #define     PIXEL_TO_UNIT           1.0//3e-6
 #define     UNIT_TO_PIXEL         ( 1.0 / PIXEL_TO_UNIT )
 
-#define     CAMERA_HALF_WIDTH_UNIT  CAMERA_HALF_WIDTH*PIXEL_TO_UNIT
-#define     CAMERA_HALF_HEIGHT_UNIT CAMERA_HALF_HEIGHT*PIXEL_TO_UNIT
-
-#define     FOCAL_REFRACTION        2.4e-6//1.3e-6//  // units / units
-#define     FOCAL_LENGTH          463.7 //( 1.39e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL//( 3.5e-3 * FOCAL_REFRACTION ) * UNIT_TO_PIXEL // dimension units
+#define     FOCAL_LENGTH            463.7 // pixels
 
 #define     D_FIXED                 5.0e-2
 

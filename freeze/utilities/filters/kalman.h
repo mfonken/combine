@@ -8,18 +8,19 @@
 //#include "rho_global.h"
 #include "unilog.h"
 
-//#define MATVEC_LIB
-#define SET_DT_SEC 0.25
+#include <stdio.h>
+#include <string.h>
 
-typedef double floating_t;
+#include "matrix.h"
 
 #ifdef MATVEC_LIB
 #include "matvec.h"
 #endif
 
-#define KALMAN_PUNISH_FACTOR  1.0
-#define MIN_KALMAN_GAIN       0.001
-#define KALMAN_MATURATION     1 // Seconds
+//#define MATVEC_LIB
+#define SET_DT_SEC 0.25
+
+//#define KALMAN_MATURATION     1 // Seconds
 
 #ifndef BOUND
 #define BOUNDU(X,MAX)           ( ( X > MAX ) ? MAX : X )         // Bound in upper range
@@ -36,98 +37,60 @@ typedef double floating_t;
 #endif
 
 #define KALMAN_TIME_UNITS TIME_SEC
-//typedef double floating_t;
-//typedef int16_t uint16_t;
+
+#define KALMAN_AUGMENT
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-    /*~ Kalman Uncertainties */
+
+#ifndef floatp
+typedef double floatp;
+#endif
+
     typedef struct
     {
-        floating_t value; /* Q */
-        floating_t bias;
-        floating_t sensor; /* R */
-    } kalman_uncertainty_c;
+        floatp p;
+        floatp v;
+        floatp a;
+    } physical_t;
     
     /*~ Kalman structure */
     typedef struct
     {
-      floating_t
-        K[2],
-        P[2][2],
-        rate,
-        bias,
-        value,
-        prev,
-        velocity,
-        variance,
-        lifespan,
-        min_value,
-        max_value,
-        t,
-        origin,
-        score,
-        estimation_error;
-      kalman_uncertainty_c
-        uncertainty;
-      bool
-        acceleration_mode,
-//        sorted,
-        valid,
-        flag;
+        physical_t x;   // State
+        floatp A[2][2]; // State Transition
+        floatp B[2];    // Control Input Matrix
+        floatp H[2];    // Measurement Mapping Matrix
+        floatp Q[2][2]; // Process Noise Covariance
+        floatp R;       // Measurement Noise Covariance
+        floatp P[2][2]; // Covariance Matrix
+        floatp K[2];    // Kalman Gain
+        floatp process_noise_sq;
+        floatp t;
     } kalman_t;
     
-    void  Kalman_Initialize( kalman_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
-    void       Kalman_Reset( kalman_t *, floating_t );
-    floating_t  Kalman_Test( kalman_t *, floating_t );
-    void     Kalman_Predict( kalman_t *, floating_t );
-    void      Kalman_Update( kalman_t *, floating_t );
-    floating_t  Kalman_Tick( kalman_t *, floating_t );
-    floating_t  Kalman_Step( kalman_t *, floating_t, floating_t );
-    bool   Kalman_IsExpired( kalman_t * );
-    floating_t Kalman_Score( kalman_t * );
-    void      Kalman_Punish( kalman_t * );
-    void       Kalman_Print( kalman_t * );
-#ifdef MATVEC_LIB
-    gaussian1d_t GetGaussian1DKalman( kalman_filter_t * );
-#endif
-    
-    typedef struct {
-        void (* Initialize)( kalman_t *, floating_t, floating_t, floating_t, floating_t, kalman_uncertainty_c );
-        void (*      Reset)( kalman_t *, floating_t );
-        floating_t (* Test)( kalman_t *, floating_t );
-        void (*    Predict)( kalman_t *, floating_t );
-        void (*     Update)( kalman_t *, floating_t );
-        floating_t (* Tick)( kalman_t *, floating_t );
-        floating_t (* Step)( kalman_t *, floating_t, floating_t );
-        bool (*  IsExpired)( kalman_t * );
-        floating_t (*Score)( kalman_t * );
-        void (*     Punish)( kalman_t * );
-        void (*      Print)( kalman_t * );
-#ifdef MATVEC_LIB
-        gaussian1d_t (*Gaussian1D)( kalman_filter_t * );
-#endif
-    } kalman;
-    
-    static const kalman Kalman =
+    struct kalman_functions
     {
-        .Initialize = Kalman_Initialize,
-        .Reset = Kalman_Reset,
-        .Test = Kalman_Test,
-        .Predict = Kalman_Predict,
-        .Update = Kalman_Update,
-        .Tick = Kalman_Tick,
-        .Step = Kalman_Step,
-        .IsExpired = Kalman_IsExpired,
-        .Score = Kalman_Score,
-        .Punish = Kalman_Punish,
-        .Print = Kalman_Print,
-#ifdef MATVEC_LIB
-        .Gaussian1D = GetGaussian1DKalman
+        void (       *Init)( kalman_t *, floatp, floatp, floatp, floatp, floatp, floatp );
+        void (       *Reset)( kalman_t *, floatp );
+        physical_t * (*Test)( kalman_t *, floatp x_new[2], bool update_A );
+        floatp (*TestPosition)( kalman_t * k, floatp p_new, bool update_A );
+        void (     *Predict)( kalman_t * );
+        void (      *Update)( kalman_t *, floatp );
+        physical_t * (*Step)( kalman_t *, floatp );
+        void (       *Print)( kalman_t * );
+#ifdef KALMAN_AUGMENT
+        bool (   *IsExpired)( kalman_t * );
+        floatp ( *Score)( kalman_t * );
+        void (      *Punish)( kalman_t * );
 #endif
+//#ifdef MATVEC_LIB
+//        gaussian1d_t (*Gaussian1D)( kalman_filter_t * );
+//#endif
     };
+    
+extern const struct kalman_functions Kalman;
     
 #ifdef __cplusplus
 }

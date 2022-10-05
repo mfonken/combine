@@ -67,7 +67,7 @@ public:
     rho_core_t * rho;
     rho_capture_t * cap;
     
-    RhoDrawer( rho_core_t * rho, rho_capture_t * cap );
+    RhoDrawer( rho_core_t * rho, rho_capture_t * cap, int w, int h );
     virtual ~RhoDrawer();
     Mat DrawAll(void);
     void GetDensitiesFrame(Mat&);
