@@ -174,14 +174,14 @@ section_process_t RhoCapture_ProcessFrameSection( const index_t end_row,
                 if( b != curr_blob && b >= 0 && capture != NULL )
                 {
                     byte_t bi = capture->blobs_order[b]; // Watch out for possible need for edge_order instead
-                    x_offset = capture->thresh_blob_loc[b].x - capture->blobs[bi].x;
-                    y_offset = capture->thresh_blob_loc[b].y - capture->blobs[bi].y;
+                    x_offset = -capture->blobs[bi].x + ( b > 0 ) * capture->thresh_blob_loc[b - 1].x;
+                    y_offset = -capture->blobs[bi].y + ( b > 0 ) * capture->thresh_blob_loc[b - 1].y;
                     curr_blob = b;
                 }
             }
+            y = v + y_offset;
             if( y >= end_row )
                 break;
-            y = v + y_offset;
         }
     }
 #else
@@ -338,21 +338,20 @@ void RhoCapture_AssignBlobsInThreshBuffer( index_pair_t * thresh_blob_loc, index
 {
     thresh_blob_loc[0].x = 0;
     thresh_blob_loc[0].y = 0;
-    for( byte_t i = 0, f = 1; i < *n * 2; i++ )
+    for( byte_t i = 0; i < *n; i++ )
     {
-        edge_t * edge = &edges[edge_order[i]];
-        if( !edge->open ) continue;
+        edge_t * edge = &edges[edge_order[i << 1]];
         blob_t * b = &blobs[edge->id];
-        thresh_blob_loc[f].x = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[f - 1].x, thresh_max.x, true, n );
-        thresh_blob_loc[f].y = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[f - 1].y, thresh_max.y, false, n );
-        f++;
+        byte_t i_ = i ? i - 1 : 0;
+        thresh_blob_loc[i].x = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[i_].x, thresh_max.x, true, n );
+        thresh_blob_loc[i].y = RhoCapture_RealWidthOnAxis( b, thresh_blob_loc[i_].y, thresh_max.y, false, n );
     }
     printf("Assign Blobs:\n X -");
-    for( byte_t f = 0; f < *n + 1; f++ )
-        printf("| %d[%d] ", f, thresh_blob_loc[f].x);
+    for( int f = -1; f < *n; f++ )
+        printf("| %d[%d] ", f+1, f < 0 ? 0 : thresh_blob_loc[f].x);
     printf("|\n Y -");
-    for( byte_t f = 0; f < *n + 1; f++ )
-        printf("| %d[%d] ", f, thresh_blob_loc[f].y);
+    for( int f = -1; f < *n; f++ )
+        printf("| %d[%d] ", f+1, f < 0 ? 0 : thresh_blob_loc[f].y);
     printf("|\n");
 }
 

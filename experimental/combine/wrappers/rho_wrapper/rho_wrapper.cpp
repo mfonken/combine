@@ -14,7 +14,7 @@
 
 #define DEBUG_RHO_WRAPPER
 
-#define RHO_TRACK_BLOBS
+//#define RHO_TRACK_BLOBS
 
 #define DO_NOT_TIME_ACQUISITION
 
@@ -63,6 +63,7 @@ double RhoWrapper::Perform( cimage_t & img )
     
     // Create blobs if available
     active_blobs = 0;
+    active_blob_density = 0;
     active_blob_confidence = 0.0;
     if( core->prediction_pair.num_regions >= 2)
     {
@@ -93,9 +94,9 @@ double RhoWrapper::Perform( cimage_t & img )
             blobs[i].x = MAX( 0, testB - ry->width / 2 - blob_padding );
             blobs[i].h = rx->width + 2 * blob_padding;
             blobs[i].w = ry->width + 2 * blob_padding;
-            active_blob_density = ( rx->density + ry->density ) / 2 * 0.9;
 
             active_blobs++;
+            active_blob_density += ( rx->density + ry->density ) / 2 * 0.9;
             active_blob_confidence = ( kx->K[0] + ky->K[0] ) / 2;
             printf("CONFIDENCE: %.2f\n", active_blob_confidence);
 
@@ -107,10 +108,20 @@ double RhoWrapper::Perform( cimage_t & img )
     floating_t a = TIMESTAMP_MS();
     
     int density = Decouple( img, backgrounding_event, blobs, active_blobs );
-    for( int i = 1; i < active_blobs && MAX_BLOBS; i++ )
+    index_pair_t prev = { 0, 0 };
+    for( int i = 0; i < active_blobs && MAX_BLOBS; i++ )
     {
-        core->density_map_pair.x.offset[i] = active_blobs >= 2 ? capture.thresh_blob_loc[i].x : 0;
-        core->density_map_pair.y.offset[i] = active_blobs >= 2 ? capture.thresh_blob_loc[i].y : 0;
+        int active = capture.num_blobs >= 2;
+        core->density_map_pair.x.offset[i] = active * capture.blobs[i].x;
+        core->density_map_pair.y.offset[i] = active * capture.blobs[i].y;
+        core->density_map_pair.x.buffer_loc[i] = active * capture.thresh_blob_loc[i].x;
+        core->density_map_pair.y.buffer_loc[i] = active * capture.thresh_blob_loc[i].y;
+        
+        core->density_map_pair.x.offset[i] += core->density_map_pair.x.buffer_loc[i] - prev.x;
+        core->density_map_pair.y.offset[i] += core->density_map_pair.y.buffer_loc[i] - prev.y;
+        
+        prev.x = core->density_map_pair.x.buffer_loc[i];
+        prev.y = core->density_map_pair.y.buffer_loc[i];
     }
 #ifdef DO_NOT_TIME_ACQUISITION
     a = TIMESTAMP_MS();
@@ -237,6 +248,7 @@ int RhoWrapper::Decouple( const cimage_t image, bool backgrounding, blob_t * blo
         printf("Decouple>Blobs: %.3fms\n", (TIMESTAMP(TIME_US) - start) / 1.0e3);
     }
 #endif
+    printf("Thresh fill %ld?\n", RhoSystem.Variables.Addresses.ThreshFill - (RhoSystem.Variables.Buffers.Thresh + active_blob_density));
     if( RhoSystem.Variables.Addresses.ThreshFill <= RhoSystem.Variables.Buffers.Thresh + active_blob_density )
     {
         double start = TIMESTAMP(TIME_US);
