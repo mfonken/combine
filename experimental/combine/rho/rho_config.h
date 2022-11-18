@@ -16,8 +16,8 @@
 #ifdef __OV9712__
 #include "../App/OV9712/OV9712.h"
 #else
-#define FRAME_WIDTH_BASE 100 // 1920
-#define FRAME_HEIGHT 100 // 1080
+#define FRAME_WIDTH_BASE 1000 // 1920 // 500 //
+#define FRAME_HEIGHT 800 // 1280 // 400 //
 #define CAPTURE_BUFFER_LENGTH FRAME_WIDTH_BASE
 #define THRESH_BUFFER_LENGTH (1 << 18)
 #endif
@@ -34,7 +34,7 @@
 
 //#define __USE_ZSCORE_THRESHOLD__ /* Detect regions using z-scoring - account for variance and overly aggressive banding */
 //#define __USE_REGION_BOUNDARY_OFFSET__ /* Bump proposed center if true centroid is within a region to nearest edge (+ gap margin) */
-#define __USE_RUNNING_AVERAGE__ /* Actively calculate running average as opposed to raw sum and count - ALT NOT FULLY IMPLEMENTED */\
+#define __USE_RUNNING_AVERAGE__ /* Actively calculate running average as opposed to raw sum and count - ALT NOT FULLY IMPLEMENTED */
 #define __USE_BLOB_TRACKING__
 #define MAX_BLOBS 2
 
@@ -86,12 +86,12 @@
 #define BACKGROUNDING_PERIOD    0 // Frames
 
 #define EXPECTED_NUM_REGIONS    2
-#define MAX_REGIONS             4
-#define MIN_REGION_DENSITY      2
+#define MAX_REGIONS             5
+#define MIN_REGION_DENSITY      30
 #define MAX_REGION_SCORE        10
 #define REGION_SCORE_FACTOR     0.5
 #define MAX_NU_REGIONS          NUM_STATE_GROUPS+1
-#define MIN_CHAOS               1.0
+#define MIN_CHAOS               10.0
 
 #define MAX_RHO_RECALCULATION_LEVEL 3
 
@@ -117,30 +117,30 @@
 /*                              FILTER PARAMETERS                                      */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Kalman Filter Configs */
-#define RHO_K_TARGET        0.02
+#define RHO_K_TARGET        1.0
 #define RHO_VARIANCE_NORMAL 10.
-#define RHO_VARIANCE_SCALE  10.
-#define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
+#define RHO_VARIANCE_SCALE  20.
+//#define RHO_VARIANCE(X)     RHO_VARIANCE_NORMAL * ( 1 + RHO_VARIANCE_SCALE * ( RHO_K_TARGET - X ) )
 
 #define RHO_TRACKER_PUNISH_FACTOR  1.0
 #define RHO_TRACKER_MIN_SCORE      0.001
 
 #define RHO_DEFAULT_LS      5.          // Lifespan
-#define RHO_DEFAULT_VU      0.1       // Value uncertainty
+#define RHO_DEFAULT_VU      0.0001       // Value uncertainty
 #define RHO_DEFAULT_BU      0           // Bias uncertainty
 #define RHO_DEFAULT_SU      0.001       // Sensor uncertainty
-#define DEFAULT_KALMAN_UNCERTAINTY \
-(kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
+//#define DEFAULT_KALMAN_UNCERTAINTY \
+//(kalman_uncertainty_c){ RHO_DEFAULT_VU, RHO_DEFAULT_BU, RHO_DEFAULT_SU }
 
 #define RHO_PREDICTION_LS   10.
-#define RHO_PREDICTION_VU   1
+#define RHO_PREDICTION_VU   0.01
 #define RHO_PREDICTION_BU   0
-#define RHO_PREDICTION_SU   0.0001
+#define RHO_PREDICTION_SU   0.01
 #define DEFAULT_PREDICTION_UNCERTAINTY \
 (kalman_uncertainty_c){ RHO_PREDICTION_VU, RHO_PREDICTION_BU, RHO_PREDICTION_SU }
 
 #define RHO_TARGET_LS       5.
-#define RHO_TARGET_VU       0.001
+#define RHO_TARGET_VU       0.1
 #define RHO_TARGET_BU       0
 #define RHO_TARGET_SU       0.025
 #define DEFAULT_TARGET_UNCERTAINTY \

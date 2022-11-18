@@ -64,7 +64,7 @@ void RhoUtility_InitializeFilters( rho_core_t * core )
 
     /* Coverage Filter */
     core->target_coverage_factor  = (floating_t)FILTERED_COVERAGE_TARGET;
-    Kalman.Init(&core->target_filter, core->target_coverage_factor, RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_TARGET_LS, RHO_TARGET_FILTER_MIN, RHO_TARGET_FILTER_MAX );
+    Kalman.Init(&core->target_filter, core->target_coverage_factor, RHO_TARGET_VU, RHO_TARGET_SU, RHO_TARGET_LS, RHO_TARGET_FILTER_MIN, RHO_TARGET_FILTER_MAX );
 }
 
 void RhoUtility_InitializePrediction( prediction_t * prediction, const char * name, index_t length )
@@ -75,7 +75,7 @@ void RhoUtility_InitializePrediction( prediction_t * prediction, const char * na
     memset( &prediction->probabilities, 0, sizeof(floating_t) * 4 );
     for(uint8_t i = 0; i < MAX_TRACKERS; i++)
     {
-        prediction->trackers_order[i] = i;
+//        prediction->trackers_order[i] = i;
         tracker_t * t = &prediction->trackers[i];
         Kalman.Init( &t->kalman, 0., RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_PREDICTION_LS, 0, length );
         t->region = NULL;
@@ -102,8 +102,8 @@ void RhoUtility_InitializeDensityMap( density_map_t * density_map, const char * 
     density_map->max[0] = 0;
     density_map->max[1] = 0;
     density_map->centroid = centroid;
-    Kalman.Init( &density_map->kalmans[0],  0, RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_DEFAULT_LS, 0, length );
-    Kalman.Init( &density_map->kalmans[1], 0, RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_DEFAULT_LS, 0, length );
+    Kalman.Init( &density_map->peak[0],  0, RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_DEFAULT_LS, 0, length );
+    Kalman.Init( &density_map->peak[1], 0, RHO_DEFAULT_VU, RHO_DEFAULT_SU, RHO_DEFAULT_LS, 0, length );
 }
 
 // ------------------------ Reset --------------------------- //
@@ -134,10 +134,10 @@ void RhoUtility_ResetDetect( rho_detection_variables * _, density_map_t * densit
 
 void RhoUtility_ResetDensityMapPairKalmans( rho_core_t * core )
 {
-    Kalman.Reset( &core->density_map_pair.x.kalmans[0], core->prediction_pair.x.previous_peak[0] );
-    Kalman.Reset( &core->density_map_pair.x.kalmans[1], core->prediction_pair.x.previous_peak[1] );
-    Kalman.Reset( &core->density_map_pair.y.kalmans[0], core->prediction_pair.y.previous_peak[0] );
-    Kalman.Reset( &core->density_map_pair.y.kalmans[1], core->prediction_pair.y.previous_peak[1] );
+    Kalman.Reset( &core->density_map_pair.x.peak[0], core->prediction_pair.x.previous_peak[0] );
+    Kalman.Reset( &core->density_map_pair.x.peak[1], core->prediction_pair.x.previous_peak[1] );
+    Kalman.Reset( &core->density_map_pair.y.peak[0], core->prediction_pair.y.previous_peak[0] );
+    Kalman.Reset( &core->density_map_pair.y.peak[1], core->prediction_pair.y.previous_peak[1] );
 }
 
 void RhoUtility_DetectPerform( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
@@ -159,8 +159,7 @@ void RhoUtility_DetectPerform( rho_detection_variables * _, density_map_t * dens
         _->maximum = 0;
         _->start = _->range[_->cycle];
         _->end = _->range[_->cycle_];
-//        _->buffer_loc = density_map->buffer_loc[_->cycle];
-        _->offset = density_map->offset[_->cycle];
+        _->offset = density_map->offset[2 - _->cycle_];
         _->recalculation_counter = 0;
         _->recalculate = false;
 
@@ -169,7 +168,7 @@ void RhoUtility_DetectPerform( rho_detection_variables * _, density_map_t * dens
         {
             do
             {
-                LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Recalc: %d\n", prediction->name, _->cycle, _->recalculation_counter);
+//                LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Recalc: %d\n", prediction->name, _->cycle, _->recalculation_counter);
                 RhoUtility.Detect.Regions( _, density_map, prediction );
                 if( !_->recalculate )
                   RhoUtility.Detect.CalculateChaos( _, prediction );
@@ -179,8 +178,10 @@ void RhoUtility_DetectPerform( rho_detection_variables * _, density_map_t * dens
             } while( _->recalculate && ++_->recalculation_counter < MAX_RHO_RECALCULATION_LEVEL );
         }
 
-        prediction->previous_peak[_->cycle] = BOUNDU( _->maximum, _->len );
-        LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Peak: %d\n", prediction->name, _->cycle, prediction->previous_peak[_->cycle]);
+        density_t peak = BOUNDU( _->maximum, _->len );
+        Kalman.Update( &density_map->peak[_->cycle], peak );
+        prediction->previous_peak[_->cycle] = peak;
+//        LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Peak: %d\n", prediction->name, _->cycle, prediction->previous_peak[_->cycle]);
         prediction->previous_density[_->cycle] = _->first_filtered_density;
         density_map->max[_->cycle] = _->maximum;
     }
@@ -191,33 +192,50 @@ void RhoUtility_DetectPerform( rho_detection_variables * _, density_map_t * dens
     LOG_RHO(RHO_DEBUG_DETECT_2, "Regions: %d\n", _->total_regions);
 }
 
+uint16_t RhoUtility_PredictPeakVariance( kalman_t * k );
+inline uint16_t RhoUtility_PredictPeakVariance( kalman_t * k )
+{
+    floating_t gain = k->K[0];
+    floating_t var = RHO_VARIANCE_SCALE * gain;
+    
+    return BOUND((uint16_t)var, MIN_VARIANCE, MAX_VARIANCE);
+}
+
 void RhoUtility_PredictPeakFilter( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 {
-    _->filter_peak      = (uint16_t)Kalman.Step( &density_map->kalmans[_->cycle], prediction->previous_peak[_->cycle] )->p;
+    kalman_t * k = &density_map->peak[_->cycle];
+    Kalman.Predict( k );
+    _->filter_peak      = (uint16_t)k->x.p;
     _->filter_peak_2    = _->filter_peak << 1;
-    _->filter_variance  = BOUND((uint16_t)(RHO_VARIANCE( density_map->kalmans[_->cycle].P[0][0]) ), MIN_VARIANCE, MAX_VARIANCE);
+    _->filter_variance  = RhoUtility_PredictPeakVariance( k );
 //    density_map->kalmans[_->cycle].variance = _->filter_variance;
 }
 
 bool RhoUtility_DetectLowerBound( rho_detection_variables * _ );
 inline bool RhoUtility_DetectLowerBound( rho_detection_variables * _ )
 {
-    _->filter_band_lower = (_->filter_peak > _->filter_variance) * (_->filter_peak - _->filter_variance); // Branchless edit
+    _->filter_band_lower = 0;//(_->filter_peak > _->filter_variance) * (_->filter_peak - _->filter_variance); // Branchless edit
     return _->filter_variance > 0;
 }
 
 void RhoUtility_DetectRegions( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction );
 inline void RhoUtility_DetectRegions( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
 { /* Detect regions - START */
-    for( _->x = _->start - 1, _->x_ = (_->offset == 0) * _->x + _->offset, _->curr = 0; _->x >= _->end; _->curr = density_map->map[--_->x], _->x_-- ) // TODO: Don't use end for x_ here
+    for( _->x = _->start, _->x_ = (_->offset == 0) * _->x + _->offset; _->x >= _->end;  ) // TODO: Don't use end for x_ here
     {
-//        printf("[%d]\n", _->x);
+        _->curr = density_map->map[--_->x];
+        --_->x_;
 //        density_map->bound[_->x] = 0;
         if( !_->recalculate )
         {
             sdensity_t b = density_map->background[_->x_];
             RhoUtility.Detect.SubtractBackground( _, b ); // Also finds peak - required even with black background
         }
+        RhoUtility.Detect.Region( _, density_map, prediction );
+    }
+    if( _->has_region )
+    {
+        _->curr = 0;
         RhoUtility.Detect.Region( _, density_map, prediction );
     }
 } /* Detect regions - END */
@@ -288,7 +306,6 @@ inline void RhoUtility_DetectRegion( rho_detection_variables * _, density_map_t 
     /* Check if CMA value is in band */
     if( _->curr > _->filter_band_lower)
     {
-        
         /* reset flag and counter */
 #ifdef __USE_ZSCORE_THRESHOLD__
         if(!_->has_region)
@@ -305,7 +322,7 @@ inline void RhoUtility_DetectRegion( rho_detection_variables * _, density_map_t 
         /* Process new values into region */
         if( _->curr > 0 )
         {
-            RhoUtility.Calculate.CumulativeMoments( (floating_t)_->curr, (floating_t)(_->x_), &_->average_curr, &_->average_moment, &_->average_counter ); /// TODO: Use blob x instead of thresh_loc
+            RhoUtility.Calculate.CumulativeMoments( (floating_t)_->curr, (floating_t)(_->x_), &_->average_curr, &_->average_moment, &_->average_counter );
         }
         /* Increment width */
         _->width++;
@@ -366,8 +383,8 @@ inline void RhoUtility_DetectRegion( rho_detection_variables * _, density_map_t 
         _->width = 0;
     }
 #ifdef __USE_REGION_BOUNDARY_OFFSET__
-    if(had_region != _->has_region
-       && _->region_boundary_index < MAX_REGIONS*2 )
+    if( had_region != _->has_region
+        && _->region_boundary_index < MAX_REGIONS*2 )
     {
         _->region_boundaries[_->region_boundary_index++] = _->x;
     }
@@ -377,7 +394,7 @@ inline void RhoUtility_DetectRegion( rho_detection_variables * _, density_map_t 
 void RhoUtility_CalculateChaos( rho_detection_variables * _, prediction_t * prediction )
 {
     _->chaos = MAX( ZDIV( (floating_t)prediction->previous_density[_->cycle], (floating_t)_->filtered_density ), MIN_CHAOS);
-    LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Chaos:%.4f\n", prediction->name, _->cycle, _->chaos);
+//    LOG_RHO(RHO_DEBUG_DETECT_2, "%s:%d> Chaos:%.4f\n", prediction->name, _->cycle, _->chaos);
 }
 
 void RhoUtility_ScoreRegions( rho_detection_variables * _, density_map_t * density_map, prediction_t * prediction )
@@ -406,7 +423,7 @@ void RhoUtility_ScoreRegions( rho_detection_variables * _, density_map_t * densi
         if( curr->score > chaos )
         {
             uint16_t x = (uint16_t)ZDIV( _->average_moment, _->average_curr );
-            sdensity_t v = density_map->map[x];
+//            sdensity_t v = density_map->map[x];
             RhoUtility.Calculate.RegionScore( curr, _->filtered_density, _->maximum );
             
             _->recalculation_chaos = MIN( curr->score, _->recalculation_chaos );
@@ -480,20 +497,10 @@ void RhoUtility_SortRegions( rho_detection_variables * _, prediction_t * predict
         prediction->regions_order[i].index = best_index;
         prediction->regions_order[best_index].valid = true;
         prediction->regions_order[best_index].index = i;
+        prediction->regions[best_index].sort = true;
 //        SWAP(prediction->trackers_order[i], prediction->trackers_order[best_index] );
         
-        prediction->regions[i].sort = true;
-
-        curr = &prediction->regions[i];
-        LOG_RHO(RHO_DEBUG_DETECT, "%s> R%d:{ M%3d, D%3d, X%3d, W%3d } = S%.4f\n",
-            prediction->name,
-            i,
-            curr->maximum,
-            curr->density,
-            curr->location,
-            curr->width,
-            curr->score
-            );
+//        curr->sort = true;
         if( curr->score > 100. )
             printf("");
     }
@@ -506,8 +513,17 @@ void RhoUtility_SortRegions( rho_detection_variables * _, prediction_t * predict
     for( i = 0; i < _->total_regions; i++)
     {
         order_t* o = &prediction->regions_order[i];
-        LOG_RHO(RHO_DEBUG_DETECT_2, "%s> [R%d] valid:%c loc:%d score:%.4f\n", prediction->name, o->index, o->valid?'y':'n', prediction->regions[o->index].location, prediction->regions[o->index].score);
-
+        region_t * curr = &prediction->regions[o->index];
+        LOG_RHO(RHO_DEBUG_DETECT, "%s> R%d%c:{M%d, D%d, X%d, W%d} = S%.4f\n",
+            prediction->name,
+            i,
+            o->valid?'y':'n',
+            curr->maximum,
+            curr->density,
+            curr->location,
+            curr->width,
+            curr->score
+            );
         c2[i] = o->index;
         bool already_has = false;
         for(int j = i - 1; j >= 0; j--)
@@ -541,6 +557,8 @@ void RhoUtility_Detect_Centroid( rho_detection_variables * _, density_map_t * de
         }
     }
 #endif
+    if(proposed_center > FRAME_WIDTH_BASE * 0.75)
+        printf(">");
     density_map->centroid = BOUNDU(proposed_center, density_map->length);
 
     LOG_RHO(RHO_DEBUG_DETECT, "%s> Centroid: %d | Moment: %d | Density: %d\n", density_map->name, (int)density_map->centroid, _->raw_density_moment, _->total_density);
@@ -552,7 +570,7 @@ void RhoUtility_CalculatedFrameStatistics( rho_detection_variables * _, predicti
     _->assumed_regions = (floating_t)_->total_regions;
     if( _->assumed_regions == 0. ) _->assumed_regions = 1.;
 
-    prediction->nu_regions = BOUNDU( ZDIV( (floating_t)_->total_density * (floating_t)_->assumed_regions, _->target_density ), MAX_NU_REGIONS );
+    prediction->nu_regions = _->assumed_regions;//BOUNDU( ZDIV( (floating_t)_->total_density * (floating_t)_->assumed_regions, _->target_density ), MAX_NU_REGIONS );
     prediction->num_regions = _->total_regions;
     prediction->total_density = _->total_density;
     prediction->average_density = ZDIV( (floating_t)prediction->total_density, prediction->nu_regions );
@@ -579,20 +597,19 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
     uint16_t m = 0, n = 0, v = 0, updated = 0;
     while( m < ( valid_tracks - 1 ) && n < ( prediction->num_regions - 1 ) )
     { /* Update tracking filters in pairs following determinant */
-        /* Retreive current region pair */
-        int8_t rAi = m, rBi = m+1, rAo = -1, rBo = -1;
-        rAo = prediction->regions_order[rAi].index;
-        rBo = prediction->regions_order[rBi].index;
+        int8_t a = m, b = m+1, rAo = -1, rBo = -1;
         
+        rAo = prediction->regions_order[a].index;
+        rBo = prediction->regions_order[b].index;
         region_t *regionA = &prediction->regions[rAo];
         region_t *regionB = &prediction->regions[rBo];
         
-        /* Retreive tracking filters pair */
-        kalman_t *filterA = &prediction->trackers[rAi].kalman;
-        kalman_t *filterB = &prediction->trackers[rBi].kalman;
-
-        floating_t testA = Kalman.TestPosition( filterA, filterA->x.p, false );
-        floating_t testB = Kalman.TestPosition( filterB, filterB->x.p, false );
+        tracker_t * trackerA = &prediction->trackers[a];
+        tracker_t * trackerB = &prediction->trackers[b];
+        kalman_t * filterA = &trackerA->kalman;
+        kalman_t * filterB = &trackerB->kalman;
+        floating_t testA = Kalman.TestSelf( filterA );
+        floating_t testB = Kalman.TestSelf( filterB );
         
         /* Calculate distances between filters and regions */
         aa = fabs(testA - regionA->location );
@@ -605,9 +622,7 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
         LOG_RHO(RHO_DEBUG_PREDICT, "R[");
         for( int i = 0; i < MAX_TRACKERS; i++ )
             LOG_RHO_BARE(RHO_DEBUG_PREDICT, "%d%c", prediction->regions_order[i].index, (i < MAX_TRACKERS -1 ? '|' : ']'));
-        LOG_RHO(RHO_DEBUG_PREDICT, "T[");
-        for( int i = 0; i < MAX_TRACKERS; i++ )
-            LOG_RHO_BARE(RHO_DEBUG_PREDICT, "%d%c", prediction->trackers_order[i], (i < MAX_TRACKERS -1 ? '|' : ']'));
+        LOG_RHO_BARE(RHO_DEBUG_PREDICT, "\n");
 
         bool swapped = false;
         /* Swap on upward determinant */
@@ -630,24 +645,24 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
             {
                 Kalman.Step( filterA, regionB->location );
                 Kalman.Step( filterB, regionA->location );
-                regionA->tracking_id = rBi;
-                regionB->tracking_id = rAi;
-                prediction->trackers_order[rAi] = rBo;
-                prediction->trackers_order[rBi] = rAo; /// TODO: Finish using tracking order to align with regions instead of alone
+                regionA->tracking_id = b;
+                regionB->tracking_id = a;
+                trackerA->region = regionB;
+                trackerB->region = regionA;
             }
             else
             {
                 Kalman.Step( filterA, regionA->location );
                 Kalman.Step( filterB, regionB->location );
-                regionA->tracking_id = rAi;
-                regionB->tracking_id = rBi;
-                prediction->trackers_order[rAi] = rAi;
-                prediction->trackers_order[rBi] = rBi;
+                regionA->tracking_id = a;
+                regionB->tracking_id = b;
+                trackerA->region = regionA;
+                trackerB->region = regionB;
             }
             updated += 2;
 
-            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rAi, filterA->x.p);
-            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", rBi, filterB->x.p);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", a, filterA->x.p);
+            LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", b, filterB->x.p);
             
             Kalman.Print( filterA );
         }
@@ -657,16 +672,16 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
     /* Account for odd number and spare regions */
     if( m < valid_tracks && n < prediction->num_regions )
     {
-        int8_t ri = -1, fi = -1;
+        int8_t ri = -1;
         for( ; v < MAX_REGIONS && !prediction->regions_order[v].valid; v++ );
         ri = prediction->regions_order[v++].index;
         region_t *region = &prediction->regions[ri];
         
         while( m < valid_tracks )
         {
-            fi = prediction->trackers_order[m];
-            kalman_t *filter = &prediction->trackers[fi].kalman;
-            floating_t test = Kalman.TestPosition( filter, filter->x.v, false );
+            tracker_t * tracker = &prediction->trackers[m];
+            kalman_t * filter = &tracker->kalman;
+            floating_t test = Kalman.TestSelf( filter );
             curr_difference = fabs( region->location - test );
             
             LOG_RHO(RHO_DEBUG_PREDICT, "Odd %s(%d,%d)> ∆:%.3f\n", prediction->name, m, n, curr_difference);
@@ -676,8 +691,8 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
                 LOG_RHO(RHO_DEBUG_PREDICT, "Updating %d: %.4f\n", region->tracking_id, filter->x.p);
                 Kalman.Step(filter, region->location);
                 
-                region->tracking_id = fi;
-                prediction->trackers_order[m] = ri;
+                region->tracking_id = m;
+                tracker->region = region;
 
                 total_difference += curr_difference;
                 updated++;
@@ -691,19 +706,20 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
     for( ; n < prediction->num_regions && n < MAX_REGIONS; n++ )
     {
         int8_t ri = prediction->regions_order[n].index;
-        prediction->trackers_order[n] = ri;
-        tracker_t * tracker = &prediction->trackers[ri];
+        tracker_t * tracker = &prediction->trackers[n];
         tracker->region = &prediction->regions[ri];
         tracker->valid = true;
+        prediction->regions[ri].tracking_id = n;
         Kalman.Step( &tracker->kalman, tracker->region->location );
-        LOG_RHO( RHO_DEBUG_PREDICT, "Activating filter at index %d[%d] - %d\n", prediction->trackers_order[n], n, prediction->regions[ri].location );
+        tracker->kalman.x.v = 0;
+        LOG_RHO( RHO_DEBUG_PREDICT, "Activating filter at index %d[%d] - %d\n", prediction->regions[ri].tracking_id, n, prediction->regions[ri].location );
     }
 
     /* Punish unused ones */
     for( ; n < MAX_TRACKERS; n++ )
     {
 //        LOG_RHO( RHO_DEBUG_PREDICT_2, "Punishing filter at index %d[%d]\n", prediction->tracking_filters_order[m], m );
-        RhoUtility.Calculate.PunishTracker( &prediction->trackers[prediction->trackers_order[n]] );
+        RhoUtility.Calculate.PunishTracker( &prediction->trackers[prediction->regions[n].tracking_id] );
     }
     
     /* Calculate confidence */
@@ -717,67 +733,25 @@ void RhoUtility_PredictTrackingFilters( prediction_t * prediction )
 //    for( byte_t i = 0; i < MAX_TRACKERS; i++ )
 //        printf("(%d):[%d]>[%d] ", i, prediction->regions_order[i].index, prediction->trackers_order[i]);
 //    printf("\n");
-    
-//    RhoUtility.Predict.SortFilters( prediction );
-}
-
-void RhoUtility_SortTrackingFilters( prediction_t * prediction )
-{
-    tracker_t *curr, *check;
-    floating_t best_score;
-    uint16_t i, io, j, jo, best_index = 0;
-
-    /* Score all filters */
-    for( i = 0; i < MAX_TRACKERS; i++ )
-        Kalman.Score( &prediction->trackers[i].kalman );
-
-    /* Swap sort - Cycle through found regions */
-    for( i = 0; i < MAX_TRACKERS; i++)
-    {
-        io = prediction->trackers_order[i];
-        curr = &prediction->trackers[io];
-
-        best_score = curr->score;
-        best_index = i;
-        /* Cycle through other regions */
-        for( j = i+1; j < MAX_TRACKERS; j++ )
-        {
-            jo = prediction->trackers_order[j];
-            check = &prediction->trackers[jo];
-
-            /* If unscored and less than min, set as new min */
-            if( check->score > best_score )
-            {
-                best_score = curr->score;
-                best_index = j;
-            }
-        }
-        prediction->trackers_order[i] = best_index;
-        prediction->trackers_order[best_index] = i;
-    }
 }
 
 uint16_t RhoUtility_CalculateValidTracks( prediction_t * prediction )
 {
-    uint16_t valid_tracks = 0, i, io;
+    uint16_t valid_tracks = 0, i;
     for( i = 0; i < MAX_TRACKERS; i++ )
     {
-        io = prediction->trackers_order[i];
-        tracker_t * curr = &prediction->trackers[io];
+        tracker_t * curr = &prediction->trackers[i];
         curr->valid = false;
         floating_t score = RhoUtility.Calculate.TrackerScore( curr );// Kalman.Score( curr );
-//        if(isnan(score))
-//            printf("!\n");
         if( false //ISTIMEDOUT( curr->kalman.t, curr->lifespan, TIME_SEC )//  Kalman.IsExpired( curr )
            || ( score < MIN_TRACKING_KALMAN_SCORE ) )
         {
-            prediction->trackers[io].valid = false;
+            prediction->trackers[i].valid = false;
             if( curr->kalman.x.p > 0 )
-                LOG_RHO(RHO_DEBUG_PREDICT_2, "%s > K%d is invalid %s\n", prediction->name, io, score < MIN_TRACKING_KALMAN_SCORE ? "[Low score]" : "[Expired]");
+                LOG_RHO(RHO_DEBUG_PREDICT_2, "%s > K%d is invalid %s\n", prediction->name, i, score < MIN_TRACKING_KALMAN_SCORE ? "[Low score]" : "[Expired]");
             break;
         }
-        Kalman.Predict( &curr->kalman );
-        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s> K%d->score=%.4f\n", prediction->name, io, curr->score);
+        LOG_RHO(RHO_DEBUG_PREDICT_2, "%s> K%d->score=%.4f\n", prediction->name, i, curr->score);
         curr->valid = true;
         valid_tracks++;
     }
@@ -803,18 +777,11 @@ void RhoUtility_ResetPrediction( prediction_predict_variables * _, prediction_pa
 //    uint8_t yi, xi;
 //    for( byte_t i = 0; i < 2; i++ )
 //    {
-//        yi = prediction->y.trackers_order[i];
-//        xi = prediction->x.trackers_order[i];
-//        yk = &prediction->y.trackers[yi].kalman;
-//        xk = &prediction->x.trackers[xi].kalman;
+//        xk = &prediction->x.trackers[i].kalman;
+//        yk = &prediction->y.trackers[i].kalman;
 //        _->pts[i] = (index_pair_t){ yk->value, xk->value };
 //    }
-//    _->centroid  = (index_pair_t){ centroid.x, centroid.y };
-}
-    
-void RhoUtility_CombineTrackers( rho_core_t * core )
-{
-    
+    _->centroid  = (index_pair_t){ centroid.x, centroid.y };
 }
 
 void RhoUtility_CorrectPredictionAmbiguity( prediction_predict_variables * _, rho_core_t * core )
@@ -855,7 +822,7 @@ void RhoUtility_UpdateCorePredictionData( prediction_predict_variables * _, rho_
     _->centroid.x = (uint16_t)core->density_map_pair.y.centroid;
     _->centroid.y = (uint16_t)core->density_map_pair.x.centroid;
     
-    LOG_RHO(RHO_DEBUG_UPDATE_2, "Primary (%d, %d) | Secondary (%d, %d)\n", _->pts[0].x, _->pts[0].y, _->pts[1].x, _->pts[1].y);
+//    LOG_RHO(RHO_DEBUG_UPDATE_2, "Primary (%d, %d) | Secondary (%d, %d)\n", _->pts[0].x, _->pts[0].y, _->pts[1].x, _->pts[1].y);
     LOG_RHO(RHO_DEBUG_UPDATE_2, "Centroid.x>%d %c Centroid.y>%d \n", _->centroid.x, core->prediction_pair.descending ? '\\' : '/', _->centroid.y);
     LOG_RHO(RHO_DEBUG_UPDATE_2, "Q[%d / %d | %d / %d]\n", core->quadrant_final[0], core->quadrant_final[1], core->quadrant_final[2], core->quadrant_final[3]);
 
@@ -894,6 +861,8 @@ void RhoUtility_CalculateTune( rho_core_t * core )
 //    if(core->PredictiveStateModelPair.proposed_threshold > 0)
 //        core->Thresh = WeightedAverage(core->PredictiveStateModelPair.proposed_threshold, core->Thresh, 0.5);
     core->thresh_byte = (byte_t)core->thresh;
+    
+    LOG_RHO(RHO_DEBUG_UPDATE, "Threshold: %.2f\n", core->thresh);
 }
 
 void RhoUtility_CalculateBackgroundTuneFactor( rho_core_t * core )
@@ -913,18 +882,8 @@ void RhoUtility_CalculateStateTuneFactor( rho_core_t * core )
     core->prediction_pair.average_density = MAX( core->prediction_pair.x.average_density, core->prediction_pair.y.average_density );
     LOG_RHO(RHO_DEBUG_UPDATE, "Filtered|Total %%: %.7f|%.7f\n", core->filtered_percentage, core->total_percentage);
 
-//#ifdef __PSM__
-////    Kalman.Step( &core->TargetFilter, core->TotalPercentage, 0. );
-//    core->TargetFilter.value = core->TotalPercentage;
-////    Kalman.Print( &core->TargetFilter );
-////    switch(-1)
-//
-//    LOG_RHO( RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->PredictiveStateModelPair.current_state));
-//    switch(core->PredictiveStateModelPair.current_state)
-//#else
     LOG_RHO(RHO_DEBUG_UPDATE, "Current state: %s\n", stateString(core->state_machine.state));
     switch(core->state_machine.state)
-//#endif
     {
         default:
             RhoUtility.Calculate.TargetCoverageFactor( core );
@@ -940,7 +899,7 @@ void RhoUtility_CalculateStateTuneFactor( rho_core_t * core )
     }
 
     RhoPID.Update( &core->thresh_filter, core->target_coverage_factor, core->target_filter.x.p );
-    core->tune.state = core->thresh_filter.value;
+    core->tune.state = core->thresh_filter.value * PID_SCALE;
 
     LOG_RHO(RHO_DEBUG_2, "Avg:%d | Nu:%.4f\n", (int)core->prediction_pair.average_density, core->prediction_pair.nu_regions);
     LOG_RHO(RHO_DEBUG_2, "Target cov.:%.4f | Target val: %.4f | Thresh val:%.4f\n", core->target_coverage_factor, core->target_filter.x.p, core->thresh_filter.value);
@@ -978,7 +937,7 @@ void RhoUtility_Calculate_RegionScore( region_t * region, density_t total_densit
 
 floating_t RhoUtility_Calculate_TrackerScore( tracker_t * t )
 {
-    t->score = t->kalman.K[0];
+    t->score = Kalman.Confidence(&t->kalman);
     return t->score;
 }
     
@@ -1063,7 +1022,7 @@ void RhoUtility_GenerateObservationListFromPredictions( prediction_t * predictio
     uint16_t i = 0;
     for( ; i < prediction->num_regions && i < MAX_OBSERVATIONS; i++ )
     {
-        uint16_t io = prediction->trackers_order[i];
+        uint16_t io = prediction->regions[i].tracking_id;
         if( io >= MAX_TRACKERS ) continue;
         floating_t x = prediction->trackers[io].kalman.x.p;
         if( !prediction->regions_order[i].valid ) continue;
@@ -1124,7 +1083,6 @@ const rho_utility_functions RhoUtility =
     .Predict.PeakFilter = RhoUtility_PredictPeakFilter,
     .Predict.TrackingFilters = RhoUtility_PredictTrackingFilters,
     .Predict.CalculateValidTracks = RhoUtility_CalculateValidTracks,
-    .Predict.SortFilters = RhoUtility_SortTrackingFilters,
     .Predict.TrackingProbabilities = RhoUtility_PredictTrackingProbabilities,
     .Predict.CorrectAmbiguity = RhoUtility_CorrectPredictionAmbiguity,
     .Predict.CombineProbabilities = RhoUtility_CombineAxisProbabilites,

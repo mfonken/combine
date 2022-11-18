@@ -29,12 +29,12 @@ extern "C" {
     static inline const char *stateString(int8_t s)
     {
         static const char *strings[] = {
-            "UN",
+            "_",
 //            "NP",
-            "UP",
-            "TP",
-            "OP",
-            "CH"
+            "v",
+            "x",
+            "^",
+            "!"
         };
         return strings[(uint8_t)s+1];
     }

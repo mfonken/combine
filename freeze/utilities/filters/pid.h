@@ -18,11 +18,12 @@ extern "C" {
     
 #include "rho_global.h"
 
+#define SET_DT_SEC 0.1
+
 typedef double floating_t;
 
     /* PID Filter Configs */
-#define PID_SCALE   1//10
-#define PID_DRIFT   1.1
+#define PID_SCALE   10
     
 #define DEFAULT_PROPORTIONAL_FACTOR 0.5
 #define DEFAULT_INTEGRAL_FACTOR     0.002

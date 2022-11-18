@@ -38,7 +38,13 @@ void RhoPIDUpdate( pid_filter_t * pid, floating_t actual, floating_t target )
     
     pid->pv = pid->error * pid->gain.kp;
     
-    pid->dt = TIMESTAMP_MS() - pid->timestamp;
+    pid->dt =
+#ifdef SET_DT_SEC
+        SET_DT_SEC;
+#else
+        TIMESTAMP_MS() - pid->timestamp;
+#endif
+    
     pid->total_error += pid->error * pid->dt;
     pid->iv = pid->gain.ki * pid->total_error;
     

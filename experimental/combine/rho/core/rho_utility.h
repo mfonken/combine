@@ -111,7 +111,6 @@ extern "C" {
         void (*PeakFilter)( rho_detection_variables *, density_map_t *, prediction_t * );
         void (*TrackingFilters)( prediction_t * );
         uint16_t (*CalculateValidTracks)( prediction_t * );
-        void (*SortFilters)( prediction_t * );
         void (*TrackingProbabilities)( prediction_t * );
         void (*CorrectAmbiguity)( prediction_predict_variables *, rho_core_t * );
         void (*CombineProbabilities)( prediction_pair_t * );

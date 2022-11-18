@@ -37,8 +37,11 @@ void WebcamUtility::init()
 //    if(size.height > 0) cam.set(CAP_PROP_FRAME_HEIGHT, size.height);
 //    if(rate > 0) cam.set(CAP_PROP_FPS, rate);
     cam.read(raw);
-    size.width = raw.cols;
-    size.height = raw.rows;
+    if(size.width == -1 || size.height == -1)
+    {
+        size.width = raw.cols;
+        size.height = raw.rows;
+    }
     
     LOG_WU(DEBUG_2, "Initializing Camera: %dx%d @ %d fps.\n", raw.cols, raw.rows, (int)cam.get(CAP_PROP_FPS));
     

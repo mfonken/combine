@@ -19,6 +19,11 @@ static void cimageInit( cimage_t& img, int width, int height )
     img.pixels = (pixel_base_t *)malloc(sizeof(pixel_base_t)*width*height);
 }
 
+static void cimageDeinit( cimage_t& img)
+{
+    free(img.pixels);
+}
+
 static bool cimageFromMat( cv::Mat &mat, cimage_t& img )
 {
     if(mat.cols != img.width || mat.rows != img.height)

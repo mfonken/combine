@@ -238,9 +238,9 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
     for( int i = 0, j = 1; i < 2; i++, j++ )
     {
         /* Kalman Values */
-        kalman_t * k = &dmap->kalmans[i];
+        kalman_t * k = &dmap->peak[i];
         int m = OP_ALIGN((k->x.p/DENSITY_SCALE), height);
-        int mv = dmap->kalmans[i].K[0];
+        int mv = RHO_VARIANCE_SCALE * dmap->peak[i].K[0];
         int mv1 = OP_ALIGN((mv/DENSITY_SCALE), m), mv2 = OP_ALIGN(-(mv/DENSITY_SCALE), m);
         double mdm = INR(OP_ALIGN(k->x.p/DENSITY_SCALE, height), height);
         
@@ -305,7 +305,7 @@ void DrawDensityMap(Mat& M, density_map_t * dmap, int range[3], int height, dime
 void RhoDrawer::DrawDensityGraph(Mat &M)
 {
     // Draw blobs
-    for( int i = 0; i < cap->num_blobs; i++ )
+    for( int i = 0; i < *cap->num_blobs; i++ )
     {
         blob_t * blob = &cap->blobs[i];
         Rect r(blob->x, blob->y, blob->w, blob->h);
@@ -315,24 +315,30 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
     vector<Point> pts;
     for( int i = 0; i < rho->prediction_pair.num_blobs; i++ )
     {
-        index_pair_t * bo = &rho->prediction_pair.blobs_order[i];
-        int y = (int)rho->prediction_pair.x.trackers[bo->x].kalman.x.p;
-        int x = (int)rho->prediction_pair.y.trackers[bo->y].kalman.x.p;
+        blob_t * b = &rho->prediction_pair.blobs[i];
+        if(b->motion.x == NULL 
+           || b->motion.y == NULL
+           || b->motion.x->region == NULL
+           || b->motion.y->region == NULL )
+            continue;
+        int x = (int)b->motion.x->kalman.x.p;
+        int y = (int)b->motion.y->kalman.x.p;
         pts.push_back(Point(x, y));
     }
     if(pts.size() >= 2)
     {
-        cv::circle(M, pts[0], 10, acolor, -1);
-        cv::circle(M, pts[1], 10, bcolor, -1);
+        int size = 5; //10
+        cv::circle(M, pts[0], size, acolor, -1);
+        cv::circle(M, pts[1], size, bcolor, -1);
     }
     
     int rangex[3] = { width, (int)rho->centroid.x, 0 };
     int rangey[3] = { height, (int)rho->centroid.y, 0 };
     int cross_l = 5;
-    line(M, DimPt(rangex[1], 0, X_DIMENSION),   DimPt(rangex[1], H, X_DIMENSION), blackish);
-    line(M, DimPt(rangey[1], 0, Y_DIMENSION),   DimPt(rangey[1], W, Y_DIMENSION), blackish);
-    line(M, DimPt(rangex[1], rangey[1]-cross_l, X_DIMENSION),   DimPt(rangex[1], rangey[1]+cross_l, X_DIMENSION), redish);
-    line(M, DimPt(rangey[1], rangex[1]-cross_l, Y_DIMENSION),   DimPt(rangey[1], rangex[1]+cross_l, Y_DIMENSION), redish);
+    line(M, DimPt(rangex[1], 0, X_DIMENSION),   DimPt(rangex[1], H, X_DIMENSION), orangish);
+    line(M, DimPt(rangey[1], 0, Y_DIMENSION),   DimPt(rangey[1], W, Y_DIMENSION), orangish);
+    line(M, DimPt(rangex[1], rangey[1]-cross_l, X_DIMENSION),   DimPt(rangex[1], rangey[1]+cross_l, X_DIMENSION), redish, 2);
+    line(M, DimPt(rangey[1], rangex[1]-cross_l, Y_DIMENSION),   DimPt(rangey[1], rangex[1]+cross_l, Y_DIMENSION), redish, 2);
     
     DrawDensityMap(M, &rho->density_map_pair.y, rangex, height, X_DIMENSION);
     DrawDensityMap(M, &rho->density_map_pair.x, rangey, width, Y_DIMENSION);
@@ -351,16 +357,16 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
 //        int o = rho->prediction_pair.y.trackers_order[i];
         int v = rho->prediction_pair.y.trackers[i].kalman.x.p;
         line(M, DimPt(0,v,Y_DIMENSION), DimPt(height,v,Y_DIMENSION), (i % 2 ? bcolor : acolor), 1);
-        int t = (int)Kalman.TestPosition(&rho->prediction_pair.y.trackers[i].kalman, rho->prediction_pair.y.trackers[i].kalman.x.v, false);
-        line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
+        int t = (int)Kalman.TestSelf(&rho->prediction_pair.y.trackers[i].kalman);
+        line(M, DimPt(0,t,Y_DIMENSION), DimPt(height,t,Y_DIMENSION), (i % 2 ? bcolor : acolor), 2);
     }
     for( int i = 0; i < 2; i++ )
     {
 //        int o = rho->prediction_pair.x.trackers_order[i];
         int v = rho->prediction_pair.x.trackers[i].kalman.x.p;
         line(M, DimPt(0,v,X_DIMENSION), DimPt(width,v,X_DIMENSION), (i % 2 ? bcolor : acolor), 1);
-        int t = (int)Kalman.TestPosition(&rho->prediction_pair.x.trackers[i].kalman, rho->prediction_pair.x.trackers[i].kalman.x.v, false);
-        line(M, DimPt(0,t,X_DIMENSION), DimPt(width,t,X_DIMENSION), (i % 2 ? bcolor : acolor) * 0.75, 1);
+        int t = (int)Kalman.TestSelf( &rho->prediction_pair.x.trackers[i].kalman);
+        line(M, DimPt(0,t,X_DIMENSION), DimPt(width,t,X_DIMENSION), (i % 2 ? bcolor : acolor), 2);
     }
     
     // Draw regions
@@ -370,8 +376,8 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
         int v = rho->prediction_pair.y.regions[o].location;
         line(M, Point(v,0), Point(v,height), (i % 2 ? bcolor : acolor) * 0.5, 1);
         putText(M, to_string(i), Point(v - 3, height - 10), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 255));
-        int j = rho->prediction_pair.y.regions[o].tracking_id;//rho->prediction_pair.y.trackers_order[i];
-        putText(M, to_string(j), Point(v + 10, height - 10), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 100));
+//        int j = rho->prediction_pair.y.regions[o].tracking_id;//rho->prediction_pair.y.trackers_order[i];
+//        putText(M, to_string(j), Point(v + 10, height - 10), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 100));
     }
     for( int i = 0; i < rho->prediction_pair.x.num_regions; i++ )
     {
@@ -379,8 +385,8 @@ void RhoDrawer::DrawDensityGraph(Mat &M)
         int v = rho->prediction_pair.x.regions[o].location;
         line(M, Point(0,v),Point(width,v), (i % 2 ? bcolor : acolor) * 0.5, 1);
         putText(M, to_string(i), Point(width - 20, v + 4), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 255));
-        int j = rho->prediction_pair.x.regions[o].tracking_id;//rho->prediction_pair.x.trackers_order[i];
-        putText(M, to_string(j), Point(width - 20, v + 20), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 100));
+//        int j = rho->prediction_pair.x.regions[o].tracking_id;//rho->prediction_pair.x.trackers_order[i];
+//        putText(M, to_string(j), Point(width - 20, v + 20), FONT_HERSHEY_DUPLEX, 0.5, Scalar(0, 255, 100));
     }
     putText(M, (rho->prediction_pair.descending ? "\\" : "/"), Point(20, 20), FONT_HERSHEY_DUPLEX, 1, Scalar(0, 255, 255));
 }
@@ -769,10 +775,10 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
     
     pDu[pX] = prediction.previous_peak[0];
     pDl[pX] = prediction.previous_peak[1];
-    pDuv[pX] = map.kalmans[0].K[0];
-    pDlv[pX] = map.kalmans[1].K[0];
-    pDut[pX] = map.kalmans[0].x.p;
-    pDlt[pX] = map.kalmans[1].x.p;
+    pDuv[pX] = map.peak[0].K[0];
+    pDlv[pX] = map.peak[1].K[0];
+    pDut[pX] = map.peak[0].x.p;
+    pDlt[pX] = map.peak[1].x.p;
     
     region_t regions[MAX_REGIONS];
     for(int i = 0; i < MAX_REGIONS; i++)
@@ -799,7 +805,7 @@ Mat& RhoDrawer::DrawRhoDetection(int dimension, Mat&M)
     {
         if(i < num_tracks)
         {
-            int c = prediction.trackers_order[i];
+            int c = prediction.regions[i].tracking_id;
             MATCH_ENCODE(match_value, i, c);
             memcpy(&tracking_filters[i], &prediction.trackers[c], sizeof(kalman_t));
             tracking_filters_order[i] = c;

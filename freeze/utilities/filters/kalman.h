@@ -18,7 +18,7 @@
 #endif
 
 //#define MATVEC_LIB
-#define SET_DT_SEC 0.25
+//#define SET_DT_SEC 0.1
 
 //#define KALMAN_MATURATION     1 // Seconds
 
@@ -27,7 +27,7 @@
 #define BOUND(X,MIN,MAX)        ( ( X < MIN ) ? MIN : BOUNDU( X, MAX ) ) // Bound in upper and lower range
 #endif
 
-//#define DEBUG_KALMAN
+//#define DEBUG_KALMAN 
 #define DEBUG_KALMAN_PRIO DEBUG_2
 
 #ifdef DEBUG_KALMAN
@@ -68,21 +68,22 @@ typedef double floatp;
         floatp K[2];    // Kalman Gain
         floatp process_noise_sq;
         floatp t;
+        floatp t_origin;
     } kalman_t;
     
     struct kalman_functions
     {
-        void (       *Init)( kalman_t *, floatp, floatp, floatp, floatp, floatp, floatp );
+        void (        *Init)( kalman_t *, floatp, floatp, floatp, floatp, floatp, floatp );
         void (       *Reset)( kalman_t *, floatp );
-        physical_t * (*Test)( kalman_t *, floatp x_new[2], bool update_A );
-        floatp (*TestPosition)( kalman_t * k, floatp p_new, bool update_A );
+        void (    *Test)( kalman_t *, floatp x_new[2], bool update );
+        floatp   (*TestSelf)( kalman_t * );
         void (     *Predict)( kalman_t * );
         void (      *Update)( kalman_t *, floatp );
         physical_t * (*Step)( kalman_t *, floatp );
         void (       *Print)( kalman_t * );
 #ifdef KALMAN_AUGMENT
         bool (   *IsExpired)( kalman_t * );
-        floatp ( *Score)( kalman_t * );
+        floatp ( *Confidence)( kalman_t * );
         void (      *Punish)( kalman_t * );
 #endif
 //#ifdef MATVEC_LIB

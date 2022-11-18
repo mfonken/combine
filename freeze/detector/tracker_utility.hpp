@@ -15,7 +15,7 @@
 #include <algorithm>
 
 #ifndef MAX_TRACKERS
-#define MAX_TRACKERS 2
+#define MAX_TRACKERS 4
 #endif
 
 #define TRACKER_PROCESS_NOISE   5

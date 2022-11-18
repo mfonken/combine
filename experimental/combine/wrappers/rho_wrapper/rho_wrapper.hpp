@@ -15,23 +15,26 @@
 #include "image_types.h"
 #include "image_cpp_types.h"
 
-#define DEBUG_RW
+#define DEBUG_RHO_WRAP DEBUG_1
+#define DEBUG_RHO_WRAP_BUFFERS
+#define RHO_TRACK_BLOBS
+#define DO_NOT_TIME_ACQUISITION
 
-#ifdef DEBUG_RW
-#define LOG_RW(L, ...) LOG(L, "<RhoWrapper> " __VA_ARGS__)
+#ifdef DEBUG_RHO_WRAP
+#define LOG_RHO_WRAP(L, ...) LOG(L, "<RhoWrapper> " __VA_ARGS__)
+#define LOG_RHO_WRAP_BARE(L, ...) LOG_BARE(L, __VA_ARGS__)
 #else
-#define LOG_RW(L, ...)
+#define LOG_RHO_WRAP(L, ...)
+#define LOG_RHO_WRAP_BARE(L, ...)
 #endif
 
-#define RHO_BLOB_PADDING_PX (FRAME_WIDTH_BASE >> 4)
-#define RHO_MIN_BLOB_CONFIDENCE 0.3
 
 class RhoWrapper
 {
     cimage_t cimage;
     
 public:
-    byte_t blob_padding = RHO_BLOB_PADDING_PX;
+//    byte_t blob_padding = RHO_BLOB_PADDING_PX;
     int                 width;
     int                 height;
 //    rho_core_t          core;
@@ -41,18 +44,17 @@ public:
     
     rho_capture_t capture;
     rho_packet_t packet;
-    blob_t blobs[MAX_BLOBS];
-    byte_t active_blobs = 0;
-    int active_blob_density = 0;
-    double active_blob_confidence = 0.0;
     
+    ~RhoWrapper();
     void Init( int, int );
     double Perform( cv::Mat& );
     double Perform( cimage_t& );
     void Reset();
+    void ResetThresh();
     void DecoupleFull( const cimage_t );
     void DecoupleBlobs( const cimage_t );
-    int Decouple( const cimage_t, bool, blob_t * blobs, byte_t n );
+    int Decouple( rho_core_t *, const cimage_t, bool );
+    void PopulateDensityMapOffsets( density_map_pair_t * d, rho_capture_t * c, int n );
     std::vector<cv::Point2f> GetPredictions();
     void ToggleBackgrounding( bool );
     void PrintSizes( void );

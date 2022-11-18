@@ -12,24 +12,78 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define DEBUG_RHO_WRAPPER
+static void PRINT_IMAGE(const cimage_t * image)
+{
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Image:\n");
+    for( int y = 0; y < image->height; y++ )
+    {
+        LOG_RHO_WRAP(DEBUG_RHO_WRAP, "%p - %d: ", &image->pixels[y*image->width], y);
+        for( int x = 0; x < image->width; x++ )
+        {
+            LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "%d ", image->pixels[y*image->width + x] ? 1 : 0);
+        }
+        LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "\n");
+    }
+}
 
-//#define RHO_TRACK_BLOBS
+static void PRINT_THRESH(const cimage_t * image)
+{
+    // Print thresh buffer
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Thresh buffer:");
+    for( index_t * p = RhoSystem.Variables.Buffers.Thresh; p < RhoSystem.Variables.Addresses.ThreshFill; p++)
+    {
+        index_t v = *p;
+        if( v >= image->width)
+        {
+            int8_t b = -2;
+            while( v >= image->width )
+            {
+                v -= image->width;
+                b++;
+            }
+            LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "\n%d[%d]: ", v, b);
+        }
+        else
+            LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "%d ", v);
+    }
+    LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "\n");
+}
 
-#define DO_NOT_TIME_ACQUISITION
+static void PRINT_DENSITY_MAPS( rho_core_t * core, rho_capture_t * capture )
+{
+    // Print density maps
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "X: ");
+    for( int i = 0; i < core->density_map_pair.x.length; i++)
+    {
+        LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "%d ", core->density_map_pair.x.map[i]);
+        for( int ii = 0; ii < MAX_BLOBS; ii++)
+            if(i == capture->thresh_blob_loc[ii].y)
+                LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "|%d| ", ii);
+    }
+    LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "\n");
+
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Y: ");
+    for( int i = 0; i < core->density_map_pair.y.length; i++)
+    {
+        LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "%d ", core->density_map_pair.y.map[i]);
+        for( int ii = 0; ii < MAX_BLOBS; ii++)
+            if(i == capture->thresh_blob_loc[ii].x)
+                LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "|%d| ", ii);
+    }
+    LOG_RHO_WRAP_BARE(DEBUG_RHO_WRAP, "\n");
+}
 
 void RhoWrapper::Init( int width, int height )
 {
     this->width = width;
     this->height = height;
     
-    LOG_RW(RHO_DEBUG, "Initializing Rho Utility: %dx%d & [KTarg-%f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Initializing Rho Utility: %dx%d & [KTarg-%f, VarNorm-%.3f, VarSca-%.3f]\n", width, height, RHO_K_TARGET, RHO_VARIANCE_NORMAL, RHO_VARIANCE_SCALE);
     
 //    pthread_mutex_init(&density_map_pair_mutex, NULL);
 //    pthread_mutex_init(&c_mutex, NULL);
 
     cimageInit( cimage, width, height );
-    
     
     RhoCore.Initialize(&RhoSystem.Variables.Utility, width, height);
     RhoSystem.Variables.Utility.subsample = 1; /// TODO: Find a place for this
@@ -42,10 +96,34 @@ void RhoWrapper::Init( int width, int height )
     
     backgrounding_event = false;
     
+    capture.blobs = RhoSystem.Variables.Utility.prediction_pair.blobs;
+    capture.num_blobs = &RhoSystem.Variables.Utility.prediction_pair.num_blobs;
+    
     PrintSizes();
 }
 
-double RhoWrapper::Perform( cv::Mat & mat )
+RhoWrapper::~RhoWrapper()
+{
+    cimageDeinit(cimage);
+}
+
+void RhoWrapper::Reset()
+{
+    RhoCapture.ResetAll( &capture );
+    
+    RhoUtility.Reset.DensityMapPairKalmans( &RhoSystem.Variables.Utility );
+    ResetThresh();
+}
+
+void RhoWrapper::ResetThresh()
+{
+    RhoSystem.Variables.Addresses.ThreshFill = RhoSystem.Variables.Buffers.Thresh;
+    
+    memset( RhoSystem.Variables.Utility.density_map_pair.x.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.x.length);
+    memset( RhoSystem.Variables.Utility.density_map_pair.y.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.y.length);
+}
+
+double RhoWrapper::Perform( cv::Mat &mat )
 {    
     if(!cimageFromMat( mat, cimage ))
         return -1;
@@ -54,83 +132,20 @@ double RhoWrapper::Perform( cv::Mat & mat )
 
 double RhoWrapper::Perform( cimage_t & img )
 {
-//    pthread_mutex_lock(&c_mutex);
-//    pthread_mutex_lock(&density_map_pair_mutex);
+    //    pthread_mutex_lock(&c_mutex);
+    //    pthread_mutex_lock(&density_map_pair_mutex);
+    Reset();
     
     rho_core_t * core = &RhoSystem.Variables.Utility;
     
-    RhoUtility.Reset.DensityMapPairKalmans( core );
-    
-    // Create blobs if available
-    active_blobs = 0;
-    active_blob_density = 0;
-    active_blob_confidence = 0.0;
-    if( core->prediction_pair.num_regions >= 2)
-    {
-        for( byte_t i = 0; i < core->prediction_pair.num_blobs; i++ )
-        {
-            index_pair_t * bo = &core->prediction_pair.blobs_order[i];
-            tracker_t * fx = &core->prediction_pair.x.trackers[bo->x];
-            tracker_t * fy = &core->prediction_pair.y.trackers[bo->y];
-            byte_t tox = core->prediction_pair.x.trackers_order[bo->x];
-            byte_t toy = core->prediction_pair.y.trackers_order[bo->y];
-            order_t * rox = &core->prediction_pair.x.regions_order[tox];
-            order_t * roy = &core->prediction_pair.y.regions_order[toy];
-            if(!fx->valid || !fy->valid || !rox->valid || !roy->valid )
-            {
-                active_blobs = 0;
-                break;
-            }
-
-            region_t * rx = &core->prediction_pair.x.regions[rox->index];
-            region_t * ry = &core->prediction_pair.y.regions[roy->index];
-
-            kalman_t * kx = &fx->kalman;
-            kalman_t * ky = &fy->kalman;
-            
-            floating_t testA = Kalman.TestPosition( kx, kx->x.v, false );
-            floating_t testB = Kalman.TestPosition( ky, ky->x.v, false );
-            blobs[i].y = MAX( 0, testA - rx->width / 2 - blob_padding );
-            blobs[i].x = MAX( 0, testB - ry->width / 2 - blob_padding );
-            blobs[i].h = rx->width + 2 * blob_padding;
-            blobs[i].w = ry->width + 2 * blob_padding;
-
-            active_blobs++;
-            active_blob_density += ( rx->density + ry->density ) / 2 * 0.9;
-            active_blob_confidence = ( kx->K[0] + ky->K[0] ) / 2;
-            printf("CONFIDENCE: %.2f\n", active_blob_confidence);
-
-//            printf("[%d (%d, %d) %dx%d]\n", i, blobs[i].x, blobs[i].y, blobs[i].w, blobs[i].h);
-        }
-    }
-    
     /* Core Rho Functions */
     floating_t a = TIMESTAMP_MS();
-    
-    int density = Decouple( img, backgrounding_event, blobs, active_blobs );
-    index_pair_t prev = { 0, 0 };
-    for( int i = 0; i < active_blobs && MAX_BLOBS; i++ )
     {
-        int active = capture.num_blobs >= 2;
-        core->density_map_pair.x.offset[i] = active * capture.blobs[i].x;
-        core->density_map_pair.y.offset[i] = active * capture.blobs[i].y;
-        core->density_map_pair.x.buffer_loc[i] = active * capture.thresh_blob_loc[i].x;
-        core->density_map_pair.y.buffer_loc[i] = active * capture.thresh_blob_loc[i].y;
-        
-        core->density_map_pair.x.offset[i] += core->density_map_pair.x.buffer_loc[i] - prev.x;
-        core->density_map_pair.y.offset[i] += core->density_map_pair.y.buffer_loc[i] - prev.y;
-        
-        prev.x = core->density_map_pair.x.buffer_loc[i];
-        prev.y = core->density_map_pair.y.buffer_loc[i];
+        int density = Decouple( core, img, backgrounding_event );
+        if(density)
+            RhoCore.Perform( core, backgrounding_event );
     }
-#ifdef DO_NOT_TIME_ACQUISITION
-    a = TIMESTAMP_MS();
-#endif
-    
-    if(density)
-        RhoCore.Perform( core, backgrounding_event );
     floating_t b = TIMESTAMP_MS();
-
     /* * * * * * * * * * */
     
 //    pthread_mutex_unlock(&density_map_pair_mutex);
@@ -139,14 +154,6 @@ double RhoWrapper::Perform( cimage_t & img )
 //    pthread_mutex_unlock(&c_mutex);
     
     return b - a;
-}
-
-void RhoWrapper::Reset()
-{
-    RhoSystem.Variables.Addresses.ThreshFill = RhoSystem.Variables.Buffers.Thresh;
-    
-    memset( RhoSystem.Variables.Utility.density_map_pair.x.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.x.length);
-    memset( RhoSystem.Variables.Utility.density_map_pair.y.map, 0, sizeof(sdensity_t) * RhoSystem.Variables.Utility.density_map_pair.y.length);
 }
 
 void RhoWrapper::DecoupleFull( const cimage_t image )
@@ -176,11 +183,9 @@ void RhoWrapper::DecoupleFull( const cimage_t image )
 void RhoWrapper::DecoupleBlobs( const cimage_t image )
 {
     RhoSystem.Variables.Addresses.Capture = (byte_t *)image.pixels;
-    
     index_t y = capture.curr_edge->i;
     byte_t * capture_address = RhoSystem.Variables.Addresses.Capture + y * image.width;
     index_t * new_thresh = NULL;
-//    *RhoSystem.Variables.Addresses.ThreshFill++;
     for( ; y < image.height; y += RhoSystem.Variables.Utility.subsample )
     {
         new_thresh = RhoCapture.CaptureBlobs(
@@ -192,147 +197,148 @@ void RhoWrapper::DecoupleBlobs( const cimage_t image )
                                             image.width,
                                             RhoSystem.Variables.Utility.subsample);
         
-        capture_address += image.width;
+        
         if( new_thresh != RhoSystem.Variables.Addresses.ThreshFill )
         {
-            *(RhoSystem.Variables.Addresses.ThreshFill) += CAPTURE_ROW_END + y;
+            *(RhoSystem.Variables.Addresses.ThreshFill) += CAPTURE_ROW_END;
             RhoSystem.Variables.Addresses.ThreshFill = new_thresh;
         }
+        capture_address += image.width;
         if( capture.done )
             break;
         else if( capture.num_active == 0 )
         {
             y = capture.curr_edge->i;
-//            printf("c - %p + %d = ", RhoSystem.Variables.Addresses.Capture, y * image.width);
             capture_address = RhoSystem.Variables.Addresses.Capture + y * image.width;
-//            printf("%p\n", capture_address);
+            y--;
         }
 //        RhoSystem.Variables.Flags->EvenRowToggle = !RhoSystem.Variables.Flags->EvenRowToggle;
     }
     *(RhoSystem.Variables.Addresses.ThreshFill++) = CAPTURE_ROW_END;
 }
 
-int RhoWrapper::Decouple( const cimage_t image, bool backgrounding, blob_t * blobs, byte_t n )
+int RhoWrapper::Decouple( rho_core_t * core, const cimage_t image, bool backgrounding )
 {
-    Reset();
 //    if(backgrounding) ToggleBackgrounding(true);
-    
-    RhoCapture.ResetAll( &capture );
-    
+    byte_t n = *capture.num_blobs;
+    density_t min_density = core->filtered_coverage * RHO_MIN_BLOB_DENSITY_CONTINUITY;
+#ifdef RHO_TRACK_BLOBS
     // Prepare blobs
     if( n >= 2)
     {
-        blobs[1].w++;
-        for( byte_t i = 0; i < n; i++ )
-            RhoCapture.AddBlob( &capture, blobs[i] );
         RhoCapture.PrepareBlobsForCapture( &capture );
     }
-    /// TODO: Change CaptureRow over to blobs when appropriate (has blobs + confidence)
-    
-#ifdef DEBUG_RHO_WRAPPER
-    // Print pixels
-    for( int y = 0; y < image.height; y++ )
-    {
-        printf("%p - %d: ", &image.pixels[y*image.width], y);
-        for( int x = 0; x < image.height; x++ )
-            printf("%d ", image.pixels[y*image.width + x]);
-        printf("\n");
-    }
 #endif
+    
+#ifdef DEBUG_RHO_WRAP_BUFFERS
+//    PRINT_IMAGE( &image );
+#endif
+    
+    bool decouple_full = true;
 #ifdef RHO_TRACK_BLOBS
-    printf("%d blobs\n", n);
-    if( n >= 2 && active_blob_confidence >= RHO_MIN_BLOB_CONFIDENCE )
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "%d blobs\n", *capture.num_blobs);
+    if( n >= 2 )
     {
+        if(n > 2)
+            printf("#");
         double start = TIMESTAMP(TIME_US);
         DecoupleBlobs( image );
-        printf("Decouple>Blobs: %.3fms\n", (TIMESTAMP(TIME_US) - start) / 1.0e3);
+        LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Decouple>Blobs: %.3fms\n", (TIMESTAMP(TIME_US) - start) / 1.0e3);
+        
+        if( RhoSystem.Variables.Addresses.ThreshFill <= RhoSystem.Variables.Buffers.Thresh + min_density )
+            ResetThresh();
+        else
+            decouple_full = false;
     }
 #endif
-    printf("Thresh fill %ld?\n", RhoSystem.Variables.Addresses.ThreshFill - (RhoSystem.Variables.Buffers.Thresh + active_blob_density));
-    if( RhoSystem.Variables.Addresses.ThreshFill <= RhoSystem.Variables.Buffers.Thresh + active_blob_density )
+    if(decouple_full)
     {
         double start = TIMESTAMP(TIME_US);
         DecoupleFull( image );
-        printf("Decouple>Full: %.3fms\n", (TIMESTAMP(TIME_US) - start) / 1.0e3);
-        capture.num_blobs = 0;
+        *capture.num_blobs = 0;
+        LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Decouple>Full: %.3fms\n", (TIMESTAMP(TIME_US) - start) / 1.0e3);
     }
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Thresh fill %ld | %d\n", RhoSystem.Variables.Addresses.ThreshFill - RhoSystem.Variables.Buffers.Thresh, min_density);
     RhoSystem.Variables.Addresses.CaptureEnd = RhoSystem.Variables.Addresses.CaptureMax; // Full frame has been processed
     RhoSystem.Variables.Addresses.ThreshEnd = RhoSystem.Variables.Addresses.ThreshFill;
     
-#ifdef DEBUG_RHO_WRAPPER
-    // Print thresh buffer
-    printf("Thresh buffer:");
-    index_t row = 0;
-    for( index_t * p = RhoSystem.Variables.Buffers.Thresh; p < RhoSystem.Variables.Addresses.ThreshFill; p++)
-    {
-        index_t v = *p;
-        if( v >= CAPTURE_ROW_END)
-        {
-            int8_t b = -1;
-            while( v >= CAPTURE_ROW_END )
-            {
-                v -= CAPTURE_ROW_END;
-                b++;
-            }
-            if(v == 0)
-                v = row;
-            else
-                row = v;
-            printf("\n%d[%d]: ", v, b);
-        }
-        else
-            printf("%d ", v);
-    }
-    printf("\n");
+#ifdef DEBUG_RHO_WRAP_BUFFERS
+//    PRINT_THRESH( &image );
 #endif
     
     section_process_t ProcessedSectionData[2];
-    uint16_t end_row = RhoSystem.Variables.Utility.centroid.y;
-//    printf("%p | %p\n", RhoSystem.Variables.Utility.density_map_pair.x.map, RhoSystem.Variables.Utility.density_map_pair.y.map);
+    uint16_t end_row = core->centroid.y;
+//    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "%p | %p\n", core->density_map_pair.x.map, core->density_map_pair.y.map);
     index_t thresh_proc = 0, rows_proc = 0;
-   for( byte_t i = 0; i < 2; i++ )
-   {
+    LOG_RHO_WRAP(DEBUG_RHO_WRAP, "Centroid: x%d y%d\n", core->centroid.x, end_row);
+    for( byte_t i = 0; i < 2; i++ )
+    {
         do { ProcessedSectionData[i] = RhoCapture.ProcessFrameSection( end_row,
                                                                       RhoSystem.Variables.Buffers.Thresh + thresh_proc,
                                                                       RhoSystem.Variables.Addresses.ThreshEnd,
-                                                                      RhoSystem.Variables.Utility.centroid.x,
-                                                                      RhoSystem.Variables.Utility.density_map_pair.y.map,
-                                                                      RhoSystem.Variables.Utility.density_map_pair.x.map,
+                                                                      core->centroid.x,
+                                                                      core->density_map_pair.y.map,
+                                                                      core->density_map_pair.x.map,
                                                                       rows_proc,
                                                                       n < 2 ? NULL : &capture );
         } while( !ProcessedSectionData[i].complete &&
                 RhoSystem.Variables.Addresses.CaptureEnd < RhoSystem.Variables.Addresses.CaptureMax );
-        end_row = RhoSystem.Variables.Utility.height;
-        thresh_proc += ProcessedSectionData[i].thresh_proc;
+        end_row = core->height;
+        thresh_proc += ProcessedSectionData[i].thresh_proc - 1;
         rows_proc = ProcessedSectionData[i].rows_proc;
     }
     
-#ifdef DEBUG_RHO_WRAPPER
-    // Print density maps
-    printf("X: ");
-    for( int i = 0; i < RhoSystem.Variables.Utility.density_map_pair.x.length; i++)
-    {
-        printf("%d ", RhoSystem.Variables.Utility.density_map_pair.x.map[i]);
-    }
-    printf("\n");
-
-    printf("Y: ");
-    for( int i = 0; i < RhoSystem.Variables.Utility.density_map_pair.y.length; i++)
-    {
-        printf("%d ", RhoSystem.Variables.Utility.density_map_pair.y.map[i]);
-    }
-    printf("\n");
+#ifdef DEBUG_RHO_WRAP_BUFFERS
+    PRINT_DENSITY_MAPS( core, &capture );
 #endif
-    
-//    printf("%p | %p\n", RhoSystem.Variables.Utility.density_map_pair.x.map, RhoSystem.Variables.Utility.density_map_pair.y.map);
     
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_LEFT_INDEX]  = ProcessedSectionData[0].left;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_TOP_RIGHT_INDEX] = ProcessedSectionData[0].right;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_LEFT_INDEX]  = ProcessedSectionData[1].left;
     RhoSystem.Variables.Buffers.Quadrant[FRAME_QUADRANT_BTM_RIGHT_INDEX] = ProcessedSectionData[1].right;
     
+    PopulateDensityMapOffsets( &core->density_map_pair, &capture, core->prediction_pair.num_blobs );
+    
 //    if(backgrounding) ToggleBackgrounding(false);
     return ProcessedSectionData[0].left + ProcessedSectionData[0].right + ProcessedSectionData[1].left + ProcessedSectionData[1].right;
+}
+
+void RhoWrapper::PopulateDensityMapOffsets( density_map_pair_t * d, rho_capture_t * c, int n )
+{
+#ifdef RHO_TRACK_BLOBS
+    if(n >= 2)
+    {
+        printf("Offset:\n");
+        index_pair_t loc = { 0, 0 }, prev = { 0, 0 };
+        for( int i = 0; i < n && MAX_BLOBS; i++ )
+        {
+            loc.x = capture.thresh_blob_loc[i].x;
+            loc.y = capture.thresh_blob_loc[i].y;
+            
+            d->y.buffer_loc[i] = loc.x;
+            d->x.buffer_loc[i] = loc.y;
+            
+            uint8_t bi = capture.blobs_order[i];
+            d->y.offset[i] = capture.blobs[bi].x + loc.x - prev.x;
+            d->x.offset[i] = capture.blobs[bi].y + loc.y - prev.y;
+            
+            prev.x = loc.x;
+            prev.y = loc.y;
+            
+            printf("%i - buff:%d|%d offset:%d|%d\n", i, d->y.buffer_loc[i], d->x.buffer_loc[i], d->y.offset[i], d->x.offset[i]);
+        }
+    }
+    else
+#endif
+    {
+        for( int i = 0; i < MAX_BLOBS; i++ )
+        {
+            d->y.offset[i] = 0;
+            d->x.offset[i] = 0;
+            d->y.buffer_loc[i] = 0;
+            d->x.buffer_loc[i] = 0;
+        }
+    }
 }
 
 std::vector<cv::Point2f> RhoWrapper::GetPredictions()

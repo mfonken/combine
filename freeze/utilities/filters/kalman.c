@@ -31,21 +31,23 @@ void Kalman_Reset( kalman_t * k, floatp p )
     Matrix.Eye( (floatp*)k->H, 1, 2 );
 
     k->x.p = p;
+    k->t = (floatp)TIMESTAMP(TIME_SEC);
+    k->t_origin = k->t;
 }
 
-physical_t * Kalman_Test( kalman_t * k, floatp x_new[2], bool update_A )
+void Kalman_Test( kalman_t * k, floatp x_new[2], bool update )
 {
-    if(update_A)
-    {
-        floatp dt =
+    floatp A01_ = k->A[0][1];
+    floatp dt =
 #ifdef SET_DT_SEC
-        SET_DT_SEC;
+    SET_DT_SEC;
 #else
-        ((floatp)TIMESTAMP(TIME_SEC)) - k->t;
+    ((floatp)TIMESTAMP(TIME_SEC)) - k->t;
 #endif
-        k->A[0][1] = dt;
-    }
+//    printf("∆t: %.2fms (%.2f | %.2f)\n ", dt * 1000.0, (floatp)TIMESTAMP(TIME_SEC), k->t);
+    k->A[0][1] = dt;
     
+//    printf("A:%.2f(%.2f)\n", k->x.p, k->x.v);
     // Predict next state:
     // x = A.x_ + B.u_ where u = [a]
     floatp r1[2], r2[2], *x = (floatp*)&k->x.p, *Ap = (floatp*)k->A;
@@ -53,16 +55,23 @@ physical_t * Kalman_Test( kalman_t * k, floatp x_new[2], bool update_A )
     Matrix.Dot( Ap, x, false, r1, 2, 1, 2 );
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "B.a:\n");
     Matrix.Dot( (floatp*)k->B, (floatp*)&k->x.a, false, r2, 2, 1, 1 );
-    Matrix.AddSub( r1, r2, x_new, 1, 2, true );
+    Matrix.AddSub( r1, r2, ( update ? (floatp*)&k->x.p : x_new ), 1, 2, true );
+//    printf("B:%.2f(%.2f)\n", k->x.p, k->x.v);
     
-    return &k->x;
+    if(k->x.p > 1000)
+        printf("!");
+    if(k->x.v > 200)
+        printf("!");
+    
+    if(!update)
+        k->A[0][1] = A01_;
 }
 
-floatp Kalman_TestPosition( kalman_t * k, floatp p_new, bool update_A )
+floatp Kalman_TestSelf( kalman_t * k )
 {
-    floatp x_new[2] = { p_new, 0. };
-    physical_t * x = Kalman.Test( k, x_new, update_A );
-    return x->p;
+    floatp x_curr[2] = { k->x.p, k->x.v };
+    Kalman.Test( k, x_curr, false );
+    return x_curr[0];
 }
 
 void Kalman_Predict( kalman_t * k )
@@ -74,9 +83,6 @@ void Kalman_Predict( kalman_t * k )
 #else
         t_ - k->t;
 #endif
-//    printf("∆t: %2fms\n", dt);
-    k->t = t_;
-    
     floatp dt_sq = dt * dt;
     floatp dt_hfsq = dt_sq / 2;
     
@@ -98,12 +104,14 @@ void Kalman_Predict( kalman_t * k )
     // Update error covariance:
     // P = A.P.AT + Q
     floatp r3[2][2], r4[2][2];
-    floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4, *Ap = (floatp*)k->A;;
+    floatp *r3p = (floatp*)r3, *r4p = (floatp*)r4, *Ap = (floatp*)k->A;
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "A.P:\n");
     Matrix.Dot( Ap, (floatp*)k->P, false, r3p, 2, 2, 2);
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "(A.P).AT:\n");
     Matrix.Dot( r3p, Ap, true, r4p, 2, 2, 2);
     Matrix.AddSub( r4p, (floatp*)k->Q, (floatp*)k->P, 2, 2, true );
+    
+    k->t = t_;
 }
 
 void Kalman_Update( kalman_t * k, floatp z )
@@ -161,6 +169,12 @@ physical_t * Kalman_Step( kalman_t * k, floatp z )
     return &k->x;
 }
 
+floatp Kalman_Confidence( kalman_t * k );
+inline floatp Kalman_Confidence( kalman_t * k )
+{
+    return k->K[0];
+}
+
 void Kalman_Print( kalman_t * k )
 {
     LOG_KALMAN(DEBUG_KALMAN_PRIO, "p: %.4f | v: %.4f | a:%.4f\n", k->x.p, k->x.v, k->x.a);
@@ -182,10 +196,11 @@ const struct kalman_functions Kalman =
     .Init = Kalman_Init,
     .Reset = Kalman_Reset,
     .Test = Kalman_Test,
-    .TestPosition = Kalman_TestPosition,
+    .TestSelf = Kalman_TestSelf,
     .Predict = Kalman_Predict,
     .Update = Kalman_Update,
     .Step = Kalman_Step,
+    .Confidence = Kalman_Confidence,
     .Print = Kalman_Print,
 #ifdef MATVEC_LIB
     .Gaussian1D = GetGaussian1DKalman

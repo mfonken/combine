@@ -38,13 +38,6 @@ typedef struct
 
 typedef struct
 {
-    index_t x, y;
-    index_t w, h;
-//    kalman2d_t k;
-} blob_t;
-
-typedef struct
-{
 density_t
     maximum,
     density;
@@ -72,6 +65,17 @@ typedef struct
     floating_t lifespan;
 } tracker_t;
 
+typedef struct
+{
+    index_t x, y;
+    index_t w, h;
+    floating_t confidence;
+    struct tracker_pair_t
+    {
+        tracker_t * x, *y;
+    } motion;
+} blob_t;
+
 /* Rho Structures* */
 typedef struct
 {
@@ -80,24 +84,13 @@ typedef struct
 //       sdensity_t * bound,
     sdensity_t max[2];
     index_t length;
-//#ifdef __USE_BLOB_TRACKING__
     index_t buffer_loc[MAX_BLOBS];
-    index_t offset[MAX_BLOBS];
-//#endif
-    floating_t
-        centroid;
-    bool
-        has_background;
-    kalman_t
-        kalmans[2];
-    const char *
-        name;
+    int16_t offset[MAX_BLOBS];
+    floating_t centroid;
+    bool has_background;
+    kalman_t peak[2];
+    const char * name;
 } density_map_t;
-
-typedef struct
-{
-    density_map_t x,y;
-} density_map_pair_t;
 
 typedef struct
 {
@@ -129,7 +122,6 @@ typedef struct
 {
     const char *    name;
     tracker_t       trackers[MAX_TRACKERS];
-    uint8_t         trackers_order[MAX_TRACKERS];
     region_t        regions[MAX_REGIONS];
     order_t         regions_order[MAX_REGIONS];
     uint8_t         num_regions;
@@ -150,13 +142,13 @@ typedef struct
     prediction_t    x,y;
     prediction_probabilities probabilities;
 
-    floating_t   nu_regions;
-    floating_t   num_regions;
-    floating_t   average_density;
-//  floating_t   BestConfidence,
-    bool         descending;
-    index_pair_t blobs_order[MAX_REGIONS];
-    byte_t       num_blobs;
+    floating_t  nu_regions;
+    floating_t  num_regions;
+    floating_t  average_density;
+//  floating_t  BestConfidence,
+    bool        descending;
+    blob_t      blobs[MAX_REGIONS];
+    byte_t      num_blobs;
 } prediction_pair_t;
 
 typedef struct
@@ -233,10 +225,10 @@ typedef struct
     index_t region_boundary_index;
 #endif
     int16_t x;
-    index_t x_;
+    int16_t x_;
 //#ifdef __USE_BLOB_TRACKING__ /// TODO: This ifdef isn't working
     index_t buffer_loc;
-    index_t offset;
+    int16_t offset;
 //#endif
     index_t start;
     index_t end;
@@ -291,7 +283,7 @@ typedef struct
 {
     uint8_t thresh;
     uint16_t density;
-    uint8_t tracking_id;
+//    uint8_t tracking_id;
 } detection_element_t;
 
 typedef struct
@@ -304,7 +296,13 @@ typedef detection_ring_buffer_t detection_map_t;
 
 typedef struct
 {
+    density_map_t x, y;
+} density_map_pair_t;
+
+typedef struct
+{
     density_map_pair_t density_map_pair;
+//    density_map_pair_t density_map_pair;
     index_t width;
 	index_t height;
     byte_t subsample;
